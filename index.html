@@ -918,8 +918,8 @@ function loginScreen(msg) {
     <div class="f"><label for="lp">Kata sandi</label><input id="lp" type="password" autocomplete="current-password"></div>
     <div class="err" id="lerr" ${msg ? '' : 'hidden'}>${esc(msg || '')}</div>
     <button class="btn pri block" type="submit" id="lbtn">${ic('key')}Masuk</button>
-    <div class="or">atau</div>
-    <button class="btn gbtn block" type="button" id="gbtn">${G_ICON}Masuk dengan Google</button>
+    <div class="or" id="gor" hidden>atau</div>
+    <button class="btn gbtn block" type="button" id="gbtn" hidden>${G_ICON}Masuk dengan Google</button>
     <p class="meta" style="margin:0">Pertama kali masuk? Pakai email Anda yang tercatat di data Aparat dan kata sandi awal <b class="mono">123456</b>. Setelah itu Anda diminta membuat kata sandi baru dan merekam wajah.</p></form>`);
   const f = $('#lf'), er = $('#lerr'), b = $('#lbtn');
   (store.get('last_email') ? $('#lp') : $('#le')).focus();
@@ -935,6 +935,10 @@ function loginScreen(msg) {
       boot();
     } catch (x) { er.textContent = x.message; er.hidden = false; b.disabled = false; b.innerHTML = ic('key') + 'Masuk'; $('#lp').select(); }
   };
+  /* tombol Google hanya tampil jika login Google sudah diaktifkan di Supabase */
+  fetch(SB_URL + '/auth/v1/settings', { headers: { apikey: SB_KEY } }).then(r => r.json()).then(x => {
+    if (x && x.external && x.external.google && $('#gbtn')) { $('#gbtn').hidden = false; $('#gor').hidden = false; }
+  }).catch(() => { });
   $('#gbtn').onclick = () => {
     location.href = SB_URL + '/auth/v1/authorize?provider=google&redirect_to=' + encodeURIComponent(location.origin + location.pathname);
   };
@@ -1959,4 +1963,3 @@ boot();
 </script>
 </body>
 </html>
-
