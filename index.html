@@ -270,6 +270,15 @@ table.tbl{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeri
   #printArea .paper{box-shadow:none;width:auto;margin:0}
   #printArea .paper+.paper{page-break-before:always}
 }
+.facebox{display:flex;flex-direction:column;gap:10px}
+.facecam{position:relative;width:min(260px,70vw);aspect-ratio:3/4;margin:0 auto;border-radius:50%;overflow:hidden;background:#111}
+.facecam video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.fring{position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 4px rgba(255,255,255,.35);pointer-events:none;transition:box-shadow .3s}
+.facebox.done .fring,#fscan.done .fring{box-shadow:inset 0 0 0 5px var(--ok)}
+.fbar{height:6px;border-radius:6px;background:var(--surface2);overflow:hidden;width:min(260px,70vw);margin:0 auto}
+.fbar i{display:block;height:100%;width:0;background:var(--pri);transition:width .3s}
+.fmsg{text-align:center;font-weight:600;min-height:22px;display:flex;gap:6px;justify-content:center;align-items:center;flex-wrap:wrap}
+#fscan.done .fmsg{color:var(--ok)}
 </style>
 </head>
 <body>
@@ -285,12 +294,13 @@ window.addEventListener('unhandledrejection', function (e) { var d = document.cr
 (function () {
 /* =====================================================================
    PANDANWANGI PEMDES — Frontend
-   Mode: "gas" (dibuka dari Apps Script), "http" (dibuka dari hosting lain
-   dengan API_URL), atau "demo" (data contoh di memori, tidak tersimpan).
+   Data: Supabase (fungsi "api"). Berkas PDF/foto: Google Drive lewat
+   Apps Script (FILE_URL). Tanpa alamat server -> mode contoh (demo).
    ===================================================================== */
-const API_URL = 'https://script.google.com/macros/s/AKfycbxShhsuYUC5jwQv0WGfxUarlhAnKvldxT8fbFmCHsSjnPg-PBDopSpX6WA1uSHAELe_/exec';
-const MODE = (window.google && google.script && google.script.run) ? 'gas'
-  : (API_URL.indexOf('https:') === 0 ? 'http' : 'demo');
+const SB_URL = 'https://niaqgsqfsztcsgdyzavt.supabase.co';
+const SB_KEY = 'sb_publishable_FrjuzHg6pJFQhJRIqBoXIw_5sL7E5sH';
+const FILE_URL = 'https://script.google.com/macros/s/AKfycbxShhsuYUC5jwQv0WGfxUarlhAnKvldxT8fbFmCHsSjnPg-PBDopSpX6WA1uSHAELe_/exec';
+const MODE = SB_URL.indexOf('https:') === 0 ? 'http' : 'demo';
 
 /* ---------------- utilitas ---------------- */
 const $ = (s, el = document) => el.querySelector(s);
@@ -368,6 +378,7 @@ const IC = {
   cam: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
   pin: '<path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/>',
   check: '<path d="M5 12l5 5 9-10"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
   x: '<path d="M6 6l12 12M18 6L6 18"/>',
   edit: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/>',
   trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
@@ -640,17 +651,18 @@ const S = { token: store.get('token'), user: null, perms: [], set: {}, stack: []
 function call(action, p) {
   const req = Object.assign({ action, token: S.token }, p || {});
   let pr;
-  if (MODE === 'gas') {
-    pr = new Promise((res, rej) => google.script.run.withSuccessHandler(res).withFailureHandler(e => rej(new Error((e && e.message) || 'Gagal terhubung ke server.'))).api(req));
-  } else if (MODE === 'http') {
-    pr = fetch(API_URL, { method: 'POST', body: JSON.stringify(req), headers: { 'Content-Type': 'text/plain;charset=utf-8' } })
+  if (MODE === 'http') {
+    const berkas = action === 'upload' || action === 'fileData';
+    const h = berkas ? { 'Content-Type': 'text/plain;charset=utf-8' } : { 'Content-Type': 'application/json', apikey: SB_KEY };
+    if (!berkas && /^eyJ/.test(SB_KEY)) h.Authorization = 'Bearer ' + SB_KEY;
+    pr = fetch(berkas ? FILE_URL : SB_URL + '/rest/v1/rpc/api', { method: 'POST', headers: h, body: JSON.stringify(berkas ? req : { req }) })
       .then(r => r.json()).catch(() => { throw new Error('Tidak ada koneksi ke server. Periksa internet Anda.'); });
   } else {
     pr = new Promise(res => setTimeout(() => res(Mock.handle(JSON.parse(JSON.stringify(req)))), 120));
   }
   return pr.then(r => {
     if (r && r.ok) return r.data;
-    const e = new Error((r && r.error) || 'Terjadi kesalahan.');
+    const e = new Error((r && (r.error || r.message)) || 'Terjadi kesalahan.');
     e.code = r && r.code;
     if (e.code === 'AUTH' && action !== 'login') { logoutLocal(); toast(e.message, 1); }
     throw e;
@@ -766,10 +778,35 @@ const ACT = {
 /* =====================================================================
    BERKAS
    ===================================================================== */
+const THUMB = {}, thumbTried = new Set();
 function thumb(id, sz) {
   if (!id || id === '•') return '';
   if (MODE === 'demo') { const f = Mock.files[id]; return f && /^image/.test(f.mime) ? `data:${f.mime};base64,${f.data}` : ''; }
+  if (THUMB[id]) return THUMB[id];
   return `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w${sz || 400}`;
+}
+/* Ganti gambar Drive (lambat) dengan gambar kecil tersimpan di Supabase (cepat). */
+let thumbTm = null;
+async function hydrateThumbs() {
+  if (MODE !== 'http' || !S.token) return;
+  const imgs = $$('img[src*="drive.google.com/thumbnail"]');
+  if (!imgs.length) return;
+  const idOf = i => { try { return new URL(i.src).searchParams.get('id'); } catch (e) { return null; } };
+  const ids = Array.from(new Set(imgs.map(idOf))).filter(x => x && !THUMB[x] && !thumbTried.has(x));
+  if (ids.length) {
+    ids.forEach(x => thumbTried.add(x));
+    try { Object.assign(THUMB, await call('thumbGet', { ids })); } catch (e) { }
+  }
+  imgs.forEach(i => { const t = THUMB[idOf(i)]; if (t && i.isConnected) i.src = t; });
+}
+new MutationObserver(() => { clearTimeout(thumbTm); thumbTm = setTimeout(hydrateThumbs, 40); }).observe(document.body, { childList: true, subtree: true });
+async function makeThumb(file) {
+  const img = await loadImg(file);
+  const s = Math.min(1, 240 / Math.max(img.width, img.height));
+  const c = document.createElement('canvas');
+  c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', .7);
 }
 function driveUrl(id) { return `https://drive.google.com/file/d/${encodeURIComponent(id)}/view`; }
 async function viewFile(id, priv, name) {
@@ -817,7 +854,12 @@ async function uploadFile(file, folder) {
   if (mime.indexOf('image') === 0 && !/gif|svg/.test(mime)) { data = await shrink(file, 2000); mime = 'image/jpeg'; name = name.replace(/\.\w+$/, '') + '.jpg'; }
   else data = await readB64(file);
   if (MODE === 'demo') { const id = 'demo_' + Math.random().toString(36).slice(2, 10); Mock.files[id] = { mime, data, name }; return { id }; }
-  return call('upload', { folder, name, mime, data });
+  const r = await call('upload', { folder, name, mime, data });
+  /* gambar kecil disimpan di Supabase, kecuali dokumen kependudukan (privat) */
+  if (mime.indexOf('image') === 0 && String(folder || '').split('/')[0] !== 'Penduduk') {
+    try { const t = await makeThumb(file); THUMB[r.id] = t; await call('thumbSave', { id: r.id, data: t }); } catch (e) { }
+  }
+  return r;
 }
 
 /* =====================================================================
@@ -946,6 +988,7 @@ VIEWS.presensi = async (p, main, alive) => {
   setTop('Presensi', fDay(isoToday()));
   const d = await call('presensiToday');
   if (!alive()) return;
+  S.faceOn = !!d.wajah;
   const rec = d.records || [];
   const has = j => rec.some(x => x.jenis === j);
   const done = has('Izin') || has('Sakit');
@@ -959,6 +1002,7 @@ VIEWS.presensi = async (p, main, alive) => {
   main.innerHTML = `<div class="stack">
     <section class="hero"><div class="clock num" id="clk"></div><div class="hi">${esc(presSummary(d).text)}</div></section>
     ${d.libur ? `<div class="card"><b>Hari ini libur (${esc(d.libur)}).</b><div class="muted">Presensi tidak diperlukan.</div></div>` : ''}
+    ${!d.wajah && !d.libur ? `<div class="card"><b>${ic('user')} Wajah Anda belum terdaftar.</b><div class="muted">Saat presensi masuk pertama, aplikasi akan meminta Anda mendaftarkan wajah (sekali saja). Foto tidak disimpan.</div></div>` : ''}
     <div class="jgrid">${J.map(j => `<button class="jbtn ${j[1]}" data-act="absen" data-j="${j[0]}" ${dis[j[0]] ? 'disabled' : ''}><span class="ti">${ic(j[2])}</span>${j[0]}<small>${esc(j[3])}</small></button>`).join('')}</div>
     <div class="sec-h"><h2>Catatan hari ini</h2></div>
     <div class="card">${rec.length ? `<div class="timeline">${rec.map(r => `<div class="tl">${r.foto_id ? `<img src="${esc(thumb(r.foto_id, 200))}" alt="">` : `<span class="av">${ic('clock')}</span>`}<div style="flex:1"><b class="num">${esc(String(r.jam).slice(0, 5))}</b> · ${esc(r.jenis)}<div class="meta">${esc(r.keterangan || '')}${r.jarak_m !== '' && r.jarak_m != null ? ' · ' + esc(r.jarak_m) + ' m dari kantor' : ''}</div></div>${stPill(r.status)}</div>`).join('')}</div>` : '<div class="muted">Belum ada presensi.</div>'}</div>
@@ -969,17 +1013,24 @@ VIEWS.presensi = async (p, main, alive) => {
 };
 function absenForm(jenis) {
   const st = S.set;
-  const needFoto = /Masuk|Pulang|Dinas Luar/.test(jenis);
+  const needFace = /Masuk|Pulang|Dinas Luar/.test(jenis);
   const needKet = !/Masuk|Pulang/.test(jenis);
+  const enroll = needFace && !S.faceOn && MODE !== 'demo';
+  let pos = null, face = null, fotoFile = null, sent = false;
   const m = modal('Presensi ' + jenis, `<div class="stack">
     <div class="gps" id="gps">${ic('pin')}<span>Mencari lokasi Anda…</span></div>
-    ${needFoto ? `<div class="f"><label>Foto ${jenis === 'Dinas Luar' ? 'di lokasi tugas' : 'swafoto di kantor'} <i>*</i></label><label class="btn" for="fotoIn">${ic('cam')}Ambil foto</label><input type="file" id="fotoIn" accept="${IMG_ANY}" capture="user" hidden><img id="fotoPrev" class="shot" alt="" hidden></div>` : ''}
+    ${needFace ? `<div class="facebox" id="fbox">
+      ${enroll ? `<div id="fcons" class="stack"><div class="card" style="box-shadow:none;background:var(--surface2)"><b>Daftarkan wajah (sekali saja)</b><p class="muted" style="margin:6px 0 0">Aplikasi menyimpan <b>pola wajah berupa 128 angka</b>, bukan foto, untuk mencocokkan presensi Anda berikutnya. Foto tidak disimpan di mana pun. Admin dapat menghapus pola wajah Anda kapan saja.</p></div>
+        <label class="switch"><input type="checkbox" id="fsetuju">Saya setuju pola wajah saya disimpan untuk presensi</label>
+        <button class="btn pri" id="fmulai" disabled>${ic('user')}Mulai daftar wajah</button></div>` : ''}
+      <div id="fscan" ${enroll ? 'hidden' : ''}><div class="facecam"><video playsinline muted></video><div class="fring"></div></div><div class="fbar"><i></i></div><div class="fmsg" aria-live="polite">Menyiapkan kamera…</div></div>
+    </div>` : ''}
     <div class="f"><label for="ket">${jenis === 'Dinas Luar' ? 'Tujuan / acara' : jenis === 'Pulang' ? 'Alasan (wajib jika pulang awal)' : 'Keterangan'} ${needKet ? '<i>*</i>' : ''}</label><textarea id="ket" rows="2"></textarea></div>
-    ${!needFoto ? `<div class="f"><label>Lampiran (surat izin/dokter), opsional</label><input type="file" id="fotoIn" accept="${IMG_ANY}"><img id="fotoPrev" class="shot" alt="" hidden></div>` : ''}
+    ${!needFace ? `<div class="f"><label>Lampiran (surat izin/dokter), opsional</label><input type="file" id="fotoIn" accept="${IMG_ANY}"><img id="fotoPrev" class="shot" alt="" hidden></div>` : ''}
     <div id="aerr" class="err" hidden></div>
-    <button class="btn pri" id="kirim">${ic('check')}Kirim presensi ${esc(jenis.toLowerCase())}</button></div>`);
-  let pos = null, fotoFile = null;
-  const gps = $('#gps', m.el);
+    <button class="btn pri" id="kirim" ${needFace ? 'disabled' : ''}>${ic('check')}Kirim presensi ${esc(jenis.toLowerCase())}</button></div>`, { onClose: () => { const f = $('#fscan', m.el); if (f && f._stop) f._stop(); } });
+  const gps = $('#gps', m.el), er = $('#aerr', m.el), kirim = $('#kirim', m.el);
+  const showErr = t => { er.textContent = t; er.hidden = false; };
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(p => {
       pos = { lat: p.coords.latitude.toFixed(6), lng: p.coords.longitude.toFixed(6) };
@@ -991,6 +1042,7 @@ function absenForm(jenis) {
         if (st.wajib_radius === 'ya' && /Masuk|Pulang/.test(jenis) && dj > Number(st.radius_m || 150)) { ok = false; txt += ' — di luar batas ' + st.radius_m + ' m'; }
       }
       gps.className = 'gps ' + (ok ? 'ok' : 'bad'); gps.innerHTML = ic('pin') + '<span>' + esc(txt) + '</span>';
+      autoSend();
     }, err => {
       gps.className = 'gps bad';
       gps.innerHTML = ic('pin') + '<span>' + (MODE === 'demo' ? 'Lokasi tidak tersedia di pratinjau ini. Di mode contoh presensi tetap bisa dikirim.' : 'Lokasi tidak dapat dibaca. Aktifkan GPS dan izinkan akses lokasi untuk aplikasi ini.') + '</span>';
@@ -998,31 +1050,144 @@ function absenForm(jenis) {
   } else { gps.className = 'gps bad'; gps.innerHTML = ic('pin') + '<span>Perangkat tidak mendukung GPS.</span>'; }
   const fi = $('#fotoIn', m.el);
   if (fi) fi.onchange = () => { fotoFile = fi.files[0]; if (fotoFile) { const pr = $('#fotoPrev', m.el); pr.src = URL.createObjectURL(fotoFile); pr.hidden = false; } };
-  $('#kirim', m.el).onclick = async e => {
-    const b = e.currentTarget, er = $('#aerr', m.el);
+
+  /* --- verifikasi wajah --- */
+  const scanBox = $('#fscan', m.el);
+  const runScan = async () => {
+    scanBox.hidden = false;
+    const msg = $('.fmsg', scanBox);
+    if (MODE === 'demo') { msg.textContent = 'Mode contoh: verifikasi wajah dilewati.'; $('.fbar i', scanBox).style.width = '100%'; face = new Array(128).fill(0); faceDone(); return; }
+    try {
+      face = await faceScan(scanBox, enroll);
+      if (enroll) { msg.textContent = 'Menyimpan pola wajah…'; await call('faceEnroll', { descriptor: face }); S.faceOn = true; toast('Wajah terdaftar.'); }
+      faceDone();
+    } catch (x) {
+      if (!m.el.isConnected) return;
+      msg.innerHTML = esc(x.message) + ' <button class="btn sm" type="button" id="fulang">Ulangi</button>';
+      $('#fulang', scanBox).onclick = runScan;
+    }
+  };
+  const faceDone = () => {
+    scanBox.classList.add('done');
+    $('.fmsg', scanBox).innerHTML = ic('check') + ' Wajah terverifikasi';
+    kirim.disabled = false;
+    autoSend();
+  };
+  function autoSend() { if (jenis === 'Masuk' && face && pos && !sent) kirim.click(); }
+  if (needFace) {
+    if (enroll) {
+      const cb = $('#fsetuju', m.el), mb = $('#fmulai', m.el);
+      cb.onchange = () => { mb.disabled = !cb.checked; };
+      mb.onclick = () => { $('#fcons', m.el).hidden = true; runScan(); };
+    } else runScan();
+  }
+
+  kirim.onclick = async e => {
+    const b = e.currentTarget;
     er.hidden = true;
     const ket = $('#ket', m.el).value.trim();
-    if (needFoto && !fotoFile) { er.textContent = 'Ambil foto terlebih dahulu.'; er.hidden = false; return; }
-    if (needKet && !ket) { er.textContent = 'Keterangan wajib diisi.'; er.hidden = false; return; }
-    b.disabled = true; b.textContent = 'Mengirim…';
+    if (needFace && !face) return showErr('Selesaikan verifikasi wajah terlebih dahulu.');
+    if (needKet && !ket) return showErr('Keterangan wajib diisi.');
+    sent = true; b.disabled = true; b.textContent = 'Mengirim…';
     try {
-      let foto = '';
-      if (fotoFile) {
-        const now = new Date();
-        foto = await shrink(fotoFile, 1280, `${S.user.nama} · ${jenis}\n${fDate(isoToday())} ${pad2(now.getHours())}:${pad2(now.getMinutes())}${pos ? ' · ' + pos.lat + ', ' + pos.lng : ''}`);
-      }
-      const r = await call('presensiSubmit', { jenis, keterangan: ket, lat: pos ? pos.lat : '', lng: pos ? pos.lng : '', foto });
+      let foto_id = '';
+      if (fotoFile) foto_id = (await uploadFile(fotoFile, 'Presensi/' + isoToday().slice(0, 7))).id;
+      const r = await call('presensiSubmit', { jenis, keterangan: ket, lat: pos ? pos.lat : '', lng: pos ? pos.lng : '', descriptor: face || undefined, hidup: !!face, foto_id });
       m.close(); toast('Presensi tercatat: ' + r.status); refresh();
-    } catch (x) { er.textContent = x.message; er.hidden = false; b.disabled = false; b.innerHTML = ic('check') + 'Kirim presensi ' + esc(jenis.toLowerCase()); }
+    } catch (x) { showErr(x.message); b.disabled = false; b.innerHTML = ic('check') + 'Kirim presensi ' + esc(jenis.toLowerCase()); }
   };
+}
+
+/* ---------------- Pengenal wajah (di perangkat) ----------------
+   Memakai face-api (TensorFlow.js). Kamera hanya dipakai di HP ini;
+   yang dikirim ke server hanya 128 angka pola wajah, bukan gambar. */
+const FACE_LIB = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/dist/face-api.js';
+const FACE_MODELS = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/model';
+let faceReady = null;
+function loadFace() {
+  if (faceReady) return faceReady;
+  faceReady = new Promise((res, rej) => {
+    if (window.faceapi) return res();
+    const s = document.createElement('script'); s.src = FACE_LIB; s.onload = res;
+    s.onerror = () => rej(new Error('Pengenal wajah gagal dimuat. Periksa internet lalu coba lagi.'));
+    document.head.appendChild(s);
+  }).then(() => Promise.all([
+    faceapi.nets.tinyFaceDetector.loadFromUri(FACE_MODELS),
+    faceapi.nets.faceLandmark68Net.loadFromUri(FACE_MODELS),
+    faceapi.nets.faceRecognitionNet.loadFromUri(FACE_MODELS)
+  ])).catch(e => { faceReady = null; throw new Error('Pengenal wajah gagal dimuat. Periksa internet lalu coba lagi.'); });
+  return faceReady;
+}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function vMean(list) { const o = new Array(128).fill(0); list.forEach(v => v.forEach((x, i) => o[i] += x / list.length)); return o; }
+function vDist(a, b) { let s = 0; for (let i = 0; i < a.length; i++) s += (a[i] - b[i]) * (a[i] - b[i]); return Math.sqrt(s); }
+/* Pindai wajah + cek wajah hidup: lihat lurus, toleh ke satu sisi, toleh ke sisi lain, lihat lurus lagi. */
+async function faceScan(box, enroll) {
+  const video = $('video', box), msg = $('.fmsg', box), bar = $('.fbar i', box);
+  const say = (t, p) => { msg.textContent = t; if (p != null) bar.style.width = p + '%'; };
+  box.classList.remove('done');
+  say('Memuat pengenal wajah… (pertama kali ±6 MB)', 5);
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error('Kamera tidak didukung di peramban ini.');
+  const camP = navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false })
+    .catch(() => { throw new Error('Kamera tidak dapat dibuka. Izinkan akses kamera untuk aplikasi ini.'); });
+  let stream;
+  try { [stream] = await Promise.all([camP, loadFace()]); }
+  catch (e) { camP.then(s => s.getTracks().forEach(t => t.stop())).catch(() => { }); throw e; }
+  const stop = () => stream.getTracks().forEach(t => t.stop());
+  box._stop = stop;
+  try {
+    video.srcObject = stream;
+    await video.play();
+    const opt = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: .5 });
+    const NEED = enroll ? 5 : 2;
+    const t0 = Date.now();
+    let stage = 0, side = 0, lastSeen = Date.now(), front = [];
+    const restart = t => { stage = 0; side = 0; front = []; say(t, 10); };
+    say('Lihat lurus ke kamera', 10);
+    while (true) {
+      if (!box.isConnected) throw new Error('Dibatalkan.');
+      if (Date.now() - t0 > 45000) throw new Error('Waktu habis. Coba lagi di tempat yang lebih terang.');
+      const withDesc = stage === 0 || stage === 3;
+      let q = faceapi.detectSingleFace(video, opt).withFaceLandmarks();
+      if (withDesc) q = q.withFaceDescriptor();
+      const det = await q;
+      if (!det) {
+        if (stage > 0 && Date.now() - lastSeen > 2500) restart('Wajah hilang dari kamera. Mulai lagi: lihat lurus ke kamera');
+        else if (stage === 0) say('Wajah belum terlihat. Hadapkan wajah ke kamera', 10);
+        await sleep(100); continue;
+      }
+      lastSeen = Date.now();
+      const p = det.landmarks.positions;
+      const yaw = (p[30].x - p[36].x) / ((p[45].x - p[36].x) || 1);
+      if (det.detection.box.width < video.videoWidth * .18) { say('Dekatkan wajah ke kamera', null); continue; }
+      const lurus = Math.abs(yaw - .5) < .1;
+      if (stage === 0) {
+        if (lurus) front.push(Array.from(det.descriptor));
+        say('Lihat lurus ke kamera… tahan sebentar', 10 + front.length / NEED * 30);
+        if (front.length >= NEED) { stage = 1; say('Toleh kepala perlahan ke kiri atau kanan', 45); }
+      } else if (stage === 1) {
+        if (yaw < .38) { side = -1; stage = 2; } else if (yaw > .62) { side = 1; stage = 2; }
+        if (stage === 2) say('Bagus. Sekarang toleh ke arah sebaliknya', 65);
+      } else if (stage === 2) {
+        if (side < 0 ? yaw > .62 : yaw < .38) { stage = 3; say('Kembali lihat lurus ke kamera', 85); }
+      } else if (stage === 3 && lurus) {
+        const d = Array.from(det.descriptor);
+        if (vDist(d, vMean(front)) > .45) { restart('Wajah berubah di tengah pemeriksaan. Mulai lagi: lihat lurus ke kamera'); continue; }
+        front.push(d);
+        say('Selesai', 100);
+        return vMean(front).map(x => Math.round(x * 1e5) / 1e5);
+      }
+    }
+  } finally { stop(); }
 }
 
 VIEWS.rekap = async (p, main, alive) => {
   const bulan = p.bulan || isoToday().slice(0, 7);
   const [y, mo] = bulan.split('-').map(Number);
   setTop('Rekap Presensi', BULAN[mo - 1] + ' ' + y);
-  const d = await call('rekap', { bulan });
+  const raw = await call('rekap', { bulan });
   if (!alive()) return;
+  const d = raw.recs ? rekapCompute(raw) : raw;
   const prev = new Date(y, mo - 2, 1), next = new Date(y, mo, 1);
   const ym = x => x.getFullYear() + '-' + pad2(x.getMonth() + 1);
   const L = ['H', 'T', 'DL', 'I', 'S', 'A', 'PA'];
@@ -1036,6 +1201,29 @@ VIEWS.rekap = async (p, main, alive) => {
   S.vh.mon = t => go('rekap', { bulan: t.dataset.m }, true);
   S.vh.cetak = () => printDocs('Rekap Presensi', [docRekap(d)]);
 };
+
+function rekapCompute(r) {
+  const K = { 'Hadir': 'H', 'Hadir Terlambat': 'T', 'Dinas Luar': 'DL', 'Izin': 'I', 'Sakit': 'S' };
+  return {
+    bulan: r.bulan, days: r.days, users: r.users.map(usr => {
+      const masuk = {}, pulang = {};
+      r.recs.filter(x => x.user_id === usr.id).forEach(x => {
+        if (x.jenis === 'Pulang') pulang[x.tanggal] = x.status === 'Pulang Awal' ? 'PA' : 'P';
+        else if (!masuk[x.tanggal] || x.jenis !== 'Dinas Luar') masuk[x.tanggal] = K[x.status] || K[x.jenis] || '?';
+      });
+      const j = { hari_kerja: 0, H: 0, T: 0, DL: 0, I: 0, S: 0, P: 0, PA: 0, A: 0 };
+      r.days.forEach(d => {
+        if (d.libur) return;
+        j.hari_kerja++;
+        const k = masuk[d.tgl];
+        if (k) j[k] = (j[k] || 0) + 1;
+        else if (d.tgl < r.today) { j.A++; masuk[d.tgl] = 'A'; }
+        if (pulang[d.tgl]) j[pulang[d.tgl]]++;
+      });
+      return { id: usr.id, nama: usr.nama, jabatan: usr.jabatan, masuk, pulang, jml: j };
+    })
+  };
+}
 
 /* ---------------- Daftar umum ---------------- */
 VIEWS.list = async (p, main, alive) => {
@@ -1353,7 +1541,7 @@ VIEWS.akun = async (p, main) => {
   setTop('Akun');
   const th = store.get('theme') || '';
   main.innerHTML = `<div class="stack">
-    <div class="card d-head"><span class="av" style="width:56px;height:56px;font-size:18px">${esc(initials(S.user.nama))}</span><div><h1 style="font-size:18px">${esc(S.user.nama)}</h1><div class="muted">${esc(S.user.jabatan)}</div><div style="margin-top:6px">${S.user.admin ? '<span class="pill pri">Admin</span>' : S.user.akses.length ? S.user.akses.map(k => `<span class="pill" style="margin:2px">${esc((S.perms.find(x => x.k === k) || {}).l || k)}</span>`).join('') : '<span class="pill">Presensi saja</span>'}</div></div></div>
+    <div class="card d-head"><span class="av" style="width:56px;height:56px;font-size:18px">${esc(initials(S.user.nama))}</span><div><h1 style="font-size:18px">${esc(S.user.nama)}</h1><div class="muted">${esc(S.user.jabatan)}</div><div class="meta" style="margin-top:4px">Wajah presensi: ${S.user.wajah || S.faceOn ? 'terdaftar' : 'belum terdaftar'}</div><div style="margin-top:6px">${S.user.admin ? '<span class="pill pri">Admin</span>' : S.user.akses.length ? S.user.akses.map(k => `<span class="pill" style="margin:2px">${esc((S.perms.find(x => x.k === k) || {}).l || k)}</span>`).join('') : '<span class="pill">Presensi saja</span>'}</div></div></div>
     <form class="card stack" id="pinf"><div class="lbl">Ganti PIN</div><div class="form"><div class="f"><label for="pl">PIN lama</label><input id="pl" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password"></div><div class="f"><label for="pb">PIN baru (4–6 angka)</label><input id="pb" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password"></div></div><div id="perr2" class="err" hidden></div><div><button class="btn pri" type="submit">${ic('key')}Simpan PIN</button></div></form>
     <div class="card stack"><div class="lbl">Tampilan</div><div class="chips">${[['', 'Ikuti perangkat'], ['light', 'Terang'], ['dark', 'Gelap']].map(t => `<button class="chip ${th === t[0] ? 'on' : ''}" data-act="theme" data-v="${t[0]}">${t[1]}</button>`).join('')}</div></div>
     <button class="btn danger" data-act="logout">${ic('out')}Keluar</button>
@@ -1376,7 +1564,7 @@ VIEWS.users = async (p, main, alive) => {
   main.innerHTML = `<div class="stack">
     <div class="meta">Setiap orang masuk dengan nama dan PIN. Centang menu yang boleh dibuka tiap orang. Semua orang otomatis bisa presensi. Admin bisa membuka semua menu.</div>
     <div class="btns"><button class="btn" data-act="fromAp">${ic('badge')}Buat akun dari data Aparat</button></div>
-    <div class="list">${us.map(u => `<button class="row" data-act="u" data-id="${esc(u.id)}"><span class="av">${esc(initials(u.nama))}</span><span class="main"><span class="t">${esc(u.nama)}</span><span class="s">${esc(u.jabatan)} · ${u.admin ? 'Admin' : u.akses.length ? u.akses.length + ' hak akses' : 'Presensi saja'}</span></span><span class="r">${u.aktif ? '' : '<span class="pill bad">Nonaktif</span>'}</span></button>`).join('')}</div>
+    <div class="list">${us.map(u => `<button class="row" data-act="u" data-id="${esc(u.id)}"><span class="av">${esc(initials(u.nama))}</span><span class="main"><span class="t">${esc(u.nama)}</span><span class="s">${esc(u.jabatan)} · ${u.admin ? 'Admin' : u.akses.length ? u.akses.length + ' hak akses' : 'Presensi saja'}</span></span><span class="r">${u.wajah ? '' : '<span class="pill">Wajah belum</span>'}${u.aktif ? '' : '<span class="pill bad">Nonaktif</span>'}</span></button>`).join('')}</div>
   </div><button class="btn pri fab" data-act="u" data-id="">${ic('plus')}Pengguna</button>`;
   S.vh.u = t => userForm(us.find(x => x.id === t.dataset.id));
   S.vh.fromAp = () => {
@@ -1393,6 +1581,7 @@ function userForm(u) {
     <div class="f" style="justify-content:flex-end"><label class="switch"><input type="checkbox" id="uak" ${u.aktif ? 'checked' : ''}>Akun aktif</label><label class="switch"><input type="checkbox" id="uad" ${u.admin ? 'checked' : ''}>Admin (semua akses)</label></div></div>
     <div class="f"><span class="lbl">Hak akses menu</span><div class="checks" id="uacc">${S.perms.map(p => `<label><input type="checkbox" value="${p.k}" ${u.akses.indexOf(p.k) >= 0 ? 'checked' : ''}>${esc(p.l)}</label>`).join('')}</div><span class="hint">"Lihat NIK/KK" membuka NIK, nomor KK, foto KTP dan KK. Tanpa izin ini NIK tampil tersamar.</span></div>
     <div class="err" id="uerr" hidden></div>
+    ${!isNew ? `<div class="f"><span class="lbl">Wajah presensi</span><div class="btns"><span class="muted">${u.wajah ? 'Sudah terdaftar.' : 'Belum terdaftar (akan diminta saat presensi pertama).'}</span>${u.wajah ? `<button class="btn sm" type="button" id="ufreset">${ic('user')}Hapus pola wajah</button>` : ''}</div><span class="hint">Hapus jika wajah orang ini gagal dikenali terus-menerus; ia akan diminta mendaftar ulang saat presensi berikutnya.</span></div>` : ''}
     <div class="btns" id="uacts"><button class="btn pri" type="submit">${ic('check')}Simpan</button>${!isNew && u.id !== S.user.id ? `<button class="btn danger" type="button" id="udel">${ic('trash')}Hapus</button>` : ''}</div></form>`);
   const el = m.el;
   const tog = () => { $('#uacc', el).style.opacity = $('#uad', el).checked ? .45 : 1; };
@@ -1404,6 +1593,8 @@ function userForm(u) {
       m.close(); toast('Pengguna disimpan.'); refresh();
     } catch (x) { $('#uerr', el).textContent = x.message; $('#uerr', el).hidden = false; }
   };
+  const fr = $('#ufreset', el);
+  if (fr) fr.onclick = async () => { try { await call('faceReset', { id: u.id }); if (u.id === S.user.id) S.faceOn = S.user.wajah = false; m.close(); toast('Pola wajah dihapus.'); refresh(); } catch (x) { toast(x.message, 1); } };
   const d = $('#udel', el);
   if (d) d.onclick = () => confirmDel($('#uacts', el), async () => { await call('usersRemove', { id: u.id }); m.close(); toast('Pengguna dihapus.'); refresh(); });
 }
@@ -1414,7 +1605,8 @@ VIEWS.settings = async (p, main) => {
   const G = [
     ['Profil desa', [['nama_desa', 'Nama desa'], ['kecamatan', 'Kecamatan'], ['kabupaten', 'Kabupaten'], ['provinsi', 'Provinsi'], ['alamat', 'Alamat kantor', 1], ['kode_pos', 'Kode pos'], ['email_desa', 'Email desa'], ['nama_kades', 'Nama Kepala Desa (untuk tanda tangan)'], ['logo_url', 'Tautan logo (gambar)', 1], ['tahun_rkp', 'Tahun RKP Desa berjalan']]],
     ['Jam kerja', [['jam_masuk_mulai', 'Presensi masuk dibuka', 0, 'time'], ['jam_masuk_batas', 'Batas masuk tepat waktu', 0, 'time'], ['jam_pulang_mulai', 'Pulang mulai (Senin–Kamis)', 0, 'time'], ['jam_pulang_jumat', 'Pulang mulai (Jumat)', 0, 'time'], ['jam_pulang_batas', 'Batas presensi pulang', 0, 'time']]],
-    ['Lokasi kantor', [['kantor_lat', 'Lintang (latitude)'], ['kantor_lng', 'Bujur (longitude)'], ['radius_m', 'Radius presensi (meter)', 0, 'number']]]
+    ['Lokasi kantor', [['kantor_lat', 'Lintang (latitude)'], ['kantor_lng', 'Bujur (longitude)'], ['radius_m', 'Radius presensi (meter)', 0, 'number']]],
+    ['Verifikasi wajah', [['face_threshold', 'Batas kecocokan (0.45 ketat – 0.55 longgar, bawaan 0.5)']]]
   ];
   const lib = String(s.libur_mingguan || '').split(',');
   main.innerHTML = `<form class="stack" id="sf">
@@ -1430,6 +1622,7 @@ VIEWS.settings = async (p, main) => {
     G.forEach(g => g[1].forEach(f => v[f[0]] = $('#s_' + f[0]).value.trim()));
     v.libur_mingguan = $$('#libm input:checked').map(i => i.value).join(',');
     v.wajib_radius = $('#s_wajib').checked ? 'ya' : 'tidak';
+    v.face_threshold = v.face_threshold.replace(',', '.');
     try { S.set = await call('settingsSave', { values: v }); S.rkpYear = S.set.tahun_rkp || S.rkpYear; toast('Pengaturan disimpan.'); }
     catch (x) { $('#serr').textContent = x.message; $('#serr').hidden = false; }
   };
@@ -1630,7 +1823,7 @@ const Mock = (() => {
   const cmp = (a, b) => String(a || '').localeCompare(String(b || ''), 'id', { numeric: true, sensitivity: 'base' });
   const err = m => { throw new Error(m); };
   const isLib = t => { const h = T.hari_libur.find(x => x.tanggal === t); if (h) return h.keterangan; const dw = parseD(t).getDay() || 7; return String(set.libur_mingguan).split(',').indexOf(String(dw)) >= 0 ? HARI[dw % 7] : ''; };
-  const today = u => ({ tanggal: isoToday(), libur: isLib(isoToday()), records: T.presensi.filter(x => x.user_id === u.id && x.tanggal === isoToday()) });
+  const today = u => ({ tanggal: isoToday(), libur: isLib(isoToday()), wajah: true, records: T.presensi.filter(x => x.user_id === u.id && x.tanggal === isoToday()) });
   const A = {
     publicUsers: () => users.filter(u => u.aktif).map(u => ({ id: u.id, nama: u.nama, jabatan: u.jabatan })),
     login: r => { const u = users.find(x => x.id === r.id); if (!u || u.pin !== r.pin) err('PIN salah.'); const t = id() + id(); sess[t] = u.id; return { token: t, user: uo(u) }; },
@@ -1679,7 +1872,7 @@ const Mock = (() => {
       if (r.jenis === 'Masuk') { if (has('Masuk') || has('Izin') || has('Sakit')) err('Anda sudah tercatat hari ini.'); st = jam <= set.jam_masuk_batas ? 'Hadir' : 'Hadir Terlambat'; }
       else if (r.jenis === 'Pulang') { if (!has('Masuk') && !has('Dinas Luar')) err('Belum ada presensi masuk hari ini.'); if (has('Pulang')) err('Anda sudah presensi pulang.'); const mulai = d.getDay() === 5 ? set.jam_pulang_jumat : set.jam_pulang_mulai; st = jam >= mulai ? 'Pulang' : 'Pulang Awal'; if (st === 'Pulang Awal' && !r.keterangan) err('Pulang sebelum pukul ' + mulai + ': mohon isi alasan.'); }
       else if (mine.length && r.jenis !== 'Dinas Luar') err('Anda sudah tercatat hari ini.');
-      let foto = ''; if (r.foto) { foto = 'demo_' + id(); files[foto] = { mime: 'image/jpeg', data: r.foto }; }
+      const foto = r.foto_id || '';
       const rec = { id: id(), tanggal: t, jam: jam + ':' + pad2(d.getSeconds()), user_id: u.id, nama: u.nama, jabatan: u.jabatan, jenis: r.jenis, status: st, keterangan: r.keterangan, lat: r.lat, lng: r.lng, jarak_m: r.lat ? String(jarakM(+r.lat, +r.lng, +set.kantor_lat, +set.kantor_lng)) : '', foto_id: foto };
       T.presensi.push(rec); return { record: rec, status: st };
     },
@@ -1718,6 +1911,10 @@ const Mock = (() => {
     usersRemove: (r, u) => { if (r.id === u.id) err('Tidak bisa menghapus akun sendiri.'); const i = users.findIndex(x => x.id === r.id); users.splice(i, 1); return true; },
     usersFromAparat: (r, u) => { if (!/^\d{4,6}$/.test(r.pin || '')) err('PIN awal harus 4–6 angka.'); let c = 0; T.aparat.forEach(a => { if (!users.some(x => x.nama.toLowerCase() === a.nama.toLowerCase())) { users.push({ id: id(), nama: a.nama, jabatan: a.jabatan, admin: false, aktif: true, akses: [], urut: a.no_urut, pin: r.pin }); c++; } }); return { dibuat: c }; },
     changePin: (r, u) => { const o = users.find(x => x.id === u.id); if (o.pin !== r.lama) err('PIN lama salah.'); if (!/^\d{4,6}$/.test(r.baru || '')) err('PIN baru harus 4–6 angka.'); o.pin = r.baru; return true; },
+    faceEnroll: () => true,
+    faceReset: () => true,
+    thumbSave: () => true,
+    thumbGet: () => ({}),
     settingsSave: (r, u) => { if (!u.admin) err('Hanya admin.'); Object.assign(set, r.values); return Object.assign({}, set); }
   };
   function uo(u) { return { id: u.id, nama: u.nama, jabatan: u.jabatan, admin: u.admin, akses: u.admin ? PERMS.map(p => p.k) : u.akses.slice() }; }
@@ -1743,3 +1940,4 @@ boot();
 </script>
 </body>
 </html>
+
