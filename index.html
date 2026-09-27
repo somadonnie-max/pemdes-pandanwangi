@@ -613,6 +613,24 @@ const UI = {
     fields: [F('no', 'No', 'number'), F('tujuan', 'Tujuan', 'text', { wide: 1 }), F('parameter', 'Parameter', 'textarea', { wide: 1 }), F('indikator', 'Contoh Indikator', 'textarea', { wide: 1 })],
     row: r => ({ t: r.tujuan, s: r.parameter, av: `<b>${esc(r.no)}</b>` })
   },
+  pembangunan: {
+    t: 'Kegiatan Pembangunan', ic: 'hammer', perm: 'pembangunan', folder: 'Pembangunan', file: 'foto_id',
+    fields: [F('nama', 'Nama Pembangunan', 'text', { req: 1, wide: 1 }), F('kode', 'Kode'), F('lokasi', 'Lokasi', 'text', { wide: 1 }), F('sumber_dana', 'Sumber Dana', 'select', { opt: OPT.sumber }),
+      F('tahun_anggaran', 'Tahun Anggaran', 'number', { def: () => new Date().getFullYear() }), F('tahapan', 'Tahapan'), F('tgl_pelaksanaan', 'Tanggal Pelaksanaan', 'date'), F('tgl_upload', 'Tanggal Unggah', 'date', { def: isoToday }),
+      F('titik_foto', 'Titik Foto'), F('progress', 'Progres', 'select', { opt: ['0%', '30%', '50%', '80%', '100%'] }), F('ket', 'Keterangan', 'textarea', { wide: 1 }), F('foto_id', 'Foto Progres', 'file', { img: 1, wide: 1 })],
+    year: 'tgl_pelaksanaan',
+    row: r => ({ t: r.nama, s: [r.lokasi, r.sumber_dana, r.tahapan].filter(Boolean).join(' · '), img: r.foto_id, av: ic('hammer'), r: r.progress || '', date: r.tgl_pelaksanaan }),
+    print: { title: 'DAFTAR KEGIATAN PEMBANGUNAN', land: 1, cols: [['Nama Pembangunan', 'nama'], ['Lokasi', 'lokasi'], ['Sumber Dana', 'sumber_dana'], ['Tahun', 'tahun_anggaran'], ['Tahapan', 'tahapan'], ['Tgl Pelaksanaan', r => fDate(r.tgl_pelaksanaan)], ['Progres', 'progress'], ['Ket', 'ket']] }
+  },
+  register_surat: {
+    t: 'Register Surat Keterangan', ic: 'file', perm: 'pelayanan',
+    fields: [F('tgl_surat', 'Tanggal Surat', 'date', { def: isoToday }), F('no', 'No. Register'), F('jenis_surat', 'Surat / Jenis Keterangan', 'text', { req: 1, wide: 1, list: ['Surat Keterangan Domisili', 'Surat Keterangan Tidak Mampu', 'Surat Keterangan Usaha', 'Surat Pengantar SKCK', 'Surat Keterangan Kelahiran', 'Surat Keterangan Kematian', 'Surat Keterangan Pindah', 'Surat Keterangan Belum Menikah', 'Surat Keterangan Penghasilan'] }),
+      F('nama', 'Nama', 'text', { req: 1, up: 1, wide: 1 }), F('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1 }), F('tempat_lahir', 'Tempat Lahir', 'text', { up: 1 }), F('tgl_lahir', 'Tanggal Lahir', 'date'), F('umur', 'Tahun Lahir / Umur'),
+      F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk }), F('dusun', 'Dusun', 'select', { opt: OPT.dusun }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }), F('keperluan', 'Keperluan', 'textarea', { wide: 1 })],
+    year: 'tgl_surat',
+    row: r => ({ t: r.nama, s: [r.jenis_surat, r.keperluan].filter(Boolean).join(' · '), av: initials(r.nama), date: r.tgl_surat, r: r.no ? 'No. ' + r.no : '' }),
+    print: { title: 'BUKU REGISTER SURAT KETERANGAN', land: 1, cols: [['No', 'no'], ['Tanggal', r => fDate(r.tgl_surat)], ['Nama', 'nama'], ['L/P', r => (r.jk || '').slice(0, 1)], ['Umur', 'umur'], ['Alamat', r => String(r.dusun || '').replace('DUSUN ', '') + (r.rt ? ' RT ' + r.rt : '') + (r.rw ? '/RW ' + r.rw : '')], ['Jenis Surat', 'jenis_surat'], ['Keperluan', 'keperluan']] }
+  },
   ref_hukum: {
     t: 'Dasar Hukum', ic: 'book', perm: '*', write: 'perencanaan', sort: 'no', asc: 1,
     fields: [F('no', 'No. Urut', 'number'), F('jenis', 'Jenis Peraturan', 'select', { opt: ['Undang-Undang', 'Peraturan Pemerintah', 'Peraturan Presiden', 'Peraturan Menteri', 'Peraturan Daerah', 'Peraturan Bupati', 'Peraturan Desa'] }), F('status', 'Status', 'select', { opt: ['Aktif', 'Tidak Aktif'], def: 'Aktif' }), F('rincian', 'Rincian', 'textarea', { wide: 1, req: 1 })],
@@ -626,10 +644,8 @@ function stPill(s) {
 
 const SOON = {
   kegiatan: { t: 'Kegiatan', ic: 'cal', d: 'Jadwal kegiatan desa, daftar hadir kegiatan, dan riwayat kegiatan beserta foto.' },
-  pembangunan: { t: 'Pembangunan', ic: 'hammer', d: 'Unggah foto progres pembangunan per titik (0%, 30%, 80%, 100%), sumber dana, dan tahapan.' },
   kesejahteraan: { t: 'Kesejahteraan', ic: 'heart', d: 'Data penerima bantuan (BLT, PKH, BPNT), posyandu, dan kegiatan keagamaan.' },
-  pemerintahan: { t: 'Pemerintahan', ic: 'landmark', d: 'Lembaga desa (BPD, LPMD, RT/RW, PKK, Karang Taruna) dan masa jabatannya.' },
-  pelayanan: { t: 'Pelayanan Surat', ic: 'file', d: 'Register surat keterangan warga dengan isian otomatis dari NIK dan cetak surat.' }
+  pemerintahan: { t: 'Pemerintahan', ic: 'landmark', d: 'Lembaga desa (BPD, LPMD, RT/RW, PKK, Karang Taruna) dan masa jabatannya.' }
 };
 
 /* Kelompok menu */
@@ -638,6 +654,8 @@ function MODS() {
     { k: 'presensi', l: 'Presensi', ic: 'clock', items: [['Absen Hari Ini', 'clock', ['presensi']], ['Riwayat', 'list', ['list', { e: 'presensi' }]], ['Rekap Bulanan', 'chart', ['rekap']], ['Hari Libur', 'cal', ['list', { e: 'hari_libur' }]]] },
     { k: 'tu', l: 'TU & Umum', ic: 'folder', items: ['surat_masuk', 'surat_keluar', 'ekspedisi', 'perdes', 'sk_kades', 'aparat', 'inventaris', 'tkd', 'tanah_desa'].map(e => [UI[e].t, UI[e].ic, ['list', { e }], e]) },
     { k: 'penduduk', l: 'Kependudukan', ic: 'users', perm: 'penduduk', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, 'penduduk'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga']] },
+    { k: 'pembangunan', l: 'Pembangunan', ic: 'hammer', perm: 'pembangunan', items: [['Kegiatan Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
+    { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Register Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat']] },
     { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RKP Desa', 'sprout', ['rkp'], null, 'perencanaan'], ['Referensi', 'book', ['refs'], null, '*']] },
     { k: 'soon', l: 'Segera Hadir', ic: 'sprout', items: Object.keys(SOON).map(k => [SOON[k].t, SOON[k].ic, ['soon', { k }], null, '*', 1]) }
   ];
@@ -1740,8 +1758,8 @@ function printDocs(title, pages) {
    ===================================================================== */
 const Mock = (() => {
   const files = {};
-  const PERMS = [['tu_perdes', 'Peraturan Desa & Lembaran Desa'], ['tu_sk', 'Keputusan Kepala Desa'], ['tu_surat', 'Agenda Surat & Ekspedisi'], ['tu_aparat', 'Aparat Pemerintah Desa'], ['tu_inventaris', 'Inventaris & Kekayaan Desa'], ['tu_tanah', 'Tanah Kas Desa & Tanah di Desa'], ['penduduk', 'Data Penduduk & Keluarga'], ['lihat_nik', 'Lihat NIK/KK & dokumen kependudukan'], ['perencanaan', 'Perencanaan (RKP Desa)'], ['presensi_rekap', 'Lihat rekap presensi semua perangkat']].map(p => ({ k: p[0], l: p[1] }));
-  const SENS = { penduduk: ['nik', 'kk', 'no_paspor', 'no_kitap', 'foto_ktp_id'], keluarga: ['kk', 'foto_kk_id'] };
+  const PERMS = [['tu_perdes', 'Peraturan Desa & Lembaran Desa'], ['tu_sk', 'Keputusan Kepala Desa'], ['tu_surat', 'Agenda Surat & Ekspedisi'], ['tu_aparat', 'Aparat Pemerintah Desa'], ['tu_inventaris', 'Inventaris & Kekayaan Desa'], ['tu_tanah', 'Tanah Kas Desa & Tanah di Desa'], ['penduduk', 'Data Penduduk & Keluarga'], ['lihat_nik', 'Lihat NIK/KK & dokumen kependudukan'], ['perencanaan', 'Perencanaan (RKP Desa)'], ['pembangunan', 'Pembangunan'], ['pelayanan', 'Pelayanan Surat (register)'], ['presensi_rekap', 'Lihat rekap presensi semua perangkat']].map(p => ({ k: p[0], l: p[1] }));
+  const SENS = { penduduk: ['nik', 'kk', 'no_paspor', 'no_kitap', 'foto_ktp_id'], keluarga: ['kk', 'foto_kk_id'], register_surat: ['nik'] };
   const UNIQ = { penduduk: 'nik', keluarga: 'kk' };
   let n = 0; const id = () => 'm' + (++n).toString(36) + Math.random().toString(36).slice(2, 6);
   const now = () => { const d = new Date(); return isoToday() + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()) + ':' + pad2(d.getSeconds()); };
@@ -1940,4 +1958,3 @@ boot();
 </script>
 </body>
 </html>
-
