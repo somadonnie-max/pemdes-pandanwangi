@@ -461,6 +461,7 @@ const OPT = {
   jabTim: ['Pembina', 'Ketua', 'Ketua Tim', 'Sekretaris', 'Anggota'],
   musy: ['Musdes Pembentukan Tim RKP Desa', 'Musdes Pencermatan RPJM Desa', 'Musrenbangdes RKP Desa', 'Musdes Penetapan RKP Desa', 'Musdes Perubahan RKP Desa', 'Musyawarah Lainnya']
 };
+const JAB_PETUGAS = ['Ketua', 'Wakil Ketua', 'Sekretaris', 'Bendahara', 'Anggota', 'Ketua BPD', 'Wakil Ketua BPD', 'Sekretaris BPD', 'Anggota BPD', 'Ketua LPMD', 'Ketua TP PKK', 'Ketua Karang Taruna', 'Direktur BUM Desa', 'Kader Posyandu', 'KPM', 'Linmas'];
 const F = (k, l, t, x) => Object.assign({ k, l, t: t || 'text' }, x || {});
 
 /* =====================================================================
@@ -520,16 +521,25 @@ const UI = {
     }
   },
   petugas: {
-    t: 'Petugas & Lembaga Desa', ic: 'users', perm: 'tu_aparat', folder: 'TU/Petugas', file: 'foto_id', sort: 'kelompok', asc: 1,
-    sortBy: st => st.chip ? ['no_urut', 'nama'] : ['kelompok', 'no_urut'],
-    fields: [F('no_urut', 'No. Urut', 'number', { auto: 1, by: 'kelompok', hint: 'Urutan dalam kelompoknya: 1 = paling atas (mis. Ketua)' }), F('nama', 'Nama', 'text', { req: 1, wide: 1 }), F('jabatan', 'Jabatan', 'text', { list: ['Ketua BPD', 'Wakil Ketua BPD', 'Sekretaris BPD', 'Anggota BPD', 'Ketua LPMD', 'Ketua RT', 'Ketua RW', 'Ketua TP PKK', 'Ketua Karang Taruna', 'Direktur BUMDes', 'Kader Posyandu', 'KPM', 'Linmas'] }),
-      F('unsur', 'Unsur', 'text', { list: ['BPD', 'LPMD', 'PKK', 'RT RW', 'Karang Taruna', 'BUMDes', 'Tokoh Masyarakat', 'Kader Pemberdayaan Masyarakat', 'Tokoh Agama', 'Perwakilan Perempuan'] }), F('kelompok', 'Kelompok / Lembaga', 'text', { req: 1, list: OPT.lembaga, hint: 'Pilih dari daftar, atau ketik nama kelompok baru' }),
+    t: 'Petugas & Lembaga Desa', ic: 'users', perm: 'tu_aparat', folder: 'TU/Petugas', file: 'foto_id',
+    /* satu orang bisa punya beberapa jabatan (data Jabatan Petugas). Grup = daftar jabatan; Semua = daftar orang */
+    listFn: (prm, st) => call('petugasList', { kelompok: st.chip, q: prm.q, offset: prm.offset, limit: prm.limit }),
+    fields: [F('nama', 'Nama', 'text', { req: 1, wide: 1 }),
+      F('kelompok', 'Kelompok / Lembaga', 'text', { req: 1, virt: 1, list: OPT.lembaga, hint: 'Pilih dari daftar, atau ketik nama kelompok baru' }), F('jabatan', 'Jabatan', 'text', { req: 1, virt: 1, list: JAB_PETUGAS }),
+      F('no_urut', 'No. Urut', 'number', { virt: 1, auto: 1, by: 'kelompok', ent: 'petugas_jabatan', hint: 'Urutan dalam kelompoknya: 1 = paling atas (mis. Ketua)' }),
       F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk2 }), F('tempat_lahir', 'Tempat Lahir'), F('tgl_lahir', 'Tanggal Lahir', 'date'), F('agama', 'Agama', 'select', { opt: OPT.agama2 }), F('pendidikan', 'Pendidikan'),
-      F('email', 'Email', 'email'), F('wa', 'Nomor WhatsApp', 'tel'), F('nrpdes', 'NRPDes'), F('no_sk', 'Nomor SK'), F('tgl_sk', 'Tanggal SK', 'date'), F('tgl_akhir_sk', 'Tanggal Berakhir SK', 'date'),
+      F('email', 'Email', 'email'), F('wa', 'Nomor WhatsApp', 'tel'), F('nrpdes', 'NRPDes'),
       F('npwp', 'NPWP', 'text', { sens: 1, mono: 1 }), F('bpjs_kes', 'BPJS Kesehatan', 'text', { sens: 1, mono: 1 }), F('bpjs_tk', 'BPJS Ketenagakerjaan', 'text', { sens: 1, mono: 1 }), F('ket', 'Keterangan', 'text', { wide: 1 }), F('foto_id', 'Foto', 'file', { img: 1 })],
-    chips: { k: 'kelompok', opt: OPT.lembaga, dyn: 1, plus: { 'Perangkat Desa': 'aparat' } },
-    row: r => ({ t: r.nama, s: [r.jabatan, r.kelompok || r.unsur].filter(Boolean).join(' · '), s2: [r.tempat_lahir && r.tgl_lahir ? r.tempat_lahir + ', ' + fDate(r.tgl_lahir, 1) : r.tempat_lahir, r.wa].filter(Boolean).join(' · '), img: r.foto_id, av: initials(r.nama), r: r.no_urut ? '#' + r.no_urut : '' }),
-    print: { title: 'DAFTAR PETUGAS DAN LEMBAGA DESA', land: 1, cols: [['No. Urut', 'no_urut'], ['Nama', 'nama'], ['Jabatan', 'jabatan'], ['Unsur/Lembaga', r => r.kelompok || r.unsur || ''], ['L/P', r => (r.jk || '').slice(0, 1)], ['Tempat & Tgl Lahir', r => (r.tempat_lahir || '') + (r.tgl_lahir ? ', ' + fDate(r.tgl_lahir) : '')], ['Pendidikan', 'pendidikan'], ['No. SK', r => (r.no_sk || '') + (r.tgl_sk ? '<br>' + fDate(r.tgl_sk) : '')], ['Ket', 'ket']] }
+    chips: { k: 'kelompok', opt: OPT.lembaga, dyn: 1, distE: 'petugas_jabatan', plus: { 'Perangkat Desa': 'aparat' } },
+    row: r => ({ t: r.nama, s: r.jid ? [r.jabatan, r.kelompok].filter(Boolean).join(' · ') : (r.jabatan_list || 'Belum ada jabatan'), s2: [r.tempat_lahir && r.tgl_lahir ? r.tempat_lahir + ', ' + fDate(r.tgl_lahir, 1) : r.tempat_lahir, r.wa].filter(Boolean).join(' · '), img: r.foto_id, av: initials(r.nama), r: r.jid && r.no_urut ? '#' + r.no_urut : '' }),
+    print: { title: 'DAFTAR PETUGAS DAN LEMBAGA DESA', land: 1, cols: [['No. Urut', r => r.jid ? esc(r.no_urut || '') : ''], ['Nama', 'nama'], ['Jabatan', r => esc(r.jid ? r.jabatan : r.jabatan_list)], ['Kelompok', 'kelompok'], ['L/P', r => (r.jk || '').slice(0, 1)], ['Tempat & Tgl Lahir', r => esc(r.tempat_lahir || '') + (r.tgl_lahir ? ', ' + fDate(r.tgl_lahir) : '')], ['Pendidikan', 'pendidikan'], ['No. SK', r => esc(r.no_sk || '') + (r.tgl_sk ? '<br>' + fDate(r.tgl_sk) : '')], ['Ket', 'ket']] }
+  },
+  petugas_jabatan: {
+    t: 'Jabatan Petugas', ic: 'badge', perm: 'tu_aparat', sub: 1,
+    fields: [F('kelompok', 'Kelompok / Lembaga', 'text', { req: 1, list: OPT.lembaga, hint: 'Pilih dari daftar, atau ketik nama kelompok baru' }), F('jabatan', 'Jabatan', 'text', { req: 1, list: JAB_PETUGAS }),
+      F('no_urut', 'No. Urut', 'number', { auto: 1, by: 'kelompok', hint: 'Urutan dalam kelompoknya: 1 = paling atas (mis. Ketua)' }), F('unsur', 'Unsur (untuk tim RKP)', 'text', { list: ['BPD', 'LPMD', 'PKK', 'RT RW', 'Karang Taruna', 'BUMDes', 'Tokoh Masyarakat', 'Kader Pemberdayaan Masyarakat', 'Tokoh Agama', 'Perwakilan Perempuan'] }),
+      F('no_sk', 'Nomor SK'), F('tgl_sk', 'Tanggal SK', 'date'), F('tgl_akhir_sk', 'Tanggal Berakhir SK', 'date'), F('ket', 'Keterangan', 'text', { wide: 1 })],
+    row: r => ({ t: r.jabatan, s: [r.kelompok, r.no_sk && 'SK ' + r.no_sk].filter(Boolean).join(' · '), av: ic('badge'), r: r.no_urut ? '#' + r.no_urut : '' })
   },
   surat_masuk: {
     t: 'Surat Masuk', ic: 'inbox', perm: 'tu_surat', folder: 'TU/Surat Masuk', file: 'dok_id',
@@ -1394,7 +1404,7 @@ VIEWS.list = async (p, main, alive) => {
   let chipOpt = u.chips ? u.chips.opt.slice() : null, chipN = {};
   if (u.chips && u.chips.dyn) {
     try {
-      const [ds, plus] = await Promise.all([call('distinct', { entity: e, field: u.chips.k }), Promise.all(Object.keys(u.chips.plus || {}).map(k => call('list', { entity: u.chips.plus[k], limit: 1 }).then(r => [k, r.total]).catch(() => [k, 0])))]);
+      const [ds, plus] = await Promise.all([call('distinct', { entity: u.chips.distE || e, field: u.chips.k }), Promise.all(Object.keys(u.chips.plus || {}).map(k => call('list', { entity: u.chips.plus[k], limit: 1 }).then(r => [k, r.total]).catch(() => [k, 0])))]);
       ds.forEach(x => { if (!x.v) return; chipN[x.v] = x.n; if (chipOpt.indexOf(x.v) < 0) chipOpt.push(x.v); });
       plus.forEach(([k, n]) => { chipN[k] = (chipN[k] || 0) + n; });
     } catch (x) { }
@@ -1428,8 +1438,9 @@ VIEWS.list = async (p, main, alive) => {
   const so = u.sortBy ? u.sortBy(st) : [u.sort];
   const params = off => ({ entity: e, q: st.q, filters: filters(), offset: off, limit: 50, sort: so[0], sort2: so[1], desc: asc ? false : undefined });
   const plusE = u.chips && u.chips.plus && st.chip ? u.chips.plus[st.chip] : null;
+  const fetchList = prm => u.listFn ? u.listFn(prm, st) : call('list', prm);
   const load = async (off) => {
-    const [r, pr] = await Promise.all([call('list', params(off)), plusE && !off ? call('list', { entity: plusE, q: st.q, limit: 500 }) : null]);
+    const [r, pr] = await Promise.all([fetchList(params(off)), plusE && !off ? call('list', { entity: plusE, q: st.q, limit: 500 }) : null]);
     if (!alive()) return;
     st.rows = off ? st.rows.concat(r.rows) : r.rows; st.total = r.total;
     if (pr) st.plus = pr.rows; else if (!off) st.plus = [];
@@ -1450,7 +1461,7 @@ VIEWS.list = async (p, main, alive) => {
   S.vh.add = () => go('form', { e, preset: Object.assign({}, p.preset || {}, u.chips && st.chip ? { [u.chips.k]: st.chip } : {}) });
   const doPrint = async (cfg) => {
     toast('Menyiapkan dokumen…');
-    const r = await call('list', Object.assign(params(0), { limit: 5000 }));
+    const r = await fetchList(Object.assign(params(0), { limit: 5000 }));
     let rows = r.rows; if (cfg.filter) rows = rows.filter(cfg.filter);
     const perLbl = st.per && st.per !== 'all' ? (u.year ? 'Tahun ' + st.per : BULAN[Number(st.per.slice(5)) - 1] + ' ' + st.per.slice(0, 4)) : (u.rkp ? 'RKP Desa Tahun ' + S.rkpYear : '');
     printDocs(cfg.title, [docRegister(cfg, rows, perLbl)]);
@@ -1535,6 +1546,7 @@ async function renderDetail(e, x, el, full) {
   if (e === 'rkp_musyawarah') await extraMusyawarah(x, xx);
   if (e === 'pembangunan') await extraPembangunan(x, xx);
   if (e === 'kegiatan') await extraKegiatan(x, xx);
+  if (e === 'petugas') await extraPetugas(x, xx);
   if (e === 'penduduk') S.pendCache = Object.assign(S.pendCache || {}, { [x.id]: x });
 }
 const DETAIL_PAGE = { keluarga: 1, rkp_musyawarah: 1, pembangunan: 1, kegiatan: 1 };
@@ -1543,6 +1555,15 @@ ACT.regSurat = t => {
   const x = (S.pendCache || {})[t.dataset.id]; if (!x) return;
   go('form', { e: 'register_surat', preset: { penduduk_id: x.id, nama: x.nama || '', nik: x.nik || '', tempat_lahir: x.tempat_lahir || '', tgl_lahir: x.tgl_lahir || '', umur: x.tgl_lahir ? umur(x.tgl_lahir) + ' tahun' : '', jk: x.jk || '', dusun: x.dusun || '', rt: x.rt || '', rw: x.rw || '' } });
 };
+
+/* ---------------- Petugas: daftar jabatan satu orang ---------------- */
+async function extraPetugas(pt, el) {
+  const r = await call('list', { entity: 'petugas_jabatan', filters: { ref: pt.id }, sort: 'kelompok', sort2: 'no_urut', desc: false, limit: 50 });
+  const w = canWrite('petugas');
+  const kel = S.listState && S.listState.e === 'petugas' && S.listState.chip && S.listState.chip !== 'Perangkat Desa' ? S.listState.chip : '';
+  el.innerHTML = `<div class="sec-h"><h2>Jabatan / keanggotaan (${r.rows.length})</h2>${w ? `<button class="btn sm" data-act="addSub" data-e="petugas_jabatan" data-p='${esc(JSON.stringify(Object.assign({ ref: pt.id }, kel ? { kelompok: kel } : {})))}'>${ic('plus')}Jabatan</button>` : ''}</div>` +
+    (r.rows.length ? `<div class="list">${r.rows.map(j => rowHtml('petugas_jabatan', j)).join('')}</div>` : '<div class="card meta">Belum ada jabatan. Tambahkan agar orang ini muncul di grupnya.</div>');
+}
 
 /* ---------------- Pembangunan: titik & foto progres ---------------- */
 const pctOf = t => OPT.progres.filter(p => t['foto_' + p]).map(Number).reduce((a, b) => Math.max(a, b), -1);
@@ -1708,18 +1729,19 @@ VIEWS.form = async (p, main, alive) => {
   const e = p.e, u = UI[e];
   setTop((p.id ? 'Ubah ' : 'Tambah ') + u.t);
   let rec = {};
+  const flds = u.fields.filter(f => !(f.virt && p.id));
   if (p.id) rec = await call('get', { entity: e, id: p.id });
   else {
     u.fields.forEach(f => { if (f.def != null) rec[f.k] = typeof f.def === 'function' ? f.def() : f.def; });
     Object.assign(rec, p.preset || {});
     if (u.rkp) rec.tahun_rkp = S.rkpYear;
-    const autoF = u.fields.find(f => f.auto);
+    const autoF = flds.find(f => f.auto);
     if (autoF) {
       try {
         const yf = u.year; const fl = yf ? { [yf + '__pre']: String(new Date().getFullYear()) } : {};
         if (autoF.by) fl[autoF.by] = rec[autoF.by] || '';
         if (!autoF.by || rec[autoF.by]) {
-          const r = await call('list', { entity: e, filters: fl, limit: 5000 });
+          const r = await call('list', { entity: autoF.ent || e, filters: fl, limit: 5000 });
           rec[autoF.k] = String(r.rows.reduce((a, x) => Math.max(a, Number(x[autoF.k]) || 0), 0) + 1);
         }
       } catch (x) { }
@@ -1728,7 +1750,8 @@ VIEWS.form = async (p, main, alive) => {
   if (u.fields.some(f => f.t === 'sdgs') && !S.sdgs) { try { S.sdgs = (await call('list', { entity: 'ref_sdgs', limit: 50, desc: false })).rows; } catch (x) { S.sdgs = []; } }
   if (!alive()) return;
   main.innerHTML = `<form class="card stack" id="frm" novalidate>
-    <div class="form">${u.fields.map(f => fieldHtml(f, rec[f.k], rec)).join('')}</div>
+    ${e === 'petugas' && !p.id ? '<div id="dupNote"></div>' : ''}
+    <div class="form">${flds.map(f => fieldHtml(f, rec[f.k], rec)).join('')}</div>
     <div id="ferr" class="err" hidden></div>
     <div class="btns"><button class="btn pri" type="submit" id="save">${ic('check')}Simpan</button><button class="btn" type="button" data-act="cancel">Batal</button></div>
   </form>`;
@@ -1737,6 +1760,16 @@ VIEWS.form = async (p, main, alive) => {
   if (u.calc) frm.addEventListener('input', ev => { if (ev.target.id === 'f_total') return; const c = u.calc(readForm(u, frm)); if (c) Object.keys(c).forEach(k => { const el = $('#f_' + k, frm); if (el) el.value = Number(c[k]).toLocaleString('id-ID'); }); });
   S.vh.cancel = back;
   if ($('[data-person]', frm)) personPick(frm);
+  /* orang yang sama sudah ada di grup lain? tawarkan tambah jabatan saja */
+  if ($('#dupNote')) $('#f_nama').addEventListener('change', async () => {
+    const nm = $('#f_nama').value.trim(), box = $('#dupNote'); box.innerHTML = '';
+    if (nm.length < 3) return;
+    try {
+      const r = await call('petugasList', { q: nm, limit: 5 });
+      const same = r.rows.filter(x => String(x.nama).trim().toLowerCase() === nm.toLowerCase());
+      if (same.length) box.innerHTML = `<div class="card" style="box-shadow:none;background:var(--surface2)"><b>${esc(nm)}</b> sudah tercatat${same[0].jabatan_list ? ' sebagai ' + esc(same[0].jabatan_list) : ''}. Bila orangnya sama, cukup tambahkan jabatan baru ke datanya. <div class="btns" style="margin-top:6px">${same.map(x => `<button type="button" class="btn sm pri" data-act="addJab" data-p='${esc(JSON.stringify(Object.assign({ ref: x.id }, rec.kelompok ? { kelompok: rec.kelompok } : {})))}'>${ic('plus')}Tambah jabatan ke data ini${same.length > 1 ? ' (' + esc(x.wa || x.id) + ')' : ''}</button>`).join('')}</div></div>`;
+    } catch (x) { }
+  });
   S.vh.geo = t => {
     if (!navigator.geolocation) return toast('Perangkat tidak mendukung GPS.', 1);
     navigator.geolocation.getCurrentPosition(pp => { $('#' + t.dataset.t).value = pp.coords.latitude.toFixed(6) + ', ' + pp.coords.longitude.toFixed(6); }, () => toast('Lokasi tidak dapat dibaca.', 1), { enableHighAccuracy: true, timeout: 15000 });
@@ -1751,7 +1784,7 @@ VIEWS.form = async (p, main, alive) => {
     const er = $('#ferr'), btn = $('#save');
     er.hidden = true;
     const val = readForm(u, frm);
-    const miss = u.fields.filter(f => f.req && f.t !== 'file' && !String(val[f.k] || '').trim());
+    const miss = flds.filter(f => f.req && f.t !== 'file' && !String(val[f.k] || '').trim());
     if (miss.length) { er.textContent = 'Lengkapi: ' + miss.map(f => f.l).join(', ') + '.'; er.hidden = false; $('#f_' + miss[0].k).focus(); return; }
     const bad = u.fields.find(f => f.len && val[f.k] && val[f.k].indexOf('•') < 0 && !new RegExp('^\\d{' + f.len + '}$').test(val[f.k]));
     if (bad) { er.textContent = bad.l + ' harus ' + bad.len + ' digit angka.'; er.hidden = false; return; }
@@ -1769,8 +1802,10 @@ VIEWS.form = async (p, main, alive) => {
       Object.assign(val, p.preset && !p.id ? Object.fromEntries(Object.entries(p.preset).filter(([k]) => !(k in val))) : {});
       if (u.rkp && !val.tahun_rkp) val.tahun_rkp = rec.tahun_rkp || S.rkpYear;
       if (u.sub && !val.ref) val.ref = rec.ref;
+      const virt = {}; u.fields.filter(f => f.virt).forEach(f => { if (f.k in val) { virt[f.k] = val[f.k]; delete val[f.k]; } });
       const saved = await call('save', { entity: e, record: val });
-      if (e === 'aparat' || e === 'petugas') S.people = null;
+      if (e === 'petugas' && !p.id && (virt.kelompok || virt.jabatan)) await call('save', { entity: 'petugas_jabatan', record: Object.assign({ ref: saved.id }, virt) });
+      if (/^(aparat|petugas)/.test(e)) S.people = null;
       toast('Tersimpan.');
       back();
     } catch (x) { er.textContent = x.message; er.hidden = false; btn.disabled = false; btn.innerHTML = ic('check') + 'Simpan'; }
@@ -1779,7 +1814,7 @@ VIEWS.form = async (p, main, alive) => {
 /* Pilih nama dari data Aparat + Petugas Desa; kolom lain (unsur, tempat/tgl lahir) terisi otomatis */
 async function people() {
   if (S.people) return S.people;
-  const [ap, pt] = await Promise.all([call('list', { entity: 'aparat', limit: 500 }), call('list', { entity: 'petugas', limit: 2000 })]);
+  const [ap, pt] = await Promise.all([call('list', { entity: 'aparat', limit: 500 }), call('petugasList', { mode: 'flat', limit: 5000 })]);
   const unsurAp = j => /^kepala desa/i.test(j) ? 'Kepala Desa' : /^sekretaris desa/i.test(j) ? 'Sekretaris Desa' : 'Perangkat Desa';
   S.people = ap.rows.map(x => ({ nama: x.nama, jabatan: x.jabatan || '', unsur: unsurAp(x.jabatan || ''), tempat_lahir: x.tempat_lahir || '', tgl_lahir: x.tgl_lahir || '', asal: 'Aparat' }))
     .concat(pt.rows.map(x => ({ nama: x.nama, jabatan: x.jabatan || '', unsur: x.unsur || x.kelompok || '', tempat_lahir: x.tempat_lahir || '', tgl_lahir: x.tgl_lahir || '', asal: x.kelompok || 'Petugas' })))
@@ -1906,6 +1941,7 @@ async function extraMusyawarah(mu, el) {
     <div class="btns"><span class="lbl">Cetak ringkas:</span><button class="btn sm" data-act="pdoc" data-d="ba" data-id="${esc(mu.id)}">${ic('print')}Berita Acara</button><button class="btn sm" data-act="pdoc" data-d="skp" data-id="${esc(mu.id)}">${ic('print')}SK Tim Penyusun</button><button class="btn sm" data-act="pdoc" data-d="skv" data-id="${esc(mu.id)}">${ic('print')}SK Tim Verifikasi</button></div></div>`;
 }
 ACT.addSub = t => go('form', { e: t.dataset.e, preset: JSON.parse(t.dataset.p) });
+ACT.addJab = t => go('form', { e: 'petugas_jabatan', preset: JSON.parse(t.dataset.p) }, true);
 ACT.pdoc = async t => { try { await rkpDoc(t.dataset.d, await call('get', { entity: 'rkp_musyawarah', id: t.dataset.id })); } catch (x) { toast(x.message, 1); } };
 
 /* ---------------- Soon / Akun / Admin ---------------- */
