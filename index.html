@@ -155,6 +155,13 @@ button.stat:hover{border-color:var(--pri)}
 .agenda .ag{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left;color:inherit;font:inherit}
 .agenda .ag:first-of-type{border-top:0}.ag .dt{min-width:54px;text-align:center;border-radius:8px;background:var(--surface2);padding:3px 4px;font-size:11px;line-height:1.25}.ag .dt b{display:block;font-size:17px}
 .ag.today .dt{background:var(--pri);color:var(--pri-ink)}
+.tbl.rk tr.r1 td{border-bottom:0}.tbl.rk tr.r2 td{border-top:1px dashed var(--line)}.tbl.rk .k{font-size:10.5px}
+.prof{align-items:center;gap:14px}
+.pfoto{position:relative;width:96px;height:96px;flex:none}
+.pfoto img,.pfoto .pini{width:96px;height:96px;border-radius:50%;object-fit:cover;display:grid;place-items:center;background:var(--pri-soft,var(--surface2));color:var(--pri);font-size:30px;font-weight:800;border:3px solid var(--surface);box-shadow:var(--shadow)}
+.pimgbtn{padding:0;border:0;background:none;border-radius:50%;cursor:zoom-in}
+.pcam{position:absolute;right:-2px;bottom:-2px;width:32px;height:32px;border-radius:50%;background:var(--pri);color:var(--pri-ink);display:grid;place-items:center;cursor:pointer;border:2px solid var(--surface)}
+.pcam svg{width:16px;height:16px}.pfoto.busy{opacity:.5;pointer-events:none}
 .chips.wrap{flex-wrap:wrap;overflow:visible}.chip small{opacity:.7;font-weight:500}
 .chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:2px 9px;font-size:11.5px;font-weight:600;white-space:nowrap;cursor:pointer;color:var(--muted)}
 .chip.on{background:var(--pri);border-color:var(--pri);color:var(--pri-ink)}
@@ -256,8 +263,8 @@ table.tbl{border-collapse:collapse;width:100%;font-size:11.5px;font-variant-nume
 .tbl th.stk{background:var(--surface2);z-index:2}
 .tbl td.c,.tbl th.c{text-align:center;padding:4px 3px;min-width:24px}
 .k{display:inline-block;min-width:20px;padding:1px 3px;border-radius:5px;font-weight:700;font-size:10px}
-.k-H{background:var(--ok-soft);color:var(--ok)} .k-T{background:var(--warn-soft);color:var(--warn)} .k-DL{background:var(--info-soft);color:var(--info)}
-.k-I,.k-S{background:var(--gold-soft);color:var(--gold)} .k-A{background:var(--bad-soft);color:var(--bad)}
+.k-H,.k-HD,.k-P{background:var(--ok-soft);color:var(--ok)} .k-T,.k-IT,.k-TD,.k-ITD{background:var(--warn-soft);color:var(--warn)} .k-D,.k-DL{background:var(--info-soft);color:var(--info)}
+.k-I,.k-S,.k-TI,.k-TS{background:var(--gold-soft);color:var(--gold)} .k-A,.k-PA{background:var(--bad-soft);color:var(--bad)}
 .tbl td.lib{background:var(--surface2)}
 .bar{height:6px;border-radius:99px;background:var(--surface2);overflow:hidden;display:flex}
 .bar i{display:block;height:100%}
@@ -607,13 +614,13 @@ const UI = {
       F('tgl_meninggal', 'Tanggal Meninggal', 'date'), F('tgl_pindah', 'Tanggal Pindah', 'date'), F('tgl_datang', 'Tanggal Datang', 'date'), F('ket', 'Keterangan', 'text'), F('foto_ktp_id', 'Foto KTP', 'file', { img: 1, priv: 1, wide: 1 })],
     chips: { k: 'dusun', opt: OPT.dusun, lbl: s => s.replace('DUSUN ', '') }, sort: 'nama',
     row: r => ({ t: r.nama, s: `<span class="mono">${esc(r.nik)}</span> · ${esc((r.jk || '').slice(0, 1))}${r.tgl_lahir ? ' · ' + umur(r.tgl_lahir) + ' th' : ''} · ${esc(String(r.dusun || '').replace('DUSUN ', ''))} RT ${esc(r.rt)}/${esc(r.rw)}`, raw: 1, s2: [r.hubungan, r.pekerjaan, r.status_kawin, r.pendidikan].filter(Boolean).join(' · '), av: initials(r.nama), pill: r.status && r.status !== 'Aktif' ? `<span class="pill ${/meninggal/i.test(r.status) ? 'bad' : 'warn'}">${esc(r.status)}</span>` : '' }),
-    print: { title: 'BUKU INDUK PENDUDUK', land: 1, cols: [['Nama', 'nama'], ['NIK', 'nik'], ['No. KK', 'kk'], ['L/P', r => (r.jk || '').slice(0, 1)], ['Tempat & Tgl Lahir', r => (r.tempat_lahir || '') + ', ' + fDate(r.tgl_lahir)], ['Agama', 'agama'], ['Pendidikan', 'pendidikan'], ['Pekerjaan', 'pekerjaan'], ['Status Kawin', 'status_kawin'], ['Hub. Keluarga', 'hubungan'], ['Alamat', r => String(r.dusun).replace('DUSUN ', '') + ' RT ' + r.rt + '/RW ' + r.rw], ['Ket', 'status']] }
+    excel: 1,
   },
   keluarga: {
     t: 'Data Keluarga (KK)', ic: 'house', perm: 'penduduk', folder: 'Penduduk/KK', file: 'foto_kk_id',
     fields: [F('kk', 'Nomor KK', 'text', { req: 1, mono: 1, len: 16, sens: 1 }), F('kepala', 'Nama Kepala Keluarga', 'text', { req: 1, up: 1 }), F('dusun', 'Dusun', 'select', { opt: OPT.dusun, req: 1 }),
       F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }), F('alamat', 'Alamat sesuai KK', 'text', { up: 1 }), F('tgl_kk', 'Tanggal KK', 'date'), F('lokasi', 'Koordinat Rumah', 'geo', { hint: 'lat, lng' }), F('foto_kk_id', 'Foto KK', 'file', { img: 1, priv: 1, wide: 1 })],
-    chips: { k: 'dusun', opt: OPT.dusun, lbl: s => s.replace('DUSUN ', '') }, sort: 'kepala',
+    chips: { k: 'dusun', opt: OPT.dusun, lbl: s => s.replace('DUSUN ', '') }, sort: 'kepala', excel: 1,
     row: r => ({ t: r.kepala, s: `<span class="mono">${esc(r.kk)}</span> · ${esc(String(r.dusun || '').replace('DUSUN ', ''))} RT ${esc(r.rt)}/${esc(r.rw)}`, raw: 1, s2: [r.alamat, r.tgl_kk && 'KK ' + fDate(r.tgl_kk, 1)].filter(Boolean).join(' · '), av: ic('house'), geo: parseLL(r.lokasi) })
   },
   rkp_musyawarah: {
@@ -844,28 +851,55 @@ function markNav() {
 }
 function root(tab) { S.stack = []; S.cur = null; go(tab, {}); }
 function go(name, params, keep) {
-  if (S.cur && !keep) S.stack.push(S.cur);
+  if (S.cur && !keep) { S.cur.y = window.scrollY; S.stack.push(S.cur); try { history.pushState({ pw: 'app', d: ((history.state && history.state.d) || 0) + 1 }, ''); } catch (x) { } }
   S.cur = { name, params: params || {} };
   show();
 }
-function back() { S.cur = S.stack.pop() || { name: 'home', params: {} }; show(); }
-function refresh() { show(); }
+/* kembali ke tampilan sebelumnya, di posisi gulir terakhir */
+function navBack() {
+  const prev = S.stack.pop();
+  S.cur = prev || { name: 'home', params: {} };
+  S.backNav = true;
+  show(prev ? prev.y : 0);
+}
+function back() { if (history.state && history.state.pw === 'app' && S.stack.length) history.back(); else navBack(); }
+/* d = kedalaman riwayat di atas titik awal aplikasi (0 = titik awal) */
+function exitAsk(d) {
+  const m = modal('Keluar aplikasi', `<div class="stack"><p style="margin:0">Apakah Anda mau keluar dari aplikasi?</p><div class="btns"><button class="btn danger solid" id="exYa">Ya</button><button class="btn" id="exNo">Tidak</button></div></div>`, { onClose: () => { if (!S.exiting && !d) history.pushState({ pw: 'app', d: 1 }, ''); } });
+  $('#exNo', m.el).onclick = () => m.close();
+  $('#exYa', m.el).onclick = () => { S.exiting = true; m.close(); history.go(-(d + 1)); setTimeout(() => { try { window.close(); } catch (x) { } S.exiting = false; }, 500); };
+}
+window.addEventListener('popstate', ev => {
+  if (!S.user || !$('#main') || S.exiting) return;
+  const d = (ev.state && ev.state.pw === 'app' && ev.state.d) || 0;
+  const keep = () => { if (!d) history.pushState({ pw: 'app', d: 1 }, ''); };
+  const md = $$('#layer .modal');
+  if (md.length) { const x = $('[data-x]', md[md.length - 1]); if (x) x.click(); else md[md.length - 1].remove(); keep(); return; }
+  if (S.stack.length) { navBack(); keep(); return; }
+  if (S.cur && S.cur.name !== 'home') { S.cur = { name: 'home', params: {} }; show(); keep(); return; }
+  exitAsk(d);
+});
+function refresh() { show(window.scrollY); }
 function setTop(t, sub, act) {
   $('#ttl').innerHTML = esc(t) + (sub ? `<span class="sub">${esc(sub)}</span>` : '');
   $('#topAct').innerHTML = act || '';
   $('#btnBack').hidden = !S.stack.length;
 }
-async function show() {
+async function show(y) {
   const v = VIEWS[S.cur.name] || VIEWS.home;
   const my = ++S.seq;
   S.vh = {};
   clearInterval(S.timer);
-  window.scrollTo(0, 0);
-  markNav();
   const main = $('#main');
+  if (y) main.style.minHeight = (y + window.innerHeight) + 'px';   /* tahan tinggi halaman agar posisi gulir bisa dipulihkan */
+  else window.scrollTo(0, 0);
+  markNav();
   main.innerHTML = '<div class="stack"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>';
   try { await v(S.cur.params, main, () => my === S.seq); }
   catch (e) { if (my === S.seq) main.innerHTML = `<div class="err">${esc(e.message)}</div><p><button class="btn" onclick="refresh()">Coba lagi</button></p>`; }
+  S.backNav = false;
+  if (my === S.seq && y) requestAnimationFrame(() => { window.scrollTo(0, y); main.style.minHeight = ''; });
+  else main.style.minHeight = '';
 }
 document.addEventListener('click', e => {
   const t = e.target.closest('[data-act]');
@@ -1062,6 +1096,9 @@ function enter() {
   if (!S.user.wajah && !S.faceSkip) return faceScreen();
   shell();
   S.stack = []; S.cur = null;
+  /* jebakan riwayat: tombol kembali HP dikelola aplikasi (lihat onpopstate) */
+  if (!history.state || !history.state.pw) { history.replaceState({ pw: 'base', d: 0 }, ''); history.pushState({ pw: 'app', d: 1 }, ''); }
+  else if (history.state.pw === 'base') history.pushState({ pw: 'app', d: 1 }, '');
   go('home');
 }
 /* ---------------- Pasang aplikasi (PWA) ---------------- */
@@ -1118,6 +1155,37 @@ const VIEWS = {};
 function clockTick(el) {
   const f = () => { const d = new Date(); el.textContent = pad2(d.getHours()) + ':' + pad2(d.getMinutes()) + ':' + pad2(d.getSeconds()); };
   f(); S.timer = setInterval(f, 1000);
+}
+/* Jendela waktu presensi (lihat PANDUAN): pagi = Masuk/DL/Izin/Sakit, pulang = Pulang */
+function presWin(jamNow) {
+  const st = S.set, n = new Date();
+  const hm = jamNow ? String(jamNow).slice(0, 5) : pad2(n.getHours()) + ':' + pad2(n.getMinutes());
+  const W = { mulai: st.jam_masuk_mulai || '06:30', batas: st.jam_masuk_batas || '08:30', pul: (n.getDay() === 5 ? st.jam_pulang_jumat : st.jam_pulang_mulai) || '14:00', tutup: st.jam_pulang_batas || '23:59' };
+  W.tahap = hm < W.mulai ? 'belum' : hm < W.pul ? 'pagi' : hm < W.tutup ? 'pulang' : 'tutup';
+  return W;
+}
+/* Sakit, Pulang, atau Izin yang menutup hari (setelah masuk/dinas luar, atau setelah batas masuk) */
+function presSelesai(rec) {
+  const batas = S.set.jam_masuk_batas || '08:30';
+  return rec.some((x, i) => x.jenis === 'Sakit' || x.jenis === 'Pulang' || (x.jenis === 'Izin' && (String(x.jam).slice(0, 5) > batas || rec.slice(0, i).some(y => y.jenis === 'Masuk' || y.jenis === 'Dinas Luar'))));
+}
+/* Kode rekap satu hari: [pagi/datang, siang/pulang] */
+function kodeHari(recs, batas, closed) {
+  const at = j => recs.findIndex(x => x.jenis === j);
+  const iM = at('Masuk'), iD = at('Dinas Luar'), iP = at('Pulang'), iI = at('Izin'), iS = at('Sakit');
+  const w1 = i => String(recs[i].jam).slice(0, 5) <= batas;
+  let pagi = '', siang = '';
+  if (iM >= 0) pagi = (iI >= 0 && iI < iM ? 'IT' : w1(iM) ? 'H' : 'T') + (iD >= 0 ? 'D' : '');
+  else if (iD >= 0) pagi = iI >= 0 && iI < iD ? 'ITD' : w1(iD) ? 'D' : 'TD';
+  else if (iI >= 0) pagi = w1(iI) ? 'I' : 'TI';
+  else if (iS >= 0) pagi = w1(iS) ? 'S' : 'TS';
+  else if (closed) pagi = 'A';
+  const aktif = iM >= 0 || iD >= 0;
+  if (iP >= 0) siang = 'P';
+  else if (iS >= 0) siang = 'S';
+  else if (iI >= 0 && (!aktif || iI > Math.min(...[iM, iD].filter(x => x >= 0)))) siang = 'I';
+  else if (closed) siang = aktif ? 'PA' : 'A';
+  return [pagi, siang];
 }
 function presSummary(p) {
   const r = p.records || [];
@@ -1184,17 +1252,17 @@ VIEWS.presensi = async (p, main, alive) => {
   const rec = d.records || [];
   S.presRec = rec;
   const has = j => rec.some(x => x.jenis === j);
-  const done = has('Izin') || has('Sakit');
-  const dis = {
-    Masuk: done || has('Masuk'), Pulang: done || has('Pulang') || !(has('Masuk') || has('Dinas Luar')),
-    'Dinas Luar': done || has('Dinas Luar'), Izin: rec.length > 0, Sakit: rec.length > 0
-  };
-  if (d.libur) Object.keys(dis).forEach(k => dis[k] = true);
-  const st = S.set;
-  const J = [['Masuk', 'masuk', 'check', 'Batas ' + (st.jam_masuk_batas || '')], ['Pulang', 'pulang', 'out', 'Mulai ' + (st.jam_pulang_mulai || '')], ['Dinas Luar', 'dl', 'send', 'Tugas di luar kantor'], ['Izin', 'izin', 'file', 'Dengan keterangan'], ['Sakit', 'sakit', 'heart', 'Dengan keterangan']];
+  const st = S.set, W = presWin(d.jam);
+  const selesai = presSelesai(rec);
+  const tutup = !!d.libur || W.tahap === 'belum' || W.tahap === 'tutup' || selesai;
+  const pagiOK = !tutup && W.tahap === 'pagi', pulangOK = !tutup && W.tahap === 'pulang';
+  const dis = { Masuk: !pagiOK || has('Masuk'), 'Dinas Luar': !pagiOK || has('Dinas Luar'), Izin: !pagiOK || has('Izin'), Sakit: !pagiOK, Pulang: !pulangOK || !(has('Masuk') || has('Dinas Luar')) };
+  const J = [['Masuk', 'masuk', 'check', W.mulai + '–' + W.batas + ' tepat waktu'], ['Pulang', 'pulang', 'out', W.pul + '–' + W.tutup], ['Dinas Luar', 'dl', 'send', 'Sampai ' + W.pul], ['Izin', 'izin', 'file', 'Sampai ' + W.pul], ['Sakit', 'sakit', 'heart', 'Sampai ' + W.pul]];
+  const info = d.libur ? '' : selesai ? 'Presensi Anda hari ini sudah selesai.' : W.tahap === 'belum' ? 'Presensi dibuka pukul ' + W.mulai + '.' : W.tahap === 'tutup' ? 'Presensi hari ini sudah ditutup (batas ' + W.tutup + ').' : W.tahap === 'pagi' ? 'Sekarang: presensi masuk, dinas luar, izin, atau sakit (sampai ' + W.pul + ').' : 'Sekarang: presensi pulang (sampai ' + W.tutup + ').';
   main.innerHTML = `<div class="stack">
     <section class="hero"><div class="who"><div class="hi">${esc(fDay(isoToday()))}</div><h1>${esc(presSummary(d).text)}</h1></div><div class="clock num" id="clk" style="position:relative;z-index:1"></div></section>
     ${d.libur ? `<div class="card"><b>Hari ini libur (${esc(d.libur)}).</b><div class="muted">Presensi tidak diperlukan.</div></div>` : ''}
+    ${info ? `<div class="card" style="padding:7px 10px"><b>${esc(info)}</b></div>` : ''}
     ${!d.wajah && !d.libur ? `<div class="card"><b>Wajah Anda belum terekam.</b> <span class="muted">Aplikasi akan meminta Anda merekam wajah saat presensi (sekali saja). Foto tidak disimpan.</span></div>` : ''}
     <div class="jgrid">${J.map(j => `<button class="jbtn ${j[1]}" data-act="absen" data-j="${j[0]}" ${dis[j[0]] ? 'disabled' : ''}><span class="ti">${ic(j[2])}</span>${j[0]}<small>${esc(j[3])}</small></button>`).join('')}</div>
     <div class="sec-h"><h2>Catatan hari ini</h2></div>
@@ -1211,20 +1279,19 @@ function absenForm(jenis) {
   const enroll = needFace && !S.faceOn;
   let pos = null, face = null, fotoFile = null, sent = false;
   /* Sesudah Dinas Luar: presensi pulang boleh di luar kantor bila sudah lewat jam pulang */
-  const jamPulang = (new Date().getDay() === 5 ? st.jam_pulang_jumat : st.jam_pulang_mulai) || '';
+  /* Masuk wajib di kantor; Pulang di kantor kecuali hari ini Dinas Luar; lainnya di mana saja */
   const sudahDL = jenis === 'Pulang' && (S.presRec || []).some(x => x.jenis === 'Dinas Luar');
-  const lewat = () => { const n = new Date(); return String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0') >= jamPulang; };
-  const bebasLokasi = sudahDL && lewat();
+  const wajibKantor = jenis === 'Masuk' || (jenis === 'Pulang' && !sudahDL);
   const m = modal('Presensi ' + jenis, `<div class="stack">
     <div class="gps" id="gps">${ic('pin')}<span>Mencari lokasi Anda…</span></div>
-    ${sudahDL ? `<div class="card" style="box-shadow:none;background:var(--surface2);padding:7px 10px">${bebasLokasi ? 'Anda tercatat <b>Dinas Luar</b> hari ini, jadi presensi pulang boleh dari luar kantor desa.' : 'Anda tercatat <b>Dinas Luar</b>. Presensi pulang dari luar kantor desa bisa dilakukan mulai pukul <b>' + esc(jamPulang) + '</b>. Sebelum jam itu, presensi pulang harus di kantor desa.'}</div>` : ''}
+    ${sudahDL ? `<div class="card" style="box-shadow:none;background:var(--surface2);padding:7px 10px">Anda tercatat <b>Dinas Luar</b> hari ini, jadi presensi pulang boleh dari luar kantor desa.</div>` : ''}
     ${needFace ? `<div class="facebox" id="fbox">
       ${enroll ? `<div id="fcons" class="stack"><div class="card" style="box-shadow:none;background:var(--surface2)"><b>Daftarkan wajah (sekali saja)</b><p class="muted" style="margin:6px 0 0">Aplikasi menyimpan <b>pola wajah berupa 128 angka</b>, bukan foto, untuk mencocokkan presensi Anda berikutnya. Foto tidak disimpan di mana pun. Admin dapat menghapus pola wajah Anda kapan saja.</p></div>
         <label class="switch"><input type="checkbox" id="fsetuju">Saya setuju pola wajah saya disimpan untuk presensi</label>
         <button class="btn pri" id="fmulai" disabled>${ic('user')}Mulai daftar wajah</button></div>` : ''}
       <div id="fscan" ${enroll ? 'hidden' : ''}><div class="facecam"><video playsinline muted></video><div class="fring"></div></div><div class="fbar"><i></i></div><div class="fmsg" aria-live="polite">Menyiapkan kamera…</div></div>
     </div>` : ''}
-    <div class="f"><label for="ket">${jenis === 'Dinas Luar' ? 'Tujuan / acara' : jenis === 'Pulang' ? 'Alasan (wajib jika pulang awal)' : 'Keterangan'} ${needKet ? '<i>*</i>' : ''}</label><textarea id="ket" rows="2"></textarea></div>
+    <div class="f"><label for="ket">${jenis === 'Dinas Luar' ? 'Tujuan / acara' : jenis === 'Pulang' ? 'Catatan (opsional)' : 'Keterangan'} ${needKet ? '<i>*</i>' : ''}</label><textarea id="ket" rows="2"></textarea></div>
     ${!needFace ? `<div class="f"><label>Lampiran (surat izin/dokter), opsional</label><input type="file" id="fotoIn" accept="${IMG_ANY}"><img id="fotoPrev" class="shot" alt="" hidden></div>` : ''}
     <div id="aerr" class="err" hidden></div>
     <button class="btn pri" id="kirim" ${needFace ? 'disabled' : ''}>${ic('check')}Kirim presensi ${esc(jenis.toLowerCase())}</button></div>`, { onClose: () => { const f = $('#fscan', m.el); if (f && f._stop) f._stop(); } });
@@ -1238,9 +1305,9 @@ function absenForm(jenis) {
       if (st.kantor_lat && st.kantor_lng) {
         const dj = jarakM(+pos.lat, +pos.lng, +st.kantor_lat, +st.kantor_lng);
         txt = dj + ' m dari kantor desa';
-        if (st.wajib_radius === 'ya' && /Masuk|Pulang/.test(jenis) && dj > Number(st.radius_m || 150)) {
-          if (bebasLokasi) txt += ' — dinas luar, boleh di luar kantor';
-          else { ok = false; txt += ' — di luar batas ' + st.radius_m + ' m'; }
+        if (st.wajib_radius === 'ya' && dj > Number(st.radius_m || 150)) {
+          if (wajibKantor) { ok = false; txt += ' — di luar batas ' + st.radius_m + ' m'; }
+          else txt += ' — boleh di luar kantor';
         }
       }
       gps.className = 'gps ' + (ok ? 'ok' : 'bad'); gps.innerHTML = ic('pin') + '<span>' + esc(txt) + '</span>';
@@ -1391,12 +1458,12 @@ VIEWS.rekap = async (p, main, alive) => {
   const d = raw.recs ? rekapCompute(raw) : raw;
   const prev = new Date(y, mo - 2, 1), next = new Date(y, mo, 1);
   const ym = x => x.getFullYear() + '-' + pad2(x.getMonth() + 1);
-  const L = ['H', 'T', 'DL', 'I', 'S', 'A', 'PA'];
+  const L = ['H', 'T', 'D', 'I', 'S', 'A', 'PA'];
   main.innerHTML = `<div class="stack">
     <div class="toolbar"><button class="btn sm" data-act="mon" data-m="${ym(prev)}">${ic('back')}</button><input type="month" class="inp" id="mon" value="${bulan}" style="max-width:180px"><button class="btn sm" data-act="mon" data-m="${ym(next)}" aria-label="Bulan berikutnya">${ic('next')}</button><span style="flex:1"></span><button class="btn sm" data-act="cetak">${ic('print')}Cetak rekap</button></div>
-    <div class="meta">H hadir · T terlambat · DL dinas luar · I izin · S sakit · A tanpa keterangan · PA pulang awal. Kolom abu-abu = hari libur.</div>
-    <div class="tbl-wrap"><table class="tbl"><thead><tr><th class="stk">Nama</th>${d.days.map(x => `<th class="c" title="${esc(x.libur || '')}">${Number(x.tgl.slice(8))}</th>`).join('')}<th class="c">Kerja</th>${L.map(k => `<th class="c">${k}</th>`).join('')}</tr></thead>
-    <tbody>${d.users.map(u => `<tr><td class="stk"><b>${esc(u.nama)}</b><div class="meta">${esc(u.jabatan)}</div></td>${d.days.map(x => { const k = u.masuk[x.tgl]; return `<td class="c ${x.libur ? 'lib' : ''}">${k ? `<span class="k k-${k}">${k}</span>` : ''}</td>`; }).join('')}<td class="c"><b>${u.jml.hari_kerja}</b></td>${L.map(k => `<td class="c">${u.jml[k] || 0}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+    <div class="meta">${esc(REKAP_KET)} Kolom abu-abu = hari libur.</div>
+    <div class="tbl-wrap"><table class="tbl rk"><thead><tr><th class="stk">Nama</th><th class="c"></th>${d.days.map(x => `<th class="c" title="${esc(x.libur || '')}">${Number(x.tgl.slice(8))}</th>`).join('')}<th class="c">Kerja</th>${L.map(k => `<th class="c">${k}</th>`).join('')}</tr></thead>
+    <tbody>${d.users.map(u => ['pagi', 'siang'].map((b, bi) => `<tr class="${bi ? 'r2' : 'r1'}">${bi ? '' : `<td class="stk" rowspan="2"><b>${esc(u.nama)}</b><div class="meta">${esc(u.jabatan)}</div></td>`}<td class="c meta">${bi ? 'Plg' : 'Dtg'}</td>${d.days.map(x => { const k = u[b][x.tgl]; return `<td class="c ${x.libur ? 'lib' : ''}">${k ? `<span class="k k-${k.replace(/[^A-Z]/g, '')}">${k}</span>` : ''}</td>`; }).join('')}${bi ? '' : `<td class="c" rowspan="2"><b>${u.jml.hari_kerja}</b></td>${L.map(k => `<td class="c" rowspan="2">${u.jml[k] || 0}</td>`).join('')}`}</tr>`).join('')).join('')}</tbody></table></div>
   </div>`;
   $('#mon').onchange = e => { if (e.target.value) go('rekap', { bulan: e.target.value }, true); };
   S.vh.mon = t => go('rekap', { bulan: t.dataset.m }, true);
@@ -1404,25 +1471,207 @@ VIEWS.rekap = async (p, main, alive) => {
 };
 
 function rekapCompute(r) {
-  const K = { 'Hadir': 'H', 'Hadir Terlambat': 'T', 'Dinas Luar': 'DL', 'Izin': 'I', 'Sakit': 'S' };
+  const batas = S.set.jam_masuk_batas || '08:30', tutup = S.set.jam_pulang_batas || '23:59';
+  const n = new Date(), hm = pad2(n.getHours()) + ':' + pad2(n.getMinutes());
   return {
     bulan: r.bulan, days: r.days, users: r.users.map(usr => {
-      const masuk = {}, pulang = {};
-      r.recs.filter(x => x.user_id === usr.id).forEach(x => {
-        if (x.jenis === 'Pulang') pulang[x.tanggal] = x.status === 'Pulang Awal' ? 'PA' : 'P';
-        else if (!masuk[x.tanggal] || x.jenis !== 'Dinas Luar') masuk[x.tanggal] = K[x.status] || K[x.jenis] || '?';
-      });
-      const j = { hari_kerja: 0, H: 0, T: 0, DL: 0, I: 0, S: 0, P: 0, PA: 0, A: 0 };
+      const pagi = {}, siang = {};
+      const j = { hari_kerja: 0, H: 0, T: 0, D: 0, I: 0, S: 0, A: 0, P: 0, PA: 0 };
       r.days.forEach(d => {
-        if (d.libur) return;
+        if (d.libur || d.tgl > r.today) return;
+        const closed = d.tgl < r.today || hm >= tutup;
+        const k = kodeHari(r.recs.filter(x => x.user_id === usr.id && x.tanggal === d.tgl), batas, closed);
+        pagi[d.tgl] = k[0]; siang[d.tgl] = k[1];
+        if (!closed && !k[0]) return;
         j.hari_kerja++;
-        const k = masuk[d.tgl];
-        if (k) j[k] = (j[k] || 0) + 1;
-        else if (d.tgl < r.today) { j.A++; masuk[d.tgl] = 'A'; }
-        if (pulang[d.tgl]) j[pulang[d.tgl]]++;
+        const g = /^(IT|T)/.test(k[0]) && k[0] !== 'TI' && k[0] !== 'TS' ? 'T' : { H: 'H', HD: 'H', D: 'D', I: 'I', TI: 'I', S: 'S', TS: 'S', A: 'A' }[k[0]];
+        if (g) j[g]++;
+        if (k[1] === 'P') j.P++; else if (k[1] === 'PA') j.PA++;
       });
-      return { id: usr.id, nama: usr.nama, jabatan: usr.jabatan, masuk, pulang, jml: j };
+      return { id: usr.id, nama: usr.nama, jabatan: usr.jabatan, pagi, siang, jml: j };
     })
+  };
+}
+const REKAP_KET = 'Baris atas = datang, baris bawah = pulang. Datang: H hadir tepat waktu · T terlambat · D dinas luar · TD dinas luar setelah jam masuk · HD hadir lalu dinas luar · I izin · TI izin setelah jam masuk · IT izin lalu masuk terlambat · ITD izin, masuk, lalu dinas luar · S sakit · TS sakit setelah jam masuk · A tanpa keterangan. Pulang: P pulang · PA tidak presensi pulang · I izin · S sakit · A tanpa keterangan.';
+
+/* =====================================================================
+   EXCEL (.xlsx) — tulis & baca tanpa pustaka luar
+   ===================================================================== */
+const XL = (() => {
+  const enc = new TextEncoder(), dec = new TextDecoder();
+  let T = null;
+  const crc32 = b => {
+    if (!T) T = Array.from({ length: 256 }, (_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });
+    let c = 0xFFFFFFFF; for (let i = 0; i < b.length; i++) c = T[(c ^ b[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0;
+  };
+  function zip(files) {
+    const parts = [], cen = []; let off = 0;
+    files.forEach(f => {
+      const nm = enc.encode(f.name), d = typeof f.data === 'string' ? enc.encode(f.data) : f.data, c = crc32(d);
+      const h = new DataView(new ArrayBuffer(30));
+      h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(12, 0x21, true); h.setUint32(14, c, true); h.setUint32(18, d.length, true); h.setUint32(22, d.length, true); h.setUint16(26, nm.length, true);
+      parts.push(new Uint8Array(h.buffer), nm, d);
+      const e = new DataView(new ArrayBuffer(46));
+      e.setUint32(0, 0x02014b50, true); e.setUint16(4, 20, true); e.setUint16(6, 20, true); e.setUint16(14, 0x21, true); e.setUint32(16, c, true); e.setUint32(20, d.length, true); e.setUint32(24, d.length, true); e.setUint16(28, nm.length, true); e.setUint32(42, off, true);
+      cen.push(new Uint8Array(e.buffer), nm);
+      off += 30 + nm.length + d.length;
+    });
+    const cl = cen.reduce((a, b) => a + b.length, 0), z = new DataView(new ArrayBuffer(22));
+    z.setUint32(0, 0x06054b50, true); z.setUint16(8, files.length, true); z.setUint16(10, files.length, true); z.setUint32(12, cl, true); z.setUint32(16, off, true);
+    return new Blob(parts.concat(cen, [new Uint8Array(z.buffer)]), { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  }
+  const x = v => String(v == null ? '' : v).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const col = i => { let s = ''; i++; while (i) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; };
+  function sheet(rows, widths, head) {
+    const w = widths || [];
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">${head ? '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>' : ''}<cols>${(rows[0] || []).map((_, i) => `<col min="${i + 1}" max="${i + 1}" width="${w[i] || 14}" style="2" customWidth="1"/>`).join('')}</cols><sheetData>${rows.map((r, ri) => `<row r="${ri + 1}">${r.map((v, ci) => `<c r="${col(ci)}${ri + 1}" t="inlineStr" s="${head && ri === 0 ? 1 : 2}"><is><t xml:space="preserve">${x(v)}</t></is></c>`).join('')}</row>`).join('')}</sheetData>${head ? `<autoFilter ref="A1:${col(Math.max(0, rows[0].length - 1))}${rows.length}"/>` : ''}</worksheet>`;
+  }
+  /* sheets: [{name, rows:[[...]], widths:[...], head:true}] */
+  function write(sheets) {
+    const S = sheets.map((s, i) => ({ ...s, id: i + 1 }));
+    return zip([
+      { name: '[Content_Types].xml', data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${S.map(s => `<Override PartName="/xl/worksheets/sheet${s.id}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>` },
+      { name: '_rels/.rels', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>' },
+      { name: 'xl/workbook.xml', data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${S.map(s => `<sheet name="${x(s.name.slice(0, 31))}" sheetId="${s.id}" r:id="rId${s.id}"/>`).join('')}</sheets></workbook>` },
+      { name: 'xl/_rels/workbook.xml.rels', data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${S.map(s => `<Relationship Id="rId${s.id}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${s.id}.xml"/>`).join('')}<Relationship Id="rId${S.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>` },
+      { name: 'xl/styles.xml', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF0F5A46"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="49" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyNumberFormat="1"/><xf numFmtId="49" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs></styleSheet>' }
+    ].concat(S.map(s => ({ name: `xl/worksheets/sheet${s.id}.xml`, data: sheet(s.rows, s.widths, s.head) }))));
+  }
+  async function unzip(buf) {
+    const dv = new DataView(buf); let e = buf.byteLength - 22;
+    while (e >= 0 && dv.getUint32(e, true) !== 0x06054b50) e--;
+    if (e < 0) throw new Error('Berkas bukan Excel (.xlsx) yang valid.');
+    const n = dv.getUint16(e + 10, true), F = {}; let p = dv.getUint32(e + 16, true);
+    for (let i = 0; i < n; i++) {
+      const nl = dv.getUint16(p + 28, true), xl = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true);
+      F[dec.decode(new Uint8Array(buf, p + 46, nl))] = { m: dv.getUint16(p + 10, true), cs: dv.getUint32(p + 20, true), lo: dv.getUint32(p + 42, true) };
+      p += 46 + nl + xl + cl;
+    }
+    return async name => {
+      const f = F[name]; if (!f) return null;
+      const d = new Uint8Array(buf, f.lo + 30 + dv.getUint16(f.lo + 26, true) + dv.getUint16(f.lo + 28, true), f.cs);
+      if (f.m === 0) return dec.decode(d);
+      if (typeof DecompressionStream === 'undefined') throw new Error('Browser ini belum bisa membaca Excel. Perbarui Chrome/Safari, atau simpan sebagai CSV.');
+      return dec.decode(await new Response(new Blob([d]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer());
+    };
+  }
+  const X = t => new DOMParser().parseFromString(t, 'application/xml');
+  const all = (n, tag) => Array.from(n.getElementsByTagNameNS('*', tag));
+  /* baca sheet pertama → array baris (array string/angka) */
+  async function read(file) {
+    if (/\.csv$/i.test(file.name)) return csv(await file.text());
+    const get = await unzip(await file.arrayBuffer());
+    const wb = X(await get('xl/workbook.xml')), rels = X(await get('xl/_rels/workbook.xml.rels'));
+    const sh = all(wb, 'sheet')[0], rid = sh.getAttribute('r:id') || sh.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id');
+    let tgt = all(rels, 'Relationship').find(r => r.getAttribute('Id') === rid).getAttribute('Target');
+    tgt = tgt.replace(/^\//, ''); if (!/^xl\//.test(tgt)) tgt = 'xl/' + tgt;
+    const sst = await get('xl/sharedStrings.xml'), ss = sst ? all(X(sst), 'si').map(si => all(si, 't').map(t => t.textContent).join('')) : [];
+    const rows = [];
+    all(X(await get(tgt)), 'row').forEach(r => {
+      const ri = Number(r.getAttribute('r')) - 1, out = [];
+      all(r, 'c').forEach((c, k) => {
+        const ref = c.getAttribute('r'); let ci = k;
+        if (ref) { ci = 0; for (const ch of ref.replace(/\d+/g, '')) ci = ci * 26 + ch.charCodeAt(0) - 64; ci--; }
+        const t = c.getAttribute('t'), v = all(c, 'v')[0];
+        out[ci] = t === 's' ? ss[Number(v && v.textContent)] : t === 'inlineStr' ? all(c, 't').map(z => z.textContent).join('') : t === 'str' || t === 'b' || t === 'e' ? (v ? v.textContent : '') : v ? Number(v.textContent) : '';
+      });
+      rows[ri >= 0 ? ri : rows.length] = out;
+    });
+    return Array.from(rows, r => r || []);
+  }
+  function csv(t) {
+    const sep = (t.split('\n')[0].match(/;/g) || []).length > (t.split('\n')[0].match(/,/g) || []).length ? ';' : ',';
+    const rows = []; let row = [], cur = '', q = false;
+    for (let i = 0; i < t.length; i++) {
+      const ch = t[i];
+      if (q) { if (ch === '"') { if (t[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += ch; }
+      else if (ch === '"') q = true;
+      else if (ch === sep) { row.push(cur); cur = ''; }
+      else if (ch === '\n' || ch === '\r') { if (ch === '\r' && t[i + 1] === '\n') i++; row.push(cur); rows.push(row); row = []; cur = ''; }
+      else cur += ch;
+    }
+    if (cur || row.length) { row.push(cur); rows.push(row); }
+    return rows;
+  }
+  return { write, read };
+})();
+function saveBlob(blob, name) {
+  const u = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 60000);
+}
+/* ubah nilai sel Excel menjadi isian aplikasi */
+function xlVal(f, v) {
+  if (v == null) return '';
+  if (typeof v === 'number') {
+    if (f.t === 'date') { const d = new Date(Date.UTC(1899, 11, 30) + Math.round(v * 864e5)); return d.toISOString().slice(0, 10); }
+    v = Number.isInteger(v) ? v.toLocaleString('fullwide', { useGrouping: false }) : String(v);
+  }
+  let s = String(v).trim();
+  if (!s) return '';
+  if (f.t === 'date') {
+    let m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);
+    if (m) return m[3] + '-' + pad2(m[2]) + '-' + pad2(m[1]);
+    m = s.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/);
+    if (m) return m[1] + '-' + pad2(m[2]) + '-' + pad2(m[3]);
+    return s;
+  }
+  if (f.t === 'money') return s.replace(/\D/g, '');
+  if (f.t === 'select' && f.opt) { const o = f.opt.find(o => o.toLowerCase() === s.toLowerCase()); if (o) return o; }
+  if (f.up) s = s.toUpperCase();
+  if (f.pad && /^\d+$/.test(s)) s = s.padStart(f.pad, '0');
+  return s;
+}
+const xlKey = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+async function excelExport(e, rows, judul) {
+  const u = UI[e], fs = u.fields.filter(f => f.t !== 'file');
+  const data = [['ID'].concat(fs.map(f => f.l))].concat(rows.map(r => [r.id].concat(fs.map(f => r[f.k] == null ? '' : r[f.k]))));
+  const pet = [['Petunjuk impor ' + u.t], [''],
+    ['1. Jangan mengubah baris judul (baris 1) dan kolom ID.'],
+    ['2. Ubah isi sel untuk memperbarui data. Baris dengan ID yang sama akan diperbarui.'],
+    ['3. Untuk menambah data baru, isi baris di bawahnya dengan kolom ID dikosongkan.' + (u.fields.some(f => f.k === 'nik') ? ' Bila NIK sudah terdaftar, data itu yang diperbarui.' : u.fields.some(f => f.k === 'kk' && f.req) ? ' Bila Nomor KK sudah terdaftar, data itu yang diperbarui.' : '')],
+    ['4. Tanggal ditulis TAHUN-BULAN-TANGGAL, mis. 1980-04-12 (boleh juga 12/04/1980).'],
+    ['5. Kolom wajib: ' + u.fields.filter(f => f.req).map(f => f.l).join(', ') + '.'],
+    ['6. Menghapus baris di Excel TIDAK menghapus data di aplikasi.'],
+    ['7. Simpan tetap sebagai .xlsx, lalu pilih Impor Excel di aplikasi.'], ['']]
+    .concat(u.fields.filter(f => f.t === 'select' && f.opt).map(f => ['Pilihan ' + f.l + ': ' + f.opt.join(' / ')]));
+  saveBlob(XL.write([
+    { name: u.t.replace(/[\\\/?*\[\]:]/g, ' '), rows: data, head: true, widths: [12].concat(fs.map(f => f.wide ? 30 : f.len || f.mono ? 20 : 16)) },
+    { name: 'Petunjuk', rows: pet, widths: [110] }
+  ]), judul + '.xlsx');
+}
+async function excelImport(e, file, done) {
+  const u = UI[e], fs = u.fields.filter(f => f.t !== 'file');
+  const rows = await XL.read(file);
+  if (rows.length < 2) throw new Error('Berkas tidak berisi data.');
+  const head = rows[0].map(xlKey), idCol = head.indexOf('id');
+  const map = head.map(h => fs.find(f => xlKey(f.l) === h || xlKey(f.k) === h) || null);
+  if (!map.some(Boolean)) throw new Error('Judul kolom tidak dikenali. Gunakan berkas hasil Ekspor Excel.');
+  const recs = [], bad = [];
+  rows.slice(1).forEach((r, i) => {
+    if (!r || !r.some(v => String(v == null ? '' : v).trim())) return;
+    const o = { _baris: String(i + 2) };
+    if (idCol >= 0 && r[idCol] != null && String(r[idCol]).trim()) o.id = String(r[idCol]).trim();
+    map.forEach((f, c) => { if (f) o[f.k] = xlVal(f, r[c]); });
+    const lenBad = fs.find(f => f.len && o[f.k] && o[f.k].indexOf('•') < 0 && !new RegExp('^\\d{' + f.len + '}$').test(o[f.k]));
+    if (lenBad) return bad.push({ baris: o._baris, pesan: lenBad.l + ' harus ' + lenBad.len + ' digit angka.' });
+    recs.push(o);
+  });
+  const nId = recs.filter(r => r.id).length;
+  const m = modal('Impor Excel', `<div class="stack"><p style="margin:0">Berkas <b>${esc(file.name)}</b>: ${recs.length} baris siap diimpor (${nId} ber-ID → diperbarui, ${recs.length - nId} tanpa ID → ditambah atau diperbarui bila ${e === 'penduduk' ? 'NIK' : 'Nomor KK'} sudah ada).</p>${bad.length ? `<div class="err">${bad.length} baris dilewati:<br>${bad.slice(0, 20).map(b => 'Baris ' + esc(b.baris) + ': ' + esc(b.pesan)).join('<br>')}</div>` : ''}<p class="meta" style="margin:0">Kolom yang dikosongkan akan mengosongkan data tersebut. Baris yang dihapus di Excel tidak menghapus data.</p><div class="btns"><button class="btn pri" id="imGo" ${recs.length ? '' : 'disabled'}>${ic('check')}Impor sekarang</button><button class="btn" data-x>Batal</button></div><div id="imSt" class="meta"></div></div>`);
+  $('#imGo', m.el).onclick = async ev => {
+    const b = ev.currentTarget; b.disabled = true;
+    let tambah = 0, ubah = 0, gagal = bad.slice();
+    try {
+      for (let i = 0; i < recs.length; i += 250) {
+        $('#imSt', m.el).textContent = 'Mengimpor ' + Math.min(i + 250, recs.length) + ' dari ' + recs.length + ' baris…';
+        const r = await call('bulkSave', { entity: e, rows: recs.slice(i, i + 250) });
+        tambah += r.tambah; ubah += r.ubah; gagal = gagal.concat(r.gagal);
+      }
+      m.body.innerHTML = `<div class="stack"><p style="margin:0"><b>Impor selesai.</b> ${ubah} data diperbarui, ${tambah} data baru ditambahkan${gagal.length ? ', ' + gagal.length + ' baris gagal' : ''}.</p>${gagal.length ? `<div class="err" style="max-height:240px;overflow:auto">${gagal.map(g => 'Baris ' + esc(g.baris) + ': ' + esc(g.pesan)).join('<br>')}</div>` : ''}<div class="btns"><button class="btn pri" data-x>Tutup</button></div></div>`;
+      if (/^(penduduk|keluarga)$/.test(e)) S.pendCache = null;
+      done && done();
+    } catch (x) { $('#imSt', m.el).textContent = ''; toast(x.message, 1); b.disabled = false; }
   };
 }
 
@@ -1447,7 +1696,7 @@ VIEWS.list = async (p, main, alive) => {
   main.innerHTML = `<div class="stack">
     <div class="toolbar"><label class="search">${ic('search')}<input id="q" placeholder="Cari…" value="${esc(st.q)}" autocomplete="off"></label>
       ${u.month ? `<input type="month" class="inp" id="per" value="${esc(st.per)}" style="max-width:180px">` : ''}
-      ${u.print ? `<button class="btn sm" data-act="cetak">${ic('print')}Cetak buku</button>` : ''}${u.print2 ? `<button class="btn sm" data-act="cetak2">${ic('print')}${esc(u.print2.label)}</button>` : ''}</div>
+      ${u.print ? `<button class="btn sm" data-act="cetak">${ic('print')}Cetak buku</button>` : ''}${u.excel ? `<button class="btn sm" data-act="xlsOut">${ic('down')}Ekspor Excel</button>${canWrite(e) ? `<label class="btn sm">${ic('plus')}Impor Excel<input type="file" id="xlsIn" accept=".xlsx,.csv" hidden></label>` : ''}` : ''}${u.print2 ? `<button class="btn sm" data-act="cetak2">${ic('print')}${esc(u.print2.label)}</button>` : ''}</div>
     ${pers ? `<div class="chips">${pers.map(y => `<button class="chip ${st.per === y || (y === 'Semua' && st.per === 'all') ? 'on' : ''}" data-act="per" data-v="${y === 'Semua' ? 'all' : y}">${y}</button>`).join('')}</div>` : ''}
     ${u.views ? `<div class="chips">${u.views.map((v, i) => `<button class="chip ${st.view === i ? 'on' : ''}" data-act="view" data-v="${i}">${esc(v[0])}</button>`).join('')}</div>` : ''}
     ${u.chips ? `<div class="chips${u.chips.dyn ? ' wrap' : ''}"><button class="chip ${!st.chip ? 'on' : ''}" data-act="chip" data-v="">Semua</button>${chipOpt.map(o => `<button class="chip ${st.chip === o ? 'on' : ''}" data-act="chip" data-v="${esc(o)}">${esc(u.chips.lbl ? u.chips.lbl(o) : o)}${chipN[o] ? ` <small class="num">${chipN[o]}</small>` : ''}</button>`).join('')}</div>` : ''}
@@ -1469,8 +1718,8 @@ VIEWS.list = async (p, main, alive) => {
   const params = off => ({ entity: e, q: st.q, filters: filters(), offset: off, limit: 50, sort: so[0], sort2: so[1], desc: asc ? false : undefined });
   const plusE = u.chips && u.chips.plus && st.chip ? u.chips.plus[st.chip] : null;
   const fetchList = prm => u.listFn ? u.listFn(prm, st) : call('list', prm);
-  const load = async (off) => {
-    const [r, pr] = await Promise.all([fetchList(params(off)), plusE && !off ? call('list', { entity: plusE, q: st.q, limit: 500 }) : null]);
+  const load = async (off, lim) => {
+    const [r, pr] = await Promise.all([fetchList(Object.assign(params(off), lim ? { limit: lim } : {})), plusE && !off ? call('list', { entity: plusE, q: st.q, limit: 500 }) : null]);
     if (!alive()) return;
     st.rows = off ? st.rows.concat(r.rows) : r.rows; st.total = r.total;
     if (pr) st.plus = pr.rows; else if (!off) st.plus = [];
@@ -1480,7 +1729,7 @@ VIEWS.list = async (p, main, alive) => {
     $('#cnt').textContent = tt ? tt.toLocaleString('id-ID') + ' data' + (canWrite(e) ? '' : ' · hanya lihat') : '';
     $('#more').innerHTML = st.rows.length < r.total ? `<button class="btn" data-act="more" style="width:100%">Muat ${Math.min(50, r.total - st.rows.length)} lagi</button>` : '';
   };
-  await load(0);
+  await load(0, S.backNav ? Math.min(Math.max(50, st.rows.length), 1000) : 50);
   let tm;
   $('#q').oninput = ev => { clearTimeout(tm); tm = setTimeout(() => { st.q = ev.target.value.trim(); load(0); }, 300); };
   if ($('#per')) $('#per').onchange = ev => { st.per = ev.target.value; load(0); };
@@ -1497,6 +1746,19 @@ VIEWS.list = async (p, main, alive) => {
     printDocs(cfg.title, [docRegister(cfg, rows, perLbl)]);
   };
   S.vh.cetak = () => doPrint(u.print).catch(x => toast(x.message, 1));
+  S.vh.xlsOut = async t => {
+    t.disabled = true; toast('Menyiapkan Excel…');
+    try {
+      let rows = [], off = 0, tot = 1;
+      while (off < tot) { const r = await fetchList(Object.assign(params(off), { limit: 5000 })); rows = rows.concat(r.rows); tot = r.total; off += r.rows.length; if (!r.rows.length) break; }
+      await excelExport(e, rows, u.t + (st.chip ? ' ' + st.chip : '') + ' ' + isoToday());
+    } catch (x) { toast(x.message, 1); }
+    t.disabled = false;
+  };
+  if ($('#xlsIn')) $('#xlsIn').onchange = async ev => {
+    const f = ev.target.files[0]; ev.target.value = ''; if (!f) return;
+    try { await excelImport(e, f, () => load(0)); } catch (x) { toast(x.message, 1); }
+  };
   S.vh.cetak2 = () => doPrint(u.print2).catch(x => toast(x.message, 1));
 };
 function rowHtml(e, x, act) {
@@ -2009,7 +2271,7 @@ VIEWS.akun = async (p, main) => {
   setTop('Akun');
   const th = store.get('theme') || '';
   main.innerHTML = `<div class="stack">
-    <div class="card d-head"><span class="av" style="width:40px;height:40px;font-size:13px">${esc(initials(S.user.nama))}</span><div><h1 style="font-size:15px">${esc(S.user.nama)}</h1><div class="muted">${esc(S.user.jabatan)} · ${esc(S.user.email || '')}</div><div class="meta" style="margin-top:4px">Wajah presensi: ${S.user.wajah || S.faceOn ? 'terekam' : 'belum terekam'}</div><div style="margin-top:6px">${S.user.admin ? '<span class="pill pri">Admin</span>' : S.user.akses.length ? S.user.akses.map(k => `<span class="pill" style="margin:2px">${esc((S.perms.find(x => x.k === k) || {}).l || k)}</span>`).join('') : '<span class="pill">Hanya lihat & presensi</span>'}</div></div></div>
+    <div class="card d-head prof"><div class="pfoto">${S.user.foto ? `<button type="button" class="pimgbtn" data-act="file" data-id="${esc(S.user.foto)}" data-name="Foto profil" aria-label="Lihat foto"><img src="${esc(thumb(S.user.foto, 400))}" alt="Foto ${esc(S.user.nama)}"></button>` : `<span class="pini">${esc(initials(S.user.nama))}</span>`}<label class="pcam" title="Ganti foto">${ic('cam')}<input type="file" id="fotoMe" accept="${IMG_ANY}" hidden></label></div><div style="flex:1;min-width:0"><h1 style="font-size:17px">${esc(S.user.nama)}</h1><div class="muted">${esc(S.user.jabatan)} · ${esc(S.user.email || '')}</div><div class="meta" style="margin-top:4px">Wajah presensi: ${S.user.wajah || S.faceOn ? 'terekam' : 'belum terekam'}</div><div style="margin-top:6px">${S.user.admin ? '<span class="pill pri">Admin</span>' : S.user.akses.length ? S.user.akses.map(k => `<span class="pill" style="margin:2px">${esc((S.perms.find(x => x.k === k) || {}).l || k)}</span>`).join('') : '<span class="pill">Hanya lihat & presensi</span>'}</div></div></div>
     <form class="card stack" id="pinf"><div class="lbl">Ganti kata sandi</div><div class="form"><div class="f"><label for="pl">Kata sandi lama</label><input id="pl" type="password" autocomplete="current-password"></div><div class="f"><label for="pb">Kata sandi baru (min. 6 karakter)</label><input id="pb" type="password" autocomplete="new-password"></div><div class="f"><label for="pb2">Ulangi kata sandi baru</label><input id="pb2" type="password" autocomplete="new-password"></div></div><div id="perr2" class="err" hidden></div><div><button class="btn pri" type="submit">${ic('key')}Simpan kata sandi</button></div></form>
     <div class="card stack"><div class="lbl">Tampilan</div><div class="chips">${[['', 'Ikuti perangkat'], ['light', 'Terang'], ['dark', 'Gelap']].map(t => `<button class="chip ${th === t[0] ? 'on' : ''}" data-act="theme" data-v="${t[0]}">${t[1]}</button>`).join('')}</div></div>
     ${isStandalone() ? '' : `<button class="btn" data-act="install">${ic('plus')}Pasang aplikasi di HP / komputer</button>`}
@@ -2024,6 +2286,16 @@ VIEWS.akun = async (p, main) => {
   };
   S.vh.theme = t => { store.set('theme', t.dataset.v || null); applyTheme(); refresh(); };
   S.vh.logout = doLogout;
+  $('#fotoMe').onchange = async ev => {
+    const f = ev.target.files[0]; if (!f) return;
+    const box = $('.pfoto'); box.classList.add('busy');
+    try {
+      const up = await uploadFile(f, 'TU/Aparat');
+      const r = await call('myPhoto', { foto_id: up.id });
+      S.user.foto = r.foto; S.people = null;
+      toast('Foto profil diganti.'); refresh();
+    } catch (x) { toast(x.message, 1); box.classList.remove('busy'); }
+  };
 };
 function applyTheme() { const t = store.get('theme'); if (t) document.documentElement.setAttribute('data-theme', t); else document.documentElement.removeAttribute('data-theme'); }
 
@@ -2118,11 +2390,12 @@ function docRegister(cfg, rows, per) {
 }
 function docRekap(d) {
   const [y, m] = d.bulan.split('-').map(Number);
-  const L = ['H', 'T', 'DL', 'I', 'S', 'A'];
+  const L = ['H', 'T', 'D', 'I', 'S', 'A', 'PA'];
+  const c = 'text-align:center;padding:1px';
   return `<div class="paper land" style="font-size:9pt">${kop()}<h2>REKAPITULASI KEHADIRAN PERANGKAT DESA</h2><h3>BULAN ${BULAN[m - 1].toUpperCase()} ${y}</h3>
-  <table class="pt" style="font-size:7.5pt"><thead><tr><th>No</th><th>Nama / Jabatan</th>${d.days.map(x => `<th style="${x.libur ? 'background:#ddd' : ''}">${Number(x.tgl.slice(8))}</th>`).join('')}${L.map(k => `<th>${k}</th>`).join('')}</tr></thead>
-  <tbody>${d.users.map((u, i) => `<tr><td>${i + 1}</td><td>${esc(u.nama)}<br><i>${esc(u.jabatan)}</i></td>${d.days.map(x => `<td style="text-align:center;${x.libur ? 'background:#ddd' : ''}">${u.masuk[x.tgl] || ''}</td>`).join('')}${L.map(k => `<td style="text-align:center">${u.jml[k] || 0}</td>`).join('')}</tr>`).join('')}</tbody></table>
-  <div style="font-size:8pt">Keterangan: H = hadir, T = terlambat, DL = dinas luar, I = izin, S = sakit, A = tanpa keterangan. Kolom abu-abu = hari libur.</div>${ttdKades(isoToday())}</div>`;
+  <table class="pt" style="font-size:7pt"><thead><tr><th>No</th><th>Nama / Jabatan</th><th></th>${d.days.map(x => `<th style="${x.libur ? 'background:#ddd' : ''}">${Number(x.tgl.slice(8))}</th>`).join('')}${L.map(k => `<th>${k}</th>`).join('')}</tr></thead>
+  <tbody>${d.users.map((u, i) => ['pagi', 'siang'].map((b, bi) => `<tr>${bi ? '' : `<td rowspan="2" style="${c}">${i + 1}</td><td rowspan="2">${esc(u.nama)}<br><i>${esc(u.jabatan)}</i></td>`}<td style="${c}">${bi ? 'Plg' : 'Dtg'}</td>${d.days.map(x => `<td style="${c};${x.libur ? 'background:#ddd' : ''}">${u[b][x.tgl] || ''}</td>`).join('')}${bi ? '' : L.map(k => `<td rowspan="2" style="${c}">${u.jml[k] || 0}</td>`).join('')}</tr>`).join('')).join('')}</tbody></table>
+  <div style="font-size:7.5pt">Keterangan: ${esc(REKAP_KET)} Kolom abu-abu = hari libur. Rekap H/T/D/I/S/A dihitung dari baris datang; PA dari baris pulang.</div>${ttdKades(isoToday())}</div>`;
 }
 async function rkpDoc(kind, mu) {
   const y = S.rkpYear;
