@@ -779,6 +779,20 @@ function call(action, p, bearer) {
       throw e;
     });
 }
+/* Foto KTP/KK: disimpan di proyek Supabase "pemdes-berkas" lewat penjaga (Edge Function) "berkas" */
+const BERKAS_URL = SB_URL + '/functions/v1/berkas';
+const isSbFile = id => /^sb[12]:/.test(String(id || ''));
+function callBerkas(action, p) {
+  return fetch(BERKAS_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ action, token: S.token }, p || {})) })
+    .then(r => r.json()).catch(() => { throw new Error('Tidak ada koneksi ke server berkas. Periksa internet Anda.'); })
+    .then(r => {
+      if (r && r.ok) return r.data;
+      const e = new Error((r && r.error) || 'Terjadi kesalahan.');
+      e.code = r && r.code;
+      if (e.code === 'AUTH') { logoutLocal(); toast(e.message, 1); }
+      throw e;
+    });
+}
 const can = p => !p || p === '*' || (S.user && (S.user.admin || (p !== 'admin' && S.user.akses.indexOf(p) >= 0)));
 const canRead = e => can(UI[e].read || '*');
 const canWrite = e => can(UI[e].write || UI[e].perm);
@@ -949,6 +963,15 @@ async function viewFile(id, priv, name) {
   if (!id || id === '•') return toast('Anda tidak punya izin melihat dokumen ini.', 1);
   if (!priv) { window.open(driveUrl(id), '_blank', 'noopener'); return; }
   const m = modal(name || 'Dokumen', '<div class="skel" style="height:240px"></div>', { big: 1 });
+  if (isSbFile(id)) {
+    try {
+      const r = await callBerkas('get', { id });
+      m.body.innerHTML = /\.pdf$/i.test(id)
+        ? `<a class="btn pri" href="${esc(r.url)}" target="_blank" rel="noopener">${ic('eye')}Buka berkas PDF</a>`
+        : `<img src="${esc(r.url)}" alt="" style="width:100%;border-radius:12px"><div class="btns" style="margin-top:8px"><a class="btn sm" href="${esc(r.url)}" target="_blank" rel="noopener">${ic('eye')}Buka ukuran penuh</a></div>`;
+    } catch (e) { m.body.innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+    return;
+  }
   try {
     const f = await call('fileData', { id });
     if (!f) throw new Error('Berkas tidak ditemukan.');
@@ -984,7 +1007,40 @@ async function shrink(file, max, stamp) {
   }
   return c.toDataURL('image/jpeg', .74).split(',')[1];
 }
+/** Perkecil foto menjadi JPEG (Blob) sampai di bawah target ukuran. */
+async function shrinkBlob(file, max, target) {
+  const img = await loadImg(file);
+  let dim = max, q = .78, b = null;
+  for (let i = 0; i < 7; i++) {
+    const s = Math.min(1, dim / Math.max(img.width, img.height));
+    const c = document.createElement('canvas');
+    c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+    const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
+    b = await new Promise(r => c.toBlob(r, 'image/jpeg', q));
+    if (!b || b.size <= target) break;
+    if (q > .6) q -= .08; else dim = Math.round(dim * .85);
+  }
+  if (!b) throw new Error('Foto tidak dapat diproses.');
+  return b;
+}
+/** Unggah foto KTP/KK ke penyimpanan kependudukan (privat). */
+async function uploadKependudukan(file, folder) {
+  const kk = /KK/i.test(String(folder).split('/')[1] || '');
+  let blob, mime = file.type || '';
+  if (/^image\//.test(mime) && !/gif|svg/.test(mime)) { blob = await shrinkBlob(file, kk ? 2000 : 1400, kk ? 450e3 : 250e3); mime = 'image/jpeg'; }
+  else if (mime === 'application/pdf') blob = file;
+  else throw new Error('Unggah foto (JPG/PNG) atau PDF.');
+  if (blob.size > 3 * 1024 * 1024) throw new Error('Ukuran berkas maksimal 3 MB.');
+  const r = await callBerkas('up', { jenis: kk ? 'kk' : 'ktp', size: blob.size, mime });
+  const up = await fetch(r.url, { method: 'PUT', headers: { 'Content-Type': mime, 'x-upsert': 'false' }, body: blob }).catch(() => null);
+  if (!up || !up.ok) throw new Error('Gagal mengunggah foto' + (up ? ' (' + up.status + ')' : '') + '. Coba lagi.');
+  return { id: r.id, size: blob.size };
+}
 async function uploadFile(file, folder) {
+  if (String(folder || '').split('/')[0] === 'Penduduk') {
+    try { return await uploadKependudukan(file, folder); }
+    catch (e) { if (!/belum dipasang/.test(e.message)) throw e; }   /* penyimpanan baru belum siap: pakai Drive */
+  }
   if (file.size > 25 * 1024 * 1024) throw new Error('Ukuran berkas maksimal 25 MB.');
   let data, mime = file.type || 'application/octet-stream', name = file.name;
   if (mime.indexOf('image') === 0 && !/gif|svg/.test(mime)) { data = await shrink(file, 2000); mime = 'image/jpeg'; name = name.replace(/\.\w+$/, '') + '.jpg'; }
@@ -2357,7 +2413,8 @@ VIEWS.settings = async (p, main) => {
       ${g[0] === 'Jam kerja' ? `<div class="f"><span class="lbl">Libur mingguan</span><div class="checks" id="libm">${['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'].map((d, i) => `<label><input type="checkbox" value="${i + 1}" ${lib.indexOf(String(i + 1)) >= 0 ? 'checked' : ''}>${d}</label>`).join('')}</div></div><button class="btn sm" type="button" data-act="go" data-go='["list",{"e":"hari_libur"}]' style="align-self:flex-start">${ic('cal')}Atur hari libur nasional & cuti bersama</button>` : ''}
       ${g[0] === 'Lokasi kantor' ? `<div class="btns"><button class="btn sm" type="button" data-act="here">${ic('pin')}Pakai lokasi saya sekarang</button><label class="switch"><input type="checkbox" id="s_wajib" ${s.wajib_radius === 'ya' ? 'checked' : ''}>Wajib di dalam radius untuk presensi masuk/pulang</label></div>` : ''}</div>`).join('')}
     <div id="serr" class="err" hidden></div>
-    <div><button class="btn pri" type="submit">${ic('check')}Simpan pengaturan</button></div></form>`;
+    <div><button class="btn pri" type="submit">${ic('check')}Simpan pengaturan</button></div>
+    <div class="card stack"><div class="lbl">Penyimpanan foto KTP/KK</div><p class="meta" style="margin:0">Foto KTP/KK baru disimpan di penyimpanan khusus yang lebih cepat. Foto lama yang masih di Google Drive bisa dipindahkan (salinan di Drive tidak dihapus).</p><button class="btn sm" type="button" data-act="go" data-go='["pindahberkas"]' style="align-self:flex-start">${ic('users')}Pindahkan foto KTP/KK lama</button></div></form>`;
   S.vh.here = () => navigator.geolocation ? navigator.geolocation.getCurrentPosition(pp => { $('#s_kantor_lat').value = pp.coords.latitude.toFixed(6); $('#s_kantor_lng').value = pp.coords.longitude.toFixed(6); toast('Lokasi diisi. Tekan Simpan.'); }, () => toast('Lokasi tidak dapat dibaca.', 1), { enableHighAccuracy: true, timeout: 15000 }) : toast('Perangkat tidak mendukung GPS.', 1);
   $('#sf').onsubmit = async ev => {
     ev.preventDefault();
@@ -2368,6 +2425,50 @@ VIEWS.settings = async (p, main) => {
     v.face_threshold = v.face_threshold.replace(',', '.');
     try { S.set = await call('settingsSave', { values: v }); S.rkpYear = S.set.tahun_rkp || S.rkpYear; toast('Pengaturan disimpan.'); }
     catch (x) { $('#serr').textContent = x.message; $('#serr').hidden = false; }
+  };
+};
+
+VIEWS.pindahberkas = async (p, main) => {
+  setTop('Pindahkan foto KTP/KK');
+  if (!S.user.admin) { main.innerHTML = '<div class="err">Khusus admin.</div>'; return; }
+  main.innerHTML = '<div class="skel" style="height:120px"></div>';
+  const J = [['penduduk', 'foto_ktp_id', 'Penduduk/KTP', 'KTP', 'nama'], ['keluarga', 'foto_kk_id', 'Penduduk/KK', 'KK', 'kepala']];
+  let todo = [], sudah = 0;
+  try {
+    for (const [e, k, folder, lbl, nm] of J) {
+      const r = await call('list', { entity: e, limit: 5000 });
+      r.rows.forEach(x => { const v = x[k]; if (!v || v === '•') return; if (isSbFile(v)) sudah++; else todo.push({ e, k, folder, lbl, id: x.id, fid: v, nama: x[nm] || '' }); });
+    }
+  } catch (x) { main.innerHTML = `<div class="err">${esc(x.message)}</div>`; return; }
+  main.innerHTML = `<div class="card stack"><p style="margin:0">Sudah di penyimpanan baru: <b>${sudah}</b> · Masih di Google Drive: <b id="pbSisa">${todo.length}</b></p>
+    <p class="meta" style="margin:0">Biarkan halaman ini terbuka sampai selesai. Salinan di Google Drive tidak dihapus.</p>
+    <div class="btns"><button class="btn pri" id="pbGo" ${todo.length ? '' : 'disabled'}>${ic('check')}Mulai pindahkan</button><button class="btn" id="pbStop" hidden>Berhenti</button></div>
+    <div class="meta" id="pbLog"></div></div>`;
+  let stop = false, ok = 0, gagal = [];
+  const log = $('#pbLog'), sisa = $('#pbSisa');
+  $('#pbStop').onclick = () => { stop = true; $('#pbStop').disabled = true; };
+  $('#pbGo').onclick = async () => {
+    $('#pbGo').disabled = true; $('#pbStop').hidden = false;
+    const q = todo.slice();
+    const kerja = async () => {
+      while (q.length && !stop) {
+        const t = q.shift();
+        try {
+          const f = await call('fileData', { id: t.fid });
+          if (!f || !f.data) throw new Error('berkas Drive tidak ditemukan');
+          const bin = atob(f.data), arr = new Uint8Array(bin.length);
+          for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+          const up = await uploadKependudukan(new File([arr], 'x', { type: f.mime || 'image/jpeg' }), t.folder);
+          await call('save', { entity: t.e, record: { id: t.id, [t.k]: up.id } });
+          ok++;
+        } catch (x) { gagal.push(t.lbl + ' ' + t.nama + ': ' + x.message); }
+        sisa.textContent = todo.length - ok;
+        log.innerHTML = `Berhasil ${ok} · Gagal ${gagal.length}${gagal.length ? '<br>' + gagal.slice(-8).map(esc).join('<br>') : ''}`;
+      }
+    };
+    await Promise.all([kerja(), kerja(), kerja()]);
+    $('#pbStop').hidden = true;
+    toast(stop ? 'Dihentikan. Berhasil ' + ok + '.' : 'Selesai. Berhasil ' + ok + ', gagal ' + gagal.length + '.', gagal.length > 0);
   };
 };
 
