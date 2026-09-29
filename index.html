@@ -520,15 +520,16 @@ const UI = {
     }
   },
   petugas: {
-    t: 'Petugas & Lembaga Desa', ic: 'users', perm: 'tu_aparat', folder: 'TU/Petugas', file: 'foto_id', sort: 'nama', asc: 1,
-    fields: [F('nama', 'Nama', 'text', { req: 1, wide: 1 }), F('jabatan', 'Jabatan', 'text', { list: ['Ketua BPD', 'Wakil Ketua BPD', 'Sekretaris BPD', 'Anggota BPD', 'Ketua LPMD', 'Ketua RT', 'Ketua RW', 'Ketua TP PKK', 'Ketua Karang Taruna', 'Direktur BUMDes', 'Kader Posyandu', 'KPM', 'Linmas'] }),
+    t: 'Petugas & Lembaga Desa', ic: 'users', perm: 'tu_aparat', folder: 'TU/Petugas', file: 'foto_id', sort: 'kelompok', asc: 1,
+    sortBy: st => st.chip ? ['no_urut', 'nama'] : ['kelompok', 'no_urut'],
+    fields: [F('no_urut', 'No. Urut', 'number', { auto: 1, by: 'kelompok', hint: 'Urutan dalam kelompoknya: 1 = paling atas (mis. Ketua)' }), F('nama', 'Nama', 'text', { req: 1, wide: 1 }), F('jabatan', 'Jabatan', 'text', { list: ['Ketua BPD', 'Wakil Ketua BPD', 'Sekretaris BPD', 'Anggota BPD', 'Ketua LPMD', 'Ketua RT', 'Ketua RW', 'Ketua TP PKK', 'Ketua Karang Taruna', 'Direktur BUMDes', 'Kader Posyandu', 'KPM', 'Linmas'] }),
       F('unsur', 'Unsur', 'text', { list: ['BPD', 'LPMD', 'PKK', 'RT RW', 'Karang Taruna', 'BUMDes', 'Tokoh Masyarakat', 'Kader Pemberdayaan Masyarakat', 'Tokoh Agama', 'Perwakilan Perempuan'] }), F('kelompok', 'Kelompok / Lembaga', 'text', { req: 1, list: OPT.lembaga, hint: 'Pilih dari daftar, atau ketik nama kelompok baru' }),
       F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk2 }), F('tempat_lahir', 'Tempat Lahir'), F('tgl_lahir', 'Tanggal Lahir', 'date'), F('agama', 'Agama', 'select', { opt: OPT.agama2 }), F('pendidikan', 'Pendidikan'),
       F('email', 'Email', 'email'), F('wa', 'Nomor WhatsApp', 'tel'), F('nrpdes', 'NRPDes'), F('no_sk', 'Nomor SK'), F('tgl_sk', 'Tanggal SK', 'date'), F('tgl_akhir_sk', 'Tanggal Berakhir SK', 'date'),
       F('npwp', 'NPWP', 'text', { sens: 1, mono: 1 }), F('bpjs_kes', 'BPJS Kesehatan', 'text', { sens: 1, mono: 1 }), F('bpjs_tk', 'BPJS Ketenagakerjaan', 'text', { sens: 1, mono: 1 }), F('ket', 'Keterangan', 'text', { wide: 1 }), F('foto_id', 'Foto', 'file', { img: 1 })],
     chips: { k: 'kelompok', opt: OPT.lembaga, dyn: 1, plus: { 'Perangkat Desa': 'aparat' } },
-    row: r => ({ t: r.nama, s: [r.jabatan, r.kelompok || r.unsur].filter(Boolean).join(' · '), s2: [r.tempat_lahir && r.tgl_lahir ? r.tempat_lahir + ', ' + fDate(r.tgl_lahir, 1) : r.tempat_lahir, r.wa].filter(Boolean).join(' · '), img: r.foto_id, av: initials(r.nama) }),
-    print: { title: 'DAFTAR PETUGAS DAN LEMBAGA DESA', land: 1, cols: [['Nama', 'nama'], ['Jabatan', 'jabatan'], ['Unsur/Lembaga', r => r.kelompok || r.unsur || ''], ['L/P', r => (r.jk || '').slice(0, 1)], ['Tempat & Tgl Lahir', r => (r.tempat_lahir || '') + (r.tgl_lahir ? ', ' + fDate(r.tgl_lahir) : '')], ['Pendidikan', 'pendidikan'], ['No. SK', r => (r.no_sk || '') + (r.tgl_sk ? '<br>' + fDate(r.tgl_sk) : '')], ['Ket', 'ket']] }
+    row: r => ({ t: r.nama, s: [r.jabatan, r.kelompok || r.unsur].filter(Boolean).join(' · '), s2: [r.tempat_lahir && r.tgl_lahir ? r.tempat_lahir + ', ' + fDate(r.tgl_lahir, 1) : r.tempat_lahir, r.wa].filter(Boolean).join(' · '), img: r.foto_id, av: initials(r.nama), r: r.no_urut ? '#' + r.no_urut : '' }),
+    print: { title: 'DAFTAR PETUGAS DAN LEMBAGA DESA', land: 1, cols: [['No. Urut', 'no_urut'], ['Nama', 'nama'], ['Jabatan', 'jabatan'], ['Unsur/Lembaga', r => r.kelompok || r.unsur || ''], ['L/P', r => (r.jk || '').slice(0, 1)], ['Tempat & Tgl Lahir', r => (r.tempat_lahir || '') + (r.tgl_lahir ? ', ' + fDate(r.tgl_lahir) : '')], ['Pendidikan', 'pendidikan'], ['No. SK', r => (r.no_sk || '') + (r.tgl_sk ? '<br>' + fDate(r.tgl_sk) : '')], ['Ket', 'ket']] }
   },
   surat_masuk: {
     t: 'Surat Masuk', ic: 'inbox', perm: 'tu_surat', folder: 'TU/Surat Masuk', file: 'dok_id',
@@ -1424,7 +1425,8 @@ VIEWS.list = async (p, main, alive) => {
     return f;
   };
   const asc = u.views ? !!u.views[st.view][2] : u.asc;
-  const params = off => ({ entity: e, q: st.q, filters: filters(), offset: off, limit: 50, sort: u.sort, desc: asc ? false : undefined });
+  const so = u.sortBy ? u.sortBy(st) : [u.sort];
+  const params = off => ({ entity: e, q: st.q, filters: filters(), offset: off, limit: 50, sort: so[0], sort2: so[1], desc: asc ? false : undefined });
   const plusE = u.chips && u.chips.plus && st.chip ? u.chips.plus[st.chip] : null;
   const load = async (off) => {
     const [r, pr] = await Promise.all([call('list', params(off)), plusE && !off ? call('list', { entity: plusE, q: st.q, limit: 500 }) : null]);
@@ -1714,8 +1716,12 @@ VIEWS.form = async (p, main, alive) => {
     const autoF = u.fields.find(f => f.auto);
     if (autoF) {
       try {
-        const yf = u.year; const r = await call('list', { entity: e, filters: yf ? { [yf + '__pre']: String(new Date().getFullYear()) } : {}, limit: 5000 });
-        rec[autoF.k] = String(r.rows.reduce((a, x) => Math.max(a, Number(x[autoF.k]) || 0), 0) + 1);
+        const yf = u.year; const fl = yf ? { [yf + '__pre']: String(new Date().getFullYear()) } : {};
+        if (autoF.by) fl[autoF.by] = rec[autoF.by] || '';
+        if (!autoF.by || rec[autoF.by]) {
+          const r = await call('list', { entity: e, filters: fl, limit: 5000 });
+          rec[autoF.k] = String(r.rows.reduce((a, x) => Math.max(a, Number(x[autoF.k]) || 0), 0) + 1);
+        }
       } catch (x) { }
     }
   }
