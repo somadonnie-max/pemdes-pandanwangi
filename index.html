@@ -732,7 +732,7 @@ const UI = {
     t: 'Jenis Surat Keterangan', ic: 'file', perm: 'admin', read: '*', write: 'admin', sort: 'nama', asc: 1,
     fields: [F('nama', 'Nama Jenis Surat', 'text', { req: 1, wide: 1, hint: 'mis. Surat Keterangan Ahli Waris' }),
       F('isi', 'Kalimat isi surat', 'textarea', { wide: 1, hint: 'Boleh memakai tanda, mis. Orang tersebut di atas benar penduduk Desa {{Desa}} dan ...' }),
-      F('isian', 'Isian tambahan (satu per baris, maks. 8)', 'textarea', { wide: 1, hint: 'mis. Nama Sekolah (baris 1), Kelas (baris 2). Nama isian = nama tanda di template, mis. {{Nama Sekolah}}' }),
+      F('isian', 'Isian tambahan (maks. 8)', 'textarea', { wide: 1, hint: 'Tulis nama isian dipisah koma atau baris baru, mis.: Nama Yayasan, Bidang Kegiatan, Nomor Akta. Di template Word tulis sama persis dalam kurung kurawal: {{Nama Yayasan}}. Jangan memakai nama tanda bawaan seperti Nama, Alamat, Nama_U.' }),
       F('aktif', 'Aktif', 'select', { opt: ['Ya', 'Tidak'], def: 'Ya' })],
     row: r => ({ t: r.nama, s: isianJenis(r).join(', ') || 'Tanpa isian tambahan', av: ic('file'), pill: r.aktif === 'Tidak' ? '<span class="pill">Tidak aktif</span>' : '' })
   },
@@ -2579,7 +2579,10 @@ const DOCX = (() => {
   const textOf = n => tAll(n).map(t => t.textContent).join('');
   const clean = v => String(v == null ? '' : v).replace(/\r?\n/g, ' ').replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
   /* ganti {{kunci}} di tiap paragraf (walau terpecah ke beberapa run); all=true: kunci tak dikenal dikosongkan & dicatat */
-  function fillNode(node, M, all, missing) {
+  /* nama tanda tidak peka huruf besar/kecil, spasi = garis bawah: {{Kode_Desa}} = {{Kode Desa}} */
+  const norm = k => String(k).toLowerCase().replace(/[\s_]+/g, ' ').trim();
+  function fillNode(node, M0, all, missing) {
+    const M = {}; Object.keys(M0).forEach(k => { M[norm(k)] = M0[k]; });
     const paras = node.localName === 'p' ? [node] : Array.from(node.getElementsByTagNameNS(W, 'p'));
     paras.forEach(p => {
       const ts = tAll(p); if (!ts.length) return;
@@ -2587,11 +2590,11 @@ const DOCX = (() => {
       if (full.indexOf('{{') < 0) return;
       const ms = []; let m; RE.lastIndex = 0;
       while ((m = RE.exec(full))) {
-        const k = m[1];
-        const has = Object.prototype.hasOwnProperty.call(M, k);
+        const k = m[1], nk = norm(k);
+        const has = Object.prototype.hasOwnProperty.call(M, nk);
         if (!has && !all) continue;
         if (!has && missing && missing.indexOf(k) < 0) missing.push(k);
-        ms.push({ s: m.index, e: m.index + m[0].length, v: has ? clean(M[k]) : '' });
+        ms.push({ s: m.index, e: m.index + m[0].length, v: has ? clean(M[nk]) : '' });
       }
       if (!ms.length) return;
       const st = []; let o = 0; txt.forEach(x => { st.push(o); o += x.length; });
@@ -2620,7 +2623,7 @@ const DOCX = (() => {
     const doc = new DOMParser().parseFromString(xml, 'application/xml');
     if (doc.getElementsByTagName('parsererror').length) throw new Error('Template rusak (XML tidak terbaca).');
     (rows || []).forEach(spec => {
-      const re = new RegExp('\\{\\{\\s*' + spec.key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*\\}\\}');
+      const re = new RegExp('\\{\\{\\s*' + spec.key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/(\\ |_| )/g, '[\\s_]+') + '\\s*\\}\\}', 'i');
       for (let guard = 0; guard < 40; guard++) {
         const tr = Array.from(doc.getElementsByTagNameNS(W, 'tr')).find(x => re.test(textOf(x)));
         if (!tr) break;
@@ -2766,7 +2769,7 @@ const SURAT = {
 };
 const suratPath = jenis => SURAT[jenis] ? 'surat/surat_' + SURAT[jenis] + '.docx' : null;
 /* jenis surat tambahan buatan admin (entitas jenis_surat) */
-const isianJenis = d => String(d && d.isian || '').split(/\r?\n/).map(x => x.trim().replace(/[{}]/g, '')).filter(Boolean).slice(0, 8);
+const isianJenis = d => String(d && d.isian || '').split(/\r?\n|,|;/).map(x => x.replace(/[{}]/g, '').replace(/\(\s*baris[^)]*\)/ig, '').trim()).filter(Boolean).slice(0, 8);
 const slugJenis = nama => 'surat/jenis_' + String(nama || '').toLowerCase().replace(/^surat\s+(keterangan|pengantar)\s+/, '').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 60) + '.docx';
 async function muatJenisSurat(force) {
   if (S.jenisSurat && !force) return S.jenisSurat;
@@ -2822,8 +2825,8 @@ async function petaSurat(reg) {
   /* jenis tambahan: isian bebas + kalimat isi */
   const def = SURAT[reg.jenis_surat] ? null : (S.jenisSurat || []).find(j => j.nama === reg.jenis_surat);
   const lbs = def ? isianJenis(def) : [];
-  lbs.forEach((l, i) => { M[l] = reg['isian' + (i + 1)] || TITIK; });
   tambahU(M);
+  lbs.forEach((l, i) => { const v = reg['isian' + (i + 1)] || TITIK; M[l] = v; if (!/_U$/i.test(l)) M[l + '_U'] = String(v).toUpperCase(); });
   M['Isi Surat'] = def && def.isi ? String(def.isi).replace(/\{\{\s*([^{}]+?)\s*\}\}/g, (m, k) => k in M ? M[k] : '') : '';
   M['Isi Surat_U'] = M['Isi Surat'].toUpperCase();
   M.rows = [{ key: 'Isian Label', items: lbs.map((l, i) => ({ 'Isian Label': l, 'Isian Titik2': ':', 'Isian Nilai': reg['isian' + (i + 1)] || TITIK })), empty: { 'Isian Label': '', 'Isian Titik2': '', 'Isian Nilai': '' } }];
