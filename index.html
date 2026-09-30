@@ -2029,7 +2029,7 @@ ACT.draftKK = async t => {
       const d = await call('docKK', { keluarga_id: t.dataset.id });
       const m = modal('Draf KK', '<div class="skel"></div>');
       const r = await buatDokumen({ path: 'kk/draf_kk.docx', M: petaKK(d), jenis: 'kk', nama: 'Draf KK ' + (d.keluarga.kk || '') + ' ' + (d.keluarga.kepala || '') });
-      hasilDokumen(m, r);
+      hasilDokumen(m, r, { pdf: 1 });   /* tata letak KK (kotak teks, halaman melintang) paling tepat lewat PDF */
       t.disabled = false; t.innerHTML = old; return;
     }
     const r = await call('makeKK', { keluarga_id: t.dataset.id });
@@ -2659,7 +2659,13 @@ const DOCX = (() => {
     });
     return out;
   }
-  return { fill, tags, unzip };
+  /* salinan ringan untuk diubah ke PDF: tanpa huruf tertanam (Google memakai hurufnya sendiri) */
+  async function ringan(blob) {
+    const files = (await unzip(await blob.arrayBuffer())).filter(f => !/^word\/fonts\//.test(f.name) && f.name !== 'word/_rels/fontTable.xml.rels');
+    files.forEach(f => { if (f.name === 'word/fontTable.xml') f.data = enc.encode(dec.decode(f.data).replace(/<w:embed(Regular|Bold|Italic|BoldItalic)\b[^>]*\/>/g, '')); });
+    return zip(files, blob.type);
+  }
+  return { fill, tags, unzip, ringan };
 })();
 
 /* ---------------- bantu format untuk dokumen ---------------- */
@@ -2720,7 +2726,23 @@ function muatPratinjau() {
     .catch(e => { DOCXV = null; throw e; });
   return DOCXV;
 }
-function hasilDokumen(m, r) {
+let PDFJS = null;
+function muatPdfJs() {
+  if (PDFJS) return PDFJS;
+  PDFJS = new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js'; sc.onload = () => { window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js'; res(window.pdfjsLib); }; sc.onerror = () => rej(new Error('pustaka PDF gagal dimuat, periksa internet')); document.head.appendChild(sc); })
+    .catch(e => { PDFJS = null; throw e; });
+  return PDFJS;
+}
+async function jadiPdf(r) {
+  if (r.pdfBlob) return r.pdfBlob;
+  const kecil = await DOCX.ringan(r.blob).catch(() => r.blob);
+  const p = await call('toPdf', { name: r.nama, data: await blobB64(kecil), jenis: r.jenis, simpan: false });
+  r.pdfBlob = b64Blob(p.data, 'application/pdf');
+  return r.pdfBlob;
+}
+/** tampilkan dokumen: pratinjau Word (cepat) atau, bila opt.pdf, pratinjau PDF (persis template) */
+function hasilDokumen(m, r, opt) {
+  opt = opt || {};
   m.el.classList.add('big');
   const h3 = m.el.querySelector('.box-h h3'); if (h3) h3.textContent = r.nama.replace(/\.(docx|xlsx)$/i, '');
   if (r.xlsx) { m.body.innerHTML = `<div class="ok-box">${ic('check')} Diunduh: <b>${esc(r.nama)}</b></div>`; return; }
@@ -2728,37 +2750,55 @@ function hasilDokumen(m, r) {
     <div class="btns"><button class="btn pri" id="dlW">${ic('file')}Unduh Word</button><button class="btn" id="dlP">${ic('file')}Unduh PDF</button><button class="btn" id="dlC">${ic('print')}Cetak</button></div>
     <div id="pdfSt" class="meta"></div>
     ${r.missing && r.missing.length ? `<div class="meta">Tanda yang belum ada datanya (dikosongkan): ${esc(r.missing.slice(0, 15).join(', '))}${r.missing.length > 15 ? ', …' : ''}</div>` : ''}
-    <div id="pvBox" style="background:#e9ecef;border-radius:12px;padding:8px;overflow:auto;max-height:70vh"><div class="skel" style="height:300px"></div></div></div>`;
+    <div id="pvBox" style="background:#e9ecef;border-radius:12px;padding:8px;overflow:auto;max-height:72vh"><div class="skel" style="height:300px"></div>${opt.pdf ? '<div class="meta" style="margin-top:6px">Menyiapkan pratinjau sesuai template… ±10–20 detik.</div>' : ''}</div></div>`;
   const pv = $('#pvBox', m.el), st = $('#pdfSt', m.el);
-  let siap = false;
-  muatPratinjau().then(() => {
-    const inner = document.createElement('div'); pv.innerHTML = ''; pv.appendChild(inner);
-    return window.docx.renderAsync(r.blob, inner, null, { inWrapper: true, ignoreLastRenderedPageBreak: true, breakPages: true }).then(() => {
-      const w = inner.querySelector('.docx-wrapper'); if (w) { w.style.background = 'transparent'; w.style.padding = '0'; }
-      const sec = inner.querySelector('section.docx'); const lebar = sec ? sec.offsetWidth + 16 : 0;
-      if (lebar && pv.clientWidth < lebar) inner.style.zoom = (pv.clientWidth - 4) / lebar;
+  let siap = false, halaman = [];
+  if (opt.pdf) {
+    Promise.all([jadiPdf(r), muatPdfJs()]).then(async ([pb, lib]) => {
+      const doc = await lib.getDocument({ data: new Uint8Array(await pb.arrayBuffer()) }).promise;
+      pv.innerHTML = '';
+      const lebar = pv.clientWidth - 16, dpr = Math.min(2, window.devicePixelRatio || 1);
+      for (let i = 1; i <= doc.numPages; i++) {
+        const pg = await doc.getPage(i), v1 = pg.getViewport({ scale: 1 });
+        const sk = Math.max(lebar, 900) / v1.width, vp = pg.getViewport({ scale: sk * dpr });
+        const c = document.createElement('canvas'); c.width = vp.width; c.height = vp.height;
+        c.style.cssText = 'width:100%;display:block;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25);margin:0 auto 10px';
+        await pg.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+        pv.appendChild(c); halaman.push({ url: c.toDataURL('image/jpeg', .92), land: v1.width > v1.height });
+      }
       siap = true;
-    });
-  }).catch(x => { pv.innerHTML = `<div class="meta" style="padding:10px">Pratinjau tidak dapat ditampilkan (${esc(x.message)}). Dokumen tetap bisa diunduh.</div>`; });
+    }).catch(x => { pv.innerHTML = `<div class="meta" style="padding:10px">Pratinjau tidak dapat ditampilkan (${esc(x.message)}). Dokumen tetap bisa diunduh.</div>`; });
+  } else {
+    muatPratinjau().then(() => {
+      const inner = document.createElement('div'); pv.innerHTML = ''; pv.appendChild(inner);
+      return window.docx.renderAsync(r.blob, inner, null, { inWrapper: true, ignoreLastRenderedPageBreak: true, breakPages: true }).then(() => {
+        const w = inner.querySelector('.docx-wrapper'); if (w) { w.style.background = 'transparent'; w.style.padding = '0'; }
+        const sec = inner.querySelector('section.docx'); const lebar = sec ? sec.offsetWidth + 16 : 0;
+        if (lebar && pv.clientWidth < lebar) inner.style.zoom = (pv.clientWidth - 4) / lebar;
+        siap = true;
+      });
+    }).catch(x => { pv.innerHTML = `<div class="meta" style="padding:10px">Pratinjau tidak dapat ditampilkan (${esc(x.message)}). Dokumen tetap bisa diunduh.</div>`; });
+  }
   $('#dlW', m.el).onclick = () => { saveBlob(r.blob, r.nama); st.innerHTML = ic('check') + ' Word diunduh.'; };
   const bp = $('#dlP', m.el);
   bp.onclick = async () => {
-    bp.disabled = true; bp.textContent = 'Membuat PDF…'; st.textContent = 'Biasanya 5–15 detik.';
-    try {
-      const p = await call('toPdf', { name: r.nama, data: await blobB64(r.blob), jenis: r.jenis, simpan: false });
-      saveBlob(b64Blob(p.data, 'application/pdf'), p.name || r.nama.replace(/\.docx$/i, '.pdf'));
-      st.innerHTML = ic('check') + ' PDF diunduh.';
-    } catch (x) { st.innerHTML = `<span class="err">PDF gagal dibuat: ${esc(x.message)}. Tekan Unduh PDF untuk mencoba lagi.</span>`; }
+    bp.disabled = true; bp.textContent = 'Membuat PDF…'; if (!r.pdfBlob) st.textContent = 'Biasanya 5–20 detik.';
+    try { saveBlob(await jadiPdf(r), r.nama.replace(/\.docx$/i, '.pdf')); st.innerHTML = ic('check') + ' PDF diunduh.'; }
+    catch (x) { st.innerHTML = `<span class="err">PDF gagal dibuat: ${esc(x.message)}. Tekan Unduh PDF untuk mencoba lagi.</span>`; }
     bp.disabled = false; bp.innerHTML = ic('file') + 'Unduh PDF';
   };
   $('#dlC', m.el).onclick = () => {
     if (!siap) return toast('Tunggu pratinjau selesai dimuat.', 1);
+    const judul = esc(r.nama.replace(/\.docx$/i, ''));
+    const isi = opt.pdf
+      ? `<style>@page{size:${halaman[0] && halaman[0].land ? 'landscape' : 'portrait'};margin:0}body{margin:0}img{width:100%;display:block;page-break-after:always;break-after:page}</style>${halaman.map(h => `<img src="${h.url}">`).join('')}`
+      : `<style>@page{margin:0}body{margin:0}.docx-wrapper{background:#fff!important;padding:0!important;display:block!important}.docx-wrapper>section.docx{box-shadow:none!important;margin:0 auto!important;page-break-after:always;break-after:page}</style>${pv.firstElementChild.innerHTML}`;
     const f = document.createElement('iframe'); f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
     document.body.appendChild(f);
     const d = f.contentDocument;
-    d.open(); d.write(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(r.nama.replace(/\.docx$/i, ''))}</title><style>@page{margin:0}body{margin:0}.docx-wrapper{background:#fff!important;padding:0!important;display:block!important}.docx-wrapper>section.docx{box-shadow:none!important;margin:0 auto!important;page-break-after:always;break-after:page}</style></head><body>${pv.firstElementChild.innerHTML}</body></html>`); d.close();
+    d.open(); d.write(`<!doctype html><html><head><meta charset="utf-8"><title>${judul}</title></head><body>${isi}</body></html>`); d.close();
     const go = () => { f.contentWindow.focus(); f.contentWindow.print(); setTimeout(() => f.remove(), 60000); };
-    if (d.readyState === 'complete') setTimeout(go, 300); else f.onload = () => setTimeout(go, 300);
+    if (d.readyState === 'complete') setTimeout(go, 400); else f.onload = () => setTimeout(go, 400);
   };
 }
 
