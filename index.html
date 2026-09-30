@@ -282,6 +282,11 @@ table.tbl{border-collapse:collapse;width:100%;font-size:11.5px;font-variant-nume
 .pl,.pp{height:11px;display:flex}.pl{justify-content:flex-end}.pl i,.pp i{display:block;height:100%}.pl i{background:var(--pri);border-radius:4px 0 0 4px}.pp i{background:var(--gold);border-radius:0 4px 4px 0}
 .hbars{display:flex;flex-direction:column;gap:5px}.hb{display:grid;grid-template-columns:minmax(90px,42%) 1fr auto;align-items:center;gap:8px;font-size:12.5px}
 .hk{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ht{height:10px;display:flex}.ht i{display:block;height:100%;background:var(--pri);border-radius:0 4px 4px 0;min-width:2px}.hv{color:var(--muted);min-width:28px;text-align:right}
+.acc{display:flex;flex-direction:column;gap:2px;margin-top:6px}.acc-g{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:8px 0 2px}
+.acc-r{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--line);font-size:13.5px}.acc-r>span:first-child{flex:1;min-width:0}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-shrink:0}.seg label{cursor:pointer}.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg b{display:block;padding:4px 9px;font-size:12px;font-weight:600;color:var(--muted);border-left:1px solid var(--line)}.seg label:first-child b{border-left:0}
+.seg input:checked+b{background:var(--pri);color:#fff}.seg input:focus-visible+b{outline:2px solid var(--pri);outline-offset:-2px}
 .bar{height:6px;border-radius:99px;background:var(--surface2);overflow:hidden;display:flex}
 .bar i{display:block;height:100%}
 
@@ -817,13 +822,13 @@ const SOON = {};
 function MODS() {
   return [
     { k: 'presensi', l: 'Presensi', ic: 'clock', items: [['Absen Hari Ini', 'clock', ['presensi']], ['Riwayat', 'list', ['list', { e: 'presensi' }]]] },
-    { k: 'kegiatan', l: 'Kegiatan', ic: 'cal', items: [['Agenda', 'cal', ['list', { e: 'kegiatan', v: 0, title: 'Agenda' }]], ['Riwayat Kegiatan', 'list', ['list', { e: 'kegiatan', v: 1, title: 'Riwayat Kegiatan' }]]] },
+    { k: 'kegiatan', l: 'Kegiatan', ic: 'cal', items: [['Agenda', 'cal', ['list', { e: 'kegiatan', v: 0, title: 'Agenda' }], null, 'r:kegiatan'], ['Riwayat Kegiatan', 'list', ['list', { e: 'kegiatan', v: 1, title: 'Riwayat Kegiatan' }], null, 'r:kegiatan']] },
     { k: 'tu', l: 'TU & Umum', ic: 'folder', items: ['surat_masuk', 'surat_keluar', 'ekspedisi', 'perdes', 'sk_kades', 'aparat', 'petugas', 'inventaris', 'tkd', 'tanah_desa'].map(e => [UI[e].t, UI[e].ic, ['list', { e }], e]) },
-    { k: 'pemerintahan', l: 'Pemerintahan', ic: 'landmark', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, '*'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga']] },
+    { k: 'pemerintahan', l: 'Pemerintahan', ic: 'landmark', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, 'r:penduduk'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga']] },
     { k: 'pembangunan', l: 'Pembangunan', ic: 'hammer', perm: 'pembangunan', items: [['Kegiatan Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
     { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
     { k: 'kesejahteraan', l: 'Kesejahteraan', ic: 'heart', items: [['Lembaga / Yayasan', 'landmark', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru Ngaji', 'book', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
-    { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RKP Desa', 'sprout', ['rkp'], null, '*'], ['Referensi', 'book', ['refs'], null, '*']] },
+    { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['Referensi', 'book', ['refs'], null, 'r:rkp']] },
     { k: 'soon', l: 'Segera Hadir', ic: 'sprout', items: Object.keys(SOON).map(k => [SOON[k].t, SOON[k].ic, ['soon', { k }], null, '*', 1]) }
   ];
 }
@@ -865,8 +870,11 @@ function callBerkas(action, p) {
     });
 }
 const can = p => !p || p === '*' || (S.user && (S.user.admin || (p !== 'admin' && S.user.akses.indexOf(p) >= 0)));
-const canRead = e => can(UI[e].read || '*');
-const canWrite = e => can(UI[e].write || UI[e].perm);
+/* Hak per menu: 'r:<menu>' melihat, 'w:<menu>' melihat & mengubah (daftar menu dari server) */
+const menuOf = e => UI[e] && UI[e].m || (/^(rkp_|ref_)/.test(e) ? 'rkp' : { kegiatan_berkas: 'kegiatan', pembangunan_titik: 'pembangunan', petugas_jabatan: 'petugas' }[e] || e);
+const isMenu = m => (S.perms || []).some(p => p.menu && p.k === m);
+const canRead = e => isMenu(menuOf(e)) ? can('r:' + menuOf(e)) : can(UI[e].read || '*');
+const canWrite = e => isMenu(menuOf(e)) ? can('w:' + menuOf(e)) : can(UI[e].write || UI[e].perm);
 
 /* =====================================================================
    RANGKA TAMPILAN
@@ -1333,7 +1341,7 @@ VIEWS.home = async (p, main, alive) => {
   const hour = new Date().getHours();
   const salam = hour < 11 ? 'Selamat pagi' : hour < 15 ? 'Selamat siang' : hour < 18 ? 'Selamat sore' : 'Selamat malam';
   const c = d.counts || {}, y = new Date().getFullYear();
-  const agenda = agendaHtml(d.agenda || []);
+  const agenda = canRead('kegiatan') ? agendaHtml(d.agenda || []) : '';
   const h = d.hariIni;
   main.innerHTML = `<div class="stack">
     <section class="hero">
@@ -2556,9 +2564,9 @@ VIEWS.users = async (p, main, alive) => {
   const us = await call('usersList');
   if (!alive()) return;
   main.innerHTML = `<div class="stack">
-    <div class="meta">Setiap orang masuk dengan email + kata sandi (atau Google). Semua akun bisa <b>melihat</b> semua menu (NIK/KK tetap tersamar tanpa hak "Lihat NIK/KK"). Centang menu yang boleh <b>ditambah/diubah/dihapus</b> tiap orang. Admin bisa semuanya. Perangkat yang emailnya ada di data Aparat otomatis dibuatkan akun saat pertama masuk dengan kata sandi 123456.</div>
+    <div class="meta">Setiap orang masuk dengan email + kata sandi (atau Google). Atur tiap menu per orang: <b>Tidak</b> (menu tidak tampil), <b>Lihat</b>, atau <b>Lihat & ubah</b>. Presensi (Absen Hari Ini & Riwayat) selalu bisa dipakai semua akun. NIK/KK tetap tersamar tanpa hak "Lihat NIK/KK". Admin bisa semuanya. Perangkat yang emailnya ada di data Aparat otomatis dibuatkan akun saat pertama masuk dengan kata sandi 123456.</div>
     <div class="btns"><button class="btn sm" data-act="fromAp">${ic('badge')}Buat akun dari data Aparat</button></div>
-    <div class="list">${us.map(u => `<button class="row" data-act="u" data-id="${esc(u.id)}"><span class="av">${esc(initials(u.nama))}</span><span class="main"><span class="t">${esc(u.nama)}</span><span class="s">${esc(u.jabatan)} · ${esc(u.email || 'tanpa email')}</span><span class="s2">${u.admin ? 'Admin' : u.akses.length ? u.akses.length + ' hak ubah data' : 'Hanya lihat & presensi'}</span></span><span class="r">${u.wajah ? '' : '<span class="pill">Wajah belum</span>'}${u.gantiSandi ? '<span class="pill warn">Sandi awal</span>' : ''}${u.aktif ? '' : '<span class="pill bad">Nonaktif</span>'}</span></button>`).join('')}</div>
+    <div class="list">${us.map(u => `<button class="row" data-act="u" data-id="${esc(u.id)}"><span class="av">${esc(initials(u.nama))}</span><span class="main"><span class="t">${esc(u.nama)}</span><span class="s">${esc(u.jabatan)} · ${esc(u.email || 'tanpa email')}</span><span class="s2">${u.admin ? 'Admin (semua menu)' : ringkasAkses(u.akses)}</span></span><span class="r">${u.wajah ? '' : '<span class="pill">Wajah belum</span>'}${u.gantiSandi ? '<span class="pill warn">Sandi awal</span>' : ''}${u.aktif ? '' : '<span class="pill bad">Nonaktif</span>'}</span></button>`).join('')}</div>
   </div><button class="btn pri fab" data-act="u" data-id="">${ic('plus')}Pengguna</button>`;
   S.vh.u = t => userForm(us.find(x => x.id === t.dataset.id));
   S.vh.fromAp = async t => {
@@ -2567,6 +2575,10 @@ VIEWS.users = async (p, main, alive) => {
     catch (x) { toast(x.message, 1); t.disabled = false; }
   };
 };
+function ringkasAkses(a) {
+  const menus = (S.perms || []).filter(p => p.menu), w = menus.filter(p => a.indexOf('w:' + p.k) >= 0).length, r = menus.filter(p => a.indexOf('w:' + p.k) < 0 && a.indexOf('r:' + p.k) >= 0).length;
+  return !w && !r ? 'Hanya presensi' : [w ? w + ' menu lihat & ubah' : '', r ? r + ' menu lihat' : ''].filter(Boolean).join(' · ');
+}
 function userForm(u) {
   const isNew = !u;
   u = u || { nama: '', jabatan: '', admin: false, aktif: true, akses: [], urut: '' };
@@ -2574,17 +2586,23 @@ function userForm(u) {
     <div class="form"><div class="f wide"><label for="un">Nama <i>*</i></label><input id="un" value="${esc(u.nama)}"></div><div class="f"><label for="uj">Jabatan</label><input id="uj" value="${esc(u.jabatan)}"></div><div class="f"><label for="ue">Email (untuk masuk) <i>*</i></label><input id="ue" type="email" value="${esc(u.email || '')}"></div><div class="f"><label for="uu">Urutan tampil</label><input id="uu" type="number" value="${esc(u.urut)}"></div>
     <div class="f"><label for="up">${isNew ? 'Kata sandi awal' : 'Atur ulang kata sandi'}</label><input id="up" placeholder="${isNew ? 'kosong = 123456' : 'kosongkan jika tidak diubah'}"><span class="hint">Pengguna wajib menggantinya saat masuk.</span></div>
     <div class="f" style="justify-content:flex-end"><label class="switch"><input type="checkbox" id="uak" ${u.aktif ? 'checked' : ''}>Akun aktif</label><label class="switch"><input type="checkbox" id="uad" ${u.admin ? 'checked' : ''}>Admin (semua akses)</label></div></div>
-    <div class="f"><span class="lbl">Boleh menambah / mengubah / menghapus</span><div class="checks" id="uacc">${S.perms.map(p => `<label><input type="checkbox" value="${p.k}" ${u.akses.indexOf(p.k) >= 0 ? 'checked' : ''}>${esc(p.l)}</label>`).join('')}</div><span class="hint">"Lihat NIK/KK" membuka NIK, nomor KK, foto KTP dan KK. Tanpa izin ini NIK tampil tersamar.</span></div>
+    <div class="f" id="uacc"><span class="lbl">Hak akses menu</span>
+      <div class="btns"><button type="button" class="btn sm" data-set="0">Hanya presensi</button><button type="button" class="btn sm" data-set="1">Semua: lihat</button><button type="button" class="btn sm" data-set="2">Semua: lihat & ubah</button></div>
+      <div class="acc">${S.perms.filter(p => p.menu).map((p, i, a) => { const lv = u.akses.indexOf('w:' + p.k) >= 0 ? 2 : u.akses.indexOf('r:' + p.k) >= 0 ? 1 : 0; return `${i === 0 || a[i - 1].g !== p.g ? `<div class="acc-g">${esc(p.g)}</div>` : ''}<div class="acc-r"><span>${esc(p.l)}</span><span class="seg" data-k="${esc(p.k)}">${['Tidak', 'Lihat', 'Lihat & ubah'].map((t, j) => `<label><input type="radio" name="acc_${esc(p.k)}" value="${j}" ${lv === j ? 'checked' : ''}><b>${t}</b></label>`).join('')}</span></div>`; }).join('')}</div>
+      <div class="acc-g">Hak khusus</div><div class="checks">${S.perms.filter(p => !p.menu).map(p => `<label><input type="checkbox" class="xk" value="${p.k}" ${u.akses.indexOf(p.k) >= 0 ? 'checked' : ''}>${esc(p.l)}</label>`).join('')}</div>
+      <span class="hint">"Lihat NIK/KK" membuka NIK, nomor KK, foto KTP dan KK. Tanpa izin ini NIK tampil tersamar.</span></div>
     <div class="err" id="uerr" hidden></div>
     ${!isNew ? `<div class="f"><span class="lbl">Wajah presensi</span><div class="btns"><span class="muted">${u.wajah ? 'Sudah terdaftar.' : 'Belum terekam (diminta setelah masuk).'}</span>${u.wajah ? `<button class="btn sm" type="button" id="ufreset">${ic('user')}Hapus pola wajah</button>` : ''}</div><span class="hint">Hapus jika wajah orang ini gagal dikenali terus-menerus; ia akan diminta mendaftar ulang saat presensi berikutnya.</span></div>` : ''}
     <div class="btns" id="uacts"><button class="btn pri" type="submit">${ic('check')}Simpan</button>${!isNew && u.id !== S.user.id ? `<button class="btn danger" type="button" id="udel">${ic('trash')}Hapus</button>` : ''}</div></form>`);
   const el = m.el;
   const tog = () => { $('#uacc', el).style.opacity = $('#uad', el).checked ? .45 : 1; };
+  $$('[data-set]', el).forEach(b => b.onclick = () => $$('.seg', el).forEach(sg => { const r = $('input[value="' + b.dataset.set + '"]', sg); if (r) r.checked = true; }));
+  const aksesDipilih = () => $$('.seg', el).map(sg => { const v = +(($('input:checked', sg) || {}).value || 0); return v === 2 ? 'w:' + sg.dataset.k : v === 1 ? 'r:' + sg.dataset.k : ''; }).filter(Boolean).concat($$('input.xk:checked', el).map(i => i.value));
   $('#uad', el).onchange = tog; tog();
   $('#uf', el).onsubmit = async ev => {
     ev.preventDefault();
     try {
-      await call('usersSave', { user: { id: u.id, nama: $('#un', el).value, jabatan: $('#uj', el).value, email: $('#ue', el).value, urut: $('#uu', el).value, sandi: $('#up', el).value, admin: $('#uad', el).checked, aktif: $('#uak', el).checked, akses: $$('#uacc input:checked', el).map(i => i.value) } });
+      await call('usersSave', { user: { id: u.id, nama: $('#un', el).value, jabatan: $('#uj', el).value, email: $('#ue', el).value, urut: $('#uu', el).value, sandi: $('#up', el).value, admin: $('#uad', el).checked, aktif: $('#uak', el).checked, akses: aksesDipilih() } });
       m.close(); toast('Pengguna disimpan.'); refresh();
     } catch (x) { $('#uerr', el).textContent = x.message; $('#uerr', el).hidden = false; }
   };
