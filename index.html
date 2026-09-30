@@ -1896,7 +1896,7 @@ async function renderDetail(e, x, el, full) {
     <div class="xk"></div>
     ${geo ? mapHtml(geo, 'Lokasi ' + (u.row(x).t || '')) : ''}
     <div class="xx"></div>
-    <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button><button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>` : ''}${e === 'penduduk' && canWrite('register_surat') ? `<button class="btn sm" data-act="regSurat" data-id="${esc(x.id)}">${ic('file')}Buat surat keterangan</button>` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak surat (Word)</button>` : ''}${e === 'register_surat' && x.pdf_id ? `<button class="btn sm" data-act="file" data-id="${esc(x.pdf_id)}" data-priv="1" data-name="PDF surat">${ic('file')}PDF</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>`;
+    <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button><button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>` : ''}${e === 'penduduk' && canWrite('register_surat') ? `<button class="btn sm" data-act="regSurat" data-id="${esc(x.id)}">${ic('file')}Buat surat keterangan</button>` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak surat (Word)</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>`;
   const xk = $('.xk', el), xx = $('.xx', el);
   if (e === 'penduduk') {
     try {
@@ -2029,7 +2029,7 @@ ACT.draftKK = async t => {
       const d = await call('docKK', { keluarga_id: t.dataset.id });
       const m = modal('Draf KK', '<div class="skel"></div>');
       const r = await buatDokumen({ path: 'kk/draf_kk.docx', M: petaKK(d), jenis: 'kk', nama: 'Draf KK ' + (d.keluarga.kk || '') + ' ' + (d.keluarga.kepala || '') });
-      hasilDokumen(m, r, 'di Google Drive (Penduduk / Draf KK, privat)');
+      hasilDokumen(m, r);
       t.disabled = false; t.innerHTML = old; return;
     }
     const r = await call('makeKK', { keluarga_id: t.dataset.id });
@@ -2302,7 +2302,7 @@ VIEWS.rkp = async (p, main) => {
     <div class="sec-h"><h2>Tahapan penyusunan</h2></div>
     <div class="list">${T.map(t => `<div class="it"><button class="row" data-act="go" data-go='${esc(JSON.stringify(['list', { e: t[0] }]))}'><span class="av">${ic(UI[t[0]].ic)}</span><span class="main"><span class="t">${esc(t[2])}</span><span class="s">${t[1]}</span></span><span class="muted">${ic('next')}</span></button></div>`).join('')}</div>
     <div class="sec-h"><h2>Dokumen dari template</h2>${w ? `<button class="btn sm" data-act="tplr">${ic('list')}Muat ulang daftar</button>` : ''}</div>
-    ${w ? `<div class="meta">Dokumen diisi otomatis dari data RKP ${y} (musyawarah pembentukan tim, tim penyusun & verifikasi, narasumber, Form 03–05, dasar hukum), lalu Word langsung terunduh dan PDF-nya disimpan di folder Output Perencanaan.</div><div id="tpls"><div class="skel"></div></div>` : '<div class="card meta">Pembuatan dokumen hanya untuk pemegang hak Perencanaan.</div>'}
+    ${w ? `<div class="meta">Dokumen diisi otomatis dari data RKP ${y} (musyawarah pembentukan tim, tim penyusun & verifikasi, narasumber, Form 03–05, dasar hukum), lalu Word langsung terunduh (PDF bisa diunduh juga bila perlu).</div><div id="tpls"><div class="skel"></div></div>` : '<div class="card meta">Pembuatan dokumen hanya untuk pemegang hak Perencanaan.</div>'}
     <details class="more"><summary>Dokumen utama per form</summary><div class="grid" style="margin-top:6px">
       <button class="tile" data-act="doc" data-d="ba"><span class="ti">${ic('print')}</span><b>Berita Acara Musdes<small>Form 01</small></b></button>
       <button class="tile" data-act="doc" data-d="skp"><span class="ti">${ic('print')}</span><b>SK Tim Penyusun<small>Form 02</small></b></button>
@@ -2524,7 +2524,7 @@ VIEWS.pindahberkas = async (p, main) => {
 /* =====================================================================
    TEMPLATE WORD (.docx) — disimpan di proyek Supabase "pemdes-berkas" akun eko,
    diisi langsung di browser: Word langsung terunduh, PDF dibuat di latar
-   belakang (Apps Script) dan disimpan di Google Drive.
+   belakang tidak disimpan; tombol "Unduh PDF" mengubahnya lewat Apps Script.
    Tanda isian di template ditulis {{Nama Tanda}}; {{Nama Tanda_U}} = HURUF BESAR.
    ===================================================================== */
 const DOCX = (() => {
@@ -2696,8 +2696,8 @@ function b64Blob(b64, type) { const bin = atob(b64), a = new Uint8Array(bin.leng
 const namaFile = s => String(s || 'Dokumen').replace(/[\\/:*?"<>|]+/g, '_').replace(/\s+/g, ' ').trim().slice(0, 140);
 
 /**
- * Isi template → unduh Word → buat PDF di latar belakang.
- * o: { path, M, rows, nama, jenis ('rkp'|'surat'|'kk'), onPdf(pdf) }
+ * Isi template → Word langsung terunduh. PDF tidak disimpan di Drive; bisa diunduh lewat tombol di hasil.
+ * o: { path, M, rows, nama, jenis ('rkp'|'surat'|'kk') }
  */
 async function buatDokumen(o) {
   const buf = await tplAmbil(o.path);
@@ -2705,19 +2705,21 @@ async function buatDokumen(o) {
   const { blob, missing } = await DOCX.fill(buf, o.M, o.rows, xlsx);
   const nama = namaFile(o.nama) + (xlsx ? '.xlsx' : '.docx');
   saveBlob(blob, nama);
-  let pdfP = null;
-  if (!xlsx && o.jenis) {
-    pdfP = blobB64(blob).then(data => call('toPdf', { name: nama, data, jenis: o.jenis }))
-      .then(async p => { if (o.onPdf) await o.onPdf(p); return p; });
-  }
-  return { nama, missing, pdf: pdfP };
+  return { nama, missing, blob, jenis: xlsx ? '' : o.jenis };
 }
-function hasilDokumen(m, r, pdfNote) {
+function hasilDokumen(m, r) {
   m.body.innerHTML = `<div class="stack"><div class="ok-box">${ic('check')} Word diunduh: <b>${esc(r.nama)}</b></div>
     ${r.missing && r.missing.length ? `<div class="meta">Tanda yang belum ada datanya (dikosongkan): ${esc(r.missing.slice(0, 15).join(', '))}${r.missing.length > 15 ? ', …' : ''}</div>` : ''}
-    <div id="pdfSt" class="meta">${r.pdf ? 'Membuat PDF di Google Drive… (boleh ditutup, proses tetap berjalan)' : ''}</div></div>`;
-  if (r.pdf) r.pdf.then(p => { const el = $('#pdfSt', m.el); if (el) el.innerHTML = `${ic('check')} PDF tersimpan${pdfNote ? ' ' + esc(pdfNote) : ''}. ${p.url && !/Penduduk|Pelayanan/.test(pdfNote || '') ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">Buka PDF</a>` : ''}`; })
-    .catch(x => { const el = $('#pdfSt', m.el); if (el) el.innerHTML = `<span class="err">PDF gagal dibuat: ${esc(x.message)}</span>`; else toast('PDF gagal dibuat: ' + x.message, 1); });
+    ${r.jenis ? `<div class="meta">Butuh versi PDF juga?</div><div class="btns"><button class="btn pri" id="pdfGo">${ic('file')}Unduh PDF</button><button class="btn" data-x>Tidak, tutup</button></div><div id="pdfSt" class="meta"></div>` : ''}</div>`;
+  const b = $('#pdfGo', m.el); if (!b) return;
+  b.onclick = async () => {
+    b.disabled = true; b.textContent = 'Membuat PDF…'; const st = $('#pdfSt', m.el); st.textContent = 'Biasanya 5–15 detik.';
+    try {
+      const p = await call('toPdf', { name: r.nama, data: await blobB64(r.blob), jenis: r.jenis, simpan: false });
+      saveBlob(b64Blob(p.data, 'application/pdf'), p.name || r.nama.replace(/\.docx$/i, '.pdf'));
+      st.innerHTML = ic('check') + ' PDF diunduh.'; b.innerHTML = ic('file') + 'Unduh PDF lagi'; b.disabled = false;
+    } catch (x) { st.innerHTML = `<span class="err">PDF gagal dibuat: ${esc(x.message)}</span>`; b.disabled = false; b.innerHTML = ic('file') + 'Coba lagi'; }
+  };
 }
 
 /* ---------------- Surat keterangan ---------------- */
@@ -2797,10 +2799,9 @@ async function cetakSurat(reg) {
   try {
     const M = await petaSurat(reg), rows = M.rows; delete M.rows;
     const r = await buatDokumen({
-      path, M, rows, jenis: 'surat', nama: reg.jenis_surat.replace(/^Surat (Keterangan )?/, 'SK ') + ' - ' + M.Nama + (reg.no ? ' - No ' + reg.no : ''),
-      onPdf: p => call('save', { entity: 'register_surat', record: { id: reg.id, pdf_id: p.id } }).catch(() => { })
+      path, M, rows, jenis: 'surat', nama: reg.jenis_surat.replace(/^Surat (Keterangan )?/, 'SK ') + ' - ' + M.Nama + (reg.no ? ' - No ' + reg.no : '')
     });
-    hasilDokumen(m, r, 'di Google Drive (Pelayanan / Surat Keterangan); bisa dibuka lagi dari tombol PDF di Register');
+    hasilDokumen(m, r);
   } catch (x) { m.body.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
 }
 ACT.cetakSurat = async t => {
@@ -2865,7 +2866,7 @@ async function buatRkp(path, extra) {
   try {
     const d = await call('docData', extra || { tahun_rkp: S.rkpYear });
     const r = await buatDokumen({ path, M: petaRkp(d), rows: barisRkp(d), jenis: 'rkp', nama: nm.replace(/_/g, ' ').replace(/\s+/g, ' ') + ' - RKP ' + d.tahun_rkp });
-    hasilDokumen(m, r, 'di folder Output Perencanaan (Google Drive)');
+    hasilDokumen(m, r);
   } catch (x) { m.body.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
 }
 ACT.mkdocW = t => buatRkp(t.dataset.p, { tahun_rkp: S.rkpYear });
