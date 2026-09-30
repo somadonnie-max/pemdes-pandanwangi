@@ -271,6 +271,17 @@ table.tbl{border-collapse:collapse;width:100%;font-size:11.5px;font-variant-nume
 .k-H,.k-HD,.k-P{background:var(--ok-soft);color:var(--ok)} .k-T,.k-IT,.k-TD,.k-ITD{background:var(--warn-soft);color:var(--warn)} .k-D,.k-DL{background:var(--info-soft);color:var(--info)}
 .k-I,.k-S,.k-TI,.k-TS{background:var(--gold-soft);color:var(--gold)} .k-A,.k-PA{background:var(--bad-soft);color:var(--bad)}
 .tbl td.lib{background:var(--surface2)}
+.pgrid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px;align-items:start}
+.pcard{gap:8px}.pch{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}.pch>b{font-size:14.5px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin:0 4px 0 2px;vertical-align:-1px}.dot.l{background:var(--pri)}.dot.p{background:var(--gold)}
+.pstats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.pstats .stat.big b{font-size:22px;color:var(--pri)}.pstats .stat span{font-size:12.5px}
+.pdh{display:flex;justify-content:space-between;gap:6px;font-size:13.5px}.pdh .num{color:var(--muted)}.pdh .num b{color:var(--ink)}
+.pbar{display:flex;gap:2px;height:10px;margin-top:4px}.pbar i{display:block;height:100%}.pbar i.l{background:var(--pri);border-radius:4px 0 0 4px}.pbar i.p{background:var(--gold);border-radius:0 4px 4px 0}
+.pyrs{display:flex;flex-direction:column;gap:2px}.pyr{display:grid;grid-template-columns:34px 1fr 42px 1fr 34px;align-items:center;gap:4px;font-size:11.5px}
+.pyr .age{text-align:center;color:var(--muted);font-weight:600}.pyr .v{color:var(--muted);text-align:right}.pyr .v.r{text-align:left}
+.pl,.pp{height:11px;display:flex}.pl{justify-content:flex-end}.pl i,.pp i{display:block;height:100%}.pl i{background:var(--pri);border-radius:4px 0 0 4px}.pp i{background:var(--gold);border-radius:0 4px 4px 0}
+.hbars{display:flex;flex-direction:column;gap:5px}.hb{display:grid;grid-template-columns:minmax(90px,42%) 1fr auto;align-items:center;gap:8px;font-size:12.5px}
+.hk{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ht{height:10px;display:flex}.ht i{display:block;height:100%;background:var(--pri);border-radius:0 4px 4px 0;min-width:2px}.hv{color:var(--muted);min-width:28px;text-align:right}
 .bar{height:6px;border-radius:99px;background:var(--surface2);overflow:hidden;display:flex}
 .bar i{display:block;height:100%}
 
@@ -618,11 +629,13 @@ const UI = {
       F('dusun', 'Dusun', 'select', { opt: OPT.dusun, req: 1 }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }), F('status', 'Status Penduduk', 'select', { opt: OPT.statusPend, def: 'Aktif' }),
       F('tgl_meninggal', 'Tanggal Meninggal', 'date'), F('tgl_pindah', 'Tanggal Pindah', 'date'), F('tgl_datang', 'Tanggal Datang', 'date'), F('ket', 'Keterangan', 'text'), F('foto_ktp_id', 'Foto KTP', 'file', { img: 1, priv: 1, wide: 1 })],
     chips: { k: 'dusun', opt: OPT.dusun, lbl: s => s.replace('DUSUN ', '') }, sort: 'nama',
+    views: [['Aktif', () => ({ _kel: 'aktif' })], ['Meninggal', () => ({ _kel: 'meninggal' })], ['Pindah', () => ({ _kel: 'pindah' })], ['Luar desa', () => ({ _kel: 'luar' })], ['Semua', () => ({})]],
     row: r => ({ t: r.nama, s: `<span class="mono">${esc(r.nik)}</span> · ${esc((r.jk || '').slice(0, 1))}${r.tgl_lahir ? ' · ' + umur(r.tgl_lahir) + ' th' : ''} · ${esc(String(r.dusun || '').replace('DUSUN ', ''))} RT ${esc(r.rt)}/${esc(r.rw)}`, raw: 1, s2: [r.hubungan, r.pekerjaan, r.status_kawin, r.pendidikan].filter(Boolean).join(' · '), av: initials(r.nama), pill: r.status && r.status !== 'Aktif' ? `<span class="pill ${/meninggal/i.test(r.status) ? 'bad' : 'warn'}">${esc(r.status)}</span>` : '' }),
     excel: 1,
   },
   keluarga: {
     t: 'Data Keluarga (KK)', ic: 'house', perm: 'penduduk', folder: 'Penduduk/KK', file: 'foto_kk_id',
+    views: [['Aktif', () => ({ _kel: 'aktif' })], ['Tidak aktif / luar desa', () => ({ _kel: 'nonaktif,luar' })], ['Semua', () => ({})]],
     fields: [F('kk', 'Nomor KK', 'text', { req: 1, mono: 1, len: 16, sens: 1 }), F('kepala', 'Nama Kepala Keluarga', 'text', { req: 1, up: 1 }), F('dusun', 'Dusun', 'select', { opt: OPT.dusun, req: 1 }),
       F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }), F('alamat', 'Alamat sesuai KK', 'text', { up: 1 }), F('tgl_kk', 'Tanggal KK', 'date'), F('lokasi', 'Koordinat Rumah', 'geo', { hint: 'lat, lng' }), F('foto_kk_id', 'Foto KK', 'file', { img: 1, priv: 1, wide: 1 })],
     chips: { k: 'dusun', opt: OPT.dusun, lbl: s => s.replace('DUSUN ', '') }, sort: 'kepala', excel: 1,
@@ -762,8 +775,7 @@ function stPill(s) {
 }
 
 const SOON = {
-  kesejahteraan: { t: 'Kesejahteraan', ic: 'heart', d: 'Data penerima bantuan (BLT, PKH, BPNT), posyandu, dan kegiatan keagamaan.' },
-  pemerintahan: { t: 'Pemerintahan', ic: 'landmark', d: 'Lembaga desa (BPD, LPMD, RT/RW, PKK, Karang Taruna) dan masa jabatannya.' }
+  kesejahteraan: { t: 'Kesejahteraan', ic: 'heart', d: 'Data penerima bantuan (BLT, PKH, BPNT), posyandu, dan kegiatan keagamaan.' }
 };
 
 /* Kelompok menu */
@@ -772,7 +784,7 @@ function MODS() {
     { k: 'presensi', l: 'Presensi', ic: 'clock', items: [['Absen Hari Ini', 'clock', ['presensi']], ['Riwayat', 'list', ['list', { e: 'presensi' }]]] },
     { k: 'kegiatan', l: 'Kegiatan', ic: 'cal', items: [['Agenda', 'cal', ['list', { e: 'kegiatan', v: 0, title: 'Agenda' }]], ['Riwayat Kegiatan', 'list', ['list', { e: 'kegiatan', v: 1, title: 'Riwayat Kegiatan' }]]] },
     { k: 'tu', l: 'TU & Umum', ic: 'folder', items: ['surat_masuk', 'surat_keluar', 'ekspedisi', 'perdes', 'sk_kades', 'aparat', 'petugas', 'inventaris', 'tkd', 'tanah_desa'].map(e => [UI[e].t, UI[e].ic, ['list', { e }], e]) },
-    { k: 'penduduk', l: 'Kependudukan', ic: 'users', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, '*'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga']] },
+    { k: 'pemerintahan', l: 'Pemerintahan', ic: 'landmark', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, '*'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga']] },
     { k: 'pembangunan', l: 'Pembangunan', ic: 'hammer', perm: 'pembangunan', items: [['Kegiatan Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
     { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Register Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat']] },
     { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RKP Desa', 'sprout', ['rkp'], null, '*'], ['Referensi', 'book', ['refs'], null, '*']] },
@@ -2332,17 +2344,36 @@ function pickBidang(cb) {
 
 /* ---------------- Kependudukan ---------------- */
 VIEWS.pstat = async (p, main, alive) => {
-  setTop('Ringkasan Penduduk');
+  setTop('Ringkasan Penduduk', 'Desa Pandanwangi');
   const d = await call('pendudukStats');
   if (!alive()) return;
-  const ds = Object.keys(d.dusun).sort();
-  const max = Math.max(1, ...ds.map(k => d.dusun[k].total));
+  const N = n => Number(n || 0).toLocaleString('id-ID'), pct = (n, t) => t ? (n / t * 100).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + '%' : '–';
+  const maxD = Math.max(1, ...d.dusun.map(x => x.total));
+  const dusunH = d.dusun.map(x => `<div class="pdrow" title="${esc(x.k)}: ${N(x.total)} jiwa (L ${N(x.L)}, P ${N(x.P)}), ${N(x.kk)} KK">
+      <div class="pdh"><b>${esc(x.k.replace('DUSUN ', ''))}</b><span class="num"><b>${N(x.total)}</b> jiwa · ${N(x.kk)} KK</span></div>
+      <div class="pbar"><i class="l" style="width:${x.L / maxD * 100}%"></i><i class="p" style="width:${x.P / maxD * 100}%"></i></div></div>`).join('');
+  const maxU = Math.max(1, ...d.usia.map(x => Math.max(x.L, x.P)));
+  const pir = d.usia.slice().reverse().map(x => `<div class="pyr" title="Usia ${esc(x.k)}: L ${N(x.L)}, P ${N(x.P)}"><span class="num v">${x.L ? N(x.L) : ''}</span><div class="pl"><i style="width:${x.L / maxU * 100}%"></i></div><span class="age">${esc(x.k)}</span><div class="pp"><i style="width:${x.P / maxU * 100}%"></i></div><span class="num v r">${x.P ? N(x.P) : ''}</span></div>`).join('');
+  const dist = (f, judul, maks) => {
+    let rows = (d.dist[f] || []).slice();
+    const kosong = rows.find(r => r.k === '(BELUM DIISI)'); rows = rows.filter(r => r !== kosong);
+    if (maks && rows.length > maks) { const sisa = rows.slice(maks - 1); rows = rows.slice(0, maks - 1).concat([{ k: 'LAINNYA (' + sisa.length + ' jenis)', n: sisa.reduce((a, r) => a + r.n, 0) }]); }
+    const isi = rows.reduce((a, r) => a + r.n, 0), mx = Math.max(1, ...rows.map(r => r.n));
+    return `<div class="card stack pcard"><div class="pch"><b>${esc(judul)}</b><span class="meta">${N(isi)} terisi${kosong ? ' · ' + N(kosong.n) + ' belum diisi' : ''}</span></div>
+      ${rows.length ? `<div class="hbars">${rows.map(r => `<div class="hb" title="${esc(r.k)}: ${N(r.n)} orang (${pct(r.n, isi)})"><span class="hk">${esc(r.k)}</span><div class="ht"><i style="width:${r.n / mx * 100}%"></i></div><span class="num hv">${N(r.n)}</span></div>`).join('')}</div>` : '<div class="muted">Belum ada data.</div>'}</div>`;
+  };
+  const ku = d.kelUsia || {};
   main.innerHTML = `<div class="stack">
-    <div class="stats"><div class="stat"><b>${d.total.toLocaleString('id-ID')}</b><span>Penduduk aktif</span></div><div class="stat"><b>${d.L.toLocaleString('id-ID')}</b><span>Laki-laki</span></div><div class="stat"><b>${d.P.toLocaleString('id-ID')}</b><span>Perempuan</span></div><div class="stat"><b>${d.kk.toLocaleString('id-ID')}</b><span>Kartu keluarga</span></div></div>
-    <div class="card stack"><div class="lbl">Penduduk aktif per dusun</div>
-      ${ds.length ? ds.map(k => { const x = d.dusun[k]; return `<div><div style="display:flex;justify-content:space-between;font-size:14px"><b>${esc(k.replace('DUSUN ', ''))}</b><span class="num muted">${x.total} jiwa · L ${x.L} / P ${x.P}</span></div><div class="bar" style="margin-top:6px"><i style="width:${x.L / max * 100}%;background:var(--pri)"></i><i style="width:${x.P / max * 100}%;background:var(--gold)"></i></div></div>`; }).join('') : '<div class="muted">Belum ada data penduduk.</div>'}
-      <div class="meta"><span style="color:var(--pri)">■</span> laki-laki &nbsp; <span style="color:var(--gold)">■</span> perempuan</div></div>
-    <div class="card"><div class="lbl" style="margin-bottom:8px">Status penduduk</div><div class="btns">${Object.keys(d.status).map(k => `<span class="pill">${esc(k)}: ${d.status[k]}</span>`).join('') || '<span class="muted">–</span>'}</div></div>
+    <div class="stats pstats"><div class="stat big"><b>${N(d.total)}</b><span>Penduduk aktif</span></div><div class="stat"><b>${N(d.L)}</b><span><i class="dot l"></i>Laki-laki · ${pct(d.L, d.total)}</span></div><div class="stat"><b>${N(d.P)}</b><span><i class="dot p"></i>Perempuan · ${pct(d.P, d.total)}</span></div><div class="stat"><b>${N(d.kk)}</b><span>Kartu keluarga</span></div></div>
+    <div class="pgrid2">
+      <div class="card stack pcard"><div class="pch"><b>Penduduk per dusun</b><span class="meta"><i class="dot l"></i>Laki-laki <i class="dot p"></i>Perempuan</span></div>${dusunH}</div>
+      <div class="card stack pcard"><div class="pch"><b>Piramida penduduk (usia)</b><span class="meta"><i class="dot l"></i>L <i class="dot p"></i>P</span></div><div class="pyrs">${pir}</div>${d.usiaKosong ? `<div class="meta">${N(d.usiaKosong)} orang tanggal lahirnya belum diisi.</div>` : ''}</div>
+    </div>
+    <div class="stats">${Object.keys(ku).map(k => `<div class="stat"><b>${N(ku[k])}</b><span>${esc(k)}</span></div>`).join('')}<div class="stat"><b>${N(d.wajibPilih)}</b><span>Usia 17+ / pernah kawin</span></div></div>
+    <div class="pgrid2">${dist('pendidikan', 'Pendidikan')}${dist('pekerjaan', 'Pekerjaan', 10)}${dist('status_kawin', 'Status perkawinan')}${dist('agama', 'Agama')}${dist('gol_darah', 'Golongan darah')}${dist('hubungan', 'Hubungan dalam keluarga')}</div>
+    <div class="card stack"><div class="pch"><b>Tidak dihitung sebagai penduduk aktif</b><span class="meta">Ketuk untuk melihat datanya</span></div>
+      <div class="stats"><button class="stat" data-act="go" data-go='["list",{"e":"penduduk","v":1}]'><b>${N(d.kel.meninggal)}</b><span>Meninggal</span></button><button class="stat" data-act="go" data-go='["list",{"e":"penduduk","v":2}]'><b>${N(d.kel.pindah)}</b><span>Pindah</span></button><button class="stat" data-act="go" data-go='["list",{"e":"penduduk","v":3}]'><b>${N(d.kel.luar)}</b><span>Luar desa</span></button><button class="stat" data-act="go" data-go='["list",{"e":"keluarga","v":1}]'><b>${N(d.kkLuar)}</b><span>KK tidak aktif / luar desa</span></button></div></div>
+    <div class="meta">Data yang belum lengkap (pendidikan, pekerjaan, agama, dll.) akan ikut terhitung otomatis setelah diperbarui di Data Penduduk.</div>
     ${can('lihat_nik') ? '' : '<div class="meta">NIK dan nomor KK ditampilkan tersamar karena akun Anda tidak memiliki izin melihat NIK/KK.</div>'}
     <div class="btns"><button class="btn" data-act="go" data-go='["list",{"e":"penduduk"}]'>${ic('users')}Data penduduk</button><button class="btn" data-act="go" data-go='["list",{"e":"keluarga"}]'>${ic('house')}Data keluarga</button></div>
   </div>`;
