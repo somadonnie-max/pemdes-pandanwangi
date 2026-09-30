@@ -3010,16 +3010,27 @@ function petaKK(d) {
 const KK_LATAR = 'kk/latar_kk.jpg';
 const KK_POS = {
   W: 3508,
-  no: { x: 1300, y: 258, px: 92, b: 1 },
+  no: { x: 1290, y: 262, px: 125 },   /* 30 pt, huruf OCR-A */
   kiri: { x: 1012, ys: [331, 375, 417, 462], px: 38, w: 1080 },
-  tgl: { x: 625, y: 1843, px: 36, w: 320 },
+  tgl: { x: 625, y: 1858, px: 36, w: 320 },
   ttd: { x: 1647, y: 2300, px: 34, w: 520 },
   t1: { tops: [618, 668, 720, 770, 821, 871, 923, 973, 1024, 1075], h: 47,
     kol: [[97, 776, 'Nama'], [779, 1132, 'NIK'], [1135, 1405, 'JK'], [1408, 1739, 'TML'], [1742, 1944, 'TL', 1], [1947, 2161, 'AG'], [2164, 2721, 'PENDIDIKAN'], [2724, 3266, 'PEKERJAAN'], [3269, 3476, 'GD', 1]] },
   t2: { tops: [1279, 1330, 1381, 1432, 1482, 1534, 1584, 1635, 1685, 1736], h: 47,
     kol: [[97, 443, 'STKW'], [446, 682, 'TGKW', 1], [685, 1040, 'SHDK'], [1043, 1405, 'KWRG'], [1408, 1639, 'NOPS'], [1642, 1921, 'NOKT'], [1925, 2655, 'AYAH'], [2658, 3476, 'IBU']] }
 };
+/* huruf OCR-A (domain publik) untuk nomor KK; bila gagal dimuat dipakai Courier */
+let OCRA = null;
+function muatOcra() {
+  if (!OCRA) OCRA = (async () => {
+    const f = new FontFace('OCRA', 'url(https://cdn.jsdelivr.net/gh/sfomuseum/go-font-ocra@main/fonts/OCRA.otf)');
+    await Promise.race([f.load(), new Promise((_, rej) => setTimeout(() => rej(new Error('lama')), 5000))]);
+    document.fonts.add(f); return true;
+  })().catch(() => { OCRA = null; return false; });
+  return OCRA;
+}
 async function gambarKK(M) {
+  const adaOcra = await muatOcra();
   const buf = await tplAmbil(KK_LATAR);
   const url = URL.createObjectURL(new Blob([buf], { type: 'image/jpeg' }));
   const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('Gambar latar KK tidak terbaca.')); i.src = url; });
@@ -3028,20 +3039,19 @@ async function gambarKK(M) {
   g.drawImage(img, 0, 0); URL.revokeObjectURL(url);
   g.fillStyle = '#000'; g.textBaseline = 'alphabetic';
   const FONT = 'Arial, Helvetica, "Liberation Sans", sans-serif';
-  const tulis = (s, x, y, px, lebar, rata, tebal) => {
+  const tulis = (s, x, y, px, lebar, rata, tebal, huruf) => {
     s = String(s == null ? '' : s); if (!s) return;
     let u = px * k;
-    do { g.font = (tebal ? 'bold ' : '') + u + 'px ' + FONT; u -= 1; } while (lebar && g.measureText(s).width > lebar * k && u > px * k * .55);
+    do { g.font = (tebal ? 'bold ' : '') + u + 'px ' + (huruf || FONT); u -= 1; } while (lebar && g.measureText(s).width > lebar * k && u > px * k * .55);
     g.textAlign = rata || 'left';
     g.fillText(s, x * k, y * k);
   };
   const v = key => { const s = M[key]; return s == null || s === '-' ? '' : s; };
-  tulis(v('NoKK'), KK_POS.no.x, KK_POS.no.y, KK_POS.no.px, 1800, 'left', KK_POS.no.b);
+  tulis(v('NoKK'), KK_POS.no.x, KK_POS.no.y, KK_POS.no.px, 2000, 'left', !adaOcra, adaOcra ? 'OCRA, monospace' : '"Courier New", monospace');
   [v('NamaKK'), v('Dusun'), [v('RT'), v('RW')].filter(Boolean).join('/'), v('KodePos')].forEach((s, i) => tulis(s, KK_POS.kiri.x, KK_POS.kiri.ys[i], KK_POS.kiri.px, KK_POS.kiri.w));
   tulis(v('TanggalKK'), KK_POS.tgl.x, KK_POS.tgl.y, KK_POS.tgl.px, KK_POS.tgl.w, 'center');
   tulis(v('NamaKK'), KK_POS.ttd.x, KK_POS.ttd.y, KK_POS.ttd.px, KK_POS.ttd.w, 'center');
-  for (let i = 1; i <= 10; i++) {
-    if (!v('Nama' + i)) continue;
+  for (let i = 1; i <= 10; i++) {   /* baris kosong tetap diberi tanda "-" seperti template */
     [KK_POS.t1, KK_POS.t2].forEach(t => {
       const top = t.tops[i - 1], y = top + t.h * .72;
       t.kol.forEach(([x0, x1, key, tengah]) => {
