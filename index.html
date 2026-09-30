@@ -2696,7 +2696,7 @@ function b64Blob(b64, type) { const bin = atob(b64), a = new Uint8Array(bin.leng
 const namaFile = s => String(s || 'Dokumen').replace(/[\\/:*?"<>|]+/g, '_').replace(/\s+/g, ' ').trim().slice(0, 140);
 
 /**
- * Isi template → Word langsung terunduh. PDF tidak disimpan di Drive; bisa diunduh lewat tombol di hasil.
+ * Isi template → pratinjau di aplikasi → pilih Unduh Word / Unduh PDF / Cetak.
  * o: { path, M, rows, nama, jenis ('rkp'|'surat'|'kk') }
  */
 async function buatDokumen(o) {
@@ -2704,21 +2704,58 @@ async function buatDokumen(o) {
   const xlsx = /\.xlsx$/i.test(o.path);
   const { blob, missing } = await DOCX.fill(buf, o.M, o.rows, xlsx);
   const nama = namaFile(o.nama) + (xlsx ? '.xlsx' : '.docx');
-  saveBlob(blob, nama);
-  return { nama, missing, blob, jenis: xlsx ? '' : o.jenis };
+  if (xlsx) saveBlob(blob, nama);
+  return { nama, missing, blob, jenis: xlsx ? '' : o.jenis, xlsx };
+}
+/* pustaka pratinjau Word (dimuat sekali saat dibutuhkan) */
+let DOCXV = null;
+function muatPratinjau() {
+  if (DOCXV) return DOCXV;
+  const load = src => new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('pustaka pratinjau gagal dimuat, periksa internet')); document.head.appendChild(s); });
+  DOCXV = (window.JSZip ? Promise.resolve() : load('https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js'))
+    .then(() => window.docx && window.docx.renderAsync ? null : load('https://cdn.jsdelivr.net/npm/docx-preview@0.3.5/dist/docx-preview.min.js'))
+    .catch(e => { DOCXV = null; throw e; });
+  return DOCXV;
 }
 function hasilDokumen(m, r) {
-  m.body.innerHTML = `<div class="stack"><div class="ok-box">${ic('check')} Word diunduh: <b>${esc(r.nama)}</b></div>
+  m.el.classList.add('big');
+  const h3 = m.el.querySelector('.box-h h3'); if (h3) h3.textContent = r.nama.replace(/\.(docx|xlsx)$/i, '');
+  if (r.xlsx) { m.body.innerHTML = `<div class="ok-box">${ic('check')} Diunduh: <b>${esc(r.nama)}</b></div>`; return; }
+  m.body.innerHTML = `<div class="stack">
+    <div class="btns"><button class="btn pri" id="dlW">${ic('file')}Unduh Word</button><button class="btn" id="dlP">${ic('file')}Unduh PDF</button><button class="btn" id="dlC">${ic('print')}Cetak</button></div>
+    <div id="pdfSt" class="meta"></div>
     ${r.missing && r.missing.length ? `<div class="meta">Tanda yang belum ada datanya (dikosongkan): ${esc(r.missing.slice(0, 15).join(', '))}${r.missing.length > 15 ? ', …' : ''}</div>` : ''}
-    ${r.jenis ? `<div class="meta">Butuh versi PDF juga?</div><div class="btns"><button class="btn pri" id="pdfGo">${ic('file')}Unduh PDF</button><button class="btn" data-x>Tidak, tutup</button></div><div id="pdfSt" class="meta"></div>` : ''}</div>`;
-  const b = $('#pdfGo', m.el); if (!b) return;
-  b.onclick = async () => {
-    b.disabled = true; b.textContent = 'Membuat PDF…'; const st = $('#pdfSt', m.el); st.textContent = 'Biasanya 5–15 detik.';
+    <div id="pvBox" style="background:#e9ecef;border-radius:12px;padding:8px;overflow:auto;max-height:70vh"><div class="skel" style="height:300px"></div></div></div>`;
+  const pv = $('#pvBox', m.el), st = $('#pdfSt', m.el);
+  let siap = false;
+  muatPratinjau().then(() => {
+    const inner = document.createElement('div'); pv.innerHTML = ''; pv.appendChild(inner);
+    return window.docx.renderAsync(r.blob, inner, null, { inWrapper: true, ignoreLastRenderedPageBreak: true, breakPages: true }).then(() => {
+      const w = inner.querySelector('.docx-wrapper'); if (w) { w.style.background = 'transparent'; w.style.padding = '0'; }
+      const sec = inner.querySelector('section.docx'); const lebar = sec ? sec.offsetWidth + 16 : 0;
+      if (lebar && pv.clientWidth < lebar) inner.style.zoom = (pv.clientWidth - 4) / lebar;
+      siap = true;
+    });
+  }).catch(x => { pv.innerHTML = `<div class="meta" style="padding:10px">Pratinjau tidak dapat ditampilkan (${esc(x.message)}). Dokumen tetap bisa diunduh.</div>`; });
+  $('#dlW', m.el).onclick = () => { saveBlob(r.blob, r.nama); st.innerHTML = ic('check') + ' Word diunduh.'; };
+  const bp = $('#dlP', m.el);
+  bp.onclick = async () => {
+    bp.disabled = true; bp.textContent = 'Membuat PDF…'; st.textContent = 'Biasanya 5–15 detik.';
     try {
       const p = await call('toPdf', { name: r.nama, data: await blobB64(r.blob), jenis: r.jenis, simpan: false });
       saveBlob(b64Blob(p.data, 'application/pdf'), p.name || r.nama.replace(/\.docx$/i, '.pdf'));
-      st.innerHTML = ic('check') + ' PDF diunduh.'; b.innerHTML = ic('file') + 'Unduh PDF lagi'; b.disabled = false;
-    } catch (x) { st.innerHTML = `<span class="err">PDF gagal dibuat: ${esc(x.message)}</span>`; b.disabled = false; b.innerHTML = ic('file') + 'Coba lagi'; }
+      st.innerHTML = ic('check') + ' PDF diunduh.';
+    } catch (x) { st.innerHTML = `<span class="err">PDF gagal dibuat: ${esc(x.message)}. Tekan Unduh PDF untuk mencoba lagi.</span>`; }
+    bp.disabled = false; bp.innerHTML = ic('file') + 'Unduh PDF';
+  };
+  $('#dlC', m.el).onclick = () => {
+    if (!siap) return toast('Tunggu pratinjau selesai dimuat.', 1);
+    const f = document.createElement('iframe'); f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+    document.body.appendChild(f);
+    const d = f.contentDocument;
+    d.open(); d.write(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(r.nama.replace(/\.docx$/i, ''))}</title><style>@page{margin:0}body{margin:0}.docx-wrapper{background:#fff!important;padding:0!important;display:block!important}.docx-wrapper>section.docx{box-shadow:none!important;margin:0 auto!important;page-break-after:always;break-after:page}</style></head><body>${pv.firstElementChild.innerHTML}</body></html>`); d.close();
+    const go = () => { f.contentWindow.focus(); f.contentWindow.print(); setTimeout(() => f.remove(), 60000); };
+    if (d.readyState === 'complete') setTimeout(go, 300); else f.onload = () => setTimeout(go, 300);
   };
 }
 
