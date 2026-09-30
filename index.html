@@ -2799,7 +2799,7 @@ async function petaSurat(reg) {
   } catch (x) { p = {}; }
   const v = k => reg[k] || p[k] || '';
   const dusun = judulKata(String(v('dusun')).replace(/^DUSUN\s+/i, ''));
-  const alamat = [dusun ? 'Dusun ' + dusun : '', v('rt') ? 'RT ' + v('rt') : '', v('rw') ? 'RW ' + v('rw') : ''].filter(Boolean).join(' ') + (S.set.nama_desa ? ', Desa ' + S.set.nama_desa : '');
+  const alamat = [dusun ? 'Dusun ' + dusun : '', v('rt') ? 'RT ' + v('rt') : '', v('rw') ? 'RW ' + v('rw') : ''].filter(Boolean).join(' ');   /* tanpa nama desa: sudah ada di kalimat surat */
   const tl = v('tgl_lahir'), d = parseD(reg.tgl_surat) || new Date();
   const M = Object.assign(petaDesa(), {
     No: reg.no || '', 'Nomor Register': reg.no || '', Tahun: String(d.getFullYear()), 'Tanggal Surat': dPanjang(reg.tgl_surat || isoToday()), 'Jenis Surat': reg.jenis_surat || '',
