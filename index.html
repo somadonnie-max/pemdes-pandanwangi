@@ -2303,7 +2303,7 @@ VIEWS.rkp = async (p, main) => {
     <div class="list">${T.map(t => `<div class="it"><button class="row" data-act="go" data-go='${esc(JSON.stringify(['list', { e: t[0] }]))}'><span class="av">${ic(UI[t[0]].ic)}</span><span class="main"><span class="t">${esc(t[2])}</span><span class="s">${t[1]}</span></span><span class="muted">${ic('next')}</span></button></div>`).join('')}</div>
     <div class="sec-h"><h2>Dokumen dari template</h2>${w ? `<button class="btn sm" data-act="tplr">${ic('list')}Muat ulang daftar</button>` : ''}</div>
     ${w ? `<div class="meta">Dokumen diisi otomatis dari data RKP ${y} (musyawarah pembentukan tim, tim penyusun & verifikasi, narasumber, Form 03–05, dasar hukum), lalu Word langsung terunduh dan PDF-nya disimpan di folder Output Perencanaan.</div><div id="tpls"><div class="skel"></div></div>` : '<div class="card meta">Pembuatan dokumen hanya untuk pemegang hak Perencanaan.</div>'}
-    <details class="more"><summary>Cetak ringkas (tanpa template)</summary><div class="grid" style="margin-top:6px">
+    <details class="more"><summary>Dokumen utama per form</summary><div class="grid" style="margin-top:6px">
       <button class="tile" data-act="doc" data-d="ba"><span class="ti">${ic('print')}</span><b>Berita Acara Musdes<small>Form 01</small></b></button>
       <button class="tile" data-act="doc" data-d="skp"><span class="ti">${ic('print')}</span><b>SK Tim Penyusun<small>Form 02</small></b></button>
       <button class="tile" data-act="doc" data-d="skv"><span class="ti">${ic('print')}</span><b>SK Tim Verifikasi<small>Form 02</small></b></button>
@@ -2314,7 +2314,7 @@ VIEWS.rkp = async (p, main) => {
     <button class="btn" data-act="go" data-go='["refs"]'>${ic('book')}Referensi: kode bidang, SDGs, dasar hukum</button>
   </div>`;
   S.vh.yr = t => { S.rkpYear = t.dataset.v; S.listState = null; refresh(); };
-  S.vh.doc = t => rkpDoc(t.dataset.d).catch(x => toast(x.message, 1));
+  S.vh.doc = t => dokRkp(t.dataset.d).catch(x => toast(x.message, 1));
   const loadT = async force => {
     const el = $('#tpls'); if (!el) return;
     try {
@@ -2351,11 +2351,20 @@ async function extraMusyawarah(mu, el) {
     ${sec('Tim Penyusun', tp, 'rkp_tim', { ref: mu.id, jenis_tim: 'Tim Penyusun', urut: String(tp.length + 1) })}
     ${sec('Tim Verifikasi', tv, 'rkp_tim', { ref: mu.id, jenis_tim: 'Tim Verifikasi', urut: String(tv.length + 1) })}
     ${sec('Narasumber', nara.rows, 'rkp_narasumber', { ref: mu.id })}
-    <div class="btns"><span class="lbl">Cetak ringkas:</span><button class="btn sm" data-act="pdoc" data-d="ba" data-id="${esc(mu.id)}">${ic('print')}Berita Acara</button><button class="btn sm" data-act="pdoc" data-d="skp" data-id="${esc(mu.id)}">${ic('print')}SK Tim Penyusun</button><button class="btn sm" data-act="pdoc" data-d="skv" data-id="${esc(mu.id)}">${ic('print')}SK Tim Verifikasi</button></div></div>`;
+    <div class="btns"><span class="lbl">Dokumen (template Word):</span><button class="btn sm" data-act="pdoc" data-d="und" data-id="${esc(mu.id)}">${ic('print')}Undangan</button><button class="btn sm" data-act="pdoc" data-d="ba" data-id="${esc(mu.id)}">${ic('print')}Berita Acara</button><button class="btn sm" data-act="pdoc" data-d="skp" data-id="${esc(mu.id)}">${ic('print')}SK Tim Penyusun</button><button class="btn sm" data-act="pdoc" data-d="skv" data-id="${esc(mu.id)}">${ic('print')}SK Tim Verifikasi</button></div></div>`;
 }
 ACT.addSub = t => go('form', { e: t.dataset.e, preset: JSON.parse(t.dataset.p) });
 ACT.addJab = t => go('form', { e: 'petugas_jabatan', preset: JSON.parse(t.dataset.p) }, true);
-ACT.pdoc = async t => { try { await rkpDoc(t.dataset.d, await call('get', { entity: 'rkp_musyawarah', id: t.dataset.id })); } catch (x) { toast(x.message, 1); } };
+ACT.pdoc = async t => { try { await dokRkp(t.dataset.d, t.dataset.id); } catch (x) { toast(x.message, 1); } };
+/* dokumen utama RKP dari template Word di penyimpanan (cadangan: cetak ringkas bila template belum ada) */
+const DOK_RKP = { und: /^01\._?Undangan/i, ba: /^01\._?BA/i, skp: /^02\._?SK_Tim_Penyusun/i, skv: /^02\._?SK_Tim_Verifikasi/i, rktl: /^03\./, f4: /^04\./, f5: /^05\./ };
+async function dokRkp(kind, muId) {
+  let path = null;
+  try { const t = (await tplDaftar()).find(x => x.path.indexOf('rkp/') === 0 && DOK_RKP[kind] && DOK_RKP[kind].test(x.path.split('/').pop())); path = t && t.path; } catch (x) { }
+  if (path) return buatRkp(path, muId ? { musyawarah_id: muId } : { tahun_rkp: S.rkpYear });
+  if (kind === 'und') throw new Error('Template undangan belum ada di Template Dokumen.');
+  return rkpDoc(kind, muId ? await call('get', { entity: 'rkp_musyawarah', id: muId }) : undefined);
+}
 
 /* ---------------- Soon / Akun / Admin ---------------- */
 VIEWS.soon = async (p, main) => {
