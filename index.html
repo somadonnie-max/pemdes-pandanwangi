@@ -147,6 +147,11 @@ button.stat:hover{border-color:var(--pri)}
 .search{flex:1 1 200px;display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:0 9px;min-height:32px}
 .search input{border:0;background:none;outline:0;flex:1;min-width:0;padding:5px 0}
 .chips{display:flex;gap:4px;overflow-x:auto;padding-bottom:1px;scrollbar-width:none}
+.fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.fslot{display:flex;flex-direction:column;gap:4px}.fslot .btn{justify-content:center}
+.fpic{aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:var(--surface2);border:1px dashed var(--line);display:grid}
+.fpic img{width:100%;height:100%;object-fit:cover}.fadd{display:grid;place-items:center;align-content:center;gap:4px;color:var(--muted);cursor:pointer;font-size:12.5px;font-weight:600}
+.fslot .fket{font-size:13px;padding:6px 8px}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px;margin-top:6px}
 .pslot{display:flex;flex-direction:column;gap:3px;align-items:stretch;text-align:center}
 .pimg{display:grid;place-items:center;aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:var(--surface2);border:1px dashed var(--line);padding:0;color:var(--muted);cursor:pointer}
@@ -698,11 +703,14 @@ const UI = {
     row: r => ({ t: r.nama_titik + (r.lokasi ? ' · ' + r.lokasi : ''), s: '', av: ic('pin') })
   },
   kegiatan: {
-    t: 'Kegiatan & Agenda', ic: 'cal', perm: 'kegiatan', folder: 'Kegiatan', sort: 'tanggal',
+    t: 'Agenda', ic: 'cal', perm: 'kegiatan', folder: 'Kegiatan', sort: 'tanggal',
     fields: [F('nama', 'Nama Kegiatan', 'text', { req: 1, wide: 1, hint: 'Contoh: Penyerahan BLT DD Tahap 3' }), F('tanggal', 'Tanggal', 'date', { req: 1, def: isoToday }), F('jam', 'Jam', 'time', { def: '09:00' }), F('sampai', 'Sampai', 'text', { def: 'Selesai' }),
       F('tempat', 'Tempat', 'text', { wide: 1, def: 'Balai Desa Pandanwangi', list: ['Balai Desa Pandanwangi', 'Kantor Desa Pandanwangi', 'Kantor Kecamatan Tempeh', 'Pendopo Kabupaten Lumajang'] }), F('penyelenggara', 'Penyelenggara / Pengundang', 'text', { list: ['Pemerintah Desa Pandanwangi', 'Kecamatan Tempeh', 'BPD Desa Pandanwangi', 'DPMD Kab. Lumajang'] }),
       F('peserta', 'Yang Hadir / Peserta', 'text', { wide: 1, def: 'Semua perangkat', list: ['Semua perangkat', 'Kepala Desa', 'Sekretaris Desa', 'Kaur TU & Umum', 'Kaur Keuangan', 'Kaur Perencanaan', 'Kasi Pemerintahan', 'Kasi Kesejahteraan', 'Kasi Pelayanan', 'Kepala Dusun'] }),
-      F('keterangan', 'Keterangan / Persiapan', 'textarea', { wide: 1, hint: 'Mis. pakaian dinas, membawa dokumen, nomor undangan' }), F('ringkasan', 'Ringkasan Materi / Hasil Kegiatan', 'textarea', { wide: 1, hint: 'Diisi saat atau sesudah kegiatan' })],
+      F('keterangan', 'Keterangan / Persiapan', 'textarea', { wide: 1, hint: 'Mis. pakaian dinas, membawa dokumen, nomor undangan' }), F('materi', 'Materi', 'textarea', { wide: 1, rows: 8, hint: 'Isi materi / paparan kegiatan (boleh panjang). Diisi saat atau sesudah kegiatan.' }),
+      F('ringkasan', 'Hasil / Kesimpulan Kegiatan', 'textarea', { wide: 1, hint: 'Diisi saat atau sesudah kegiatan' }),
+      F('dok_id', 'Dokumen Kegiatan', 'file', { hint: 'Satu berkas gabungan: berita acara, daftar hadir, undangan, dll. (PDF lebih baik).' }),
+      F('foto', 'Foto Kegiatan', 'fotos', { max: 10 })],
     views: [['Akan datang', () => ({ tanggal__gte: isoToday() }), 1], ['Riwayat', () => ({ tanggal__lt: isoToday() }), 0], ['Semua', () => ({}), 0]],
     row: r => ({ t: r.nama, s: fDay(r.tanggal) + (r.jam ? ' · ' + String(r.jam).slice(0, 5) + ' WIB' : '') + (r.tempat ? ' · ' + r.tempat : ''), s2: r.peserta || '', av: ic('cal'), pill: kgPill(r) }),
     print: { title: 'BUKU AGENDA KEGIATAN', land: 1, cols: [['Tanggal', r => fDate(r.tanggal) + (r.jam ? '<br>' + esc(String(r.jam).slice(0, 5)) : '')], ['Kegiatan', 'nama'], ['Tempat', 'tempat'], ['Penyelenggara', 'penyelenggara'], ['Peserta', 'peserta'], ['Ringkasan', 'ringkasan']] }
@@ -761,8 +769,8 @@ const SOON = {
 /* Kelompok menu */
 function MODS() {
   return [
-    { k: 'presensi', l: 'Presensi', ic: 'clock', items: [['Absen Hari Ini', 'clock', ['presensi']], ['Riwayat', 'list', ['list', { e: 'presensi' }]], ['Rekap Bulanan', 'chart', ['rekap']], ['Hari Libur', 'cal', ['list', { e: 'hari_libur' }]]] },
-    { k: 'kegiatan', l: 'Kegiatan', ic: 'cal', items: [['Kegiatan & Agenda', 'cal', ['list', { e: 'kegiatan' }], 'kegiatan']] },
+    { k: 'presensi', l: 'Presensi', ic: 'clock', items: [['Absen Hari Ini', 'clock', ['presensi']], ['Riwayat', 'list', ['list', { e: 'presensi' }]]] },
+    { k: 'kegiatan', l: 'Kegiatan', ic: 'cal', items: [['Agenda', 'cal', ['list', { e: 'kegiatan', v: 0, title: 'Agenda' }]], ['Riwayat Kegiatan', 'list', ['list', { e: 'kegiatan', v: 1, title: 'Riwayat Kegiatan' }]]] },
     { k: 'tu', l: 'TU & Umum', ic: 'folder', items: ['surat_masuk', 'surat_keluar', 'ekspedisi', 'perdes', 'sk_kades', 'aparat', 'petugas', 'inventaris', 'tkd', 'tanah_desa'].map(e => [UI[e].t, UI[e].ic, ['list', { e }], e]) },
     { k: 'penduduk', l: 'Kependudukan', ic: 'users', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, '*'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga']] },
     { k: 'pembangunan', l: 'Pembangunan', ic: 'hammer', perm: 'pembangunan', items: [['Kegiatan Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
@@ -1338,7 +1346,7 @@ VIEWS.presensi = async (p, main, alive) => {
     <div class="jgrid">${J.map(j => `<button class="jbtn ${j[1]}" data-act="absen" data-j="${j[0]}" ${dis[j[0]] ? 'disabled' : ''}><span class="ti">${ic(j[2])}</span>${j[0]}<small>${esc(j[3])}</small></button>`).join('')}</div>
     <div class="sec-h"><h2>Catatan hari ini</h2></div>
     <div class="card">${rec.length ? `<div class="timeline">${rec.map(r => `<div class="tl">${r.foto_id ? `<img src="${esc(thumb(r.foto_id, 200))}" alt="">` : `<span class="av">${ic('clock')}</span>`}<div style="flex:1"><b class="num">${esc(String(r.jam).slice(0, 5))}</b> · ${esc(r.jenis)}<div class="meta">${esc(r.keterangan || '')}${r.jarak_m !== '' && r.jarak_m != null ? ' · ' + esc(r.jarak_m) + ' m dari kantor' : ''}</div></div>${stPill(r.status)}</div>`).join('')}</div>` : '<div class="muted">Belum ada presensi.</div>'}</div>
-    <div class="btns"><button class="btn" data-act="go" data-go='["list",{"e":"presensi"}]'>${ic('list')}Riwayat</button><button class="btn" data-act="go" data-go='["rekap"]'>${ic('chart')}Rekap bulanan</button></div>
+    <div class="btns"><button class="btn" data-act="go" data-go='["list",{"e":"presensi"}]'>${ic('list')}Riwayat</button><button class="btn" data-act="go" data-go='["rekap"]'>${ic('chart')}Rekap bulanan</button><button class="btn" data-act="go" data-go='["list",{"e":"hari_libur"}]'>${ic('cal')}Hari libur</button></div>
   </div>`;
   clockTick($('#clk'));
   S.vh.absen = t => absenForm(t.dataset.j);
@@ -1750,7 +1758,7 @@ async function excelImport(e, file, done) {
 VIEWS.list = async (p, main, alive) => {
   const e = p.e, u = UI[e];
   if (!canRead(e)) throw new Error('Anda tidak punya akses ke menu ini.');
-  const st = S.listState = (S.listState && S.listState.e === e && S.listState.ctx === JSON.stringify(p)) ? S.listState : { e, ctx: JSON.stringify(p), q: '', chip: '', per: '', view: 0, rows: [], total: 0 };
+  const st = S.listState = (S.listState && S.listState.e === e && S.listState.ctx === JSON.stringify(p)) ? S.listState : { e, ctx: JSON.stringify(p), q: '', chip: '', per: '', view: p.v || 0, rows: [], total: 0 };
   let chipOpt = u.chips ? u.chips.opt.slice() : null, chipN = {};
   if (u.chips && u.chips.dyn) {
     try {
@@ -1762,7 +1770,7 @@ VIEWS.list = async (p, main, alive) => {
   const yearNow = new Date().getFullYear();
   if (st.per === '' && u.year) st.per = String(yearNow);
   if (st.per === '' && u.month) st.per = isoToday().slice(0, 7);
-  setTop(u.t, u.rkp ? 'RKP Desa ' + S.rkpYear : '');
+  setTop(p.title || u.t, u.rkp ? 'RKP Desa ' + S.rkpYear : '');
   const pers = u.year ? [String(yearNow), String(yearNow - 1), String(yearNow - 2), 'Semua'] : null;
   main.innerHTML = `<div class="stack">
     <div class="toolbar"><label class="search">${ic('search')}<input id="q" placeholder="Cari…" value="${esc(st.q)}" autocomplete="off"></label>
@@ -1872,6 +1880,7 @@ function valHtml(f, v) {
   if (f.t === 'date') return fDate(v);
   if (f.t === 'money') return esc(fMoney(v));
   if (f.t === 'sdgs') return esc(String(v).split(',').filter(Boolean).map(n => 'SDGs ' + n).join(', '));
+  if (f.t === 'textarea') return `<span style="white-space:pre-wrap">${esc(v)}</span>`;
   return `<span class="${f.mono ? 'mono' : ''}">${esc(v)}</span>`;
 }
 function parseLL(v) { const m = String(v || '').match(/(-?\d{1,3}(?:\.\d+)?)\s*[,; ]\s*(-?\d{1,3}(?:\.\d+)?)/); return m && Math.abs(+m[1]) <= 90 && Math.abs(+m[2]) <= 180 && (+m[1] || +m[2]) ? [m[1], m[2]] : null; }
@@ -1886,13 +1895,15 @@ function mapHtml(v, title) {
 async function renderDetail(e, x, el, full) {
   const u = UI[e];
   const files = u.fields.filter(f => f.t === 'file' && x[f.k]);
-  const shown = u.fields.filter(f => f.t !== 'file' && f.t !== 'geo' && x[f.k] !== '' && x[f.k] != null);
+  const shown = u.fields.filter(f => f.t !== 'file' && f.t !== 'geo' && f.t !== 'fotos' && x[f.k] !== '' && x[f.k] != null);
+  const galeri = u.fields.filter(f => f.t === 'fotos' && x[f.k]).map(f => { let a = []; try { a = JSON.parse(x[f.k]); } catch (er) { } return a.length ? `<div class="lbl">${esc(f.l)} (${a.length})</div><div class="pgrid">${a.map(fo => `<div class="pslot has"><button type="button" class="pimg" data-act="file" data-id="${esc(fo.id)}" data-name="${esc(fo.ket || f.l)}"><img src="${esc(thumb(fo.id, 240))}" alt="" loading="lazy"></button>${fo.ket ? `<span class="plbl">${esc(fo.ket)}</span>` : ''}</div>`).join('')}</div>` : ''; }).join('');
   const geoF = u.fields.find(f => f.t === 'geo' && x[f.k]);
   const geo = geoF ? x[geoF.k] : u.geo ? u.geo(x) : '';
   const w = canWrite(e);
   el.innerHTML = `
     ${shown.length ? `<dl class="dl">${shown.map(f => `<div class="${f.t === 'textarea' || f.wide && String(x[f.k]).length > 40 ? 'w' : ''}"><dt>${esc(f.l)}</dt><dd>${valHtml(f, x[f.k])}</dd></div>`).join('')}</dl>` : ''}
     ${files.length ? `<div class="btns">${files.map(f => `<button class="btn sm" data-act="file" data-id="${esc(x[f.k])}" data-priv="${f.priv ? 1 : 0}" data-name="${esc(f.l)}">${ic(x[f.k] === '•' ? 'lock' : f.img ? 'eye' : 'file')}${esc(f.l)}</button>`).join('')}</div>` : ''}
+    ${galeri}
     <div class="xk"></div>
     ${geo ? mapHtml(geo, 'Lokasi ' + (u.row(x).t || '')) : ''}
     <div class="xx"></div>
@@ -1908,7 +1919,6 @@ async function renderDetail(e, x, el, full) {
   if (e === 'keluarga') await extraKeluarga(x, xx, full);
   if (e === 'rkp_musyawarah') await extraMusyawarah(x, xx);
   if (e === 'pembangunan') await extraPembangunan(x, xx);
-  if (e === 'kegiatan') await extraKegiatan(x, xx);
   if (e === 'petugas') await extraPetugas(x, xx);
   if (e === 'penduduk') S.pendCache = Object.assign(S.pendCache || {}, { [x.id]: x });
 }
@@ -2047,16 +2057,47 @@ ACT.draftKK = async t => {
 };
 
 /* ---------------- Formulir ---------------- */
+/* Beberapa foto + keterangan (disimpan sebagai JSON [{id, ket}]) */
+function fotoSlot(fo) {
+  return `<div class="fslot"${fo ? ` data-id="${esc(fo.id)}"` : ''}><div class="fpic">${fo ? `<img src="${esc(thumb(fo.id, 240))}" alt="">` : `<label class="fadd">${ic('plus')}<span>Tambah foto</span><input type="file" accept="${IMG_ANY}" multiple hidden></label>`}</div>
+    <input class="fket" placeholder="Keterangan (opsional)" value="${esc(fo && fo.ket || '')}"${fo ? '' : ' hidden'}>${fo ? `<button type="button" class="btn sm danger fdel">${ic('trash')}Hapus</button>` : ''}</div>`;
+}
+function fotoBox(box) {
+  const mx = +box.dataset.max || 10;
+  const ensure = () => { const sl = $$('.fslot', box); if (sl.length < mx && !sl.some(s => !s.dataset.id && !s._file)) box.insertAdjacentHTML('beforeend', fotoSlot(null)); };
+  const isi = (slot, file) => {
+    slot._file = file;
+    $('.fpic', slot).innerHTML = `<img src="${URL.createObjectURL(file)}" alt="">`;
+    $('.fket', slot).hidden = false;
+    slot.insertAdjacentHTML('beforeend', `<button type="button" class="btn sm danger fdel">${ic('trash')}Hapus</button>`);
+  };
+  box.addEventListener('change', ev => {
+    const inp = ev.target; if (inp.type !== 'file') return;
+    const files = Array.from(inp.files || []); let slot = inp.closest('.fslot');
+    for (const file of files) {
+      if (!slot) { if ($$('.fslot', box).length >= mx) { toast('Maksimal ' + mx + ' foto.', 1); break; } box.insertAdjacentHTML('beforeend', fotoSlot(null)); slot = box.lastElementChild; }
+      isi(slot, file); slot = null;
+    }
+    ensure();
+  });
+  box.addEventListener('click', ev => { const b = ev.target.closest('.fdel'); if (!b) return; b.closest('.fslot').remove(); ensure(); });
+}
 function fieldHtml(f, v, rec) {
   const id = 'f_' + f.k;
   const req = f.req ? ' <i>*</i>' : '';
   const lab = `<label for="${id}">${esc(f.l)}${req}</label>`;
   const hint = f.hint ? `<span class="hint">${esc(f.hint)}</span>` : '';
-  const wide = f.wide || /textarea|file|sdgs|refpick/.test(f.t) ? ' wide' : '';
+  const wide = f.wide || /textarea|file|sdgs|refpick|fotos/.test(f.t) ? ' wide' : '';
   v = v == null ? '' : String(v);
   let inp;
   switch (f.t) {
-    case 'textarea': inp = `<textarea id="${id}" rows="3">${esc(v)}</textarea>`; break;
+    case 'textarea': inp = `<textarea id="${id}" rows="${f.rows || 3}">${esc(v)}</textarea>`; break;
+    case 'fotos': {
+      let arr = []; try { arr = JSON.parse(v || '[]'); } catch (x) { }
+      const mx = f.max || 10;
+      inp = `<div class="fotos" id="${id}" data-max="${mx}">${arr.slice(0, mx).map(fotoSlot).join('')}${arr.length < mx ? fotoSlot(null) : ''}</div><span class="hint">Maksimal ${mx} foto. Setelah memilih satu foto, kotak "Tambah foto" berikutnya akan muncul.</span>`;
+      break;
+    }
     case 'select': {
       const opts = f.opt.slice(); if (v && opts.indexOf(v) < 0) opts.unshift(v);
       inp = `<select id="${id}"><option value="">— pilih —</option>${opts.map(o => `<option ${o === v ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`; break;
@@ -2089,7 +2130,7 @@ function readForm(u, root) {
   const v = {};
   u.fields.forEach(f => {
     const el = $('#f_' + f.k, root);
-    if (!el || f.t === 'file') return;
+    if (!el || f.t === 'file' || f.t === 'fotos') return;
     if (f.t === 'sdgs') v[f.k] = $$('input:checked', el).map(i => i.value).join(',');
     else if (f.t === 'money') v[f.k] = nOnly(el.value);
     else {
@@ -2149,6 +2190,7 @@ VIEWS.form = async (p, main, alive) => {
     jf.addEventListener('input', sync); jf.addEventListener('change', sync); sync();
   }
   if ($('[data-person]', frm)) personPick(frm);
+  $$('.fotos', frm).forEach(fotoBox);
   /* NIK -> isi otomatis dari Data Penduduk (hanya kolom yang masih kosong) */
   const nikF = flds.find(f => f.nikfill), nikEl = nikF && $('#f_' + nikF.k, frm);
   if (nikEl && !nikEl.readOnly) nikEl.addEventListener('input', async () => {
@@ -2210,6 +2252,17 @@ VIEWS.form = async (p, main, alive) => {
           const up = await uploadFile(el.files[0], u.folder || 'Lainnya');
           val[f.k] = up.id;
         }
+      }
+      for (const f of u.fields.filter(f => f.t === 'fotos')) {
+        const box = $('#f_' + f.k, frm); if (!box) continue;
+        const slots = $$('.fslot', box), tot = slots.filter(s => s._file).length, out = [];
+        let n = 0;
+        for (const s of slots) {
+          const ket = ($('.fket', s).value || '').trim();
+          if (s._file) { n++; btn.textContent = 'Mengunggah foto ' + n + '/' + tot + '…'; const up = await uploadFile(s._file, u.folder || 'Lainnya'); out.push({ id: up.id, ket }); }
+          else if (s.dataset.id) out.push({ id: s.dataset.id, ket });
+        }
+        val[f.k] = out.length ? JSON.stringify(out) : '';
       }
       if (p.id) val.id = p.id;
       Object.assign(val, p.preset && !p.id ? Object.fromEntries(Object.entries(p.preset).filter(([k]) => !(k in val))) : {});
