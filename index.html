@@ -464,6 +464,7 @@ const OPT = {
   dusun: ['DUSUN KRAJAN 1', 'DUSUN KRAJAN 2', 'DUSUN KRAJAN 3', 'DUSUN TIMUR SAWAH', 'DUSUN TUNJUNGAN', 'DUSUN PEMUKIMAN'],
   jk: ['LAKI-LAKI', 'PEREMPUAN'],
   jk2: ['Laki-laki', 'Perempuan'],
+  jenisLembaga: ['Yayasan', 'Masjid', 'Musholla', 'TPQ/TPA', 'Madrasah Diniyah', 'Pondok Pesantren', 'Sekolah/Madrasah', 'PAUD/TK/KB', 'Majelis Taklim', 'Kelompok Tani', 'Koperasi', 'Usaha/UMKM', 'Organisasi Kemasyarakatan', 'Instansi Pemerintah', 'Lainnya'],
   agama: ['ISLAM', 'KRISTEN', 'KATHOLIK', 'HINDU', 'BUDHA', 'KHONGHUCU', 'KEPERCAYAAN'],
   agama2: ['Islam', 'Kristen', 'Katholik', 'Hindu', 'Budha', 'Khonghucu'],
   pendidikan: ['TIDAK/BELUM SEKOLAH', 'BELUM TAMAT SD/SEDERAJAT', 'TAMAT SD/SEDERAJAT', 'SLTP/SEDERAJAT', 'SLTA/SEDERAJAT', 'DIPLOMA I/II', 'AKADEMI/DIPLOMA III/S. MUDA', 'DIPLOMA IV/STRATA I', 'STRATA II', 'STRATA III'],
@@ -728,16 +729,52 @@ const UI = {
     row: r => ({ t: r.nama, s: fDay(r.tanggal) + (r.jam ? ' · ' + String(r.jam).slice(0, 5) + ' WIB' : '') + (r.tempat ? ' · ' + r.tempat : ''), s2: r.peserta || '', av: ic('cal'), pill: kgPill(r) }),
     print: { title: 'BUKU AGENDA KEGIATAN', land: 1, cols: [['Tanggal', r => fDate(r.tanggal) + (r.jam ? '<br>' + esc(String(r.jam).slice(0, 5)) : '')], ['Kegiatan', 'nama'], ['Tempat', 'tempat'], ['Penyelenggara', 'penyelenggara'], ['Peserta', 'peserta'], ['Ringkasan', 'ringkasan']] }
   },
+  produk_layanan: {
+    t: 'Produk Layanan', ic: 'book', perm: 'admin', sort: 'no', asc: 1,
+    fields: [F('no', 'No.', 'number'), F('nama', 'Nama Layanan', 'text', { req: 1, wide: 1 }), F('persyaratan', 'Persyaratan', 'textarea', { wide: 1, rows: 8, hint: 'Satu persyaratan per baris, mis. "a. Fotocopy e-KTP 1 lembar".' }), F('ket', 'Dasar Hukum / Catatan', 'text', { wide: 1 })],
+    row: r => ({ t: r.nama, s: String(r.persyaratan || '').split('\n').filter(x => x.trim()).length + ' persyaratan' + (r.ket ? ' · ' + r.ket : ''), av: r.no || '•' }),
+    print: { title: 'PRODUK LAYANAN DESA', cols: [['No', 'no'], ['Layanan', 'nama'], ['Persyaratan', r => esc(r.persyaratan || '').replace(/\n/g, '<br>') + (r.ket ? '<br><i>' + esc(r.ket) + '</i>' : '')]] }
+  },
+  lembaga: {
+    t: 'Lembaga / Yayasan', ic: 'landmark', perm: 'kesejahteraan', folder: 'Kesejahteraan/Lembaga', sort: 'nama', excel: 1,
+    fields: [F('nama', 'Nama Lembaga / Yayasan', 'text', { req: 1, wide: 1 }), F('jenis', 'Jenis', 'text', { req: 1, list: OPT.jenisLembaga }), F('no_sk', 'No. SK / Akta / Izin'), F('berdiri', 'Tahun Berdiri'),
+      F('alamat', 'Alamat / Lokasi', 'text', { wide: 1, hint: 'Mis. Jl. ..., atau nama tempat' }), F('dusun', 'Dusun', 'select', { opt: OPT.dusun }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }),
+      F('ketua_nik', 'NIK Ketua / Penanggung Jawab', 'text', { mono: 1, len: 16, sens: 1, nikfill: { pre: 'ketua_' }, hint: 'Ketik 16 digit: nama terisi otomatis dari Data Penduduk' }), F('ketua_nama', 'Nama Ketua / Penanggung Jawab', 'text', { up: 1 }),
+      F('ketua_jabatan', 'Jabatan', 'text', { def: 'Ketua', list: ['Ketua', 'Pengasuh', 'Kepala Sekolah', 'Takmir', 'Pimpinan', 'Direktur'] }), F('telp', 'No. HP / Telepon', 'tel'), F('jml_anggota', 'Jumlah Anggota / Santri / Jamaah', 'number'),
+      F('lokasi', 'Titik Lokasi', 'geo'), F('ket', 'Keterangan', 'textarea', { wide: 1 }), F('dok_id', 'Dokumen SK / Akta', 'file')],
+    chips: { k: 'jenis', opt: [], dyn: 1 },
+    row: r => ({ t: r.nama, s: [r.jenis, r.ketua_nama ? (r.ketua_jabatan || 'Ketua') + ': ' + r.ketua_nama : ''].filter(Boolean).join(' · '), s2: [String(r.dusun || '').replace('DUSUN ', ''), r.rt ? 'RT ' + r.rt + (r.rw ? '/' + r.rw : '') : ''].filter(Boolean).join(' '), av: initials(r.nama) }),
+    print: { title: 'DAFTAR LEMBAGA / YAYASAN DI DESA', land: 1, cols: [['Nama', 'nama'], ['Jenis', 'jenis'], ['No. SK/Akta', 'no_sk'], ['Alamat', r => esc([r.alamat, String(r.dusun || '').replace('DUSUN ', ''), r.rt ? 'RT ' + r.rt + '/' + (r.rw || '') : ''].filter(Boolean).join(', '))], ['Ketua', 'ketua_nama'], ['Anggota', 'jml_anggota'], ['Telp', 'telp']] }
+  },
+  guru_ngaji: {
+    t: 'Guru Ngaji', ic: 'book', perm: 'kesejahteraan', folder: 'Kesejahteraan/Guru Ngaji', sort: 'nama', excel: 1,
+    fields: [F('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1, nikfill: 1, hint: 'Ketik 16 digit: data dari Data Penduduk terisi otomatis' }), F('nama', 'Nama Lengkap', 'text', { req: 1, up: 1, wide: 1 }),
+      F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk }), F('tempat_lahir', 'Tempat Lahir', 'text', { up: 1 }), F('tgl_lahir', 'Tanggal Lahir', 'date'),
+      F('dusun', 'Dusun', 'select', { opt: OPT.dusun }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }), F('telp', 'No. HP', 'tel'),
+      F('lembaga', 'TPQ / Lembaga / Tempat Mengajar', 'text', { wide: 1, listFrom: { e: 'lembaga', k: 'nama' } }), F('tempat_jenis', 'Jenis Tempat Mengajar', 'select', { opt: ['TPQ/TPA', 'Musholla', 'Masjid', 'Rumah sendiri', 'Madrasah Diniyah', 'Pondok Pesantren', 'Lainnya'] }),
+      F('jml_santri', 'Jumlah Santri', 'number'), F('sejak', 'Mengajar Sejak (tahun)'), F('ket', 'Keterangan', 'textarea', { wide: 1 }), F('foto_id', 'Foto', 'file', { img: 1 })],
+    chips: { k: 'dusun', opt: OPT.dusun, lbl: s => s.replace('DUSUN ', '') },
+    row: r => ({ t: r.nama, s: [r.lembaga, r.jml_santri ? r.jml_santri + ' santri' : ''].filter(Boolean).join(' · '), s2: [String(r.dusun || '').replace('DUSUN ', ''), r.rt ? 'RT ' + r.rt + (r.rw ? '/' + r.rw : '') : '', r.telp].filter(Boolean).join(' · '), av: initials(r.nama), img: r.foto_id }),
+    print: { title: 'DAFTAR GURU NGAJI', land: 1, cols: [['Nama', 'nama'], ['L/P', r => esc((r.jk || '').slice(0, 1))], ['Alamat', r => esc([String(r.dusun || '').replace('DUSUN ', ''), r.rt ? 'RT ' + r.rt + '/' + (r.rw || '') : ''].filter(Boolean).join(' '))], ['Tempat Mengajar', 'lembaga'], ['Santri', 'jml_santri'], ['Sejak', 'sejak'], ['No. HP', 'telp']] }
+  },
   kegiatan_berkas: {
     t: 'Berkas Kegiatan', ic: 'file', perm: 'kegiatan', sub: 1, folder: 'Kegiatan',
     fields: [F('jenis', 'Jenis', 'select', { opt: OPT.jenisBerkas }), F('ket', 'Keterangan'), F('file_id', 'Berkas', 'file')],
     row: r => ({ t: r.nama_file || r.jenis, s: r.ket || '', av: ic('file') })
   },
   register_surat: {
-    t: 'Register Surat Keterangan', ic: 'file', perm: 'pelayanan',
+    t: 'Surat Keterangan', ic: 'file', perm: 'pelayanan', excel: 1,
     fields: [F('tgl_surat', 'Tanggal Surat', 'date', { def: isoToday }), F('no', 'No. Register', 'text', { auto: 1 }), F('jenis_surat', 'Surat / Jenis Keterangan', 'text', { req: 1, wide: 1, list: ['Surat Keterangan Domisili', 'Surat Keterangan Tidak Mampu', 'Surat Keterangan Usaha', 'Surat Pengantar SKCK', 'Surat Keterangan Kelahiran', 'Surat Keterangan Kematian', 'Surat Keterangan Pindah', 'Surat Keterangan Belum Menikah', 'Surat Keterangan Penghasilan'] }),
-      F('nama', 'Nama', 'text', { req: 1, up: 1, wide: 1 }), F('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1 }), F('tempat_lahir', 'Tempat Lahir', 'text', { up: 1 }), F('tgl_lahir', 'Tanggal Lahir', 'date'), F('umur', 'Tahun Lahir / Umur'),
-      F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk }), F('dusun', 'Dusun', 'select', { opt: OPT.dusun }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }), F('keperluan', 'Keperluan', 'textarea', { wide: 1 }),
+      F('pemohon', 'Pemohon', 'select', { opt: ['Perorangan', 'Lembaga / Instansi'], def: 'Perorangan', hint: 'Lembaga / Instansi: yayasan, masjid, TPQ, sekolah, kelompok, instansi, dll.' }),
+      F('lembaga_nama', 'Nama Lembaga / Instansi', 'text', { wide: 1, when: { k: 'pemohon', v: 'Lembaga / Instansi' }, listFrom: { e: 'lembaga', k: 'nama' }, hint: 'Ketik atau pilih dari data Lembaga/Yayasan: data lembaga & penanggung jawab terisi otomatis',
+        fill: x => ({ lembaga_jenis: x.jenis, lembaga_alamat: [x.alamat, x.dusun ? 'Dusun ' + judulKata(String(x.dusun).replace(/^DUSUN\s+/i, '')) : '', x.rt ? 'RT ' + x.rt : '', x.rw ? 'RW ' + x.rw : ''].filter(Boolean).join(' '), lembaga_no: x.no_sk, pj_jabatan: x.ketua_jabatan || 'Ketua', nik: String(x.ketua_nik || '').indexOf('•') >= 0 ? '' : x.ketua_nik, nama: x.ketua_nama }) }),
+      F('lembaga_jenis', 'Jenis Lembaga', 'text', { when: { k: 'pemohon', v: 'Lembaga / Instansi' }, list: OPT.jenisLembaga }), F('lembaga_no', 'No. SK / Akta / Izin', 'text', { when: { k: 'pemohon', v: 'Lembaga / Instansi' } }),
+      F('lembaga_alamat', 'Alamat Lembaga', 'text', { wide: 1, when: { k: 'pemohon', v: 'Lembaga / Instansi' } }),
+      F('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1, nikfill: 1, hint: 'Ketik 16 digit: data dari Data Penduduk terisi otomatis' }), F('nama', 'Nama', 'text', { req: 1, up: 1, wide: 1, lblW: { k: 'pemohon', v: 'Lembaga / Instansi', l: 'Nama Penanggung Jawab' } }),
+      F('pj_jabatan', 'Jabatan dalam Lembaga', 'text', { when: { k: 'pemohon', v: 'Lembaga / Instansi' }, list: ['Ketua', 'Pengasuh', 'Kepala Sekolah', 'Takmir', 'Pimpinan', 'Direktur', 'Sekretaris', 'Bendahara'] }),
+      F('tempat_lahir', 'Tempat Lahir', 'text', { up: 1 }), F('tgl_lahir', 'Tanggal Lahir', 'date'), F('umur', 'Tahun Lahir / Umur'),
+      F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk }), F('agama', 'Agama', 'select', { opt: OPT.agama }), F('pekerjaan', 'Pekerjaan', 'text', { up: 1, list: ['BELUM/TIDAK BEKERJA', 'MENGURUS RUMAH TANGGA', 'PELAJAR/MAHASISWA', 'PETANI/PEKEBUN', 'BURUH TANI/PERKEBUNAN', 'BURUH HARIAN LEPAS', 'KARYAWAN SWASTA', 'WIRASWASTA', 'PEDAGANG', 'PNS', 'PERANGKAT DESA', 'GURU', 'PENSIUNAN'] }), F('status_kawin', 'Status Perkawinan', 'text', { up: 1, list: OPT.kawin }),
+      F('dusun', 'Dusun', 'select', { opt: OPT.dusun }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }), F('keperluan', 'Keperluan', 'textarea', { wide: 1 }),
       F('alamat_domisili', 'Alamat Domisili (kosongkan bila sama dengan alamat)', 'text', { wide: 1, grp: ['Surat Keterangan Domisili'] }), F('lama_tinggal', 'Tinggal Sejak', 'text', { hint: 'mis. tahun 2015', grp: ['Surat Keterangan Domisili'] }),
       F('usaha_nama', 'Nama Usaha', 'text', { grp: ['Surat Keterangan Usaha'] }), F('usaha_jenis', 'Jenis Usaha', 'text', { grp: ['Surat Keterangan Usaha'] }), F('usaha_alamat', 'Alamat Usaha', 'text', { wide: 1, grp: ['Surat Keterangan Usaha'] }), F('usaha_mulai', 'Mulai Usaha (tahun)', 'text', { grp: ['Surat Keterangan Usaha'] }),
       F('bayi_nama', 'Nama Bayi', 'text', { up: 1, grp: ['Surat Keterangan Kelahiran'] }), F('bayi_jk', 'Jenis Kelamin Bayi', 'select', { opt: OPT.jk, grp: ['Surat Keterangan Kelahiran'] }), F('bayi_tgl', 'Tanggal Lahir Bayi', 'date', { grp: ['Surat Keterangan Kelahiran'] }), F('bayi_jam', 'Jam Lahir', 'time', { grp: ['Surat Keterangan Kelahiran'] }), F('bayi_tempat', 'Tempat Lahir Bayi', 'text', { grp: ['Surat Keterangan Kelahiran'] }), F('anak_ke', 'Anak ke', 'number', { grp: ['Surat Keterangan Kelahiran'] }), F('ayah_nama', 'Nama Ayah', 'text', { up: 1, grp: ['Surat Keterangan Kelahiran'] }), F('ibu_nama', 'Nama Ibu', 'text', { up: 1, grp: ['Surat Keterangan Kelahiran'] }),
@@ -746,7 +783,7 @@ const UI = {
       F('penghasilan', 'Penghasilan per Bulan', 'money', { grp: ['Surat Keterangan Penghasilan'] }),
       ...[1, 2, 3, 4, 5, 6, 7, 8].map(n => F('isian' + n, 'Isian ' + n, 'text', { dyn: n }))],
     year: 'tgl_surat', grpBy: 'jenis_surat',
-    row: r => ({ t: r.nama, s: [r.jenis_surat, r.keperluan].filter(Boolean).join(' · '), av: initials(r.nama), date: r.tgl_surat, r: r.no ? 'No. ' + r.no : '' }),
+    row: r => ({ t: r.pemohon === 'Lembaga / Instansi' && r.lembaga_nama ? r.lembaga_nama + ' (' + r.nama + ')' : r.nama, s: [r.jenis_surat, r.keperluan].filter(Boolean).join(' · '), av: initials(r.lembaga_nama && r.pemohon === 'Lembaga / Instansi' ? r.lembaga_nama : r.nama), date: r.tgl_surat, r: r.no ? 'No. ' + r.no : '' }),
     print: { title: 'BUKU REGISTER SURAT KETERANGAN', land: 1, cols: [['No', 'no'], ['Tanggal', r => fDate(r.tgl_surat)], ['Nama', 'nama'], ['L/P', r => (r.jk || '').slice(0, 1)], ['Umur', 'umur'], ['Alamat', r => String(r.dusun || '').replace('DUSUN ', '') + (r.rt ? ' RT ' + r.rt : '') + (r.rw ? '/RW ' + r.rw : '')], ['Jenis Surat', 'jenis_surat'], ['Keperluan', 'keperluan']] }
   },
   jenis_surat: {
@@ -774,9 +811,7 @@ function stPill(s) {
   return `<span class="pill ${c || ''}">${esc(s)}</span>`;
 }
 
-const SOON = {
-  kesejahteraan: { t: 'Kesejahteraan', ic: 'heart', d: 'Data penerima bantuan (BLT, PKH, BPNT), posyandu, dan kegiatan keagamaan.' }
-};
+const SOON = {};
 
 /* Kelompok menu */
 function MODS() {
@@ -786,7 +821,8 @@ function MODS() {
     { k: 'tu', l: 'TU & Umum', ic: 'folder', items: ['surat_masuk', 'surat_keluar', 'ekspedisi', 'perdes', 'sk_kades', 'aparat', 'petugas', 'inventaris', 'tkd', 'tanah_desa'].map(e => [UI[e].t, UI[e].ic, ['list', { e }], e]) },
     { k: 'pemerintahan', l: 'Pemerintahan', ic: 'landmark', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, '*'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga']] },
     { k: 'pembangunan', l: 'Pembangunan', ic: 'hammer', perm: 'pembangunan', items: [['Kegiatan Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
-    { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Register Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat']] },
+    { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
+    { k: 'kesejahteraan', l: 'Kesejahteraan', ic: 'heart', items: [['Lembaga / Yayasan', 'landmark', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru Ngaji', 'book', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
     { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RKP Desa', 'sprout', ['rkp'], null, '*'], ['Referensi', 'book', ['refs'], null, '*']] },
     { k: 'soon', l: 'Segera Hadir', ic: 'sprout', items: Object.keys(SOON).map(k => [SOON[k].t, SOON[k].ic, ['soon', { k }], null, '*', 1]) }
   ];
@@ -1842,7 +1878,7 @@ VIEWS.list = async (p, main, alive) => {
     try {
       let rows = [], off = 0, tot = 1;
       while (off < tot) { const r = await fetchList(Object.assign(params(off), { limit: 5000 })); rows = rows.concat(r.rows); tot = r.total; off += r.rows.length; if (!r.rows.length) break; }
-      await excelExport(e, rows, u.t + (st.chip ? ' ' + st.chip : '') + ' ' + isoToday());
+      await excelExport(e, rows, u.t + (u.year && st.per && st.per !== 'all' ? ' Tahun ' + st.per : '') + (st.chip ? ' ' + st.chip : '') + ' ' + isoToday());
     } catch (x) { toast(x.message, 1); }
     t.disabled = false;
   };
@@ -2129,9 +2165,10 @@ function fieldHtml(f, v, rec) {
     case 'person': inp = `<div class="pick"><input id="${id}" value="${esc(v)}" autocomplete="off" data-person="${esc(JSON.stringify(f.fill || {}))}" placeholder="Ketik nama, pilih dari daftar"><div class="pickl" hidden></div></div>`; break;
     case 'refpick': inp = `<div class="btns" style="flex-wrap:nowrap"><input id="${id}" value="${esc(v)}" style="flex:1"><button type="button" class="btn sm" data-act="pick">${ic('list')}Pilih kode</button></div>`; break;
     default: {
-      const dl = f.list ? `<datalist id="dl_${f.k}">${f.list.map(o => `<option value="${esc(o)}">`).join('')}</datalist>` : '';
+      const lst = f._list || f.list;
+      const dl = lst ? `<datalist id="dl_${f.k}">${lst.map(o => `<option value="${esc(o)}">`).join('')}</datalist>` : '';
       const sens = f.sens && v.indexOf('•') >= 0;
-      inp = `<input id="${id}" type="${f.t === 'email' ? 'email' : f.t === 'tel' ? 'tel' : 'text'}" value="${esc(v)}" ${f.list ? `list="dl_${f.k}"` : ''} ${f.len ? `maxlength="${f.len}" inputmode="numeric"` : ''} ${f.mono ? 'class="mono"' : ''} ${sens ? 'readonly' : ''}>${dl}`;
+      inp = `<input id="${id}" type="${f.t === 'email' ? 'email' : f.t === 'tel' ? 'tel' : 'text'}" value="${esc(v)}" ${lst ? `list="dl_${f.k}"` : ''} ${f.len ? `maxlength="${f.len}" inputmode="numeric"` : ''} ${f.mono ? 'class="mono"' : ''} ${sens ? 'readonly' : ''}>${dl}`;
       if (sens) inp += '<span class="hint">Tersamar. Anda tidak punya izin mengubah NIK/KK.</span>';
       if (f.nikfill && !sens) inp += '<span class="hint" id="nikNote" aria-live="polite"></span>';
     }
@@ -2177,6 +2214,7 @@ VIEWS.form = async (p, main, alive) => {
     }
   }
   if (e === 'register_surat') await muatJenisSurat();
+  for (const f of flds.filter(f => f.listFrom)) { try { const r = await call('list', { entity: f.listFrom.e, limit: 2000 }); f._rows = r.rows; f._list = r.rows.map(x => x[f.listFrom.k]).filter(Boolean); } catch (x) { f._list = f._rows = []; } }
   if (u.fields.some(f => f.t === 'sdgs') && !S.sdgs) { try { S.sdgs = (await call('list', { entity: 'ref_sdgs', limit: 50, desc: false })).rows; } catch (x) { S.sdgs = []; } }
   if (!alive()) return;
   main.innerHTML = `<form class="card stack" id="frm" novalidate>
@@ -2202,6 +2240,26 @@ VIEWS.form = async (p, main, alive) => {
     jf.addEventListener('input', sync); jf.addEventListener('change', sync); sync();
   }
   if ($('[data-person]', frm)) personPick(frm);
+  /* kolom yang tampil hanya untuk pilihan tertentu (mis. Pemohon = Lembaga) */
+  const whenF = flds.filter(f => f.when || f.lblW);
+  if (whenF.length) {
+    const sync2 = () => whenF.forEach(f => {
+      const el = $('#f_' + f.k, frm), box = el && el.closest('.f'); if (!box) return;
+      if (f.when) { const c = $('#f_' + f.when.k, frm); box.hidden = !c || c.value !== f.when.v; }
+      if (f.lblW) { const c = $('#f_' + f.lblW.k, frm), lb = box.querySelector('label'); if (lb && lb.firstChild) lb.firstChild.textContent = c && c.value === f.lblW.v ? f.lblW.l : f.l; }
+    });
+    frm.addEventListener('change', sync2); sync2();
+  }
+  /* pilih dari daftar (mis. Lembaga) -> kolom terkait terisi */
+  flds.filter(f => f.fill && f.listFrom).forEach(f => {
+    const el = $('#f_' + f.k, frm); if (!el) return;
+    el.addEventListener('change', () => {
+      const x = (f._rows || []).find(r => String(r[f.listFrom.k] || '').trim().toLowerCase() === el.value.trim().toLowerCase()); if (!x) return;
+      const m = f.fill(x);
+      Object.keys(m).forEach(k => { const t = $('#f_' + k, frm); if (!t || !m[k] || t.readOnly) return; if (t.tagName === 'SELECT' && !Array.from(t.options).some(o => o.value === m[k])) return; t.value = m[k]; });
+      const nk = $('#f_nik', frm); if (nk && /^\d{16}$/.test(nk.value)) nk.dispatchEvent(new Event('input'));
+    });
+  });
   $$('.fotos', frm).forEach(fotoBox);
   /* NIK -> isi otomatis dari Data Penduduk (hanya kolom yang masih kosong) */
   const nikF = flds.find(f => f.nikfill), nikEl = nikF && $('#f_' + nikF.k, frm);
@@ -2214,8 +2272,9 @@ VIEWS.form = async (p, main, alive) => {
       if (!d) { note.textContent = 'NIK ini belum ada di Data Penduduk. Isi data secara manual.'; return; }
       const tc = x => String(x).toLowerCase().replace(/(^|[\s.,'/-])([a-z])/g, (m, a, b) => a + b.toUpperCase());
       let n = 0;
+      const pre = (nikF.nikfill && nikF.nikfill.pre) || '';
       Object.keys(d).forEach(k => {
-        const el = $('#f_' + k, frm), val = d[k];
+        const el = $('#f_' + pre + k, frm), val = d[k];
         if (!el || !val || el.value.trim() || el.readOnly) return;
         if (el.tagName === 'SELECT') {
           const lv = String(val).toLowerCase(), o = Array.from(el.options).find(o => o.value && (o.value.toLowerCase() === lv || lv.indexOf(o.value.toLowerCase() + '/') === 0));
@@ -2965,8 +3024,10 @@ async function petaSurat(reg) {
     No: reg.no || '', 'Nomor Register': reg.no || '', Tahun: String(d.getFullYear()), 'Tanggal Surat': dPanjang(reg.tgl_surat || isoToday()), 'Jenis Surat': reg.jenis_surat || '',
     Nama: judulKata(v('nama')), NIK: String(v('nik')).indexOf('•') >= 0 ? '' : v('nik'), 'No KK': String(p.kk || '').indexOf('•') >= 0 ? '' : (p.kk || ''),
     'Tempat Lahir': judulKata(v('tempat_lahir')), 'Tanggal Lahir': dPanjang(tl), TTL: [judulKata(v('tempat_lahir')), dPanjang(tl)].filter(Boolean).join(', '),
-    Umur: tl ? umur(tl) + ' tahun' : (reg.umur || ''), 'Jenis Kelamin': judulKata(v('jk')), Agama: judulKata(p.agama || ''), Pekerjaan: judulKata(p.pekerjaan || ''),
-    'Status Perkawinan': judulKata(p.status_kawin || ''), Kewarganegaraan: String(p.warga_negara || 'WNI').toUpperCase() === 'WNI' ? 'Indonesia' : (p.warga_negara || ''), Pendidikan: judulKata(p.pendidikan || ''),
+    Umur: tl ? umur(tl) + ' tahun' : (reg.umur || ''), 'Jenis Kelamin': judulKata(v('jk')), Agama: judulKata(v('agama')), Pekerjaan: judulKata(v('pekerjaan')),
+    'Status Perkawinan': judulKata(v('status_kawin')),
+    Pemohon: reg.pemohon || 'Perorangan', 'Nama Lembaga': reg.lembaga_nama || TITIK, 'Jenis Lembaga': reg.lembaga_jenis || TITIK, 'Alamat Lembaga': reg.lembaga_alamat || TITIK,
+    'No SK Lembaga': reg.lembaga_no || TITIK, Jabatan: reg.pj_jabatan || TITIK, 'Penanggung Jawab': judulKata(v('nama')), Kewarganegaraan: String(p.warga_negara || 'WNI').toUpperCase() === 'WNI' ? 'Indonesia' : (p.warga_negara || ''), Pendidikan: judulKata(p.pendidikan || ''),
     Alamat: alamat, Dusun: dusun, RT: v('rt'), RW: v('rw'), Keperluan: reg.keperluan || TITIK,
     'Alamat Domisili': reg.alamat_domisili || alamat, 'Lama Tinggal': reg.lama_tinggal || TITIK,
     'Nama Usaha': reg.usaha_nama || TITIK, 'Jenis Usaha': reg.usaha_jenis || TITIK, 'Alamat Usaha': reg.usaha_alamat || TITIK, 'Mulai Usaha': reg.usaha_mulai || TITIK,
