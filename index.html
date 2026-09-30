@@ -722,10 +722,19 @@ const UI = {
       F('bayi_nama', 'Nama Bayi', 'text', { up: 1, grp: ['Surat Keterangan Kelahiran'] }), F('bayi_jk', 'Jenis Kelamin Bayi', 'select', { opt: OPT.jk, grp: ['Surat Keterangan Kelahiran'] }), F('bayi_tgl', 'Tanggal Lahir Bayi', 'date', { grp: ['Surat Keterangan Kelahiran'] }), F('bayi_jam', 'Jam Lahir', 'time', { grp: ['Surat Keterangan Kelahiran'] }), F('bayi_tempat', 'Tempat Lahir Bayi', 'text', { grp: ['Surat Keterangan Kelahiran'] }), F('anak_ke', 'Anak ke', 'number', { grp: ['Surat Keterangan Kelahiran'] }), F('ayah_nama', 'Nama Ayah', 'text', { up: 1, grp: ['Surat Keterangan Kelahiran'] }), F('ibu_nama', 'Nama Ibu', 'text', { up: 1, grp: ['Surat Keterangan Kelahiran'] }),
       F('mati_tgl', 'Tanggal Meninggal', 'date', { grp: ['Surat Keterangan Kematian'] }), F('mati_jam', 'Jam Meninggal', 'time', { grp: ['Surat Keterangan Kematian'] }), F('mati_tempat', 'Tempat Meninggal', 'text', { grp: ['Surat Keterangan Kematian'] }), F('mati_sebab', 'Sebab Meninggal', 'text', { grp: ['Surat Keterangan Kematian'] }), F('pelapor', 'Pelapor', 'text', { grp: ['Surat Keterangan Kematian'] }),
       F('pindah_tujuan', 'Alamat Tujuan Pindah', 'text', { wide: 1, grp: ['Surat Keterangan Pindah'] }), F('pindah_alasan', 'Alasan Pindah', 'text', { grp: ['Surat Keterangan Pindah'] }), F('pengikut', 'Jumlah Pengikut', 'number', { grp: ['Surat Keterangan Pindah'] }),
-      F('penghasilan', 'Penghasilan per Bulan', 'money', { grp: ['Surat Keterangan Penghasilan'] })],
+      F('penghasilan', 'Penghasilan per Bulan', 'money', { grp: ['Surat Keterangan Penghasilan'] }),
+      ...[1, 2, 3, 4, 5, 6, 7, 8].map(n => F('isian' + n, 'Isian ' + n, 'text', { dyn: n }))],
     year: 'tgl_surat', grpBy: 'jenis_surat',
     row: r => ({ t: r.nama, s: [r.jenis_surat, r.keperluan].filter(Boolean).join(' · '), av: initials(r.nama), date: r.tgl_surat, r: r.no ? 'No. ' + r.no : '' }),
     print: { title: 'BUKU REGISTER SURAT KETERANGAN', land: 1, cols: [['No', 'no'], ['Tanggal', r => fDate(r.tgl_surat)], ['Nama', 'nama'], ['L/P', r => (r.jk || '').slice(0, 1)], ['Umur', 'umur'], ['Alamat', r => String(r.dusun || '').replace('DUSUN ', '') + (r.rt ? ' RT ' + r.rt : '') + (r.rw ? '/RW ' + r.rw : '')], ['Jenis Surat', 'jenis_surat'], ['Keperluan', 'keperluan']] }
+  },
+  jenis_surat: {
+    t: 'Jenis Surat Keterangan', ic: 'file', perm: 'admin', read: '*', write: 'admin', sort: 'nama', asc: 1,
+    fields: [F('nama', 'Nama Jenis Surat', 'text', { req: 1, wide: 1, hint: 'mis. Surat Keterangan Ahli Waris' }),
+      F('isi', 'Kalimat isi surat', 'textarea', { wide: 1, hint: 'Boleh memakai tanda, mis. Orang tersebut di atas benar penduduk Desa {{Desa}} dan ...' }),
+      F('isian', 'Isian tambahan (satu per baris, maks. 8)', 'textarea', { wide: 1, hint: 'mis. Nama Sekolah (baris 1), Kelas (baris 2). Nama isian = nama tanda di template, mis. {{Nama Sekolah}}' }),
+      F('aktif', 'Aktif', 'select', { opt: ['Ya', 'Tidak'], def: 'Ya' })],
+    row: r => ({ t: r.nama, s: isianJenis(r).join(', ') || 'Tanpa isian tambahan', av: ic('file'), pill: r.aktif === 'Tidak' ? '<span class="pill">Tidak aktif</span>' : '' })
   },
   ref_hukum: {
     t: 'Dasar Hukum', ic: 'book', perm: '*', write: 'perencanaan', sort: 'no', asc: 1,
@@ -1887,7 +1896,7 @@ async function renderDetail(e, x, el, full) {
     <div class="xk"></div>
     ${geo ? mapHtml(geo, 'Lokasi ' + (u.row(x).t || '')) : ''}
     <div class="xx"></div>
-    <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button><button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>` : ''}${e === 'penduduk' && canWrite('register_surat') ? `<button class="btn sm" data-act="regSurat" data-id="${esc(x.id)}">${ic('file')}Buat surat keterangan</button>` : ''}${e === 'register_surat' && w && suratPath(x.jenis_surat) ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak surat (Word)</button>` : ''}${e === 'register_surat' && x.pdf_id ? `<button class="btn sm" data-act="file" data-id="${esc(x.pdf_id)}" data-priv="1" data-name="PDF surat">${ic('file')}PDF</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>`;
+    <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button><button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>` : ''}${e === 'penduduk' && canWrite('register_surat') ? `<button class="btn sm" data-act="regSurat" data-id="${esc(x.id)}">${ic('file')}Buat surat keterangan</button>` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak surat (Word)</button>` : ''}${e === 'register_surat' && x.pdf_id ? `<button class="btn sm" data-act="file" data-id="${esc(x.pdf_id)}" data-priv="1" data-name="PDF surat">${ic('file')}PDF</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>`;
   const xk = $('.xk', el), xx = $('.xx', el);
   if (e === 'penduduk') {
     try {
@@ -2110,6 +2119,7 @@ VIEWS.form = async (p, main, alive) => {
       } catch (x) { }
     }
   }
+  if (e === 'register_surat') await muatJenisSurat();
   if (u.fields.some(f => f.t === 'sdgs') && !S.sdgs) { try { S.sdgs = (await call('list', { entity: 'ref_sdgs', limit: 50, desc: false })).rows; } catch (x) { S.sdgs = []; } }
   if (!alive()) return;
   main.innerHTML = `<form class="card stack" id="frm" novalidate>
@@ -2124,7 +2134,14 @@ VIEWS.form = async (p, main, alive) => {
   S.vh.cancel = back;
   if (u.grpBy && $('#f_' + u.grpBy, frm)) {
     const jf = $('#f_' + u.grpBy, frm);
-    const sync = () => flds.filter(f => f.grp).forEach(f => { const el = $('#f_' + f.k, frm), box = el && el.closest('.f'); if (box) box.hidden = f.grp.indexOf(jf.value.trim()) < 0; });
+    const sync = () => {
+      const jv = jf.value.trim(), def = (S.jenisSurat || []).find(j => j.nama === jv), lbs = def ? isianJenis(def) : [];
+      flds.filter(f => f.grp || f.dyn).forEach(f => {
+        const el = $('#f_' + f.k, frm), box = el && el.closest('.f'); if (!box) return;
+        if (f.dyn) { box.hidden = f.dyn > lbs.length; const lb = box.querySelector('label'); if (lb && lbs[f.dyn - 1]) lb.textContent = lbs[f.dyn - 1]; }
+        else box.hidden = f.grp.indexOf(jv) < 0;
+      });
+    };
     jf.addEventListener('input', sync); jf.addEventListener('change', sync); sync();
   }
   if ($('[data-person]', frm)) personPick(frm);
@@ -2200,7 +2217,8 @@ VIEWS.form = async (p, main, alive) => {
       if (/^(aparat|petugas)/.test(e)) S.people = null;
       toast('Tersimpan.');
       back();
-      if (e === 'register_surat' && !p.id && suratPath(saved.jenis_surat)) setTimeout(() => cetakSurat(saved), 500);   /* tunggu kembali ke daftar dulu */
+      if (e === 'register_surat' && !p.id && jenisDikenal(saved.jenis_surat)) setTimeout(() => cetakSurat(saved), 500);
+      if (e === 'jenis_surat') S.jenisSurat = null;   /* tunggu kembali ke daftar dulu */
     } catch (x) { er.textContent = x.message; er.hidden = false; btn.disabled = false; btn.innerHTML = ic('check') + 'Simpan'; }
   };
 };
@@ -2699,6 +2717,26 @@ const SURAT = {
   'Surat Keterangan Kelahiran': 'kelahiran', 'Surat Keterangan Kematian': 'kematian', 'Surat Keterangan Pindah': 'pindah', 'Surat Keterangan Belum Menikah': 'belum_menikah', 'Surat Keterangan Penghasilan': 'penghasilan'
 };
 const suratPath = jenis => SURAT[jenis] ? 'surat/surat_' + SURAT[jenis] + '.docx' : null;
+/* jenis surat tambahan buatan admin (entitas jenis_surat) */
+const isianJenis = d => String(d && d.isian || '').split(/\r?\n/).map(x => x.trim().replace(/[{}]/g, '')).filter(Boolean).slice(0, 8);
+const slugJenis = nama => 'surat/jenis_' + String(nama || '').toLowerCase().replace(/^surat\s+(keterangan|pengantar)\s+/, '').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 60) + '.docx';
+async function muatJenisSurat(force) {
+  if (S.jenisSurat && !force) return S.jenisSurat;
+  try { S.jenisSurat = (await call('list', { entity: 'jenis_surat', limit: 200, sort: 'nama', desc: false })).rows; } catch (x) { S.jenisSurat = S.jenisSurat || []; }
+  const f = UI.register_surat.fields.find(x => x.k === 'jenis_surat');
+  f.list = Object.keys(SURAT).concat(S.jenisSurat.filter(j => j.aktif !== 'Tidak').map(j => j.nama).filter(n => !SURAT[n]));
+  return S.jenisSurat;
+}
+const jenisDikenal = jenis => !!SURAT[jenis] || (S.jenisSurat || []).some(j => j.nama === jenis);
+/** template untuk satu jenis: bawaan, template khusus jenis tambahan, atau template umum */
+async function suratTemplate(jenis) {
+  if (SURAT[jenis]) return suratPath(jenis);
+  await muatJenisSurat();
+  const def = S.jenisSurat.find(j => j.nama === jenis); if (!def) return null;
+  const p = slugJenis(def.nama);
+  let ada = false; try { ada = (await tplDaftar()).some(x => x.path === p); } catch (x) { }
+  return ada ? p : 'surat/_umum.docx';
+}
 async function namaKades() {
   if (S.kades != null) return S.kades;
   try { const r = await call('list', { entity: 'aparat', q: 'kepala desa', limit: 50 }); const k = r.rows.find(x => /^\s*kepala desa\s*$/i.test(x.jabatan || '')); S.kades = k ? k.nama : ''; }
@@ -2733,16 +2771,24 @@ async function petaSurat(reg) {
     Penghasilan: reg.penghasilan ? Number(reg.penghasilan).toLocaleString('id-ID') : TITIK, 'Penghasilan Terbilang': reg.penghasilan ? terbilang(reg.penghasilan) : TITIK,
     'Kepala Desa': S.set.nama_kades || await namaKades() || TITIK
   });
-  return tambahU(M);
+  /* jenis tambahan: isian bebas + kalimat isi */
+  const def = SURAT[reg.jenis_surat] ? null : (S.jenisSurat || []).find(j => j.nama === reg.jenis_surat);
+  const lbs = def ? isianJenis(def) : [];
+  lbs.forEach((l, i) => { M[l] = reg['isian' + (i + 1)] || TITIK; });
+  tambahU(M);
+  M['Isi Surat'] = def && def.isi ? String(def.isi).replace(/\{\{\s*([^{}]+?)\s*\}\}/g, (m, k) => k in M ? M[k] : '') : '';
+  M['Isi Surat_U'] = M['Isi Surat'].toUpperCase();
+  M.rows = [{ key: 'Isian Label', items: lbs.map((l, i) => ({ 'Isian Label': l, 'Isian Titik2': ':', 'Isian Nilai': reg['isian' + (i + 1)] || TITIK })), empty: { 'Isian Label': '', 'Isian Titik2': '', 'Isian Nilai': '' } }];
+  return M;
 }
 async function cetakSurat(reg) {
-  const path = suratPath(reg.jenis_surat);
-  if (!path) return toast('Jenis surat "' + reg.jenis_surat + '" belum punya template. Pilih jenis dari daftar.', 1);
+  const path = await suratTemplate(reg.jenis_surat);
+  if (!path) return toast('Jenis surat "' + reg.jenis_surat + '" belum terdaftar. Admin dapat menambahkannya di menu Template Dokumen.', 1);
   const m = modal('Membuat surat', `<div class="stack"><b>${esc(reg.jenis_surat)}</b><div class="skel"></div><div class="meta">Mengisi template…</div></div>`);
   try {
-    const M = await petaSurat(reg);
+    const M = await petaSurat(reg), rows = M.rows; delete M.rows;
     const r = await buatDokumen({
-      path, M, jenis: 'surat', nama: reg.jenis_surat.replace(/^Surat (Keterangan )?/, 'SK ') + ' - ' + M.Nama + (reg.no ? ' - No ' + reg.no : ''),
+      path, M, rows, jenis: 'surat', nama: reg.jenis_surat.replace(/^Surat (Keterangan )?/, 'SK ') + ' - ' + M.Nama + (reg.no ? ' - No ' + reg.no : ''),
       onPdf: p => call('save', { entity: 'register_surat', record: { id: reg.id, pdf_id: p.id } }).catch(() => { })
     });
     hasilDokumen(m, r, 'di Google Drive (Pelayanan / Surat Keterangan); bisa dibuka lagi dari tombol PDF di Register');
@@ -2843,7 +2889,7 @@ VIEWS.template = async (p, main) => {
   if (!S.user.admin) { main.innerHTML = '<div class="err">Khusus admin.</div>'; return; }
   main.innerHTML = '<div class="skel" style="height:160px"></div>';
   let list;
-  try { list = await tplDaftar(true); } catch (x) { main.innerHTML = `<div class="err">${esc(x.message)}</div>`; return; }
+  try { list = await tplDaftar(true); await muatJenisSurat(true); } catch (x) { main.innerHTML = `<div class="err">${esc(x.message)}</div>`; return; }
   const ada = new Set(list.map(x => x.path));
   const wajib = Object.keys(SURAT).map(j => ({ path: suratPath(j), label: j })).concat([{ path: 'kk/draf_kk.docx', label: 'Draf Formulir KK' }]);
   const baris = (path, label) => {
@@ -2854,11 +2900,17 @@ VIEWS.template = async (p, main) => {
   main.innerHTML = `<div class="stack">
     <div class="card meta">Template berupa file Word (.docx). Tulis tanda isian dengan kurung kurawal ganda, misalnya <b>{{Nama}}</b> atau <b>{{Nama_U}}</b> (huruf besar). Unduh template, ubah di Microsoft Word/WPS, lalu unggah lagi dengan tombol <b>Ganti</b>. Tanda yang tidak dikenal akan dikosongkan saat surat dibuat.</div>
     <div class="sec-h"><h2>Surat Keterangan</h2></div><div class="list">${wajib.filter(w => w.path.indexOf('surat/') === 0).map(w => baris(w.path, w.label)).join('')}</div>
+    <div class="sec-h"><h2>Surat keterangan tambahan</h2><button class="btn sm pri" data-act="go" data-go='["form",{"e":"jenis_surat"}]'>${ic('plus')}Tambah jenis surat</button></div>
+    <div class="list">${baris('surat/_umum.docx', 'Template umum (dipakai jenis tambahan yang belum punya template sendiri)')}${S.jenisSurat.map(j => {
+      const p = slugJenis(j.nama), x = list.find(y => y.path === p);
+      return `<div class="it"><div class="row" style="cursor:default"><span class="av">${ic('file')}</span><span class="main"><span class="t">${esc(j.nama)}${j.aktif === 'Tidak' ? ' <span class="pill">Tidak aktif</span>' : ''}</span><span class="s">${x ? 'Template sendiri: ' + esc(p.split('/').pop()) : 'Memakai template umum'}${isianJenis(j).length ? ' · Isian: ' + esc(isianJenis(j).join(', ')) : ''}</span></span></div>
+        <div class="btns xacts"><button class="btn sm" data-act="xedit" data-e="jenis_surat" data-id="${esc(j.id)}">${ic('edit')}Ubah</button>${x ? `<button class="btn sm" data-act="tplDl" data-p="${esc(p)}">${ic('eye')}Unduh</button>` : `<button class="btn sm" data-act="tplDlAs" data-p="${esc(p)}">${ic('eye')}Unduh template umum sebagai awal</button>`}<button class="btn sm pri" data-act="tplUpBtn" data-p="${esc(p)}">${ic('plus')}${x ? 'Ganti template' : 'Unggah template sendiri'}</button>${x ? `<button class="btn sm danger" data-act="tplDelBtn" data-p="${esc(p)}">${ic('trash')}Pakai template umum</button>` : ''}</div></div>`;
+    }).join('') || ''}</div>
     <div class="sec-h"><h2>RKP Desa</h2><span class="btns"><button class="btn sm" data-act="tplUpBtn" data-p="rkp/">${ic('plus')}Tambah template</button><button class="btn sm" data-act="tplImpor">${ic('folder')}Ambil dari Google Drive</button></span></div>
     <div class="list">${list.filter(x => x.path.indexOf('rkp/') === 0).map(x => baris(x.path)).join('') || '<div class="card meta">Belum ada. Tekan "Ambil dari Google Drive" untuk memindahkan template Google Docs lama.</div>'}</div>
     <div class="sec-h"><h2>Draf KK</h2></div><div class="list">${baris('kk/draf_kk.docx', 'Draf Formulir KK')}</div>
-    <div class="sec-h"><h2>Daftar tanda Surat Keterangan</h2></div>
-    <div class="card meta" style="line-height:1.7">${['Desa', 'Kecamatan', 'Kabupaten', 'Alamat Desa', 'Kode Pos', 'Kode Desa', 'No', 'Tahun', 'Tanggal Surat', 'Nama', 'NIK', 'No KK', 'TTL', 'Tempat Lahir', 'Tanggal Lahir', 'Umur', 'Jenis Kelamin', 'Agama', 'Pekerjaan', 'Status Perkawinan', 'Kewarganegaraan', 'Pendidikan', 'Alamat', 'Dusun', 'RT', 'RW', 'Keperluan', 'Kepala Desa', 'Alamat Domisili', 'Lama Tinggal', 'Nama Usaha', 'Jenis Usaha', 'Alamat Usaha', 'Mulai Usaha', 'Nama Bayi', 'JK Bayi', 'Hari Lahir Bayi', 'Tanggal Lahir Bayi', 'Jam Lahir', 'Tempat Lahir Bayi', 'Anak Ke', 'Nama Ayah', 'Nama Ibu', 'Hari Meninggal', 'Tanggal Meninggal', 'Jam Meninggal', 'Tempat Meninggal', 'Sebab Meninggal', 'Pelapor', 'Alamat Tujuan', 'Alasan Pindah', 'Jumlah Pengikut', 'Penghasilan', 'Penghasilan Terbilang'].map(k => `<span class="mono">{{${esc(k)}}}</span>`).join(' · ')}</div>
+    <div class="sec-h"><h2>Daftar tanda Surat Keterangan</h2></div><div class="meta">Jenis tambahan: setiap isian tambahan menjadi tanda dengan nama yang sama (mis. {{Nama Sekolah}}). {{Isi Surat}} = kalimat isi dari pengaturan jenis surat. Baris tabel yang memuat {{Isian Label}} diulang untuk semua isian tambahan.</div>
+    <div class="card meta" style="line-height:1.7">${['Desa', 'Kecamatan', 'Kabupaten', 'Alamat Desa', 'Kode Pos', 'Kode Desa', 'No', 'Tahun', 'Tanggal Surat', 'Nama', 'NIK', 'No KK', 'TTL', 'Tempat Lahir', 'Tanggal Lahir', 'Umur', 'Jenis Kelamin', 'Agama', 'Pekerjaan', 'Status Perkawinan', 'Kewarganegaraan', 'Pendidikan', 'Alamat', 'Dusun', 'RT', 'RW', 'Keperluan', 'Kepala Desa', 'Alamat Domisili', 'Lama Tinggal', 'Nama Usaha', 'Jenis Usaha', 'Alamat Usaha', 'Mulai Usaha', 'Nama Bayi', 'JK Bayi', 'Hari Lahir Bayi', 'Tanggal Lahir Bayi', 'Jam Lahir', 'Tempat Lahir Bayi', 'Anak Ke', 'Nama Ayah', 'Nama Ibu', 'Hari Meninggal', 'Tanggal Meninggal', 'Jam Meninggal', 'Tempat Meninggal', 'Sebab Meninggal', 'Pelapor', 'Alamat Tujuan', 'Alasan Pindah', 'Jumlah Pengikut', 'Penghasilan', 'Penghasilan Terbilang', 'Jenis Surat', 'Isi Surat', 'Isian Label', 'Isian Nilai', 'Isian Titik2'].map(k => `<span class="mono">{{${esc(k)}}}</span>`).join(' · ')}</div>
     <input type="file" id="tplFile" accept=".docx,.xlsx" hidden></div>`;
   void ada;
   let target = '';
@@ -2872,6 +2924,7 @@ VIEWS.template = async (p, main) => {
     try { await DOCX.unzip(await f.arrayBuffer()); await tplSimpan(path, f); toast('Template disimpan.'); refresh(); } catch (x) { toast(x.message, 1); }
   };
   S.vh.tplUpBtn = t => { target = t.dataset.p; fin.click(); };
+  S.vh.tplDlAs = async t => { try { const b = await tplAmbil('surat/_umum.docx'); saveBlob(new Blob([b]), t.dataset.p.split('/').pop()); toast('Ubah file ini di Word, lalu tekan "Unggah template sendiri".'); } catch (x) { toast(x.message, 1); } };
   S.vh.tplDl = async t => { try { const b = await tplAmbil(t.dataset.p); saveBlob(new Blob([b]), t.dataset.p.split('/').pop()); } catch (x) { toast(x.message, 1); } };
   S.vh.tplTags = async t => { try { const tg = await DOCX.tags(await tplAmbil(t.dataset.p)); modal('Tanda di template', tg.length ? `<div class="meta" style="line-height:1.8">${tg.map(k => `<span class="mono">{{${esc(k)}}}</span>`).join(' · ')}</div>` : '<div class="meta">Tidak ada tanda {{…}}.</div>'); } catch (x) { toast(x.message, 1); } };
   S.vh.tplDelBtn = t => confirmDel(t.parentNode, async () => { await callBerkas('tplDel', { path: t.dataset.p }); S.tplStore = null; toast('Template dihapus.'); refresh(); });
