@@ -758,6 +758,17 @@ const UI = {
       foot: rows => ['Jumlah'].concat(['padesa', 'dd', 'add', 'bhp', 'bk_prov', 'bk_kab', 'lainnya'].map(k => fMoney(rows.reduce((a, r) => a + mNum(r[k]), 0))))
     }
   },
+  rpjm_visimisi: {
+    t: 'RPJM Desa — Visi, Misi, Tujuan & Sasaran', ic: 'target', perm: 'perencanaan', sort: 'urut', asc: 1,
+    fields: [F('jenis', 'Jenis', 'select', { opt: ['Visi', 'Misi', 'Tujuan', 'Sasaran'], req: 1 }), F('no', 'No.', 'text'), F('induk', 'Induk', 'text', { hint: 'Mis. Misi 05 / Tujuan 04' }), F('urut', 'Urutan', 'number'), F('uraian', 'Uraian', 'textarea', { req: 1, wide: 1 })],
+    row: r => ({ t: r.uraian, s: [r.jenis + (r.no ? ' ' + r.no : ''), r.induk].filter(Boolean).join(' · '), av: `<b>${esc((r.jenis || '?')[0])}</b>` })
+  },
+  rpjm_kegiatan: {
+    t: 'RPJM Desa — Rencana Kegiatan 2020–2027', ic: 'list', perm: 'perencanaan', sort: 'urut', asc: 1,
+    fields: [F('kegiatan', 'Jenis Kegiatan', 'text', { req: 1, wide: 1 }), F('kode_bidang', 'Kode Bidang', 'text', { mono: 1 }), F('bidang', 'Bidang', 'text', { wide: 1 }), F('sub_bidang', 'Sub Bidang', 'text', { wide: 1 }),
+      F('lokasi', 'Lokasi'), F('volume', 'Perkiraan Volume'), F('sasaran', 'Sasaran / Manfaat', 'text', { wide: 1 }), F('tahun_pelaksanaan', 'Tahun Pelaksanaan', 'text', { hint: 'Mis. 2023, 2024, 2025' }), F('jumlah', 'Prakiraan Biaya', 'money'), F('sumber', 'Sumber Dana'), F('urut', 'Urutan', 'number')],
+    row: r => ({ t: r.kegiatan, s: [r.sub_bidang, r.sumber, r.tahun_pelaksanaan].filter(Boolean).join(' · '), r: fMoney(r.jumlah), av: `<span class="mono">${esc(r.kode_bidang || '–')}</span>` })
+  },
   ref_bidang: {
     t: 'Kode Bidang & Kegiatan', ic: 'list', perm: '*', write: 'perencanaan', sort: 'kode_uraian', asc: 1,
     fields: [F('kode_bidang', 'Kode Bidang'), F('nama_bidang', 'Nama Bidang'), F('kode_sub', 'Kode Sub Bidang'), F('sub_bidang', 'Sub Bidang'), F('kode_kegiatan', 'Kode Kegiatan'), F('kegiatan', 'Kegiatan', 'text', { wide: 1 }), F('kode_uraian', 'Kode Uraian'), F('uraian_output', 'Uraian Output'), F('satuan', 'Satuan Output')],
@@ -993,7 +1004,7 @@ function callBerkas(action, p) {
 }
 const can = p => !p || p === '*' || (S.user && (S.user.admin || (p !== 'admin' && S.user.akses.indexOf(p) >= 0)));
 /* Hak per menu: 'r:<menu>' melihat, 'w:<menu>' melihat & mengubah (daftar menu dari server) */
-const menuOf = e => UI[e] && UI[e].m || (/^(rkp_|ref_)/.test(e) ? 'rkp' : { kegiatan_berkas: 'kegiatan', pembangunan_titik: 'pembangunan', petugas_jabatan: 'petugas', keu_rek: 'keu_anggaran', keu_spp: 'keu_penatausahaan', keu_trans: 'keu_penatausahaan' }[e] || e);
+const menuOf = e => UI[e] && UI[e].m || (/^(rkp_|ref_|rpjm_)/.test(e) ? 'rkp' : { kegiatan_berkas: 'kegiatan', pembangunan_titik: 'pembangunan', petugas_jabatan: 'petugas', keu_rek: 'keu_anggaran', keu_spp: 'keu_penatausahaan', keu_trans: 'keu_penatausahaan' }[e] || e);
 const isMenu = m => (S.perms || []).some(p => p.menu && p.k === m);
 const canRead = e => isMenu(menuOf(e)) ? can('r:' + menuOf(e)) : can(UI[e].read || '*');
 const canWrite = e => isMenu(menuOf(e)) ? can('w:' + menuOf(e)) : can(UI[e].write || UI[e].perm);
@@ -2745,6 +2756,8 @@ VIEWS.rkp = async (p, main) => {
       <button class="tile" data-act="doc" data-d="f4"><span class="ti">${ic('print')}</span><b>Program Masuk Desa<small>Form 04</small></b></button>
       <button class="tile" data-act="doc" data-d="f5"><span class="ti">${ic('print')}</span><b>Rencana Pembiayaan<small>Form 05</small></b></button>
     </div></details>
+    <div class="sec-h"><h2>RPJM Desa 2020–2027</h2></div>
+    <div class="list">${[['rpjm_visimisi', 'Visi, misi, tujuan & sasaran'], ['rpjm_kegiatan', 'Rencana kegiatan per bidang & tahun']].map(t => `<div class="it"><button class="row" data-act="go" data-go='${esc(JSON.stringify(['list', { e: t[0] }]))}'><span class="av">${ic(UI[t[0]].ic)}</span><span class="main"><span class="t">${esc(UI[t[0]].t.replace('RPJM Desa — ', ''))}</span><span class="s">${t[1]}</span></span></button></div>`).join('')}</div>
     <button class="btn" data-act="go" data-go='["refs"]'>${ic('book')}Referensi: kode bidang, SDGs, dasar hukum</button>
   </div>`;
   S.vh.yr = t => { S.rkpYear = t.dataset.v; S.listState = null; refresh(); };
