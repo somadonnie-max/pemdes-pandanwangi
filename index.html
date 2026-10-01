@@ -331,6 +331,26 @@ table.tbl{border-collapse:collapse;width:100%;font-size:11.5px;font-variant-nume
 .kg-r{display:flex;flex-direction:column;gap:6px}.kg-t{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.kg-t b{flex:1;min-width:160px}
 .kg-m{display:flex;gap:6px 12px;align-items:center;flex-wrap:wrap;font-size:12px}.kg-m .btn{margin-left:auto}
 #sppInfo .tbl tr.bad td{color:var(--bad)}
+/* wizard generator RKP */
+.wz-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;counter-reset:s}
+.wz-steps li{display:flex;align-items:center;gap:7px;padding:7px 9px;border:1px solid var(--line);border-radius:9px;background:var(--surface);font-size:12px;color:var(--muted);min-width:0}
+.wz-steps .n{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:11.5px;background:var(--surface2);color:var(--muted)}
+.wz-steps .n .ic{width:13px;height:13px}
+.wz-steps .l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wz-steps li.on{border-color:var(--pri);color:var(--ink);font-weight:600}.wz-steps li.on .n{background:var(--pri);color:var(--pri-ink)}
+.wz-steps li.done .n{background:var(--ok-soft);color:var(--ok)}
+.wz-list{display:flex;flex-direction:column;gap:4px}
+.wz-it{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface);cursor:pointer}
+.wz-it:has(input[type=checkbox]:checked){border-color:var(--pri);background:var(--pri-soft)}
+.wz-it input[type=checkbox]{width:18px;height:18px;flex:none;accent-color:var(--pri)}
+.wz-it .main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.wz-it .main b{font-size:13px;font-weight:600}.wz-it .main small{font-size:11px;color:var(--muted)}
+.wz-it.dis{opacity:.6;cursor:default}
+.wz-rp{width:130px;flex:none;text-align:right;font-variant-numeric:tabular-nums}
+.wz-grp{display:flex;flex-direction:column;gap:6px}
+.wz-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;position:sticky;bottom:0;background:var(--bg);padding:8px 0;border-top:1px solid var(--line)}
+.wz-neg,.wz-def .v{color:var(--bad)}
+.wz-cta{display:flex;align-items:center;gap:10px;text-align:left;cursor:pointer;width:100%;border-color:var(--pri);background:var(--pri-soft);color:var(--ink);font:inherit}.wz-cta .main{flex:1;display:flex;flex-direction:column;gap:2px}.wz-cta b{font-size:14px}
+@media (max-width:560px){.wz-steps .l{display:none}.wz-steps li{justify-content:center}.wz-it{flex-wrap:wrap}.wz-rp{width:100%}}
 @media (max-width:520px){.kd-k .v{font-size:17px}.kd-mini{grid-template-columns:1fr}.kd-st .pill{white-space:normal}}
 
 /* ---------- modal / toast ---------- */
@@ -832,9 +852,9 @@ const UI = {
     fields: [F('kegiatan', 'Nama Program / Kegiatan', 'refpick', { req: 1, wide: 1 }), F('kode_bidang', 'Kode Bidang', 'text', { mono: 1 }), F('bidang', 'Bidang'), F('kode_kegiatan', 'Kode Kegiatan', 'text', { mono: 1 }),
       F('uraian_output', 'Uraian Output'), F('sumber_dana', 'Sumber Dana', 'select', { opt: OPT.sumber, req: 1 }), F('kementerian', 'Kementerian / OPD'), F('sdgs', 'Tujuan SDGs Desa', 'sdgs', { wide: 1 }),
       F('tahun_pelaksanaan', 'Tahun Pelaksanaan', 'number'), F('lokasi', 'Lokasi Kegiatan'), F('dusun', 'Dusun', 'select', { opt: OPT.dusun }), F('rt', 'RT'), F('rw', 'RW'),
-      F('volume', 'Volume', 'number'), F('satuan', 'Satuan', 'text', { list: ['Paket', 'Unit', 'Kegiatan', 'Orang', 'OB (Orang/Bulan)', 'Kali', 'M', 'M2', 'M3'] }), F('harga_satuan', 'Harga Satuan', 'money'), F('total', 'Total Pagu Dana', 'money', { hint: 'Terhitung otomatis dari volume × harga' }), F('ket', 'Keterangan', 'text', { wide: 1 })],
+      F('volume', 'Volume', 'number'), F('satuan', 'Satuan', 'text', { list: ['Paket', 'Unit', 'Kegiatan', 'Orang', 'OB (Orang/Bulan)', 'Kali', 'M', 'M2', 'M3'] }), F('harga_satuan', 'Harga Satuan', 'money'), F('total', 'Total Pagu Dana', 'money', { hint: 'Terhitung otomatis dari volume × harga' }), F('sumber_data', 'Asal Usulan', 'select', { opt: ['RPJM', 'Rutin', 'Luncuran', 'Musyawarah Dusun', 'Lainnya'] }), F('ket', 'Keterangan', 'text', { wide: 1 })],
     calc: (v) => { const t = Number(String(v.volume || '').replace(',', '.')) * mNum(v.harga_satuan); return t ? { total: String(t) } : null; },
-    row: r => ({ t: r.kegiatan, s: [r.bidang, r.sumber_dana, r.lokasi].filter(Boolean).join(' · '), r: fMoney(r.total), av: `<span class="mono">${esc(r.kode_bidang || '–')}</span>` }),
+    row: r => ({ t: r.kegiatan, s: [r.bidang, r.sumber_dana, r.lokasi].filter(Boolean).join(' · '), r: fMoney(r.total), av: `<span class="mono">${esc(r.kode_bidang || '–')}</span>`, pill: r.sumber_data ? `<span class="pill ${r.sumber_data === 'Luncuran' ? 'warn' : r.sumber_data === 'RPJM' ? 'info' : ''}">${esc(r.sumber_data)}</span>` : '' }),
     print: {
       title: 'DAFTAR RENCANA PROGRAM DAN KEGIATAN YANG MASUK KE DESA', land: 1, form: 'Form 04',
       cols: [['Bidang / Kegiatan', r => '<b>' + esc(r.bidang) + '</b><br>' + esc(r.kegiatan)], ['Sumber Dana', 'sumber_dana'], ['SDGs', 'sdgs'], ['Lokasi', r => [r.lokasi, r.dusun && r.dusun.replace('DUSUN ', ''), r.rt && 'RT ' + r.rt, r.rw && 'RW ' + r.rw].filter(Boolean).join(', ')], ['Volume', r => (r.volume || '') + ' ' + (r.satuan || '')], ['Harga Satuan', r => fMoney(r.harga_satuan)], ['Total Pagu', r => fMoney(r.total)]],
@@ -851,6 +871,14 @@ const UI = {
       cols: [['Bidang / Kegiatan', r => '<b>' + esc(r.bidang) + '</b><br>' + esc(r.kegiatan)], ['PADesa', r => fMoney(r.padesa)], ['Dana Desa', r => fMoney(r.dd)], ['ADD', r => fMoney(r.add)], ['BHP', r => fMoney(r.bhp)], ['BK Prov', r => fMoney(r.bk_prov)], ['BK Kab', r => fMoney(r.bk_kab)], ['Lainnya', r => fMoney(r.lainnya)]],
       foot: rows => ['Jumlah'].concat(['padesa', 'dd', 'add', 'bhp', 'bk_prov', 'bk_kab', 'lainnya'].map(k => fMoney(rows.reduce((a, r) => a + mNum(r[k]), 0))))
     }
+  },
+  rkp_rutin: {
+    t: 'Kegiatan Rutin Tahunan', ic: 'clock', perm: 'perencanaan', sort: 'kode_kegiatan', asc: 1,
+    fields: [F('kegiatan', 'Nama Kegiatan', 'text', { req: 1, wide: 1 }), F('kode_kegiatan', 'Kode Kegiatan', 'text', { mono: 1, hint: 'mis. 1.1.02' }), F('kode_bidang', 'Kode Bidang', 'text', { mono: 1 }), F('bidang', 'Bidang'),
+      F('sumber_dana', 'Sumber Dana', 'select', { opt: OPT.sumber, req: 1 }), F('volume', 'Volume', 'number', { def: '12' }), F('satuan', 'Satuan', 'text', { def: 'Bulan', list: ['Bulan', 'Tahun', 'Orang', 'Paket', 'Kegiatan'] }),
+      F('biaya', 'Perkiraan Biaya per Tahun', 'money', { req: 1 }), F('aktif', 'Ikut ke RKP berikutnya?', 'select', { opt: ['Ya', 'Tidak'], def: 'Ya' }), F('ket', 'Keterangan', 'text', { wide: 1 })],
+    chips: { k: 'aktif', opt: ['Ya', 'Tidak'], lbl: v => v === 'Ya' ? 'Aktif' : 'Tidak aktif' },
+    row: r => ({ t: r.kegiatan, s: [r.kode_kegiatan, r.sumber_dana, r.volume && r.volume + ' ' + (r.satuan || '')].filter(Boolean).join(' · '), r: fMoney(r.biaya), av: ic('clock'), pill: r.aktif === 'Tidak' ? '<span class="pill">tidak aktif</span>' : '' })
   },
   rpjm_visimisi: {
     t: 'RPJM Desa — Visi, Misi, Tujuan & Sasaran', ic: 'target', perm: 'perencanaan', sort: 'urut', asc: 1,
@@ -2100,7 +2128,7 @@ VIEWS.list = async (p, main, alive) => {
   main.innerHTML = `<div class="stack">
     <div class="toolbar"><label class="search">${ic('search')}<input id="q" placeholder="Cari…" value="${esc(st.q)}" autocomplete="off"></label>
       ${u.month ? `<input type="month" class="inp" id="per" value="${esc(st.per)}" style="max-width:180px">` : ''}
-      ${NASKAH[e] && canWrite(e) ? `<button class="btn sm pri" data-act="go" data-go='${esc(JSON.stringify(['form', { e, buat: 1 }]))}'>${ic('plus')}${esc(NASKAH[e].buat)}</button>` : ''}${u.print ? `<button class="btn sm" data-act="cetak">${ic('print')}Cetak buku</button>` : ''}${u.excel ? `<button class="btn sm" data-act="xlsOut">${ic('down')}Ekspor Excel</button>${canWrite(e) ? `<label class="btn sm">${ic('plus')}Impor Excel<input type="file" id="xlsIn" accept=".xlsx,.csv" hidden></label>` : ''}` : ''}${u.print2 ? `<button class="btn sm" data-act="cetak2">${ic('print')}${esc(u.print2.label)}</button>` : ''}</div>
+      ${e === 'rkp_rutin' && canWrite(e) ? `<button class="btn sm" data-act="rkpRutinIsi">${ic('down')}Salin dari APBDes ${esc(keuTh())}</button>` : ''}${NASKAH[e] && canWrite(e) ? `<button class="btn sm pri" data-act="go" data-go='${esc(JSON.stringify(['form', { e, buat: 1 }]))}'>${ic('plus')}${esc(NASKAH[e].buat)}</button>` : ''}${u.print ? `<button class="btn sm" data-act="cetak">${ic('print')}Cetak buku</button>` : ''}${u.excel ? `<button class="btn sm" data-act="xlsOut">${ic('down')}Ekspor Excel</button>${canWrite(e) ? `<label class="btn sm">${ic('plus')}Impor Excel<input type="file" id="xlsIn" accept=".xlsx,.csv" hidden></label>` : ''}` : ''}${u.print2 ? `<button class="btn sm" data-act="cetak2">${ic('print')}${esc(u.print2.label)}</button>` : ''}</div>
     ${pers ? `<div class="chips">${pers.map(y => `<button class="chip ${st.per === y || (y === 'Semua' && st.per === 'all') ? 'on' : ''}" data-act="per" data-v="${y === 'Semua' ? 'all' : y}">${y}</button>`).join('')}</div>` : ''}
     ${u.views ? `<div class="chips">${u.views.map((v, i) => `<button class="chip ${st.view === i ? 'on' : ''}" data-act="view" data-v="${i}">${esc(v[0])}</button>`).join('')}</div>` : ''}
     ${u.chips ? `<div class="chips${u.chips.dyn ? ' wrap' : ''}"><button class="chip ${!st.chip ? 'on' : ''}" data-act="chip" data-v="">Semua</button>${chipOpt.map(o => `<button class="chip ${st.chip === o ? 'on' : ''}" data-act="chip" data-v="${esc(o)}">${esc(u.chips.lbl ? u.chips.lbl(o) : o)}${chipN[o] ? ` <small class="num">${chipN[o]}</small>` : ''}</button>`).join('')}</div>` : ''}
@@ -2966,6 +2994,128 @@ async function cetakKuitansi(id) {
   if (note) toast(note);
 }
 ACT.kuitansi = t => cetakKuitansi(t.dataset.id).catch(x => toast(x.message, 1));
+/* ---------- Generator RKP Desa otomatis (wizard 4 langkah) ----------
+   Sumber: RPJM Desa (tahun pelaksanaan = tahun RKP) + Kegiatan Rutin aktif + Luncuran
+   (kegiatan APBDes tahun sebelumnya yang belum Selesai & masih ada sisa). Hasil -> Form 04. */
+const WZ_LANGKAH = ['Tahun & pagu', 'RPJM & rutin', 'Luncuran', 'Tinjau & simpan'];
+const WZ_PAGU = [['dds', 'Dana Desa'], ['add', 'Alokasi Dana Desa'], ['pbh', 'Bagi Hasil Pajak'], ['pad', 'PADesa'], ['lain', 'Lainnya']];
+const wzKunciSd = sd => ({ 'Dana Desa': 'dds', 'Alokasi Dana Desa': 'add', 'Bagi Hasil Pajak': 'pbh', PADesa: 'pad' })[sd] || 'lain';
+function wzBaru() { return { step: 0, tahun: String(Number(keuTh()) + 1), pagu: {}, data: null, dataTh: '', pilih: {}, biaya: {}, err: '' }; }
+/* semua calon kegiatan dari hasil rkpDraft, sudah dengan kunci, sumber_data & nilai awal */
+function wzCalon(d) {
+  const sudah = new Set(d.sudah || []), nk = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const T = d.rutin.map(r => ({ key: 'T:' + r.id, sumber_data: 'Rutin', kegiatan: r.kegiatan, kode_kegiatan: r.kode_kegiatan, kode_bidang: r.kode_bidang, bidang: r.bidang, sumber_dana: r.sumber_dana, volume: r.volume, satuan: r.satuan, biaya: Number(r.biaya) || 0, ref: r.id, info: [r.kode_kegiatan, r.sumber_dana, r.volume && r.volume + ' ' + (r.satuan || '')].filter(Boolean).join(' · '), def: true }));
+  const R = d.rpjm.map(r => ({ key: 'R:' + r.id, sumber_data: 'RPJM', kegiatan: r.kegiatan, kode_bidang: r.kode_bidang, bidang: r.bidang, sumber_dana: r.sumber_dana, lokasi: r.lokasi, volume: '', satuan: '', biaya: Number(r.biaya) || 0, ref: r.id, ket: r.sasaran ? 'Sasaran: ' + r.sasaran : '', info: [r.sub_bidang, r.sumber, r.lokasi, r.n_tahun > 1 ? 'RPJM ' + rp(r.jumlah_rpjm) + ' ÷ ' + r.n_tahun + ' th' : ''].filter(Boolean).join(' · '), def: !r.dobel_rutin, catat: r.dobel_rutin ? 'sudah ada di Kegiatan Rutin' : '' }));
+  const L = d.luncuran.map(r => ({ key: 'L:' + r.kg, sumber_data: 'Luncuran', kegiatan: r.kegiatan, kode_kegiatan: r.kode, kode_bidang: r.kode_bidang, bidang: r.bidang, sumber_dana: r.sumber_dana, biaya: Math.round(Number(r.sisa) || 0), ref: r.kg, ket: 'Luncuran APBDes ' + d.tahun_lalu + ' (' + r.status + ')', info: [r.kode, r.status, 'pagu ' + rp(r.pagu), 'realisasi ' + rp(r.realisasi) + ' (' + pctT(Number(r.persen)) + ')'].filter(Boolean).join(' · '), def: false }));
+  return T.concat(R, L).map(c => Object.assign(c, { ada: sudah.has(nk(c.kegiatan)) }));
+}
+/* kegiatan bernama sama dari dua sumber (mis. RPJM + Luncuran) digabung: biaya dijumlah, satu baris di Form 04 */
+const wzNk = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+function wzGabung(P, nilai) {
+  const m = new Map();
+  P.forEach(c => { const k = wzNk(c.kegiatan), v = nilai(c);
+    if (!m.has(k)) m.set(k, Object.assign({}, c, { total: v, asal: [c.sumber_data + ' ' + rp(v)] }));
+    else { const g = m.get(k); g.total += v; g.asal.push(c.sumber_data + ' ' + rp(v)); g.ket = [g.ket, c.ket].filter(Boolean).join('; '); } });
+  return Array.from(m.values()).map(g => Object.assign(g, { ket: [g.ket, g.asal.length > 1 ? 'Gabungan: ' + g.asal.join(' + ') : ''].filter(Boolean).join('; ') }));
+}
+VIEWS.rkpgen = async (p, main, alive) => {
+  const W = S.wz = S.wz || wzBaru();
+  setTop('Generator RKP Desa', 'Tahun ' + W.tahun);
+  if (!can('perencanaan')) { main.innerHTML = '<div class="err">Anda tidak punya izin menyusun RKP.</div>'; return; }
+  if (W.step > 0 && W.dataTh !== W.tahun) W.step = 0;
+  const calon = W.data ? wzCalon(W.data) : [];
+  const dipilih = () => calon.filter(c => !c.ada && W.pilih[c.key]);
+  const nilai = c => W.biaya[c.key] != null ? Number(W.biaya[c.key]) || 0 : c.biaya;
+  const stepper = `<ol class="wz-steps" aria-label="Langkah">${WZ_LANGKAH.map((l, i) => `<li class="${i === W.step ? 'on' : i < W.step ? 'done' : ''}" ${i === W.step ? 'aria-current="step"' : ''}><span class="n">${i < W.step ? ic('check') : i + 1}</span><span class="l">${l}</span></li>`).join('')}</ol>`;
+  const dobel = c => c.sumber_data === 'Luncuran' && calon.some(o => o !== c && o.sumber_data !== 'Luncuran' && W.pilih[o.key] && !o.ada && wzNk(o.kegiatan) === wzNk(c.kegiatan));
+  const item = c => `<label class="wz-it${c.ada ? ' dis' : ''}"><input type="checkbox" data-k="${esc(c.key)}" ${c.ada ? 'disabled' : W.pilih[c.key] ? 'checked' : ''}>
+      <span class="main"><b>${esc(c.kegiatan)}</b><small>${esc(c.info || '')}${c.ada ? ' · <span class="pill">sudah ada di Form 04</span>' : ''}${c.catat ? ` · <span class="pill warn">${esc(c.catat)}</span>` : ''}${dobel(c) ? ' · <span class="pill info">juga dipilih di langkah 2 — biaya digabung</span>' : ''}</small></span>
+      <input class="wz-rp" inputmode="numeric" data-money data-b="${esc(c.key)}" value="${mFmt(nilai(c))}" aria-label="Biaya ${esc(c.kegiatan)}" ${c.ada ? 'disabled' : ''}></label>`;
+  const grup = (judul, L, hint) => `<section class="wz-grp"><div class="sec-h"><h2>${judul} <small class="meta">${L.length} kegiatan</small></h2>${L.some(c => !c.ada) ? `<span class="btns"><button type="button" class="btn sm" data-act="wzAll" data-g="${esc(L[0] ? L[0].sumber_data : '')}" data-v="1">Pilih semua</button><button type="button" class="btn sm" data-act="wzAll" data-g="${esc(L[0] ? L[0].sumber_data : '')}" data-v="0">Kosongkan</button></span>` : ''}</div>${hint ? `<div class="meta">${hint}</div>` : ''}<div class="wz-list">${L.map(item).join('') || '<div class="empty">Tidak ada.</div>'}</div></section>`;
+  let body = '';
+  if (W.step === 0) {
+    const tot = WZ_PAGU.reduce((a, k) => a + (Number(W.pagu[k[0]]) || 0), 0);
+    body = `<div class="card stack"><div class="form">
+        <div class="f"><label for="wzTh">Tahun RKP yang disusun</label><input id="wzTh" type="number" inputmode="numeric" min="2015" max="2100" value="${esc(W.tahun)}"><span class="hint">Luncuran diambil dari APBDes ${esc(String(Number(W.tahun) - 1))}.</span></div>
+      </div>
+      <div class="lbl">Pagu indikatif dari Kabupaten</div>
+      <div class="form">${WZ_PAGU.map(k => `<div class="f"><label for="wzP_${k[0]}">${k[1]}</label><input id="wzP_${k[0]}" data-p="${k[0]}" data-money inputmode="numeric" placeholder="0" value="${W.pagu[k[0]] ? mFmt(W.pagu[k[0]]) : ''}"></div>`).join('')}</div>
+      <div class="pch"><span class="meta">Total pagu indikatif</span><b class="num" id="wzPT">${rp(tot)}</b></div></div>`;
+  } else if (W.step === 1) {
+    body = grup('Kegiatan rutin', calon.filter(c => c.sumber_data === 'Rutin'), `Pengeluaran wajib tiap tahun. Ubah daftarnya di <a href="#" data-act="go" data-go='["list",{"e":"rkp_rutin"}]'>Kegiatan Rutin</a>.`)
+      + grup('Dari RPJM Desa', calon.filter(c => c.sumber_data === 'RPJM'), 'Kegiatan RPJM yang dijadwalkan tahun ' + esc(W.tahun) + '. Biaya awal = prakiraan RPJM dibagi jumlah tahun pelaksanaan; sesuaikan bila perlu.');
+  } else if (W.step === 2) {
+    body = grup('Kegiatan belum selesai tahun ' + esc(W.data.tahun_lalu), calon.filter(c => c.sumber_data === 'Luncuran'), 'Kegiatan APBDes yang belum Selesai dan masih ada sisa anggaran. Centang yang perlu dilanjutkan; biaya awal = sisa anggaran. Kegiatan rutin tidak ikut di sini.');
+  } else {
+    const P0 = dipilih(), P = wzGabung(P0, nilai), per = {}, perSd = {};
+    P0.forEach(c => { const k = wzKunciSd(c.sumber_dana); per[k] = (per[k] || 0) + nilai(c); perSd[c.sumber_data] = (perSd[c.sumber_data] || 0) + nilai(c); });
+    const totR = P0.reduce((a, c) => a + nilai(c), 0), totP = WZ_PAGU.reduce((a, k) => a + (Number(W.pagu[k[0]]) || 0), 0), sel = totP - totR;
+    body = `<div class="kd-kpi">
+        <div class="kd-k" style="--kc:var(--c-bel)"><span class="l">Total rencana</span><b class="v">${rp(totR)}</b><span class="s">${P.length} kegiatan</span></div>
+        <div class="kd-k" style="--kc:var(--c-pend)"><span class="l">Pagu indikatif</span><b class="v">${rp(totP)}</b><span class="s">dari Kabupaten</span></div>
+        <div class="kd-k ${sel < 0 ? 'wz-def' : ''}" style="--kc:${sel < 0 ? 'var(--bad)' : 'var(--ok)'}"><span class="l">${sel < 0 ? ic('x') + 'Defisit' : ic('check') + 'Sisa pagu'}</span><b class="v">${rpS(sel)}</b><span class="s">${sel < 0 ? 'Rencana melebihi pagu — kurangi kegiatan atau biaya' : 'Rencana masih di dalam pagu'}</span></div></div>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Sumber dana</th><th style="text-align:right">Rencana</th><th style="text-align:right">Pagu indikatif</th><th style="text-align:right">Selisih</th></tr></thead><tbody>
+        ${WZ_PAGU.map(k => { const r = per[k[0]] || 0, g = Number(W.pagu[k[0]]) || 0, s = g - r; return r || g ? `<tr><td>${k[1]}</td><td style="text-align:right">${rp(r)}</td><td style="text-align:right">${rp(g)}</td><td style="text-align:right" class="${s < 0 ? 'wz-neg' : ''}"><b>${rpS(s)}</b>${s < 0 ? ' ' + ic('x') : ''}</td></tr>` : ''; }).join('')}
+        <tr class="tot"><td><b>Jumlah</b></td><td style="text-align:right"><b>${rp(totR)}</b></td><td style="text-align:right"><b>${rp(totP)}</b></td><td style="text-align:right" class="${sel < 0 ? 'wz-neg' : ''}"><b>${rpS(sel)}</b></td></tr></tbody></table></div>
+      <div class="meta">Asal kegiatan: ${['Rutin', 'RPJM', 'Luncuran'].map(s => `${s} ${rp(perSd[s] || 0)}`).join(' · ')}</div>
+      <details class="more"><summary>Daftar ${P.length} kegiatan yang akan masuk Form 04</summary><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Kegiatan</th><th>Asal</th><th>Sumber dana</th><th style="text-align:right">Biaya</th></tr></thead><tbody>${P.map(c => `<tr><td style="white-space:normal">${esc(c.kegiatan)}</td><td>${c.asal.length > 1 ? c.asal.map(a => a.split(' ')[0]).join(' + ') : c.sumber_data}</td><td>${esc(c.sumber_dana)}</td><td style="text-align:right">${rp(c.total)}</td></tr>`).join('')}</tbody></table></div></details>
+      <div class="meta">Kegiatan yang namanya sudah ada di Form 04 tahun ${esc(W.tahun)} tidak akan digandakan. Setelah disimpan, semua tetap bisa diubah di Form 04.</div>`;
+  }
+  main.innerHTML = `<form class="stack wz" id="wzF" novalidate>${stepper}
+    <div id="wzBody">${body}</div><div id="wzErr" class="err" ${W.err ? '' : 'hidden'} role="alert">${esc(W.err)}</div>
+    <div class="wz-nav">${W.step > 0 ? `<button type="button" class="btn" data-act="wzPrev">${ic('back')}Sebelumnya</button>` : '<span></span>'}
+      <span class="meta" id="wzSum"></span>
+      ${W.step < 3 ? `<button type="submit" class="btn pri" id="wzNext">Berikutnya ${ic('next')}</button>` : `<button type="submit" class="btn pri" id="wzNext">${ic('check')}Simpan ke Form 04</button>`}</div></form>`;
+  W.err = '';
+  const F = $('#wzF');
+  const sum = () => { const n = dipilih().length, t = dipilih().reduce((a, c) => a + nilai(c), 0); const el = $('#wzSum'); if (el && W.step > 0 && W.step < 3) el.textContent = n + ' dipilih · ' + rp(t); };
+  sum();
+  F.addEventListener('input', ev => {
+    const t = ev.target;
+    if (t.matches('[data-money]')) liveMoney(t);
+    if (t.dataset.p) { W.pagu[t.dataset.p] = mIn(t); $('#wzPT').textContent = rp(WZ_PAGU.reduce((a, k) => a + (Number(W.pagu[k[0]]) || 0), 0)); }
+    if (t.dataset.b) { W.biaya[t.dataset.b] = mIn(t); sum(); }
+    if (t.id === 'wzTh') W.tahun = t.value.trim();
+  });
+  F.addEventListener('change', ev => { const t = ev.target; if (t.dataset.k) { W.pilih[t.dataset.k] = t.checked; sum(); } });
+  const gagal = m => { const e = $('#wzErr'); e.textContent = m; e.hidden = false; e.scrollIntoView({ block: 'center', behavior: 'smooth' }); };
+  F.onsubmit = async ev => {
+    ev.preventDefault();
+    const btn = $('#wzNext');
+    try {
+      if (W.step === 0) {
+        const th = Number(W.tahun);
+        if (!Number.isInteger(th) || th < 2015 || th > 2100) return gagal('Isi tahun RKP yang sah, misalnya ' + (new Date().getFullYear() + 1) + '.');
+        if (WZ_PAGU.some(k => Number(W.pagu[k[0]]) < 0)) return gagal('Pagu indikatif tidak boleh negatif.');
+        if (W.dataTh !== W.tahun) {
+          btn.disabled = true; btn.textContent = 'Mengambil data…';
+          W.data = await call('rkpDraft', { tahun: W.tahun }); W.dataTh = W.tahun; W.pilih = {}; W.biaya = {};
+          if (!WZ_PAGU.some(k => W.pagu[k[0]]) && W.data.pagu) WZ_PAGU.forEach(k => { if (Number(W.data.pagu[k[0]])) W.pagu[k[0]] = W.data.pagu[k[0]]; });
+          wzCalon(W.data).forEach(c => { if (!c.ada) W.pilih[c.key] = c.def; });
+        }
+        W.step = 1; return refresh();
+      }
+      if (W.step < 3) {
+        W.step++; return refresh();
+      }
+      if (dipilih().some(c => nilai(c) < 0)) return gagal('Ada biaya negatif. Periksa kembali.');
+      const P = wzGabung(dipilih(), nilai);
+      if (!P.length) return gagal('Tidak ada kegiatan yang dipilih.');
+      btn.disabled = true; btn.textContent = 'Menyimpan…';
+      const r = await call('rkpDraftSimpan', { tahun: W.tahun, pagu: W.pagu, items: P.map(c => ({ kegiatan: c.kegiatan, kode_bidang: c.kode_bidang, bidang: namaBidang(c.bidang), kode_kegiatan: c.kode_kegiatan, sumber_dana: c.sumber_dana, lokasi: c.lokasi, volume: c.volume, satuan: c.satuan, total: String(c.total), sumber_data: c.sumber_data, ref: c.ref, ket: c.ket })) });
+      toast(r.disimpan + ' kegiatan masuk Form 04 RKP ' + W.tahun + (r.dilewati ? '; ' + r.dilewati + ' dilewati karena sudah ada.' : '.'));
+      S.rkpYear = W.tahun; S.listState = null; S.wz = null;
+      go('list', { e: 'rkp_usulan' });
+    } catch (x) { btn.disabled = false; btn.innerHTML = W.step < 3 ? 'Berikutnya ' + ic('next') : ic('check') + 'Simpan ke Form 04'; gagal(x.message); }
+  };
+  S.vh.wzPrev = () => { W.step = Math.max(0, W.step - 1); refresh(); };
+  S.vh.wzAll = t => { calon.filter(c => c.sumber_data === t.dataset.g && !c.ada).forEach(c => { W.pilih[c.key] = t.dataset.v === '1'; }); refresh(); };
+};
+ACT.rkpRutinIsi = async t => {
+  t.disabled = true;
+  try { const r = await call('rkpRutinIsi', { tahun: keuTh() }); toast(r.ditambah ? r.ditambah + ' kegiatan rutin disalin dari APBDes ' + keuTh() + '.' : 'Tidak ada kegiatan baru untuk disalin.'); refresh(); }
+  catch (x) { toast(x.message, 1); t.disabled = false; }
+};
 VIEWS.keubuku = async (p, main, alive) => {
   const st = S.bukuSt = S.bukuSt || { buku: 'BKU', bulan: '' };
   setTop({ BKU: 'Buku Kas Umum', Bank: 'Buku Bank', Tunai: 'Buku Kas Tunai', Pajak: 'Buku Pembantu Pajak' }[st.buku], 'Tahun ' + keuTh());
@@ -3064,6 +3214,7 @@ VIEWS.rkp = async (p, main) => {
   main.innerHTML = `<div class="stack">
     <div class="card" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:7px 10px"><div style="flex:1;min-width:160px"><span class="lbl">RKP Desa yang disusun</span> <b class="num" style="font-size:16px">${y}</b> <span class="meta">(disusun tahun ${y - 1})</span></div>
       <div class="chips">${[y - 1, y, y + 1].map(t => `<button class="chip ${t === y ? 'on' : ''}" data-act="yr" data-v="${t}">${t}</button>`).join('')}</div></div>
+    ${w ? `<button class="card wz-cta" data-act="go" data-go='["rkpgen",{}]'><span class="av">${ic('sprout')}</span><span class="main"><b>Generator RKP otomatis</b><span class="meta">Tarik kegiatan dari RPJM, kegiatan rutin, dan luncuran tahun lalu → Form 04, dibandingkan dengan pagu indikatif</span></span>${ic('next')}</button>` : ''}
     <div class="sec-h"><h2>Tahapan penyusunan</h2></div>
     <div class="list">${T.map(t => `<div class="it"><button class="row" data-act="go" data-go='${esc(JSON.stringify(['list', { e: t[0] }]))}'><span class="av">${ic(UI[t[0]].ic)}</span><span class="main"><span class="t">${esc(t[2])}</span><span class="s">${t[1]}</span></span><span class="muted">${ic('next')}</span></button></div>`).join('')}</div>
     <div class="sec-h"><h2>Dokumen dari template</h2>${w ? `<button class="btn sm" data-act="tplr">${ic('list')}Muat ulang daftar</button>` : ''}</div>
@@ -3077,7 +3228,7 @@ VIEWS.rkp = async (p, main) => {
       <button class="tile" data-act="doc" data-d="f5"><span class="ti">${ic('print')}</span><b>Rencana Pembiayaan<small>Form 05</small></b></button>
     </div></details>
     <div class="sec-h"><h2>RPJM Desa 2020–2027</h2></div>
-    <div class="list">${[['rpjm_visimisi', 'Visi, misi, tujuan & sasaran'], ['rpjm_kegiatan', 'Rencana kegiatan per bidang & tahun']].map(t => `<div class="it"><button class="row" data-act="go" data-go='${esc(JSON.stringify(['list', { e: t[0] }]))}'><span class="av">${ic(UI[t[0]].ic)}</span><span class="main"><span class="t">${esc(UI[t[0]].t.replace('RPJM Desa — ', ''))}</span><span class="s">${t[1]}</span></span></button></div>`).join('')}</div>
+    <div class="list">${[['rpjm_visimisi', 'Visi, misi, tujuan & sasaran'], ['rpjm_kegiatan', 'Rencana kegiatan per bidang & tahun'], ['rkp_rutin', 'Pengeluaran wajib tiap tahun (dipakai Generator RKP)']].map(t => `<div class="it"><button class="row" data-act="go" data-go='${esc(JSON.stringify(['list', { e: t[0] }]))}'><span class="av">${ic(UI[t[0]].ic)}</span><span class="main"><span class="t">${esc(UI[t[0]].t.replace('RPJM Desa — ', ''))}</span><span class="s">${t[1]}</span></span></button></div>`).join('')}</div>
     <button class="btn" data-act="go" data-go='["refs"]'>${ic('book')}Referensi: kode bidang, SDGs, dasar hukum</button>
   </div>`;
   S.vh.yr = t => { S.rkpYear = t.dataset.v; S.listState = null; refresh(); };
