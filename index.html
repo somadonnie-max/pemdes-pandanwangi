@@ -158,6 +158,11 @@ button.stat:hover{border-color:var(--pri)}
 .pimg img{width:100%;height:100%;object-fit:cover}.pimg.empty{cursor:default}.pslot.has .pimg{border-style:solid}
 .plbl{font-size:11.5px;font-weight:700}.pup{justify-content:center}.pup.busy{opacity:.6;pointer-events:none}
 .agenda .ag{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left;color:inherit;font:inherit}
+.agenda .ag.bt .dt{background:var(--gold-soft);color:var(--gold);display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 4px}.agenda .ag.bt .dt span{font-size:10.5px;font-weight:600}
+.agf{display:flex;justify-content:flex-end;gap:14px;border-top:1px solid var(--line);padding-top:6px;margin-top:2px}.agf .linkbtn{display:inline-flex;align-items:center;gap:3px;font-size:13px;font-weight:600}.agf .linkbtn svg{width:14px;height:14px}
+.clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.aturan ul{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted)}.aturan ul b{color:var(--ink)}.aturan>b{display:flex;gap:6px;align-items:center}
+.tbl.harian td.c{min-width:64px}.tbl.harian td.ok{color:var(--ok);font-weight:600}.tbl.harian td.warn{color:var(--warn);font-weight:600}.tbl.harian td.info{color:var(--info,var(--pri));font-weight:600}
 .agenda .ag:first-of-type{border-top:0}.ag .dt{min-width:54px;text-align:center;border-radius:8px;background:var(--surface2);padding:3px 4px;font-size:11px;line-height:1.25}.ag .dt b{display:block;font-size:17px}
 .ag.today .dt{background:var(--pri);color:var(--pri-ink)}
 .tbl.rk tr.r1 td{border-bottom:0}.tbl.rk tr.r2 td{border-top:1px dashed var(--line)}.tbl.rk .k{font-size:10.5px}
@@ -451,6 +456,8 @@ const IC = {
   file: '<path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5"/>',
   sprout: '<path d="M12 21V11"/><path d="M12 11c0-4 3-7 8-7 0 5-3 7-8 7zM12 13c0-3-2-5-7-5 0 4 2 5 7 5z"/>',
   heart: '<path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11z"/>',
+  mega: '<path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"/>',
+  wallet: '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 14.5h2"/>',
   landmark: '<path d="M3 10l9-6 9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/>',
   hammer: '<path d="M14 4l6 6-3 3-6-6z"/><path d="M11 7l-8 8 3 3 8-8"/>',
   clip: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM9 12h6M9 16h4"/>',
@@ -729,8 +736,9 @@ const UI = {
       F('keterangan', 'Keterangan / Persiapan', 'textarea', { wide: 1, hint: 'Mis. pakaian dinas, membawa dokumen, nomor undangan' }), F('materi', 'Materi', 'textarea', { wide: 1, rows: 8, hint: 'Isi materi / paparan kegiatan (boleh panjang). Diisi saat atau sesudah kegiatan.' }),
       F('ringkasan', 'Hasil / Kesimpulan Kegiatan', 'textarea', { wide: 1, hint: 'Diisi saat atau sesudah kegiatan' }),
       F('dok_id', 'Dokumen Kegiatan', 'file', { hint: 'Satu berkas gabungan: berita acara, daftar hadir, undangan, dll. (PDF lebih baik).' }),
-      F('foto', 'Foto Kegiatan', 'fotos', { max: 10 })],
-    views: [['Akan datang', () => ({ tanggal__gte: isoToday() }), 1], ['Riwayat', () => ({ tanggal__lt: isoToday() }), 0], ['Semua', () => ({}), 0]],
+      F('foto', 'Foto Kegiatan', 'fotos', { max: 10 }),
+      F('tampil_dari', 'Tampil di Beranda mulai', 'date', { hint: 'Kosong = langsung tampil' }), F('tampil_sampai', 'Tampil di Beranda sampai', 'date', { hint: 'Kosong = sampai tanggal kegiatan / ditandai selesai' })],
+    views: [['Akan datang', () => ({ _kel: 'agenda' }), 1], ['Riwayat', () => ({ _kel: 'riwayat' }), 0], ['Semua', () => ({}), 0]],
     row: r => ({ t: r.nama, s: fDay(r.tanggal) + (r.jam ? ' · ' + String(r.jam).slice(0, 5) + ' WIB' : '') + (r.tempat ? ' · ' + r.tempat : ''), s2: r.peserta || '', av: ic('cal'), pill: kgPill(r) }),
     print: { title: 'BUKU AGENDA KEGIATAN', land: 1, cols: [['Tanggal', r => fDate(r.tanggal) + (r.jam ? '<br>' + esc(String(r.jam).slice(0, 5)) : '')], ['Kegiatan', 'nama'], ['Tempat', 'tempat'], ['Penyelenggara', 'penyelenggara'], ['Peserta', 'peserta'], ['Ringkasan', 'ringkasan']] }
   },
@@ -761,6 +769,16 @@ const UI = {
     chips: { k: 'dusun', opt: OPT.dusun, lbl: s => s.replace('DUSUN ', '') },
     row: r => ({ t: r.nama, s: [r.lembaga, r.jml_santri ? r.jml_santri + ' santri' : ''].filter(Boolean).join(' · '), s2: [String(r.dusun || '').replace('DUSUN ', ''), r.rt ? 'RT ' + r.rt + (r.rw ? '/' + r.rw : '') : '', r.telp].filter(Boolean).join(' · '), av: initials(r.nama), img: r.foto_id }),
     print: { title: 'DAFTAR GURU NGAJI', land: 1, cols: [['Nama', 'nama'], ['L/P', r => esc((r.jk || '').slice(0, 1))], ['Alamat', r => esc([String(r.dusun || '').replace('DUSUN ', ''), r.rt ? 'RT ' + r.rt + '/' + (r.rw || '') : ''].filter(Boolean).join(' '))], ['Tempat Mengajar', 'lembaga'], ['Santri', 'jml_santri'], ['Sejak', 'sejak'], ['No. HP', 'telp']] }
+  },
+  berita: {
+    t: 'Berita & Informasi', ic: 'mega', perm: 'kegiatan', folder: 'Kegiatan/Berita', sort: 'tanggal',
+    fields: [F('judul', 'Judul', 'text', { req: 1, wide: 1 }), F('tanggal', 'Tanggal Diterima', 'date', { req: 1, def: isoToday }),
+      F('kategori', 'Kategori', 'select', { opt: ['Informasi', 'Himbauan', 'Pengumuman', 'Undangan', 'Surat Edaran', 'Lainnya'], def: 'Informasi' }), F('sumber', 'Dari / Sumber', 'text', { list: ['Kecamatan Tempeh', 'Pemkab Lumajang', 'DPMD Kab. Lumajang', 'Dinas Kesehatan', 'Puskesmas Tempeh', 'Polsek Tempeh', 'Koramil Tempeh', 'BPD Desa Pandanwangi'] }),
+      F('isi', 'Isi Berita / Informasi', 'textarea', { wide: 1, rows: 6 }), F('dok_id', 'Lampiran', 'file'), F('foto', 'Foto', 'fotos', { max: 5 }),
+      F('tampil_dari', 'Tampil di Beranda mulai', 'date', { hint: 'Kosong = mulai tanggal diterima' }), F('tampil_sampai', 'Tampil di Beranda sampai', 'date', { hint: 'Kosong = 7 hari setelah tanggal diterima' })],
+    chips: { k: 'kategori', opt: ['Informasi', 'Himbauan', 'Pengumuman', 'Undangan', 'Surat Edaran', 'Lainnya'] },
+    row: r => ({ t: r.judul, s: [fDay(r.tanggal), r.sumber].filter(Boolean).join(' · '), s2: String(r.isi || '').slice(0, 120), av: ic('mega'), pill: r.kategori ? `<span class="pill info">${esc(r.kategori)}</span>` : '' }),
+    print: { title: 'BUKU BERITA & INFORMASI', cols: [['Tanggal', r => fDate(r.tanggal)], ['Kategori', 'kategori'], ['Judul', 'judul'], ['Dari', 'sumber'], ['Isi', r => esc(r.isi || '').replace(/\n/g, '<br>')]] }
   },
   kegiatan_berkas: {
     t: 'Berkas Kegiatan', ic: 'file', perm: 'kegiatan', sub: 1, folder: 'Kegiatan',
@@ -807,6 +825,7 @@ const UI = {
 };
 function kgPill(r) {
   const t = isoToday();
+  if (r.selesai) return '<span class="pill">Selesai</span>';
   if (r.tanggal === t) return '<span class="pill ok">Hari ini</span>';
   if (r.tanggal > t) return '<span class="pill info">Akan datang</span>';
   return r.ringkasan ? '<span class="pill">Selesai</span>' : '';
@@ -821,8 +840,8 @@ const SOON = {};
 /* Kelompok menu */
 function MODS() {
   return [
-    { k: 'presensi', l: 'Presensi', ic: 'clock', items: [['Absen Hari Ini', 'clock', ['presensi']], ['Riwayat', 'list', ['list', { e: 'presensi' }]]] },
-    { k: 'kegiatan', l: 'Kegiatan', ic: 'cal', items: [['Agenda', 'cal', ['list', { e: 'kegiatan', v: 0, title: 'Agenda' }], null, 'r:kegiatan'], ['Riwayat Kegiatan', 'list', ['list', { e: 'kegiatan', v: 1, title: 'Riwayat Kegiatan' }], null, 'r:kegiatan']] },
+    { k: 'presensi', l: 'Presensi', ic: 'clock', items: [['Presensi Hari Ini', 'clock', ['presensi']], ['Riwayat Harian', 'list', ['harian']]] },
+    { k: 'kegiatan', l: 'Kegiatan', ic: 'cal', items: [['Agenda', 'cal', ['list', { e: 'kegiatan', v: 0, title: 'Agenda' }], null, 'r:kegiatan'], ['Berita', 'mega', ['list', { e: 'berita' }], 'berita']] },
     { k: 'tu', l: 'TU & Umum', ic: 'folder', items: ['surat_masuk', 'surat_keluar', 'ekspedisi', 'perdes', 'sk_kades', 'aparat', 'petugas', 'inventaris', 'tkd', 'tanah_desa'].map(e => [UI[e].t, UI[e].ic, ['list', { e }], e]) },
     { k: 'pemerintahan', l: 'Pemerintahan', ic: 'landmark', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, 'r:penduduk'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga']] },
     { k: 'pembangunan', l: 'Pembangunan', ic: 'hammer', perm: 'pembangunan', items: [['Kegiatan Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
@@ -1341,7 +1360,7 @@ VIEWS.home = async (p, main, alive) => {
   const hour = new Date().getHours();
   const salam = hour < 11 ? 'Selamat pagi' : hour < 15 ? 'Selamat siang' : hour < 18 ? 'Selamat sore' : 'Selamat malam';
   const c = d.counts || {}, y = new Date().getFullYear();
-  const agenda = canRead('kegiatan') ? agendaHtml(d.agenda || []) : '';
+  const agenda = canRead('kegiatan') || canRead('berita') ? agendaHtml(canRead('kegiatan') ? d.agenda || [] : [], canRead('berita') ? d.berita || [] : []) : '';
   const h = d.hariIni;
   main.innerHTML = `<div class="stack">
     <section class="hero">
@@ -1357,11 +1376,14 @@ VIEWS.home = async (p, main, alive) => {
   </div>`;
   clockTick($('#clk'));
 };
-function agendaHtml(rows) {
+function agendaHtml(rows, berita) {
   const t = isoToday(), bs = new Date(Date.now() + 864e5), besok = bs.getFullYear() + '-' + String(bs.getMonth() + 1).padStart(2, '0') + '-' + String(bs.getDate()).padStart(2, '0');
   const lbl = d => d === t ? 'Hari ini' : d === besok ? 'Besok' : fDay(d).split(',')[0];
   const items = rows.map(r => { const dd = new Date(r.tanggal + 'T00:00:00'); return `<button class="ag ${r.tanggal === t ? 'today' : ''}" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'kegiatan', id: r.id }]))}'><span class="dt">${esc(lbl(r.tanggal))}<b class="num">${dd.getDate()}</b>${esc(BULAN[dd.getMonth()].slice(0, 3))}</span><span style="flex:1;min-width:0"><b>${esc(r.nama)}</b><span class="meta" style="display:block">${r.jam ? ic('clock') + ' ' + esc(String(r.jam).slice(0, 5)) + ' WIB · ' : ''}${esc(r.tempat || '')}</span>${r.peserta ? `<span class="meta" style="display:block">${ic('users')} ${esc(r.peserta)}</span>` : ''}</span></button>`; }).join('');
-  return `<div class="card agenda"><div class="sec-h" style="margin:0 0 4px"><h2>${ic('cal')} Agenda kegiatan</h2><span class="btns">${canWrite('kegiatan') ? `<button class="btn sm" data-act="go" data-go='["form",{"e":"kegiatan"}]'>${ic('plus')}Tambah</button>` : ''}<button class="btn sm" data-act="go" data-go='["list",{"e":"kegiatan"}]'>Semua</button></span></div>${items || '<div class="meta">Belum ada kegiatan terjadwal. Kegiatan yang akan datang tampil di sini sebagai pengingat.</div>'}</div>`;
+  const bItems = (berita || []).map(r => `<button class="ag bt" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'berita', id: r.id }]))}'><span class="dt">${ic('mega')}<span>${esc(r.kategori || 'Info')}</span></span><span style="flex:1;min-width:0"><b>${esc(r.judul)}</b><span class="meta" style="display:block">${esc([fDate(r.tanggal), r.sumber].filter(Boolean).join(' · '))}</span>${r.ringkas ? `<span class="meta clamp2">${esc(r.ringkas)}</span>` : ''}</span></button>`).join('');
+  const tb = (canWrite('kegiatan') ? `<button class="btn sm" data-act="go" data-go='["form",{"e":"kegiatan"}]'>${ic('plus')}Agenda</button>` : '') + (canWrite('berita') ? `<button class="btn sm" data-act="go" data-go='["form",{"e":"berita"}]'>${ic('plus')}Berita</button>` : '');
+  return `<div class="card agenda"><div class="sec-h" style="margin:0 0 4px"><h2>${ic('cal')} Update kegiatan</h2><span class="btns">${tb}</span></div>${items + bItems || '<div class="meta">Belum ada agenda atau berita. Agenda yang akan datang dan berita terbaru tampil di sini.</div>'}
+    <div class="agf">${canRead('kegiatan') ? `<button class="linkbtn" data-act="go" data-go='["list",{"e":"kegiatan","v":0,"title":"Agenda"}]'>Semua agenda ${ic('next')}</button>` : ''}${canRead('berita') ? `<button class="linkbtn" data-act="go" data-go='["list",{"e":"berita"}]'>Semua berita ${ic('next')}</button>` : ''}</div></div>`;
 }
 function modsHtml(c) {
   let h = '';
@@ -1379,8 +1401,41 @@ VIEWS.menu = async (p, main) => {
 };
 
 /* ---------------- Presensi ---------------- */
+/* Catatan aturan presensi (ringkas, mengikuti jam di Pengaturan) */
+function aturanPresensi(W) {
+  const st = S.set, jum = st.jam_pulang_jumat || '11:00', pul = st.jam_pulang_mulai || '14:00';
+  return `<div class="card aturan"><b>${ic('file')} Aturan presensi</b><ul>
+    <li><b>Pagi ${esc(W.mulai)}–${esc(pul)}</b> (Jumat s.d. ${esc(jum)}): Masuk, Dinas Luar, Izin, atau Sakit. Masuk tepat waktu sampai <b>${esc(W.batas)}</b>, setelahnya tercatat terlambat.</li>
+    <li><b>Pulang ${esc(pul)}–${esc(W.tutup)}</b> (Jumat mulai ${esc(jum)}). Pulang sebelum jamnya tidak bisa, gunakan Izin.</li>
+    <li>Masuk & Pulang wajib di kantor desa; Pulang boleh di luar kantor bila hari itu Dinas Luar. Masuk, Pulang, dan Dinas Luar memakai verifikasi wajah.</li>
+    <li>Dinas Luar, Izin, Sakit boleh dari mana saja dan wajib diberi keterangan.</li>
+    <li>Izin sebelum ${esc(W.batas)} (datang terlambat) masih bisa diikuti Masuk. Setelah Pulang, Sakit, atau Izin setelah masuk, presensi hari itu selesai.</li>
+    <li>Lewat ${esc(W.tutup)} presensi ditutup; yang belum presensi tercatat <b>A</b> (tanpa keterangan) di rekap.</li></ul></div>`;
+}
+/* Riwayat harian: satu baris per orang per tanggal, jam tiap kondisi */
+VIEWS.harian = async (p, main, alive) => {
+  setTop('Riwayat Harian', 'Presensi');
+  const st = S.harianSt = S.harianSt || { bln: isoToday().slice(0, 7), q: '' };
+  main.innerHTML = `<div class="stack"><div class="toolbar"><input type="month" class="inp" id="hbln" value="${esc(st.bln)}" style="max-width:180px"><label class="search">${ic('search')}<input id="hq" placeholder="Cari nama…" value="${esc(st.q)}" autocomplete="off"></label></div>
+    <div class="meta" id="hcnt"></div><div id="hrows"><div class="skel"></div></div></div>`;
+  const muat = async () => {
+    const [y, m] = st.bln.split('-').map(Number), akhir = new Date(y, m, 0).getDate();
+    $('#hrows').innerHTML = '<div class="skel"></div>';
+    try {
+      const rows = await call('presensiHarian', { dari: st.bln + '-01', sampai: st.bln + '-' + String(akhir).padStart(2, '0'), q: st.q });
+      if (!alive()) return;
+      const tg = d => { const x = parseD(d); return x ? x.getDate() + '/' + (x.getMonth() + 1) + '/' + x.getFullYear() : d; };
+      const c = (v, k) => v ? `<td class="c ${k}">${esc(String(v).replace(':', '.'))}</td>` : '<td class="c"></td>';
+      $('#hcnt').textContent = rows.length ? rows.length + ' baris' : '';
+      $('#hrows').innerHTML = rows.length ? `<div class="tbl-wrap"><table class="tbl harian"><thead><tr><th>Tanggal</th><th class="stk">Nama Perangkat</th><th class="c">Hadir</th><th class="c">Hadir Terlambat</th><th class="c">Pulang</th><th class="c">Dinas Luar</th><th class="c">Izin</th><th class="c">Sakit</th></tr></thead><tbody>${rows.map(r => `<tr${r.ket ? ` title="${esc(r.ket)}"` : ''}><td class="num">${esc(tg(r.tanggal))}</td><td class="stk">${esc(r.nama)}</td>${c(r.hadir, 'ok')}${c(r.terlambat, 'warn')}${c(r.pulang, '')}${c(r.dl, 'info')}${c(r.izin, '')}${c(r.sakit, '')}</tr>`).join('')}</tbody></table></div>` : '<div class="card empty">' + ic('clock') + 'Belum ada presensi pada bulan ini.</div>';
+    } catch (x) { $('#hrows').innerHTML = `<div class="err">${esc(x.message)}</div>`; }
+  };
+  $('#hbln').onchange = e => { st.bln = e.target.value || isoToday().slice(0, 7); muat(); };
+  let tq; $('#hq').oninput = e => { clearTimeout(tq); tq = setTimeout(() => { st.q = e.target.value.trim(); muat(); }, 350); };
+  muat();
+};
 VIEWS.presensi = async (p, main, alive) => {
-  setTop('Presensi', fDay(isoToday()));
+  setTop('Presensi Hari Ini', fDay(isoToday()));
   const d = await call('presensiToday');
   if (!alive()) return;
   S.faceOn = !!d.wajah;
@@ -1403,6 +1458,7 @@ VIEWS.presensi = async (p, main, alive) => {
     <div class="sec-h"><h2>Catatan hari ini</h2></div>
     <div class="card">${rec.length ? `<div class="timeline">${rec.map(r => `<div class="tl">${r.foto_id ? `<img src="${esc(thumb(r.foto_id, 200))}" alt="">` : `<span class="av">${ic('clock')}</span>`}<div style="flex:1"><b class="num">${esc(String(r.jam).slice(0, 5))}</b> · ${esc(r.jenis)}<div class="meta">${esc(r.keterangan || '')}${r.jarak_m !== '' && r.jarak_m != null ? ' · ' + esc(r.jarak_m) + ' m dari kantor' : ''}</div></div>${stPill(r.status)}</div>`).join('')}</div>` : '<div class="muted">Belum ada presensi.</div>'}</div>
     <div class="btns"><button class="btn" data-act="go" data-go='["list",{"e":"presensi"}]'>${ic('list')}Riwayat</button><button class="btn" data-act="go" data-go='["rekap"]'>${ic('chart')}Rekap bulanan</button><button class="btn" data-act="go" data-go='["list",{"e":"hari_libur"}]'>${ic('cal')}Hari libur</button></div>
+    ${aturanPresensi(W)}
   </div>`;
   clockTick($('#clk'));
   S.vh.absen = t => absenForm(t.dataset.j);
@@ -1963,7 +2019,7 @@ async function renderDetail(e, x, el, full) {
     <div class="xk"></div>
     ${geo ? mapHtml(geo, 'Lokasi ' + (u.row(x).t || '')) : ''}
     <div class="xx"></div>
-    <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button><button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>` : ''}${e === 'penduduk' && canWrite('register_surat') ? `<button class="btn sm" data-act="regSurat" data-id="${esc(x.id)}">${ic('file')}Buat surat keterangan</button>` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak surat (Word)</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>`;
+    <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button><button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>` : ''}${e === 'penduduk' && canWrite('register_surat') ? `<button class="btn sm" data-act="regSurat" data-id="${esc(x.id)}">${ic('file')}Buat surat keterangan</button>` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak surat (Word)</button>` : ''}${e === 'kegiatan' && w && kgBisaSelesai(x) ? `<button class="btn sm pri" data-act="kgSelesai" data-id="${esc(x.id)}">${ic('check')}Selesai</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>`;
   const xk = $('.xk', el), xx = $('.xx', el);
   if (e === 'penduduk') {
     try {
@@ -1978,7 +2034,21 @@ async function renderDetail(e, x, el, full) {
   if (e === 'petugas') await extraPetugas(x, xx);
   if (e === 'penduduk') S.pendCache = Object.assign(S.pendCache || {}, { [x.id]: x });
 }
-const DETAIL_PAGE = { keluarga: 1, rkp_musyawarah: 1, pembangunan: 1, kegiatan: 1 };
+/* tombol Selesai: kegiatan hari ini yang sudah dimulai (atau tanggalnya lewat tapi belum ditandai) */
+function kgBisaSelesai(x) {
+  if (x.selesai) return false;
+  const t = isoToday(), n = new Date(), jam = String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0');
+  return x.tanggal < t || (x.tanggal === t && (!x.jam || String(x.jam).slice(0, 5) <= jam));
+}
+ACT.kgSelesai = async t => {
+  t.disabled = true;
+  const n = new Date();
+  try {
+    await call('save', { entity: 'kegiatan', record: { id: t.dataset.id, selesai: isoToday() + ' ' + String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0') } });
+    toast('Kegiatan ditandai selesai, pindah ke Riwayat.'); refresh();
+  } catch (x) { toast(x.message, 1); t.disabled = false; }
+};
+const DETAIL_PAGE = { keluarga: 1, rkp_musyawarah: 1, pembangunan: 1, kegiatan: 1, berita: 1 };
 /* Data Penduduk -> Register Surat Keterangan: identitas terisi otomatis */
 ACT.regSurat = t => {
   const x = (S.pendCache || {})[t.dataset.id]; if (!x) return;
