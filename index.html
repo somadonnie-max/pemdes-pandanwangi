@@ -2431,6 +2431,7 @@ VIEWS.form = async (p, main, alive) => {
   }
   if (e === 'register_surat') await muatJenisSurat();
   if (flds.some(f => f.gen) && !(p.buat || NASKAH[e] && NASKAH[e].ada(rec))) flds = flds.filter(f => !f.gen);
+  if (p.buat && NASKAH[e]) flds = flds.filter(f => f.t !== 'file'); /* tombol Buat = menyusun naskah; unggah scan (berkas bertanda tangan) lewat Tambah/Ubah */
   for (const f of flds.filter(f => f.listFrom)) { try { const r = await call('list', { entity: f.listFrom.e, limit: 2000 }); f._rows = r.rows; f._list = r.rows.map(x => typeof f.listFrom.k === 'function' ? f.listFrom.k(x) : x[f.listFrom.k]).filter(Boolean); } catch (x) { f._list = f._rows = []; } }
   if (u.fields.some(f => f.t === 'sdgs') && !S.sdgs) { try { S.sdgs = (await call('list', { entity: 'ref_sdgs', limit: 50, desc: false })).rows; } catch (x) { S.sdgs = []; } }
   if (!alive()) return;
