@@ -1004,6 +1004,7 @@ const UI = {
     fields: [F('tahun', 'Tahun Anggaran', 'number', { req: 1, def: () => new Date().getFullYear() }), F('no', 'No. SPP', 'text', { auto: 1 }), F('tanggal', 'Tanggal SPP', 'date', { req: 1, def: isoToday }),
       F('jenis', 'Jenis SPP', 'select', { opt: ['Definitif', 'Pembiayaan'], def: 'Definitif' }), F('kegiatan', 'Kegiatan', 'refpick', { wide: 1 }), F('kode_bidang', 'Kode Bidang', 'text', { mono: 1 }), F('bidang', 'Bidang'), F('kode_kegiatan', 'Kode Kegiatan', 'text', { mono: 1 }),
       F('uraian', 'Keperluan / Uraian', 'text', { req: 1, wide: 1 }), F('penerima', 'Penerima / Pihak Ketiga', 'text', { wide: 1 }),
+      F('pka', 'Pelaksana Kegiatan (PKA)', 'person', { fill: { pka_jabatan: 'jabatan' }, hint: 'Penanda tangan SPP & SPTJM' }), F('pka_jabatan', 'Jabatan PKA', 'text'),
       F('jenis_belanja', 'Jenis Belanja (untuk pajak)', 'select', { opt: JENIS_BELANJA, hint: 'Menentukan PPN/PPh yang dipotong otomatis' }), F('pkp', 'Penerima PKP (memungut PPN)?', 'select', { opt: ['Tidak', 'Ya'], def: 'Tidak' }),
       F('npwp', 'NPWP / NIK Penerima', 'text', { mono: 1, hint: 'Kosong = tanpa NPWP/NIK, tarif PPh naik' }), F('kualifikasi', 'Kualifikasi Penyedia Konstruksi', 'select', { opt: Object.keys(PAJAK.konstruksi), when: { k: 'jenis_belanja', v: ['Jasa konstruksi'] } }),
       F('rincian', 'Rincian Belanja', 'rows', { listFrom: { e: 'keu_rek', k: x => x.kode + ' ' + x.uraian }, cols: [['rek', 'Kode Rekening', 'list'], ['uraian', 'Uraian', 'text'], ['sumber', 'Sumber', 'sumber'], ['jumlah', 'Jumlah (Rp)', 'money']] }),
@@ -1087,7 +1088,7 @@ function MODS() {
     { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
     { k: 'kesejahteraan', l: 'Kesejahteraan', ic: 'heart', items: [['Lembaga / Yayasan', 'landmark', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru Ngaji', 'book', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
     { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Kegiatan Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
-    { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek']] },
+    { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Rekap Pajak', 'coin', ['keupajak'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek']] },
     { k: 'soon', l: 'Segera Hadir', ic: 'sprout', items: Object.keys(SOON).map(k => [SOON[k].t, SOON[k].ic, ['soon', { k }], null, '*', 1]) }
   ];
 }
@@ -1954,9 +1955,17 @@ const XL = (() => {
   }
   const x = v => String(v == null ? '' : v).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const col = i => { let s = ''; i++; while (i) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; };
+  /* sel: teks biasa, angka (number -> sel angka #.##0,00 yang bisa dijumlah), atau {v, b:1} = tebal */
+  const cel = (v, ci, ri, head) => {
+    let b = 0; if (v && typeof v === 'object') { b = v.b ? 1 : 0; v = v.v; }
+    const ref = col(ci) + (ri + 1);
+    if (head && ri === 0) return `<c r="${ref}" t="inlineStr" s="1"><is><t xml:space="preserve">${x(v)}</t></is></c>`;
+    if (typeof v === 'number' && isFinite(v)) return `<c r="${ref}" s="${b ? 5 : 3}"><v>${v}</v></c>`;
+    return `<c r="${ref}" t="inlineStr" s="${b ? 4 : 2}"><is><t xml:space="preserve">${x(v)}</t></is></c>`;
+  };
   function sheet(rows, widths, head) {
     const w = widths || [];
-    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">${head ? '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>' : ''}<cols>${(rows[0] || []).map((_, i) => `<col min="${i + 1}" max="${i + 1}" width="${w[i] || 14}" style="2" customWidth="1"/>`).join('')}</cols><sheetData>${rows.map((r, ri) => `<row r="${ri + 1}">${r.map((v, ci) => `<c r="${col(ci)}${ri + 1}" t="inlineStr" s="${head && ri === 0 ? 1 : 2}"><is><t xml:space="preserve">${x(v)}</t></is></c>`).join('')}</row>`).join('')}</sheetData>${head ? `<autoFilter ref="A1:${col(Math.max(0, rows[0].length - 1))}${rows.length}"/>` : ''}</worksheet>`;
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">${head ? '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>' : ''}<cols>${(rows[0] || []).map((_, i) => `<col min="${i + 1}" max="${i + 1}" width="${w[i] || 14}" style="2" customWidth="1"/>`).join('')}</cols><sheetData>${rows.map((r, ri) => `<row r="${ri + 1}">${r.map((v, ci) => cel(v, ci, ri, head)).join('')}</row>`).join('')}</sheetData>${head ? `<autoFilter ref="A1:${col(Math.max(0, rows[0].length - 1))}${rows.length}"/>` : ''}</worksheet>`;
   }
   /* sheets: [{name, rows:[[...]], widths:[...], head:true}] */
   function write(sheets) {
@@ -1966,7 +1975,7 @@ const XL = (() => {
       { name: '_rels/.rels', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>' },
       { name: 'xl/workbook.xml', data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${S.map(s => `<sheet name="${x(s.name.slice(0, 31))}" sheetId="${s.id}" r:id="rId${s.id}"/>`).join('')}</sheets></workbook>` },
       { name: 'xl/_rels/workbook.xml.rels', data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${S.map(s => `<Relationship Id="rId${s.id}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${s.id}.xml"/>`).join('')}<Relationship Id="rId${S.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>` },
-      { name: 'xl/styles.xml', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF0F5A46"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="49" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyNumberFormat="1"/><xf numFmtId="49" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs></styleSheet>' }
+      { name: 'xl/styles.xml', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="1"><numFmt numFmtId="164" formatCode="#,##0.00;(#,##0.00);\\-"/></numFmts><fonts count="3"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF0F5A46"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="6"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="49" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyNumberFormat="1"/><xf numFmtId="49" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="49" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1" applyNumberFormat="1"/><xf numFmtId="164" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1" applyNumberFormat="1"/></cellXfs></styleSheet>' }
     ].concat(S.map(s => ({ name: `xl/worksheets/sheet${s.id}.xml`, data: sheet(s.rows, s.widths, s.head) }))));
   }
   async function unzip(buf) {
@@ -2261,7 +2270,7 @@ async function renderDetail(e, x, el, full) {
     <div class="xk"></div>
     ${geo ? mapHtml(geo, 'Lokasi ' + (u.row(x).t || '')) : ''}
     <div class="xx"></div>
-    <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button><button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>` : ''}${e === 'penduduk' && canWrite('register_surat') ? `<button class="btn sm" data-act="regSurat" data-id="${esc(x.id)}">${ic('file')}Buat surat keterangan</button>` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak surat (Word)</button>` : ''}${e === 'keu_spp' ? `<button class="btn sm" data-act="kuitansi" data-id="${esc(x.id)}">${ic('print')}Cetak kuitansi</button>` : ''}${e === 'keu_spp' && w && x.status !== 'Dicairkan' ? `<button class="btn sm pri" data-act="keuCair" data-id="${esc(x.id)}">${ic('check')}Cairkan</button>` : ''}${e === 'keu_spp' && w && x.status === 'Dicairkan' ? `<button class="btn sm danger" data-act="keuBatal" data-id="${esc(x.id)}">${ic('x')}Batalkan pencairan</button>` : ''}${e === 'keu_trans' && w && x.jenis === 'Pajak Dipungut' ? `<button class="btn sm" data-act="setorPajak" data-id="${esc(x.id)}">${ic('send')}Setor pajak</button>` : ''}${NASKAH[e] && w ? `<button class="btn sm" data-act="cetakNaskah" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('print')}Buat dokumen (Word)</button>` : ''}${e === 'kegiatan' && w && kgBisaSelesai(x) ? `<button class="btn sm pri" data-act="kgSelesai" data-id="${esc(x.id)}">${ic('check')}Selesai</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>`;
+    <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button><button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>` : ''}${e === 'penduduk' && canWrite('register_surat') ? `<button class="btn sm" data-act="regSurat" data-id="${esc(x.id)}">${ic('file')}Buat surat keterangan</button>` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak surat (Word)</button>` : ''}${e === 'keu_spp' ? `<button class="btn sm" data-act="sppWord" data-id="${esc(x.id)}">${ic('file')}SPP + SPTJM (Word)</button><button class="btn sm" data-act="kuitansi" data-id="${esc(x.id)}">${ic('print')}Cetak kuitansi</button>` : ''}${e === 'keu_spp' && w && x.status !== 'Dicairkan' ? `<button class="btn sm pri" data-act="keuCair" data-id="${esc(x.id)}">${ic('check')}Cairkan</button>` : ''}${e === 'keu_spp' && w && x.status === 'Dicairkan' ? `<button class="btn sm danger" data-act="keuBatal" data-id="${esc(x.id)}">${ic('x')}Batalkan pencairan</button>` : ''}${e === 'keu_trans' && w && x.jenis === 'Pajak Dipungut' ? `<button class="btn sm" data-act="setorPajak" data-id="${esc(x.id)}">${ic('send')}Setor pajak</button>` : ''}${NASKAH[e] && w ? `<button class="btn sm" data-act="cetakNaskah" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('print')}Buat dokumen (Word)</button>` : ''}${e === 'kegiatan' && w && kgBisaSelesai(x) ? `<button class="btn sm pri" data-act="kgSelesai" data-id="${esc(x.id)}">${ic('check')}Selesai</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>`;
   const xk = $('.xk', el), xx = $('.xx', el);
   if (e === 'penduduk') {
     try {
@@ -3116,6 +3125,192 @@ ACT.rkpRutinIsi = async t => {
   try { const r = await call('rkpRutinIsi', { tahun: keuTh() }); toast(r.ditambah ? r.ditambah + ' kegiatan rutin disalin dari APBDes ' + keuTh() + '.' : 'Tidak ada kegiatan baru untuk disalin.'); refresh(); }
   catch (x) { toast(x.message, 1); t.disabled = false; }
 };
+/* ---------- Ekspor Excel laporan keuangan (angka tetap angka, bisa dijumlah di Excel) ---------- */
+/* judul: baris-baris kop; kepala: header tabel; baris: [[...]] (angka = number); tot: baris jumlah (tebal) */
+function keuXls(nama, sheets) {
+  saveBlob(XL.write(sheets.map(s => {
+    const rows = [], tb = v => v == null ? '' : typeof v === 'number' ? { v, b: 1 } : { v, b: 1 };
+    (s.judul || []).forEach(j => rows.push([tb(j)]));
+    if ((s.judul || []).length) rows.push(['']);
+    rows.push((s.kepala || []).map(tb));
+    (s.baris || []).forEach(r => rows.push(r.map(v => v && v.b ? v : v)));
+    (s.tot || []).forEach(r => rows.push(r.map(tb)));
+    return { name: s.name, rows, widths: s.widths, head: false };
+  })), namaFile(nama) + '.xlsx');
+}
+const BUKU_NAMA = { BKU: 'BUKU KAS UMUM', Bank: 'BUKU BANK DESA', Tunai: 'BUKU KAS TUNAI', Pajak: 'BUKU KAS PEMBANTU PAJAK' };
+function bukuXls(d, st) {
+  const per = 'TAHUN ANGGARAN ' + keuTh() + (st.bulan ? ' — BULAN ' + BULAN[Number(st.bulan) - 1].toUpperCase() : '');
+  const baris = (st.bulan ? [['', '', 'Saldo awal bulan', '', '', '', Number(d.awal) || 0]] : [])
+    .concat(d.rows.map(r => [fDate(r.tanggal) || '', r.bukti || '', r.uraian || '', String(r.rek || '').split(' ')[0], Number(r.masuk) || 0, Number(r.keluar) || 0, Number(r.saldo) || 0]));
+  const tm = d.rows.reduce((a, r) => a + Number(r.masuk || 0), 0), tk = d.rows.reduce((a, r) => a + Number(r.keluar || 0), 0);
+  keuXls(BUKU_NAMA[st.buku] + ' ' + keuTh() + (st.bulan ? ' ' + BULAN[Number(st.bulan) - 1] : ''), [{ name: st.buku, widths: [12, 26, 48, 12, 16, 16, 18],
+    judul: [BUKU_NAMA[st.buku], 'DESA ' + String(S.set.nama_desa || '').toUpperCase(), per],
+    kepala: ['Tanggal', 'No. Bukti', 'Uraian', 'Kode Rekening', 'Penerimaan (Rp)', 'Pengeluaran (Rp)', 'Saldo (Rp)'], baris,
+    tot: [['', '', 'JUMLAH', '', tm, tk, d.rows.length ? Number(d.rows[d.rows.length - 1].saldo) : Number(d.awal) || 0]] }]);
+}
+
+/* ---------- Laporan Realisasi APBDes (format Permendagri 20/2018): Semester I, Semester akhir, atau s.d. tanggal ---------- */
+const JENIS_BEL = { '5.1': 'Belanja Pegawai', '5.2': 'Belanja Barang dan Jasa', '5.3': 'Belanja Modal', '5.4': 'Belanja Tak Terduga' };
+/* rows dari keuRealisasi (per rekening rinci, belanja per kegiatan) -> baris laporan berjenjang */
+function lapSusun(rows, rekNama, rinci) {
+  const out = [], nm = k => rekNama[k] || JENIS_BEL[k] || '', r2 = n => Math.round(n * 100) / 100, S = f => rows.filter(f).reduce((a, r) => [r2(a[0] + Number(r.anggaran || 0)), r2(a[1] + Number(r.realisasi || 0))], [0, 0]);
+  const line = (lvl, kode, uraian, ar, o) => out.push(Object.assign({ lvl, kode, uraian, a: ar[0], r: ar[1] }, o || {}));
+  const pre = (k, n) => k.split('.').slice(0, n).join('.');
+  const blokRek = (awal, judul, jumlahLbl) => {
+    const R = rows.filter(r => r.kode.indexOf(awal) === 0 && !(awal === '5'));
+    line(0, awal, judul, S(r => r.kode.indexOf(awal) === 0), { head: 1 });
+    Array.from(new Set(R.map(r => pre(r.kode, 2)))).sort().forEach(k2 => {
+      line(1, k2, nm(k2), S(r => pre(r.kode, 2) === k2), { bold: 1 });
+      Array.from(new Set(R.filter(r => pre(r.kode, 2) === k2).map(r => pre(r.kode, 3)))).sort().forEach(k3 => {
+        line(2, k3, nm(k3), S(r => pre(r.kode, 3) === k3));
+        if (rinci) R.filter(r => pre(r.kode, 3) === k3).forEach(r => line(3, r.kode, r.uraian || nm(r.kode), [Number(r.anggaran || 0), Number(r.realisasi || 0)], { kecil: 1 }));
+      });
+    });
+    if (jumlahLbl) line(0, '', jumlahLbl, S(r => r.kode.indexOf(awal) === 0), { tot: 1 });
+  };
+  blokRek('4', 'PENDAPATAN', 'JUMLAH PENDAPATAN');
+  const B = rows.filter(r => /^5/.test(r.kode)), bid = r => String(r.kode_kegiatan || '').split('.')[0] || '?';
+  line(0, '5', 'BELANJA', S(r => /^5/.test(r.kode)), { head: 1 });
+  Array.from(new Set(B.map(bid))).sort().forEach(kb => {
+    const Bb = B.filter(r => bid(r) === kb), nmB = (Bb.find(r => r.bidang) || {}).bidang || keuBidangNama(kb);
+    line(1, kb, 'BIDANG ' + namaBidang(nmB).toUpperCase(), S(r => /^5/.test(r.kode) && bid(r) === kb), { bold: 1 });
+    Array.from(new Set(Bb.map(r => (r.kode_kegiatan || '') + '|' + (r.kegiatan || '(tanpa kegiatan)')))).sort().forEach(kg => {
+      const [kk, nk] = kg.split('|'), Bk = Bb.filter(r => (r.kode_kegiatan || '') + '|' + (r.kegiatan || '(tanpa kegiatan)') === kg);
+      line(2, kk, nk, S(r => Bk.indexOf(r) >= 0), { bold: 1 });
+      Array.from(new Set(Bk.map(r => pre(r.kode, 2)))).sort().forEach(k2 => {
+        line(3, k2, JENIS_BEL[k2] || nm(k2), S(r => Bk.indexOf(r) >= 0 && pre(r.kode, 2) === k2));
+        if (rinci) Bk.filter(r => pre(r.kode, 2) === k2).forEach(r => line(4, r.kode, r.uraian || nm(r.kode), [Number(r.anggaran || 0), Number(r.realisasi || 0)], { kecil: 1 }));
+      });
+    });
+  });
+  line(0, '', 'JUMLAH BELANJA', S(r => /^5/.test(r.kode)), { tot: 1 });
+  const P = S(r => /^4/.test(r.kode)), Bl = S(r => /^5/.test(r.kode));
+  line(0, '', 'SURPLUS / (DEFISIT)', [r2(P[0] - Bl[0]), r2(P[1] - Bl[1])], { tot: 1 });
+  line(0, '6', 'PEMBIAYAAN', [0, 0], { head: 1, kosong: 1 });
+  [['6.1', 'Penerimaan Pembiayaan'], ['6.2', 'Pengeluaran Pembiayaan']].forEach(([k2, j]) => {
+    const R = rows.filter(r => r.kode.indexOf(k2) === 0);
+    line(1, k2, nm(k2) || j, S(r => r.kode.indexOf(k2) === 0), { bold: 1 });
+    Array.from(new Set(R.map(r => pre(r.kode, 3)))).sort().forEach(k3 => {
+      line(2, k3, nm(k3), S(r => pre(r.kode, 3) === k3));
+      if (rinci) R.filter(r => pre(r.kode, 3) === k3).forEach(r => line(3, r.kode, r.uraian || nm(r.kode), [Number(r.anggaran || 0), Number(r.realisasi || 0)], { kecil: 1 }));
+    });
+  });
+  const T1 = S(r => /^6\.1/.test(r.kode)), T2 = S(r => /^6\.2/.test(r.kode));
+  line(0, '', 'PEMBIAYAAN NETTO', [r2(T1[0] - T2[0]), r2(T1[1] - T2[1])], { tot: 1 });
+  line(0, '', 'SISA LEBIH / (KURANG) PEMBIAYAAN ANGGARAN', [r2(P[0] - Bl[0] + T1[0] - T2[0]), r2(P[1] - Bl[1] + T1[1] - T2[1])], { tot: 1 });
+  return out;
+}
+const keuBidangNama = k => ({ 1: 'Penyelenggaraan Pemerintahan Desa', 2: 'Pelaksanaan Pembangunan Desa', 3: 'Pembinaan Kemasyarakatan', 4: 'Pemberdayaan Masyarakat', 5: 'Penanggulangan Bencana, Darurat dan Mendesak Desa' })[k] || 'Lainnya';
+VIEWS.keulap = async (p, main, alive) => {
+  const st = S.lapSt = S.lapSt && S.lapSt.mode ? S.lapSt : { mode: 'smt1', sampai: '', rinci: false };
+  const th = keuTh(), sd = st.mode === 'smt1' ? th + '-06-30' : st.mode === 'smt2' ? th + '-12-31' : st.sampai;
+  const judul = st.mode === 'smt1' ? 'LAPORAN REALISASI PELAKSANAAN APBDES SEMESTER PERTAMA' : st.mode === 'smt2' ? 'LAPORAN REALISASI PELAKSANAAN APBDES SEMESTER AKHIR TAHUN' : 'LAPORAN REALISASI PELAKSANAAN APBDES';
+  const kolR = st.mode === 'smt1' ? 'Realisasi s.d. Semester I' : st.mode === 'smt2' ? 'Realisasi s.d. Semester II' : 'Realisasi' + (st.sampai ? ' s.d. ' + fDate(st.sampai) : '');
+  setTop('Laporan Realisasi APBDes', 'Tahun ' + th);
+  const [rows, rek] = await Promise.all([call('keuRealisasi', { tahun: th, sampai: sd }), S.rekNama ? Promise.resolve(null) : call('list', { entity: 'keu_rek', limit: 2000 })]);
+  if (!alive()) return;
+  if (rek) { S.rekNama = {}; rek.rows.forEach(x => { S.rekNama[x.kode] = x.uraian; }); }
+  const L = lapSusun(rows, S.rekNama, st.rinci);
+  const pc = (a, r) => Math.abs(a) >= 0.5 ? (r / a * 100).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + '%' : '-';
+  const isi = cetak => `<table class="${cetak ? 'pt' : 'tbl lap'}"><thead><tr><th>Kode Rek.</th><th>Uraian</th><th style="text-align:right">Anggaran (Rp)</th><th style="text-align:right">${esc(kolR)} (Rp)</th><th style="text-align:right">Lebih / (Kurang) (Rp)</th><th style="text-align:right">%</th></tr></thead><tbody>
+    ${L.map(l => `<tr class="${l.tot ? 'tot' : l.head ? 'sub' : ''}"><td class="mono" style="padding-left:${4 + l.lvl * 8}px">${esc(l.kode)}</td><td style="white-space:normal;padding-left:${4 + l.lvl * 10}px">${l.bold || l.head || l.tot ? '<b>' + esc(l.uraian) + '</b>' : l.kecil ? '<small>' + esc(l.uraian) + '</small>' : esc(l.uraian)}</td>${l.kosong ? '<td></td><td></td><td></td><td></td>' : `<td style="text-align:right">${l.tot || l.head ? '<b>' + rpS(l.a) + '</b>' : rpS(l.a)}</td><td style="text-align:right">${l.tot || l.head ? '<b>' + rpS(l.r) + '</b>' : rpS(l.r)}</td><td style="text-align:right">${rpS(l.r - l.a)}</td><td style="text-align:right">${pc(l.a, l.r)}</td>`}</tr>`).join('')}</tbody></table>`;
+  main.innerHTML = `<div class="stack">${thChips('lpTh')}
+    <div class="chips wrap">${[['smt1', 'Semester I (s.d. 30 Juni)'], ['smt2', 'Semester akhir (s.d. 31 Des)'], ['tgl', 'Sampai tanggal…']].map(c => `<button class="chip ${st.mode === c[0] ? 'on' : ''}" data-act="lpM" data-v="${c[0]}">${c[1]}</button>`).join('')}</div>
+    <div class="toolbar">${st.mode === 'tgl' ? `<label class="meta">Sampai tanggal <input type="date" class="inp" id="lpS" value="${esc(st.sampai)}" style="max-width:180px"></label>` : ''}<label class="meta"><input type="checkbox" id="lpR" ${st.rinci ? 'checked' : ''}> Rinci per rekening</label>
+      <button class="btn sm" data-act="lpPrint">${ic('print')}Cetak / PDF</button><button class="btn sm" data-act="lpXls">${ic('down')}Excel</button></div>
+    <div class="tbl-wrap">${isi()}</div><div class="meta">Format mengikuti Permendagri 20/2018: pendapatan per kelompok & jenis, belanja per bidang → kegiatan → jenis belanja, pembiayaan. Realisasi dihitung dari transaksi Pendapatan, Belanja (termasuk pencairan SPP) dan Pembiayaan.</div></div>`;
+  S.vh.lpTh = t => { S.keuTh = t.dataset.v; refresh(); };
+  S.vh.lpM = t => { st.mode = t.dataset.v; refresh(); };
+  if ($('#lpS')) $('#lpS').onchange = e => { st.sampai = e.target.value; refresh(); };
+  $('#lpR').onchange = e => { st.rinci = e.target.checked; refresh(); };
+  S.vh.lpPrint = () => printDocs('Laporan Realisasi', [`<div class="paper">${kop()}<h2>${judul}</h2><h3>PEMERINTAH DESA ${esc(String(S.set.nama_desa || '').toUpperCase())} TAHUN ANGGARAN ${esc(th)}${st.mode === 'tgl' && st.sampai ? ' — SAMPAI ' + esc(fDate(st.sampai).toUpperCase()) : ''}</h3>${isi(1)}${ttdKades(sd && sd < isoToday() ? sd : isoToday())}</div>`]);
+  S.vh.lpXls = () => keuXls(judul.replace('LAPORAN REALISASI PELAKSANAAN', 'Laporan Realisasi') + ' ' + th, [{ name: 'Realisasi', widths: [12, 60, 18, 18, 18, 8],
+    judul: [judul, 'PEMERINTAH DESA ' + String(S.set.nama_desa || '').toUpperCase(), 'TAHUN ANGGARAN ' + th + (sd ? ' (s.d. ' + fDate(sd) + ')' : '')],
+    kepala: ['Kode Rekening', 'Uraian', 'Anggaran (Rp)', kolR + ' (Rp)', 'Lebih/(Kurang) (Rp)', '%'],
+    baris: L.map(l => { const c = [l.kode, '  '.repeat(l.lvl) + l.uraian].concat(l.kosong ? ['', '', '', ''] : [l.a, l.r, l.r - l.a, Math.abs(l.a) >= 0.5 ? Math.round(l.r / l.a * 10000) / 100 : '']); return l.tot || l.head || l.bold ? c.map(v => ({ v, b: 1 })) : c; }) }]);
+};
+
+/* ---------- Rekap pajak per bulan (bahan SPT Masa) ---------- */
+const PAJAK_JENIS = ['PPN', 'PPh 21', 'PPh 22', 'PPh 23', 'PPh Final 4(2)', 'Pajak Daerah'];
+VIEWS.keupajak = async (p, main, alive) => {
+  const th = keuTh();
+  setTop('Rekap Pajak per Bulan', 'Tahun ' + th);
+  const d = await call('keuPajak', { tahun: th }); if (!alive()) return;
+  const J = PAJAK_JENIS.filter(j => d.rekap.some(r => r.pajak === j)).concat(Array.from(new Set(d.rekap.map(r => r.pajak))).filter(j => PAJAK_JENIS.indexOf(j) < 0));
+  const sel = (b, j, k) => d.rekap.filter(r => (!b || r.bulan === b) && (!j || r.pajak === j)).reduce((a, r) => a + Number(r[k] || 0), 0);
+  const bulan = BULAN.map((_, i) => String(i + 1).padStart(2, '0'));
+  const sisaTot = sel(null, null, 'dipungut') - sel(null, null, 'disetor');
+  const isi = cetak => `<table class="${cetak ? 'pt' : 'tbl'}"><thead><tr><th rowspan="2">Bulan</th>${J.map(j => `<th colspan="2" style="text-align:center">${esc(j)}</th>`).join('')}<th colspan="2" style="text-align:center">Jumlah</th></tr><tr>${J.concat(['']).map(() => '<th style="text-align:right">Dipungut</th><th style="text-align:right">Disetor</th>').join('')}</tr></thead><tbody>
+    ${bulan.map((b, i) => { const dp = sel(b, null, 'dipungut'), ds = sel(b, null, 'disetor'); return dp || ds ? `<tr><td>${BULAN[i]}</td>${J.map(j => `<td style="text-align:right">${sel(b, j, 'dipungut') ? rp(sel(b, j, 'dipungut')) : ''}</td><td style="text-align:right">${sel(b, j, 'disetor') ? rp(sel(b, j, 'disetor')) : ''}</td>`).join('')}<td style="text-align:right"><b>${rp(dp)}</b></td><td style="text-align:right"><b>${rp(ds)}</b></td></tr>` : ''; }).join('') || `<tr><td colspan="${J.length * 2 + 3}" style="text-align:center">Belum ada pungutan/setoran pajak.</td></tr>`}
+    <tr class="tot"><td><b>Jumlah</b></td>${J.map(j => `<td style="text-align:right"><b>${rp(sel(null, j, 'dipungut'))}</b></td><td style="text-align:right"><b>${rp(sel(null, j, 'disetor'))}</b></td>`).join('')}<td style="text-align:right"><b>${rp(sel(null, null, 'dipungut'))}</b></td><td style="text-align:right"><b>${rp(sel(null, null, 'disetor'))}</b></td></tr>
+    <tr><td>Belum disetor</td>${J.map(j => { const s = sel(null, j, 'dipungut') - sel(null, j, 'disetor'); return `<td colspan="2" style="text-align:right" class="${s > 0 ? 'wz-neg' : ''}">${s ? rpS(s) : '–'}</td>`; }).join('')}<td colspan="2" style="text-align:right" class="${sisaTot > 0 ? 'wz-neg' : ''}"><b>${rpS(sisaTot)}</b></td></tr></tbody></table>`;
+  const rinc = d.rincian.filter(r => r.jenis === 'Pajak Disetor');
+  main.innerHTML = `<div class="stack">${thChips('pjTh')}
+    <div class="kd-cash"><span>Dipungut <b class="num">${rp(sel(null, null, 'dipungut'))}</b></span><span>Disetor <b class="num">${rp(sel(null, null, 'disetor'))}</b></span><span class="${sisaTot > 0 ? 'warn' : ''}">Belum disetor <b class="num">${rpS(sisaTot)}</b></span></div>
+    <div class="toolbar"><button class="btn sm" data-act="pjPrint">${ic('print')}Cetak / PDF</button><button class="btn sm" data-act="pjXls">${ic('down')}Excel (rekap + rincian setoran)</button></div>
+    <div class="tbl-wrap">${isi()}</div>
+    <div class="sec-h"><h2>Setoran pajak (${rinc.length})</h2></div>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tanggal</th><th>Jenis</th><th>Uraian</th><th>NTPN / Bukti</th><th style="text-align:right">Jumlah</th></tr></thead><tbody>${rinc.map(r => `<tr><td>${esc(fDate(r.tanggal))}</td><td>${esc(r.pajak)}</td><td style="white-space:normal">${esc(r.uraian || '')}</td><td class="mono">${esc(r.ntpn || r.no_bukti || '')}</td><td style="text-align:right">${rp(r.jumlah)}</td></tr>`).join('') || '<tr><td colspan="5" class="meta">Belum ada setoran.</td></tr>'}</tbody></table></div>
+    <div class="meta">Dipungut = potongan saat SPP dicairkan / transaksi Pajak Dipungut. Disetor = transaksi Pajak Disetor (isi NTPN agar mudah dicocokkan saat lapor SPT Masa).</div></div>`;
+  S.vh.pjTh = t => { S.keuTh = t.dataset.v; refresh(); };
+  S.vh.pjPrint = () => printDocs('Rekap Pajak', [`<div class="paper land">${kop()}<h2>REKAPITULASI PAJAK PER BULAN</h2><h3>TAHUN ANGGARAN ${esc(th)}</h3>${isi(1)}${ttdKades(isoToday())}</div>`]);
+  S.vh.pjXls = () => {
+    const kep = ['Bulan'].concat(...J.map(j => [j + ' dipungut', j + ' disetor']), ['Jumlah dipungut', 'Jumlah disetor']);
+    const baris = bulan.map((b, i) => [BULAN[i]].concat(...J.map(j => [sel(b, j, 'dipungut'), sel(b, j, 'disetor')]), [sel(b, null, 'dipungut'), sel(b, null, 'disetor')]));
+    keuXls('Rekap Pajak ' + th, [
+      { name: 'Rekap', widths: [14].concat(J.flatMap(() => [16, 16]), [18, 18]), judul: ['REKAPITULASI PAJAK PER BULAN', 'DESA ' + String(S.set.nama_desa || '').toUpperCase(), 'TAHUN ANGGARAN ' + th], kepala: kep, baris,
+        tot: [['Jumlah'].concat(...J.map(j => [sel(null, j, 'dipungut'), sel(null, j, 'disetor')]), [sel(null, null, 'dipungut'), sel(null, null, 'disetor')])] },
+      { name: 'Rincian', widths: [12, 14, 14, 60, 22, 16], kepala: ['Tanggal', 'Transaksi', 'Jenis Pajak', 'Uraian', 'NTPN / No. Bukti', 'Jumlah (Rp)'],
+        baris: d.rincian.map(r => [fDate(r.tanggal), r.jenis, r.pajak, r.uraian || '', r.ntpn || r.no_bukti || '', Number(r.jumlah) || 0]) }]);
+  };
+};
+
+/* ---------- SPP + SPTJM + Rincian + Kuitansi (Word, template keu/keu_spp.docx) ---------- */
+/* pajak final SPP: hitung otomatis bila memakai Jenis Belanja; samakan ke SPP bila belum cair */
+async function sppHitung(x) {
+  let a = []; try { a = JSON.parse(x.rincian || '[]'); } catch (er) { }
+  const bruto = a.reduce((t, r) => t + mNum(r.jumlah), 0);
+  if (!bruto) throw new Error('Rincian SPP masih kosong.');
+  let t = null, note = '';
+  if (x.jenis_belanja && x.pajak_auto !== 'Tidak') {
+    t = hitungPajak({ nilai: bruto, jenis: x.jenis_belanja, pkp: x.pkp, npwp: x.npwp, kualifikasi: x.kualifikasi });
+    const beda = ['ppn', 'pph21', 'pph22', 'pph23', 'pph4'].some(k => Math.abs(mNum(x[k]) - t[k]) > 0.004);
+    if (beda && x.status !== 'Dicairkan' && canWrite('keu_spp')) {
+      x = await call('save', { entity: 'keu_spp', record: { id: x.id, ppn: String(t.ppn), pph21: String(t.pph21), pph22: String(t.pph22), pph23: String(t.pph23), pph4: String(t.pph4) } });
+      note = 'Nominal pajak di SPP diperbarui sesuai perhitungan otomatis.';
+    } else if (beda) { note = 'Catatan: SPP sudah dicairkan, dokumen memakai nominal pajak yang tercatat.'; t = null; }
+  }
+  const P = t ? { ppn: t.ppn, pph21: t.pph21, pph22: t.pph22, pph23: t.pph23, pph4: t.pph4 } : { ppn: mNum(x.ppn), pph21: mNum(x.pph21), pph22: mNum(x.pph22), pph23: mNum(x.pph23), pph4: mNum(x.pph4) };
+  P.daerah = mNum(x.pajak_daerah);
+  const L = [['PPN', P.ppn], ['PPh Pasal 21', P.pph21], ['PPh Pasal 22', P.pph22], ['PPh Pasal 23', P.pph23], ['PPh Final Pasal 4 ayat (2)', P.pph4], ['Pajak Daerah', P.daerah]].filter(r => r[1]);
+  const pot = L.reduce((s, r) => s + r[1], 0);
+  return { x, a, bruto, t, P, L, pot, netto: bruto - pot, note };
+}
+const rpTerbilang = n => { n = Number(n) || 0; const s = terbilang(Math.floor(n)).trim(); const c = Math.round(n % 1 * 100); return (s ? s.charAt(0).toUpperCase() + s.slice(1) : 'Nol') + ' rupiah' + (c ? ' ' + terbilang(c).trim() + ' sen' : ''); };
+async function sppWord(id) {
+  const m = modal('Membuat SPP', `<div class="stack"><div class="skel"></div><div class="meta">Mengisi template SPP, SPTJM, rincian & kuitansi…</div></div>`);
+  try {
+    const h = await sppHitung(await call('get', { entity: 'keu_spp', id })), x = h.x, s = S.set || {};
+    const [kades, sekdes, bend] = await Promise.all([s.nama_kades ? Promise.resolve(s.nama_kades) : namaKades(), namaJabatan('^\\s*sekretaris desa'), namaJabatan('bendahara|kaur keuangan')]);
+    const tgl = x.tanggal || isoToday();
+    const M = tambahU(Object.assign(petaDesa(), {
+      'Nomor SPP': x.no || TITIK, 'Tanggal SPP': dPanjang(tgl), Tahun: x.tahun || String(tgl).slice(0, 4), 'Jenis SPP': x.jenis || 'Definitif',
+      Bidang: (x.bidang || x.kode_bidang) ? [x.kode_bidang, namaBidang(x.bidang || '')].filter(Boolean).join('. ') : (x.kode_kegiatan ? String(x.kode_kegiatan).split('.')[0] + '. ' + keuBidangNama(String(x.kode_kegiatan).split('.')[0]) : '-'), 'Kode Kegiatan': x.kode_kegiatan || '', Kegiatan: x.kegiatan || '-',
+      Uraian: x.uraian || '', Penerima: x.penerima || TITIK, NPWP: x.npwp || '-', 'Jenis Belanja': x.jenis_belanja || '-',
+      Jumlah: rp(h.bruto), 'Jumlah Angka': mFmt(h.bruto), Terbilang: rpTerbilang(h.bruto), Potongan: rp(h.pot), Netto: rp(h.netto), 'Netto Angka': mFmt(h.netto), 'Terbilang Netto': rpTerbilang(h.netto),
+      'Tanggal Cair': dPanjang(x.tgl_cair || tgl), 'Kepala Desa': kades || TITIK, 'Sekretaris Desa': sekdes || TITIK, Bendahara: bend || TITIK,
+      PKA: x.pka || TITIK, 'Jabatan PKA': x.pka_jabatan || 'Pelaksana Kegiatan Anggaran'
+    }));
+    const rows = [
+      { key: 'R No', items: h.a.map((r, i) => ({ 'R No': String(i + 1), 'R Kode': String(r.rek || '').split(' ')[0], 'R Uraian': r.uraian || String(r.rek || '').replace(/^\S+\s*/, ''), 'R Sumber': r.sumber || '', 'R Jumlah': mFmt(r.jumlah) })) },
+      { key: 'P Jenis', items: h.L.map(r => ({ 'P Jenis': r[0] + (h.t && h.t.dpp !== h.bruto && r[0] !== 'PPh Pasal 21' ? ' (DPP ' + mFmt(h.t.dpp) + ')' : ''), 'P Jumlah': mFmt(r[1]) })), empty: { 'P Jenis': 'Tidak ada potongan pajak', 'P Jumlah': '-' } }
+    ];
+    hasilDokumen(m, await buatDokumen({ path: 'keu/keu_spp.docx', M, rows, jenis: 'surat', nama: 'SPP ' + (x.no || '') + ' - ' + (x.uraian || '').slice(0, 60) }));
+    if (h.note) toast(h.note);
+  } catch (er) { m.body.innerHTML = `<div class="err">${esc(er.message)}</div>`; }
+}
+ACT.sppWord = t => sppWord(t.dataset.id);
 VIEWS.keubuku = async (p, main, alive) => {
   const st = S.bukuSt = S.bukuSt || { buku: 'BKU', bulan: '' };
   setTop({ BKU: 'Buku Kas Umum', Bank: 'Buku Bank', Tunai: 'Buku Kas Tunai', Pajak: 'Buku Pembantu Pajak' }[st.buku], 'Tahun ' + keuTh());
@@ -3126,34 +3321,13 @@ VIEWS.keubuku = async (p, main, alive) => {
     <tr><td colspan="3"><b>Jumlah</b></td><td style="text-align:right"><b>${rp(d.rows.reduce((a, r) => a + r.masuk, 0))}</b></td><td style="text-align:right"><b>${rp(d.rows.reduce((a, r) => a + r.keluar, 0))}</b></td><td style="text-align:right"><b>${rp(d.rows.length ? d.rows[d.rows.length - 1].saldo : d.awal)}</b></td></tr></tbody></table>`;
   main.innerHTML = `<div class="stack">${thChips('bkTh')}
     <div class="chips">${['BKU', 'Bank', 'Tunai', 'Pajak'].map(b => `<button class="chip ${st.buku === b ? 'on' : ''}" data-act="bkB" data-v="${b}">${{ BKU: 'Kas Umum', Bank: 'Bank', Tunai: 'Tunai', Pajak: 'Pajak' }[b]}</button>`).join('')}</div>
-    <div class="toolbar"><select class="inp" id="bkM" style="max-width:200px"><option value="">Satu tahun</option>${BULAN.map((b, i) => `<option value="${String(i + 1).padStart(2, '0')}" ${st.bulan === String(i + 1).padStart(2, '0') ? 'selected' : ''}>${b}</option>`).join('')}</select><button class="btn sm" data-act="bkPrint">${ic('print')}Cetak</button></div>
+    <div class="toolbar"><select class="inp" id="bkM" style="max-width:200px"><option value="">Satu tahun</option>${BULAN.map((b, i) => `<option value="${String(i + 1).padStart(2, '0')}" ${st.bulan === String(i + 1).padStart(2, '0') ? 'selected' : ''}>${b}</option>`).join('')}</select><button class="btn sm" data-act="bkPrint">${ic('print')}Cetak / PDF</button><button class="btn sm" data-act="bkXls">${ic('down')}Excel</button></div>
     <div class="tbl-wrap">${tbl()}</div></div>`;
   S.vh.bkTh = t => { S.keuTh = t.dataset.v; refresh(); };
   S.vh.bkB = t => { st.buku = t.dataset.v; refresh(); };
   $('#bkM').onchange = e => { st.bulan = e.target.value; refresh(); };
+  S.vh.bkXls = () => bukuXls(d, st);
   S.vh.bkPrint = () => printDocs('Buku', [`<div class="paper land">${kop()}<h2>${esc({ BKU: 'BUKU KAS UMUM', Bank: 'BUKU BANK DESA', Tunai: 'BUKU KAS TUNAI', Pajak: 'BUKU KAS PEMBANTU PAJAK' }[st.buku])}</h2><h3>TAHUN ANGGARAN ${esc(keuTh())}${st.bulan ? ' — BULAN ' + BULAN[Number(st.bulan) - 1].toUpperCase() : ''}</h3>${tbl(1)}${ttdKades(isoToday())}</div>`]);
-};
-VIEWS.keulap = async (p, main, alive) => {
-  const st = S.lapSt = S.lapSt || { sampai: '' };
-  setTop('Laporan Realisasi APBDes', 'Tahun ' + keuTh());
-  const rows = await call('keuRealisasi', { tahun: keuTh(), sampai: st.sampai }); if (!alive()) return;
-  const sum = (f, k) => rows.filter(f).reduce((a, r) => a + Number(r[k] || 0), 0);
-  const line = (r, ind) => `<tr><td class="mono" style="padding-left:${ind}px">${esc(r.kode || '')}</td><td style="white-space:normal">${esc(r.uraian || '')}</td><td style="text-align:right">${rp(r.anggaran)}</td><td style="text-align:right">${rp(r.realisasi)}</td><td style="text-align:right">${rpS(r.realisasi - r.anggaran)}</td><td style="text-align:right">${r.anggaran ? (r.realisasi / r.anggaran * 100).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + '%' : '-'}</td></tr>`;
-  const tot = (lbl, f) => { const a = sum(f, 'anggaran'), z = sum(f, 'realisasi'); return `<tr class="tot"><td></td><td><b>${esc(lbl)}</b></td><td style="text-align:right"><b>${rp(a)}</b></td><td style="text-align:right"><b>${rp(z)}</b></td><td style="text-align:right"><b>${rpS(z - a)}</b></td><td style="text-align:right"><b>${a ? (z / a * 100).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + '%' : '-'}</b></td></tr>`; };
-  const pend = rows.filter(r => /^4/.test(r.kode)), bel = rows.filter(r => /^5/.test(r.kode)), pb1 = rows.filter(r => /^6\.1/.test(r.kode)), pb2 = rows.filter(r => /^6\.2/.test(r.kode));
-  const kg = {}; bel.forEach(r => { const k = (r.kode_kegiatan || '') + '|' + (r.kegiatan || '(tanpa kegiatan)'); (kg[k] = kg[k] || []).push(r); });
-  const belH = Object.keys(kg).sort().map(k => { const [kk, nm] = k.split('|'), rr = kg[k]; return `<tr class="sub"><td class="mono">${esc(kk)}</td><td colspan="5"><b>${esc(nm)}</b></td></tr>` + rr.map(r => line(r, 14)).join(''); }).join('');
-  const isi = cetak => `<table class="${cetak ? 'pt' : 'tbl lap'}"><thead><tr><th>Kode</th><th>Uraian</th><th style="text-align:right">Anggaran</th><th style="text-align:right">Realisasi</th><th style="text-align:right">Lebih/(Kurang)</th><th style="text-align:right">%</th></tr></thead><tbody>
-    <tr class="sub"><td class="mono">4</td><td colspan="5"><b>PENDAPATAN</b></td></tr>${pend.map(r => line(r, 6)).join('')}${tot('Jumlah Pendapatan', r => /^4/.test(r.kode))}
-    <tr class="sub"><td class="mono">5</td><td colspan="5"><b>BELANJA</b></td></tr>${belH}${tot('Jumlah Belanja', r => /^5/.test(r.kode))}
-    <tr class="tot"><td></td><td><b>SURPLUS / (DEFISIT)</b></td><td style="text-align:right"><b>${rpS(sum(r => /^4/.test(r.kode), 'anggaran') - sum(r => /^5/.test(r.kode), 'anggaran'))}</b></td><td style="text-align:right"><b>${rpS(sum(r => /^4/.test(r.kode), 'realisasi') - sum(r => /^5/.test(r.kode), 'realisasi'))}</b></td><td></td><td></td></tr>
-    <tr class="sub"><td class="mono">6</td><td colspan="5"><b>PEMBIAYAAN</b></td></tr>${pb1.map(r => line(r, 6)).join('')}${tot('Jumlah Penerimaan Pembiayaan', r => /^6\.1/.test(r.kode))}${pb2.map(r => line(r, 6)).join('')}${tot('Jumlah Pengeluaran Pembiayaan', r => /^6\.2/.test(r.kode))}
-    </tbody></table>`;
-  main.innerHTML = `<div class="stack">${thChips('lpTh')}<div class="toolbar"><label class="meta">Sampai tanggal <input type="date" class="inp" id="lpS" value="${esc(st.sampai)}" style="max-width:180px"></label><button class="btn sm" data-act="lpPrint">${ic('print')}Cetak</button></div>
-    <div class="tbl-wrap">${isi()}</div><div class="meta">Realisasi dihitung dari transaksi Pendapatan, Belanja (termasuk pencairan SPP) dan Pembiayaan pada menu Penerimaan/SPP.</div></div>`;
-  S.vh.lpTh = t => { S.keuTh = t.dataset.v; refresh(); };
-  $('#lpS').onchange = e => { st.sampai = e.target.value; refresh(); };
-  S.vh.lpPrint = () => printDocs('Laporan Realisasi', [`<div class="paper">${kop()}<h2>LAPORAN REALISASI PELAKSANAAN APBDES</h2><h3>TAHUN ANGGARAN ${esc(keuTh())}${st.sampai ? ' — SAMPAI ' + esc(fDate(st.sampai).toUpperCase()) : ''}</h3>${isi(1)}${ttdKades(st.sampai || isoToday())}</div>`]);
 };
 ACT.keuCair = async t => {
   const box = t.closest('.xacts'); t.disabled = true;
@@ -3653,8 +3827,8 @@ async function tplAmbil(path) {
     const r = await callBerkas('tplGet', { path });
     const res = await fetch(r.url).catch(() => null);
     if (res && res.ok) return res.arrayBuffer();
-  } catch (x) { if (!/^naskah_/.test(nm)) throw x; }
-  const bawaan = /^naskah_/.test(nm) ? await naskahBawaan(nm) : null;
+  } catch (x) { if (NX.nama.indexOf(nm) < 0) throw x; }
+  const bawaan = NX.nama.indexOf(nm) >= 0 ? await naskahBawaan(nm) : null;
   if (bawaan) return bawaan.arrayBuffer();
   throw new Error('Template "' + path.split('/').pop() + '" belum ada atau gagal diunduh.');
 }
@@ -3730,6 +3904,54 @@ const NX = (() => {
     naskah_sk_bpd: () => [...kop(), C('KEPUTUSAN BADAN PERMUSYAWARATAN DESA {{Desa_U}}', { bold: 1 }), C('NOMOR : {{Nomor}}', { bold: 1, after: 120 }), C('TENTANG', { bold: 1 }), C('{{Tentang_U}}', { bold: 1, after: 200 }),
       C('BADAN PERMUSYAWARATAN DESA {{Desa_U}},', { bold: 1, after: 200 }), ...kons(1), ...tetapkan('KEPUTUSAN BADAN PERMUSYAWARATAN DESA'), ...ditetapkan('KETUA BADAN PERMUSYAWARATAN DESA {{Desa_U}},', '{{Ketua BPD_U}}'), ...tembusan()]
   });
+  /* Keuangan: SPP + Pernyataan Tanggung Jawab Belanja (SPTJM) + Lampiran Rincian + Kuitansi (Permendagri 20/2018) */
+  const PB = '<w:p><w:r><w:br w:type="page"/></w:r></w:p>';
+  const kv = (rows, ind) => tbl([2600, 250, W - 2850 - (ind || 0)], rows, ind || 0);
+  const ttd = (judul, nama, o) => [C(judul, { after: (o && o.after) || 1000 }), C(nama, { bold: 1, u: 1 })];
+  T.keu_spp = () => [
+    ...kop(),
+    C('SURAT PERMINTAAN PEMBAYARAN (SPP)', { bold: 1, size: 26 }), C('Nomor : {{Nomor SPP}}'), C('Tahun Anggaran {{Tahun}}', { after: 240 }),
+    kv([['Jenis SPP', ':', '{{Jenis SPP}}'], ['Bidang', ':', '{{Bidang}}'], ['Kegiatan', ':', '{{Kode Kegiatan}} {{Kegiatan}}'], ['Untuk keperluan', ':', '{{Uraian}}'],
+      ['Penerima', ':', '{{Penerima}}'], ['NPWP / NIK', ':', '{{NPWP}}'], ['Jumlah pembayaran', ':', [P([r('{{Jumlah}}', { bold: 1 })], { after: 40, al: 'L' })]],
+      ['Terbilang', ':', [P([r('{{Terbilang}}', { i: 1 })], { after: 40, al: 'L' })]], ['Potongan pajak', ':', '{{Potongan}}'], ['Jumlah diterima', ':', '{{Netto}}']]),
+    P('Kepada Yth. Kepala Desa {{Desa}} selaku Pemegang Kekuasaan Pengelolaan Keuangan Desa. Bersama ini kami mengajukan permintaan pembayaran sebagaimana tersebut di atas dengan rincian terlampir.', { before: 200, ind: 1 }),
+    P('{{Desa}}, {{Tanggal SPP}}', { al: 'R', before: 120, after: 120 }),
+    tbl([4680, 4680], [[ttd('Pelaksana Kegiatan Anggaran,', '{{PKA_U}}'), ttd('Telah diverifikasi Sekretaris Desa,', '{{Sekretaris Desa_U}}')],
+      [[P('', { after: 200 }), C('Disetujui untuk dibayar,'), C('Kepala Desa {{Desa}},', { after: 1000 }), C('{{Kepala Desa_U}}', { bold: 1, u: 1 })], [P('', { after: 200 }), C('Telah dibayar,'), C('Bendahara Desa,', { after: 1000 }), C('{{Bendahara_U}}', { bold: 1, u: 1 })]]]),
+    PB,
+    ...kop(),
+    C('PERNYATAAN TANGGUNG JAWAB BELANJA', { bold: 1, u: 1, size: 26 }), C('Nomor : {{Nomor SPP}}', { after: 240 }),
+    P('Yang bertanda tangan di bawah ini:'),
+    kv([['Nama', ':', '{{PKA}}'], ['Jabatan', ':', '{{Jabatan PKA}}'], ['Kegiatan', ':', '{{Kode Kegiatan}} {{Kegiatan}}'], ['Tahun Anggaran', ':', '{{Tahun}}']], 720),
+    P('menyatakan bahwa saya bertanggung jawab penuh atas segala pengeluaran yang telah dibayar lunas oleh Bendahara Desa kepada yang berhak menerima sebesar {{Jumlah}} ({{Terbilang}}) untuk keperluan {{Uraian}}, dengan rincian sebagaimana terlampir.', { before: 120, ind: 1 }),
+    P('Bukti-bukti belanja tersebut di atas disimpan sesuai ketentuan yang berlaku untuk kelengkapan administrasi dan keperluan pemeriksaan aparat pengawas fungsional.', { ind: 1 }),
+    P('Apabila di kemudian hari terbukti pernyataan ini tidak benar, saya bersedia bertanggung jawab sesuai ketentuan peraturan perundang-undangan.', { ind: 1 }),
+    P('Demikian surat pernyataan ini dibuat dengan sebenarnya.', { ind: 1 }),
+    tbl([4680, 4680], [[[], [C('{{Desa}}, {{Tanggal SPP}}'), C('Yang menyatakan,'), C('{{Jabatan PKA}},', { after: 300 }), C('Meterai Rp10.000', { size: 18, i: 1, after: 500 }), C('{{PKA_U}}', { bold: 1, u: 1 })]]]),
+    PB,
+    C('LAMPIRAN SPP NOMOR {{Nomor SPP}}', { size: 20 }), C('RINCIAN PERMINTAAN PEMBAYARAN', { bold: 1, size: 26, after: 120 }),
+    kv([['Kegiatan', ':', '{{Kode Kegiatan}} {{Kegiatan}}'], ['Untuk keperluan', ':', '{{Uraian}}'], ['Tahun Anggaran', ':', '{{Tahun}}']]),
+    P('', { after: 120 }),
+    tbl([600, 1700, 4160, 1100, 1800], [[[C('No.', { bold: 1 })], [C('Kode Rekening', { bold: 1 })], [C('Uraian', { bold: 1 })], [C('Sumber', { bold: 1 })], [C('Jumlah (Rp)', { bold: 1 })]],
+      [[C('{{R No}}')], [L('{{R Kode}}')], [L('{{R Uraian}}')], [C('{{R Sumber}}')], [P('{{R Jumlah}}', { al: 'R', after: 0 })]],
+      [[C('')], [L('')], [L('JUMLAH', { bold: 1 })], [C('')], [P([r('{{Jumlah Angka}}', { bold: 1 })], { al: 'R', after: 0 })]]], 0, 1),
+    P('Potongan pajak', { before: 200, after: 80, al: 'L' }),
+    tbl([6660, 2700], [[[L('Jenis potongan', { bold: 1 })], [P([r('Jumlah (Rp)', { bold: 1 })], { al: 'R', after: 0 })]],
+      [[L('{{P Jenis}}')], [P('{{P Jumlah}}', { al: 'R', after: 0 })]],
+      [[L('Jumlah potongan', { bold: 1 })], [P([r('{{Potongan}}', { bold: 1 })], { al: 'R', after: 0 })]],
+      [[L('Jumlah diterima (netto)', { bold: 1 })], [P([r('{{Netto}}', { bold: 1 })], { al: 'R', after: 0 })]]], 0, 1),
+    tbl([4680, 4680], [[[], [P('', { after: 200 }), C('{{Desa}}, {{Tanggal SPP}}'), C('Pelaksana Kegiatan Anggaran,', { after: 1000 }), C('{{PKA_U}}', { bold: 1, u: 1 })]]]),
+    PB,
+    ...kop(),
+    C('KUITANSI / BUKTI PEMBAYARAN', { bold: 1, size: 26 }), C('Nomor : {{Nomor SPP}}', { after: 240 }),
+    kv([['Sudah terima dari', ':', 'Bendahara Desa {{Desa}}'], ['Uang sejumlah', ':', [P([r('{{Jumlah}}', { bold: 1 })], { after: 0, al: 'L' }), P([r('({{Terbilang}})', { i: 1 })], { after: 40, al: 'L' })]],
+      ['Untuk pembayaran', ':', '{{Uraian}} — Kegiatan {{Kegiatan}}, Tahun Anggaran {{Tahun}}'], ['Potongan pajak', ':', '{{Potongan}}'], ['Jumlah diterima', ':', [P([r('{{Netto}}', { bold: 1 })], { after: 40, al: 'L' })]]]),
+    P('{{Desa}}, {{Tanggal Cair}}', { al: 'R', before: 200, after: 120 }),
+    tbl([2340, 2340, 2340, 2340], [[[C('Mengetahui,'), C('Kepala Desa,', { after: 1000 }), C('{{Kepala Desa_U}}', { bold: 1, u: 1 })],
+      [C('Pelaksana Kegiatan'), C('Anggaran,', { after: 1000 }), C('{{PKA_U}}', { bold: 1, u: 1 })],
+      [C('Lunas dibayar,'), C('Bendahara Desa,', { after: 1000 }), C('{{Bendahara_U}}', { bold: 1, u: 1 })],
+      [C('Yang menerima,'), C(' ', { after: 1000 }), C('{{Penerima_U}}', { bold: 1, u: 1 })]]])
+  ];
   const DOC = body => `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"><w:body>${body}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1000" w:right="1134" w:bottom="1134" w:left="1560" w:header="709" w:footer="709" w:gutter="0"/></w:sectPr></w:body></w:document>`;
   const PKG = {
     '[Content_Types].xml': '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>',
@@ -4205,6 +4427,10 @@ VIEWS.template = async (p, main) => {
     <div class="list">${naskahDaftar.map(([path, label]) => { const x = list.find(y => y.path === path); return `<div class="it"><div class="row" style="cursor:default"><span class="av">${ic('file')}</span><span class="main"><span class="t">${esc(label)}</span><span class="s">${x ? 'Template sendiri · ' + Math.round(x.size / 1024) + ' KB' : 'Template bawaan'}</span></span></div>
       <div class="btns xacts"><button class="btn sm" data-act="tplDlN" data-p="${esc(path)}">${ic('eye')}Unduh untuk diedit</button><button class="btn sm" data-act="tplUpBtn" data-p="${esc(path)}">${ic('plus')}Ganti</button>${x ? `<button class="btn sm danger" data-act="tplDelBtn" data-p="${esc(path)}">${ic('trash')}Kembali ke bawaan</button>` : ''}</div></div>`; }).join('')}</div>
     <div class="card meta" style="line-height:1.7"><b>Tanda Surat Keluar & Produk Hukum:</b> ${TAG_NASKAH.map(t => '{{' + esc(t) + '}}').join(' ')}<br>Menimbang, Mengingat, Isi, Isi Surat, Tembusan, Yang Ditugaskan: tulis tanda sendirian dalam satu paragraf, maka setiap baris isian menjadi paragraf baru.</div>
+    <div class="sec-h"><h2>Keuangan</h2></div>
+    <div class="list">${[['keu/keu_spp.docx', 'SPP + Pernyataan Tanggung Jawab Belanja + Rincian + Kuitansi']].map(([path, label]) => { const x = list.find(y => y.path === path); return `<div class="it"><div class="row" style="cursor:default"><span class="av">${ic('file')}</span><span class="main"><span class="t">${esc(label)}</span><span class="s">${x ? 'Template sendiri · ' + Math.round(x.size / 1024) + ' KB' : 'Template bawaan'}</span></span></div>
+      <div class="btns xacts"><button class="btn sm" data-act="tplDlN" data-p="${esc(path)}">${ic('eye')}Unduh untuk diedit</button><button class="btn sm" data-act="tplUpBtn" data-p="${esc(path)}">${ic('plus')}Ganti</button>${x ? `<button class="btn sm danger" data-act="tplDelBtn" data-p="${esc(path)}">${ic('trash')}Kembali ke bawaan</button>` : ''}</div></div>`; }).join('')}</div>
+    <div class="card meta" style="line-height:1.7"><b>Tanda SPP:</b> ${['Desa', 'Kecamatan', 'Kabupaten', 'Nomor SPP', 'Tanggal SPP', 'Tanggal Cair', 'Tahun', 'Jenis SPP', 'Bidang', 'Kode Kegiatan', 'Kegiatan', 'Uraian', 'Penerima', 'NPWP', 'Jenis Belanja', 'Jumlah', 'Jumlah Angka', 'Terbilang', 'Potongan', 'Netto', 'Netto Angka', 'Terbilang Netto', 'Kepala Desa', 'Sekretaris Desa', 'Bendahara', 'PKA', 'Jabatan PKA'].map(t => '{{' + t + '}}').join(' ')}<br>Baris rincian (diulang per rekening): {{R No}} {{R Kode}} {{R Uraian}} {{R Sumber}} {{R Jumlah}} · baris potongan: {{P Jenis}} {{P Jumlah}}. Tambahkan _U untuk huruf besar, mis. {{Kepala Desa_U}}.</div>
     <div class="sec-h"><h2>RKP Desa</h2><span class="btns"><button class="btn sm" data-act="tplUpBtn" data-p="rkp/">${ic('plus')}Tambah template</button><button class="btn sm" data-act="tplImpor">${ic('folder')}Ambil dari Google Drive</button></span></div>
     <div class="list">${list.filter(x => x.path.indexOf('rkp/') === 0).map(x => baris(x.path)).join('') || '<div class="card meta">Belum ada. Tekan "Ambil dari Google Drive" untuk memindahkan template Google Docs lama.</div>'}</div>
     <div class="sec-h"><h2>Draf KK</h2></div><div class="list">${baris('kk/draf_kk.docx', 'Draf Formulir KK (Word)')}${baris(KK_LATAR, 'Gambar latar Draf KK (JPG, A4 melintang 300 dpi) — dipakai untuk pratinjau, PDF & cetak')}</div>
