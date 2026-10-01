@@ -396,7 +396,13 @@ function fDate(s, short) {
   return d.getDate() + ' ' + (short ? BULAN[d.getMonth()].slice(0, 3) : BULAN[d.getMonth()]) + ' ' + d.getFullYear();
 }
 function fDay(s) { const d = parseD(s); return d ? HARI[d.getDay()] + ', ' + fDate(s) : ''; }
-function fMoney(v) { const n = Number(String(v || '').replace(/[^\d-]/g, '')); return v === '' || v == null || isNaN(n) ? '' : 'Rp ' + n.toLocaleString('id-ID'); }
+/* uang: disimpan kanonik "1234567.89" (titik desimal); tampil "1.234.567,89" */
+function mNum(v) { const s = String(v == null ? '' : v).trim(); if (/^-?\d+(\.\d+)?$/.test(s)) return Number(s); if (s.indexOf(',') >= 0) return Number(s.replace(/[^\d,-]/g, '').replace(',', '.')) || 0; return Number(s.replace(/[^\d-]/g, '')) || 0; }
+function mVal(s) { s = String(s || '').trim(); if (!s) return ''; if (/^-?\d+(\.\d+)?$/.test(s) && !/^\d{1,3}(\.\d{3})+$/.test(s)) return s; const n = mNum(s); return String(Math.round(n * 100) / 100); }
+const mFmt = v => v === '' || v == null ? '' : mNum(v).toLocaleString('id-ID', { maximumFractionDigits: 2 });
+function liveMoney(el) { let s = el.value.replace(/[^\d,]/g, ''); const i = s.indexOf(','); let a = i < 0 ? s : s.slice(0, i); const b = i < 0 ? null : s.slice(i + 1).replace(/,/g, '').slice(0, 2); a = a.replace(/^0+(?=\d)/, ''); el.value = (a ? Number(a).toLocaleString('id-ID') : (b != null ? '0' : '')) + (b != null ? ',' + b : ''); }
+const mIn = el => mVal(String(el.value || '').replace(/\./g, '').replace(',', '.'));
+function fMoney(v) { return v === '' || v == null || isNaN(mNum(v)) ? '' : 'Rp ' + mFmt(v); }
 function nOnly(v) { return String(v || '').replace(/[^\d]/g, ''); }
 function umur(s) { const d = parseD(s); if (!d) return ''; const t = new Date(); let a = t.getFullYear() - d.getFullYear(); if (t.getMonth() < d.getMonth() || (t.getMonth() === d.getMonth() && t.getDate() < d.getDate())) a--; return a; }
 function initials(n) { return String(n || '?').replace(/[,.].*$/, '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase(); }
@@ -492,7 +498,7 @@ const OPT = {
   asal: ['Dibeli sendiri', 'Bantuan Pemerintah', 'Bantuan Provinsi', 'Bantuan Kabupaten', 'Sumbangan', 'Hibah'],
   sumber: ['Dana Desa', 'Alokasi Dana Desa', 'PADesa', 'Bagi Hasil Pajak', 'Bantuan Provinsi', 'Bantuan Kabupaten', 'Pemda Kabupaten', 'Pemerintah Provinsi', 'Kementerian', 'Swadaya', 'Lainnya'],
   jenisPerdes: ['Peraturan Desa'],
-  sumberDana: ['DDS', 'ADD', 'PBH', 'PAD', 'BKK', 'BKP', 'SILPA', 'DLL'],
+  sumberDana: ['DDS', 'ADD', 'PBH', 'PAD', 'PBK', 'PBP', 'SWD', 'DLL'],
   jenisTrans: ['Pendapatan', 'Penerimaan Pembiayaan', 'Pajak Disetor', 'Mutasi Kas', 'Saldo Awal', 'Belanja', 'Pengeluaran Pembiayaan', 'Pajak Dipungut'],
   jenisKeluar: ['Surat Biasa', 'Surat Undangan', 'Surat Pemberitahuan', 'Surat Permohonan', 'Surat Pengantar', 'Surat Tugas', 'Surat Kuasa', 'Surat Edaran', 'Surat Rekomendasi', 'Pengumuman', 'Berita Acara'],
   kka: ['400.10.2.2', '000.1.6', '100.3.3', '100.3.4', '400.10.3.1', '400.10.7', '400.9.12.5', '500.6', '900.1'],
@@ -733,23 +739,23 @@ const UI = {
       F('uraian_output', 'Uraian Output'), F('sumber_dana', 'Sumber Dana', 'select', { opt: OPT.sumber, req: 1 }), F('kementerian', 'Kementerian / OPD'), F('sdgs', 'Tujuan SDGs Desa', 'sdgs', { wide: 1 }),
       F('tahun_pelaksanaan', 'Tahun Pelaksanaan', 'number'), F('lokasi', 'Lokasi Kegiatan'), F('dusun', 'Dusun', 'select', { opt: OPT.dusun }), F('rt', 'RT'), F('rw', 'RW'),
       F('volume', 'Volume', 'number'), F('satuan', 'Satuan', 'text', { list: ['Paket', 'Unit', 'Kegiatan', 'Orang', 'OB (Orang/Bulan)', 'Kali', 'M', 'M2', 'M3'] }), F('harga_satuan', 'Harga Satuan', 'money'), F('total', 'Total Pagu Dana', 'money', { hint: 'Terhitung otomatis dari volume × harga' }), F('ket', 'Keterangan', 'text', { wide: 1 })],
-    calc: (v) => { const t = Number(nOnly(v.volume)) * Number(nOnly(v.harga_satuan)); return t ? { total: String(t) } : null; },
+    calc: (v) => { const t = Number(String(v.volume || '').replace(',', '.')) * mNum(v.harga_satuan); return t ? { total: String(t) } : null; },
     row: r => ({ t: r.kegiatan, s: [r.bidang, r.sumber_dana, r.lokasi].filter(Boolean).join(' · '), r: fMoney(r.total), av: `<span class="mono">${esc(r.kode_bidang || '–')}</span>` }),
     print: {
       title: 'DAFTAR RENCANA PROGRAM DAN KEGIATAN YANG MASUK KE DESA', land: 1, form: 'Form 04',
       cols: [['Bidang / Kegiatan', r => '<b>' + esc(r.bidang) + '</b><br>' + esc(r.kegiatan)], ['Sumber Dana', 'sumber_dana'], ['SDGs', 'sdgs'], ['Lokasi', r => [r.lokasi, r.dusun && r.dusun.replace('DUSUN ', ''), r.rt && 'RT ' + r.rt, r.rw && 'RW ' + r.rw].filter(Boolean).join(', ')], ['Volume', r => (r.volume || '') + ' ' + (r.satuan || '')], ['Harga Satuan', r => fMoney(r.harga_satuan)], ['Total Pagu', r => fMoney(r.total)]],
-      foot: rows => ['Jumlah', '', '', '', '', '', fMoney(rows.reduce((a, r) => a + Number(nOnly(r.total)), 0))]
+      foot: rows => ['Jumlah', '', '', '', '', '', fMoney(rows.reduce((a, r) => a + mNum(r.total), 0))]
     }
   },
   rkp_pembiayaan: {
     t: 'Rencana Pembiayaan Desa (Form 05)', ic: 'coin', perm: 'perencanaan', rkp: 1,
     fields: [F('kegiatan', 'Program / Kegiatan', 'refpick', { req: 1, wide: 1 }), F('kode_bidang', 'Kode Bidang', 'text', { mono: 1 }), F('bidang', 'Bidang'),
       F('padesa', 'PADesa', 'money'), F('dd', 'Dana Desa', 'money'), F('add', 'Alokasi Dana Desa', 'money'), F('bhp', 'Bagi Hasil Pajak & Retribusi', 'money'), F('bk_prov', 'Bantuan Keuangan Provinsi', 'money'), F('bk_kab', 'Bantuan Keuangan Kabupaten', 'money'), F('lainnya', 'Pendapatan Lainnya', 'money'), F('ket', 'Keterangan', 'text', { wide: 1 })],
-    row: r => ({ t: r.kegiatan, s: r.bidang, r: fMoney(['padesa', 'dd', 'add', 'bhp', 'bk_prov', 'bk_kab', 'lainnya'].reduce((a, k) => a + Number(nOnly(r[k])), 0)), av: `<span class="mono">${esc(r.kode_bidang || '–')}</span>` }),
+    row: r => ({ t: r.kegiatan, s: r.bidang, r: fMoney(['padesa', 'dd', 'add', 'bhp', 'bk_prov', 'bk_kab', 'lainnya'].reduce((a, k) => a + mNum(r[k]), 0)), av: `<span class="mono">${esc(r.kode_bidang || '–')}</span>` }),
     print: {
       title: 'DATA DAN INFORMASI RENCANA PEMBIAYAAN PEMBANGUNAN DESA', land: 1, form: 'Form 05',
       cols: [['Bidang / Kegiatan', r => '<b>' + esc(r.bidang) + '</b><br>' + esc(r.kegiatan)], ['PADesa', r => fMoney(r.padesa)], ['Dana Desa', r => fMoney(r.dd)], ['ADD', r => fMoney(r.add)], ['BHP', r => fMoney(r.bhp)], ['BK Prov', r => fMoney(r.bk_prov)], ['BK Kab', r => fMoney(r.bk_kab)], ['Lainnya', r => fMoney(r.lainnya)]],
-      foot: rows => ['Jumlah'].concat(['padesa', 'dd', 'add', 'bhp', 'bk_prov', 'bk_kab', 'lainnya'].map(k => fMoney(rows.reduce((a, r) => a + Number(nOnly(r[k])), 0))))
+      foot: rows => ['Jumlah'].concat(['padesa', 'dd', 'add', 'bhp', 'bk_prov', 'bk_kab', 'lainnya'].map(k => fMoney(rows.reduce((a, r) => a + mNum(r[k]), 0))))
     }
   },
   ref_bidang: {
@@ -840,7 +846,7 @@ const UI = {
       F('kegiatan', 'Kegiatan (untuk belanja)', 'refpick', { wide: 1 }), F('kode_bidang', 'Kode Bidang', 'text', { mono: 1 }), F('bidang', 'Bidang'), F('kode_kegiatan', 'Kode Kegiatan', 'text', { mono: 1 }),
       F('uraian', 'Uraian Rincian', 'text', { wide: 1 }), F('volume', 'Volume', 'number'), F('satuan', 'Satuan', 'text', { list: ['Paket', 'Orang', 'OB', 'OH', 'OK', 'Bulan', 'Tahun', 'Unit', 'Buah', 'Meter', 'M2', 'M3', 'Kali', 'Kegiatan'] }), F('harga', 'Harga Satuan', 'money'),
       F('jumlah', 'Jumlah Anggaran', 'money', { req: 1, hint: 'Terisi otomatis dari volume × harga' }), F('sumber', 'Sumber Dana', 'select', { opt: OPT.sumberDana }), F('jumlah_pak', 'Anggaran Perubahan (PAK)', 'money', { hint: 'Diisi bila ada perubahan APBDes' }), F('ket', 'Keterangan', 'text', { wide: 1 })],
-    calc: v => v.volume && v.harga ? { jumlah: Number(v.volume) * Number(v.harga) } : null,
+    calc: v => v.volume && v.harga ? { jumlah: String(Math.round(Number(String(v.volume).replace(',', '.')) * mNum(v.harga) * 100) / 100) } : null,
     views: [['Pendapatan', () => ({ rek__pre: '4' }), 1], ['Belanja', () => ({ rek__pre: '5' }), 1], ['Pembiayaan', () => ({ rek__pre: '6' }), 1], ['Semua', () => ({}), 1]],
     sortBy: () => ['rek', 'kode_kegiatan'],
     row: r => ({ t: r.uraian || String(r.rek || '').replace(/^\S+\s*/, ''), s: `<span class="mono">${esc(String(r.rek || '').split(' ')[0])}</span>${r.kegiatan ? ' · ' + esc(r.kegiatan) : ''}${r.sumber ? ' · ' + esc(r.sumber) : ''}`, raw: 1, r: fMoney(r.jumlah_pak || r.jumlah) }),
@@ -1905,7 +1911,7 @@ function xlVal(f, v) {
     if (m) return m[1] + '-' + pad2(m[2]) + '-' + pad2(m[3]);
     return s;
   }
-  if (f.t === 'money') return s.replace(/\D/g, '');
+  if (f.t === 'money') return mVal(s);
   if (f.t === 'select' && f.opt) { const o = f.opt.find(o => o.toLowerCase() === s.toLowerCase()); if (o) return o; }
   if (f.up) s = s.toUpperCase();
   if (f.pad && /^\d+$/.test(s)) s = s.padStart(f.pad, '0');
@@ -2284,18 +2290,18 @@ ACT.draftKK = async t => {
 /* ---------------- Formulir ---------------- */
 /* Isian baris berulang (mis. rincian SPP), disimpan sebagai JSON */
 function rowsTr(f, r) {
-  return '<tr>' + f.cols.map(([k, , t]) => `<td>${t === 'sumber' ? `<select data-c="${k}"><option value=""></option>${OPT.sumberDana.map(o => `<option ${r[k] === o ? 'selected' : ''}>${o}</option>`).join('')}</select>` : t === 'money' ? `<input data-c="${k}" data-money inputmode="numeric" value="${r[k] ? Number(r[k]).toLocaleString('id-ID') : ''}" style="min-width:110px;text-align:right">` : `<input data-c="${k}" value="${esc(r[k] || '')}" ${t === 'list' ? `list="dl_${f.k}" style="min-width:220px"` : 'style="min-width:160px"'}>`}</td>`).join('') + `<td><button type="button" class="btn sm danger rwdel">${ic('trash')}</button></td></tr>`;
+  return '<tr>' + f.cols.map(([k, , t]) => `<td>${t === 'sumber' ? `<select data-c="${k}"><option value=""></option>${OPT.sumberDana.map(o => `<option ${r[k] === o ? 'selected' : ''}>${o}</option>`).join('')}</select>` : t === 'money' ? `<input data-c="${k}" data-money inputmode="numeric" value="${r[k] ? mFmt(r[k]) : ''}" style="min-width:110px;text-align:right">` : `<input data-c="${k}" value="${esc(r[k] || '')}" ${t === 'list' ? `list="dl_${f.k}" style="min-width:220px"` : 'style="min-width:160px"'}>`}</td>`).join('') + `<td><button type="button" class="btn sm danger rwdel">${ic('trash')}</button></td></tr>`;
 }
 function rowsBox(box, f) {
-  const sum = () => { const t = $$('input[data-money]', box).reduce((a, i) => a + Number(nOnly(i.value) || 0), 0); $('.rwsum', box).textContent = 'Jumlah: ' + rp(t); };
-  box.addEventListener('input', ev => { if (ev.target.matches('[data-money]')) { const n = nOnly(ev.target.value); ev.target.value = n ? Number(n).toLocaleString('id-ID') : ''; } sum(); });
+  const sum = () => { const t = $$('input[data-money]', box).reduce((a, i) => a + Number(mIn(i) || 0), 0); $('.rwsum', box).textContent = 'Jumlah: ' + rp(t); };
+  box.addEventListener('input', ev => { if (ev.target.matches('[data-money]')) liveMoney(ev.target); sum(); });
   box.addEventListener('click', ev => {
     if (ev.target.closest('.rwadd')) { $('tbody', box).insertAdjacentHTML('beforeend', rowsTr(f, {})); }
     const d = ev.target.closest('.rwdel'); if (d) { d.closest('tr').remove(); if (!$('tbody tr', box)) $('tbody', box).insertAdjacentHTML('beforeend', rowsTr(f, {})); sum(); }
   });
   sum();
 }
-function rowsVal(box) { return $$('tbody tr', box).map(tr => { const o = {}; $$('[data-c]', tr).forEach(i => { o[i.dataset.c] = i.matches('[data-money]') ? nOnly(i.value) : i.value.trim(); }); return o; }).filter(o => Object.values(o).some(Boolean)); }
+function rowsVal(box) { return $$('tbody tr', box).map(tr => { const o = {}; $$('[data-c]', tr).forEach(i => { o[i.dataset.c] = i.matches('[data-money]') ? mIn(i) : i.value.trim(); }); return o; }).filter(o => Object.values(o).some(Boolean)); }
 /* Beberapa foto + keterangan (disimpan sebagai JSON [{id, ket}]) */
 function fotoSlot(fo) {
   return `<div class="fslot"${fo ? ` data-id="${esc(fo.id)}"` : ''}><div class="fpic">${fo ? `<img src="${esc(thumb(fo.id, 240))}" alt="">` : `<label class="fadd">${ic('plus')}<span>Tambah foto</span><input type="file" accept="${IMG_ANY}" multiple hidden></label>`}</div>
@@ -2348,7 +2354,7 @@ function fieldHtml(f, v, rec) {
       const opts = f.opt.slice(); if (v && opts.indexOf(v) < 0) opts.unshift(v);
       inp = `<select id="${id}"><option value="">— pilih —</option>${opts.map(o => `<option ${o === v ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`; break;
     }
-    case 'money': inp = `<input id="${id}" inputmode="numeric" data-money value="${v ? Number(nOnly(v)).toLocaleString('id-ID') : ''}" placeholder="0">`; break;
+    case 'money': inp = `<input id="${id}" inputmode="numeric" data-money value="${v !== '' && v != null ? mFmt(v) : ''}" placeholder="0">`; break;
     case 'date': inp = `<input id="${id}" type="date" value="${esc(v)}">`; break;
     case 'time': inp = `<input id="${id}" type="time" value="${esc(String(v).slice(0, 5))}">`; break;
     case 'number': inp = `<input id="${id}" type="number" inputmode="numeric" value="${esc(v)}">`; break;
@@ -2380,7 +2386,7 @@ function readForm(u, root) {
     if (!el || f.t === 'file' || f.t === 'fotos') return;
     if (f.t === 'rows') { v[f.k] = JSON.stringify(rowsVal(el)); return; }
     if (f.t === 'sdgs') v[f.k] = $$('input:checked', el).map(i => i.value).join(',');
-    else if (f.t === 'money') v[f.k] = nOnly(el.value);
+    else if (f.t === 'money') v[f.k] = mIn(el);
     else {
       let s = el.value.trim();
       if (f.up) s = s.toUpperCase();
@@ -2424,7 +2430,7 @@ VIEWS.form = async (p, main, alive) => {
     <div class="btns"><button class="btn pri" type="submit" id="save">${ic('check')}Simpan</button><button class="btn" type="button" data-act="cancel">Batal</button></div>
   </form>`;
   const frm = $('#frm');
-  $$('[data-money]', frm).forEach(el => el.addEventListener('input', () => { const n = nOnly(el.value); el.value = n ? Number(n).toLocaleString('id-ID') : ''; }));
+  $$('[data-money]', frm).forEach(el => el.addEventListener('input', () => liveMoney(el)));
   if (u.calc) frm.addEventListener('input', ev => { if (ev.target.id === 'f_total') return; const c = u.calc(readForm(u, frm)); if (c) Object.keys(c).forEach(k => { const el = $('#f_' + k, frm); if (el) el.value = Number(c[k]).toLocaleString('id-ID'); }); });
   S.vh.cancel = back;
   if (u.grpBy && $('#f_' + u.grpBy, frm)) {
@@ -2606,8 +2612,8 @@ function pickBidang(cb) {
 
 /* ---------------- Kependudukan ---------------- */
 /* ---------------- KEUANGAN ---------------- */
-function sppTotal(r) { let a = []; try { a = JSON.parse(r.rincian || '[]'); } catch (x) { } return a.reduce((t, x) => t + Number(x.jumlah || 0), 0); }
-const rp = n => 'Rp ' + Math.round(Number(n || 0)).toLocaleString('id-ID');
+function sppTotal(r) { let a = []; try { a = JSON.parse(r.rincian || '[]'); } catch (x) { } return a.reduce((t, x) => t + mNum(x.jumlah), 0); }
+const rp = n => 'Rp ' + Number(n || 0).toLocaleString('id-ID', { maximumFractionDigits: 2 });
 const rpS = n => Number(n) < 0 ? '(' + rp(-Number(n)) + ')' : rp(n);
 const keuTh = () => S.keuTh = S.keuTh || String(new Date().getFullYear());
 const thChips = act => { const y = new Date().getFullYear(); return `<div class="chips">${[y, y - 1, y - 2].map(v => `<button class="chip ${keuTh() === String(v) ? 'on' : ''}" data-act="${act}" data-v="${v}">${v}</button>`).join('')}</div>`; };
