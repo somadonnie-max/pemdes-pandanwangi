@@ -20,6 +20,7 @@
   --pri:#0f5a46; --pri-2:#0b4838; --pri-ink:#ffffff; --pri-soft:#dcede5;
   --gold:#b0770c; --gold-soft:#f8edd3;
   --ok:#1d7a48; --ok-soft:#dff2e6; --warn:#98640a; --warn-soft:#fbeed3; --bad:#b3261e; --bad-soft:#fae1de; --info:#1d5f9e; --info-soft:#e1ecf7;
+  --c-pend:#1baf7a; --c-bel:#eb6834; --c-pemb:#2a78d6;
   --shadow:0 1px 2px rgba(15,40,30,.05),0 4px 14px rgba(15,40,30,.06);
   --r:10px; --font:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
 }
@@ -30,6 +31,7 @@
     --pri:#58c39b; --pri-2:#3fa983; --pri-ink:#062519; --pri-soft:#163a2e;
     --gold:#e4b24a; --gold-soft:#3a2d12;
     --ok:#5cc98b; --ok-soft:#173a28; --warn:#e3ad4c; --warn-soft:#3b2d12; --bad:#f0827a; --bad-soft:#442320; --info:#7fb1e6; --info-soft:#1b2d42;
+    --c-pend:#199e70; --c-bel:#d95926; --c-pemb:#3987e5;
     --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);
   }
 }
@@ -39,6 +41,7 @@
   --pri:#58c39b; --pri-2:#3fa983; --pri-ink:#062519; --pri-soft:#163a2e;
   --gold:#e4b24a; --gold-soft:#3a2d12;
   --ok:#5cc98b; --ok-soft:#173a28; --warn:#e3ad4c; --warn-soft:#3b2d12; --bad:#f0827a; --bad-soft:#442320; --info:#7fb1e6; --info-soft:#1b2d42;
+    --c-pend:#199e70; --c-bel:#d95926; --c-pemb:#3987e5;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);
 }
 *{box-sizing:border-box}
@@ -295,6 +298,40 @@ table.tbl{border-collapse:collapse;width:100%;font-size:11.5px;font-variant-nume
 .seg input:checked+b{background:var(--pri);color:#fff}.seg input:focus-visible+b{outline:2px solid var(--pri);outline-offset:-2px}
 .bar{height:6px;border-radius:99px;background:var(--surface2);overflow:hidden;display:flex}
 .bar i{display:block;height:100%}
+/* dashboard keuangan: hijau-toska = pendapatan, oranye = belanja, biru = pembiayaan */
+.kd{display:grid;gap:10px}
+.kd-act{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.kd-act .btn{min-height:44px;justify-content:flex-start;font-size:13px;padding:6px 12px}
+.kd-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.kd-k{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;display:flex;flex-direction:column;gap:4px;border-top:3px solid var(--kc,var(--line));min-width:0}
+.kd-k .l{font-size:11.5px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:6px}
+.kd-k .v{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.25;overflow-wrap:anywhere}
+.kd-k .s{font-size:11px;color:var(--muted)}
+.kd-dot{width:9px;height:9px;border-radius:3px;background:var(--kc);display:inline-block;flex:none;vertical-align:middle}
+.kd-track{height:8px;border-radius:4px;background:var(--surface2);overflow:hidden}
+.kd-track i{display:block;height:100%;background:var(--kc);border-radius:4px}
+.kd-cash{display:flex;flex-wrap:wrap;gap:6px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:8px 12px;font-size:12px;color:var(--muted)}
+.kd-cash span{display:inline-flex;align-items:center;gap:5px}.kd-cash b{color:var(--ink)}.kd-cash .warn b{color:var(--warn)}
+.kd-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:10px;align-items:stretch}
+.kd-c{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.kd-h{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.kd-h>b{font-size:14px}
+.kd-g{display:flex;justify-content:center}.kd-g svg{width:100%;max-width:250px;height:auto}
+.kd-mini{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;font-size:12px}
+.kd-mini div{display:flex;justify-content:space-between;gap:6px}.kd-mini span{display:inline-flex;align-items:center;gap:5px;color:var(--muted)}
+.kd-bars{display:flex;flex-direction:column;gap:10px}
+.kd-bar .t{display:flex;justify-content:space-between;gap:8px;font-size:12px;margin-bottom:3px;flex-wrap:wrap}.kd-bar .t span:last-child{color:var(--muted);font-variant-numeric:tabular-nums}
+.kd-bar .kd-track{height:12px}.kd-lane{width:100%}
+.kd-lg{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--muted)}.kd-lg>span{display:inline-flex;align-items:center;gap:5px}
+.kd-stack{display:flex;gap:2px;height:12px;border-radius:4px;overflow:hidden}.kd-stack i{display:block;height:100%}
+.kd-st{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.kd-st button{display:flex;flex-direction:column;align-items:flex-start;gap:4px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px;cursor:pointer;color:var(--ink);font:inherit;min-width:0}
+.kd-st button b{font-size:20px}.kd-st button:hover{border-color:var(--pri)}
+.kd-tbl td{vertical-align:top}.kd-tbl td.r{text-align:right}
+.kd-tip{position:fixed;z-index:999;pointer-events:none;background:var(--ink);color:var(--surface);font-size:11.5px;line-height:1.45;padding:6px 9px;border-radius:7px;max-width:280px;box-shadow:var(--shadow)}
+.kg-r{display:flex;flex-direction:column;gap:6px}.kg-t{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.kg-t b{flex:1;min-width:160px}
+.kg-m{display:flex;gap:6px 12px;align-items:center;flex-wrap:wrap;font-size:12px}.kg-m .btn{margin-left:auto}
+#sppInfo .tbl tr.bad td{color:var(--bad)}
+@media (max-width:520px){.kd-k .v{font-size:17px}.kd-mini{grid-template-columns:1fr}.kd-st .pill{white-space:normal}}
 
 /* ---------- modal / toast ---------- */
 .modal{position:fixed;inset:0;z-index:60;background:rgba(8,20,15,.5);display:flex;align-items:flex-end;justify-content:center}
@@ -416,7 +453,9 @@ function terbilang(n) {
   if (n < 1000) return terbilang(n / 100) + ' ratus' + (n % 100 ? ' ' + terbilang(n % 100) : '');
   if (n < 2000) return 'seribu' + (n - 1000 ? ' ' + terbilang(n - 1000) : '');
   if (n < 1e6) return terbilang(n / 1000) + ' ribu' + (n % 1000 ? ' ' + terbilang(n % 1000) : '');
-  return terbilang(n / 1e6) + ' juta' + (n % 1e6 ? ' ' + terbilang(n % 1e6) : '');
+  if (n < 1e9) return terbilang(n / 1e6) + ' juta' + (n % 1e6 ? ' ' + terbilang(n % 1e6) : '');
+  if (n < 1e12) return terbilang(n / 1e9) + ' miliar' + (n % 1e9 ? ' ' + terbilang(n % 1e9) : '');
+  return terbilang(n / 1e12) + ' triliun' + (n % 1e12 ? ' ' + terbilang(n % 1e12) : '');
 }
 function jarakM(a, b, c, d) {
   const R = 6371000, r = Math.PI / 180, x = (c - a) * r, y = (d - b) * r;
@@ -479,6 +518,61 @@ const ic = (n, cls) => `<svg class="ic ${cls || ''}" viewBox="0 0 24 24" aria-hi
 
 /* ---------------- pilihan referensi ---------------- */
 const LOGO = document.getElementById('favi').href;
+/* =====================================================================
+   PAJAK BENDAHARA DESA — kalkulator otomatis (dipakai form SPP & cetak kuitansi)
+   Dasar (cek ulang ke KPP setempat bila ada aturan baru):
+   - PPN: tarif 12% × DPP nilai lain 11/12 (= 11% efektif) untuk barang/jasa non-mewah
+     (UU HPP; PMK 131/2024; PMK 11/2025). Dipungut bila penjual PKP dan DPP > Rp2.000.000.
+   - PPh 22: 1,5% × DPP atas pembelian barang > Rp2.000.000 (tanpa NPWP/NIK: 3%).
+   - PPh 23: 2% × DPP atas jasa & sewa harta selain tanah/bangunan (tanpa NPWP/NIK: 4%).
+   - PPh Final 4(2): sewa tanah/bangunan 10%; jasa konstruksi 1,75% / 2,65% / 4% (PP 9/2022).
+   - PPh 21 honor bukan pegawai: 5% × 50% bruto = 2,5% (lapisan pertama; tanpa NPWP/NIK +20%).
+   Nilai SPP dianggap SUDAH termasuk PPN bila penerima PKP. Semua pajak dibulatkan ke bawah (rupiah penuh).
+   ===================================================================== */
+const PAJAK = {
+  batasPPN: 2000000, batasPPh22: 2000000,
+  ppnTarif: 0.12, ppnDpp: 11 / 12,
+  pph22: 0.015, pph23: 0.02, sewaTB: 0.10, honor: 0.025, tanpaNpwp21: 1.2, tanpaNpwp2223: 2,
+  konstruksi: { 'Kecil / perorangan bersertifikat': 0.0175, 'Menengah / besar bersertifikat': 0.0265, 'Tidak bersertifikat': 0.04 }
+};
+const JENIS_BELANJA = ['Barang / bahan / ATK', 'Jasa (selain konstruksi)', 'Sewa alat / kendaraan', 'Sewa tanah / bangunan', 'Jasa konstruksi', 'Honor / upah perorangan', 'Makan minum (rumah makan)', 'Tanpa potongan pajak'];
+class PajakError extends Error { constructor(kode, pesan) { super(pesan); this.name = 'PajakError'; this.kode = kode; } }
+/* o = { nilai, jenis, pkp ('Ya'/'Tidak'), npwp (teks; kosong = tanpa NPWP/NIK), kualifikasi }
+   hasil = { bruto, dpp, ppn, pph21, pph22, pph23, pph4, potongan, netto, catatan[] } — melempar PajakError bila isian tidak sah */
+function hitungPajak(o) {
+  const nilai = Math.round(Number(o && o.nilai) * 100) / 100;
+  if (!isFinite(nilai) || nilai <= 0) throw new PajakError('NILAI', 'Nilai pembayaran belum diisi atau tidak sah.');
+  const jenis = o.jenis || '';
+  if (JENIS_BELANJA.indexOf(jenis) < 0) throw new PajakError('JENIS', 'Pilih jenis belanja agar pajak bisa dihitung.');
+  const pkp = o.pkp === 'Ya', adaNpwp = String(o.npwp || '').replace(/\D/g, '').length >= 15, cat = [];
+  const fl = n => Math.floor(n + 1e-6);
+  const h = { bruto: nilai, dpp: nilai, ppn: 0, pph21: 0, pph22: 0, pph23: 0, pph4: 0, catatan: cat };
+  if (pkp && /^(Barang|Jasa|Sewa alat)/.test(jenis)) {
+    h.dpp = Math.round(nilai / (1 + PAJAK.ppnTarif * PAJAK.ppnDpp) * 100) / 100;
+    if (h.dpp > PAJAK.batasPPN) h.ppn = fl(h.dpp * PAJAK.ppnTarif * PAJAK.ppnDpp);
+    else { h.dpp = nilai; cat.push('PPN tidak dipungut: nilai sampai Rp2.000.000.'); }
+  } else if (/^(Barang|Jasa|Sewa alat)/.test(jenis)) cat.push('Penerima bukan PKP: tidak ada PPN.');
+  const x2 = adaNpwp ? 1 : PAJAK.tanpaNpwp2223;
+  if (jenis.indexOf('Barang') === 0) {
+    if (h.dpp > PAJAK.batasPPh22) h.pph22 = fl(h.dpp * PAJAK.pph22 * x2);
+    else cat.push('PPh 22 tidak dipungut: nilai sampai Rp2.000.000.');
+  }
+  if (/^(Jasa \(|Sewa alat)/.test(jenis)) h.pph23 = fl(h.dpp * PAJAK.pph23 * x2);
+  if (jenis === 'Sewa tanah / bangunan') h.pph4 = fl(h.dpp * PAJAK.sewaTB);
+  if (jenis === 'Jasa konstruksi') {
+    let t = PAJAK.konstruksi[o.kualifikasi];
+    if (t == null) { t = PAJAK.konstruksi['Tidak bersertifikat']; cat.push('Kualifikasi penyedia belum dipilih: dipakai tarif tidak bersertifikat 4%.'); }
+    h.pph4 = fl(h.dpp * t);
+  }
+  if (jenis === 'Honor / upah perorangan') h.pph21 = fl(nilai * PAJAK.honor * (adaNpwp ? 1 : PAJAK.tanpaNpwp21));
+  if (jenis === 'Makan minum (rumah makan)') cat.push('Pajak restoran (PBJT) sudah dipungut rumah makan; bendahara tidak memotong.');
+  if (!adaNpwp && (h.pph21 || h.pph22 || h.pph23)) cat.push('Penerima tanpa NPWP/NIK 16 digit: tarif PPh dinaikkan sesuai ketentuan.');
+  h.potongan = h.ppn + h.pph21 + h.pph22 + h.pph23 + h.pph4;
+  h.netto = Math.round((nilai - h.potongan) * 100) / 100;
+  if (h.netto < 0) throw new PajakError('NEGATIF', 'Potongan pajak melebihi nilai pembayaran. Periksa isian.');
+  return h;
+}
+
 const OPT = {
   dusun: ['DUSUN KRAJAN 1', 'DUSUN KRAJAN 2', 'DUSUN KRAJAN 3', 'DUSUN TIMUR SAWAH', 'DUSUN TUNJUNGAN', 'DUSUN PEMUKIMAN'],
   jk: ['LAKI-LAKI', 'PEREMPUAN'],
@@ -869,7 +963,7 @@ const UI = {
     fields: [F('tahun', 'Tahun Anggaran', 'number', { req: 1, def: () => new Date().getFullYear() }), F('tanggal', 'Tanggal', 'date', { req: 1, def: isoToday }), F('jenis', 'Jenis Transaksi', 'select', { req: 1, opt: OPT.jenisTrans, def: 'Pendapatan' }),
       F('no_bukti', 'No. Bukti (TBP / kuitansi)', 'text'), F('rek', 'Kode Rekening', 'text', { wide: 1, listFrom: { e: 'keu_rek', k: x => x.kode + ' ' + x.uraian }, when: { k: 'jenis', v: ['Pendapatan', 'Penerimaan Pembiayaan', 'Belanja', 'Pengeluaran Pembiayaan'] } }),
       F('kegiatan', 'Kegiatan', 'refpick', { wide: 1, when: { k: 'jenis', v: ['Belanja'] } }), F('kode_kegiatan', 'Kode Kegiatan', 'text', { mono: 1, when: { k: 'jenis', v: ['Belanja'] } }),
-      F('pajak', 'Jenis Pajak', 'select', { opt: ['PPN', 'PPh 21', 'PPh 22', 'PPh 23', 'Pajak Daerah'], when: { k: 'jenis', v: ['Pajak Dipungut', 'Pajak Disetor'] } }), F('ntpn', 'NTPN / Bukti Setor', 'text', { when: { k: 'jenis', v: ['Pajak Disetor'] } }),
+      F('pajak', 'Jenis Pajak', 'select', { opt: ['PPN', 'PPh 21', 'PPh 22', 'PPh 23', 'PPh Final 4(2)', 'Pajak Daerah'], when: { k: 'jenis', v: ['Pajak Dipungut', 'Pajak Disetor'] } }), F('ntpn', 'NTPN / Bukti Setor', 'text', { when: { k: 'jenis', v: ['Pajak Disetor'] } }),
       F('uraian', 'Uraian', 'text', { req: 1, wide: 1 }), F('jumlah', 'Jumlah', 'money', { req: 1 }), F('sumber', 'Sumber Dana', 'select', { opt: OPT.sumberDana }),
       F('kas', 'Kas', 'select', { opt: ['Bank', 'Tunai'], def: 'Bank', hint: 'Mutasi kas: kas asal' }), F('kas_ke', 'Ke Kas', 'select', { opt: ['Tunai', 'Bank'], when: { k: 'jenis', v: ['Mutasi Kas'] } }),
       F('dok_id', 'Bukti (foto/PDF)', 'file')],
@@ -882,9 +976,13 @@ const UI = {
     fields: [F('tahun', 'Tahun Anggaran', 'number', { req: 1, def: () => new Date().getFullYear() }), F('no', 'No. SPP', 'text', { auto: 1 }), F('tanggal', 'Tanggal SPP', 'date', { req: 1, def: isoToday }),
       F('jenis', 'Jenis SPP', 'select', { opt: ['Definitif', 'Pembiayaan'], def: 'Definitif' }), F('kegiatan', 'Kegiatan', 'refpick', { wide: 1 }), F('kode_bidang', 'Kode Bidang', 'text', { mono: 1 }), F('bidang', 'Bidang'), F('kode_kegiatan', 'Kode Kegiatan', 'text', { mono: 1 }),
       F('uraian', 'Keperluan / Uraian', 'text', { req: 1, wide: 1 }), F('penerima', 'Penerima / Pihak Ketiga', 'text', { wide: 1 }),
+      F('jenis_belanja', 'Jenis Belanja (untuk pajak)', 'select', { opt: JENIS_BELANJA, hint: 'Menentukan PPN/PPh yang dipotong otomatis' }), F('pkp', 'Penerima PKP (memungut PPN)?', 'select', { opt: ['Tidak', 'Ya'], def: 'Tidak' }),
+      F('npwp', 'NPWP / NIK Penerima', 'text', { mono: 1, hint: 'Kosong = tanpa NPWP/NIK, tarif PPh naik' }), F('kualifikasi', 'Kualifikasi Penyedia Konstruksi', 'select', { opt: Object.keys(PAJAK.konstruksi), when: { k: 'jenis_belanja', v: ['Jasa konstruksi'] } }),
       F('rincian', 'Rincian Belanja', 'rows', { listFrom: { e: 'keu_rek', k: x => x.kode + ' ' + x.uraian }, cols: [['rek', 'Kode Rekening', 'list'], ['uraian', 'Uraian', 'text'], ['sumber', 'Sumber', 'sumber'], ['jumlah', 'Jumlah (Rp)', 'money']] }),
-      F('ppn', 'PPN dipungut', 'money'), F('pph21', 'PPh 21 dipungut', 'money'), F('pph22', 'PPh 22 dipungut', 'money'), F('pph23', 'PPh 23 dipungut', 'money'), F('pajak_daerah', 'Pajak Daerah dipungut', 'money'),
+      F('pajak_auto', 'Hitung pajak otomatis', 'select', { opt: ['Ya', 'Tidak'], def: 'Ya', hint: 'Pilih Tidak bila ingin mengisi nominal pajak sendiri' }),
+      F('ppn', 'PPN dipungut', 'money'), F('pph21', 'PPh 21 dipungut', 'money'), F('pph22', 'PPh 22 dipungut', 'money'), F('pph23', 'PPh 23 dipungut', 'money'), F('pph4', 'PPh Final 4(2) dipungut', 'money'), F('pajak_daerah', 'Pajak Daerah dipungut', 'money'),
       F('kas', 'Dibayar dari Kas', 'select', { opt: ['Bank', 'Tunai'], def: 'Bank' }), F('status', 'Status', 'select', { opt: ['Draf', 'Diverifikasi', 'Disetujui'], def: 'Draf' }), F('ket', 'Keterangan', 'text', { wide: 1 }), F('dok_id', 'Dokumen SPP / Bukti', 'file')],
+    calc: v => sppPajakCalc(v),
     views: [['Semua', () => ({})], ['Draf', () => ({ status: 'Draf' })], ['Disetujui', () => ({ status: 'Disetujui' })], ['Dicairkan', () => ({ status: 'Dicairkan' })]],
     row: r => ({ t: r.uraian, s: ['No. ' + (r.no || '-'), fDate(r.tanggal), r.kegiatan].filter(Boolean).join(' · '), r: fMoney(sppTotal(r)), pill: `<span class="pill ${r.status === 'Dicairkan' ? 'ok' : r.status === 'Disetujui' ? 'info' : ''}">${esc(r.status || 'Draf')}</span>` }),
     print: { title: 'REGISTER SURAT PERMINTAAN PEMBAYARAN (SPP)', land: 1, cols: [['No', 'no'], ['Tanggal', r => fDate(r.tanggal)], ['Kegiatan', 'kegiatan'], ['Uraian', 'uraian'], ['Jumlah', r => fMoney(sppTotal(r))], ['Status', 'status'], ['Tgl Cair', r => fDate(r.tgl_cair)]] }
@@ -961,7 +1059,7 @@ function MODS() {
     { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
     { k: 'kesejahteraan', l: 'Kesejahteraan', ic: 'heart', items: [['Lembaga / Yayasan', 'landmark', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru Ngaji', 'book', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
     { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Kegiatan Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
-    { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Ringkasan Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek']] },
+    { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek']] },
     { k: 'soon', l: 'Segera Hadir', ic: 'sprout', items: Object.keys(SOON).map(k => [SOON[k].t, SOON[k].ic, ['soon', { k }], null, '*', 1]) }
   ];
 }
@@ -983,7 +1081,7 @@ function call(action, p, bearer) {
     .then(r => {
       if (r && r.ok) return r.data;
       const e = new Error((r && (r.error || r.message || r.msg)) || 'Terjadi kesalahan.');
-      e.code = r && r.code;
+      e.code = r && r.code; e.detail = r && r.detail;
       if (e.code === 'AUTH' && action !== 'login') { logoutLocal(); toast(e.message, 1); }
       throw e;
     });
@@ -2135,7 +2233,7 @@ async function renderDetail(e, x, el, full) {
     <div class="xk"></div>
     ${geo ? mapHtml(geo, 'Lokasi ' + (u.row(x).t || '')) : ''}
     <div class="xx"></div>
-    <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button><button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>` : ''}${e === 'penduduk' && canWrite('register_surat') ? `<button class="btn sm" data-act="regSurat" data-id="${esc(x.id)}">${ic('file')}Buat surat keterangan</button>` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak surat (Word)</button>` : ''}${e === 'keu_spp' && w && x.status !== 'Dicairkan' ? `<button class="btn sm pri" data-act="keuCair" data-id="${esc(x.id)}">${ic('check')}Cairkan</button>` : ''}${e === 'keu_spp' && w && x.status === 'Dicairkan' ? `<button class="btn sm danger" data-act="keuBatal" data-id="${esc(x.id)}">${ic('x')}Batalkan pencairan</button>` : ''}${e === 'keu_trans' && w && x.jenis === 'Pajak Dipungut' ? `<button class="btn sm" data-act="setorPajak" data-id="${esc(x.id)}">${ic('send')}Setor pajak</button>` : ''}${NASKAH[e] && w ? `<button class="btn sm" data-act="cetakNaskah" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('print')}Buat dokumen (Word)</button>` : ''}${e === 'kegiatan' && w && kgBisaSelesai(x) ? `<button class="btn sm pri" data-act="kgSelesai" data-id="${esc(x.id)}">${ic('check')}Selesai</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>`;
+    <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button><button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>` : ''}${e === 'penduduk' && canWrite('register_surat') ? `<button class="btn sm" data-act="regSurat" data-id="${esc(x.id)}">${ic('file')}Buat surat keterangan</button>` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak surat (Word)</button>` : ''}${e === 'keu_spp' ? `<button class="btn sm" data-act="kuitansi" data-id="${esc(x.id)}">${ic('print')}Cetak kuitansi</button>` : ''}${e === 'keu_spp' && w && x.status !== 'Dicairkan' ? `<button class="btn sm pri" data-act="keuCair" data-id="${esc(x.id)}">${ic('check')}Cairkan</button>` : ''}${e === 'keu_spp' && w && x.status === 'Dicairkan' ? `<button class="btn sm danger" data-act="keuBatal" data-id="${esc(x.id)}">${ic('x')}Batalkan pencairan</button>` : ''}${e === 'keu_trans' && w && x.jenis === 'Pajak Dipungut' ? `<button class="btn sm" data-act="setorPajak" data-id="${esc(x.id)}">${ic('send')}Setor pajak</button>` : ''}${NASKAH[e] && w ? `<button class="btn sm" data-act="cetakNaskah" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('print')}Buat dokumen (Word)</button>` : ''}${e === 'kegiatan' && w && kgBisaSelesai(x) ? `<button class="btn sm pri" data-act="kgSelesai" data-id="${esc(x.id)}">${ic('check')}Selesai</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>`;
   const xk = $('.xk', el), xx = $('.xx', el);
   if (e === 'penduduk') {
     try {
@@ -2480,6 +2578,7 @@ VIEWS.form = async (p, main, alive) => {
   });
   $$('.fotos', frm).forEach(fotoBox);
   flds.filter(f => f.t === 'rows').forEach(f => { const b = $('#f_' + f.k, frm); if (b) rowsBox(b, f); });
+  keuFormHook(e, frm, rec);
   /* NIK -> isi otomatis dari Data Penduduk (hanya kolom yang masih kosong) */
   const nikF = flds.find(f => f.nikfill), nikEl = nikF && $('#f_' + nikF.k, frm);
   if (nikEl && !nikEl.readOnly) nikEl.addEventListener('input', async () => {
@@ -2519,7 +2618,11 @@ VIEWS.form = async (p, main, alive) => {
     if (!navigator.geolocation) return toast('Perangkat tidak mendukung GPS.', 1);
     navigator.geolocation.getCurrentPosition(pp => { $('#' + t.dataset.t).value = pp.coords.latitude.toFixed(6) + ', ' + pp.coords.longitude.toFixed(6); }, () => toast('Lokasi tidak dapat dibaca.', 1), { enableHighAccuracy: true, timeout: 15000 });
   };
-  S.vh.pick = () => pickBidang(r => {
+  S.vh.pick = () => /^keu_(spp|trans)$/.test(e) ? pickKegApb(($('#f_tahun', frm) || {}).value || keuTh(), r => {
+    const set = (k, val) => { const el = $('#f_' + k, frm); if (el) el.value = val || ''; };
+    set('kegiatan', r.kegiatan); set('kode_kegiatan', r.kode); set('kode_bidang', r.kode_bidang); set('bidang', namaBidang(r.bidang));
+    if (frm._keuReload) frm._keuReload();
+  }) : pickBidang(r => {
     const set = (k, val) => { const el = $('#f_' + k, frm); if (el) el.value = val || ''; };
     set('kegiatan', r.kegiatan); set('kode_bidang', r.kode_bidang); set('bidang', r.nama_bidang); set('kode_kegiatan', r.kode_kegiatan); set('uraian_output', r.uraian_output);
     if (r.satuan) set('satuan', r.satuan);
@@ -2568,7 +2671,7 @@ VIEWS.form = async (p, main, alive) => {
       if (e === 'register_surat' && !p.id && jenisDikenal(saved.jenis_surat)) setTimeout(() => cetakSurat(saved), 500);
       if (e === 'jenis_surat') S.jenisSurat = null;   /* tunggu kembali ke daftar dulu */
       if (NASKAH[e] && p.buat) setTimeout(() => cetakNaskah(e, saved), 500);
-    } catch (x) { er.textContent = x.message; er.hidden = false; btn.disabled = false; btn.innerHTML = ic('check') + 'Simpan'; }
+    } catch (x) { if (x.code === 'PAGU') er.innerHTML = paguErrHtml(x); else er.textContent = x.message; er.hidden = false; btn.disabled = false; btn.innerHTML = ic('check') + 'Simpan'; er.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
   };
 };
 /* Pilih nama dari data Aparat + Petugas Desa; kolom lain (unsur, tempat/tgl lahir) terisi otomatis */
@@ -2629,24 +2732,240 @@ const rp = n => 'Rp ' + Number(n || 0).toLocaleString('id-ID', { maximumFraction
 const rpS = n => Number(n) < 0 ? '(' + rp(-Number(n)) + ')' : rp(n);
 const keuTh = () => S.keuTh = S.keuTh || String(new Date().getFullYear());
 const thChips = act => { const y = new Date().getFullYear(); return `<div class="chips">${[y, y - 1, y - 2].map(v => `<button class="chip ${keuTh() === String(v) ? 'on' : ''}" data-act="${act}" data-v="${v}">${v}</button>`).join('')}</div>`; };
+/* ---------- Dashboard keuangan ---------- */
+const KEU_WARNA = { Pendapatan: 'pend', 'Penerimaan Pembiayaan': 'pemb', 'Pengeluaran Pembiayaan': 'pemb', Belanja: 'bel' };
+const KEU_MASUK = { Pendapatan: 1, 'Penerimaan Pembiayaan': 1, 'Pajak Dipungut': 1, 'Saldo Awal': 1, Belanja: -1, 'Pengeluaran Pembiayaan': -1, 'Pajak Disetor': -1 };
+const pct = (a, b) => b > 0 ? a / b * 100 : 0;
+const pctT = n => n.toLocaleString('id-ID', { maximumFractionDigits: 1 }) + '%';
+const rpK = n => { n = Number(n || 0); const a = Math.abs(n); return (n < 0 ? '−' : '') + (a >= 1e9 ? 'Rp ' + (a / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + ' M' : a >= 1e6 ? 'Rp ' + (a / 1e6).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' jt' : rp(a)); };
+const namaBidang = s => { s = String(s || '').replace(/^BIDANG\s+/i, ''); return s === s.toUpperCase() ? s.toLowerCase().replace(/(^|[\s,(])\S/g, c => c.toUpperCase()) : s; };
+const STATUS_KG = { Perencanaan: '', 'Dalam Realisasi': 'info', Selesai: 'ok' };
+/* Tooltip ringan untuk elemen ber-atribut data-tip (dipasang sekali untuk seluruh aplikasi) */
+function kdTip() {
+  if (kdTip.on) return; kdTip.on = 1;
+  let tip = null;
+  const hide = () => { if (tip) { tip.remove(); tip = null; } };
+  document.addEventListener('pointermove', ev => {
+    const t = ev.target.closest && ev.target.closest('[data-tip]'); if (!t) return hide();
+    if (!tip) { tip = document.createElement('div'); tip.className = 'kd-tip'; tip.setAttribute('role', 'tooltip'); document.body.appendChild(tip); }
+    tip.innerHTML = t.dataset.tip;
+    const w = tip.offsetWidth, h = tip.offsetHeight, x = Math.min(window.innerWidth - w - 8, ev.clientX + 12), y = ev.clientY + 16 + h > window.innerHeight ? ev.clientY - h - 10 : ev.clientY + 16;
+    tip.style.left = Math.max(8, x) + 'px'; tip.style.top = Math.max(8, y) + 'px';
+  });
+  ['pointerdown', 'scroll', 'hashchange'].forEach(n => window.addEventListener(n, hide, { passive: true, capture: true }));
+}
+function kdGauge(p) {
+  const v = Math.max(0, Math.min(100, p));
+  return `<svg viewBox="0 0 200 116" role="img" aria-label="Realisasi belanja ${pctT(p)}">
+    <path d="M20 100 A80 80 0 0 1 180 100" pathLength="100" fill="none" stroke="var(--surface2)" stroke-width="18" stroke-linecap="round"/>
+    ${v > 0 ? `<path d="M20 100 A80 80 0 0 1 180 100" pathLength="100" fill="none" stroke="var(--c-bel)" stroke-width="18" stroke-linecap="round" stroke-dasharray="${v} 100"/>` : ''}
+    <text x="100" y="86" text-anchor="middle" font-size="30" font-weight="700" fill="var(--ink)" style="font-variant-numeric:tabular-nums">${pctT(p)}</text>
+    <text x="100" y="108" text-anchor="middle" font-size="11" fill="var(--muted)">realisasi belanja</text></svg>`;
+}
 VIEWS.keu = async (p, main, alive) => {
-  setTop('Ringkasan Keuangan', 'Tahun ' + keuTh());
-  const d = await call('keuRingkas', { tahun: keuTh() }); if (!alive()) return;
-  const bar = (a, r) => { const pc = a ? Math.min(100, r / a * 100) : 0; return `<div class="bar" style="height:9px;margin-top:5px"><i style="width:${pc}%;background:var(--pri)"></i></div><div class="meta">${rp(r)} dari ${rp(a)} · ${a ? (r / a * 100).toLocaleString('id-ID', { maximumFractionDigits: 1 }) : 0}%</div>`; };
-  const A = d.anggaran, Z = d.realisasi, pj = d.pajak.dipungut - d.pajak.disetor;
-  main.innerHTML = `<div class="stack">${thChips('keuTh')}
-    <div class="stats pstats"><div class="stat big"><b>${rp(d.kas.Bank + d.kas.Tunai)}</b><span>Saldo kas</span></div><div class="stat"><b>${rp(d.kas.Bank)}</b><span>Kas di Bank</span></div><div class="stat"><b>${rp(d.kas.Tunai)}</b><span>Kas Tunai</span></div><div class="stat"><b>${rp(pj)}</b><span>Pajak belum disetor</span></div></div>
-    <div class="pgrid2">
-      <div class="card stack"><div class="pch"><b>Pendapatan</b><span class="meta">realisasi / anggaran</span></div>${bar(A.pendapatan, Z.pendapatan)}</div>
-      <div class="card stack"><div class="pch"><b>Belanja</b><span class="meta">realisasi / anggaran</span></div>${bar(A.belanja, Z.belanja)}</div>
-      <div class="card stack"><div class="pch"><b>Penerimaan Pembiayaan</b></div>${bar(A.pembiayaan_terima, Z.pembiayaan_terima)}</div>
-      <div class="card stack"><div class="pch"><b>Pengeluaran Pembiayaan</b></div>${bar(A.pembiayaan_keluar, Z.pembiayaan_keluar)}</div>
+  setTop('Dashboard Keuangan', 'Tahun Anggaran ' + keuTh());
+  const d = await call('keuDash', { tahun: keuTh() }); if (!alive()) return;
+  const A = d.anggaran, Z = d.realisasi, kg = d.kegiatan, pj = d.pajak.dipungut - d.pajak.disetor;
+  const sisa = A.belanja - Z.belanja, pB = pct(Z.belanja, A.belanja), pP = pct(Z.pendapatan, A.pendapatan);
+  const wS = canWrite('keu_spp'), wT = canWrite('keu_trans');
+  const act = [
+    wS && ['form', { e: 'keu_spp' }, 'file', 'Buat SPP', 'pri'],
+    canRead('keu_spp') && ['list', { e: 'keu_spp' }, 'check', 'Cek Pencairan' + (d.spp.draf ? ` <span class="pill warn">${d.spp.draf}</span>` : '')],
+    wT && ['form', { e: 'keu_trans', preset: { jenis: 'Pendapatan' } }, 'down', 'Catat Penerimaan'],
+    can('r:perencanaan') || can('perencanaan') ? ['rkp', {}, 'sprout', 'Input Perencanaan'] : null,
+    ['keukeg', {}, 'target', 'Status Kegiatan']
+  ].filter(Boolean);
+  const maxB = Math.max(1, ...d.bidang.map(b => Math.max(b.anggaran, b.realisasi)));
+  const bars = d.bidang.map(b => { const pr = pct(b.realisasi, b.anggaran);
+    return `<div class="kd-bar" data-tip="<b>${esc(namaBidang(b.bidang))}</b><br>Anggaran ${esc(rp(b.anggaran))}<br>Realisasi ${esc(rp(b.realisasi))} (${pctT(pr)})<br>Sisa ${esc(rpS(b.anggaran - b.realisasi))}">
+      <div class="t"><span>${esc(b.kode)}. ${esc(namaBidang(b.bidang))}</span><span>${rpK(b.realisasi)} / ${rpK(b.anggaran)} · <b>${pctT(pr)}</b></span></div>
+      <div class="kd-lane"><div class="kd-track" style="width:${b.anggaran / maxB * 100}%"><i style="width:${Math.min(100, pr)}%"></i></div></div></div>`; }).join('') || '<div class="meta">Belum ada anggaran belanja.</div>';
+  const kgTot = Math.max(1, kg.jumlah);
+  const trx = d.terakhir.map(t => { const g = KEU_WARNA[t.jenis], s = KEU_MASUK[t.jenis];
+    return `<tr><td>${esc(fDate(t.tanggal, 1))}</td><td style="white-space:normal"><span class="kd-dot" style="--kc:${g ? 'var(--c-' + g + ')' : 'var(--muted)'}"></span> ${esc(t.uraian || '')}<br><small class="meta">${esc(t.jenis)}${t.no_bukti ? ' · ' + esc(t.no_bukti) : ''}</small></td><td class="r num">${s > 0 ? '+' : s < 0 ? '−' : '⇄ '}${esc(rp(t.jumlah))}</td></tr>`; }).join('');
+  main.innerHTML = `<div class="kd">${thChips('keuTh')}
+    <div class="kd-act">${act.map(a => `<button class="btn ${a[4] || ''}" data-act="go" data-go='${esc(JSON.stringify([a[0], a[1]]))}'>${ic(a[2])}${a[3]}</button>`).join('')}</div>
+    <div class="kd-kpi">
+      <div class="kd-k" style="--kc:var(--c-bel)"><span class="l">Total APBDes (belanja)</span><b class="v">${rp(A.belanja)}</b><span class="s">Pendapatan ${rp(A.pendapatan)} · Pembiayaan netto ${rpS(A.pembiayaan_terima - A.pembiayaan_keluar)}</span></div>
+      <div class="kd-k" style="--kc:var(--c-pend)"><span class="l"><span class="kd-dot"></span>Realisasi Pendapatan</span><b class="v">${rp(Z.pendapatan)}</b><div class="kd-track" data-tip="Pendapatan: ${esc(rp(Z.pendapatan))} dari ${esc(rp(A.pendapatan))}"><i style="width:${Math.min(100, pP)}%"></i></div><span class="s">${pctT(pP)} dari ${rp(A.pendapatan)}</span></div>
+      <div class="kd-k" style="--kc:var(--c-bel)"><span class="l"><span class="kd-dot"></span>Realisasi Belanja</span><b class="v">${rp(Z.belanja)}</b><div class="kd-track" data-tip="Belanja: ${esc(rp(Z.belanja))} dari ${esc(rp(A.belanja))}"><i style="width:${Math.min(100, pB)}%"></i></div><span class="s">${pctT(pB)} dari ${rp(A.belanja)}</span></div>
+      <div class="kd-k" style="--kc:var(--line)"><span class="l">Sisa Anggaran Belanja</span><b class="v">${rpS(sisa)}</b><span class="s">${d.spp.draf ? d.spp.draf + ' SPP menunggu pencairan' : 'Tidak ada SPP menunggu'}</span></div>
     </div>
-    <div class="card"><div class="pch"><b>Surplus / (Defisit) anggaran</b><b class="num">${rpS(A.pendapatan - A.belanja)}</b></div><div class="pch"><span class="meta">Pembiayaan netto</span><span class="num">${rpS(A.pembiayaan_terima - A.pembiayaan_keluar)}</span></div><div class="pch"><span class="meta">SPP belum cair / sudah cair</span><span class="num">${d.spp.draf} / ${d.spp.cair}</span></div></div>
-    <div class="btns">${canRead('keu_anggaran') ? `<button class="btn" data-act="go" data-go='["list",{"e":"keu_anggaran"}]'>${ic('wallet')}APBDes</button>` : ''}${canRead('keu_spp') ? `<button class="btn" data-act="go" data-go='["list",{"e":"keu_spp"}]'>${ic('file')}SPP</button>` : ''}${can('r:keu_laporan') ? `<button class="btn" data-act="go" data-go='["keubuku"]'>${ic('book')}Buku Kas</button><button class="btn" data-act="go" data-go='["keulap"]'>${ic('chart')}Laporan Realisasi</button>` : ''}</div>
+    <div class="kd-cash"><span>${ic('wallet')} Saldo kas <b class="num">${rp(d.kas.Bank + d.kas.Tunai)}</b></span><span>Bank <b class="num">${rp(d.kas.Bank)}</b></span><span>Tunai <b class="num">${rp(d.kas.Tunai)}</b></span><span class="${pj > 0 ? 'warn' : ''}">Pajak belum disetor <b class="num">${rp(pj)}</b></span></div>
+    <div class="kd-2">
+      <div class="kd-c"><div class="kd-h"><b>Realisasi Anggaran</b><span class="meta">s.d. hari ini</span></div>
+        <div class="kd-g" data-tip="Belanja ${esc(rp(Z.belanja))} dari ${esc(rp(A.belanja))}">${kdGauge(pB)}</div>
+        <div class="kd-mini">
+          <div style="--kc:var(--c-pend)"><span><span class="kd-dot"></span>Pendapatan</span><b class="num">${pctT(pP)}</b></div>
+          <div style="--kc:var(--c-bel)"><span><span class="kd-dot"></span>Belanja</span><b class="num">${pctT(pB)}</b></div>
+          <div style="--kc:var(--c-pemb)"><span><span class="kd-dot"></span>Penerimaan pembiayaan</span><b class="num">${pctT(pct(Z.pembiayaan_terima, A.pembiayaan_terima))}</b></div>
+          <div style="--kc:var(--c-pemb)"><span><span class="kd-dot"></span>Pengeluaran pembiayaan</span><b class="num">${pctT(pct(Z.pembiayaan_keluar, A.pembiayaan_keluar))}</b></div>
+        </div></div>
+      <div class="kd-c" style="--kc:var(--c-bel)"><div class="kd-h"><b>Belanja per Bidang</b><span class="kd-lg"><span><span class="kd-dot"></span>Realisasi</span><span><span class="kd-dot" style="--kc:var(--surface2);outline:1px solid var(--line)"></span>Anggaran</span></span></div>
+        <div class="kd-bars">${bars}</div></div>
+    </div>
+    <div class="kd-2">
+      <div class="kd-c"><div class="kd-h"><b>Progres Kegiatan</b><button class="btn sm" data-act="go" data-go='["keukeg",{}]'>Lihat semua</button></div>
+        <div class="kd-stack" role="img" aria-label="${kg.selesai} selesai, ${kg.realisasi} dalam realisasi, ${kg.perencanaan} perencanaan">
+          <i style="width:${kg.selesai / kgTot * 100}%;background:var(--ok)"></i><i style="width:${kg.realisasi / kgTot * 100}%;background:var(--info)"></i><i style="width:${kg.perencanaan / kgTot * 100}%;background:var(--surface2)"></i></div>
+        <div class="kd-st">${[['Selesai', kg.selesai, 'ok', 'check'], ['Dalam Realisasi', kg.realisasi, 'info', 'clock'], ['Perencanaan', kg.perencanaan, '', 'sprout']].map(s => `<button data-act="go" data-go='${esc(JSON.stringify(['keukeg', { st: s[0] }]))}'><b class="num">${s[1]}</b><span class="pill ${s[2]}">${ic(s[3])}${s[0]}</span></button>`).join('')}</div>
+        <div class="meta">${kg.jumlah} kegiatan di APBDes ${esc(keuTh())}. Status berubah otomatis dari SPP & realisasi.</div></div>
+      <div class="kd-c"><div class="kd-h"><b>Transaksi Terakhir</b>${can('r:keu_laporan') ? `<button class="btn sm" data-act="go" data-go='["keubuku"]'>Buku Kas</button>` : ''}</div>
+        <div class="tbl-wrap"><table class="tbl kd-tbl"><tbody>${trx || '<tr><td class="meta">Belum ada transaksi.</td></tr>'}</tbody></table></div></div>
+    </div>
+    <div class="btns">${canRead('keu_anggaran') ? `<button class="btn" data-act="go" data-go='["list",{"e":"keu_anggaran"}]'>${ic('wallet')}APBDes</button>` : ''}${can('r:keu_laporan') ? `<button class="btn" data-act="go" data-go='["keulap"]'>${ic('chart')}Laporan Realisasi</button>` : ''}</div>
   </div>`;
+  kdTip();
   S.vh.keuTh = t => { S.keuTh = t.dataset.v; refresh(); };
 };
+
+/* ---------- Status progres kegiatan ---------- */
+VIEWS.keukeg = async (p, main, alive) => {
+  const st = S.kgSt = S.kgSt || { f: '', q: '' }; if (p.st) { st.f = p.st; p.st = ''; }
+  setTop('Status Kegiatan', 'APBDes ' + keuTh());
+  const rows = await call('keuKegiatan', { tahun: keuTh() }); if (!alive()) return;
+  const w = canWrite('keu_spp'), n = s => rows.filter(r => r.status === s).length;
+  const draw = () => {
+    const q = st.q.toLowerCase(), L = rows.filter(r => (!st.f || r.status === st.f) && (!q || (r.kode + ' ' + r.kegiatan).toLowerCase().indexOf(q) >= 0));
+    const grp = {}; L.forEach(r => (grp[r.kode_bidang + '|' + namaBidang(r.bidang)] = grp[r.kode_bidang + '|' + namaBidang(r.bidang)] || []).push(r));
+    $('#kgL').innerHTML = Object.keys(grp).sort().map(g => `<div class="sec-h"><h2>${esc(g.replace('|', '. '))}</h2></div><div class="list">${grp[g].map(r => `
+      <div class="card kg-r"><div class="kg-t"><span class="mono">${esc(r.kode || '–')}</span><b>${esc(r.kegiatan)}</b><span class="pill ${STATUS_KG[r.status]}">${esc(r.status)}${r.manual ? ' (manual)' : ''}</span></div>
+        <div class="kd-track" style="--kc:var(--c-bel)" data-tip="Realisasi ${esc(rp(r.realisasi))} dari ${esc(rp(r.pagu))}"><i style="width:${Math.min(100, r.persen)}%"></i></div>
+        <div class="kg-m"><span class="num">${rp(r.realisasi)} / ${rp(r.pagu)} · <b>${pctT(Number(r.persen))}</b></span>${r.spp_proses ? `<span class="pill warn">${r.spp_proses} SPP belum cair · ${rp(r.spp_nilai)}</span>` : ''}${r.sumber ? `<span class="meta">${esc(r.sumber)}</span>` : ''}${r.catatan ? `<span class="meta">Catatan: ${esc(r.catatan)}</span>` : ''}
+        ${w && r.status !== 'Selesai' && r.status !== 'Perencanaan' ? `<button class="btn sm" data-act="kgTutup" data-k="${esc(r.kode || '')}" data-n="${esc(r.kegiatan)}">${ic('check')}Tandai selesai</button>` : ''}${w && r.manual ? `<button class="btn sm" data-act="kgBuka" data-k="${esc(r.kode || '')}" data-n="${esc(r.kegiatan)}">Buka kembali</button>` : ''}</div></div>`).join('')}</div>`).join('') || '<div class="empty">Tidak ada kegiatan untuk filter ini.</div>';
+  };
+  main.innerHTML = `<div class="stack">${thChips('kgTh')}
+    <div class="chips wrap">${[['', 'Semua', rows.length], ['Perencanaan', 'Perencanaan', n('Perencanaan')], ['Dalam Realisasi', 'Dalam Realisasi', n('Dalam Realisasi')], ['Selesai', 'Selesai', n('Selesai')]].map(c => `<button class="chip ${st.f === c[0] ? 'on' : ''}" data-act="kgF" data-v="${esc(c[0])}">${c[1]} <small>${c[2]}</small></button>`).join('')}</div>
+    <label class="search" style="flex:none">${ic('search')}<input id="kgQ" placeholder="Cari kode atau nama kegiatan" value="${esc(st.q)}"></label>
+    <div class="meta">Perencanaan = belum ada SPP/realisasi · Dalam Realisasi = sudah ada SPP atau belanja · Selesai = realisasi mencapai pagu, atau ditutup manual.</div>
+    <div id="kgL"></div></div>`;
+  draw(); kdTip();
+  $('#kgQ').oninput = ev => { st.q = ev.target.value; draw(); };
+  S.vh.kgTh = t => { S.keuTh = t.dataset.v; refresh(); };
+  S.vh.kgF = t => { st.f = t.dataset.v; refresh(); };
+  S.vh.kgTutup = t => {
+    const m = modal('Tandai kegiatan selesai', `<form class="stack" id="kgF"><b>${esc(t.dataset.n)}</b><div class="meta">Pakai ini bila kegiatan sudah tuntas walau anggaran tidak terserap 100% (mis. sisa efisiensi). Status bisa dibuka kembali.</div>
+      <div class="f wide"><label for="kgC">Catatan (alasan)</label><textarea id="kgC" rows="3" placeholder="Contoh: pekerjaan selesai, sisa efisiensi Rp ..."></textarea></div><div id="kgE" class="err" hidden></div>
+      <div class="btns"><button class="btn pri" id="kgOk">${ic('check')}Tandai selesai</button></div></form>`);
+    $('#kgF', m.el).onsubmit = async ev => {
+      ev.preventDefault(); const b = $('#kgOk', m.el); b.disabled = true;
+      try { await call('keuKegSelesai', { tahun: keuTh(), kode_kegiatan: t.dataset.k, kegiatan: t.dataset.n, selesai: '1', catatan: $('#kgC', m.el).value.trim() }); m.close(); toast('Kegiatan ditandai selesai.'); refresh(); }
+      catch (x) { const e = $('#kgE', m.el); e.textContent = x.message; e.hidden = false; b.disabled = false; }
+    };
+  };
+  S.vh.kgBuka = async t => { try { await call('keuKegSelesai', { tahun: keuTh(), kode_kegiatan: t.dataset.k, kegiatan: t.dataset.n, selesai: '0' }); toast('Status kegiatan dibuka kembali.'); refresh(); } catch (x) { toast(x.message, 1); } };
+};
+
+/* ---------- Form SPP: sisa pagu langsung terlihat + pajak otomatis ---------- */
+function paguErrHtml(x) {
+  const d = x.detail || {}, R = d.rincian || [];
+  return `<div>${esc(x.message)}</div>${R.length ? `<div class="tbl-wrap" style="margin-top:6px"><table class="tbl"><thead><tr><th>Rekening</th><th style="text-align:right">Diminta</th><th style="text-align:right">Sisa pagu</th><th style="text-align:right">Kurang</th></tr></thead><tbody>${R.map(r => `<tr><td class="mono">${esc(r.kode)}</td><td style="text-align:right">${rp(r.diminta)}</td><td style="text-align:right">${r.alasan === 'belum dianggarkan' ? 'belum dianggarkan' : rp(r.sisa)}</td><td style="text-align:right"><b>${rp(r.diminta - r.sisa)}</b></td></tr>`).join('')}</tbody></table></div>` : ''}`;
+}
+function keuFormHook(e, frm, rec) {
+  if (e !== 'keu_spp') return;
+  const rb = $('#f_rincian', frm); if (!rb) return;
+  const box = document.createElement('div'); box.className = 'f wide'; box.id = 'sppInfo'; box.setAttribute('aria-live', 'polite');
+  (rb.closest('.f') || rb).after(box);
+  let pagu = null, key = '', tmr = 0;
+  const val = k => { const el = $('#f_' + k, frm); return el ? (el.matches('[data-money]') ? mIn(el) : el.value.trim()) : ''; };
+  const draw = () => {
+    const rin = rowsVal(rb), per = {};
+    rin.forEach(r => { const k = String(r.rek || '').split(' ')[0]; if (k && Number(r.jumlah)) per[k] = (per[k] || 0) + Number(r.jumlah); });
+    const tot = Object.values(per).reduce((a, n) => a + n, 0);
+    let h = '';
+    if (!val('kegiatan') && !val('kode_kegiatan')) h += `<div class="meta">Pilih kegiatan (tombol "Pilih kode") untuk melihat sisa pagu tiap rekening.</div>`;
+    else if (pagu == null) h += '<div class="skel"></div>';
+    else {
+      const ks = Array.from(new Set(pagu.map(p => p.rek).concat(Object.keys(per)))).sort();
+      h += `<div class="lbl">Sisa pagu kegiatan ini</div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Rekening</th><th style="text-align:right">Pagu</th><th style="text-align:right">Terpakai</th><th style="text-align:right">SPP ini</th><th style="text-align:right">Sisa setelah SPP</th></tr></thead><tbody>${ks.map(k => {
+        const p = pagu.find(x => x.rek === k), m = per[k] || 0;
+        if (!p) return `<tr class="bad"><td class="mono">${esc(k)}</td><td colspan="3" style="text-align:right">${rp(m)}</td><td style="text-align:right"><b>${ic('x')} belum dianggarkan</b></td></tr>`;
+        const s = Number(p.sisa) - m;
+        return `<tr class="${s < -0.004 ? 'bad' : ''}"><td class="mono" title="${esc(p.rek_lengkap || '')}">${esc(k)}</td><td style="text-align:right">${rp(p.pagu)}</td><td style="text-align:right">${rp(Number(p.realisasi) + Number(p.komitmen))}</td><td style="text-align:right">${m ? rp(m) : ''}</td><td style="text-align:right"><b>${s < -0.004 ? ic('x') + ' kurang ' + rp(-s) : rp(s)}</b></td></tr>`;
+      }).join('')}</tbody></table></div>`;
+      if (ks.some(k => { const p = pagu.find(x => x.rek === k); return !p || Number(p.sisa) - (per[k] || 0) < -0.004; })) h += `<div class="err">SPP ini tidak bisa disimpan: ada rekening melebihi sisa pagu atau belum dianggarkan.</div>`;
+    }
+    if (val('jenis_belanja') && tot > 0) {
+      try {
+        const t = hitungPajak({ nilai: tot, jenis: val('jenis_belanja'), pkp: val('pkp'), npwp: val('npwp'), kualifikasi: val('kualifikasi') });
+        const L = [['PPN', t.ppn], ['PPh 21', t.pph21], ['PPh 22', t.pph22], ['PPh 23', t.pph23], ['PPh Final 4(2)', t.pph4]].filter(x => x[1]);
+        h += `<div class="card" style="box-shadow:none;background:var(--surface2)"><div class="pch"><b>Perhitungan pajak${val('pajak_auto') === 'Tidak' ? ' (saran — isian manual dipakai)' : ''}</b><span class="meta">DPP ${rp(t.dpp)}</span></div>
+          ${L.map(x => `<div class="pch"><span>${x[0]}</span><span class="num">${rp(x[1])}</span></div>`).join('') || '<div class="meta">Tidak ada potongan pajak.</div>'}
+          <div class="pch"><b>Diterima penerima (netto)</b><b class="num">${rp(t.netto)}</b></div>${t.catatan.map(c => `<div class="meta">• ${esc(c)}</div>`).join('')}</div>`;
+      } catch (x) { h += `<div class="meta">${esc(x.message)}</div>`; }
+    }
+    box.innerHTML = h;
+  };
+  const load = () => {
+    const th = val('tahun'), kk = val('kode_kegiatan'), kn = val('kegiatan'), k = th + '|' + kk + '|' + kn;
+    if (k === key) return draw(); key = k;
+    if (!kk && !kn) { pagu = null; return draw(); }
+    pagu = null; draw();
+    call('keuPagu', { tahun: th, kode_kegiatan: kk, kegiatan: kn, kecuali: rec.id || '' }).then(r => { if (key === k) { pagu = r; draw(); } }).catch(x => { box.innerHTML = `<div class="err">${esc(x.message)}</div>`; });
+  };
+  const sched = () => { clearTimeout(tmr); tmr = setTimeout(load, 350); };
+  frm.addEventListener('input', sched); frm.addEventListener('change', sched);
+  frm._keuReload = () => { key = ''; sched(); };
+  load();
+}
+function sppPajakCalc(v) {
+  if (v.pajak_auto === 'Tidak' || !v.jenis_belanja) return null;
+  let a = []; try { a = JSON.parse(v.rincian || '[]'); } catch (x) { }
+  const tot = a.reduce((t, x) => t + mNum(x.jumlah), 0);
+  try { const t = hitungPajak({ nilai: tot, jenis: v.jenis_belanja, pkp: v.pkp, npwp: v.npwp, kualifikasi: v.kualifikasi }); return { ppn: t.ppn, pph21: t.pph21, pph22: t.pph22, pph23: t.pph23, pph4: t.pph4 }; }
+  catch (x) { return null; }
+}
+/* Pilih kegiatan dari APBDes tahun berjalan (bukan dari referensi umum) agar kode cocok dengan pagu */
+function pickKegApb(th, cb) {
+  const m = modal('Pilih Kegiatan APBDes ' + th, `<div class="stack"><label class="search" style="flex:none">${ic('search')}<input id="kq" placeholder="Cari kode atau nama kegiatan"></label><div id="kl"><div class="skel"></div></div></div>`, { big: 1 });
+  let rows = [];
+  const draw = q => { q = (q || '').toLowerCase(); const L = rows.filter(r => !q || (r.kode + ' ' + r.kegiatan + ' ' + r.bidang).toLowerCase().indexOf(q) >= 0);
+    $('#kl', m.el).innerHTML = L.length ? `<div class="list">${L.map((r, i) => `<button class="row" data-i="${rows.indexOf(r)}"><span class="av" style="width:auto;padding:0 8px"><span class="mono">${esc(r.kode || '–')}</span></span><span class="main"><span class="t">${esc(r.kegiatan)}</span><span class="s">${esc(namaBidang(r.bidang))} · sisa ${rp(r.pagu - r.realisasi - r.spp_nilai)} dari ${rp(r.pagu)}</span></span><span class="pill ${STATUS_KG[r.status]}">${esc(r.status)}</span></button>`).join('')}</div>` : `<div class="empty">Belum ada kegiatan belanja di APBDes ${esc(th)}.</div>`; };
+  call('keuKegiatan', { tahun: th }).then(r => { rows = r; draw(''); }).catch(x => { $('#kl', m.el).innerHTML = `<div class="err">${esc(x.message)}</div>`; });
+  $('#kq', m.el).oninput = ev => draw(ev.target.value);
+  $('#kl', m.el).onclick = ev => { const b = ev.target.closest('[data-i]'); if (b) { cb(rows[+b.dataset.i]); m.close(); } };
+}
+
+/* ---------- Kuitansi / bukti pembayaran (pajak dihitung otomatis saat cetak) ---------- */
+async function cetakKuitansi(id) {
+  let x = await call('get', { entity: 'keu_spp', id });
+  let a = []; try { a = JSON.parse(x.rincian || '[]'); } catch (er) { }
+  const bruto = a.reduce((t, r) => t + mNum(r.jumlah), 0);
+  if (!bruto) throw new Error('Rincian SPP masih kosong.');
+  let t = null, note = '';
+  if (x.jenis_belanja && x.pajak_auto !== 'Tidak') {
+    t = hitungPajak({ nilai: bruto, jenis: x.jenis_belanja, pkp: x.pkp, npwp: x.npwp, kualifikasi: x.kualifikasi });
+    const beda = ['ppn', 'pph21', 'pph22', 'pph23', 'pph4'].some(k => Math.abs(mNum(x[k]) - t[k]) > 0.004);
+    if (beda && x.status !== 'Dicairkan' && canWrite('keu_spp')) {
+      x = await call('save', { entity: 'keu_spp', record: { id: x.id, ppn: String(t.ppn), pph21: String(t.pph21), pph22: String(t.pph22), pph23: String(t.pph23), pph4: String(t.pph4) } });
+      note = 'Nominal pajak di SPP diperbarui sesuai perhitungan otomatis.';
+    } else if (beda) note = 'Catatan: SPP sudah dicairkan, kuitansi memakai nominal pajak yang tercatat.';
+    if (beda && x.status === 'Dicairkan') t = null;
+  }
+  const P = t ? { ppn: t.ppn, pph21: t.pph21, pph22: t.pph22, pph23: t.pph23, pph4: t.pph4 } : { ppn: mNum(x.ppn), pph21: mNum(x.pph21), pph22: mNum(x.pph22), pph23: mNum(x.pph23), pph4: mNum(x.pph4) };
+  P.daerah = mNum(x.pajak_daerah);
+  const pot = Object.values(P).reduce((s, n) => s + n, 0), netto = bruto - pot;
+  let bend = '';
+  try { const ap = (await call('list', { entity: 'aparat', limit: 200 })).rows; bend = (ap.find(r => /bendahara|kaur keuangan/i.test(r.jabatan || '')) || {}).nama || ''; } catch (er) { }
+  const s = S.set, L = [['PPN', P.ppn], ['PPh Pasal 21', P.pph21], ['PPh Pasal 22', P.pph22], ['PPh Pasal 23', P.pph23], ['PPh Final Pasal 4 ayat (2)', P.pph4], ['Pajak Daerah', P.daerah]].filter(r => r[1]);
+  const sat = n => terbilang(Math.floor(n)).replace(/^\s+/, '') + ' rupiah' + (Math.round(n % 1 * 100) ? ' ' + terbilang(Math.round(n % 1 * 100)) + ' sen' : '');
+  const kol = (j, n) => `<div style="text-align:center;flex:1;min-width:120px">${j}<div class="sp"></div><u>${esc(n || '..............................')}</u></div>`;
+  printDocs('Kuitansi ' + (x.no || ''), [`<div class="paper">${kop()}<h2 style="margin-bottom:2px">KUITANSI / BUKTI PEMBAYARAN</h2><div style="text-align:center;margin-bottom:12px">Nomor: ${esc(x.no || '..........')}</div>
+    <table style="width:100%;border-collapse:collapse"><tbody>
+      <tr><td style="width:34%;vertical-align:top">Sudah terima dari</td><td>: Bendahara Desa ${esc(s.nama_desa || '')}</td></tr>
+      <tr><td style="vertical-align:top">Uang sejumlah</td><td>: <b>${rp(bruto)}</b><br><i>(${esc(sat(bruto))})</i></td></tr>
+      <tr><td style="vertical-align:top">Untuk pembayaran</td><td>: ${esc(x.uraian || '')}${x.kegiatan ? '<br>Kegiatan ' + esc((x.kode_kegiatan ? x.kode_kegiatan + ' ' : '') + x.kegiatan) : ''} — Tahun Anggaran ${esc(x.tahun)}</td></tr>
+    </tbody></table>
+    <table class="pt" style="margin-top:10px"><thead><tr><th>Kode Rekening</th><th>Uraian</th><th>Jumlah (Rp)</th></tr></thead><tbody>${a.map(r => `<tr><td>${esc(String(r.rek || '').split(' ')[0])}</td><td>${esc(r.uraian || String(r.rek || '').replace(/^\S+\s*/, ''))}</td><td style="text-align:right">${mFmt(r.jumlah)}</td></tr>`).join('')}
+      <tr><td colspan="2"><b>Jumlah bruto</b></td><td style="text-align:right"><b>${mFmt(bruto)}</b></td></tr>
+      ${L.map(r => `<tr><td colspan="2">Dikurangi ${esc(r[0])}${t && t.dpp !== bruto && r[0] !== 'PPh Pasal 21' ? ' (DPP ' + mFmt(t.dpp) + ')' : ''}</td><td style="text-align:right">(${mFmt(r[1])})</td></tr>`).join('')}
+      <tr><td colspan="2"><b>Jumlah diterima (netto)</b></td><td style="text-align:right"><b>${mFmt(netto)}</b></td></tr></tbody></table>
+    ${x.penerima || x.npwp ? `<div style="margin-top:6px;font-size:10.5pt">Penerima: ${esc(x.penerima || '-')}${x.npwp ? ' · NPWP/NIK ' + esc(x.npwp) : ''}${x.jenis_belanja ? ' · ' + esc(x.jenis_belanja) : ''}</div>` : ''}
+    <div style="text-align:right;margin-top:16px">${esc(s.nama_desa || '')}, ${fDate(x.tgl_cair || x.tanggal || isoToday())}</div>
+    <div class="ttd" style="gap:10px">${kol('Mengetahui,<br>Kepala Desa', s.nama_kades)}${kol('Pelaksana Kegiatan<br>Anggaran', '')}${kol('Lunas dibayar,<br>Bendahara Desa', bend)}${kol('Yang menerima,<br>&nbsp;', x.penerima)}</div></div>`]);
+  if (note) toast(note);
+}
+ACT.kuitansi = t => cetakKuitansi(t.dataset.id).catch(x => toast(x.message, 1));
 VIEWS.keubuku = async (p, main, alive) => {
   const st = S.bukuSt = S.bukuSt || { buku: 'BKU', bulan: '' };
   setTop({ BKU: 'Buku Kas Umum', Bank: 'Buku Bank', Tunai: 'Buku Kas Tunai', Pajak: 'Buku Pembantu Pajak' }[st.buku], 'Tahun ' + keuTh());
