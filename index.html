@@ -1175,12 +1175,13 @@ function MODS() {
   return [
     { k: 'presensi', l: 'Presensi', ic: 'clock', items: [['Presensi Hari Ini', 'clock', ['presensi']], ['Riwayat Harian', 'list', ['harian']]] },
     { k: 'kegiatan', l: 'Kegiatan', ic: 'cal', items: [['Agenda', 'cal', ['list', { e: 'kegiatan', v: 0, title: 'Agenda' }], null, 'r:kegiatan'], ['Berita', 'mega', ['list', { e: 'berita' }], 'berita']] },
-    { k: 'arsip', l: 'Arsip', ic: 'folder', items: [['Surat', 'inbox', ['sub', { k: 'surat' }], null, null, 0, 'surat'], ['Produk Hukum', 'scale', ['sub', { k: 'hukum' }], null, null, 0, 'hukum']].concat(['aparat', 'petugas', 'inventaris', 'tkd', 'tanah_desa'].map(e => [UI[e].t, UI[e].ic, ['list', { e }], e])) },
+    { k: 'arsip', l: 'Arsip', ic: 'folder', items: [['Surat', 'inbox', ['sub', { k: 'surat' }], null, null, 0, 'surat'], ['Produk Hukum', 'scale', ['sub', { k: 'hukum' }], null, null, 0, 'hukum']].concat(['aparat', 'petugas', 'tanah_desa'].map(e => [UI[e].t, UI[e].ic, ['list', { e }], e])) },
+    { k: 'aset', l: 'Aset Desa', ic: 'box', items: [['Dashboard Aset', 'chart', ['asetdash'], null, 'r:aset'], ['Buku Inventaris & KIB', 'box', ['list', { e: 'aset' }], 'aset'], ['Inventarisasi Fisik', 'check', ['list', { e: 'aset_cek' }], 'aset_cek'], ['Cetak Laporan Aset', 'print', ['asetcetak'], null, 'r:aset'], ['Kode Barang', 'list', ['list', { e: 'ref_kode_barang' }], 'ref_kode_barang']] },
     { k: 'pemerintahan', l: 'Pemerintahan', ic: 'landmark', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, 'r:penduduk'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga']] },
     { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
     { k: 'kesejahteraan', l: 'Kesejahteraan', ic: 'heart', items: [['Lembaga / Yayasan', 'landmark', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru Ngaji', 'book', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
-    { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RPJM Desa', 'book', ['rpjm', {}], null, 'r:rkp'], ['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['RAB & Gambar', 'list', ['list', { e: 'rkp_rab' }], null, 'r:rkp'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Progres Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
-    { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Rekap Pajak', 'coin', ['keupajak'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek']] },
+    { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RPJM Desa', 'book', ['rpjm', {}], null, 'r:rkp'], ['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['RAB & Gambar', 'hammer', ['rab', {}], null, 'r:rab'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Progres Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
+    { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['SPJ', 'check', ['spj', {}], null, 'r:spj'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Rekap Pajak', 'coin', ['keupajak'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek']] },
     { k: 'soon', l: 'Segera Hadir', ic: 'sprout', items: Object.keys(SOON).map(k => [SOON[k].t, SOON[k].ic, ['soon', { k }], null, '*', 1]) }
   ];
 }
@@ -2378,6 +2379,8 @@ async function renderDetail(e, x, el, full) {
   }
   if (e === 'keluarga') await extraKeluarga(x, xx, full);
   if (e === 'rkp_musyawarah') await extraMusyawarah(x, xx);
+  if (e === 'aset') await extraAset(x, xx);
+  if (e === 'bast') await extraBast(x, xx);
   if (e === 'rpjm_musyawarah') await extraMusRpjm(x, xx);
   if (e === 'rpjm_gagasan' && canWrite(e) && x.status !== 'Masuk RPJM') xx.innerHTML = `<div class="btns"><button class="btn sm pri" data-act="rpjGagKeg" data-id="${esc(x.id)}">${ic('plus')}Jadikan kegiatan RPJM</button></div>`;
   if (e === 'pembangunan') await extraPembangunan(x, xx);
@@ -2925,6 +2928,8 @@ VIEWS.form = async (p, main, alive) => {
       if (e === 'petugas' && !p.id && (virt.kelompok || virt.jabatan)) await call('save', { entity: 'petugas_jabatan', record: Object.assign({ ref: saved.id }, virt) });
       if (/^(aparat|petugas)/.test(e)) S.people = null;
       toast('Tersimpan.');
+      if (e === 'aset' && saved && saved.id) await asetSetelahSimpan(saved.id);
+      if (e === 'aset_cek' && saved && saved.id) await asetCekSetelahSimpan(saved.id);
       if ((e === 'rkp_musyawarah' || e === 'rpjm_musyawarah') && saved && saved.id && val.tanggal && val.jam) { const ag = await syncAgendaMus(saved.id, e); if (ag) toast('Tersimpan. Masuk juga ke Kegiatan → Agenda.'); }
       back();
       if (e === 'register_surat' && !p.id && jenisDikenal(saved.jenis_surat)) setTimeout(() => cetakSurat(saved), 500);
@@ -4812,6 +4817,7 @@ VIEWS.settings = async (p, main) => {
   const G = [
     ['Profil desa', [['nama_desa', 'Nama desa'], ['kecamatan', 'Kecamatan'], ['kabupaten', 'Kabupaten'], ['provinsi', 'Provinsi'], ['alamat', 'Alamat kantor', 1], ['kode_pos', 'Kode pos'], ['email_desa', 'Email desa'], ['nama_kades', 'Nama Kepala Desa (untuk tanda tangan)'], ['logo_url', 'Tautan logo (gambar)', 1], ['tahun_rkp', 'Tahun RKP Desa berjalan'], ['kode_surat', 'Kode desa pada nomor surat (Nomor: 470/No/KODE/Tahun)']]],
     ['Jam kerja', [['jam_masuk_mulai', 'Presensi masuk dibuka', 0, 'time'], ['jam_masuk_batas', 'Batas masuk tepat waktu', 0, 'time'], ['jam_pulang_mulai', 'Pulang mulai (Senin–Kamis)', 0, 'time'], ['jam_pulang_jumat', 'Pulang mulai (Jumat)', 0, 'time'], ['jam_pulang_batas', 'Batas presensi pulang', 0, 'time']]],
+    ['Aset & RAB', [['kode_lokasi_aset', 'Kode lokasi desa (10 digit, Permendagri 56/2015)'], ['kode_pengguna_aset', 'Kode pengguna barang (2 digit, bawaan 01)'], ['masa_jabatan_mulai', 'Masa jabatan Kepala Desa — tahun mulai', 0, 'number'], ['masa_jabatan_akhir', 'Masa jabatan Kepala Desa — tahun akhir', 0, 'number'], ['bu_swakelola', 'Biaya umum & keuntungan swakelola (%), bawaan 0', 0, 'number'], ['bu_penyedia', 'Biaya umum & keuntungan penyedia (%), bawaan 10', 0, 'number'], ['nama_sekdes', 'Nama Sekretaris Desa'], ['nama_bendahara', 'Nama Kaur Keuangan / Bendahara'], ['nama_pengurus_aset', 'Nama Pengurus Aset (Kaur Umum)']]],
     ['Lokasi kantor', [['kantor_lat', 'Lintang (latitude)'], ['kantor_lng', 'Bujur (longitude)'], ['radius_m', 'Radius presensi (meter)', 0, 'number']]],
     ['Verifikasi wajah', [['face_threshold', 'Batas kecocokan (0.45 ketat – 0.55 longgar, bawaan 0.5)']]]
   ];
@@ -6259,6 +6265,786 @@ function printDocs(title, pages) {
     st.textContent = '@media print{@page{size:A4 ' + (land ? 'landscape' : 'portrait') + ';margin:0}}';
     setTimeout(() => window.print(), 50);
   };
+}
+
+/* =====================================================================
+   ASET DESA — Buku Inventaris & KIB A–F (Permendagri 1/2016 jo. 3/2024)
+   Pengurus aset: Kaur Umum; pembantu pengelola: Sekretaris Desa
+   ===================================================================== */
+const KIB_OPT = ['A. Tanah', 'B. Peralatan dan Mesin', 'C. Gedung dan Bangunan', 'D. Jalan, Irigasi dan Jaringan', 'E. Aset Tetap Lainnya', 'F. Konstruksi Dalam Pengerjaan'];
+const KIB_GOL = { A: '2', B: '3', C: '4', D: '5', E: '6', F: '7' };
+const KONDISI_ASET = ['Baik', 'Kurang Baik', 'Rusak Berat'];
+const ASAL_ASET = ['APBDes (dibeli/dibangun sendiri)', 'Kekayaan asli desa', 'Bantuan Pemerintah', 'Bantuan Provinsi', 'Bantuan Kabupaten', 'Hibah / Sumbangan', 'Perolehan lain yang sah'];
+const kibHuruf = a => String((a && a.kib) || '').charAt(0);
+const kibNama = h => (KIB_OPT.find(k => k.charAt(0) === h) || h).replace(/^.\. /, '');
+const asetNum = v => Number(String(v == null ? '' : v).replace(/\./g, '').replace(',', '.')) || 0;
+const asetDig = v => String(v || '').replace(/\D/g, '');
+/* nomor register = kode lokasi (10) + kode pengguna (2) + tahun (4) + kode barang (10) + nomor urut (6) */
+function asetRegister(a) {
+  const s = S.set || {}, th = String(a.tahun || String(a.tgl_perolehan || '').slice(0, 4) || '');
+  const lok = asetDig(s.kode_lokasi_aset).padEnd(10, '0').slice(0, 10), pg = asetDig(s.kode_pengguna_aset || '01').padStart(2, '0').slice(-2);
+  const kb = (asetDig(a.kode_barang) || (KIB_GOL[kibHuruf(a)] || '0')).padEnd(10, '0').slice(0, 10), no = asetDig(a.no_urut).padStart(6, '0').slice(-6);
+  return { atas: lok + ' ' + pg + ' ' + (th || '0000'), bawah: kb + ' ' + no, full: lok + pg + (th || '0000') + kb + no, sementara: !asetDig(s.kode_lokasi_aset) };
+}
+const kodeFmt = k => { const d = asetDig(k); return d.length >= 10 ? d.slice(0, 1) + '.' + d.slice(1, 3) + '.' + d.slice(3, 5) + '.' + d.slice(5, 7) + '.' + d.slice(7, 10) : (k || ''); };
+
+Object.assign(UI, {
+  aset: {
+    t: 'Buku Inventaris & KIB', ic: 'box', perm: 'aset', m: 'aset', folder: 'Aset Desa', excel: 1, sort: 'tgl_perolehan',
+    fields: [F('kib', 'Jenis KIB', 'select', { opt: KIB_OPT, req: 1, wide: 1 }), F('nama', 'Nama Barang / Bangunan', 'text', { req: 1, wide: 1 }),
+      F('kode_barang', 'Kode Barang (10 digit)', 'text', { mono: 1, listFrom: { e: 'ref_kode_barang', k: x => x.kode + ' ' + x.uraian }, hint: 'Golongan.Bidang.Kelompok.Sub.Sub-sub, mis. 5.01.01.01.001. Boleh dilengkapi belakangan.' }),
+      F('no_urut', 'Nomor Urut Register', 'number', { hint: 'Kosong = otomatis' }),
+      F('merk', 'Merk / Tipe', 'text', { when: { k: 'kib', v: [KIB_OPT[1], KIB_OPT[4]] } }), F('ukuran', 'Ukuran / CC / Spesifikasi', 'text', { when: { k: 'kib', v: [KIB_OPT[1], KIB_OPT[4]] } }),
+      F('bahan', 'Bahan / Konstruksi', 'text', { list: ['Beton', 'Rabat beton', 'Paving', 'Aspal', 'Makadam', 'Pasangan batu', 'Bata', 'Kayu', 'Besi', 'Plastik', 'Permanen', 'Semi permanen'] }),
+      F('panjang', 'Panjang (m)', 'number', { when: { k: 'kib', v: [KIB_OPT[3], KIB_OPT[5]] } }), F('lebar', 'Lebar (m)', 'number', { when: { k: 'kib', v: [KIB_OPT[3], KIB_OPT[5]] } }),
+      F('luas', 'Luas (m²)', 'number', { when: { k: 'kib', v: [KIB_OPT[0], KIB_OPT[2], KIB_OPT[3], KIB_OPT[5]] } }), F('tingkat', 'Bertingkat?', 'select', { opt: ['Tidak', 'Ya'], when: { k: 'kib', v: [KIB_OPT[2], KIB_OPT[5]] } }),
+      F('jumlah', 'Jumlah', 'number', { def: 1 }), F('satuan', 'Satuan', 'text', { def: 'Unit', list: ['Unit', 'Buah', 'Paket', 'Set', 'Bidang', 'Ruas', 'Meter', 'Ekor', 'Batang', 'Eksemplar'] }),
+      F('tahun', 'Tahun Perolehan', 'number', { def: () => new Date().getFullYear() }), F('tgl_perolehan', 'Tanggal Perolehan / BAST', 'date'),
+      F('asal', 'Asal Usul', 'select', { opt: ASAL_ASET, def: ASAL_ASET[0] }), F('sumber_dana', 'Sumber Dana', 'select', { opt: OPT.sumber }), F('nilai', 'Nilai Perolehan (Rp)', 'money'),
+      F('kondisi', 'Kondisi', 'select', { opt: KONDISI_ASET, def: 'Baik' }), F('letak', 'Letak / Lokasi', 'text', { wide: 1 }), F('dusun', 'Dusun', 'select', { opt: OPT.dusun }), F('koordinat', 'Koordinat', 'geo'),
+      F('status_tanah', 'Status Hak / Status Tanah', 'text', { list: ['Sertifikat Hak Pakai', 'Sertifikat Hak Milik', 'Letter C', 'Tanah Kas Desa', 'Tanah Negara', 'Belum bersertifikat'], when: { k: 'kib', v: [KIB_OPT[0], KIB_OPT[2], KIB_OPT[3], KIB_OPT[5]] } }),
+      F('no_dokumen', 'No. Dokumen (sertifikat, BPKB, BAST, IMB)', 'text', { wide: 1 }), F('tgl_dokumen', 'Tanggal Dokumen', 'date'), F('penggunaan', 'Penggunaan', 'text'),
+      F('status', 'Status Aset', 'select', { opt: ['Draf', 'Aktif', 'Dihapus'], def: 'Aktif', hint: 'Draf = dari BAST, belum dilengkapi kode/lokasi' }), F('inv_terakhir', 'Inventarisasi Fisik Terakhir', 'date'),
+      F('ket', 'Keterangan', 'textarea', { wide: 1 }), F('foto', 'Foto Aset', 'fotos', { max: 5 }), F('dok_id', 'Dokumen Pendukung', 'file')],
+    chips: { k: 'kib', opt: KIB_OPT, lbl: s => 'KIB ' + s.charAt(0) },
+    views: [['Aktif', () => ({ status: 'Aktif' })], ['Draf', () => ({ status: 'Draf' })], ['Dihapus', () => ({ status: 'Dihapus' })], ['Semua', () => ({})]],
+    row: r => ({ t: r.nama, s: ['KIB ' + kibHuruf(r), r.kode_barang ? kodeFmt(r.kode_barang) : 'kode belum diisi', r.letak || r.dusun, r.tahun].filter(Boolean).join(' · '), r: fMoney(r.nilai), av: `<b>${esc(kibHuruf(r) || '?')}</b>`, pill: r.status === 'Draf' ? '<span class="pill warn">Draf</span>' : r.status === 'Dihapus' ? '<span class="pill">Dihapus</span>' : r.kondisi && r.kondisi !== 'Baik' ? `<span class="pill ${r.kondisi === 'Rusak Berat' ? 'bad' : 'warn'}">${esc(r.kondisi)}</span>` : '' })
+  },
+  aset_mutasi: {
+    t: 'Mutasi Aset', ic: 'list', perm: 'aset', m: 'aset', sub: 1, sort: 'tanggal',
+    fields: [F('jenis', 'Jenis Mutasi', 'select', { req: 1, opt: ['Penambahan nilai', 'Pindah lokasi / pengguna', 'Perubahan kondisi', 'Penghapusan', 'Pemindahtanganan (tukar menukar / penjualan)'] }), F('tanggal', 'Tanggal', 'date', { req: 1, def: isoToday }),
+      F('dasar', 'Dasar (No. SK / Berita Acara)', 'text', { wide: 1 }), F('nilai', 'Nilai (Rp)', 'money'), F('ket', 'Keterangan', 'textarea', { wide: 1 }), F('dok_id', 'Dokumen', 'file')],
+    row: r => ({ t: r.jenis, s: [fDate(r.tanggal), r.dasar].filter(Boolean).join(' · '), r: r.nilai ? fMoney(r.nilai) : '', av: ic('list') })
+  },
+  aset_cek: {
+    t: 'Inventarisasi Fisik', ic: 'check', perm: 'aset', m: 'aset', sub: 1, sort: 'tanggal', excel: 1,
+    fields: [F('tanggal', 'Tanggal Pemeriksaan', 'date', { req: 1, def: isoToday }), F('nama_aset', 'Aset', 'text', { wide: 1, hint: 'Terisi otomatis dari aset yang dipilih' }), F('kondisi', 'Kondisi Fisik', 'select', { req: 1, opt: KONDISI_ASET }),
+      F('keberadaan', 'Keberadaan', 'select', { opt: ['Ada', 'Tidak ditemukan', 'Dikuasai pihak lain'], def: 'Ada' }), F('petugas', 'Petugas', 'person'), F('catatan', 'Catatan', 'textarea', { wide: 1 }), F('foto', 'Foto', 'fotos', { max: 3 })],
+    row: r => ({ t: r.nama_aset || 'Pemeriksaan aset', s: [fDate(r.tanggal), r.keberadaan, r.petugas].filter(Boolean).join(' · '), av: ic('check'), pill: `<span class="pill ${r.kondisi === 'Baik' ? 'ok' : r.kondisi === 'Rusak Berat' ? 'bad' : 'warn'}">${esc(r.kondisi || '')}</span>` })
+  },
+  ref_kode_barang: {
+    t: 'Kode Barang Aset Desa', ic: 'list', perm: '*', m: 'aset', write: 'aset', sort: 'kode', asc: 1, excel: 1,
+    fields: [F('kode', 'Kode Barang', 'text', { req: 1, mono: 1, hint: 'Golongan(1).Bidang(2).Kelompok(2).Sub(2).Sub-sub(3)' }), F('uraian', 'Uraian', 'text', { req: 1, wide: 1 }), F('kib', 'KIB', 'select', { opt: KIB_OPT }), F('satuan', 'Satuan', 'text')],
+    row: r => ({ t: r.uraian, s: r.kib || '', av: `<span class="mono">${esc(r.kode)}</span>` })
+  }
+});
+/* daftar contoh kode golongan (lengkapi/impor dari Pedoman Kodefikasi Aset Desa Kemendagri) */
+const KODE_GOL_CONTOH = [['1', 'Persediaan', ''], ['2', 'Tanah', KIB_OPT[0]], ['3', 'Peralatan dan Mesin', KIB_OPT[1]], ['4', 'Gedung dan Bangunan', KIB_OPT[2]], ['5', 'Jalan, Irigasi dan Jaringan', KIB_OPT[3]], ['6', 'Aset Tetap Lainnya', KIB_OPT[4]], ['7', 'Konstruksi Dalam Pengerjaan', KIB_OPT[5]], ['8', 'Aset Tak Berwujud', '']];
+
+/* ---------- ambil semua aset (untuk dashboard & laporan) ---------- */
+async function asetSemua(f) {
+  let rows = [], off = 0, tot = 1;
+  while (off < tot) { const r = await call('list', { entity: 'aset', filters: f || {}, limit: 5000, offset: off, sort: 'tgl_perolehan', desc: false }); rows = rows.concat(r.rows || []); tot = r.total || 0; off += (r.rows || []).length; if (!(r.rows || []).length) break; }
+  return rows;
+}
+/* setelah aset disimpan: nomor urut otomatis per kode barang */
+async function asetSetelahSimpan(id) {
+  try {
+    const a = await call('get', { entity: 'aset', id }); if (!a || asetDig(a.no_urut)) return;
+    const kb = asetDig(a.kode_barang) || KIB_GOL[kibHuruf(a)] || '';
+    const L = await asetSemua({}), max = L.filter(x => x.id !== id && (asetDig(x.kode_barang) || KIB_GOL[kibHuruf(x)] || '') === kb).reduce((m, x) => Math.max(m, Number(asetDig(x.no_urut)) || 0), 0);
+    await call('save', { entity: 'aset', record: { id, no_urut: String(max + 1) } });
+  } catch (x) { console.warn('nomor urut aset', x); }
+}
+/* setelah inventarisasi fisik disimpan: kondisi & tanggal di aset ikut diperbarui */
+async function asetCekSetelahSimpan(id) {
+  try { const c = await call('get', { entity: 'aset_cek', id }); if (c && c.ref) await call('save', { entity: 'aset', record: { id: c.ref, kondisi: c.kondisi, inv_terakhir: c.tanggal } }); } catch (x) { console.warn(x); }
+}
+/* detail aset: nomor register, asal proyek/BAST, riwayat mutasi & inventarisasi */
+async function extraAset(a, el) {
+  const w = canWrite('aset_mutasi'), R = asetRegister(a);
+  const [mut, cek] = await Promise.all([call('list', { entity: 'aset_mutasi', filters: { ref: a.id }, limit: 200 }).then(r => r.rows || []), call('list', { entity: 'aset_cek', filters: { ref: a.id }, limit: 200 }).then(r => r.rows || [])]);
+  const due = asetJatuhTempo(a);
+  el.innerHTML = `<div class="stack">
+    <div class="card" style="padding:8px 11px"><div class="lbl">Nomor register</div><div class="mono" style="font-size:13px">${esc(R.atas)}<br>${esc(R.bawah)}</div>${R.sementara ? '<div class="meta">Kode lokasi desa belum diisi (Pengaturan → Aset & RAB); nomor masih sementara.</div>' : ''}</div>
+    ${a.proyek_id ? `<div class="btns"><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['rabproyek', { id: a.proyek_id }]))}'>${ic('hammer')}Buka RAB & gambar asal aset</button></div>` : ''}
+    <div class="meta">${due ? `Inventarisasi fisik berikutnya: <b>${esc(dPanjang(due.iso))}</b>${due.hari < 0 ? ' <span class="pill bad">lewat</span>' : due.hari < 183 ? ' <span class="pill warn">segera</span>' : ''}` : ''}</div>
+    <div class="sec-h"><h2>Inventarisasi fisik (${cek.length})</h2>${w ? `<button class="btn sm" data-act="addSub" data-e="aset_cek" data-p='${esc(JSON.stringify({ ref: a.id, nama_aset: a.nama, kondisi: a.kondisi || 'Baik' }))}'>${ic('plus')}Catat pemeriksaan</button>` : ''}</div>
+    ${cek.length ? `<div class="list">${cek.map(r => rowHtml('aset_cek', r)).join('')}</div>` : '<div class="card meta">Belum pernah diperiksa. Permendagri 3/2024: inventarisasi paling sedikit sekali dalam 5 tahun.</div>'}
+    <div class="sec-h"><h2>Mutasi (${mut.length})</h2>${w ? `<button class="btn sm" data-act="addSub" data-e="aset_mutasi" data-p='${esc(JSON.stringify({ ref: a.id }))}'>${ic('plus')}Catat mutasi</button>` : ''}</div>
+    ${mut.length ? `<div class="list">${mut.map(r => rowHtml('aset_mutasi', r)).join('')}</div>` : '<div class="card meta">Belum ada mutasi.</div>'}</div>`;
+}
+function asetJatuhTempo(a) {
+  const b = parseD(a.inv_terakhir || a.tgl_perolehan || (a.tahun ? a.tahun + '-12-31' : '')); if (!b) return null;
+  const d = new Date(b); d.setFullYear(d.getFullYear() + 5);
+  const iso = d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+  return { iso, hari: Math.round((d - parseD(isoToday())) / 864e5) };
+}
+
+/* ---------- kop & tanda tangan laporan aset (diatur di Editor Template Aset) ---------- */
+function kopAset() {
+  const s = S.set || {};
+  if (!s.kop_aset_1 && !s.kop_aset_2) return kop();
+  return `<div class="kop">${s.logo_url ? `<img src="${esc(s.logo_url)}" alt="">` : ''}<div>${[s.kop_aset_1, s.kop_aset_2, s.kop_aset_3].filter(Boolean).map((t, i, A) => `<b class="${i === A.length - 1 ? 'big' : ''}">${esc(t)}</b>`).join('')}${s.kop_aset_alamat ? `<span>${esc(s.kop_aset_alamat)}</span>` : s.alamat ? `<span>${esc(s.alamat)}</span>` : ''}</div></div>`;
+}
+function ttdAset(tgl) {
+  const s = S.set || {};
+  const kiri = s.ttd_aset_kiri_jab || 'Pengurus Aset Desa', kNama = s.ttd_aset_kiri_nama || s.nama_pengurus_aset || '..............................';
+  const kanan = s.ttd_aset_kanan_jab || ('Kepala Desa ' + (s.nama_desa || '')), nNama = s.ttd_aset_kanan_nama || s.nama_kades || '..............................';
+  return `<div class="ttd" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;text-align:center;margin-top:14px"><div><br>${esc(kiri)}<div class="sp"></div><u>${esc(kNama)}</u></div><div>${esc(s.nama_desa || '')}, ${fDate(tgl || isoToday())}<br>${esc(kanan)}<div class="sp"></div><u>${esc(nNama)}</u></div></div>`;
+}
+/* ---------- kolom laporan (format KIB penatausahaan; tabel dikunci, tidak ikut editor) ---------- */
+const regTxt = a => { const R = asetRegister(a); return `<span class="mono" style="font-size:7pt">${esc(kodeFmt(a.kode_barang) || '-')}<br>${esc(R.bawah.split(' ')[1])}</span>`; };
+const ASET_KOLOM = {
+  A: [['Nama Barang', 'nama'], ['Kode / Reg', regTxt], ['Luas (m²)', a => esc(a.luas || '')], ['Tahun', 'tahun'], ['Letak / Alamat', a => esc([a.letak, a.dusun].filter(Boolean).join(', '))], ['Status Hak', 'status_tanah'], ['No. & Tgl Sertifikat', a => esc([a.no_dokumen, fDate(a.tgl_dokumen)].filter(Boolean).join(' / '))], ['Penggunaan', 'penggunaan'], ['Asal Usul', 'asal'], ['Nilai (Rp)', a => fMoney(a.nilai)], ['Ket', 'ket']],
+  B: [['Nama Barang', 'nama'], ['Kode / Reg', regTxt], ['Merk / Tipe', 'merk'], ['Ukuran / CC', 'ukuran'], ['Bahan', 'bahan'], ['Tahun', 'tahun'], ['No. Pabrik/Rangka/Mesin/Polisi/BPKB', 'no_dokumen'], ['Jumlah', a => esc((a.jumlah || '') + ' ' + (a.satuan || ''))], ['Asal Usul', 'asal'], ['Kondisi', 'kondisi'], ['Nilai (Rp)', a => fMoney(a.nilai)], ['Ket', 'ket']],
+  C: [['Nama Bangunan', 'nama'], ['Kode / Reg', regTxt], ['Kondisi', 'kondisi'], ['Bertingkat', 'tingkat'], ['Konstruksi', 'bahan'], ['Luas Lantai (m²)', a => esc(a.luas || '')], ['Letak', a => esc([a.letak, a.dusun].filter(Boolean).join(', '))], ['No. & Tgl Dokumen', a => esc([a.no_dokumen, fDate(a.tgl_dokumen)].filter(Boolean).join(' / '))], ['Status Tanah', 'status_tanah'], ['Tahun', 'tahun'], ['Asal Usul', 'asal'], ['Nilai (Rp)', a => fMoney(a.nilai)], ['Ket', 'ket']],
+  D: [['Nama', 'nama'], ['Kode / Reg', regTxt], ['Konstruksi', 'bahan'], ['Panjang (m)', a => esc(a.panjang || '')], ['Lebar (m)', a => esc(a.lebar || '')], ['Luas (m²)', a => esc(a.luas || (asetNum(a.panjang) * asetNum(a.lebar) || ''))], ['Letak', a => esc([a.letak, a.dusun].filter(Boolean).join(', '))], ['No. & Tgl Dokumen', a => esc([a.no_dokumen, fDate(a.tgl_dokumen)].filter(Boolean).join(' / '))], ['Status Tanah', 'status_tanah'], ['Tahun', 'tahun'], ['Asal Usul', 'asal'], ['Kondisi', 'kondisi'], ['Nilai (Rp)', a => fMoney(a.nilai)], ['Ket', 'ket']],
+  E: [['Nama Barang', 'nama'], ['Kode / Reg', regTxt], ['Judul / Pencipta / Jenis', a => esc([a.merk, a.ukuran].filter(Boolean).join(' · '))], ['Bahan', 'bahan'], ['Jumlah', a => esc((a.jumlah || '') + ' ' + (a.satuan || ''))], ['Tahun', 'tahun'], ['Asal Usul', 'asal'], ['Kondisi', 'kondisi'], ['Nilai (Rp)', a => fMoney(a.nilai)], ['Ket', 'ket']],
+  F: [['Nama Bangunan', 'nama'], ['Kode / Reg', regTxt], ['Bertingkat', 'tingkat'], ['Konstruksi', 'bahan'], ['Luas (m²)', a => esc(a.luas || '')], ['Letak', a => esc([a.letak, a.dusun].filter(Boolean).join(', '))], ['Tgl Mulai', a => fDate(a.tgl_perolehan)], ['Status Tanah', 'status_tanah'], ['Asal Pembiayaan', a => esc([a.asal, a.sumber_dana].filter(Boolean).join(' / '))], ['Nilai s.d. Saat Ini (Rp)', a => fMoney(a.nilai)], ['Ket', 'ket']]
+};
+function asetHalaman(judul, sub, cols, rows, foot) {
+  return `<div class="paper land" style="font-size:8.5pt">${kopAset()}<h2>${esc(judul)}</h2><h3>${esc(sub)}</h3>
+    <table class="pt" style="font-size:7.5pt"><thead><tr><th>No</th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${rows.length ? rows.map((r, i) => `<tr><td style="text-align:center">${i + 1}</td>${cols.map(c => `<td>${(typeof c[1] === 'function' ? c[1](r) : esc(r[c[1]] == null ? '' : r[c[1]])) || ''}</td>`).join('')}</tr>`).join('') : `<tr><td colspan="${cols.length + 1}" style="text-align:center">Nihil</td></tr>`}</tbody>${foot ? `<tfoot><tr><td></td>${foot.map(v => `<td><b>${v}</b></td>`).join('')}</tr></tfoot>` : ''}</table>
+    ${S.set && S.set.redaksi_aset ? `<p style="font-size:8pt">${esc(S.set.redaksi_aset)}</p>` : ''}${ttdAset()}</div>`;
+}
+const asetTotal = L => L.reduce((s, a) => s + asetNum(a.nilai), 0);
+function asetLaporan(jenis, L, opt) {
+  const desa = 'DESA ' + String((S.set || {}).nama_desa || '').toUpperCase(), th = opt.tahun ? ' — KEADAAN S.D. ' + (opt.semester === '1' ? '30 JUNI ' : '31 DESEMBER ') + opt.tahun : '';
+  const aktif = L.filter(a => a.status !== 'Dihapus');
+  if (/^KIB/.test(jenis)) {
+    const h = jenis.slice(-1), R = aktif.filter(a => kibHuruf(a) === h), cols = ASET_KOLOM[h];
+    const foot = cols.map((c, i) => /Nilai/.test(c[0]) ? fMoney(asetTotal(R)) : i === 0 ? 'Jumlah' : '');
+    return { html: asetHalaman('KARTU INVENTARIS BARANG (KIB) ' + h, kibNama(h).toUpperCase() + ' · ' + desa + th, cols, R, foot), rows: R, cols };
+  }
+  if (jenis === 'Buku Inventaris') {
+    const cols = [['Jenis Barang / Bangunan', 'nama'], ['KIB', a => 'KIB ' + kibHuruf(a)], ['Kode / Reg', regTxt], ['Identitas', a => esc([a.merk, a.ukuran, a.bahan, a.panjang ? a.panjang + ' m' : '', a.luas ? a.luas + ' m²' : ''].filter(Boolean).join(', '))], ['Jumlah', a => esc((a.jumlah || '1') + ' ' + (a.satuan || ''))], ['Asal Usul', 'asal'], ['Sumber Dana', 'sumber_dana'], ['Tahun', 'tahun'], ['Kondisi', 'kondisi'], ['Lokasi', a => esc([a.letak, a.dusun].filter(Boolean).join(', '))], ['Nilai (Rp)', a => fMoney(a.nilai)], ['Ket', 'ket']];
+    const R = aktif.slice().sort((a, b) => kibHuruf(a).localeCompare(kibHuruf(b)) || String(a.kode_barang || '').localeCompare(String(b.kode_barang || '')));
+    return { html: asetHalaman('BUKU INVENTARIS ASET DESA', desa + th, cols, R, cols.map((c, i) => /Nilai/.test(c[0]) ? fMoney(asetTotal(R)) : i === 0 ? 'Jumlah' : '')), rows: R, cols };
+  }
+  if (jenis === 'Laporan Kondisi') {
+    const rows = KIB_OPT.map(k => { const h = k.charAt(0), R = aktif.filter(a => kibHuruf(a) === h), o = { nama: k }; KONDISI_ASET.forEach(c => { const X = R.filter(a => (a.kondisi || 'Baik') === c); o[c] = X.length; o[c + '_n'] = asetTotal(X); }); o.jml = R.length; o.nilai = asetTotal(R); return o; });
+    const cols = [['Jenis KIB', 'nama']].concat(...KONDISI_ASET.map(c => [[c + ' (unit)', r => String(r[c])], [c + ' (Rp)', r => fMoney(r[c + '_n'])]]), [['Jumlah', r => String(r.jml)], ['Nilai (Rp)', r => fMoney(r.nilai)]]);
+    return { html: asetHalaman('LAPORAN KONDISI ASET DESA', desa + th, cols, rows), rows, cols };
+  }
+  if (jenis === 'Laporan Semester') {
+    const y = Number(opt.tahun) || new Date().getFullYear(), awal = opt.semester === '1' ? y + '-01-01' : y + '-07-01', akhir = opt.semester === '1' ? y + '-06-30' : y + '-12-31';
+    const tgl = a => String(a.tgl_perolehan || (a.tahun ? a.tahun + '-12-31' : '')).slice(0, 10), hapus = a => a.status === 'Dihapus' ? String(a.tgl_hapus || a.tgl_dokumen || akhir).slice(0, 10) : '9999';
+    const rows = KIB_OPT.map(k => {
+      const h = k.charAt(0), R = L.filter(a => kibHuruf(a) === h && a.status !== 'Draf');
+      const saldo = R.filter(a => tgl(a) < awal && hapus(a) >= awal), tambah = R.filter(a => tgl(a) >= awal && tgl(a) <= akhir), kurang = R.filter(a => a.status === 'Dihapus' && hapus(a) >= awal && hapus(a) <= akhir);
+      return { nama: k, sa: saldo.length, san: asetTotal(saldo), t: tambah.length, tn: asetTotal(tambah), k: kurang.length, kn: asetTotal(kurang), ak: saldo.length + tambah.length - kurang.length, akn: asetTotal(saldo) + asetTotal(tambah) - asetTotal(kurang) };
+    });
+    const cols = [['Jenis KIB', 'nama'], ['Saldo awal (unit)', r => String(r.sa)], ['Saldo awal (Rp)', r => fMoney(r.san)], ['Tambah (unit)', r => String(r.t)], ['Tambah (Rp)', r => fMoney(r.tn)], ['Kurang (unit)', r => String(r.k)], ['Kurang (Rp)', r => fMoney(r.kn)], ['Saldo akhir (unit)', r => String(r.ak)], ['Saldo akhir (Rp)', r => fMoney(r.akn)]];
+    const tot = k => rows.reduce((s, r) => s + r[k], 0);
+    return { html: asetHalaman('LAPORAN ASET DESA SEMESTER ' + (opt.semester === '1' ? 'I' : 'II') + ' TAHUN ' + y, desa + ' · disampaikan kepada Bupati (Permendagri 3/2024 Pasal 28 ayat 3)', cols, rows, ['Jumlah', String(tot('sa')), fMoney(tot('san')), String(tot('t')), fMoney(tot('tn')), String(tot('k')), fMoney(tot('kn')), String(tot('ak')), fMoney(tot('akn'))]), rows, cols };
+  }
+  return { html: '', rows: [], cols: [] };
+}
+const ASET_LAP = ['Buku Inventaris', 'KIB A', 'KIB B', 'KIB C', 'KIB D', 'KIB E', 'KIB F', 'Laporan Kondisi', 'Laporan Semester'];
+VIEWS.asetcetak = async (p, main) => {
+  setTop('Cetak Laporan Aset');
+  const st = S.asetCt = S.asetCt || { j: 'Buku Inventaris', tahun: String(new Date().getFullYear()), semester: new Date().getMonth() < 6 ? '1' : '2' };
+  main.innerHTML = '<div class="skel" style="height:200px"></div>';
+  const L = await asetSemua({});
+  main.innerHTML = `<div class="stack"><div class="card stack"><div class="chips wrap">${ASET_LAP.map(j => `<button class="chip ${st.j === j ? 'on' : ''}" data-act="acJ" data-v="${esc(j)}">${esc(j)}</button>`).join('')}</div>
+    <div class="form"><div class="f"><label for="acT">Tahun</label><input id="acT" type="number" value="${esc(st.tahun)}"></div><div class="f"><label for="acS">Semester</label><select id="acS"><option value="1" ${st.semester === '1' ? 'selected' : ''}>I (Januari–Juni)</option><option value="2" ${st.semester === '2' ? 'selected' : ''}>II (Juli–Desember)</option></select></div></div>
+    <div class="btns"><button class="btn pri" data-act="acCetak">${ic('print')}Cetak / PDF</button><button class="btn" data-act="acXls">${ic('down')}Excel</button><button class="btn" data-act="acAll">${ic('print')}Cetak semua KIB</button>${S.user.admin ? `<button class="btn" data-act="go" data-go='["asettpl"]'>${ic('edit')}Atur kop & penandatangan</button>` : ''}</div>
+    <div class="meta">${L.length} aset tercatat. Kolom tabel mengikuti format KIB dan tidak bisa diubah; kop, logo, penandatangan, dan redaksi diatur di editor template.</div></div><div id="acPrev" class="card" style="overflow:auto"></div></div>`;
+  const opt = () => ({ tahun: $('#acT').value, semester: $('#acS').value });
+  const prev = () => { st.tahun = $('#acT').value; st.semester = $('#acS').value; const r = asetLaporan(st.j, L, opt()); $('#acPrev').innerHTML = `<div style="zoom:.6">${r.html}</div>`; };
+  prev(); $('#acT').onchange = prev; $('#acS').onchange = prev;
+  S.vh.acJ = t => { st.j = t.dataset.v; refresh(); };
+  S.vh.acCetak = () => printDocs(st.j, [asetLaporan(st.j, L, opt()).html]);
+  S.vh.acAll = () => printDocs('KIB A–F', ['KIB A', 'KIB B', 'KIB C', 'KIB D', 'KIB E', 'KIB F'].map(j => asetLaporan(j, L, opt()).html));
+  S.vh.acXls = () => {
+    const strip = h => String(h == null ? '' : h).replace(/<br\s*\/?>/g, ' ').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").trim();
+    const jj = st.j === 'Buku Inventaris' ? ASET_LAP.slice(0, 7) : [st.j];
+    saveBlob(XL.write(jj.map(j => { const r = asetLaporan(j, L, opt()); return { name: j, rows: [['No'].concat(r.cols.map(c => c[0]))].concat(r.rows.map((x, i) => [i + 1].concat(r.cols.map(c => { const v = typeof c[1] === 'function' ? strip(c[1](x)) : (x[c[1]] == null ? '' : x[c[1]]); const n = /Rp|Nilai|unit|Luas|Panjang|Lebar/.test(c[0]) ? Number(String(v).replace(/[^\d,-]/g, '').replace(',', '.')) : NaN; return isNaN(n) || v === '' ? v : n; })))), head: true, widths: [5].concat(r.cols.map(c => /Nama|Jenis|Letak|Identitas/.test(c[0]) ? 30 : 16)) }; })), namaFile(st.j + ' ' + (S.set.nama_desa || '') + ' ' + st.tahun) + '.xlsx');
+  };
+};
+/* ---------- editor kop & penandatangan laporan aset ---------- */
+VIEWS.asettpl = async (p, main) => {
+  setTop('Editor Template Laporan Aset');
+  if (!S.user.admin) { main.innerHTML = '<div class="err">Khusus admin.</div>'; return; }
+  const s = S.set || {}, F2 = [['kop_aset_1', 'Kop baris 1', 'PEMERINTAH KABUPATEN ' + String(s.kabupaten || '').toUpperCase()], ['kop_aset_2', 'Kop baris 2', 'KECAMATAN ' + String(s.kecamatan || '').toUpperCase()], ['kop_aset_3', 'Kop baris 3 (huruf besar)', 'DESA ' + String(s.nama_desa || '').toUpperCase()], ['kop_aset_alamat', 'Alamat di bawah kop', s.alamat || ''],
+    ['ttd_aset_kiri_jab', 'Penandatangan kiri — jabatan', 'Pengurus Aset Desa'], ['ttd_aset_kiri_nama', 'Penandatangan kiri — nama', ''], ['ttd_aset_kanan_jab', 'Penandatangan kanan — jabatan', 'Kepala Desa ' + (s.nama_desa || '')], ['ttd_aset_kanan_nama', 'Penandatangan kanan — nama', s.nama_kades || ''], ['redaksi_aset', 'Redaksi penutup (opsional)', '']];
+  main.innerHTML = `<div class="stack"><div class="card stack"><div class="meta">Yang bisa diubah hanya kop, penandatangan, dan redaksi. Tabel KIB, Buku Inventaris, dan laporan dikunci sesuai format baku. Logo memakai logo di Pengaturan.</div>
+    <div class="form">${F2.map(f => `<div class="f ${/redaksi|alamat/.test(f[0]) ? 'wide' : ''}"><label for="t_${f[0]}">${esc(f[1])}</label><input id="t_${f[0]}" value="${esc(s[f[0]] || '')}" placeholder="${esc(f[2])}"></div>`).join('')}</div>
+    <div class="btns"><button class="btn pri" data-act="atSimpan">${ic('check')}Simpan untuk semua laporan aset</button><button class="btn" data-act="go" data-go='["asetcetak"]'>${ic('print')}Ke Cetak Laporan</button></div></div>
+    <div class="card" style="overflow:auto"><div class="lbl">Pratinjau</div><div id="atPrev" style="zoom:.6"></div></div></div>`;
+  const ambil = () => { const v = {}; F2.forEach(f => { v[f[0]] = $('#t_' + f[0]).value.trim(); }); return v; };
+  const prev = () => { const keep = S.set; S.set = Object.assign({}, keep, ambil()); $('#atPrev').innerHTML = asetHalaman('KARTU INVENTARIS BARANG (KIB) D', 'JALAN, IRIGASI DAN JARINGAN · CONTOH', ASET_KOLOM.D, [], null).replace('<tbody>', '<tbody><tr><td colspan="15" style="text-align:center;background:#f3f3f3">Tabel baku — terkunci</td></tr>'); S.set = keep; };
+  prev(); $$('[id^=t_]', main).forEach(i => i.oninput = prev);
+  S.vh.atSimpan = async () => { try { S.set = await call('settingsSave', { values: ambil() }); toast('Template laporan aset disimpan.'); } catch (x) { toast(x.message, 1); } };
+};
+/* ---------- dashboard aset & kinerja ---------- */
+VIEWS.asetdash = async (p, main, alive) => {
+  setTop('Dashboard Aset Desa');
+  main.innerHTML = '<div class="skel" style="height:240px"></div>';
+  const [L, lama] = await Promise.all([asetSemua({}), Promise.all(['inventaris', 'tkd'].map(e => call('list', { entity: e, limit: 1 }).then(r => r.total || 0).catch(() => 0)))]); if (alive && !alive()) return;
+  const s = S.set || {}, y0 = Number(s.masa_jabatan_mulai) || 0, y1 = Number(s.masa_jabatan_akhir) || 0;
+  const st = S.asetDs = S.asetDs || { per: y0 ? 'jabatan' : 'semua' };
+  const aktif = L.filter(a => a.status !== 'Dihapus'), draf = L.filter(a => a.status === 'Draf');
+  const th = a => Number(a.tahun || String(a.tgl_perolehan || '').slice(0, 4)) || 0;
+  const dalam = a => st.per === 'semua' ? true : st.per === 'jabatan' ? th(a) >= y0 && th(a) <= (y1 || 9999) : th(a) === Number(st.per);
+  const rx = /jalan|rabat|paving|aspal|makadam|jembatan|gang|lapen/i, ri = /irigasi|saluran|drainase|plengsengan|talud|gorong|parit/i;
+  const P = aktif.filter(dalam), jalan = P.filter(a => kibHuruf(a) === 'D' && rx.test(a.nama)), irig = P.filter(a => kibHuruf(a) === 'D' && ri.test(a.nama) && !rx.test(a.nama)), ged = P.filter(a => kibHuruf(a) === 'C');
+  const km = R => R.reduce((t, a) => t + asetNum(a.panjang), 0) / 1000;
+  const tahunList = Array.from(new Set(aktif.map(th).filter(Boolean))).sort();
+  const perTh = tahunList.filter(y => st.per === 'semua' || st.per === 'jabatan' ? (st.per === 'semua' || (y >= y0 && y <= (y1 || 9999))) : y === Number(st.per)).map(y => ({ y, j: km(jalan.filter(a => th(a) === y)), i: km(irig.filter(a => th(a) === y)), g: ged.filter(a => th(a) === y).length }));
+  const mx = Math.max(0.001, ...perTh.map(x => x.j + x.i));
+  const tot = asetTotal(aktif), perK = KIB_OPT.map(k => ({ k, n: asetTotal(aktif.filter(a => kibHuruf(a) === k.charAt(0))) }));
+  const kon = KONDISI_ASET.map(c => ({ c, n: aktif.filter(a => (a.kondisi || 'Baik') === c).length }));
+  const jt = aktif.map(a => ({ a, d: asetJatuhTempo(a) })).filter(x => x.d && x.d.hari < 183);
+  const bln = new Date().getMonth() + 1, semDue = bln === 6 || bln === 12 || bln === 5 || bln === 11;
+  const kibF = aktif.filter(a => kibHuruf(a) === 'F' && th(a) && th(a) < new Date().getFullYear());
+  const rpf = v => 'Rp ' + Math.round(v).toLocaleString('id-ID');
+  const KC = { Baik: 'var(--ok)', 'Kurang Baik': 'var(--warn)', 'Rusak Berat': 'var(--bad)' };
+  main.innerHTML = `<div class="kd">
+    <div class="card rk-top"><div style="flex:1;min-width:180px"><span class="lbl">Periode</span> <span class="chips wrap" style="display:inline-flex">${(y0 ? [['jabatan', 'Masa jabatan Kades ' + y0 + '–' + (y1 || 'sekarang')]] : []).concat([['semua', 'Semua tahun']], tahunList.slice(-4).map(y => [String(y), String(y)])).map(c => `<button class="chip ${st.per === c[0] ? 'on' : ''}" data-act="adPer" data-v="${c[0]}">${esc(c[1])}</button>`).join('')}</span>
+      ${y0 ? '' : `<div class="meta">Masa jabatan Kepala Desa belum diisi (Pengaturan → Aset & RAB).</div>`}</div></div>
+    ${lama.some(Boolean) ? `<div class="card meta">Ada ${lama[0]} data Inventaris lama dan ${lama[1]} Tanah Kas Desa. <button class="btn sm pri" data-act="adMigrasi">Pindahkan ke KIB</button></div>` : ''}
+    <div class="kd-kpi">
+      <div class="kd-k" style="--kc:var(--ok)"><span class="l">Total nilai aset</span><b class="v">${rpf(tot)}</b><span class="s">${aktif.length} aset aktif</span></div>
+      <div class="kd-k" style="--kc:var(--info)"><span class="l">Jalan dibangun</span><b class="v">${km(jalan).toLocaleString('id-ID', { maximumFractionDigits: 2 })} km</b><span class="s">${jalan.length} ruas · periode terpilih</span></div>
+      <div class="kd-k" style="--kc:var(--c-bel)"><span class="l">Irigasi / saluran</span><b class="v">${km(irig).toLocaleString('id-ID', { maximumFractionDigits: 2 })} km</b><span class="s">${irig.length} ruas</span></div>
+      <div class="kd-k" style="--kc:var(--c-pend)"><span class="l">Gedung / bangunan</span><b class="v">${ged.length}</b><span class="s">unit, KIB C</span></div>
+    </div>
+    <div class="kd-2">
+      <div class="kd-c"><div class="kd-h"><b>Capaian pembangunan per tahun</b><span class="meta">panjang dari KIB D, jumlah gedung dari KIB C</span></div>
+        <div class="kd-bars">${perTh.length ? perTh.map(x => `<div class="kd-bar"><div class="t"><span>${x.y}</span><span class="num">jalan ${x.j.toLocaleString('id-ID', { maximumFractionDigits: 2 })} km · irigasi ${x.i.toLocaleString('id-ID', { maximumFractionDigits: 2 })} km · gedung ${x.g}</span></div><div class="kd-lane" style="display:flex;gap:2px"><div class="kd-track" style="--kc:var(--info);width:${x.j / mx * 100}%"><i style="width:100%"></i></div><div class="kd-track" style="--kc:var(--c-bel);width:${x.i / mx * 100}%"><i style="width:100%"></i></div></div></div>`).join('') : '<div class="meta">Belum ada aset jalan/irigasi/gedung pada periode ini.</div>'}</div></div>
+      <div class="kd-c"><div class="kd-h"><b>Nilai per KIB</b><span class="meta">${rpf(tot)}</span></div>
+        <div class="kd-bars">${perK.map(x => `<div class="kd-bar"><div class="t"><span>${esc(x.k)}</span><span class="num">${rpf(x.n)}${tot ? ' · ' + Math.round(x.n / tot * 100) + '%' : ''}</span></div><div class="kd-lane"><div class="kd-track" style="--kc:var(--ok)"><i style="width:${tot ? x.n / tot * 100 : 0}%"></i></div></div></div>`).join('')}</div>
+        <div class="kd-h" style="margin-top:12px"><b>Kondisi aset</b></div>
+        <div style="display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--line)">${kon.map(x => `<div title="${esc(x.c)}: ${x.n}" style="width:${aktif.length ? x.n / aktif.length * 100 : 0}%;background:${KC[x.c]}"></div>`).join('')}</div>
+        <div class="meta">${kon.map(x => esc(x.c) + ' ' + x.n).join(' · ')}</div></div>
+    </div>
+    <div class="kd-c"><div class="kd-h"><b>Peringatan</b></div><div class="list">
+      ${jt.length ? `<button class="row" data-act="go" data-go='["list",{"e":"aset"}]'><span class="av">${ic('check')}</span><span class="main"><span class="t">Inventarisasi fisik jatuh tempo / segera: ${jt.length} aset</span><span class="s">Siklus paling lama 5 tahun (Permendagri 3/2024 Pasal 28 ayat 4)</span></span></button>` : ''}
+      ${semDue ? `<button class="row" data-act="go" data-go='["asetcetak"]'><span class="av">${ic('file')}</span><span class="main"><span class="t">Laporan aset semester ${bln <= 6 ? 'I' : 'II'} ke Bupati</span><span class="s">Cetak Laporan Semester di menu Cetak Laporan Aset</span></span></button>` : ''}
+      ${draf.length ? `<button class="row" data-act="go" data-go='["list",{"e":"aset","v":1}]'><span class="av">${ic('edit')}</span><span class="main"><span class="t">Draf aset dari BAST belum dilengkapi: ${draf.length}</span><span class="s">Lengkapi kode barang & lokasi, lalu ubah status menjadi Aktif</span></span></button>` : ''}
+      ${kibF.length ? `<div class="row" style="cursor:default"><span class="av">${ic('hammer')}</span><span class="main"><span class="t">KIB F lebih dari 1 tahun: ${kibF.length}</span><span class="s">Selesaikan BAST agar pindah ke KIB C/D</span></span></div>` : ''}
+      ${!asetDig(s.kode_lokasi_aset) ? `<button class="row" data-act="go" data-go='["settings"]'><span class="av">${ic('pin')}</span><span class="main"><span class="t">Kode lokasi desa belum diisi</span><span class="s">Nomor register aset masih sementara</span></span></button>` : ''}
+      ${!jt.length && !semDue && !draf.length && !kibF.length && asetDig(s.kode_lokasi_aset) ? '<div class="meta">Tidak ada peringatan.</div>' : ''}</div></div>
+    <div class="btns"><button class="btn pri" data-act="go" data-go='["list",{"e":"aset"}]'>${ic('box')}Buku Inventaris & KIB</button><button class="btn" data-act="go" data-go='["asetcetak"]'>${ic('print')}Cetak laporan</button><button class="btn" data-act="go" data-go='["list",{"e":"ref_kode_barang"}]'>${ic('list')}Kode barang</button></div></div>`;
+  S.vh.adPer = t => { st.per = t.dataset.v; refresh(); };
+  S.vh.adMigrasi = async t => { t.disabled = true; try { const n = await asetMigrasi(); toast(n + ' data dipindahkan ke KIB.'); refresh(); } catch (x) { toast(x.message, 1); t.disabled = false; } };
+};
+/* pindahkan data Inventaris & Tanah Kas Desa lama ke KIB */
+async function asetMigrasi() {
+  const ambil = async e => { const r = await call('list', { entity: e, limit: 5000 }); return r.rows || []; };
+  const [inv, tkd, ada] = await Promise.all([ambil('inventaris'), ambil('tkd'), asetSemua({})]);
+  const sudah = new Set(ada.map(a => a.dari_id).filter(Boolean));
+  const mapK = k => /tanah/i.test(k) ? KIB_OPT[0] : /gedung|bangunan/i.test(k) ? KIB_OPT[2] : /jalan|irigasi|jaringan/i.test(k) ? KIB_OPT[3] : /lainnya/i.test(k) ? KIB_OPT[4] : /konstruksi/i.test(k) ? KIB_OPT[5] : KIB_OPT[1];
+  const mapAsal = a => /sendiri/i.test(a) ? ASAL_ASET[0] : /pemerintah$/i.test(a) ? ASAL_ASET[2] : /provinsi/i.test(a) ? ASAL_ASET[3] : /kabupaten/i.test(a) ? ASAL_ASET[4] : /sumbangan|hibah/i.test(a) ? ASAL_ASET[5] : a ? ASAL_ASET[6] : '';
+  const rows = inv.filter(r => !sudah.has(r.id)).map(r => ({ dari_id: r.id, kib: mapK(r.kategori), nama: r.nama, kode_barang: r.kode_aset || '', no_urut: r.no_register || '', merk: r.merk || '', ukuran: r.ukuran || '', bahan: r.bahan || '', jumlah: r.jumlah || '1', satuan: r.satuan || 'Unit', asal: mapAsal(r.asal), sumber_dana: r.sumber_dana || '', tahun: String(r.tgl_perolehan || '').slice(0, 4), tgl_perolehan: r.tgl_perolehan || '', nilai: r.nilai || '', kondisi: r.kondisi === 'Rusak Ringan' ? 'Kurang Baik' : (r.kondisi || 'Baik'), letak: r.lokasi || '', no_dokumen: r.no_dokumen || '', ket: r.ket || '', foto: r.foto_id ? JSON.stringify([{ id: r.foto_id }]) : '', status: 'Aktif' }))
+    .concat(tkd.filter(r => !sudah.has(r.id)).map(r => ({ dari_id: r.id, kib: KIB_OPT[0], nama: 'Tanah Kas Desa ' + (r.jenis || '') + (r.lokasi ? ' ' + r.lokasi : ''), luas: r.luas || '', status_tanah: r.no_sertifikat ? 'Sertifikat / Letter C' : '', no_dokumen: r.no_sertifikat || '', tahun: String(r.tgl_perolehan || '').slice(0, 4), tgl_perolehan: r.tgl_perolehan || '', asal: /asli/i.test(r.perolehan) ? ASAL_ASET[1] : mapAsal(r.perolehan), letak: r.lokasi || '', penggunaan: r.peruntukan || '', ket: [r.kelas && 'Kelas ' + r.kelas, r.patok && 'Patok: ' + r.patok, r.ket].filter(Boolean).join('; '), dok_id: r.dok_id || '', status: 'Aktif' })));
+  for (let i = 0; i < rows.length; i += 200) { const r = await call('bulkSave', { entity: 'aset', rows: rows.slice(i, i + 200) }); if (r.gagal && r.gagal.length) throw new Error(r.gagal[0].pesan); }
+  return rows.length;
+}
+
+/* =====================================================================
+   RAB & GAMBAR — proyek parametrik (P, L, T) → gambar SVG → volume → AHSP × SSH
+   → bundel RAB → sahkan → pelaksanaan → BAST → draf aset (KIB C/D/F)
+   Tertaut ke APBDes (kegiatan, rincian) dan RKP Desa (Form 12–13)
+   ===================================================================== */
+const SSH_CONTOH = [["U.01", "Pekerja", "Upah", "OH", 100000], ["U.02", "Tukang batu", "Upah", "OH", 120000], ["U.03", "Tukang kayu", "Upah", "OH", 120000], ["U.04", "Tukang besi", "Upah", "OH", 120000], ["U.05", "Tukang cat", "Upah", "OH", 120000], ["U.06", "Kepala tukang", "Upah", "OH", 130000], ["U.07", "Mandor", "Upah", "OH", 140000], ["M.01", "Semen Portland (PC)", "Bahan", "kg", 1400], ["M.02", "Pasir beton", "Bahan", "m3", 260000], ["M.03", "Pasir pasang", "Bahan", "m3", 230000], ["M.04", "Pasir urug", "Bahan", "m3", 160000], ["M.05", "Kerikil / batu pecah 2/3", "Bahan", "m3", 320000], ["M.06", "Batu kali", "Bahan", "m3", 240000], ["M.07", "Bata merah", "Bahan", "buah", 900], ["M.08", "Air kerja", "Bahan", "liter", 50], ["M.09", "Kayu kelas III (bekisting)", "Bahan", "m3", 3500000], ["M.10", "Paku 5–12 cm", "Bahan", "kg", 22000], ["M.11", "Minyak bekisting", "Bahan", "liter", 15000], ["M.12", "Besi beton polos", "Bahan", "kg", 14500], ["M.13", "Kawat beton", "Bahan", "kg", 26000], ["M.14", "Keramik lantai 40×40", "Bahan", "m2", 70000], ["M.15", "Cat tembok", "Bahan", "kg", 30000], ["M.16", "Atap baja ringan + galvalum (terpasang)", "Bahan", "m2", 250000], ["M.17", "Pintu panel kayu + kusen (terpasang)", "Bahan", "unit", 1800000], ["M.18", "Jendela kayu + kusen (terpasang)", "Bahan", "unit", 900000], ["A.01", "Sewa molen (concrete mixer) 0,3 m3", "Alat", "jam", 60000]];
+const AHSP_CONTOH = [["P.01", "Pembersihan lahan dan perataan", "m2", "Persiapan", [["U.01", "0,1"], ["U.07", "0,05"]]], ["T.01", "Galian tanah biasa sedalam s.d. 1 m", "m3", "Tanah", [["U.01", "0,75"], ["U.07", "0,025"]]], ["T.02", "Urugan pasir", "m3", "Tanah", [["M.04", "1,2"], ["U.01", "0,3"], ["U.07", "0,01"]]], ["B.01", "Beton mutu f'c 14,5 MPa (K-175)", "m3", "Beton", [["M.01", "326"], ["M.02", "0,543"], ["M.05", "0,762"], ["M.08", "215"], ["U.01", "1,65"], ["U.02", "0,275"], ["U.06", "0,028"], ["U.07", "0,083"]]], ["B.02", "Beton bertulang praktis (sloof, kolom, ring balok)", "m3", "Beton", [["M.01", "326"], ["M.02", "0,543"], ["M.05", "0,762"], ["M.08", "215"], ["M.12", "150"], ["M.13", "2,25"], ["M.09", "0,2"], ["M.10", "2"], ["U.01", "5,3"], ["U.02", "0,275"], ["U.03", "1,3"], ["U.04", "1,05"], ["U.06", "0,262"], ["U.07", "0,265"]]], ["K.01", "Bekisting sisi beton (kayu)", "m2", "Bekisting", [["M.09", "0,04"], ["M.10", "0,3"], ["M.11", "0,1"], ["U.01", "0,52"], ["U.03", "0,26"], ["U.06", "0,026"], ["U.07", "0,026"]]], ["S.01", "Pasangan batu kali 1PC:4PP", "m3", "Pasangan", [["M.06", "1,2"], ["M.01", "163"], ["M.03", "0,52"], ["U.01", "1,5"], ["U.02", "0,75"], ["U.06", "0,075"], ["U.07", "0,075"]]], ["S.02", "Pasangan bata merah ½ bata 1PC:4PP", "m2", "Pasangan", [["M.07", "70"], ["M.01", "11,5"], ["M.03", "0,043"], ["U.01", "0,3"], ["U.02", "0,1"], ["U.06", "0,01"], ["U.07", "0,015"]]], ["L.01", "Plesteran 1PC:4PP tebal 15 mm", "m2", "Plesteran", [["M.01", "6,24"], ["M.03", "0,024"], ["U.01", "0,3"], ["U.02", "0,15"], ["U.06", "0,015"], ["U.07", "0,015"]]], ["L.02", "Acian", "m2", "Plesteran", [["M.01", "3,25"], ["U.01", "0,2"], ["U.02", "0,1"], ["U.06", "0,01"], ["U.07", "0,01"]]], ["R.01", "Pasangan lantai keramik 40×40", "m2", "Lantai", [["M.14", "1,08"], ["M.01", "10"], ["M.03", "0,045"], ["U.01", "0,7"], ["U.02", "0,35"], ["U.06", "0,035"], ["U.07", "0,035"]]], ["C.01", "Pengecatan tembok baru", "m2", "Pengecatan", [["M.15", "0,36"], ["U.01", "0,02"], ["U.05", "0,063"], ["U.06", "0,0063"], ["U.07", "0,0025"]]], ["A.01", "Atap baja ringan + penutup galvalum", "m2", "Atap", [["M.16", "1"]]], ["J.01", "Pintu panel kayu + kusen", "unit", "Kusen", [["M.17", "1"]]], ["J.02", "Jendela kayu + kusen", "unit", "Kusen", [["M.18", "1"]]]];
+
+const RAB_STATUS = { Draf: '', Disahkan: 'info', Pelaksanaan: 'warn', Selesai: 'ok' };
+const RAB_TPL = {
+  rabat: {
+    n: 'Rabat Beton / Jalan Beton', kib: 'D', bahan: 'Rabat beton',
+    param: [['P', 'Panjang P', 'm', 100], ['L', 'Lebar L', 'm', 3], ['t', 'Tebal beton', 'm', 0.12], ['tp', 'Tebal urugan pasir', 'm', 0.05]],
+    items: [['P.01', 'P*L'], ['T.02', 'P*L*tp'], ['B.01', 'P*L*t'], ['K.01', '2*(P+L)*t']],
+    ukuran: v => ({ panjang: v.P, lebar: v.L, luas: v.P * v.L })
+  },
+  irigasi: {
+    n: 'Saluran Irigasi / Drainase Pasangan Batu', kib: 'D', bahan: 'Pasangan batu kali',
+    param: [['P', 'Panjang saluran P', 'm', 100], ['b', 'Lebar dalam b', 'm', 0.4], ['h', 'Tinggi dinding h', 'm', 0.5], ['td', 'Tebal dinding', 'm', 0.25], ['ta', 'Tebal dasar', 'm', 0.2]],
+    items: [['T.01', 'P*(b+2*td)*(h+ta)'], ['S.01', 'P*(2*h*td+(b+2*td)*ta)'], ['L.01', 'P*(2*h+b)'], ['L.02', 'P*(2*h+b)']],
+    ukuran: v => ({ panjang: v.P, lebar: v.b + 2 * v.td, luas: v.P * (v.b + 2 * v.td) })
+  },
+  gedung: {
+    n: 'Gedung Sederhana 1 Lantai', kib: 'C', bahan: 'Permanen (bata, beton bertulang)',
+    param: [['P', 'Panjang bangunan P', 'm', 8], ['L', 'Lebar bangunan L', 'm', 6], ['T', 'Tinggi dinding T', 'm', 3.5], ['pintu', 'Jumlah pintu', 'unit', 1], ['jendela', 'Jumlah jendela', 'unit', 2]],
+    items: [['P.01', '(P+2)*(L+2)'], ['T.01', '2*(P+L)*0.6*0.8'], ['T.02', '2*(P+L)*0.6*0.05+P*L*0.05'], ['S.01', '2*(P+L)*0.315'], ['B.02', '2*(P+L)*0.15*0.2*2+ceil(2*(P+L)/3)*T*0.15*0.15'],
+      ['S.02', '2*(P+L)*T-pintu*1.89-jendela*1.2'], ['L.01', '2*(2*(P+L)*T-pintu*1.89-jendela*1.2)'], ['L.02', '2*(2*(P+L)*T-pintu*1.89-jendela*1.2)'], ['R.01', 'P*L'], ['A.01', '(P+1)*(L+1)*1.15'], ['C.01', '2*(2*(P+L)*T-pintu*1.89-jendela*1.2)'], ['J.01', 'pintu'], ['J.02', 'jendela']],
+    ukuran: v => ({ panjang: v.P, lebar: v.L, luas: v.P * v.L })
+  }
+};
+const rabNum = v => { if (typeof v === 'number') return v; const s = String(v == null ? '' : v).trim(); if (!s) return 0; return Number(s.indexOf(',') >= 0 ? s.replace(/\./g, '').replace(',', '.') : s) || 0; };
+const rabFmt = (n, d) => Number(n || 0).toLocaleString('id-ID', { maximumFractionDigits: d == null ? 2 : d });
+const rabRp = n => 'Rp ' + Math.round(n || 0).toLocaleString('id-ID');
+function rabEval(expr, v) {
+  const keys = Object.keys(v), fn = new Function(...keys, 'ceil', 'floor', 'max', 'min', 'return (' + String(expr).replace(/[^\w\s+\-*/().,]/g, '') + ');');
+  const r = fn(...keys.map(k => rabNum(v[k])), Math.ceil, Math.floor, Math.max, Math.min);
+  return isFinite(r) ? Math.max(0, Math.round(r * 100) / 100) : 0;
+}
+/* ---------- master data ---------- */
+async function rabMaster(force) {
+  if (!force && S.rabM && Date.now() - S.rabM.t < 120000) return S.rabM;
+  const L = e => call('list', { entity: e, limit: 5000, sort: 'kode', desc: false }).then(r => r.rows || []);
+  const [ssh, ahsp] = await Promise.all([L('ssh_item'), L('ahsp')]);
+  const sshK = {}; ssh.forEach(x => { sshK[String(x.kode || '').trim()] = x; });
+  const ahspK = {}; ahsp.forEach(x => { ahspK[String(x.kode || '').trim()] = x; });
+  S.rabM = { t: Date.now(), ssh, ahsp, sshK, ahspK };
+  return S.rabM;
+}
+const ahspKoef = a => { let r = []; try { r = JSON.parse(a.koef || '[]'); } catch (x) { } return r.map(k => ({ kode: String(k.ssh || '').trim().split(/\s+/)[0], koef: rabNum(k.koef) })).filter(k => k.kode); };
+/* harga satuan pekerjaan = Σ koefisien × harga, ditambah biaya umum & keuntungan (bu %) */
+function rabHsp(a, M, bu) {
+  const o = { upah: 0, bahan: 0, alat: 0, rinci: [] };
+  ahspKoef(a).forEach(k => { const s = M.sshK[k.kode] || {}, h = rabNum(s.harga), j = /upah/i.test(s.jenis) ? 'upah' : /alat/i.test(s.jenis) ? 'alat' : 'bahan'; o[j] += k.koef * h; o.rinci.push({ kode: k.kode, uraian: s.uraian || '(SSH ' + k.kode + ' tidak ada)', satuan: s.satuan || '', jenis: s.jenis || '', koef: k.koef, harga: h, jumlah: k.koef * h, kosong: !h }); });
+  o.langsung = o.upah + o.bahan + o.alat; o.bu = o.langsung * (rabNum(bu) / 100); o.hsp = Math.round(o.langsung + o.bu);
+  return o;
+}
+function rabHitung(pr, M) {
+  const tpl = RAB_TPL[pr.jenis_proyek]; if (!tpl) return { items: [], total: 0 };
+  const v = {}; tpl.param.forEach(p => { v[p[0]] = rabNum((pr._p || {})[p[0]] != null ? pr._p[p[0]] : p[3]); });
+  const bu = pr.bu_persen != null && pr.bu_persen !== '' ? pr.bu_persen : (pr.pola === 'Penyedia' ? (S.set.bu_penyedia || 10) : (S.set.bu_swakelola || 0));
+  const items = tpl.items.map(([kode, rumus]) => {
+    const a = M.ahspK[kode] || { kode, uraian: '(AHSP ' + kode + ' belum ada)', satuan: '' }, vol = rabEval(rumus, v), h = rabHsp(a, M, bu);
+    return { kode, uraian: a.uraian, kategori: a.kategori || '', satuan: a.satuan || '', rumus, volume: vol, hsp: h.hsp, jumlah: Math.round(vol * h.hsp / 100) * 100, h };
+  }).filter(it => it.volume > 0);
+  return { items, total: items.reduce((s, it) => s + it.jumlah, 0), v, bu: rabNum(bu), tpl };
+}
+/* kebutuhan bahan, upah, alat (untuk daftar harga, Form 12 RKP, rincian APBDes) */
+function rabSumberDaya(items) {
+  const g = {};
+  items.forEach(it => (it.h ? it.h.rinci : []).forEach(r => { const k = r.kode; g[k] = g[k] || { kode: k, uraian: r.uraian, satuan: r.satuan, jenis: r.jenis || 'Bahan', harga: r.harga, qty: 0 }; g[k].qty += r.koef * it.volume; }));
+  return Object.values(g).map(x => Object.assign(x, { qty: Math.round(x.qty * 100) / 100, jumlah: Math.round(x.qty * x.harga) })).sort((a, b) => a.kode.localeCompare(b.kode));
+}
+/* ---------- gambar teknis (SVG) ---------- */
+function svgDim(x1, y1, x2, y2, label, off) {
+  off = off || 0; const vert = x1 === x2, tx = vert ? x1 + off : (x1 + x2) / 2, ty = vert ? (y1 + y2) / 2 : y1 + off;
+  return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#555" stroke-width="1" marker-start="url(#da)" marker-end="url(#da)"/><text x="${tx}" y="${ty}" font-size="11" text-anchor="middle" fill="#222" ${vert ? `transform="rotate(-90 ${tx} ${ty})"` : ''}>${esc(label)}</text>`;
+}
+const SVG_DEF = '<defs><marker id="da" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 2L5 5L0 8" fill="none" stroke="#555"/></marker><pattern id="hb" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#999" stroke-width="1"/></pattern><pattern id="hp" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".6" fill="#b08d57"/></pattern></defs>';
+function rabGambar(pr, v) {
+  const j = pr.jenis_proyek, m = n => rabFmt(n) + ' m';
+  const kotak = (judul, isi, w, h) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="100%" style="max-width:${w}px;background:#fff;border:1px solid #ccc;border-radius:6px">${SVG_DEF}<text x="10" y="18" font-size="12" font-weight="700" fill="#222">${esc(judul)}</text>${isi}</svg>`;
+  if (j === 'rabat') {
+    const lw = Math.max(26, Math.min(110, 520 * v.L / Math.max(v.P, 0.1))), y = 40;
+    const den = kotak('DENAH (skematis)', `<rect x="40" y="${y}" width="520" height="${lw}" fill="url(#hb)" stroke="#333" stroke-width="1.5"/>${svgDim(40, y + lw + 18, 560, y + lw + 18, 'P = ' + m(v.P), 14)}${svgDim(575, y, 575, y + lw, 'L = ' + m(v.L), 14)}<text x="300" y="${y + lw / 2 + 4}" font-size="11" text-anchor="middle" fill="#222">rabat beton t = ${esc(m(v.t))}</text>`, 620, y + lw + 50);
+    const W = 360, sc = W / Math.max(v.L, 0.1), tb = Math.max(14, v.t * sc * 3), tpp = Math.max(8, v.tp * sc * 3), x0 = 60, y0 = 46;
+    const pot = kotak('POTONGAN MELINTANG A–A (tebal diperbesar)', `<rect x="${x0}" y="${y0}" width="${W}" height="${tb}" fill="url(#hb)" stroke="#333"/><rect x="${x0}" y="${y0 + tb}" width="${W}" height="${tpp}" fill="url(#hp)" stroke="#333"/><line x1="${x0 - 30}" y1="${y0 + tb + tpp}" x2="${x0 + W + 30}" y2="${y0 + tb + tpp}" stroke="#7a5" stroke-width="2"/>${svgDim(x0, y0 + tb + tpp + 22, x0 + W, y0 + tb + tpp + 22, 'L = ' + m(v.L), 14)}<text x="${x0 + W + 12}" y="${y0 + tb / 2 + 4}" font-size="11" fill="#222">beton K-175, t = ${esc(m(v.t))}</text><text x="${x0 + W + 12}" y="${y0 + tb + tpp / 2 + 6}" font-size="11" fill="#222">urugan pasir ${esc(m(v.tp))}</text><text x="${x0 - 28}" y="${y0 + tb + tpp - 4}" font-size="10" fill="#7a5">tanah</text>`, 640, y0 + tb + tpp + 56);
+    return den + pot;
+  }
+  if (j === 'irigasi') {
+    const y = 40, den = kotak('DENAH (skematis)', `<rect x="40" y="${y}" width="520" height="12" fill="url(#hb)" stroke="#333"/><rect x="40" y="${y + 12}" width="520" height="40" fill="#e8f2fb" stroke="none"/><rect x="40" y="${y + 52}" width="520" height="12" fill="url(#hb)" stroke="#333"/>${svgDim(40, y + 88, 560, y + 88, 'P = ' + m(v.P), 14)}<text x="300" y="${y + 37}" font-size="11" text-anchor="middle" fill="#246">aliran air →</text>`, 620, y + 120);
+    const tot = v.b + 2 * v.td, sc = 240 / Math.max(tot, 0.1), Hh = (v.h + v.ta) * sc, x0 = 120, y0 = 40, td = v.td * sc, b = v.b * sc, ta = v.ta * sc, hh = v.h * sc;
+    const pot = kotak('POTONGAN MELINTANG A–A', `<path d="M${x0} ${y0} h${td} v${hh} h${b} v${-hh} h${td} v${hh + ta} h${-(2 * td + b)} z" fill="url(#hb)" stroke="#333" stroke-width="1.5"/><rect x="${x0 + td}" y="${y0 + hh * 0.35}" width="${b}" height="${hh * 0.65}" fill="#e8f2fb"/>${svgDim(x0 + td, y0 - 10, x0 + td + b, y0 - 10, 'b = ' + m(v.b), -6)}${svgDim(x0 - 18, y0, x0 - 18, y0 + hh, 'h = ' + m(v.h), -8)}${svgDim(x0, y0 + Hh + 20, x0 + 2 * td + b, y0 + Hh + 20, 'lebar luar ' + m(tot), 14)}<text x="${x0 + 2 * td + b + 14}" y="${y0 + 14}" font-size="11" fill="#222">dinding pasangan batu kali 1PC:4PP, tebal ${esc(m(v.td))}</text><text x="${x0 + 2 * td + b + 14}" y="${y0 + hh + ta / 2 + 4}" font-size="11" fill="#222">dasar tebal ${esc(m(v.ta))}, diplester & diaci</text>`, 640, y0 + Hh + 56);
+    return den + pot;
+  }
+  if (j === 'gedung') {
+    const sc = Math.min(380 / Math.max(v.P, 0.1), 220 / Math.max(v.L, 0.1)), w = v.P * sc, h = v.L * sc, x0 = 60, y0 = 40, tw = 6;
+    let bukaan = ''; const np = Math.max(0, Math.round(v.pintu)), nj = Math.max(0, Math.round(v.jendela));
+    for (let i = 0; i < np; i++) { const cx = x0 + w * (i + 1) / (np + 1); bukaan += `<rect x="${cx - 0.45 * sc}" y="${y0 + h - tw}" width="${0.9 * sc}" height="${tw}" fill="#fff"/><path d="M${cx - 0.45 * sc} ${y0 + h - tw} a${0.9 * sc} ${0.9 * sc} 0 0 1 ${0.9 * sc} ${-0.9 * sc}" fill="none" stroke="#777"/>`; }
+    for (let i = 0; i < nj; i++) { const cx = x0 + w * (i + 1) / (nj + 1); bukaan += `<rect x="${cx - 0.5 * sc}" y="${y0}" width="${1 * sc}" height="${tw}" fill="#dbeafe" stroke="#333" stroke-width=".8"/>`; }
+    const den = kotak('DENAH', `<rect x="${x0}" y="${y0}" width="${w}" height="${h}" fill="none" stroke="#333" stroke-width="${tw}"/>${bukaan}${svgDim(x0, y0 + h + 24, x0 + w, y0 + h + 24, 'P = ' + m(v.P), 14)}${svgDim(x0 + w + 24, y0, x0 + w + 24, y0 + h, 'L = ' + m(v.L), 14)}<text x="${x0 + w / 2}" y="${y0 + h / 2}" font-size="12" text-anchor="middle" fill="#222">luas ${esc(rabFmt(v.P * v.L))} m²</text><text x="${x0}" y="${y0 + h + 52}" font-size="10" fill="#555">${np} pintu (bawah) · ${nj} jendela (atas) · dinding bata ½ batu</text>`, 520, y0 + h + 64);
+    const s2 = Math.min(300 / Math.max(v.L, 0.1), 160 / Math.max(v.T + 1.5, 0.1)), W = v.L * s2, H = v.T * s2, X = 90, Yd = 50 + 1.4 * s2, fd = 0.8 * s2;
+    const pot = kotak('POTONGAN MELINTANG', `<path d="M${X - 0.5 * s2} ${Yd} L${X + W / 2} ${Yd - 1.3 * s2} L${X + W + 0.5 * s2} ${Yd}" fill="none" stroke="#333" stroke-width="2"/><rect x="${X}" y="${Yd}" width="${0.15 * s2 + 3}" height="${H}" fill="url(#hb)" stroke="#333"/><rect x="${X + W - 0.15 * s2 - 3}" y="${Yd}" width="${0.15 * s2 + 3}" height="${H}" fill="url(#hb)" stroke="#333"/><line x1="${X}" y1="${Yd + H}" x2="${X + W}" y2="${Yd + H}" stroke="#333" stroke-width="2"/><path d="M${X - 0.15 * s2} ${Yd + H + fd} h${0.6 * s2} l${-0.15 * s2} ${-fd} h${-0.3 * s2} z" fill="url(#hb)" stroke="#333"/><path d="M${X + W - 0.45 * s2} ${Yd + H + fd} h${0.6 * s2} l${-0.15 * s2} ${-fd} h${-0.3 * s2} z" fill="url(#hb)" stroke="#333"/>${svgDim(X - 26, Yd, X - 26, Yd + H, 'T = ' + m(v.T), -8)}${svgDim(X, Yd + H + fd + 20, X + W, Yd + H + fd + 20, 'L = ' + m(v.L), 14)}<text x="${X + W + 30}" y="${Yd - 0.6 * s2}" font-size="10" fill="#222">atap baja ringan + galvalum</text><text x="${X + W + 30}" y="${Yd + H / 2}" font-size="10" fill="#222">dinding bata, plester, aci, cat</text><text x="${X + W + 30}" y="${Yd + H + fd / 2}" font-size="10" fill="#222">pondasi batu kali, sloof 15/20</text>`, 520, Yd + H + fd + 56);
+    return den + pot;
+  }
+  return '<div class="meta">Pilih jenis proyek.</div>';
+}
+/* ---------- daftar proyek RAB ---------- */
+VIEWS.rab = async (p, main, alive) => {
+  setTop('RAB & Gambar', 'Proyek pembangunan parametrik');
+  const [r, M] = await Promise.all([call('list', { entity: 'rab_proyek', limit: 500 }), rabMaster()]); if (alive && !alive()) return;
+  const L = r.rows || [], w = canWrite('rab_proyek'), th = S.rabTh = S.rabTh || 'semua';
+  const ths = Array.from(new Set(L.map(x => String(x.tahun || '')).filter(Boolean))).sort().reverse();
+  const R = L.filter(x => th === 'semua' || String(x.tahun) === th);
+  main.innerHTML = `<div class="stack">
+    ${!M.ssh.length || !M.ahsp.length ? `<div class="card stack"><b>Master harga belum ada</b><div class="meta">Isi daftar contoh SSH (harga perkiraan) dan AHSP (koefisien SNI/PUPR) agar RAB bisa dihitung. Harga bisa diubah atau diganti lewat impor Excel kapan saja.</div>${w ? `<button class="btn pri" data-act="rabSeed">${ic('plus')}Isi contoh SSH & AHSP</button>` : ''}</div>` : ''}
+    <div class="card stack"><div class="sec-h" style="margin:0"><h2>Buat RAB baru</h2></div><div class="rk-dl">${Object.keys(RAB_TPL).map(k => `<button class="card rk-d" ${w ? `data-act="rabBaru" data-k="${k}"` : 'disabled'} style="text-align:left"><b>${esc(RAB_TPL[k].n)}</b><span class="meta">${RAB_TPL[k].param.map(x => x[1]).join(', ')}</span><span class="pill">KIB ${RAB_TPL[k].kib}</span></button>`).join('')}</div></div>
+    <div class="btns"><button class="btn sm" data-act="go" data-go='["list",{"e":"ssh_item"}]'>${ic('coin')}Harga Satuan (SSH) · ${M.ssh.length}</button><button class="btn sm" data-act="go" data-go='["list",{"e":"ahsp"}]'>${ic('list')}AHSP · ${M.ahsp.length}</button><button class="btn sm" data-act="go" data-go='["list",{"e":"bast"}]'>${ic('stamp')}BAST</button><button class="btn sm" data-act="go" data-go='["list",{"e":"rkp_rab"}]'>${ic('file')}Form 12–13 RKP</button></div>
+    <div class="chips wrap">${['semua'].concat(ths).map(y => `<button class="chip ${th === y ? 'on' : ''}" data-act="rabTh" data-v="${esc(y)}">${y === 'semua' ? 'Semua tahun' : esc(y)}</button>`).join('')}</div>
+    <div class="list">${R.length ? R.map(x => `<button class="row" data-act="go" data-go='${esc(JSON.stringify(['rabproyek', { id: x.id }]))}'><span class="av">${ic('hammer')}</span><span class="main"><span class="t">${esc(x.nama)} <span class="pill ${RAB_STATUS[x.status] || ''}">${esc(x.status || 'Draf')}</span></span><span class="s">${esc([(RAB_TPL[x.jenis_proyek] || {}).n, x.lokasi, x.tahun, x.keu_kegiatan ? 'APBDes: ' + x.keu_kegiatan : 'belum tertaut APBDes'].filter(Boolean).join(' · '))}</span></span><span class="num">${rabRp(x.total)}</span></button>`).join('') : '<div class="card meta">Belum ada RAB. Pilih jenis proyek di atas.</div>'}</div></div>`;
+  S.vh.rabTh = t => { S.rabTh = t.dataset.v; refresh(); };
+  S.vh.rabSeed = async t => { t.disabled = true; try { await rabSeed(); toast('Contoh SSH & AHSP terisi.'); refresh(); } catch (x) { toast(x.message, 1); t.disabled = false; } };
+  S.vh.rabBaru = async t => {
+    const k = t.dataset.k, tpl = RAB_TPL[k], pp = {}; tpl.param.forEach(x => { pp[x[0]] = String(x[3]); });
+    try { const x = await call('save', { entity: 'rab_proyek', record: { nama: tpl.n + ' ' + (S.set.nama_desa || ''), jenis_proyek: k, tahun: String(new Date().getFullYear()), pola: 'Swakelola', status: 'Draf', versi: '1', params: JSON.stringify(pp) } }); go('rabproyek', { id: x.id }); } catch (e) { toast(e.message, 1); }
+  };
+};
+async function rabSeed() {
+  const M = await rabMaster(true), names = {}; SSH_CONTOH.forEach(x => { names[x[0]] = x[1]; });
+  if (!M.ssh.length) await call('bulkSave', { entity: 'ssh_item', rows: SSH_CONTOH.map(x => ({ kode: x[0], uraian: x[1], jenis: x[2], satuan: x[3], harga: String(x[4]), tahun: String(new Date().getFullYear()), sumber: 'Perkiraan (belum SSH resmi)' })) });
+  if (!M.ahsp.length) await call('bulkSave', { entity: 'ahsp', rows: AHSP_CONTOH.map(x => ({ kode: x[0], uraian: x[1], satuan: x[2], kategori: x[3], koef: JSON.stringify(x[4].map(k => ({ ssh: k[0] + ' ' + (names[k[0]] || ''), koef: k[1] }))), sumber: 'Contoh AHSP (SNI/PUPR) — periksa dengan Lampiran Permen PUPR 8/2023' })) });
+  S.rabM = null;
+}
+/* ---------- editor proyek ---------- */
+VIEWS.rabproyek = async (p, main, alive) => {
+  setTop('RAB & Gambar', 'Memuat…');
+  const [pr, M] = await Promise.all([call('get', { entity: 'rab_proyek', id: p.id }), rabMaster()]); if (alive && !alive()) return;
+  let pp = {}; try { pp = JSON.parse(pr.params || '{}'); } catch (x) { }
+  pr._p = pp;
+  const tpl = RAB_TPL[pr.jenis_proyek] || RAB_TPL.rabat, w = canWrite('rab_proyek'), kunci = pr.status && pr.status !== 'Draf', th = pr.tahun || String(new Date().getFullYear());
+  let keg = [], pb = null, bs = [], aset = [];
+  try { keg = await call('keuKegiatan', { tahun: th }); } catch (x) { }
+  try { if (pr.pembangunan_id) pb = await call('get', { entity: 'pembangunan', id: pr.pembangunan_id }); } catch (x) { }
+  try { bs = (await call('list', { entity: 'bast', filters: { proyek_id: pr.id }, limit: 20 })).rows || []; aset = (await call('list', { entity: 'aset', filters: { proyek_id: pr.id }, limit: 20 })).rows || []; } catch (x) { }
+  if (alive && !alive()) return;
+  setTop('RAB & Gambar', pr.nama);
+  const kg = keg.find(k => k.kode === pr.keu_kode && k.kegiatan === pr.keu_kegiatan) || keg.find(k => k.kegiatan === pr.keu_kegiatan);
+  const inp = (id, v, lbl, type, opt) => `<div class="f ${opt && opt.wide ? 'wide' : ''}"><label for="${id}">${esc(lbl)}</label>${type === 'select' ? `<select id="${id}" ${kunci ? 'disabled' : ''}>${opt.o.map(o => `<option ${o === v ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>` : `<input id="${id}" ${type === 'number' ? 'type="number" step="any" inputmode="decimal"' : ''} value="${esc(v == null ? '' : v)}" ${kunci && !(opt && opt.bebas) ? 'disabled' : ''} ${opt && opt.list ? `list="${opt.list}"` : ''}>`}</div>`;
+  const progres = pb ? Number(pb.progres || 0) : 0, bast = bs[0];
+  main.innerHTML = `<div class="stack rab">
+    <div class="card stack rpj-h"><div class="rpj-t"><b>${esc(pr.nama)}</b><span class="pill ${RAB_STATUS[pr.status] || ''}">${esc(pr.status || 'Draf')}</span><span class="pill">${esc(tpl.n)}</span>${pr.versi > 1 ? `<span class="pill info">RAB Perubahan ${pr.versi - 1}</span>` : ''}${pr.no_rab ? `<span class="pill">No. ${esc(pr.no_rab)}</span>` : ''}</div>
+      <div class="chips">${['1 Identitas', '2 Ukuran & gambar', '3 RAB', '4 Bundel & pengesahan', '5 Pelaksanaan & BAST'].map((s, i) => `<a class="chip" href="#rab${i + 1}" data-x>${esc(s)}</a>`).join('')}</div>
+      ${kunci ? `<div class="meta">${ic('lock')} RAB sudah disahkan${pr.tgl_rab ? ' tanggal ' + esc(fDate(pr.tgl_rab)) : ''}; harga & volume terkunci. Untuk mengubah, buat RAB Perubahan.</div>` : ''}</div>
+    <div class="card stack" id="rab1"><div class="lbl">1. Identitas & tautan</div><div class="form">
+      ${inp('rbNama', pr.nama, 'Nama pekerjaan', 'text', { wide: 1 })}${inp('rbLok', pr.lokasi, 'Lokasi (RT/RW, ruas)', 'text')}${inp('rbDus', pr.dusun, 'Dusun', 'select', { o: [''].concat(OPT.dusun) })}
+      ${inp('rbTh', th, 'Tahun anggaran', 'number')}${inp('rbPola', pr.pola || 'Swakelola', 'Pola pelaksanaan', 'select', { o: ['Swakelola', 'Penyedia'] })}${inp('rbSd', pr.sumber_dana, 'Sumber dana', 'select', { o: [''].concat(OPT.sumber) })}
+      ${inp('rbTpk', pr.ketua_tpk, 'Ketua TPK', 'text', { list: 'dlAp' })}${inp('rbPka', pr.pka, 'Kasi/Kaur pelaksana (PKA)', 'text', { list: 'dlAp' })}${inp('rbBu', pr.bu_persen, 'Biaya umum & keuntungan (%) — kosong = sesuai pola', 'number')}
+      <div class="f wide"><label for="rbKeg">Kegiatan APBDes ${esc(th)}</label><select id="rbKeg" ${kunci ? 'disabled' : ''}><option value="">— belum dipilih —</option>${keg.map((k, i) => `<option value="${i}" ${kg === k ? 'selected' : ''}>${esc((k.kode || '') + ' ' + k.kegiatan + ' · pagu ' + rabRp(k.pagu))}</option>`).join('')}</select><span class="hint">${keg.length ? 'Dari APBDes tahun ' + esc(th) + '. Pagu dan realisasi dibaca otomatis.' : 'APBDes tahun ini belum ada; isi dulu di Keuangan → APBDes.'}</span></div>
+      <datalist id="dlAp"></datalist></div></div>
+    <div class="card stack" id="rab2"><div class="lbl">2. Ukuran & gambar <span class="meta">— gambar dan RAB berubah saat diketik</span></div>
+      <div class="form">${tpl.param.map(x => inp('rbP_' + x[0], pp[x[0]] != null ? pp[x[0]] : x[3], x[1] + ' (' + x[2] + ')', 'number')).join('')}</div>
+      <div id="rbSvg" class="stack"></div></div>
+    <div class="card stack" id="rab3"><div class="lbl">3. Rencana Anggaran Biaya</div><div id="rbTab"></div></div>
+    <div class="card stack" id="rab4"><div class="lbl">4. Bundel RAB & pengesahan</div>
+      <div class="btns"><button class="btn pri" data-act="rbBundel">${ic('print')}Pratinjau & cetak bundel (PDF)</button><button class="btn" data-act="rbXls">${ic('down')}Excel bundel</button></div>
+      <div class="meta">Bundel: Cover · Rekapitulasi RAB · RAB rinci · Daftar harga satuan bahan & upah · AHSP · Gambar denah & potongan.</div>
+      ${w ? `<div class="btns">${!kunci ? `<button class="btn sm pri" data-act="rbSahkan">${ic('check')}Sahkan RAB</button>` : `<button class="btn sm" data-act="rbUbah">${ic('edit')}Buat RAB Perubahan</button>`}<button class="btn sm" data-act="rbRkp">${ic('sprout')}Kirim ke RKP (Form 12–13)</button><button class="btn sm" data-act="rbApb">${ic('wallet')}Salin rincian ke APBDes</button><button class="btn sm danger" data-act="rbHapus">${ic('trash')}Hapus</button></div>` : ''}
+      <div id="rbCek" class="meta"></div></div>
+    <div class="card stack" id="rab5"><div class="lbl">5. Pelaksanaan & BAST</div>
+      <div class="kd-mini"><div><span>Progres fisik</span><b class="num">${pb ? progres + '%' : '—'}</b></div><div><span>Realisasi APBDes</span><b class="num">${kg ? rabRp(kg.realisasi) : '—'}</b></div><div><span>Status</span><b>${esc(pr.status || 'Draf')}</b></div></div>
+      <div class="btns">${pb ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'pembangunan', id: pb.id }]))}'>${ic('hammer')}Buka Progres Pembangunan</button>` : w ? `<button class="btn sm" data-act="rbPb">${ic('hammer')}Buat data Progres Pembangunan</button>` : ''}
+        ${w && kunci && !bast ? `<button class="btn sm ${progres >= 100 ? 'pri' : ''}" data-act="rbBast">${ic('stamp')}Sahkan BAST</button>` : ''}
+        ${w && kunci && !bast && progres < 100 ? `<button class="btn sm" data-act="rbKibF">${ic('box')}Catat sebagai KIB F (konstruksi berjalan)</button>` : ''}
+        ${bast ? `<button class="btn sm pri" data-act="rbBastCetak" data-id="${esc(bast.id)}">${ic('print')}Cetak BAST</button>` : ''}
+        ${aset.map(a => `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'aset', id: a.id }]))}'>${ic('box')}Aset KIB ${esc(kibHuruf(a))} (${esc(a.status)})</button>`).join('')}</div>
+      <div class="meta">${bast ? 'BAST No. ' + esc(bast.nomor || '-') + ' tanggal ' + esc(fDate(bast.tanggal)) + ' · nilai ' + esc(rabRp(bast.nilai)) + '. Aset sudah dikirim ke Menu Aset Desa sebagai draf.' : 'Sahkan BAST setelah progres 100%: dokumen BAST dibuat dan aset otomatis masuk Buku Inventaris (draf KIB ' + tpl.kib + ').'}</div></div>
+  </div>`;
+  try { const ap = await peopleList(); $('#dlAp').innerHTML = ap.map(x => `<option value="${esc(x.nama)}">`).join(''); } catch (x) { }
+  const baca = () => {
+    const o = Object.assign({}, pr); o._p = {}; tpl.param.forEach(x => { o._p[x[0]] = $('#rbP_' + x[0]).value; });
+    o.nama = $('#rbNama').value.trim(); o.lokasi = $('#rbLok').value.trim(); o.dusun = $('#rbDus').value; o.tahun = $('#rbTh').value; o.pola = $('#rbPola').value; o.sumber_dana = $('#rbSd').value; o.ketua_tpk = $('#rbTpk').value.trim(); o.pka = $('#rbPka').value.trim(); o.bu_persen = $('#rbBu').value;
+    const ki = $('#rbKeg').value, k = ki !== '' ? keg[Number(ki)] : null; if (k) { o.keu_kegiatan = k.kegiatan; o.keu_kode = k.kode || ''; o.keu_pagu = String(k.pagu || 0); if (!o.sumber_dana && k.sumber) o.sumber_dana = String(k.sumber).split(',')[0]; } else if (ki === '') { o.keu_kegiatan = ''; o.keu_kode = ''; o.keu_pagu = ''; }
+    return o;
+  };
+  let H = null;
+  const gambar = () => {
+    const o = baca(); H = kunci && pr.items ? rabDariSimpan(pr, M) : rabHitung(o, M);
+    $('#rbSvg').innerHTML = rabGambar(o, H.v);
+    const kat = {}; H.items.forEach(it => { kat[it.kategori || 'Lain-lain'] = (kat[it.kategori || 'Lain-lain'] || 0) + it.jumlah; });
+    const pagu = rabNum(o.keu_pagu), selisih = pagu - H.total;
+    $('#rbTab').innerHTML = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Kode</th><th>Uraian pekerjaan</th><th>Perhitungan volume</th><th class="r">Volume</th><th>Sat</th><th class="r">Harga satuan</th><th class="r">Jumlah</th></tr></thead><tbody>${H.items.map(it => `<tr><td class="mono">${esc(it.kode)}</td><td>${esc(it.uraian)}${it.h.rinci.some(r => r.kosong) ? ' <span class="pill warn">harga kosong</span>' : ''}</td><td class="mono" style="font-size:11px">${esc(it.rumus)}</td><td class="r num">${rabFmt(it.volume)}</td><td>${esc(it.satuan)}</td><td class="r num">${rabFmt(it.hsp, 0)}</td><td class="r num">${rabFmt(it.jumlah, 0)}</td></tr>`).join('')}</tbody>
+      <tfoot><tr><td></td><td colspan="5"><b>Jumlah</b>${H.bu ? ' <span class="meta">(termasuk biaya umum & keuntungan ' + H.bu + '%)</span>' : ''}</td><td class="r num"><b>${rabFmt(H.total, 0)}</b></td></tr></tfoot></table></div>
+      <div class="kd-mini"><div><span>Total RAB</span><b class="num">${rabRp(H.total)}</b></div><div><span>Pagu APBDes</span><b class="num">${pagu ? rabRp(pagu) : '—'}</b></div><div><span>Selisih</span><b class="num" style="color:var(${selisih < 0 ? '--bad' : '--ok'})">${pagu ? rabRp(selisih) : '—'}</b></div></div>
+      ${pagu && selisih < 0 ? '<div class="err">Total RAB melebihi pagu kegiatan di APBDes. Kurangi volume atau sesuaikan APBDes.</div>' : ''}`;
+    const cek = []; if (!o.keu_kegiatan) cek.push('kegiatan APBDes belum dipilih'); if (!o.ketua_tpk) cek.push('Ketua TPK belum diisi'); if (!o.pka) cek.push('PKA belum diisi'); if (H.items.some(it => it.h.rinci.some(r => r.kosong))) cek.push('ada harga satuan kosong');
+    $('#rbCek').innerHTML = cek.length ? 'Perlu dilengkapi sebelum disahkan: ' + esc(cek.join(', ')) + '.' : 'Siap disahkan.';
+    return o;
+  };
+  gambar();
+  let tm = null, kotor = false;
+  const simpan = async (extra) => { const o = gambar(); const rec = { id: pr.id, nama: o.nama, lokasi: o.lokasi, dusun: o.dusun, tahun: o.tahun, pola: o.pola, sumber_dana: o.sumber_dana, ketua_tpk: o.ketua_tpk, pka: o.pka, bu_persen: o.bu_persen, keu_kegiatan: o.keu_kegiatan || '', keu_kode: o.keu_kode || '', keu_pagu: o.keu_pagu || '', total: String(H.total) }; if (!kunci) rec.params = JSON.stringify(o._p); await call('save', { entity: 'rab_proyek', record: Object.assign(rec, extra || {}) }); Object.assign(pr, rec, extra || {}); kotor = false; return o; };
+  $$('input,select', main).forEach(el => { el.addEventListener('input', () => { gambar(); kotor = true; clearTimeout(tm); tm = setTimeout(() => simpan().catch(x => toast(x.message, 1)), 1200); }); el.addEventListener('change', () => { gambar(); clearTimeout(tm); simpan().catch(x => toast(x.message, 1)); }); });
+  S.vh.rbBundel = async () => { try { const o = await simpan(); printDocs('Bundel RAB ' + o.nama, rabBundel(Object.assign({}, pr, o), H, M)); } catch (x) { toast(x.message, 1); } };
+  S.vh.rbXls = async () => { try { const o = await simpan(); rabXls(Object.assign({}, pr, o), H); } catch (x) { toast(x.message, 1); } };
+  S.vh.rbSahkan = async t => {
+    const o = gambar(); if (!o.keu_kegiatan && !confirm2(t, 'Kegiatan APBDes belum dipilih. Sahkan tetap?')) return;
+    try { const no = pr.no_rab || ('RAB/' + (o.tahun || '') + '/' + String(Date.now()).slice(-4)); await simpan({ status: 'Disahkan', no_rab: no, tgl_rab: isoToday(), disahkan_oleh: S.user.nama, items: JSON.stringify(H.items.map(it => ({ kode: it.kode, uraian: it.uraian, kategori: it.kategori, satuan: it.satuan, rumus: it.rumus, volume: it.volume, hsp: it.hsp, jumlah: it.jumlah, h: it.h }))), vars: JSON.stringify(H.v), bu_dipakai: String(H.bu) }); toast('RAB disahkan dan dikunci.'); refresh(); } catch (x) { toast(x.message, 1); }
+  };
+  S.vh.rbUbah = async t => { if (!confirm2(t, 'Buka kembali sebagai RAB Perubahan? Versi lama tersimpan di riwayat.')) return; try { let hist = []; try { hist = JSON.parse(pr.riwayat || '[]'); } catch (x) { } hist.push({ versi: pr.versi || '1', no: pr.no_rab, tgl: pr.tgl_rab, total: pr.total, items: pr.items }); await call('save', { entity: 'rab_proyek', record: { id: pr.id, status: 'Draf', versi: String((Number(pr.versi) || 1) + 1), riwayat: JSON.stringify(hist), items: '' } }); toast('RAB dibuka sebagai perubahan.'); refresh(); } catch (x) { toast(x.message, 1); } };
+  S.vh.rbHapus = t => confirmDel(t.parentNode, async () => { await call('remove', { entity: 'rab_proyek', id: pr.id }); toast('RAB dihapus.'); go('rab', {}); });
+  S.vh.rbRkp = async () => { try { const o = await simpan(); await rabKeRkp(Object.assign({}, pr, o), H); } catch (x) { toast(x.message, 1); } };
+  S.vh.rbApb = async () => { try { const o = await simpan(); await rabKeApbdes(Object.assign({}, pr, o), H); } catch (x) { toast(x.message, 1); } };
+  S.vh.rbPb = async () => { try { const o = await simpan(); const x = await call('save', { entity: 'pembangunan', record: { nama: o.nama, kode: o.keu_kode || '', sumber_dana: o.sumber_dana || '', tahun_anggaran: o.tahun, pagu: String(H.total), pelaksana: o.pola === 'Penyedia' ? 'Penyedia' : 'TPK Desa ' + (S.set.nama_desa || ''), lokasi: [o.lokasi, o.dusun].filter(Boolean).join(', '), ket: 'Dari RAB & Gambar' } }); await call('save', { entity: 'rab_proyek', record: { id: pr.id, pembangunan_id: x.id } }); toast('Data Progres Pembangunan dibuat. Unggah foto 0–100% di sana.'); refresh(); } catch (x) { toast(x.message, 1); } };
+  S.vh.rbBast = t => rabBastForm(pr, H, kg, progres, bs);
+  S.vh.rbKibF = async () => { try { const n = await rabKeAset(pr, H, null, kg, 'F'); toast(n ? 'Dicatat sebagai KIB F (draf) di Menu Aset.' : 'Sudah tercatat.'); refresh(); } catch (x) { toast(x.message, 1); } };
+  S.vh.rbBastCetak = async t => { try { const b = await call('get', { entity: 'bast', id: t.dataset.id }); printDocs('BAST ' + pr.nama, rabBastDok(pr, b)); } catch (x) { toast(x.message, 1); } };
+};
+function confirm2(t, msg) { if (t.dataset.ok === '1') { t.dataset.ok = ''; return true; } t.dataset.ok = '1'; const old = t.innerHTML; t.innerHTML = ic('check') + 'Tekan lagi untuk lanjut'; toast(msg); setTimeout(() => { if (t.dataset.ok === '1') { t.dataset.ok = ''; t.innerHTML = old; } }, 6000); return false; }
+async function peopleList() { try { const r = await call('list', { entity: 'aparat', limit: 200 }); return r.rows || []; } catch (x) { return []; } }
+/* RAB yang sudah disahkan dibaca dari salinan tersimpan (harga terkunci) */
+function rabDariSimpan(pr, M) { let items = [], v = {}; try { items = JSON.parse(pr.items || '[]'); v = JSON.parse(pr.vars || '{}'); } catch (x) { } if (!items.length) return rabHitung(pr, M); return { items, total: items.reduce((s, it) => s + rabNum(it.jumlah), 0), v, bu: rabNum(pr.bu_dipakai), tpl: RAB_TPL[pr.jenis_proyek] }; }
+/* ---------- bundel RAB (HTML siap cetak / PDF) ---------- */
+function rabTtd3(pr) {
+  const s = S.set || {};
+  return `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center;margin-top:16px;font-size:9.5pt"><div>Dibuat oleh,<br>${pr.pola === 'Penyedia' ? 'Pelaksana Kegiatan' : 'Ketua TPK'}<div class="sp"></div><u>${esc(pr.ketua_tpk || '..........................')}</u></div><div>Diperiksa oleh,<br>Kasi/Kaur Pelaksana Kegiatan<div class="sp"></div><u>${esc(pr.pka || '..........................')}</u></div><div>${esc(s.nama_desa || '')}, ${fDate(pr.tgl_rab || isoToday())}<br>Disetujui oleh,<br>Kepala Desa ${esc(s.nama_desa || '')}<div class="sp"></div><u>${esc(s.nama_kades || '..........................')}</u></div></div>`;
+}
+function rabKepala(pr, judul) { const s = S.set || {}; return `${kop()}<h2>${esc(judul)}</h2><table style="font-size:9.5pt;margin:4px 0 8px"><tr><td>Kegiatan</td><td>: ${esc(pr.keu_kegiatan || pr.nama)}</td></tr><tr><td>Pekerjaan</td><td>: ${esc(pr.nama)}</td></tr><tr><td>Lokasi</td><td>: ${esc([pr.lokasi, pr.dusun, 'Desa ' + (s.nama_desa || '')].filter(Boolean).join(', '))}</td></tr><tr><td>Tahun Anggaran</td><td>: ${esc(pr.tahun || '')}${pr.sumber_dana ? ' · Sumber dana: ' + esc(pr.sumber_dana) : ''}</td></tr></table>`; }
+function rabBundel(pr, H, M) {
+  const s = S.set || {}, SD = rabSumberDaya(H.items), kat = {};
+  H.items.forEach(it => { const k = it.kategori || 'Lain-lain'; kat[k] = (kat[k] || 0) + rabNum(it.jumlah); });
+  const cover = `<div class="paper" style="text-align:center;font-size:12pt">${kop()}<div style="margin-top:90px"><h2 style="font-size:18pt">RENCANA ANGGARAN BIAYA (RAB)</h2><h2 style="font-size:15pt;margin-top:14px">${esc(pr.nama.toUpperCase())}</h2><p style="margin-top:30px">Lokasi: ${esc([pr.lokasi, pr.dusun].filter(Boolean).join(', ') || '-')}<br>Desa ${esc(s.nama_desa || '')}, Kecamatan ${esc(s.kecamatan || '')}, Kabupaten ${esc(s.kabupaten || '')}</p><p>Tahun Anggaran ${esc(pr.tahun || '')}${pr.sumber_dana ? '<br>Sumber dana: ' + esc(pr.sumber_dana) : ''}</p><p style="margin-top:30px">Nilai RAB: <b>${rabRp(H.total)}</b><br><i>(${esc(terbilang(Math.round(H.total)))} rupiah)</i></p>${pr.no_rab ? `<p>Nomor RAB: ${esc(pr.no_rab)}</p>` : ''}<p style="margin-top:50px">Pelaksana: ${esc(pr.pola === 'Penyedia' ? 'Penyedia' : 'Tim Pelaksana Kegiatan (TPK) — Swakelola')}</p></div></div>`;
+  const rekap = `<div class="paper">${rabKepala(pr, 'REKAPITULASI RENCANA ANGGARAN BIAYA')}<table class="pt"><thead><tr><th>No</th><th>Uraian Pekerjaan</th><th>Jumlah (Rp)</th></tr></thead><tbody>${Object.keys(kat).map((k, i) => `<tr><td style="text-align:center">${i + 1}</td><td>Pekerjaan ${esc(k)}</td><td style="text-align:right">${rabFmt(kat[k], 0)}</td></tr>`).join('')}</tbody><tfoot><tr><td></td><td><b>JUMLAH</b></td><td style="text-align:right"><b>${rabFmt(H.total, 0)}</b></td></tr><tr><td></td><td colspan="2"><i>Terbilang: ${esc(terbilang(Math.round(H.total)))} rupiah</i></td></tr></tfoot></table>${H.bu ? `<p style="font-size:9pt">Harga satuan termasuk biaya umum & keuntungan ${H.bu}%.</p>` : '<p style="font-size:9pt">Swakelola: harga satuan tanpa keuntungan.</p>'}${rabTtd3(pr)}</div>`;
+  const rinci = `<div class="paper land">${rabKepala(pr, 'RINCIAN ANGGARAN BIAYA (RAB)')}<table class="pt" style="font-size:8.5pt"><thead><tr><th>No</th><th>Kode AHSP</th><th>Uraian Pekerjaan</th><th>Perhitungan Volume</th><th>Volume</th><th>Satuan</th><th>Harga Satuan (Rp)</th><th>Jumlah (Rp)</th></tr></thead><tbody>${H.items.map((it, i) => `<tr><td style="text-align:center">${i + 1}</td><td>${esc(it.kode)}</td><td>${esc(it.uraian)}</td><td style="font-family:monospace;font-size:7.5pt">${esc(rabRumusIsi(it.rumus, H.v))}</td><td style="text-align:right">${rabFmt(it.volume)}</td><td>${esc(it.satuan)}</td><td style="text-align:right">${rabFmt(it.hsp, 0)}</td><td style="text-align:right">${rabFmt(it.jumlah, 0)}</td></tr>`).join('')}</tbody><tfoot><tr><td colspan="7" style="text-align:right"><b>JUMLAH</b></td><td style="text-align:right"><b>${rabFmt(H.total, 0)}</b></td></tr></tfoot></table>${rabTtd3(pr)}</div>`;
+  const harga = `<div class="paper">${rabKepala(pr, 'DAFTAR HARGA SATUAN BAHAN, UPAH DAN ALAT')}<table class="pt" style="font-size:8.5pt"><thead><tr><th>No</th><th>Kode</th><th>Uraian</th><th>Jenis</th><th>Satuan</th><th>Harga Satuan (Rp)</th><th>Kebutuhan</th><th>Jumlah (Rp)</th></tr></thead><tbody>${SD.map((r, i) => `<tr><td style="text-align:center">${i + 1}</td><td>${esc(r.kode)}</td><td>${esc(r.uraian)}</td><td>${esc(r.jenis)}</td><td>${esc(r.satuan)}</td><td style="text-align:right">${rabFmt(r.harga, 0)}</td><td style="text-align:right">${rabFmt(r.qty)}</td><td style="text-align:right">${rabFmt(r.jumlah, 0)}</td></tr>`).join('')}</tbody></table><p style="font-size:8.5pt">Sumber harga: ${esc(Array.from(new Set(SD.map(r => ((M.sshK[r.kode] || {}).sumber || '')).filter(Boolean))).join('; ') || '-')}.</p>${rabTtd3(pr)}</div>`;
+  const ahsp = `<div class="paper">${rabKepala(pr, 'ANALISA HARGA SATUAN PEKERJAAN (AHSP)')}${H.items.map((it, i) => `<div style="break-inside:avoid;margin-bottom:8px"><b style="font-size:9pt">${i + 1}. ${esc(it.kode)} — ${esc(it.uraian)} (per ${esc(it.satuan)})</b><table class="pt" style="font-size:8pt"><thead><tr><th>Uraian</th><th>Satuan</th><th>Koefisien</th><th>Harga (Rp)</th><th>Jumlah (Rp)</th></tr></thead><tbody>${it.h.rinci.map(r => `<tr><td>${esc(r.uraian)}</td><td>${esc(r.satuan)}</td><td style="text-align:right">${rabFmt(r.koef, 4)}</td><td style="text-align:right">${rabFmt(r.harga, 0)}</td><td style="text-align:right">${rabFmt(r.jumlah, 0)}</td></tr>`).join('')}</tbody><tfoot><tr><td colspan="4" style="text-align:right">Biaya langsung</td><td style="text-align:right">${rabFmt(it.h.langsung, 0)}</td></tr>${it.h.bu ? `<tr><td colspan="4" style="text-align:right">Biaya umum & keuntungan</td><td style="text-align:right">${rabFmt(it.h.bu, 0)}</td></tr>` : ''}<tr><td colspan="4" style="text-align:right"><b>Harga satuan pekerjaan</b></td><td style="text-align:right"><b>${rabFmt(it.hsp, 0)}</b></td></tr></tfoot></table></div>`).join('')}<p style="font-size:8pt">Koefisien mengacu AHSP (SNI/Permen PUPR 8/2023); sesuaikan dengan analisa yang ditetapkan daerah.</p></div>`;
+  const gambar = `<div class="paper land">${rabKepala(pr, 'GAMBAR RENCANA')}<div style="display:grid;gap:10px">${rabGambar(pr, H.v)}</div>${rabTtd3(pr)}</div>`;
+  return [cover, rekap, rinci, harga, ahsp, gambar];
+}
+const rabRumusIsi = (rumus, v) => String(rumus).replace(/[A-Za-z_]\w*/g, k => v[k] != null ? rabFmt(v[k]) : k);
+function rabXls(pr, H) {
+  const SD = rabSumberDaya(H.items), kat = {}; H.items.forEach(it => { kat[it.kategori || 'Lain-lain'] = (kat[it.kategori || 'Lain-lain'] || 0) + rabNum(it.jumlah); });
+  const B = v => ({ v, b: 1 });
+  const head = [[B('RENCANA ANGGARAN BIAYA')], [pr.nama], ['Lokasi: ' + [pr.lokasi, pr.dusun].filter(Boolean).join(', ')], ['Tahun anggaran: ' + (pr.tahun || '') + (pr.keu_kegiatan ? ' · Kegiatan APBDes: ' + pr.keu_kegiatan : '')], ['']];
+  saveBlob(XL.write([
+    { name: 'Rekap', rows: head.concat([['No', 'Uraian Pekerjaan', 'Jumlah (Rp)'].map(B)], Object.keys(kat).map((k, i) => [i + 1, 'Pekerjaan ' + k, kat[k]]), [['', B('JUMLAH'), B(H.total)]]), widths: [6, 50, 18], head: false },
+    { name: 'RAB', rows: head.concat([['No', 'Kode', 'Uraian', 'Perhitungan', 'Volume', 'Satuan', 'Harga Satuan', 'Jumlah'].map(B)], H.items.map((it, i) => [i + 1, it.kode, it.uraian, rabRumusIsi(it.rumus, H.v), rabNum(it.volume), it.satuan, rabNum(it.hsp), rabNum(it.jumlah)]), [['', '', B('JUMLAH'), '', '', '', '', B(H.total)]]), widths: [5, 8, 40, 28, 10, 8, 14, 16], head: false },
+    { name: 'Harga Satuan', rows: [['Kode', 'Uraian', 'Jenis', 'Satuan', 'Harga', 'Kebutuhan', 'Jumlah'].map(B)].concat(SD.map(r => [r.kode, r.uraian, r.jenis, r.satuan, r.harga, r.qty, r.jumlah])), widths: [8, 40, 10, 8, 14, 12, 16], head: true },
+    { name: 'AHSP', rows: [].concat(...H.items.map(it => [[B(it.kode + ' ' + it.uraian + ' per ' + it.satuan)], ['Uraian', 'Satuan', 'Koefisien', 'Harga', 'Jumlah']].concat(it.h.rinci.map(r => [r.uraian, r.satuan, r.koef, r.harga, Math.round(r.jumlah)]), [['', '', '', 'HSP', it.hsp], ['']]))), widths: [40, 8, 12, 14, 16], head: false }
+  ]), namaFile('RAB ' + pr.nama + ' ' + (pr.tahun || '')) + '.xlsx');
+}
+/* ---------- RKP Desa: Form 12 (RAB) & 13 (gambar) ---------- */
+async function rabKeRkp(pr, H) {
+  const SD = rabSumberDaya(H.items), baris = j => SD.filter(r => (j === 'upah' ? /upah/i : j === 'alat' ? /alat/i : /^(?!.*(upah|alat)).*/i).test(r.jenis)).map(r => [r.uraian, rabFmt(r.qty).replace(/\./g, ''), r.satuan, r.harga].join(' ; ')).join('\n');
+  const th = String(pr.tahun || S.rkpYear || new Date().getFullYear());
+  const ada = (await call('list', { entity: 'rkp_rab', filters: { tahun_rkp: th, kegiatan: pr.nama }, limit: 1 })).rows || [];
+  const rec = { tahun_rkp: th, kegiatan: pr.nama, no_rab: pr.no_rab || '', bidang: 'Pelaksanaan Pembangunan Desa', tgl: pr.tgl_rab || isoToday(), bahan: baris('bahan'), alat: baris('alat'), upah: baris('upah'), jenis_prasarana: (RAB_TPL[pr.jenis_proyek] || {}).n || '', lokasi: [pr.lokasi, pr.dusun].filter(Boolean).join(', '), judul_gambar: pr.nama, lembar_ke: '1', dari_lembar: '1', rab_proyek_id: pr.id };
+  if (ada[0]) rec.id = ada[0].id;
+  await call('save', { entity: 'rkp_rab', record: rec });
+  toast('Terkirim ke RKP ' + rkpLbl(th) + ' (Form 12–13 RAB & Gambar).');
+}
+/* ---------- APBDes: salin rincian belanja (bahan / upah / alat) ---------- */
+async function rabKeApbdes(pr, H) {
+  if (!pr.keu_kegiatan) throw new Error('Pilih dulu kegiatan APBDes di bagian 1.');
+  const SD = rabSumberDaya(H.items);
+  const rek = (await call('list', { entity: 'keu_rek', filters: { kode__pre: '5' }, limit: 500 })).rows || [];
+  const opt = rek.filter(r => String(r.kode).split('.').length >= 4).map(r => r.kode + ' ' + r.uraian);
+  const tebak = re => opt.find(o => re.test(o)) || '';
+  const m = modal('Salin rincian ke APBDes ' + pr.tahun, `<div class="stack"><div class="meta">Rincian kegiatan <b>${esc(pr.keu_kegiatan)}</b> di APBDes ${esc(pr.tahun)} ditambah dari kebutuhan RAB (${SD.length} baris, total ${rabRp(H.total)}). Pilih kode rekening tiap jenis belanja.</div>
+    <datalist id="dlRek">${opt.map(o => `<option value="${esc(o)}">`).join('')}</datalist>
+    <div class="form">${[['Bahan', /material|bahan/i], ['Upah', /upah/i], ['Alat', /sewa|alat/i]].map(([j, re]) => `<div class="f wide"><label for="ra_${j}">Rekening untuk ${j}</label><input id="ra_${j}" list="dlRek" value="${esc(tebak(re))}"></div>`).join('')}</div>
+    <label class="switch"><input type="checkbox" id="raGab" checked>Satu baris per jenis (lebih ringkas). Hapus centang untuk satu baris per bahan/upah.</label>
+    <div class="err" hidden></div><div class="btns"><button class="btn pri" id="raOk">${ic('check')}Tambahkan ke APBDes</button></div></div>`);
+  $('#raOk', m.el).onclick = async ev => {
+    const b = ev.currentTarget; b.disabled = true;
+    try {
+      const gab = $('#raGab', m.el).checked, rows = [];
+      ['Bahan', 'Upah', 'Alat'].forEach(j => {
+        const R = SD.filter(r => (j === 'Upah' ? /upah/i : j === 'Alat' ? /alat/i : /^(?!.*(upah|alat)).*/i).test(r.jenis)); if (!R.length) return;
+        const rk = $('#ra_' + j, m.el).value.trim(); if (!rk) throw new Error('Rekening untuk ' + j + ' belum dipilih.');
+        const fak = H.total / Math.max(1, SD.reduce((s, r) => s + r.jumlah, 0));
+        if (gab) { const jml = Math.round(R.reduce((s, r) => s + r.jumlah, 0) * fak); rows.push({ uraian: j + ' — ' + pr.nama, volume: '1', satuan: 'Paket', harga: String(jml), jumlah: String(jml), rek: rk }); }
+        else R.forEach(r => { const hg = Math.round(r.harga * fak); rows.push({ uraian: r.uraian, volume: String(r.qty), satuan: r.satuan, harga: String(hg), jumlah: String(Math.round(r.qty * hg)), rek: rk }); });
+      });
+      await call('bulkSave', { entity: 'keu_anggaran', rows: rows.map(r => Object.assign(r, { tahun: String(pr.tahun), kegiatan: pr.keu_kegiatan, kode_kegiatan: pr.keu_kode || '', sumber: pr.sumber_dana || '', ket: 'Dari RAB ' + (pr.no_rab || pr.nama) })) });
+      m.close(); toast(rows.length + ' rincian ditambahkan ke APBDes ' + pr.tahun + '.');
+    } catch (x) { const e = $('.err', m.el); e.textContent = x.message; e.hidden = false; b.disabled = false; }
+  };
+}
+/* ---------- BAST & aset ---------- */
+function rabBastForm(pr, H, kg, progres, bs) {
+  const nilaiReal = kg && rabNum(kg.realisasi) > 0 ? Math.min(rabNum(kg.realisasi), H.total || rabNum(kg.realisasi)) : H.total;
+  const m = modal('Sahkan BAST — ' + pr.nama, `<form class="stack" id="bsF">${progres < 100 ? '<div class="err">Progres fisik belum 100%. Pastikan pekerjaan benar-benar selesai.</div>' : ''}
+    <div class="form"><div class="f"><label for="bsNo">Nomor BAST</label><input id="bsNo" value="${esc((S.set.kode_surat ? '' : '') + '')}" placeholder="mis. 600/01/427.85.01/${esc(pr.tahun || '')}"></div><div class="f"><label for="bsTg">Tanggal BAST</label><input id="bsTg" type="date" value="${isoToday()}"></div>
+    <div class="f"><label for="bsNl">Nilai perolehan (Rp)</label><input id="bsNl" data-money value="${mFmt(nilaiReal)}"><span class="hint">${kg ? 'Realisasi APBDes kegiatan: ' + esc(rabRp(kg.realisasi)) + ' · total RAB: ' + esc(rabRp(H.total)) : 'Total RAB yang disahkan'}</span></div>
+    <div class="f"><label for="bsMutu">Kondisi hasil pekerjaan</label><select id="bsMutu"><option>Baik</option><option>Kurang Baik</option></select></div>
+    <div class="f wide"><label for="bsCat">Catatan / spesifikasi akhir</label><textarea id="bsCat" rows="2">${esc(rabRingkasUkuran(pr, H))}</textarea></div></div>
+    <div class="meta">Setelah disahkan: dokumen BAST (TPK → Kasi/Kaur, lalu Kasi/Kaur → Kepala Desa) siap cetak, status proyek menjadi Selesai, dan aset masuk Menu Aset Desa sebagai draf KIB ${esc((RAB_TPL[pr.jenis_proyek] || {}).kib || 'D')}.</div>
+    <div class="err" hidden></div><div class="btns"><button class="btn pri" id="bsOk">${ic('stamp')}Sahkan BAST</button></div></form>`);
+  $('#bsF', m.el).onsubmit = async ev => {
+    ev.preventDefault(); const b = $('#bsOk', m.el); b.disabled = true;
+    try {
+      const rec = { proyek_id: pr.id, nama_proyek: pr.nama, nomor: $('#bsNo', m.el).value.trim(), tanggal: $('#bsTg', m.el).value, nilai: String(mNum($('#bsNl', m.el).value)), kondisi: $('#bsMutu', m.el).value, catatan: $('#bsCat', m.el).value.trim(), ketua_tpk: pr.ketua_tpk || '', pka: pr.pka || '', kades: S.set.nama_kades || '', spesifikasi: JSON.stringify(H.v), tahun: pr.tahun || '' };
+      const bast = await call('save', { entity: 'bast', record: rec });
+      await rabKeAset(pr, H, Object.assign({ id: bast.id }, rec), kg);
+      await call('save', { entity: 'rab_proyek', record: { id: pr.id, status: 'Selesai', bast_id: bast.id } });
+      m.close(); toast('BAST disahkan. Aset masuk Menu Aset Desa sebagai draf.'); printDocs('BAST ' + pr.nama, rabBastDok(pr, Object.assign({ id: bast.id }, rec))); refresh();
+    } catch (x) { const e = $('.err', m.el); e.textContent = x.message; e.hidden = false; b.disabled = false; }
+  };
+}
+function rabRingkasUkuran(pr, H) { const tpl = RAB_TPL[pr.jenis_proyek]; if (!tpl) return ''; return tpl.param.map(x => x[1] + ' ' + rabFmt(H.v[x[0]]) + ' ' + x[2]).join(', '); }
+async function rabKeAset(pr, H, bast, kg, paksaKib) {
+  const tpl = RAB_TPL[pr.jenis_proyek] || RAB_TPL.rabat, u = tpl.ukuran(H.v), kibH = paksaKib || tpl.kib, kib = KIB_OPT.find(k => k.charAt(0) === kibH);
+  const ada = ((await call('list', { entity: 'aset', filters: { proyek_id: pr.id }, limit: 5 })).rows || [])[0];
+  if (ada && paksaKib === 'F') return 0;
+  const rec = { kib, nama: pr.nama, bahan: tpl.bahan, panjang: String(u.panjang || ''), lebar: String(u.lebar || ''), luas: String(Math.round((u.luas || 0) * 100) / 100), jumlah: '1', satuan: kibH === 'C' ? 'Unit' : 'Ruas', tahun: String((bast && bast.tanggal ? bast.tanggal : isoToday()).slice(0, 4)), tgl_perolehan: bast ? bast.tanggal : isoToday(), asal: ASAL_ASET[0], sumber_dana: pr.sumber_dana || '', nilai: bast ? bast.nilai : String(kg && rabNum(kg.realisasi) ? kg.realisasi : 0), kondisi: bast ? (bast.kondisi || 'Baik') : 'Baik', letak: pr.lokasi || '', dusun: pr.dusun || '', no_dokumen: bast ? 'BAST ' + (bast.nomor || '') : 'RAB ' + (pr.no_rab || ''), tgl_dokumen: bast ? bast.tanggal : '', status: 'Draf', proyek_id: pr.id, bast_id: bast ? bast.id : '', ket: (bast ? 'Otomatis dari BAST. ' : 'Konstruksi dalam pengerjaan per ' + fDate(isoToday()) + '. ') + rabRingkasUkuran(pr, H) };
+  if (ada) rec.id = ada.id;
+  const x = await call('save', { entity: 'aset', record: rec });
+  await asetSetelahSimpan(x.id || ada.id);
+  return 1;
+}
+function rabBastDok(pr, b) {
+  const s = S.set || {}, desa = s.nama_desa || '', tgl = b.tanggal || isoToday(), d = parseD(tgl);
+  const hariTgl = d ? dHari(tgl) + ' tanggal ' + terbilang(d.getDate()) + ' bulan ' + BULAN[d.getMonth()] + ' tahun ' + terbilang(d.getFullYear()) : '....';
+  const ttd2 = (j1, n1, j2, n2) => `<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;text-align:center;margin-top:24px"><div>PIHAK KEDUA<br>${esc(j2)}<div class="sp"></div><u>${esc(n2 || '..........................')}</u></div><div>PIHAK PERTAMA<br>${esc(j1)}<div class="sp"></div><u>${esc(n1 || '..........................')}</u></div></div>`;
+  const isi = (j1, n1, j2, n2, judul) => `<div class="paper" style="font-size:11pt">${kop()}<h2>${esc(judul)}</h2><h3>Nomor: ${esc(b.nomor || '..........................')}</h3>
+    <p>Pada hari ini ${esc(hariTgl)}, yang bertanda tangan di bawah ini:</p>
+    <table style="margin-left:14px"><tr><td>1.</td><td>Nama</td><td>: ${esc(n1 || '..........................')}</td></tr><tr><td></td><td>Jabatan</td><td>: ${esc(j1)}</td></tr><tr><td></td><td colspan="2">selanjutnya disebut <b>PIHAK PERTAMA</b>;</td></tr>
+    <tr><td>2.</td><td>Nama</td><td>: ${esc(n2 || '..........................')}</td></tr><tr><td></td><td>Jabatan</td><td>: ${esc(j2)}</td></tr><tr><td></td><td colspan="2">selanjutnya disebut <b>PIHAK KEDUA</b>.</td></tr></table>
+    <p>PIHAK PERTAMA menyerahkan kepada PIHAK KEDUA, dan PIHAK KEDUA menerima dari PIHAK PERTAMA, hasil pekerjaan:</p>
+    <table style="margin-left:14px"><tr><td>Kegiatan</td><td>: ${esc(pr.keu_kegiatan || pr.nama)}</td></tr><tr><td>Pekerjaan</td><td>: ${esc(pr.nama)}</td></tr><tr><td>Lokasi</td><td>: ${esc([pr.lokasi, pr.dusun, 'Desa ' + desa].filter(Boolean).join(', '))}</td></tr><tr><td>Volume / spesifikasi</td><td>: ${esc(b.catatan || '')}</td></tr><tr><td>Nilai</td><td>: ${esc(rabRp(b.nilai))} (${esc(terbilang(Math.round(rabNum(b.nilai))))} rupiah)</td></tr><tr><td>Sumber dana</td><td>: ${esc(pr.sumber_dana || '-')} Tahun Anggaran ${esc(pr.tahun || '')}</td></tr><tr><td>Kondisi</td><td>: ${esc(b.kondisi || 'Baik')}, selesai 100%</td></tr></table>
+    <p>Hasil pekerjaan tersebut telah diperiksa dan dinyatakan selesai sesuai Rencana Anggaran Biaya dan gambar rencana. Demikian berita acara ini dibuat untuk dipergunakan sebagaimana mestinya.</p>${ttd2(j1, n1, j2, n2)}</div>`;
+  return [isi(pr.pola === 'Penyedia' ? 'Penyedia / Pelaksana' : 'Ketua Tim Pelaksana Kegiatan (TPK)', b.ketua_tpk || pr.ketua_tpk, 'Kasi/Kaur Pelaksana Kegiatan Anggaran', b.pka || pr.pka, 'BERITA ACARA SERAH TERIMA HASIL PEKERJAAN'),
+    isi('Kasi/Kaur Pelaksana Kegiatan Anggaran', b.pka || pr.pka, 'Kepala Desa ' + desa, b.kades || s.nama_kades, 'BERITA ACARA PENYERAHAN HASIL KEGIATAN')];
+}
+Object.assign(UI, {
+  ssh_item: {
+    t: 'Harga Satuan (SSH)', ic: 'coin', perm: '*', m: 'rab', write: 'rab', sort: 'kode', asc: 1, excel: 1,
+    fields: [F('kode', 'Kode', 'text', { mono: 1, req: 1, hint: 'Mis. M.01 bahan, U.01 upah, A.01 alat' }), F('uraian', 'Uraian', 'text', { req: 1, wide: 1 }), F('jenis', 'Jenis', 'select', { req: 1, opt: ['Bahan', 'Upah', 'Alat'] }), F('satuan', 'Satuan', 'text', { req: 1 }),
+      F('harga', 'Harga Satuan (Rp)', 'money'), F('tahun', 'Tahun', 'number', { def: () => new Date().getFullYear() }), F('sumber', 'Sumber Harga', 'select', { opt: ['Perkiraan (belum SSH resmi)', 'SSH Kabupaten', 'Survei harga desa', 'HPS / penawaran'], def: 'Perkiraan (belum SSH resmi)' }), F('ket', 'Keterangan', 'text', { wide: 1 })],
+    chips: { k: 'jenis', opt: ['Bahan', 'Upah', 'Alat'] },
+    row: r => ({ t: r.uraian, s: [r.kode, r.satuan, r.sumber].filter(Boolean).join(' · '), r: fMoney(r.harga), av: `<span class="mono">${esc(r.kode || '')}</span>`, pill: /perkiraan/i.test(r.sumber || '') ? '<span class="pill">perkiraan</span>' : '' })
+  },
+  ahsp: {
+    t: 'Analisa Harga Satuan Pekerjaan (AHSP)', ic: 'list', perm: '*', m: 'rab', write: 'rab', sort: 'kode', asc: 1, excel: 1,
+    fields: [F('kode', 'Kode AHSP', 'text', { mono: 1, req: 1 }), F('uraian', 'Uraian Pekerjaan', 'text', { req: 1, wide: 1 }), F('satuan', 'Satuan', 'text', { req: 1 }), F('kategori', 'Kategori', 'text', { list: ['Persiapan', 'Tanah', 'Beton', 'Bekisting', 'Pasangan', 'Plesteran', 'Lantai', 'Pengecatan', 'Atap', 'Kusen', 'Lain-lain'] }),
+      F('koef', 'Koefisien (bahan, upah, alat)', 'rows', { listFrom: { e: 'ssh_item', k: x => x.kode + ' ' + x.uraian }, cols: [['ssh', 'Kode + uraian SSH', 'list'], ['koef', 'Koefisien', 'text']] }), F('sumber', 'Sumber Analisa', 'text', { wide: 1 })],
+    row: r => ({ t: r.uraian, s: [r.kode, 'per ' + (r.satuan || ''), r.kategori].filter(Boolean).join(' · '), av: `<span class="mono">${esc(r.kode || '')}</span>`, r: S.rabM && S.rabM.ahspK[r.kode] ? fMoney(rabHsp(r, S.rabM, 0).hsp) : '' })
+  },
+  bast: {
+    t: 'Berita Acara Serah Terima (BAST)', ic: 'stamp', perm: 'rab', m: 'rab', sort: 'tanggal', noAdd: 1,
+    fields: [F('nama_proyek', 'Pekerjaan', 'text', { wide: 1 }), F('nomor', 'Nomor BAST', 'text', { mono: 1 }), F('tanggal', 'Tanggal', 'date'), F('nilai', 'Nilai (Rp)', 'money'), F('kondisi', 'Kondisi', 'text'), F('ketua_tpk', 'Ketua TPK', 'text'), F('pka', 'Kasi/Kaur PKA', 'text'), F('kades', 'Kepala Desa', 'text'), F('catatan', 'Spesifikasi akhir', 'textarea', { wide: 1 })],
+    row: r => ({ t: r.nama_proyek || 'BAST', s: [r.nomor, fDate(r.tanggal)].filter(Boolean).join(' · '), r: fMoney(r.nilai), av: ic('stamp') })
+  }
+});
+/* detail BAST: tombol cetak & buka proyek */
+async function extraBast(b, el) {
+  el.innerHTML = `<div class="btns"><button class="btn sm pri" data-act="bsCetak" data-id="${esc(b.id)}">${ic('print')}Cetak BAST</button><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['rabproyek', { id: b.proyek_id }]))}'>${ic('hammer')}Buka RAB & gambar</button></div>`;
+}
+ACT.bsCetak = async t => { try { const b = await call('get', { entity: 'bast', id: t.dataset.id }), pr = await call('get', { entity: 'rab_proyek', id: b.proyek_id }); printDocs('BAST', rabBastDok(pr, b)); } catch (x) { toast(x.message, 1); } };
+
+/* =====================================================================
+   SPJ — Surat Pertanggungjawaban per SPP (Permendagri 20/2018, Perlem LKPP 12/2019)
+   Disusun bertahap seperti RKP: Data SPP → Bukti belanja → Upah & honor →
+   Laporan & foto → Pajak → Cetak & periksa. Semua dokumen siap cetak.
+   ===================================================================== */
+const SPJ_TAHAP = [['spp', 'Data SPP', 'file'], ['barang', 'Bukti belanja barang/jasa', 'coin'], ['upah', 'Upah & honor', 'users'], ['laporan', 'Laporan & foto', 'eye'], ['pajak', 'Pajak', 'scale'], ['cetak', 'Cetak & periksa', 'print']];
+const SPJ_PERAN = ['Pekerja', 'Tukang', 'Kepala tukang', 'Mandor', 'Honor / narasumber', 'Lainnya'];
+Object.assign(UI, {
+  spj: { t: 'SPJ', ic: 'file', perm: 'spj', m: 'spj', noAdd: 1, fields: [F('spp_no', 'No. SPP'), F('kegiatan', 'Kegiatan', 'text', { wide: 1 }), F('status', 'Status')], row: r => ({ t: r.kegiatan || 'SPJ', s: 'SPP ' + (r.spp_no || ''), av: ic('file') }) }
+});
+const spjJ = (v, d) => { try { const x = JSON.parse(v || ''); return x == null ? d : x; } catch (e) { return d; } };
+const spjN = v => mNum(v);
+/* daftar SPP + status SPJ */
+VIEWS.spj = async (p, main, alive) => {
+  const th = keuTh();
+  setTop('SPJ', 'Tahun ' + th);
+  const [sp, sj] = await Promise.all([call('list', { entity: 'keu_spp', filters: { tahun: th }, limit: 1000, sort: 'tanggal', desc: true }), call('list', { entity: 'spj', filters: { tahun: th }, limit: 1000 })]); if (alive && !alive()) return;
+  const map = {}; (sj.rows || []).forEach(x => { map[x.spp_id] = x; });
+  const st = S.spjSt = S.spjSt || { f: '', q: '' };
+  const L = (sp.rows || []).filter(x => x.jenis !== 'Pembiayaan'), stOf = x => map[x.id] ? (map[x.id].status || 'Draf') : 'Belum';
+  const draw = () => {
+    const q = st.q.toLowerCase(), R = L.filter(x => (!st.f || stOf(x) === st.f) && (!q || [x.no, x.uraian, x.kegiatan, x.penerima].join(' ').toLowerCase().indexOf(q) >= 0));
+    $('#spjL').innerHTML = R.length ? `<div class="list">${R.map(x => { const s = stOf(x), j = map[x.id]; return `<button class="row" data-act="go" data-go='${esc(JSON.stringify(['spjsusun', { spp: x.id }]))}'><span class="av">${ic('file')}</span><span class="main"><span class="t">${esc(x.uraian || '')} <span class="pill ${s === 'Lengkap' ? 'ok' : s === 'Draf' ? 'warn' : ''}">${esc(s === 'Belum' ? 'SPJ belum disusun' : 'SPJ ' + s)}</span></span><span class="s">${esc(['SPP ' + (x.no || '-'), fDate(x.tanggal), x.kegiatan].filter(Boolean).join(' · '))}${j && j.progres ? ' · ' + esc(j.progres) : ''}</span></span><span class="num">${rabRp(sppTotal(x))}</span></button>`; }).join('')}</div>` : '<div class="card meta">Tidak ada SPP.</div>';
+  };
+  const n = s => L.filter(x => stOf(x) === s).length;
+  main.innerHTML = `<div class="stack">${thChips('spjThC')}
+    <div class="card meta">Pilih SPP untuk menyusun SPJ-nya. Setiap SPJ memuat: bukti belanja + BA pemeriksaan & penerimaan barang, daftar hadir & daftar penerimaan upah/honor, laporan kegiatan + foto, dan rekap pajak. SPP, pernyataan tanggung jawab belanja, dan kuitansi tetap dicetak dari menu SPP & Pencairan.</div>
+    <div class="chips wrap">${[['', 'Semua', L.length], ['Belum', 'Belum disusun', n('Belum')], ['Draf', 'Draf', n('Draf')], ['Lengkap', 'Lengkap', n('Lengkap')]].map(c => `<button class="chip ${st.f === c[0] ? 'on' : ''}" data-act="spjF" data-v="${c[0]}">${esc(c[1])} <small>${c[2]}</small></button>`).join('')}</div>
+    <label class="search" style="flex:none">${ic('search')}<input id="spjQ" placeholder="Cari nomor, uraian, kegiatan" value="${esc(st.q)}"></label><div id="spjL"></div></div>`;
+  draw();
+  $('#spjQ').oninput = ev => { st.q = ev.target.value; draw(); };
+  S.vh.spjF = t => { st.f = t.dataset.v; refresh(); };
+  S.vh.spjThC = t => { S.keuTh = t.dataset.v; refresh(); };
+};
+/* ---------- penyusun SPJ ---------- */
+VIEWS.spjsusun = async (p, main, alive) => {
+  setTop('Susun SPJ', 'Memuat…');
+  const spp = await call('get', { entity: 'keu_spp', id: p.spp }); if (alive && !alive()) return;
+  let sj = ((await call('list', { entity: 'spj', filters: { spp_id: spp.id }, limit: 1 })).rows || [])[0];
+  if (!sj) sj = { spp_id: spp.id, spp_no: spp.no || '', kegiatan: spp.kegiatan || '', kode_kegiatan: spp.kode_kegiatan || '', tahun: String(spp.tahun || ''), status: 'Draf' };
+  const w = canWrite('spj'), D = { barang: spjJ(sj.barang, []), upah: spjJ(sj.upah, []), ba: spjJ(sj.ba, {}), lap: spjJ(sj.laporan, {}), foto: sj.foto || '' };
+  let proyek = null; try { const pr = (await call('list', { entity: 'rab_proyek', limit: 500 })).rows || []; proyek = pr.find(x => x.id === sj.proyek_id) || pr.find(x => spp.kode_kegiatan && x.keu_kode === spp.kode_kegiatan && String(x.tahun) === String(spp.tahun)) || null; } catch (x) { }
+  let pb = null, titik = []; try { if (proyek && proyek.pembangunan_id) { pb = await call('get', { entity: 'pembangunan', id: proyek.pembangunan_id }); titik = ((await call('list', { entity: 'pembangunan_titik', filters: { ref: pb.id }, limit: 100 })).rows) || []; } } catch (x) { }
+  let pajakTr = []; try { pajakTr = ((await call('list', { entity: 'keu_trans', filters: { ref_spp: spp.id }, limit: 100 })).rows) || []; } catch (x) { }
+  if (alive && !alive()) return;
+  setTop('Susun SPJ', 'SPP ' + (spp.no || '') + ' · ' + (spp.kegiatan || ''));
+  const st = S.spjTab = S.spjTab && S.spjTab.id === spp.id ? S.spjTab : { id: spp.id, t: 'spp' };
+  const bruto = sppTotal(spp);
+  if (!D.ba.ketua && proyek) { D.ba.ketua = proyek.ketua_tpk || ''; D.ba.pka = proyek.pka || ''; }
+  const hit = () => {
+    const nota = {}; D.barang.forEach(r => { const k = (r.no || '?') + '|' + (r.penyedia || ''); nota[k] = nota[k] || { no: r.no, penyedia: r.penyedia, tgl: r.tgl, jenis: r.jenis || JENIS_BELANJA[0], pkp: r.pkp || 'Tidak', npwp: r.npwp || '', rows: [], jml: 0 }; const j = spjN(r.vol) * spjN(r.harga); nota[k].rows.push(Object.assign({}, r, { jml: j })); nota[k].jml += j; });
+    const N = Object.values(nota); N.forEach(n => { try { n.pj = hitungPajak({ nilai: n.jml, jenis: n.jenis, pkp: n.pkp, npwp: n.npwp }); } catch (e) { n.pj = null; } });
+    const U = D.upah.map(r => { const j = spjN(r.hari) * spjN(r.upah); let pj = null; try { if (/honor/i.test(r.peran || '')) pj = hitungPajak({ nilai: j, jenis: 'Honor / upah perorangan', npwp: r.npwp || '' }); } catch (e) { } return Object.assign({}, r, { jml: j, pph21: pj ? pj.pph21 : 0 }); });
+    const tb = N.reduce((s, n) => s + n.jml, 0), tu = U.reduce((s, u) => s + u.jml, 0);
+    const pajak = { PPN: 0, 'PPh 21': 0, 'PPh 22': 0, 'PPh 23': 0, 'PPh Final 4(2)': 0 };
+    N.forEach(n => { if (n.pj) { pajak.PPN += n.pj.ppn || 0; pajak['PPh 21'] += n.pj.pph21 || 0; pajak['PPh 22'] += n.pj.pph22 || 0; pajak['PPh 23'] += n.pj.pph23 || 0; pajak['PPh Final 4(2)'] += n.pj.pph4 || 0; } });
+    U.forEach(u => { pajak['PPh 21'] += u.pph21 || 0; });
+    return { N, U, tb, tu, total: tb + tu, pajak, selisih: bruto - (tb + tu) };
+  };
+  const cekTahap = H => ({
+    spp: !!(spp.no && bruto), barang: D.barang.length ? D.barang.every(r => r.uraian && spjN(r.harga) > 0) && !!D.ba.tgl_periksa : null, upah: D.upah.length ? D.upah.every(r => r.nama && spjN(r.hari) > 0) && !!(D.lap.mulai) : null,
+    laporan: !!(D.lap.uraian && D.lap.tgl), pajak: true, cetak: Math.abs(H.selisih) < 1
+  });
+  const draw = () => {
+    const H = hit(), C = cekTahap(H), aktif = SPJ_TAHAP.filter(t => C[t[0]] !== null), ok = aktif.filter(t => C[t[0]]).length;
+    const stepper = SPJ_TAHAP.map((t, i) => `<button class="card rk-s ${st.t === t[0] ? 'on' : ''}" data-act="sjTab" data-v="${t[0]}" style="${st.t === t[0] ? 'border-color:var(--pri)' : ''}"><span class="rk-n">${i + 1}</span><span class="main"><b>${esc(t[1])}</b></span><span class="rk-r"><span class="pill ${C[t[0]] === null ? '' : C[t[0]] ? 'ok' : 'warn'}">${C[t[0]] === null ? 'tidak ada' : C[t[0]] ? 'lengkap' : 'belum'}</span></span></button>`).join('');
+    const ro = w ? '' : 'disabled';
+    let body = '';
+    if (st.t === 'spp') {
+      const R = spjJ(spp.rincian, []);
+      body = `<div class="kd-mini"><div><span>No. SPP</span><b>${esc(spp.no || '-')}</b></div><div><span>Tanggal</span><b>${esc(fDate(spp.tanggal))}</b></div><div><span>Nilai bruto</span><b class="num">${rabRp(bruto)}</b></div><div><span>Status</span><b>${esc(spp.status || 'Draf')}</b></div></div>
+        <div class="meta">${esc(spp.uraian || '')} · Penerima: ${esc(spp.penerima || '-')} · Kegiatan: ${esc(spp.kegiatan || '-')}</div>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Kode Rekening</th><th>Uraian</th><th class="r">Jumlah</th></tr></thead><tbody>${R.map(r => `<tr><td class="mono">${esc(String(r.rek || '').split(' ')[0])}</td><td>${esc(r.uraian || String(r.rek || '').replace(/^\S+\s*/, ''))}</td><td class="r num">${rabFmt(spjN(r.jumlah), 0)}</td></tr>`).join('')}</tbody></table></div>
+        <div class="f"><label for="sjPr">Tautkan ke RAB & Gambar (untuk nama TPK & foto progres)</label><select id="sjPr" ${ro}><option value="">— tidak ada —</option></select></div>
+        <div class="btns"><button class="btn sm" data-act="sppWord" data-id="${esc(spp.id)}">${ic('print')}Cetak SPP + SPTJB + Kuitansi (Word)</button><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'keu_spp', id: spp.id }]))}'>${ic('eye')}Buka SPP</button></div>`;
+    } else if (st.t === 'barang') {
+      body = `<div class="meta">Satu baris satu barang. Baris dengan nomor nota & penyedia yang sama digabung menjadi satu bukti; pajak dihitung per bukti (PPN bila penyedia PKP, PPh 22/23 sesuai jenis belanja).</div>
+        <div class="tbl-wrap"><table class="tbl spj-t"><thead><tr><th>Tgl</th><th>No. nota</th><th>Penyedia / toko</th><th>Jenis belanja</th><th>PKP?</th><th>Uraian barang/jasa</th><th>Vol</th><th>Sat</th><th>Harga</th><th class="r">Jumlah</th><th></th></tr></thead><tbody id="sjB">${(D.barang.length ? D.barang : [{}]).map((r, i) => `<tr data-i="${i}"><td><input type="date" data-k="tgl" value="${esc(r.tgl || '')}" ${ro}></td><td><input data-k="no" value="${esc(r.no || '')}" style="width:70px" ${ro}></td><td><input data-k="penyedia" value="${esc(r.penyedia || '')}" ${ro}></td><td><select data-k="jenis" ${ro}>${JENIS_BELANJA.map(o => `<option ${o === (r.jenis || JENIS_BELANJA[0]) ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select></td><td><select data-k="pkp" ${ro}><option ${r.pkp !== 'Ya' ? 'selected' : ''}>Tidak</option><option ${r.pkp === 'Ya' ? 'selected' : ''}>Ya</option></select></td><td><input data-k="uraian" value="${esc(r.uraian || '')}" ${ro}></td><td><input data-k="vol" inputmode="decimal" value="${esc(r.vol || '')}" style="width:60px" ${ro}></td><td><input data-k="sat" value="${esc(r.sat || '')}" style="width:56px" ${ro}></td><td><input data-k="harga" inputmode="numeric" value="${esc(r.harga || '')}" style="width:100px" ${ro}></td><td class="r num">${rabFmt(spjN(r.vol) * spjN(r.harga), 0)}</td><td>${w ? `<button class="iconbtn" data-act="sjDel" data-g="barang" data-i="${i}" aria-label="Hapus baris">${ic('trash')}</button>` : ''}</td></tr>`).join('')}</tbody></table></div>
+        ${w ? `<div class="btns"><button class="btn sm" data-act="sjAdd" data-g="barang">${ic('plus')}Tambah baris</button>${proyek ? `<button class="btn sm" data-act="sjDariRab">${ic('hammer')}Isi dari kebutuhan bahan RAB</button>` : ''}</div>` : ''}
+        <div class="kd-mini"><div><span>Jumlah bukti</span><b>${H.N.length}</b></div><div><span>Total belanja barang/jasa</span><b class="num">${rabRp(H.tb)}</b></div></div>
+        <div class="lbl" style="margin-top:6px">Berita acara pemeriksaan & penerimaan barang</div>
+        <div class="form"><div class="f"><label for="ba1">Tanggal pemeriksaan</label><input id="ba1" type="date" data-ba="tgl_periksa" value="${esc(D.ba.tgl_periksa || '')}" ${ro}></div><div class="f"><label for="ba2">Ketua TPK (pemeriksa)</label><input id="ba2" data-ba="ketua" value="${esc(D.ba.ketua || '')}" ${ro}></div><div class="f"><label for="ba3">Anggota TPK 1</label><input id="ba3" data-ba="anggota1" value="${esc(D.ba.anggota1 || '')}" ${ro}></div><div class="f"><label for="ba4">Anggota TPK 2</label><input id="ba4" data-ba="anggota2" value="${esc(D.ba.anggota2 || '')}" ${ro}></div><div class="f"><label for="ba5">Kasi/Kaur penerima (PKA)</label><input id="ba5" data-ba="pka" value="${esc(D.ba.pka || '')}" ${ro}></div><div class="f"><label for="ba6">Nomor BA</label><input id="ba6" data-ba="no" value="${esc(D.ba.no || '')}" ${ro}></div></div>`;
+    } else if (st.t === 'upah') {
+      body = `<div class="meta">Upah harian orang kerja (HOK) dan honor. Daftar hadir dibuat otomatis dari periode kerja; PPh 21 dihitung untuk baris honor.</div>
+        <div class="form"><div class="f"><label for="up1">Mulai kerja</label><input id="up1" type="date" data-lap="mulai" value="${esc(D.lap.mulai || '')}" ${ro}></div><div class="f"><label for="up2">Selesai kerja</label><input id="up2" type="date" data-lap="selesai" value="${esc(D.lap.selesai || '')}" ${ro}></div></div>
+        <div class="tbl-wrap"><table class="tbl spj-t"><thead><tr><th>Nama</th><th>Peran</th><th>NIK/NPWP</th><th>Alamat</th><th>Hari kerja</th><th>Upah / hari</th><th class="r">Jumlah</th><th></th></tr></thead><tbody id="sjU">${(D.upah.length ? D.upah : [{}]).map((r, i) => `<tr data-i="${i}"><td><input data-k="nama" value="${esc(r.nama || '')}" list="dlPd" ${ro}></td><td><select data-k="peran" ${ro}>${SPJ_PERAN.map(o => `<option ${o === (r.peran || 'Pekerja') ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select></td><td><input data-k="npwp" value="${esc(r.npwp || '')}" style="width:130px" ${ro}></td><td><input data-k="alamat" value="${esc(r.alamat || '')}" ${ro}></td><td><input data-k="hari" inputmode="decimal" value="${esc(r.hari || '')}" style="width:60px" ${ro}></td><td><input data-k="upah" inputmode="numeric" value="${esc(r.upah || '')}" style="width:100px" ${ro}></td><td class="r num">${rabFmt(spjN(r.hari) * spjN(r.upah), 0)}</td><td>${w ? `<button class="iconbtn" data-act="sjDel" data-g="upah" data-i="${i}" aria-label="Hapus baris">${ic('trash')}</button>` : ''}</td></tr>`).join('')}</tbody></table></div><datalist id="dlPd"></datalist>
+        ${w ? `<div class="btns"><button class="btn sm" data-act="sjAdd" data-g="upah">${ic('plus')}Tambah orang</button><label class="btn sm">${ic('plus')}Impor Excel<input type="file" id="sjUx" accept=".xlsx,.csv" hidden></label><button class="btn sm" data-act="sjUxT">${ic('down')}Format Excel</button></div>` : ''}
+        <div class="kd-mini"><div><span>Orang</span><b>${H.U.length}</b></div><div><span>Total HOK</span><b class="num">${rabFmt(H.U.reduce((s, u) => s + spjN(u.hari), 0))}</b></div><div><span>Total upah/honor</span><b class="num">${rabRp(H.tu)}</b></div></div>`;
+    } else if (st.t === 'laporan') {
+      const fotoPb = titik.map(t => OPT.progres.filter(p => t['foto_' + p]).map(p => ({ id: t['foto_' + p], ket: (t.nama_titik || '') + ' ' + p + '%' }))).flat();
+      body = `<div class="form"><div class="f"><label for="lp1">Tanggal laporan</label><input id="lp1" type="date" data-lap="tgl" value="${esc(D.lap.tgl || '')}" ${ro}></div><div class="f"><label for="lp5">Volume / hasil yang dicapai</label><input id="lp5" data-lap="hasil" value="${esc(D.lap.hasil || (proyek ? rabRingkasUkuran(proyek, { v: spjJ(proyek.vars || proyek.params, {}) }) : ''))}" ${ro}></div>
+        <div class="f wide"><label for="lp2">Uraian pelaksanaan kegiatan</label><textarea id="lp2" data-lap="uraian" rows="4" ${ro}>${esc(D.lap.uraian || '')}</textarea></div><div class="f wide"><label for="lp3">Kendala / permasalahan</label><textarea id="lp3" data-lap="kendala" rows="2" ${ro}>${esc(D.lap.kendala || '')}</textarea></div><div class="f wide"><label for="lp4">Saran / tindak lanjut</label><textarea id="lp4" data-lap="saran" rows="2" ${ro}>${esc(D.lap.saran || '')}</textarea></div></div>
+        <div class="lbl">Foto dokumentasi</div>${fotoPb.length ? `<div class="meta">${fotoPb.length} foto progres dari Progres Pembangunan ikut dicetak otomatis.</div><div class="pgrid">${fotoPb.slice(0, 8).map(f => `<div class="pslot"><img src="${esc(thumb(f.id, 300))}" alt=""><small>${esc(f.ket)}</small></div>`).join('')}</div>` : '<div class="meta">Belum ada foto progres. Tautkan SPJ ke RAB yang punya data Progres Pembangunan, atau unggah foto 0%, 50%, 100% di menu Progres Pembangunan.</div>'}`;
+    } else if (st.t === 'pajak') {
+      const tr = {}; pajakTr.forEach(t => { const k = t.pajak || ''; tr[k] = tr[k] || { pungut: 0, setor: 0, ntpn: [] }; if (t.jenis === 'Pajak Dipungut') tr[k].pungut += spjN(t.jumlah); if (t.jenis === 'Pajak Disetor') { tr[k].setor += spjN(t.jumlah); if (t.ntpn) tr[k].ntpn.push(t.ntpn); } });
+      const sppP = { PPN: spjN(spp.ppn), 'PPh 21': spjN(spp.pph21), 'PPh 22': spjN(spp.pph22), 'PPh 23': spjN(spp.pph23), 'PPh Final 4(2)': spjN(spp.pph4) };
+      body = `<div class="meta">Perbandingan pajak dari bukti SPJ, potongan di SPP, dan transaksi pajak (dipungut/disetor) di Buku Kas.</div>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Jenis pajak</th><th class="r">Dari bukti SPJ</th><th class="r">Dipotong di SPP</th><th class="r">Dipungut (kas)</th><th class="r">Disetor (kas)</th><th>NTPN</th></tr></thead><tbody>${Object.keys(H.pajak).map(k => { const t = tr[k] || { pungut: 0, setor: 0, ntpn: [] }, beda = Math.abs(H.pajak[k] - sppP[k]) >= 1; return `<tr><td>${esc(k)}</td><td class="r num">${rabFmt(H.pajak[k], 0)}</td><td class="r num" style="${beda ? 'color:var(--bad)' : ''}">${rabFmt(sppP[k], 0)}</td><td class="r num">${rabFmt(t.pungut, 0)}</td><td class="r num" style="${t.pungut > t.setor ? 'color:var(--warn)' : ''}">${rabFmt(t.setor, 0)}</td><td class="mono">${esc(t.ntpn.join(', '))}</td></tr>`; }).join('')}</tbody></table></div>
+        <div class="meta">Merah = berbeda dengan potongan di SPP (periksa jenis belanja/PKP). Kuning = pajak dipungut belum seluruhnya disetor. Setoran dicatat di Keuangan → Penerimaan & Pajak.</div>`;
+    } else {
+      body = `<div class="kd-mini"><div><span>Nilai SPP (bruto)</span><b class="num">${rabRp(bruto)}</b></div><div><span>Total SPJ</span><b class="num">${rabRp(H.total)}</b></div><div><span>Selisih</span><b class="num" style="color:var(${Math.abs(H.selisih) < 1 ? '--ok' : '--bad'})">${rabRp(H.selisih)}</b></div></div>
+        ${Math.abs(H.selisih) >= 1 ? `<div class="err">Total bukti SPJ (barang ${rabRp(H.tb)} + upah ${rabRp(H.tu)}) belum sama dengan nilai SPP.</div>` : '<div class="ok-box">' + ic('check') + ' Total bukti sama dengan nilai SPP.</div>'}
+        <div class="list">${[['rekap', 'Lembar kendali & rekap bukti SPJ', true], ['kuitansi', 'Kuitansi pembelian per bukti (bila toko tidak memberi nota)', H.N.length], ['baperiksa', 'Berita acara pemeriksaan barang (TPK)', H.N.length], ['baterima', 'Berita acara penerimaan barang (Kasi/Kaur)', H.N.length], ['hadir', 'Daftar hadir pekerja', H.U.length], ['upah', 'Daftar penerimaan upah / honor', H.U.length], ['laporan', 'Laporan pelaksanaan kegiatan + dokumentasi foto', true], ['pajak', 'Rekap pajak SPJ', true]].map(d => `<div class="row" style="cursor:default"><span class="av">${ic(d[2] ? 'check' : 'x')}</span><span class="main"><span class="t">${esc(d[1])}</span></span><button class="btn sm" data-act="sjCetak" data-v="${d[0]}" ${d[2] ? '' : 'disabled'}>${ic('print')}Cetak</button></div>`).join('')}</div>
+        <div class="btns"><button class="btn pri" data-act="sjCetak" data-v="semua">${ic('print')}Cetak seluruh SPJ (PDF)</button><button class="btn" data-act="sppWord" data-id="${esc(spp.id)}">${ic('print')}SPP + Kuitansi (Word)</button>${w ? `<button class="btn" data-act="sjLengkap">${ic('check')}Tandai SPJ lengkap</button>` : ''}</div>`;
+    }
+    main.innerHTML = `<div class="kd"><div class="card rk-top"><div style="flex:1"><b>${esc(spp.uraian || '')}</b><div class="meta">SPP ${esc(spp.no || '-')} · ${esc(spp.kegiatan || '')} · ${rabRp(bruto)} · ${ok}/${aktif.length} bagian lengkap</div><div class="kd-track" style="--kc:var(--ok)"><i style="width:${ok / Math.max(1, aktif.length) * 100}%"></i></div></div><span class="pill ${sj.status === 'Lengkap' ? 'ok' : 'warn'}">${esc(sj.status || 'Draf')}</span></div>
+      <div class="rk-sl">${stepper}</div><div class="kd-c">${body}</div>
+      <div class="btns">${SPJ_TAHAP.findIndex(t => t[0] === st.t) > 0 ? `<button class="btn" data-act="sjNav" data-d="-1">${ic('back')}Sebelumnya</button>` : ''}<button class="btn" data-act="go" data-go='["spj"]'>${ic('list')}Daftar SPJ</button>${SPJ_TAHAP.findIndex(t => t[0] === st.t) < SPJ_TAHAP.length - 1 ? `<button class="btn pri" data-act="sjNav" data-d="1">Berikutnya${ic('next')}</button>` : ''}</div></div>`;
+    pasang();
+  };
+  let tm = null;
+  const simpan = async (extra) => { const H = hit(); const rec = Object.assign({ id: sj.id || undefined, spp_id: spp.id, spp_no: spp.no || '', kegiatan: spp.kegiatan || '', kode_kegiatan: spp.kode_kegiatan || '', tahun: String(spp.tahun || ''), status: sj.status || 'Draf', barang: JSON.stringify(D.barang), upah: JSON.stringify(D.upah), ba: JSON.stringify(D.ba), laporan: JSON.stringify(D.lap), total: String(H.total), progres: SPJ_TAHAP.filter(t => cekTahap(H)[t[0]]).length + '/' + SPJ_TAHAP.filter(t => cekTahap(H)[t[0]] !== null).length + ' lengkap', proyek_id: proyek ? proyek.id : '' }, extra || {}); if (!rec.id) delete rec.id; const sv = await call('save', { entity: 'spj', record: rec }); Object.assign(sj, rec, { id: sv.id || sj.id }); };
+  const tunda = () => { clearTimeout(tm); tm = setTimeout(() => simpan().catch(x => toast(x.message, 1)), 900); };
+  const bacaTabel = (g, tb) => { D[g] = $$('#' + tb + ' tr', main).map(tr => { const o = {}; $$('[data-k]', tr).forEach(i => { o[i.dataset.k] = i.value.trim(); }); return o; }).filter(o => Object.keys(o).some(k => o[k] && !(k === 'jenis' || k === 'pkp' || k === 'peran'))); };
+  const pasang = () => {
+    $$('#sjB [data-k]', main).forEach(i => i.onchange = () => { bacaTabel('barang', 'sjB'); tunda(); draw(); });
+    $$('#sjU [data-k]', main).forEach(i => i.onchange = () => { bacaTabel('upah', 'sjU'); tunda(); draw(); });
+    $$('[data-ba]', main).forEach(i => i.onchange = () => { D.ba[i.dataset.ba] = i.value.trim(); tunda(); draw(); });
+    $$('[data-lap]', main).forEach(i => i.onchange = () => { D.lap[i.dataset.lap] = i.value.trim(); tunda(); draw(); });
+    const sp = $('#sjPr', main); if (sp) { call('list', { entity: 'rab_proyek', limit: 500 }).then(r => { sp.innerHTML = '<option value="">— tidak ada —</option>' + (r.rows || []).map(x => `<option value="${esc(x.id)}" ${proyek && proyek.id === x.id ? 'selected' : ''}>${esc(x.nama + ' (' + (x.tahun || '') + ')')}</option>`).join(''); }); sp.onchange = async () => { await simpan({ proyek_id: sp.value }); refresh(); }; }
+    const dl = $('#dlPd', main); if (dl) peopleList().then(ap => { dl.innerHTML = ap.map(x => `<option value="${esc(x.nama)}">`).join(''); });
+    const ux = $('#sjUx', main); if (ux) ux.onchange = async ev => { const f = ev.target.files[0]; ev.target.value = ''; if (!f) return; try { const rows = await XL.read(f), hd = (rows[0] || []).map(xlKey), ix = k => hd.findIndex(h => h.indexOf(k) >= 0); const add = rows.slice(1).filter(r => r && r[ix('nama')]).map(r => ({ nama: String(r[ix('nama')] || ''), peran: String(r[ix('peran')] || 'Pekerja'), npwp: ix('nik') >= 0 ? String(r[ix('nik')] || '') : '', alamat: String(r[ix('alamat')] || ''), hari: String(r[ix('hari')] || ''), upah: String(r[ix('upah')] || '') })); D.upah = D.upah.concat(add); await simpan(); toast(add.length + ' orang ditambahkan.'); draw(); } catch (x) { toast(x.message, 1); } };
+  };
+  S.vh.sjTab = t => { st.t = t.dataset.v; draw(); };
+  S.vh.sjNav = t => { const i = SPJ_TAHAP.findIndex(x => x[0] === st.t) + Number(t.dataset.d); st.t = SPJ_TAHAP[Math.max(0, Math.min(SPJ_TAHAP.length - 1, i))][0]; draw(); window.scrollTo(0, 0); };
+  S.vh.sjAdd = t => { if (t.dataset.g === 'barang') bacaTabel('barang', 'sjB'); else bacaTabel('upah', 'sjU'); const last = D[t.dataset.g][D[t.dataset.g].length - 1] || {}; D[t.dataset.g].push(t.dataset.g === 'barang' ? { tgl: last.tgl || '', no: last.no || '', penyedia: last.penyedia || '', jenis: last.jenis, pkp: last.pkp } : { peran: 'Pekerja', upah: last.upah || '' }); draw(); };
+  S.vh.sjDel = t => { D[t.dataset.g].splice(Number(t.dataset.i), 1); tunda(); draw(); };
+  S.vh.sjUxT = () => saveBlob(XL.write([{ name: 'Upah', rows: [['Nama', 'Peran', 'NIK/NPWP', 'Alamat', 'Hari kerja', 'Upah per hari']].concat(D.upah.map(u => [u.nama, u.peran, u.npwp, u.alamat, spjN(u.hari), spjN(u.upah)])), head: true, widths: [28, 16, 20, 28, 12, 14] }]), 'Format daftar upah.xlsx');
+  S.vh.sjDariRab = async () => { try { const M = await rabMaster(), Hh = rabDariSimpan(proyek, M), SD = rabSumberDaya(Hh.items).filter(r => !/upah/i.test(r.jenis)); D.barang = D.barang.concat(SD.map(r => ({ uraian: r.uraian, vol: String(r.qty), sat: r.satuan, harga: String(r.harga), jenis: JENIS_BELANJA[0], pkp: 'Tidak' }))); await simpan(); toast(SD.length + ' baris dari RAB. Sesuaikan dengan nota yang sebenarnya.'); draw(); } catch (x) { toast(x.message, 1); } };
+  S.vh.sjLengkap = async () => { const H = hit(); if (Math.abs(H.selisih) >= 1) return toast('Total SPJ belum sama dengan nilai SPP.', 1); try { await simpan({ status: 'Lengkap' }); toast('SPJ ditandai lengkap.'); draw(); } catch (x) { toast(x.message, 1); } };
+  S.vh.sjCetak = async t => { try { await simpan(); const H = hit(); const fotoPb = titik.map(x => OPT.progres.filter(p => x['foto_' + p]).map(p => ({ id: x['foto_' + p], ket: (x.nama_titik || '') + ' — progres ' + p + '%' }))).flat(); const all = spjDokumen(spp, D, H, fotoPb, pajakTr); printDocs('SPJ ' + (spp.no || ''), t.dataset.v === 'semua' ? Object.values(all).flat() : all[t.dataset.v]); } catch (x) { toast(x.message, 1); } };
+  draw();
+};
+/* ---------- template dokumen SPJ (siap cetak) ---------- */
+function spjDokumen(spp, D, H, foto, pajakTr) {
+  const s = S.set || {}, desa = s.nama_desa || '', th = spp.tahun || '';
+  const head = judul => `${kop()}<h2>${esc(judul)}</h2><table style="font-size:9.5pt;margin:2px 0 8px"><tr><td>Kegiatan</td><td>: ${esc((spp.kode_kegiatan ? spp.kode_kegiatan + ' ' : '') + (spp.kegiatan || ''))}</td></tr><tr><td>Nomor SPP</td><td>: ${esc(spp.no || '-')} tanggal ${esc(fDate(spp.tanggal))}</td></tr><tr><td>Tahun Anggaran</td><td>: ${esc(th)}</td></tr></table>`;
+  const ttd = (kiri, kn, kanan, nn) => `<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;text-align:center;margin-top:18px;font-size:10pt"><div><br>${esc(kiri)}<div class="sp"></div><u>${esc(kn || '..........................')}</u></div><div>${esc(desa)}, ${fDate(D.lap.tgl || isoToday())}<br>${esc(kanan)}<div class="sp"></div><u>${esc(nn || '..........................')}</u></div></div>`;
+  const rp0 = n => rabFmt(n, 0);
+  const tglTxt = t => { const d = parseD(t); return d ? dHari(t) + ' tanggal ' + terbilang(d.getDate()) + ' bulan ' + BULAN[d.getMonth()] + ' tahun ' + terbilang(d.getFullYear()) : '..........'; };
+  const rekap = [`<div class="paper">${head('LEMBAR KENDALI DAN REKAPITULASI BUKTI SPJ')}<table class="pt" style="font-size:9pt"><thead><tr><th>No</th><th>Tanggal</th><th>No. Bukti</th><th>Penerima / Penyedia</th><th>Uraian</th><th>Jumlah (Rp)</th><th>Pajak (Rp)</th></tr></thead><tbody>${H.N.map((n, i) => `<tr><td style="text-align:center">${i + 1}</td><td>${esc(fDate(n.tgl))}</td><td>${esc(n.no || '')}</td><td>${esc(n.penyedia || '')}</td><td>${esc(n.rows.map(r => r.uraian).join(', '))}</td><td style="text-align:right">${rp0(n.jml)}</td><td style="text-align:right">${rp0(n.pj ? n.pj.potongan || 0 : 0)}</td></tr>`).join('')}${H.U.length ? `<tr><td style="text-align:center">${H.N.length + 1}</td><td>${esc(fDate(D.lap.selesai || D.lap.mulai))}</td><td>Daftar upah</td><td>${H.U.length} orang</td><td>Upah/honor ${rabFmt(H.U.reduce((t, u) => t + spjN(u.hari), 0))} HOK</td><td style="text-align:right">${rp0(H.tu)}</td><td style="text-align:right">${rp0(H.U.reduce((t, u) => t + (u.pph21 || 0), 0))}</td></tr>` : ''}</tbody><tfoot><tr><td colspan="5" style="text-align:right"><b>Jumlah SPJ</b></td><td style="text-align:right"><b>${rp0(H.total)}</b></td><td></td></tr><tr><td colspan="5" style="text-align:right">Nilai SPP</td><td style="text-align:right">${rp0(sppTotal(spp))}</td><td></td></tr><tr><td colspan="5" style="text-align:right">Selisih</td><td style="text-align:right">${rp0(H.selisih)}</td><td></td></tr></tfoot></table>${ttd('Kaur Keuangan', s.nama_bendahara, 'Kasi/Kaur Pelaksana Kegiatan', D.ba.pka)}</div>`];
+  const kuitansi = H.N.map(n => `<div class="paper" style="font-size:11pt">${kop()}<h2>KUITANSI</h2><table style="width:100%;margin-top:10px"><tr><td style="width:180px">Nomor</td><td>: ${esc(n.no || '..........')}</td></tr><tr><td>Sudah terima dari</td><td>: Kasi/Kaur Pelaksana Kegiatan Desa ${esc(desa)}</td></tr><tr><td>Uang sejumlah</td><td>: <b>${rabRp(n.jml)}</b> <i>(${esc(terbilang(Math.round(n.jml)))} rupiah)</i></td></tr><tr><td>Untuk pembayaran</td><td>: ${esc(n.rows.map(r => r.uraian + ' ' + rabFmt(spjN(r.vol)) + ' ' + (r.sat || '')).join('; '))} — kegiatan ${esc(spp.kegiatan || '')}</td></tr></table>${ttd('Kasi/Kaur Pelaksana Kegiatan', D.ba.pka, 'Yang menerima,', n.penyedia)}</div>`);
+  const tabelBarang = `<table class="pt" style="font-size:9pt"><thead><tr><th>No</th><th>Uraian barang/jasa</th><th>Volume</th><th>Satuan</th><th>Penyedia / No. bukti</th><th>Keterangan</th></tr></thead><tbody>${H.N.map(n => n.rows).flat().map((r, i) => `<tr><td style="text-align:center">${i + 1}</td><td>${esc(r.uraian || '')}</td><td style="text-align:right">${rabFmt(spjN(r.vol))}</td><td>${esc(r.sat || '')}</td><td>${esc((r.penyedia || '') + (r.no ? ' / ' + r.no : ''))}</td><td>Baik, sesuai</td></tr>`).join('')}</tbody></table>`;
+  const baperiksa = H.N.length ? [`<div class="paper" style="font-size:10.5pt">${kop()}<h2>BERITA ACARA PEMERIKSAAN BARANG</h2><h3>Nomor: ${esc(D.ba.no || '..........')}</h3><p>Pada hari ini ${esc(tglTxt(D.ba.tgl_periksa))}, kami Tim Pelaksana Kegiatan (TPK) Desa ${esc(desa)} telah melakukan pemeriksaan atas barang/jasa untuk kegiatan <b>${esc(spp.kegiatan || '')}</b> Tahun Anggaran ${esc(th)}, dengan hasil sebagai berikut:</p>${tabelBarang}<p>Barang/jasa tersebut dalam keadaan baik dan sesuai dengan spesifikasi. Demikian berita acara ini dibuat untuk dipergunakan sebagaimana mestinya.</p><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center;margin-top:18px;font-size:10pt">${[['Ketua TPK', D.ba.ketua], ['Anggota', D.ba.anggota1], ['Anggota', D.ba.anggota2]].map(x => `<div>${esc(x[0])}<div class="sp"></div><u>${esc(x[1] || '..........................')}</u></div>`).join('')}</div></div>`] : [];
+  const baterima = H.N.length ? [`<div class="paper" style="font-size:10.5pt">${kop()}<h2>BERITA ACARA PENERIMAAN BARANG</h2><p>Pada hari ini ${esc(tglTxt(D.ba.tgl_periksa))}, Kasi/Kaur Pelaksana Kegiatan Desa ${esc(desa)} menerima dari Tim Pelaksana Kegiatan barang/jasa hasil pengadaan kegiatan <b>${esc(spp.kegiatan || '')}</b> sebagai berikut:</p>${tabelBarang}<p>Barang/jasa diterima dalam keadaan baik dan lengkap.</p>${ttd('Yang menyerahkan, Ketua TPK', D.ba.ketua, 'Yang menerima, Kasi/Kaur Pelaksana Kegiatan', D.ba.pka)}</div>`] : [];
+  const hari = []; const d0 = parseD(D.lap.mulai), d1 = parseD(D.lap.selesai || D.lap.mulai); if (d0 && d1) for (let d = new Date(d0); d <= d1 && hari.length < 31; d.setDate(d.getDate() + 1)) hari.push(new Date(d));
+  const hadir = H.U.length ? [`<div class="paper land" style="font-size:8.5pt">${head('DAFTAR HADIR PEKERJA')}<table class="pt" style="font-size:7.5pt"><thead><tr><th>No</th><th>Nama</th><th>Peran</th>${(hari.length ? hari : [null]).map(d => `<th>${d ? d.getDate() + '/' + (d.getMonth() + 1) : 'Tgl'}</th>`).join('')}<th>Jml HOK</th></tr></thead><tbody>${H.U.map((u, i) => `<tr><td style="text-align:center">${i + 1}</td><td>${esc(u.nama || '')}</td><td>${esc(u.peran || '')}</td>${(hari.length ? hari : [null]).map((d, k) => `<td style="text-align:center">${k < Math.round(spjN(u.hari)) ? '✓' : ''}</td>`).join('')}<td style="text-align:center">${rabFmt(spjN(u.hari))}</td></tr>`).join('')}</tbody></table><p style="font-size:8pt">Periode kerja ${esc(fDate(D.lap.mulai))} s.d. ${esc(fDate(D.lap.selesai || D.lap.mulai))}. Tanda ✓ diisi/diparaf saat hadir.</p>${ttd('Mandor / Ketua TPK', D.ba.ketua, 'Kasi/Kaur Pelaksana Kegiatan', D.ba.pka)}</div>`] : [];
+  const upah = H.U.length ? [`<div class="paper land" style="font-size:9pt">${head('DAFTAR PENERIMAAN UPAH / HONOR')}<table class="pt" style="font-size:8.5pt"><thead><tr><th>No</th><th>Nama</th><th>Peran</th><th>NIK/NPWP</th><th>Alamat</th><th>Hari</th><th>Upah/hari</th><th>Jumlah</th><th>PPh 21</th><th>Diterima</th><th>Tanda tangan</th></tr></thead><tbody>${H.U.map((u, i) => `<tr><td style="text-align:center">${i + 1}</td><td>${esc(u.nama || '')}</td><td>${esc(u.peran || '')}</td><td>${esc(u.npwp || '')}</td><td>${esc(u.alamat || '')}</td><td style="text-align:right">${rabFmt(spjN(u.hari))}</td><td style="text-align:right">${rp0(spjN(u.upah))}</td><td style="text-align:right">${rp0(u.jml)}</td><td style="text-align:right">${rp0(u.pph21 || 0)}</td><td style="text-align:right">${rp0(u.jml - (u.pph21 || 0))}</td><td style="${i % 2 ? 'text-align:right' : ''}">${i + 1}. ........</td></tr>`).join('')}</tbody><tfoot><tr><td colspan="7" style="text-align:right"><b>Jumlah</b></td><td style="text-align:right"><b>${rp0(H.tu)}</b></td><td style="text-align:right">${rp0(H.U.reduce((t, u) => t + (u.pph21 || 0), 0))}</td><td style="text-align:right"><b>${rp0(H.tu - H.U.reduce((t, u) => t + (u.pph21 || 0), 0))}</b></td><td></td></tr></tfoot></table>${ttd('Kaur Keuangan', s.nama_bendahara, 'Kasi/Kaur Pelaksana Kegiatan', D.ba.pka)}</div>`] : [];
+  const laporan = [`<div class="paper" style="font-size:10.5pt">${head('LAPORAN PELAKSANAAN KEGIATAN')}<ol><li><b>Uraian pelaksanaan</b><br>${esc(D.lap.uraian || '..........').replace(/\n/g, '<br>')}</li><li><b>Hasil / volume yang dicapai</b><br>${esc(D.lap.hasil || '..........')}</li><li><b>Waktu pelaksanaan</b><br>${esc(fDate(D.lap.mulai) || '..........')} s.d. ${esc(fDate(D.lap.selesai) || '..........')}</li><li><b>Realisasi anggaran SPP ini</b><br>${rabRp(H.total)} (barang/jasa ${rabRp(H.tb)}, upah/honor ${rabRp(H.tu)})</li><li><b>Kendala</b><br>${esc(D.lap.kendala || '-').replace(/\n/g, '<br>')}</li><li><b>Saran / tindak lanjut</b><br>${esc(D.lap.saran || '-').replace(/\n/g, '<br>')}</li></ol>${ttd('Mengetahui, Kepala Desa ' + desa, s.nama_kades, 'Kasi/Kaur Pelaksana Kegiatan', D.ba.pka)}</div>`]
+    .concat(foto.length ? [`<div class="paper">${head('DOKUMENTASI FOTO KEGIATAN')}<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${foto.slice(0, 8).map(f => `<figure style="margin:0;text-align:center"><img src="${esc(thumb(f.id, 800))}" style="width:100%;height:200px;object-fit:cover;border:1px solid #999"><figcaption style="font-size:9pt">${esc(f.ket)}</figcaption></figure>`).join('')}</div></div>`] : []);
+  const pajak = [`<div class="paper">${head('REKAPITULASI PAJAK SPJ')}<table class="pt"><thead><tr><th>No</th><th>Jenis pajak</th><th>Dari bukti SPJ (Rp)</th><th>Disetor (Rp)</th><th>NTPN</th></tr></thead><tbody>${Object.keys(H.pajak).map((k, i) => { const T = pajakTr.filter(t => t.pajak === k && t.jenis === 'Pajak Disetor'); return `<tr><td style="text-align:center">${i + 1}</td><td>${esc(k)}</td><td style="text-align:right">${rp0(H.pajak[k])}</td><td style="text-align:right">${rp0(T.reduce((a, t) => a + spjN(t.jumlah), 0))}</td><td>${esc(T.map(t => t.ntpn).filter(Boolean).join(', '))}</td></tr>`; }).join('')}</tbody><tfoot><tr><td></td><td><b>Jumlah</b></td><td style="text-align:right"><b>${rp0(Object.values(H.pajak).reduce((a, b) => a + b, 0))}</b></td><td></td><td></td></tr></tfoot></table>${ttd('Kasi/Kaur Pelaksana Kegiatan', D.ba.pka, 'Kaur Keuangan', s.nama_bendahara)}</div>`];
+  return { rekap, kuitansi, baperiksa, baterima, hadir, upah, laporan, pajak };
 }
 
 /* ---------------- mulai ---------------- */
