@@ -6868,6 +6868,7 @@ function rabBastDok(pr, b) {
     isi('Kasi/Kaur Pelaksana Kegiatan Anggaran', b.pka || pr.pka, 'Kepala Desa ' + desa, b.kades || s.nama_kades, 'BERITA ACARA PENYERAHAN HASIL KEGIATAN')];
 }
 Object.assign(UI, {
+  rab_proyek: { t: 'Proyek RAB & Gambar', ic: 'hammer', perm: 'rab', m: 'rab', noAdd: 1, fields: [F('nama', 'Nama Pekerjaan', 'text', { wide: 1 }), F('lokasi', 'Lokasi'), F('tahun', 'Tahun', 'number'), F('status', 'Status')], row: r => ({ t: r.nama, s: [r.lokasi, r.tahun, r.status].filter(Boolean).join(' · '), r: fMoney(r.total), av: ic('hammer') }) },
   ssh_item: {
     t: 'Harga Satuan (SSH)', ic: 'coin', perm: '*', m: 'rab', write: 'rab', sort: 'kode', asc: 1, excel: 1,
     fields: [F('kode', 'Kode', 'text', { mono: 1, req: 1, hint: 'Mis. M.01 bahan, U.01 upah, A.01 alat' }), F('uraian', 'Uraian', 'text', { req: 1, wide: 1 }), F('jenis', 'Jenis', 'select', { req: 1, opt: ['Bahan', 'Upah', 'Alat'] }), F('satuan', 'Satuan', 'text', { req: 1 }),
