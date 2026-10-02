@@ -300,6 +300,16 @@ table.tbl{border-collapse:collapse;width:100%;font-size:11.5px;font-variant-nume
 .bar i{display:block;height:100%}
 /* dashboard keuangan: hijau-toska = pendapatan, oranye = belanja, biru = pembiayaan */
 .kd{display:grid;gap:10px}
+.rk-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:7px 10px}
+.rk-sl{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.rk-s{display:flex;gap:10px;align-items:center;text-align:left;padding:10px 12px;cursor:pointer;width:100%}
+.rk-s .main{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}.rk-s .meta{white-space:normal}
+.rk-n{width:30px;height:30px;border-radius:50%;background:var(--pri);color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
+.rk-r{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}
+.rk-dl{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.rk-d{display:flex;flex-direction:column;gap:6px;padding:9px 11px}.rk-dt{display:flex;gap:8px;align-items:flex-start;justify-content:space-between}
+.rk-bl{display:grid;gap:6px}.rk-b{display:flex;gap:8px;align-items:center;padding:6px 8px;border:1px solid var(--line);border-radius:8px}.rk-b .main{flex:1;display:flex;flex-direction:column;min-width:0}
+.rk-tabs{flex-wrap:wrap}.warn-t{color:var(--bad);font-weight:600}
 .kd-act{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
 .kd-act .btn{min-height:44px;justify-content:flex-start;font-size:13px;padding:6px 12px}
 .kd-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
@@ -1102,7 +1112,7 @@ function MODS() {
     { k: 'pemerintahan', l: 'Pemerintahan', ic: 'landmark', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, 'r:penduduk'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga']] },
     { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
     { k: 'kesejahteraan', l: 'Kesejahteraan', ic: 'heart', items: [['Lembaga / Yayasan', 'landmark', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru Ngaji', 'book', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
-    { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['Penyusunan RKP (dokumen)', 'file', ['rkpdok'], null, 'r:rkp'], ['Dashboard Perencanaan', 'chart', ['rkpdash'], null, 'r:rkp'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Kegiatan Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
+    { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['Generator RKP', 'sprout', ['rkpgen', {}], null, 'r:rkp'], ['Usulan Kegiatan', 'clip', ['list', { e: 'rkp_usulan' }], null, 'r:rkp'], ['RAB & Gambar', 'list', ['list', { e: 'rkp_rab' }], null, 'r:rkp'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Kegiatan Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
     { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Rekap Pajak', 'coin', ['keupajak'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek']] },
     { k: 'soon', l: 'Segera Hadir', ic: 'sprout', items: Object.keys(SOON).map(k => [SOON[k].t, SOON[k].ic, ['soon', { k }], null, '*', 1]) }
   ];
@@ -3396,45 +3406,113 @@ VIEWS.pstat = async (p, main, alive) => {
 };
 
 /* ---------------- Perencanaan ---------------- */
-VIEWS.rkp = async (p, main) => {
+/* ======== RKP Desa v2: dashboard + lima tahapan (gaya Dashboard Keuangan) ======== */
+const RKP_TJ = [
+  { n: 'Pembentukan Tim', ic: 'users', d: 'Musyawarah pembentukan tim, SK Tim Penyusun & Verifikasi, jadwal kerja' },
+  { n: 'Pengkajian & Rancangan', ic: 'clip', d: 'Pembiayaan, usulan, kerja sama, RAB, gambar & rancangan RKP' },
+  { n: 'Musdes Perencanaan', ic: 'users', d: 'BA hasil penyusunan, SK panitia, BA Musdes, pandangan BPD' },
+  { n: 'Musrenbang Desa', ic: 'chart', d: 'Tata tertib, penyusunan prioritas, BA Musrenbang' },
+  { n: 'Penetapan & Pengesahan', ic: 'check', d: 'SK panitia, BA pengesahan, daftar RKP, Rancangan Perdes' }];
+const rkpNk = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+async function rkpAmbil() {
+  const y = String(S.rkpYear), L = (e, f) => call('list', { entity: e, limit: 5000, filters: f }).then(r => r.rows || []).catch(() => []);
+  const [mp, us, pb, pg, mu, tm, jd, rb, ag, rp, pbg] = await Promise.all([rkpDokMap(true), L('rkp_usulan', { tahun_rkp: y }), L('rkp_pembiayaan', { tahun_rkp: y }), L('rkp_pagu', { tahun_rkp: y }), L('rkp_musyawarah', { tahun_rkp: y }), L('rkp_tim', {}), L('rkp_jadwal', { tahun_rkp: y }), L('rkp_rab', { tahun_rkp: y }), L('keu_anggaran', { tahun: y }), L('rpjm_kegiatan', {}), L('pembangunan', {})]);
+  const ids = new Set(mu.map(x => x.id));
+  const D = { y, mp, us, pb, pg, mu, tm: tm.filter(x => ids.has(x.ref)), jd, rb, ag, rp, pbg };
+  D.nu = us.filter(u => u.dokumen !== 'DU-RKP'); D.du = us.filter(u => u.dokumen === 'DU-RKP');
+  const aK = new Set(ag.map(a => a.kode_kegiatan).filter(Boolean)), aN = new Set(ag.map(a => rkpNk(a.kegiatan)).filter(Boolean));
+  D.masuk = D.nu.filter(u => (u.kode_kegiatan && aK.has(u.kode_kegiatan)) || aN.has(rkpNk(u.kegiatan)));
+  D.st = k => (mp[k] || {}).status || 'Belum';
+  return D;
+}
+/* bahan data tiap tahap: [label, jumlah, rute buka, rute tambah, keterangan] */
+function rkpBahan(D, t) {
+  const tp = D.tm.filter(x => x.jenis_tim === 'Tim Penyusun').length, tv = D.tm.filter(x => x.jenis_tim === 'Tim Verifikasi').length;
+  const L = e => ['list', { e }], F = (e, pre) => ['form', { e, preset: pre || {} }];
+  const mus = ['Musyawarah & tim', D.mu.length, L('rkp_musyawarah'), F('rkp_musyawarah'), 'tanggal, tempat, pimpinan, notulen'];
+  const usu = ['Usulan kegiatan (Form 04)', D.us.length, L('rkp_usulan'), F('rkp_usulan'), 'sumber semua form tabel'];
+  const pr = D.nu.filter(u => Number(u.prioritas)).length, sk = D.nu.filter(u => [1, 2, 3, 4].some(n => Number(u['skor' + n]))).length;
+  return [
+    [mus, ['Tim Penyusun', tp, L('rkp_musyawarah'), null, 'dibuka dari data musyawarah'], ['Tim Verifikasi', tv, L('rkp_musyawarah'), null, 'dibuka dari data musyawarah'], ['Jadwal & tindak lanjut (Form 03)', D.jd.length, L('rkp_jadwal'), F('rkp_jadwal'), 'rencana kerja tim']],
+    [['Rencana pembiayaan (Form 05)', D.pb.length, L('rkp_pembiayaan'), F('rkp_pembiayaan'), 'PADes, DD, ADD, BHP, bantuan'], usu, ['Kerja sama (Form 08/09)', D.us.filter(u => u.kerjasama).length, L('rkp_usulan'), null, 'isi kolom "Kerja sama" di usulan'], ['RAB & gambar (Form 12/13)', D.rb.length, L('rkp_rab'), F('rkp_rab'), 'satu data per kegiatan']],
+    [mus, ['Usulan masuk RKP', D.nu.length, L('rkp_usulan'), null, 'dipakai BA & lampiran']],
+    [['Usulan diberi prioritas', pr + '/' + D.nu.length, L('rkp_usulan'), null, 'kolom Nomor Prioritas'], ['Usulan diberi skor (Form 21)', sk + '/' + D.nu.length, L('rkp_usulan'), null, 'skor 1–4 tiap usulan'], mus],
+    [['Usulan masuk RKP', D.nu.length, L('rkp_usulan'), null, 'jadi Daftar RKP (Form 25)'], ['Sudah masuk APBDes', D.masuk.length + '/' + D.nu.length, ['list', { e: 'keu_anggaran' }], null, 'cocok lewat kode/nama kegiatan']]
+  ][t - 1];
+}
+/* kesiapan data satu dokumen: [jumlah baris, sumber] */
+function rkpSiap(k, D) {
+  if (k === '12' || k === '13') return [D.rb.length, 'data RAB kegiatan'];
+  const tb = (RKP_CAT[k] || {}).tb; if (!tb) return null;
+  const m = { F05: [D.pb.length, 'rencana pembiayaan'], F06: [D.nu.length, 'usulan'], F07: [D.us.length, 'usulan'], F08: [D.us.filter(u => u.kerjasama === 'Antar Desa').length, 'kerja sama antar desa'], F09: [D.us.filter(u => u.kerjasama === 'Pihak Ketiga').length, 'kerja sama pihak ketiga'], F10: [D.nu.length, 'usulan'], F14: [D.du.length, 'usulan DU-RKP'], F21: [D.nu.length, 'usulan'], F25: [D.nu.length, 'usulan'] };
+  return m[tb] || null;
+}
+const rkpPillS = s => s === 'Selesai' ? 'ok' : s === 'Siap TTD' ? 'warn' : s === 'Draf' ? 'info' : '';
+function dokKartu(dk, mp, w, D) {
+  const s = (mp[dk.k] || {}).status || 'Belum', ada = rkpFields(dk.k).length > 0 && dk.k !== '12' && dk.k !== '13', sp = D ? rkpSiap(dk.k, D) : null;
+  const lbl = dk.k === '12' || dk.k === '13' ? 'Pilih kegiatan' : 'Cetak Word';
+  return `<div class="card rk-d"><div class="rk-dt"><b>${esc(dk.n)}</b><span class="pill ${rkpPillS(s)}">${esc(s)}</span></div>
+    ${sp ? `<div class="meta">${sp[0] ? ic('check') + ' ' + sp[0] + ' baris dari ' + esc(sp[1]) : '<span class="warn-t">Belum ada data ' + esc(sp[1]) + '</span>'}</div>` : ''}
+    ${w ? `<div class="btns">${ada ? `<button class="btn sm" data-act="dokIsi" data-k="${esc(dk.k)}">${ic('edit')}Isi cepat</button>` : ''}<button class="btn sm pri" data-act="dokBuat" data-k="${esc(dk.k)}">${ic('file')}${lbl}</button>
+    <select class="sel" data-act-change="dokStatus" data-k="${esc(dk.k)}" aria-label="Status ${esc(dk.n)}">${RKP_STATUS.map(x => `<option ${x === s ? 'selected' : ''}>${x}</option>`).join('')}</select></div>` : ''}</div>`;
+}
+const rkpYrChips = y => `<div class="chips">${[y - 1, y, y + 1].map(t => `<button class="chip ${t === y ? 'on' : ''}" data-act="yr" data-v="${t}">${t}</button>`).join('')}</div>`;
+function rkpBarisBahan(b, w) {
+  return `<div class="rk-b"><span class="main"><b>${esc(b[0])}</b><small class="meta">${esc(b[4])}</small></span><b class="num">${esc(String(b[1]))}</b><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(b[2]))}'>Buka</button>${w && b[3] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(b[3]))}' aria-label="Tambah ${esc(b[0])}">${ic('plus')}</button>` : ''}</div>`;
+}
+VIEWS.rkp = async (p, main, alive) => {
   setTop('RKP Desa', 'Tahun ' + S.rkpYear);
-  const y = Number(S.rkpYear), w = can('perencanaan');
-  const T = [['rkp_musyawarah', 'Form 01–02', 'Musyawarah, tim penyusun & verifikasi'], ['rkp_jadwal', 'Form 03', 'Rencana kerja & tindak lanjut'], ['rkp_usulan', 'Form 04', 'Program & kegiatan yang masuk desa'], ['rkp_pembiayaan', 'Form 05', 'Rencana pembiayaan desa']];
-  main.innerHTML = `<div class="stack">
-    <div class="card" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:7px 10px"><div style="flex:1;min-width:160px"><span class="lbl">RKP Desa yang disusun</span> <b class="num" style="font-size:16px">${y}</b> <span class="meta">(disusun tahun ${y - 1})</span></div>
-      <div class="chips">${[y - 1, y, y + 1].map(t => `<button class="chip ${t === y ? 'on' : ''}" data-act="yr" data-v="${t}">${t}</button>`).join('')}</div></div>
-    ${w ? `<button class="card wz-cta" data-act="go" data-go='["rkpgen",{}]'><span class="av">${ic('sprout')}</span><span class="main"><b>Generator RKP otomatis</b><span class="meta">Tarik kegiatan dari RPJM, kegiatan rutin, dan luncuran tahun lalu → Form 04, dibandingkan dengan pagu indikatif</span></span>${ic('next')}</button>` : ''}
-    <div class="btns"><button class="btn pri" data-act="go" data-go='["rkpdok"]'>${ic('file')}Dokumen penyusunan RKP</button><button class="btn" data-act="go" data-go='["rkpdash"]'>${ic('chart')}Dashboard Perencanaan</button></div>
-    <div class="sec-h"><h2>Tahapan penyusunan</h2></div>
-    <div class="list">${T.map(t => `<div class="it"><button class="row" data-act="go" data-go='${esc(JSON.stringify(['list', { e: t[0] }]))}'><span class="av">${ic(UI[t[0]].ic)}</span><span class="main"><span class="t">${esc(t[2])}</span><span class="s">${t[1]}</span></span><span class="muted">${ic('next')}</span></button></div>`).join('')}</div>
-    <div class="sec-h"><h2>Dokumen dari template</h2>${w ? `<button class="btn sm" data-act="tplr">${ic('list')}Muat ulang daftar</button>` : ''}</div>
-    ${w ? `<div class="meta">Dokumen diisi otomatis dari data RKP ${y} (musyawarah pembentukan tim, tim penyusun & verifikasi, narasumber, Form 03–05, dasar hukum), lalu Word langsung terunduh (PDF bisa diunduh juga bila perlu).</div><div id="tpls"><div class="skel"></div></div>` : '<div class="card meta">Pembuatan dokumen hanya untuk pemegang hak Perencanaan.</div>'}
-    <details class="more"><summary>Dokumen utama per form</summary><div class="grid" style="margin-top:6px">
-      <button class="tile" data-act="doc" data-d="ba"><span class="ti">${ic('print')}</span><b>Berita Acara Musdes<small>Form 01</small></b></button>
-      <button class="tile" data-act="doc" data-d="skp"><span class="ti">${ic('print')}</span><b>SK Tim Penyusun<small>Form 02</small></b></button>
-      <button class="tile" data-act="doc" data-d="skv"><span class="ti">${ic('print')}</span><b>SK Tim Verifikasi<small>Form 02</small></b></button>
-      <button class="tile" data-act="doc" data-d="rktl"><span class="ti">${ic('print')}</span><b>Rencana Kerja & Tindak Lanjut<small>Form 03</small></b></button>
-      <button class="tile" data-act="doc" data-d="f4"><span class="ti">${ic('print')}</span><b>Program Masuk Desa<small>Form 04</small></b></button>
-      <button class="tile" data-act="doc" data-d="f5"><span class="ti">${ic('print')}</span><b>Rencana Pembiayaan<small>Form 05</small></b></button>
-    </div></details>
-    <div class="sec-h"><h2>RPJM Desa 2020–2027</h2></div>
-    <div class="list">${[['rpjm_visimisi', 'Visi, misi, tujuan & sasaran'], ['rpjm_kegiatan', 'Rencana kegiatan per bidang & tahun'], ['rkp_rutin', 'Pengeluaran wajib tiap tahun (dipakai Generator RKP)']].map(t => `<div class="it"><button class="row" data-act="go" data-go='${esc(JSON.stringify(['list', { e: t[0] }]))}'><span class="av">${ic(UI[t[0]].ic)}</span><span class="main"><span class="t">${esc(UI[t[0]].t.replace('RPJM Desa — ', ''))}</span><span class="s">${t[1]}</span></span></button></div>`).join('')}</div>
-    <button class="btn" data-act="go" data-go='["refs"]'>${ic('book')}Referensi: kode bidang, SDGs, dasar hukum</button>
-  </div>`;
-  S.vh.yr = t => { S.rkpYear = t.dataset.v; S.listState = null; refresh(); };
-  S.vh.doc = t => dokRkp(t.dataset.d).catch(x => toast(x.message, 1));
-  const loadT = async force => {
-    const el = $('#tpls'); if (!el) return;
-    try {
-      let tw = []; try { tw = (await tplDaftar(force)).filter(x => x.path.indexOf('rkp/') === 0 && !/_cadangan/.test(x.path)); } catch (x) { }
-      if (tw.length) { el.innerHTML = `<div class="grid">${tw.map(t => `<button class="tile" data-act="mkdocW" data-p="${esc(t.path)}"><span class="ti">${ic('file')}</span><b>${esc(t.path.split('/').pop().replace(/\.docx$/i, '').replace(/_/g, ' ').replace(/\s+/g, ' '))}</b></button>`).join('')}</div>`; return; }
-      if (force || !S.tpls) S.tpls = await call('tplList');
-      el.innerHTML = S.tpls.length ? `<div class="grid">${S.tpls.map(t => `<button class="tile" data-act="mkdoc" data-id="${esc(t.id)}" data-n="${esc(t.name)}"><span class="ti">${ic('file')}</span><b>${esc(t.name.replace(/_/g, ' ').replace(/\s+/g, ' '))}</b></button>`).join('')}</div>` : '<div class="card meta">Belum ada template di folder Draf RKP.</div>';
-    } catch (x) { el.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
-  };
-  S.vh.tplr = () => loadT(true);
-  if (w) loadT();
+  const y = Number(S.rkpYear), w = can('perencanaan'), D = await rkpAmbil(); if (alive && !alive()) return;
+  const rpf = v => 'Rp ' + (Number(v) || 0).toLocaleString('id-ID');
+  const tot = RKP_DOKS.length, sel = RKP_DOKS.filter(x => D.st(x.k) === 'Selesai').length, ttd = RKP_DOKS.filter(x => D.st(x.k) === 'Siap TTD');
+  const next = RKP_DOKS.find(x => D.st(x.k) === 'Belum' || D.st(x.k) === 'Draf');
+  const jum = D.us.reduce((a, u) => a + mNum(u.total), 0), perB = {}, perS = {};
+  D.us.forEach(u => { const b = rkpBid(u); perB[b] = (perB[b] || 0) + mNum(u.total); const k = wzKunciSd(u.sumber_dana); perS[k] = (perS[k] || 0) + mNum(u.total); });
+  const pag = D.pg[0] || {}, pagTot = WZ_PAGU.reduce((a, k) => a + mNum(pag[k[0]]), 0), maxB = Math.max.apply(null, [1].concat(Object.values(perB)));
+  const barB = [1, 2, 3, 4, 5].map(b => `<div class="kd-bar" data-tip="<b>${esc(RKP_BID[b])}</b><br>${esc(rpf(perB[b] || 0))}"><div class="t"><span>${b}. ${esc(RKP_BID[b])}</span><span class="num">${rpf(perB[b] || 0)}</span></div><div class="kd-lane"><div class="kd-track" style="width:${(perB[b] || 0) / maxB * 100}%"><i style="width:100%"></i></div></div></div>`).join('');
+  const tabS = WZ_PAGU.map(k => { const r = perS[k[0]] || 0, g = mNum(pag[k[0]]); return r || g ? `<tr><td>${esc(k[1])}</td><td class="r num">${rpf(g)}</td><td class="r num">${rpf(r)}</td><td class="r num" style="color:var(${g - r < 0 ? '--bad' : '--ok'})">${rpf(g - r)}</td></tr>` : ''; }).join('');
+  const rpY = D.rp.filter(r => String(r.tahun_pelaksanaan || '').indexOf(String(y)) >= 0), rpMasuk = rpY.filter(r => D.us.some(u => rkpNk(u.kegiatan) === rkpNk(r.kegiatan)));
+  const pbY = D.pbg.filter(x => [String(y), String(y - 1)].indexOf(String(x.tahun_anggaran)) >= 0), pbSel = pbY.filter(x => Number(x.progres) >= 100);
+  const stepper = RKP_TAHAP.map((t, i) => {
+    const a = t.docs.filter(k => D.st(k) === 'Selesai').length, b = t.docs.length, mul = t.docs.some(k => D.st(k) !== 'Belum'), st = a === b ? 'Selesai' : mul ? 'Berjalan' : 'Belum mulai';
+    return `<button class="card rk-s" data-act="go" data-go='["rkptahap",{"t":${i + 1}}]'><span class="rk-n">${i + 1}</span><span class="main"><b>${esc(RKP_TJ[i].n)}</b><small class="meta">${esc(RKP_TJ[i].d)}</small>
+      <span class="kd-track" style="--kc:var(--ok)"><i style="width:${a / b * 100}%"></i></span></span><span class="rk-r"><span class="pill ${a === b ? 'ok' : mul ? 'info' : ''}">${st}</span><b class="num">${a}/${b}</b></span></button>`;
+  }).join('');
+  main.innerHTML = `<div class="kd"><div class="card rk-top"><div style="flex:1;min-width:160px"><span class="lbl">RKP Desa yang disusun</span> <b class="num" style="font-size:16px">${y}</b> <span class="meta">(disusun tahun ${y - 1})</span></div>${rkpYrChips(y)}</div>
+    ${w ? `<div class="kd-act">${next ? `<button class="btn pri" data-act="go" data-go='["rkptahap",{"t":${next.tahap}}]'>${ic('next')}Lanjut: ${esc(next.n)}</button>` : ''}<button class="btn" data-act="go" data-go='["rkpgen",{}]'>${ic('sprout')}Generator RKP</button><button class="btn" data-act="go" data-go='["form",{"e":"rkp_usulan"}]'>${ic('plus')}Tambah Usulan</button><button class="btn" data-act="go" data-go='["list",{"e":"rkp_usulan"}]'>${ic('clip')}Daftar Usulan</button></div>` : ''}
+    <div class="kd-kpi">
+      <div class="kd-k" style="--kc:var(--ok)"><span class="l">Dokumen selesai</span><b class="v">${sel}/${tot}</b><div class="kd-track"><i style="width:${tot ? sel / tot * 100 : 0}%"></i></div><span class="s">${ttd.length ? ttd.length + ' menunggu tanda tangan' : 'Tidak ada yang menunggu TTD'}</span></div>
+      <div class="kd-k" style="--kc:var(--c-bel)"><span class="l">Usulan kegiatan</span><b class="v">${D.us.length}</b><span class="s">${D.nu.length} masuk RKP · ${D.du.length} DU-RKP</span></div>
+      <div class="kd-k" style="--kc:var(--c-pend)"><span class="l">Total usulan / pagu</span><b class="v">${rpf(jum)}</b><span class="s">${pagTot ? 'Pagu indikatif ' + rpf(pagTot) + ' · sisa ' + rpf(pagTot - jum) : 'Pagu diisi di Generator RKP'}</span></div>
+      <div class="kd-k" style="--kc:var(--info)"><span class="l">Sudah masuk APBDes</span><b class="v">${D.masuk.length}/${D.nu.length}</b><div class="kd-track"><i style="width:${D.nu.length ? D.masuk.length / D.nu.length * 100 : 0}%"></i></div><span class="s">${canRead('keu_anggaran') ? 'dicocokkan lewat kode/nama kegiatan' : 'perlu hak akses Keuangan'}</span></div></div>
+    <div class="kd-c"><div class="kd-h"><b>Tahapan penyusunan</b><span class="meta">pilih tahap untuk mengisi & mencetak dokumen</span></div><div class="rk-sl">${stepper}</div></div>
+    <div class="kd-2">
+      <div class="kd-c" style="--kc:var(--c-bel)"><div class="kd-h"><b>Usulan per Bidang</b></div><div class="kd-bars">${barB}</div>${tabS ? `<div class="tbl-wrap" style="margin-top:8px"><table class="tbl"><thead><tr><th>Sumber</th><th class="r">Pagu</th><th class="r">Usulan</th><th class="r">Selisih</th></tr></thead><tbody>${tabS}</tbody></table></div>` : ''}</div>
+      <div class="kd-c"><div class="kd-h"><b>Capaian RPJM & Realisasi</b></div>
+        <div class="kd-mini"><div><span>Rencana RPJM tahun ${y}</span><b class="num">${rpY.length}</b></div><div><span>Sudah masuk usulan RKP</span><b class="num">${rpMasuk.length}</b></div><div><span>Kegiatan pembangunan</span><b class="num">${pbY.length}</b></div><div><span>Selesai (100%)</span><b class="num">${pbSel.length}</b></div></div>
+        ${rpY.length - rpMasuk.length > 0 ? `<div class="meta" style="margin-top:6px">Belum masuk RKP: ${esc(rpY.filter(r => rpMasuk.indexOf(r) < 0).slice(0, 4).map(r => r.kegiatan).join('; '))}${rpY.length - rpMasuk.length > 4 ? ', …' : ''}</div>` : ''}
+        <div class="kd-h" style="margin-top:10px"><b>Menunggu tanda tangan</b><span class="num">${ttd.length}</span></div>
+        ${ttd.length ? `<div class="list">${ttd.map(x => `<button class="row" data-act="go" data-go='["rkptahap",{"t":${x.tahap}}]'><span class="av">${ic('file')}</span><span class="main"><span class="t">${esc(x.n)}</span><span class="s">Tahap ${x.tahap}</span></span></button>`).join('')}</div>` : '<div class="meta">Ubah status dokumen menjadi "Siap TTD" di halaman tahapan.</div>'}</div>
+    </div>
+    <div class="kd-c"><div class="kd-h"><b>Alur data</b></div><div class="meta">Satu kali input, dipakai di banyak dokumen: <b>Usulan kegiatan (Form 04)</b> → Form 06, 07, 08, 09, 10, 14, 21, 25 · <b>Rencana pembiayaan (Form 05)</b> → Form 05 · <b>RAB kegiatan</b> → Form 12 & 13 · <b>Musyawarah & tim</b> → undangan, BA, SK · <b>Dasar hukum</b> otomatis dari Referensi · usulan RKP → <b>APBDes</b> di Keuangan.</div></div>
+    <details class="more"><summary>Data pendukung</summary><div class="btns" style="margin-top:6px"><button class="btn" data-act="go" data-go='["list",{"e":"rkp_musyawarah"}]'>${ic('users')}Musyawarah & Tim</button><button class="btn" data-act="go" data-go='["list",{"e":"rkp_jadwal"}]'>${ic('cal')}Jadwal (Form 03)</button><button class="btn" data-act="go" data-go='["list",{"e":"rkp_pembiayaan"}]'>${ic('coin')}Pembiayaan (Form 05)</button><button class="btn" data-act="go" data-go='["list",{"e":"rkp_rab"}]'>${ic('list')}RAB & Gambar</button><button class="btn" data-act="go" data-go='["list",{"e":"rkp_rutin"}]'>${ic('clock')}Kegiatan Rutin</button><button class="btn" data-act="go" data-go='["list",{"e":"rpjm_visimisi"}]'>${ic('book')}RPJM: Visi & Misi</button><button class="btn" data-act="go" data-go='["list",{"e":"rpjm_kegiatan"}]'>${ic('book')}RPJM: Kegiatan</button><button class="btn" data-act="go" data-go='["refs"]'>${ic('book')}Referensi</button></div></details></div>`;
+  kdTip();
+  S.vh.yr = t => { S.rkpYear = t.dataset.v; S.listState = null; S.dokMap = null; refresh(); };
 };
+VIEWS.rkptahap = async (p, main, alive) => {
+  const ti = Math.max(1, Math.min(5, Number(p.t) || 1)); S.rkpTahap = ti;
+  setTop('Tahap ' + ti + ' · ' + RKP_TJ[ti - 1].n, 'RKP ' + S.rkpYear);
+  const w = can('perencanaan'), D = await rkpAmbil(); if (alive && !alive()) return;
+  const t = RKP_TAHAP[ti - 1], a = t.docs.filter(k => D.st(k) === 'Selesai').length;
+  main.innerHTML = `<div class="kd"><div class="chips rk-tabs">${RKP_TAHAP.map((x, i) => `<button class="chip ${i + 1 === ti ? 'on' : ''}" data-act="go" data-go='["rkptahap",{"t":${i + 1}}]'>${i + 1}. ${esc(RKP_TJ[i].n)}</button>`).join('')}</div>
+    <div class="card" style="padding:8px 11px"><div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(RKP_TJ[ti - 1].d)}</b><span class="num">${a}/${t.docs.length} selesai</span></div><div class="kd-track" style="--kc:var(--ok);margin-top:5px"><i style="width:${a / t.docs.length * 100}%"></i></div></div>
+    <div class="kd-c"><div class="kd-h"><b>1. Siapkan data</b><span class="meta">dokumen di bawah terisi dari data ini</span></div><div class="rk-bl">${rkpBahan(D, ti).map(b => rkpBarisBahan(b, w)).join('')}</div>${ti === 2 && w ? `<div class="btns" style="margin-top:8px"><button class="btn" data-act="go" data-go='["rkpgen",{}]'>${ic('sprout')}Isi otomatis dengan Generator RKP</button></div>` : ''}</div>
+    <div class="kd-c"><div class="kd-h"><b>2. Isi cepat & cetak dokumen</b><span class="meta">Isi cepat → Cetak Word → ubah status</span></div><div class="rk-dl">${t.docs.map(k => dokKartu({ k, n: RKP_NAMA[k] }, D.mp, w, D)).join('')}</div></div>
+    <div class="btns">${ti > 1 ? `<button class="btn" data-act="go" data-go='["rkptahap",{"t":${ti - 1}}]'>${ic('back')}Tahap ${ti - 1}</button>` : ''}<button class="btn" data-act="go" data-go='["rkp"]'>${ic('chart')}Dashboard RKP</button>${ti < 5 ? `<button class="btn pri" data-act="go" data-go='["rkptahap",{"t":${ti + 1}}]'>Tahap ${ti + 1}${ic('next')}</button>` : ''}</div></div>`;
+  $$('select[data-act-change]', main).forEach(s => s.onchange = () => ACT.dokStatus(s));
+};
+VIEWS.rkpdok = VIEWS.rkpdash = (p, main, alive) => VIEWS.rkp(p, main, alive);
+
 ACT.mkdoc = t => makeDocFlow(t.dataset.id, t.dataset.n, { tahun_rkp: S.rkpYear });
 async function makeDocFlow(tpl, name, extra) {
   const m = modal('Membuat dokumen', `<div class="stack"><b>${esc(String(name).replace(/_/g, ' '))}</b><div class="skel"></div><div class="meta">Mengisi template… biasanya 5–20 detik.</div></div>`);
@@ -4499,6 +4577,7 @@ async function buatDokKode(kode, rab) {
     }
     const r = await buatDokumen({ path, M, rows, jenis: 'rkp', nama: nm + ' - RKP ' + S.rkpYear + (rab ? ' - ' + (rab.kegiatan || '') : '') });
     hasilDokumen(m, r);
+    if (!rab && ((await rkpDokMap())[kode] || {}).status !== 'Selesai' && ((await rkpDokMap())[kode] || {}).status !== 'Siap TTD' && ((await rkpDokMap())[kode] || {}).status !== 'Draf') { await rkpSimpanDok(kode, { status: 'Draf' }); }
   } catch (x) { m.body.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
 }
 /* ---- isian cepat ---- */
@@ -4526,55 +4605,6 @@ async function pilihRab(kode) {
 ACT.dokBuat = t => { const k = t.dataset.k; if (k === '12' || k === '13') return pilihRab(k); if (/^\d\d$/.test(k) && RKP_CAT[k]) return buatDokKode(k); return dokRkp(k).catch(x => toast(x.message, 1)); };
 ACT.dokIsi = t => isianDok(t.dataset.k).catch(x => toast(x.message, 1));
 ACT.dokStatus = async t => { try { await rkpSimpanDok(t.dataset.k, { status: t.value }); toast('Status disimpan'); } catch (x) { toast(x.message, 1); } };
-function dokKartu(dk, mp, w) {
-  const s = (mp[dk.k] || {}).status || 'Belum', ada = rkpFields(dk.k).length > 0 && dk.k !== '12' && dk.k !== '13';
-  return `<div class="card" style="display:flex;flex-direction:column;gap:6px;padding:9px 11px"><div style="display:flex;gap:8px;align-items:flex-start;justify-content:space-between"><b>${esc(dk.n)}</b><span class="pill ${s === 'Selesai' ? 'ok' : s === 'Siap TTD' ? 'warn' : s === 'Draf' ? 'info' : ''}">${esc(s)}</span></div>
-    ${w ? `<div class="btns">${ada ? `<button class="btn sm" data-act="dokIsi" data-k="${esc(dk.k)}">${ic('edit')}Isi cepat</button>` : ''}<button class="btn sm pri" data-act="dokBuat" data-k="${esc(dk.k)}">${ic('file')}Buat Word</button>
-    <select class="sel" data-act-change="dokStatus" data-k="${esc(dk.k)}" aria-label="Status ${esc(dk.n)}">${RKP_STATUS.map(x => `<option ${x === s ? 'selected' : ''}>${x}</option>`).join('')}</select></div>` : ''}</div>`;
-}
-VIEWS.rkpdok = async (p, main) => {
-  setTop('Penyusunan RKP', 'Tahun ' + S.rkpYear);
-  const w = can('perencanaan'), mp = await rkpDokMap(true);
-  const tot = RKP_DOKS.length, sel = RKP_DOKS.filter(x => (mp[x.k] || {}).status === 'Selesai').length;
-  main.innerHTML = `<div class="stack">
-    <div class="card" style="padding:8px 11px"><div style="display:flex;justify-content:space-between"><b>Dokumen tahapan penyusunan RKP ${esc(S.rkpYear)}</b><span class="num">${sel}/${tot} selesai</span></div><div class="bar" style="margin-top:5px"><i style="width:${tot ? sel / tot * 100 : 0}%;background:var(--ok)"></i></div></div>
-    ${RKP_TAHAP.map(t => `<div class="sec-h"><h2>${esc(t.t)}</h2></div><div class="grid">${t.docs.map(k => dokKartu({ k, n: RKP_NAMA[k] }, mp, w)).join('')}</div>`).join('')}
-    <div class="btns"><button class="btn" data-act="go" data-go='["list",{"e":"rkp_rab"}]'>${ic('list')}RAB & gambar kegiatan</button><button class="btn" data-act="go" data-go='["rkpdash"]'>${ic('chart')}Dashboard Perencanaan</button></div></div>`;
-  $$('select[data-act-change]', main).forEach(s => s.onchange = () => ACT.dokStatus(s));
-};
-/* ---- dashboard perencanaan ---- */
-VIEWS.rkpdash = async (p, main, alive) => {
-  setTop('Dashboard Perencanaan', 'RKP Desa ' + S.rkpYear);
-  const y = String(S.rkpYear), L = (e, f) => call('list', { entity: e, limit: 5000, filters: f }).then(r => r.rows).catch(() => []);
-  const [mp, us, pg, rp, pb] = await Promise.all([rkpDokMap(true), L('rkp_usulan', { tahun_rkp: y }), L('rkp_pagu', { tahun_rkp: y }), L('rpjm_kegiatan', {}), L('pembangunan', {})]);
-  if (alive && !alive()) return;
-  const rpf = v => 'Rp ' + (Number(v) || 0).toLocaleString('id-ID');
-  const tot = RKP_DOKS.length, sel = RKP_DOKS.filter(x => (mp[x.k] || {}).status === 'Selesai').length;
-  const prog = RKP_TAHAP.map((t, i) => { const a = t.docs.filter(k => (mp[k] || {}).status === 'Selesai').length; return `<div style="margin:6px 0"><div style="display:flex;justify-content:space-between"><span>${esc(t.t)}</span><span class="num">${a}/${t.docs.length}</span></div><div class="bar"><i style="width:${a / t.docs.length * 100}%;background:var(--ok)"></i></div></div>`; }).join('');
-  const jum = us.reduce((a, u) => a + mNum(u.total), 0), perB = {}, perS = {};
-  us.forEach(u => { const b = rkpBid(u); perB[b] = (perB[b] || 0) + mNum(u.total); const k = wzKunciSd(u.sumber_dana); perS[k] = (perS[k] || 0) + mNum(u.total); });
-  const pag = pg[0] || {}, pagTot = WZ_PAGU.reduce((a, k) => a + mNum(pag[k[0]]), 0);
-  const maxB = Math.max.apply(null, [1].concat(Object.values(perB)));
-  const barB = [1, 2, 3, 4, 5].map(b => `<div style="margin:5px 0"><div style="display:flex;justify-content:space-between;gap:8px"><span>${esc(RKP_BID[b])}</span><span class="num">${rpf(perB[b] || 0)}</span></div><div class="bar"><i style="width:${(perB[b] || 0) / maxB * 100}%"></i></div></div>`).join('');
-  const tabS = WZ_PAGU.map(k => { const r = perS[k[0]] || 0, g = mNum(pag[k[0]]); return r || g ? `<tr><td>${k[1]}</td><td style="text-align:right">${rpf(g)}</td><td style="text-align:right">${rpf(r)}</td><td style="text-align:right;color:var(${g - r < 0 ? '--bad' : '--ok'})">${rpf(g - r)}</td></tr>` : ''; }).join('');
-  const nk = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-  const rpY = rp.filter(r => String(r.tahun_pelaksanaan || '').indexOf(y) >= 0), masuk = rpY.filter(r => us.some(u => nk(u.kegiatan) === nk(r.kegiatan)));
-  const pbY = pb.filter(x => String(x.tahun_anggaran) === y || String(x.tahun_anggaran) === String(Number(y) - 1)), pbSel = pbY.filter(x => Number(x.progres) >= 100);
-  const rataP = pbY.length ? Math.round(pbY.reduce((a, x) => a + (Number(x.progres) || 0), 0) / pbY.length) : 0;
-  const ttd = RKP_DOKS.filter(x => (mp[x.k] || {}).status === 'Siap TTD');
-  main.innerHTML = `<div class="stack">
-    <div class="card"><div class="sec-h" style="margin:0"><h2>1. Progres tahapan penyusunan</h2><span class="num">${sel}/${tot} dokumen</span></div>${prog}<button class="linkbtn" data-act="go" data-go='["rkpdok"]'>Buka daftar dokumen ${ic('next')}</button></div>
-    <div class="card"><div class="sec-h" style="margin:0"><h2>2. Ringkasan usulan & pagu</h2></div>
-      <div class="grid" style="margin:6px 0"><div class="tile"><b>${us.length}<small>usulan kegiatan</small></b></div><div class="tile"><b>${rpf(jum)}<small>total usulan</small></b></div><div class="tile"><b>${pagTot ? rpf(pagTot) : '–'}<small>pagu indikatif</small></b></div><div class="tile"><b style="color:var(${pagTot - jum < 0 ? '--bad' : '--ok'})">${pagTot ? rpf(pagTot - jum) : '–'}<small>sisa pagu</small></b></div></div>
-      ${barB}${tabS ? `<table class="tbl" style="width:100%;margin-top:8px"><thead><tr><th>Sumber</th><th style="text-align:right">Pagu</th><th style="text-align:right">Usulan</th><th style="text-align:right">Selisih</th></tr></thead><tbody>${tabS}</tbody></table>` : '<div class="meta">Pagu indikatif diisi di Generator RKP.</div>'}</div>
-    <div class="card"><div class="sec-h" style="margin:0"><h2>3. Capaian RPJM & realisasi</h2></div>
-      <div class="grid" style="margin:6px 0"><div class="tile"><b>${rpY.length}<small>rencana RPJM tahun ${esc(y)}</small></b></div><div class="tile"><b>${masuk.length}<small>sudah masuk usulan RKP</small></b></div><div class="tile"><b>${pbY.length}<small>kegiatan pembangunan</small></b></div><div class="tile"><b>${pbSel.length}<small>selesai (100%)</small></b></div></div>
-      <div class="meta">Rata-rata progres pembangunan: <b>${rataP}%</b></div><div class="bar"><i style="width:${rataP}%;background:var(--ok)"></i></div>
-      ${rpY.length - masuk.length > 0 ? `<div class="meta" style="margin-top:6px">Belum masuk RKP: ${esc(rpY.filter(r => masuk.indexOf(r) < 0).slice(0, 5).map(r => r.kegiatan).join('; '))}${rpY.length - masuk.length > 5 ? ', …' : ''}</div>` : ''}</div>
-    <div class="card"><div class="sec-h" style="margin:0"><h2>4. Dokumen menunggu tanda tangan</h2><span class="num">${ttd.length}</span></div>
-      ${ttd.length ? `<div class="list">${ttd.map(x => `<div class="it"><button class="row" data-act="dokBuat" data-k="${esc(x.k)}"><span class="av">${ic('file')}</span><span class="main"><span class="t">${esc(x.n)}</span><span class="s">Tahap ${x.tahap} · ketuk untuk membuat ulang Word</span></span></button></div>`).join('')}</div>` : '<div class="meta">Tidak ada. Ubah status dokumen menjadi "Siap TTD" di daftar dokumen.</div>'}</div>
-  </div>`;
-};
 
 
 /* ---------------- Draf KK ---------------- */
