@@ -4219,20 +4219,57 @@ async function buatDokumen(o) {
   return { nama, missing, blob, jenis: xlsx ? '' : o.jenis, xlsx };
 }
 /* pustaka pratinjau Word (dimuat sekali saat dibutuhkan) */
-/* Pratinjau/cetak saja (file Word tidak diubah): pemisah seksi "halaman baru" yang diikuti seksi "berkelanjutan" dengan ukuran kertas & margin sama dibuang, supaya tidak muncul halaman kosong seperti di Word */
+/* Pratinjau/cetak saja (file Word tidak diubah): menyesuaikan hal-hal yang berbeda antara Word dan pratinjau (logo/garis mengambang, garis tabel tersembunyi, pemisah seksi) */
 async function rapikanSeksi(blob) {
   try {
     const z = await window.JSZip.loadAsync(blob), f = z.file('word/document.xml'); if (!f) return blob;
-    let x = await f.async('string');
-    const re = /<w:sectPr\b[\s\S]*?<\/w:sectPr>/g, ms = [...x.matchAll(re)]; if (ms.length < 2) return blob;
-    const kunci = t => ((t.match(/<w:pgSz[^>]*>/) || [''])[0]) + ((t.match(/<w:pgMar[^>]*>/) || [''])[0]);
-    const buang = [];
-    for (let i = 0; i < ms.length - 1; i++) {
-      const nx = ms[i + 1][0];
-      if (/<w:type w:val="continuous"\s*\/>/.test(nx) && !/<w:type\b/.test(ms[i][0]) && kunci(nx) === kunci(ms[i][0]) && x.lastIndexOf('<w:pPr>', ms[i].index) > x.lastIndexOf('</w:pPr>', ms[i].index)) buang.push(ms[i]);
+    let x = await f.async('string'), ubah = false;
+    /* 1. gambar mengambang yang tidak dikenal pratinjau (grup logo, garis) -> gambar biasa */
+    const fr = z.file('word/_rels/document.xml.rels'), tm = z.file('word/theme/theme1.xml');
+    if (fr && /<mc:AlternateContent>/.test(x)) {
+      let rel = await fr.async('string'); const tema = tm ? await tm.async('string') : '', acc = (tema.match(/<a:accent1>\s*<a:srgbClr val="(\w{6})"/) || [])[1] || '000000', wr = {};
+      const warna = hex => {
+        if (!wr[hex]) {
+          const c = document.createElement('canvas'); c.width = c.height = 1; const g = c.getContext('2d'); g.fillStyle = '#' + hex; g.fillRect(0, 0, 1, 1);
+          z.file('word/media/_garis' + hex + '.png', c.toDataURL('image/png').split(',')[1], { base64: true });
+          rel = rel.replace('</Relationships>', '<Relationship Id="rIdG' + hex + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/_garis' + hex + '.png"/></Relationships>'); wr[hex] = 'rIdG' + hex;
+        }
+        return wr[hex];
+      };
+      let n = 900;
+      x = x.replace(/<mc:AlternateContent>([\s\S]*?)<\/mc:AlternateContent>/g, (all, isi) => {
+        const ch = (isi.match(/<mc:Choice[^>]*>([\s\S]*?)<\/mc:Choice>/) || [])[1] || '', an = ch.match(/<wp:anchor\b[^>]*>/);
+        if (!an) return all;
+        const g = (re) => (ch.match(re) || [''])[0], ex = ch.match(/<wp:extent cx="(\d+)" cy="(\d+)"/); if (!ex) return all;
+        let cx = +ex[1], cy = +ex[2], rid;
+        if (/<pic:pic\b/.test(ch)) rid = (ch.match(/r:embed="(\w+)"/) || [])[1];
+        else {
+          const ln = ch.match(/<a:ln\b([^>]*)>([\s\S]*?)<\/a:ln>|<a:ln\b([^>]*)\/>/) || [], tebal = +(((ln[1] || ln[3] || '').match(/\bw="(\d+)"/) || [])[1]) || 9525, hx = ((ln[2] || '').match(/<a:srgbClr val="(\w{6})"/) || [])[1] || acc;
+          cy = Math.max(cy, tebal); rid = warna(hx);
+        }
+        if (!rid) return all;
+        ubah = true; n++;
+        const wrap = /<wp:wrapThrough|<wp:wrapSquare|<wp:wrapTight/.test(ch) ? '<wp:wrapSquare wrapText="bothSides"/>' : '<wp:wrapNone/>';
+        return '<w:drawing>' + an[0] + g(/<wp:simplePos[^>]*\/>/) + g(/<wp:positionH[\s\S]*?<\/wp:positionH>/) + g(/<wp:positionV[\s\S]*?<\/wp:positionV>/) + '<wp:extent cx="' + cx + '" cy="' + cy + '"/><wp:effectExtent l="0" t="0" r="0" b="0"/>' + wrap + '<wp:docPr id="' + n + '" name="gambar' + n + '"/><wp:cNvGraphicFramePr/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="' + n + '" name="gambar' + n + '"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="' + rid + '"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="' + cx + '" cy="' + cy + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:anchor></w:drawing>';
+      });
+      if (ubah) z.file('word/_rels/document.xml.rels', rel);
     }
-    if (!buang.length) return blob;
-    for (let k = buang.length - 1; k >= 0; k--) x = x.slice(0, buang[k].index) + x.slice(buang[k].index + buang[k][0].length);
+    /* 2. tabel yang garisnya disembunyikan di Word: lepas gaya "Table Grid" supaya garisnya tidak muncul */
+    x = x.replace(/<w:tbl>[\s\S]*?<\/w:tblPr>/g, s => {
+      if (!/<w:tblBorders>/.test(s) || /<w:(?:top|left|bottom|right|insideH|insideV)\b[^>]*w:val="(?!none|nil)/.test(s)) return s;
+      const t = s.replace(/<w:tblStyle\b[^>]*\/>/, '').replace(/<w:tblBorders>[\s\S]*?<\/w:tblBorders>/, ''); if (t !== s) ubah = true; return t;
+    });
+    /* 3. pemisah seksi "halaman baru" yang diikuti seksi "berkelanjutan" dengan kertas & margin sama dibuang (Word menggabungkannya) */
+    const re = /<w:sectPr\b[\s\S]*?<\/w:sectPr>/g, ms = [...x.matchAll(re)];
+    if (ms.length > 1) {
+      const kunci = t => ((t.match(/<w:pgSz[^>]*>/) || [''])[0]) + ((t.match(/<w:pgMar[^>]*>/) || [''])[0]), buang = [];
+      for (let i = 0; i < ms.length - 1; i++) {
+        const nx = ms[i + 1][0];
+        if (/<w:type w:val="continuous"\s*\/>/.test(nx) && !/<w:type\b/.test(ms[i][0]) && kunci(nx) === kunci(ms[i][0]) && x.lastIndexOf('<w:pPr>', ms[i].index) > x.lastIndexOf('</w:pPr>', ms[i].index)) buang.push(ms[i]);
+      }
+      for (let k = buang.length - 1; k >= 0; k--) { x = x.slice(0, buang[k].index) + x.slice(buang[k].index + buang[k][0].length); ubah = true; }
+    }
+    if (!ubah) return blob;
     z.file('word/document.xml', x);
     return await z.generateAsync({ type: 'blob', mimeType: blob.type || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
   } catch (e) { return blob; }
