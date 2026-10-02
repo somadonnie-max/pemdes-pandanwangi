@@ -636,7 +636,7 @@ const OPT = {
   progres: ['0', '30', '50', '80', '100'],
   jenisBerkas: ['Foto', 'Berita Acara', 'Daftar Hadir', 'Materi', 'Lainnya'],
   jabTim: ['Pembina', 'Ketua', 'Ketua Tim', 'Sekretaris', 'Anggota'],
-  musy: ['Musdes Pembentukan Tim RKP Desa', 'Musdes Pencermatan RPJM Desa', 'Musrenbangdes RKP Desa', 'Musdes Penetapan RKP Desa', 'Musdes Perubahan RKP Desa', 'Musyawarah Lainnya']
+  musy: ['Musdes Pembentukan Tim RKP Desa', 'Musdes Pencermatan RPJM Desa', 'Musdes Perencanaan RKP Desa', 'Musrenbangdes RKP Desa', 'Musdes Penetapan RKP Desa', 'Musdes Perubahan RKP Desa', 'Musyawarah Lainnya']
 };
 const JAB_PETUGAS = ['Ketua', 'Wakil Ketua', 'Sekretaris', 'Bendahara', 'Anggota', 'Ketua BPD', 'Wakil Ketua BPD', 'Sekretaris BPD', 'Anggota BPD', 'Ketua LPMD', 'Ketua TP PKK', 'Ketua Karang Taruna', 'Direktur BUM Desa', 'Kader Posyandu', 'KPM', 'Linmas'];
 const F = (k, l, t, x) => Object.assign({ k, l, t: t || 'text' }, x || {});
@@ -842,7 +842,9 @@ const UI = {
     fields: [F('musyawarah', 'Jenis Musyawarah', 'select', { opt: OPT.musy, req: 1, wide: 1 }), F('no_undangan', 'Nomor Undangan', 'text', { mono: 1 }), F('tgl_undangan', 'Tanggal Undangan', 'date'),
       F('tanggal', 'Tanggal Pelaksanaan', 'date', { req: 1 }), F('jam', 'Jam Mulai', 'time', { def: '19:00' }), F('tempat', 'Tempat', 'text', { def: 'Balai Desa Pandanwangi', wide: 1 }),
       F('pimpinan', 'Pimpinan Musyawarah', 'person', { fill: { unsur_pimpinan: 'jabatan' } }), F('unsur_pimpinan', 'Unsur Pimpinan', 'text', { def: 'Ketua BPD' }), F('notulen', 'Notulen / Sekretaris', 'person', { fill: { unsur_notulen: 'jabatan' } }), F('unsur_notulen', 'Unsur Notulen', 'text', { def: 'Sekretaris BPD' }),
-      F('wakil_masyarakat', 'Wakil Masyarakat (penanda tangan BA)', 'person'), F('tgl_sk', 'Tanggal SK Tim', 'date'), F('no_sk_penyusun', 'Nomor SK Tim Penyusun', 'text', { mono: 1 }), F('no_sk_verifikasi', 'Nomor SK Tim Verifikasi', 'text', { mono: 1 }), F('catatan', 'Catatan / Hasil Musyawarah', 'textarea', { wide: 1 })],
+      F('tgl_sk', 'Tanggal SK Tim', 'date'), F('no_sk_penyusun', 'Nomor SK Tim Penyusun', 'text', { mono: 1 }), F('no_sk_verifikasi', 'Nomor SK Tim Verifikasi', 'text', { mono: 1 }), F('catatan', 'Catatan / Hasil Musyawarah', 'textarea', { wide: 1 }),
+      F('foto', 'Foto Dokumentasi Kegiatan', 'fotos', { max: 7 })],
+    folder: 'Perencanaan/Musyawarah',
     row: r => ({ t: r.musyawarah, s: fDay(r.tanggal) + (r.tempat ? ' · ' + r.tempat : ''), av: ic('users') })
   },
   rkp_tim: {
@@ -1164,7 +1166,7 @@ const can = p => !p || p === '*' || (S.user && (S.user.admin || (p !== 'admin' &
 const menuOf = e => UI[e] && UI[e].m || (/^(rkp_|ref_|rpjm_)/.test(e) ? 'rkp' : { kegiatan_berkas: 'kegiatan', pembangunan_titik: 'pembangunan', petugas_jabatan: 'petugas', keu_rek: 'keu_anggaran', keu_spp: 'keu_penatausahaan', keu_trans: 'keu_penatausahaan' }[e] || e);
 const isMenu = m => (S.perms || []).some(p => p.menu && p.k === m);
 const canRead = e => isMenu(menuOf(e)) ? can('r:' + menuOf(e)) : can(UI[e].read || '*');
-const canWrite = e => isMenu(menuOf(e)) ? can('w:' + menuOf(e)) : can(UI[e].write || UI[e].perm);
+const canWrite = e => (UI[e] && UI[e].rkp && S.rkpKunci && S.rkpBuka !== S.rkpYear) ? false : isMenu(menuOf(e)) ? can('w:' + menuOf(e)) : can(UI[e].write || UI[e].perm);
 
 /* =====================================================================
    RANGKA TAMPILAN
@@ -2150,6 +2152,7 @@ async function excelImport(e, file, done) {
 VIEWS.list = async (p, main, alive) => {
   const e = p.e, u = UI[e];
   if (!canRead(e)) throw new Error('Anda tidak punya akses ke menu ini.');
+  if (u.rkp) await rkpMuatVer();
   const st = S.listState = (S.listState && S.listState.e === e && S.listState.ctx === JSON.stringify(p)) ? S.listState : { e, ctx: JSON.stringify(p), q: '', chip: '', per: '', view: p.v || 0, rows: [], total: 0 };
   let chipOpt = u.chips ? u.chips.opt.slice() : null, chipN = {};
   if (u.chips && u.chips.dyn) {
@@ -2162,7 +2165,7 @@ VIEWS.list = async (p, main, alive) => {
   const yearNow = new Date().getFullYear();
   if (st.per === '' && u.year) st.per = String(yearNow);
   if (st.per === '' && u.month) st.per = isoToday().slice(0, 7);
-  setTop(p.title || u.t, u.rkp ? 'RKP Desa ' + S.rkpYear : '');
+  setTop(p.title || u.t, u.rkp ? 'RKP Desa ' + rkpLbl(S.rkpYear) : '');
   const pers = u.year ? [String(yearNow), String(yearNow - 1), String(yearNow - 2), 'Semua'] : null;
   main.innerHTML = `<div class="stack">
     <div class="toolbar"><label class="search">${ic('search')}<input id="q" placeholder="Cari…" value="${esc(st.q)}" autocomplete="off"></label>
@@ -2574,6 +2577,7 @@ function readForm(u, root) {
 }
 VIEWS.form = async (p, main, alive) => {
   const e = p.e, u = UI[e];
+  if (u.rkp) { await rkpMuatVer(); if (!canWrite(e)) throw new Error('RKP ' + rkpLbl(S.rkpYear) + ' hanya bisa dilihat karena sudah digantikan versi perubahan. Pilih versi terbaru di Dashboard RKP.'); }
   setTop(p.buat && NASKAH[e] ? NASKAH[e].buat : (p.id ? 'Ubah ' : 'Tambah ') + u.t);
   let rec = {};
   let flds = u.fields.filter(f => !(f.virt && p.id));
@@ -3412,6 +3416,66 @@ VIEWS.pstat = async (p, main, alive) => {
 
 /* ---------------- Perencanaan ---------------- */
 /* ======== RKP Desa v2: dashboard + lima tahapan (gaya Dashboard Keuangan) ======== */
+/* ---- versi RKP: kunci tahun_rkp "2026" = RKP murni, "2026-P1" = Perubahan 1, dst; riwayat tiap versi tersimpan utuh ---- */
+const rkpTh = k => Number(String(k == null ? '' : k).split('-')[0]) || 0;
+const rkpVn = k => { const m = /-P(\d+)$/.exec(String(k || '')); return m ? Number(m[1]) : 0; };
+const rkpKey = (th, n) => String(th) + (n ? '-P' + n : '');
+const rkpLbl = k => rkpTh(k) + (rkpVn(k) ? ' Perubahan ' + rkpVn(k) : '');
+async function rkpMuatVer(force) {
+  const th = rkpTh(S.rkpYear);
+  if (!force && S.rkpV && S.rkpV.th === th) { S.rkpKunci = rkpVn(S.rkpYear) < S.rkpV.max; return S.rkpV; }
+  let rows = []; try { rows = (await call('list', { entity: 'rkp_dok', limit: 20, filters: { tahun_rkp: String(th), kode: '_versi' } })).rows || []; } catch (x) { }
+  let list = []; try { list = JSON.parse((rows[0] || {}).isi || '{}').list || []; } catch (x) { }
+  const max = list.reduce((a, v) => Math.max(a, Number(v.n) || 0), 0);
+  S.rkpV = { th, list, max, id: (rows[0] || {}).id };
+  S.rkpKunci = rkpVn(S.rkpYear) < max;
+  return S.rkpV;
+}
+function rkpVerCard(D, w) {
+  const V = S.rkpV || { list: [], max: 0 }, th = D.th, cur = rkpVn(S.rkpYear), kunci = S.rkpKunci && S.rkpBuka !== S.rkpYear;
+  const ns = [0].concat(V.list.map(v => Number(v.n)).filter(Boolean).sort((a, b) => a - b));
+  const info = V.list.find(v => Number(v.n) === cur);
+  return `<div class="kd-c"><div class="kd-h"><b>Versi RKP ${th}</b><span class="meta">tiap versi tersimpan utuh sebagai riwayat</span></div>
+    <div class="chips">${ns.map(n => `<button class="chip ${n === cur ? 'on' : ''}" data-act="rkpVer" data-v="${rkpKey(th, n)}">${n ? 'Perubahan ' + n : 'RKP Murni'}</button>`).join('')}</div>
+    ${info ? `<div class="meta" style="margin-top:6px">Perubahan ${cur} dibuat ${esc(dPanjang(info.tgl))}, salinan dari ${esc(rkpLbl(info.dari))}${info.alasan ? ' · ' + esc(info.alasan) : ''}</div>` : ''}
+    ${kunci ? `<div class="meta" style="margin-top:6px"><span class="pill gold">Hanya lihat</span> Versi ini sudah digantikan Perubahan ${V.max}, jadi tidak bisa diubah (tetap bisa dilihat & dicetak).${w ? ` <button class="btn sm" data-act="rkpBuka">Buka kunci sementara</button>` : ''}</div>` : ''}
+    ${w && cur === V.max ? `<div class="btns" style="margin-top:8px"><button class="btn" data-act="rkpBuatP">${ic('plus')}Buat RKP Perubahan ${V.max + 1}</button></div>` : ''}</div>`;
+}
+ACT.rkpBuka = () => { S.rkpBuka = S.rkpYear; toast('Kunci dibuka sementara untuk sesi ini.'); refresh(); };
+ACT.rkpBuatP = async () => {
+  const V = await rkpMuatVer(true), th = V.th, n = V.max + 1, src = rkpKey(th, V.max), dst = rkpKey(th, n);
+  const m = modal('Buat RKP Perubahan ' + n, `<div class="stack"><p style="margin:0">Data <b>${esc(rkpLbl(src))}</b> (usulan, rencana pembiayaan, pagu, RAB) disalin menjadi <b>Perubahan ${n}</b> untuk diubah. Versi sebelumnya tetap utuh dan menjadi hanya-lihat.</p>
+    <div class="f"><label for="pa">Dasar / alasan perubahan (boleh dikosongkan)</label><input id="pa" placeholder="mis. perubahan APBDes, penyesuaian pagu DD"></div>
+    <div class="err" id="perr" hidden></div><div class="btns"><button class="btn pri" id="pgo">${ic('plus')}Buat Perubahan ${n}</button><button class="btn" data-x>Batal</button></div></div>`);
+  $('#pgo', m.el).onclick = async ev => {
+    const b = ev.currentTarget; b.disabled = true; b.textContent = 'Menyalin data…';
+    try {
+      let jml = 0;
+      for (const e of ['rkp_usulan', 'rkp_pembiayaan', 'rkp_pagu', 'rkp_rab']) {
+        const rows = (await call('list', { entity: e, limit: 5000, filters: { tahun_rkp: src } })).rows || [];
+        const recs = rows.map(r => { const o = Object.assign({}, r); ['id', '_oleh', '_waktu', 'seq'].forEach(k => delete o[k]); o.tahun_rkp = dst; return o; });
+        for (let i = 0; i < recs.length; i += 250) { const r = await call('bulkSave', { entity: e, rows: recs.slice(i, i + 250) }); if (r.gagal && r.gagal.length) throw new Error(r.gagal[0].pesan); }
+        jml += recs.length;
+      }
+      const old = (await call('list', { entity: 'rkp_dok', limit: 20, filters: { tahun_rkp: src, kode: '_aturan' } })).rows || [];
+      if (old[0]) await call('save', { entity: 'rkp_dok', record: { tahun_rkp: dst, kode: '_aturan', status: old[0].status || 'Belum', isi: old[0].isi || '{}' } });
+      const list = V.list.concat([{ n, tgl: isoToday(), dari: src, alasan: ($('#pa', m.el).value || '').trim(), jml }]);
+      const rec = { tahun_rkp: String(th), kode: '_versi', status: 'Selesai', isi: JSON.stringify({ list }) }; if (V.id) rec.id = V.id;
+      await call('save', { entity: 'rkp_dok', record: rec });
+      S.rkpYear = dst; S.rkpV = null; S.rkpBuka = null; S.listState = null; S.dokMap = null; await rkpMuatVer(true); m.close(); toast('Perubahan ' + n + ' dibuat: ' + jml + ' data disalin.'); refresh();
+    } catch (x) { const er = $('#perr', m.el); er.textContent = x.message; er.hidden = false; b.disabled = false; b.textContent = 'Coba lagi'; }
+  };
+};
+const rkpJudulMus = (j, y) => {
+  j = String(j || '');
+  if (/pembentukan/i.test(j)) return 'MUSYAWARAH DESA\nPEMBENTUKAN TIM PENYUSUN RKP DESA ' + y;
+  if (/pencermatan/i.test(j)) return 'MUSYAWARAH DESA\nPENCERMATAN RPJM DESA DALAM PENYUSUNAN RKP DESA ' + y;
+  if (/musrenbang/i.test(j)) return 'MUSYAWARAH PERENCANAAN PEMBANGUNAN DESA (MUSRENBANGDES)\nPENYEPAKATAN RANCANGAN RKP DESA ' + y + ' DAN DU-RKP ' + (Number(y) ? Number(y) + 1 : '');
+  if (/penetapan/i.test(j)) return 'MUSYAWARAH DESA\nPENETAPAN RKP DESA ' + y;
+  if (/perubahan/i.test(j)) return 'MUSYAWARAH DESA\nPERUBAHAN RKP DESA ' + y;
+  if (/perencanaan/i.test(j)) return 'MUSYAWARAH DESA PERENCANAAN\nPENYUSUNAN RANCANGAN RKP DESA ' + y;
+  return 'MUSYAWARAH DESA\n' + j.toUpperCase();
+};
 const RKP_TJ = [
   { n: 'Pembentukan Tim', ic: 'users', d: 'Musyawarah pembentukan tim, SK Tim Penyusun & Verifikasi, jadwal kerja' },
   { n: 'Pengkajian & Rancangan', ic: 'clip', d: 'Pembiayaan, usulan, kerja sama, RAB, gambar & rancangan RKP' },
@@ -3453,7 +3517,7 @@ function rkpJadwalDef(v, T) {
 }
 function rkpJadwal(D) {
   const hariIni = parseD(isoToday());
-  return rkpJadwalDef(D.v, Number(D.y) - 1).map(m => {
+  return rkpJadwalDef(D.v, D.th - 1).map(m => {
     const dk = m.docs.filter(k => D.wajib(k)), sel = dk.filter(k => D.st(k) === 'Selesai').length;
     const mulaiOk = m.j === 'mulai' && dk.some(k => D.st(k) !== 'Belum');
     const done = m.j === 'info' ? false : m.j === 'mulai' ? mulaiOk : (dk.length > 0 && sel === dk.length);
@@ -3479,10 +3543,11 @@ ACT.rkpAturan = async t => {
 };
 const rkpNk = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 async function rkpAmbil() {
-  const y = String(S.rkpYear), L = (e, f) => call('list', { entity: e, limit: 5000, filters: f }).then(r => r.rows || []).catch(() => []);
-  const [mp, us, pb, pg, mu, tm, jd, rb, ag, rp, pbg] = await Promise.all([rkpDokMap(true), L('rkp_usulan', { tahun_rkp: y }), L('rkp_pembiayaan', { tahun_rkp: y }), L('rkp_pagu', { tahun_rkp: y }), L('rkp_musyawarah', { tahun_rkp: y }), L('rkp_tim', {}), L('rkp_jadwal', { tahun_rkp: y }), L('rkp_rab', { tahun_rkp: y }), L('keu_anggaran', { tahun: y }), L('rpjm_kegiatan', {}), L('pembangunan', {})]);
+  await rkpMuatVer();
+  const y = String(S.rkpYear), th = String(rkpTh(y)), L = (e, f) => call('list', { entity: e, limit: 5000, filters: f }).then(r => r.rows || []).catch(() => []);
+  const [mp, us, pb, pg, mu, tm, jd, rb, ag, rp, pbg] = await Promise.all([rkpDokMap(true), L('rkp_usulan', { tahun_rkp: y }), L('rkp_pembiayaan', { tahun_rkp: y }), L('rkp_pagu', { tahun_rkp: y }), L('rkp_musyawarah', { tahun_rkp: y }), L('rkp_tim', {}), L('rkp_jadwal', { tahun_rkp: y }), L('rkp_rab', { tahun_rkp: y }), L('keu_anggaran', { tahun: th }), L('rpjm_kegiatan', {}), L('pembangunan', {})]);
   const ids = new Set(mu.map(x => x.id));
-  const D = { y, mp, us, pb, pg, mu, tm: tm.filter(x => ids.has(x.ref)), jd, rb, ag, rp, pbg };
+  const D = { y, th: rkpTh(y), n: rkpVn(y), mp, us, pb, pg, mu, tm: tm.filter(x => ids.has(x.ref)), jd, rb, ag, rp, pbg };
   D.nu = us.filter(u => u.dokumen !== 'DU-RKP'); D.du = us.filter(u => u.dokumen === 'DU-RKP');
   const aK = new Set(ag.map(a => a.kode_kegiatan).filter(Boolean)), aN = new Set(ag.map(a => rkpNk(a.kegiatan)).filter(Boolean));
   D.masuk = D.nu.filter(u => (u.kode_kegiatan && aK.has(u.kode_kegiatan)) || aN.has(rkpNk(u.kegiatan)));
@@ -3495,15 +3560,17 @@ async function rkpAmbil() {
 function rkpBahan(D, t) {
   const tp = D.tm.filter(x => x.jenis_tim === 'Tim Penyusun').length, tv = D.tm.filter(x => x.jenis_tim === 'Tim Verifikasi').length;
   const L = e => ['list', { e }], F = (e, pre) => ['form', { e, preset: pre || {} }];
-  const mus = ['Musyawarah & tim', D.mu.length, L('rkp_musyawarah'), F('rkp_musyawarah'), 'tanggal, tempat, pimpinan, notulen'];
+  const musJ = { 1: [D.n ? 'Musdes Perubahan RKP Desa' : 'Musdes Pembentukan Tim RKP Desa'], 2: ['Musdes Pencermatan RPJM Desa'], 3: D.v === 'B' ? ['Musdes Perencanaan RKP Desa'] : [], 4: ['Musrenbangdes RKP Desa'], 5: ['Musdes Penetapan RKP Desa'] };
+  const mI = k => (musJ[k] || []).map(j => ({ mus: j }));
+  const pemb = D.mu.find(x => /pembentukan/i.test(x.musyawarah)), rPem = pemb ? ['detail', { e: 'rkp_musyawarah', id: pemb.id }] : L('rkp_musyawarah');
   const usu = ['Usulan kegiatan (Form 04)', D.us.length, L('rkp_usulan'), F('rkp_usulan'), 'sumber semua form tabel'];
   const pr = D.nu.filter(u => Number(u.prioritas)).length, sk = D.nu.filter(u => [1, 2, 3, 4].some(n => Number(u['skor' + n]))).length;
   return [
-    [mus, ['Tim Penyusun', tp + (tp && (tp < 7 || (D.v === 'A' && tp > 11)) ? ' \u26a0' : ''), L('rkp_musyawarah'), null, D.v === 'A' ? 'aturan: 7\u201311 orang, Sekdes ketua, ketua LPM sekretaris' : 'aturan: minimal 7 orang, \u226530% perempuan'], ['Tim Verifikasi', tv, L('rkp_musyawarah'), null, 'dibuka dari data musyawarah'], ['Jadwal & tindak lanjut (Form 03)', D.jd.length, L('rkp_jadwal'), F('rkp_jadwal'), 'rencana kerja tim']],
-    [['Rencana pembiayaan (Form 05)', D.pb.length, L('rkp_pembiayaan'), F('rkp_pembiayaan'), 'PADes, DD, ADD, BHP, bantuan'], usu, ['Kerja sama (Form 08/09)', D.us.filter(u => u.kerjasama).length, L('rkp_usulan'), null, 'isi kolom "Kerja sama" di usulan'], ['RAB & gambar (Form 12/13)', D.rb.length, L('rkp_rab'), F('rkp_rab'), 'satu data per kegiatan']],
-    [mus, ['Usulan masuk RKP', D.nu.length, L('rkp_usulan'), null, 'dipakai BA & lampiran']],
-    [['Usulan diberi prioritas', pr + '/' + D.nu.length, L('rkp_usulan'), null, 'kolom Nomor Prioritas'], ['Usulan diberi skor (Form 21)', sk + '/' + D.nu.length, L('rkp_usulan'), null, 'skor 1–4 tiap usulan'], mus],
-    [['Usulan masuk RKP', D.nu.length, L('rkp_usulan'), null, 'jadi Daftar RKP (Form 25)'], ['Sudah masuk APBDes', D.masuk.length + '/' + D.nu.length, ['list', { e: 'keu_anggaran' }], null, 'cocok lewat kode/nama kegiatan']]
+    [...mI(1), ...(D.n ? [] : [['Tim Penyusun', tp + (tp && (tp < 7 || (D.v === 'A' && tp > 11)) ? ' \u26a0' : ''), rPem, null, D.v === 'A' ? 'aturan: 7\u201311 orang, Sekdes ketua, ketua LPM sekretaris' : 'aturan: minimal 7 orang, \u226530% perempuan'], ['Tim Verifikasi', tv, rPem, null, 'dibuka dari data musyawarah']]), ['Jadwal & tindak lanjut (Form 03)', D.jd.length, L('rkp_jadwal'), F('rkp_jadwal'), 'rencana kerja tim']],
+    [...mI(2), ['Rencana pembiayaan (Form 05)', D.pb.length, L('rkp_pembiayaan'), F('rkp_pembiayaan'), 'PADes, DD, ADD, BHP, bantuan'], usu, ['Kerja sama (Form 08/09)', D.us.filter(u => u.kerjasama).length, L('rkp_usulan'), null, 'isi kolom "Kerja sama" di usulan'], ['RAB & gambar (Form 12/13)', D.rb.length, L('rkp_rab'), F('rkp_rab'), 'satu data per kegiatan']],
+    [...mI(3), ['Usulan masuk RKP', D.nu.length, L('rkp_usulan'), null, 'dipakai BA & lampiran']],
+    [['Usulan diberi prioritas', pr + '/' + D.nu.length, L('rkp_usulan'), null, 'kolom Nomor Prioritas'], ['Usulan diberi skor (Form 21)', sk + '/' + D.nu.length, L('rkp_usulan'), null, 'skor 1–4 tiap usulan'], ...mI(4)],
+    [...mI(5), ['Usulan masuk RKP', D.nu.length, L('rkp_usulan'), null, 'jadi Daftar RKP (Form 25)'], ['Sudah masuk APBDes', D.masuk.length + '/' + D.nu.length, ['list', { e: 'keu_anggaran' }], null, 'cocok lewat kode/nama kegiatan']]
   ][t - 1];
 }
 /* kesiapan data satu dokumen: [jumlah baris, sumber] */
@@ -3524,12 +3591,20 @@ function dokKartu(dk, mp, w, D) {
     <select class="sel" data-act-change="dokStatus" data-k="${esc(dk.k)}" aria-label="Status ${esc(dk.n)}">${RKP_STATUS.map(x => `<option ${x === s ? 'selected' : ''}>${x}</option>`).join('')}</select></div>` : ''}</div>`;
 }
 const rkpYrChips = y => `<div class="chips">${[y - 1, y, y + 1].map(t => `<button class="chip ${t === y ? 'on' : ''}" data-act="yr" data-v="${t}">${t}</button>`).join('')}</div>`;
-function rkpBarisBahan(b, w) {
+function rkpBarisMus(j, D, w) {
+  const ada = D.mu.filter(x => x.musyawarah === j).sort((a, c) => String(a.tanggal).localeCompare(String(c.tanggal))), r = ada[0];
+  let nf = 0; try { nf = r ? JSON.parse(r.foto || '[]').length : 0; } catch (x) { }
+  const sub = r ? [dPanjang(r.tanggal), r.tempat].filter(Boolean).join(' · ') + ' · foto ' + nf + '/7' + (ada.length > 1 ? ' · ' + ada.length + ' kali' : '') : 'belum diisi — tekan Isi untuk langsung membuka formnya';
+  const go = a => `data-act="go" data-go='${esc(JSON.stringify(a))}'`;
+  return `<div class="rk-b"><span class="main"><b>${esc(j)}</b><small class="meta">${esc(sub)}</small></span><b class="num">${r ? ic('check') : '–'}</b>${r ? `<button class="btn sm" ${go(['detail', { e: 'rkp_musyawarah', id: r.id }])}>Buka</button>${w ? `<button class="btn sm" ${go(['form', { e: 'rkp_musyawarah', id: r.id }])} aria-label="Ubah ${esc(j)}">${ic('edit')}</button>` : ''}` : w ? `<button class="btn sm pri" ${go(['form', { e: 'rkp_musyawarah', preset: { musyawarah: j } }])}>${ic('plus')}Isi</button>` : ''}</div>`;
+}
+function rkpBarisBahan(b, w, D) {
+  if (b.mus) return rkpBarisMus(b.mus, D, w);
   return `<div class="rk-b"><span class="main"><b>${esc(b[0])}</b><small class="meta">${esc(b[4])}</small></span><b class="num">${esc(String(b[1]))}</b><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(b[2]))}'>Buka</button>${w && b[3] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(b[3]))}' aria-label="Tambah ${esc(b[0])}">${ic('plus')}</button>` : ''}</div>`;
 }
 VIEWS.rkp = async (p, main, alive) => {
-  setTop('RKP Desa', 'Tahun ' + S.rkpYear);
-  const y = Number(S.rkpYear), w = can('perencanaan'), D = await rkpAmbil(); if (alive && !alive()) return;
+  setTop('RKP Desa', 'Tahun ' + rkpLbl(S.rkpYear));
+  const y = rkpTh(S.rkpYear), D = await rkpAmbil(), w = can('perencanaan') && !(S.rkpKunci && S.rkpBuka !== S.rkpYear); if (alive && !alive()) return;
   const rpf = v => 'Rp ' + (Number(v) || 0).toLocaleString('id-ID');
   const tot = D.dok.length, sel = D.dok.filter(x => D.st(x.k) === 'Selesai').length, ttd = D.dok.filter(x => D.st(x.k) === 'Siap TTD');
   const next = D.dok.find(x => D.st(x.k) === 'Belum' || D.st(x.k) === 'Draf');
@@ -3546,12 +3621,13 @@ VIEWS.rkp = async (p, main, alive) => {
     return `<button class="card rk-s" data-act="go" data-go='["rkptahap",{"t":${i + 1}}]'><span class="rk-n">${i + 1}</span><span class="main"><b>${esc(RKP_TJ[i].n)}</b><small class="meta">${esc(RKP_TJ[i].d)}</small>
       <span class="kd-track" style="--kc:var(--ok)"><i style="width:${a / b * 100}%"></i></span></span><span class="rk-r"><span class="pill ${a === b ? 'ok' : mul ? 'info' : ''}">${st}</span><b class="num">${a}/${b}</b></span></button>`;
   }).join('');
-  main.innerHTML = `<div class="kd"><div class="card rk-top"><div style="flex:1;min-width:160px"><span class="lbl">RKP Desa yang disusun</span> <b class="num" style="font-size:16px">${y}</b> <span class="meta">(disusun tahun ${y - 1})</span></div>${rkpYrChips(y)}</div>
+  main.innerHTML = `<div class="kd"><div class="card rk-top"><div style="flex:1;min-width:160px"><span class="lbl">RKP Desa yang disusun</span> <b class="num" style="font-size:16px">${esc(rkpLbl(S.rkpYear))}</b> <span class="meta">(disusun tahun ${y - 1})</span></div>${rkpYrChips(y)}</div>
+    ${rkpVerCard(D, can('perencanaan'))}
     <div class="kd-c"><div class="kd-h"><b>Dasar aturan RKP ${y}</b><span class="meta">menentukan batas waktu & dokumen wajib</span></div>
       <div class="rk-at">${['A', 'B'].map(k => `<button class="rk-ab ${D.v === k ? 'on' : ''}" ${w ? `data-act="rkpAturan" data-v="${k}"` : 'disabled'} aria-pressed="${D.v === k}"><b>${esc(RKP_ATURAN[k].n)}</b><small class="meta">${esc(RKP_ATURAN[k].ringkas)}</small></button>`).join('')}</div>
       <div class="meta" style="margin-top:6px">Kedua peraturan tercantum berlaku; Permendesa 21/2020 lebih baru dan berbasis SDGs Desa. Cek juga Peraturan Bupati Lumajang tentang juknis RKP Desa bila ada ketentuan tanggal yang lebih rinci.</div></div>
     <div class="kd-c ${tel.length ? 'rk-alert' : ''}"><div class="kd-h"><b>Jadwal & batas waktu (tahun berjalan ${y - 1})</b><span>${tel.length ? `<span class="pill bad">${tel.length} terlambat</span> ` : ''}${seg.length ? `<span class="pill warn">${seg.length} segera</span>` : ''}</span></div>${rkpJadwalHtml(J)}</div>
-    ${w ? `<div class="kd-act">${next ? `<button class="btn pri" data-act="go" data-go='["rkptahap",{"t":${next.tahap}}]'>${ic('next')}Lanjut: ${esc(next.n)}</button>` : ''}<button class="btn" data-act="go" data-go='["rkpgen",{}]'>${ic('sprout')}Generator RKP</button><button class="btn" data-act="go" data-go='["form",{"e":"rkp_usulan"}]'>${ic('plus')}Tambah Usulan</button><button class="btn" data-act="go" data-go='["list",{"e":"rkp_usulan"}]'>${ic('clip')}Daftar Usulan</button></div>` : ''}
+    ${w ? `<div class="kd-act">${next ? `<button class="btn pri" data-act="go" data-go='["rkptahap",{"t":${next.tahap}}]'>${ic('next')}Lanjut: ${esc(next.n)}</button>` : ''}${rkpVn(S.rkpYear) ? '' : `<button class="btn" data-act="go" data-go='["rkpgen",{}]'>${ic('sprout')}Generator RKP</button>`}<button class="btn" data-act="go" data-go='["form",{"e":"rkp_usulan"}]'>${ic('plus')}Tambah Usulan</button><button class="btn" data-act="go" data-go='["list",{"e":"rkp_usulan"}]'>${ic('clip')}Daftar Usulan</button></div>` : ''}
     <div class="kd-kpi">
       <div class="kd-k" style="--kc:var(--ok)"><span class="l">Dokumen selesai</span><b class="v">${sel}/${tot}</b><div class="kd-track"><i style="width:${tot ? sel / tot * 100 : 0}%"></i></div><span class="s">${ttd.length ? ttd.length + ' menunggu tanda tangan' : 'Tidak ada yang menunggu TTD'}</span></div>
       <div class="kd-k" style="--kc:var(--c-bel)"><span class="l">Usulan kegiatan</span><b class="v">${D.us.length}</b><span class="s">${D.nu.length} masuk RKP · ${D.du.length} DU-RKP</span></div>
@@ -3569,17 +3645,18 @@ VIEWS.rkp = async (p, main, alive) => {
     <div class="kd-c"><div class="kd-h"><b>Alur data</b></div><div class="meta">Satu kali input, dipakai di banyak dokumen: <b>Usulan kegiatan (Form 04)</b> → Form 06, 07, 08, 09, 10, 14, 21, 25 · <b>Rencana pembiayaan (Form 05)</b> → Form 05 · <b>RAB kegiatan</b> → Form 12 & 13 · <b>Musyawarah & tim</b> → undangan, BA, SK · <b>Dasar hukum</b> otomatis dari Referensi · usulan RKP → <b>APBDes</b> di Keuangan.</div></div>
     <details class="more"><summary>Data pendukung</summary><div class="btns" style="margin-top:6px"><button class="btn" data-act="go" data-go='["list",{"e":"rkp_musyawarah"}]'>${ic('users')}Musyawarah & Tim</button><button class="btn" data-act="go" data-go='["list",{"e":"rkp_jadwal"}]'>${ic('cal')}Jadwal (Form 03)</button><button class="btn" data-act="go" data-go='["list",{"e":"rkp_pembiayaan"}]'>${ic('coin')}Pembiayaan (Form 05)</button><button class="btn" data-act="go" data-go='["list",{"e":"rkp_rab"}]'>${ic('list')}RAB & Gambar</button><button class="btn" data-act="go" data-go='["list",{"e":"rkp_rutin"}]'>${ic('clock')}Kegiatan Rutin</button><button class="btn" data-act="go" data-go='["list",{"e":"rpjm_visimisi"}]'>${ic('book')}RPJM: Visi & Misi</button><button class="btn" data-act="go" data-go='["list",{"e":"rpjm_kegiatan"}]'>${ic('book')}RPJM: Kegiatan</button><button class="btn" data-act="go" data-go='["refs"]'>${ic('book')}Referensi</button></div></details></div>`;
   kdTip();
-  S.vh.yr = t => { S.rkpYear = t.dataset.v; S.listState = null; S.dokMap = null; refresh(); };
+  S.vh.yr = t => { S.rkpYear = t.dataset.v; S.rkpBuka = null; S.listState = null; S.dokMap = null; refresh(); };
+  S.vh.rkpVer = t => { S.rkpYear = t.dataset.v; S.rkpBuka = null; S.listState = null; S.dokMap = null; refresh(); };
 };
 VIEWS.rkptahap = async (p, main, alive) => {
   const ti = Math.max(1, Math.min(5, Number(p.t) || 1)); S.rkpTahap = ti;
-  setTop('Tahap ' + ti + ' · ' + RKP_TJ[ti - 1].n, 'RKP ' + S.rkpYear);
-  const w = can('perencanaan'), D = await rkpAmbil(); if (alive && !alive()) return;
+  setTop('Tahap ' + ti + ' · ' + RKP_TJ[ti - 1].n, 'RKP ' + rkpLbl(S.rkpYear));
+  const D = await rkpAmbil(), w = can('perencanaan') && !(S.rkpKunci && S.rkpBuka !== S.rkpYear); if (alive && !alive()) return;
   const t = RKP_TAHAP[ti - 1], dw = t.docs.filter(k => D.wajib(k)), a = dw.filter(k => D.st(k) === 'Selesai').length, J = rkpJadwal(D);
-  main.innerHTML = `<div class="kd"><div class="chips rk-tabs">${RKP_TAHAP.map((x, i) => `<button class="chip ${i + 1 === ti ? 'on' : ''}" data-act="go" data-go='["rkptahap",{"t":${i + 1}}]'>${i + 1}. ${esc(RKP_TJ[i].n)}</button>`).join('')}</div>
+  main.innerHTML = `<div class="kd">${rkpVn(S.rkpYear) || S.rkpKunci ? `<div class="card" style="padding:8px 11px"><b>RKP ${esc(rkpLbl(S.rkpYear))}</b>${S.rkpKunci && S.rkpBuka !== S.rkpYear ? ' <span class="pill gold">Hanya lihat</span>' : ''} <span class="meta">ganti versi di Dashboard RKP</span></div>` : ''}<div class="chips rk-tabs">${RKP_TAHAP.map((x, i) => `<button class="chip ${i + 1 === ti ? 'on' : ''}" data-act="go" data-go='["rkptahap",{"t":${i + 1}}]'>${i + 1}. ${esc(RKP_TJ[i].n)}</button>`).join('')}</div>
     <div class="card" style="padding:8px 11px"><div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(RKP_TJ[ti - 1].d)}</b><span class="num">${a}/${dw.length} selesai</span></div><div class="kd-track" style="--kc:var(--ok);margin-top:5px"><i style="width:${dw.length ? a / dw.length * 100 : 0}%"></i></div></div>
     <div class="kd-c"><div class="kd-h"><b>Batas waktu tahap ini</b><span class="meta">${esc(RKP_ATURAN[D.v].n)}</span></div>${rkpJadwalHtml(J, ti)}</div>
-    <div class="kd-c"><div class="kd-h"><b>1. Siapkan data</b><span class="meta">dokumen di bawah terisi dari data ini</span></div><div class="rk-bl">${rkpBahan(D, ti).map(b => rkpBarisBahan(b, w)).join('')}</div>${ti === 2 && w ? `<div class="btns" style="margin-top:8px"><button class="btn" data-act="go" data-go='["rkpgen",{}]'>${ic('sprout')}Isi otomatis dengan Generator RKP</button></div>` : ''}</div>
+    <div class="kd-c"><div class="kd-h"><b>1. Siapkan data</b><span class="meta">dokumen di bawah terisi dari data ini</span></div><div class="rk-bl">${rkpBahan(D, ti).map(b => rkpBarisBahan(b, w, D)).join('')}</div>${ti === 2 && w ? `<div class="btns" style="margin-top:8px"><button class="btn" data-act="go" data-go='["rkpgen",{}]'>${ic('sprout')}Isi otomatis dengan Generator RKP</button></div>` : ''}</div>
     <div class="kd-c"><div class="kd-h"><b>2. Isi cepat & cetak dokumen</b><span class="meta">Isi cepat → Cetak Word → ubah status</span></div><div class="rk-dl">${t.docs.map(k => dokKartu({ k, n: RKP_NAMA[k] }, D.mp, w, D)).join('')}</div></div>
     <div class="btns">${ti > 1 ? `<button class="btn" data-act="go" data-go='["rkptahap",{"t":${ti - 1}}]'>${ic('back')}Tahap ${ti - 1}</button>` : ''}<button class="btn" data-act="go" data-go='["rkp"]'>${ic('chart')}Dashboard RKP</button>${ti < 5 ? `<button class="btn pri" data-act="go" data-go='["rkptahap",{"t":${ti + 1}}]'>Tahap ${ti + 1}${ic('next')}</button>` : ''}</div></div>`;
   $$('select[data-act-change]', main).forEach(s => s.onchange = () => ACT.dokStatus(s));
@@ -3610,19 +3687,21 @@ async function extraMusyawarah(mu, el) {
     ${sec('Tim Penyusun', tp, 'rkp_tim', { ref: mu.id, jenis_tim: 'Tim Penyusun', urut: String(tp.length + 1) })}
     ${sec('Tim Verifikasi', tv, 'rkp_tim', { ref: mu.id, jenis_tim: 'Tim Verifikasi', urut: String(tv.length + 1) })}
     ${sec('Narasumber', nara.rows, 'rkp_narasumber', { ref: mu.id })}
-    <div class="btns"><span class="lbl">Dokumen (template Word):</span><button class="btn sm" data-act="pdoc" data-d="und" data-id="${esc(mu.id)}">${ic('print')}Undangan</button><button class="btn sm" data-act="pdoc" data-d="ba" data-id="${esc(mu.id)}">${ic('print')}Berita Acara</button><button class="btn sm" data-act="pdoc" data-d="skp" data-id="${esc(mu.id)}">${ic('print')}SK Tim Penyusun</button><button class="btn sm" data-act="pdoc" data-d="skv" data-id="${esc(mu.id)}">${ic('print')}SK Tim Verifikasi</button></div></div>`;
+    <div class="btns"><span class="lbl">Dokumen (template Word):</span><button class="btn sm" data-act="pdoc" data-d="und" data-id="${esc(mu.id)}">${ic('print')}Undangan</button><button class="btn sm" data-act="pdoc" data-d="ba" data-id="${esc(mu.id)}">${ic('print')}Berita Acara</button><button class="btn sm" data-act="pdoc" data-d="skp" data-id="${esc(mu.id)}">${ic('print')}SK Tim Penyusun</button><button class="btn sm" data-act="pdoc" data-d="foto" data-id="${esc(mu.id)}">${ic('print')}Dokumentasi Foto</button><button class="btn sm" data-act="pdoc" data-d="skv" data-id="${esc(mu.id)}">${ic('print')}SK Tim Verifikasi</button></div></div>`;
 }
 ACT.addSub = t => go('form', { e: t.dataset.e, preset: JSON.parse(t.dataset.p) });
 ACT.addJab = t => go('form', { e: 'petugas_jabatan', preset: JSON.parse(t.dataset.p) }, true);
 ACT.pdoc = async t => { try { await dokRkp(t.dataset.d, t.dataset.id); } catch (x) { toast(x.message, 1); } };
 /* dokumen utama RKP dari template Word di penyimpanan (cadangan: cetak ringkas bila template belum ada) */
-const DOK_RKP = { und: /^01\._?Undangan/i, ba: /^01\._?BA/i, skp: /^02\._?SK_Tim_Penyusun/i, skv: /^02\._?SK_Tim_Verifikasi/i, rktl: /^03\./, f4: /^04\./, f5: /^05\./ };
+const DOK_RKP = { und: /^01\._?Undangan/i, ba: /^01\._?BA/i, skp: /^02\._?SK_Tim_Penyusun/i, skv: /^02\._?SK_Tim_Verifikasi/i, foto: /^31\./, rktl: /^03\./, f4: /^04\./, f5: /^05\./ };
 async function dokRkp(kind, muId) {
   if (kind === 'f5') return buatDokKode('05');
+  if (kind === 'foto') { const mu = await call('get', { entity: 'rkp_musyawarah', id: muId }); let a = []; try { a = JSON.parse(mu.foto || '[]'); } catch (x) { } if (!a.length) throw new Error('Belum ada foto. Unggah foto lewat tombol Ubah pada musyawarah ini (maksimal 7).'); }
   let path = null;
   try { const t = (await tplDaftar()).find(x => x.path.indexOf('rkp/') === 0 && !/_cadangan/.test(x.path) && DOK_RKP[kind] && DOK_RKP[kind].test(x.path.split('/').pop())); path = t && t.path; } catch (x) { }
   if (path) return buatRkp(path, muId ? { musyawarah_id: muId } : { tahun_rkp: S.rkpYear });
   if (kind === 'und') throw new Error('Template undangan belum ada di Template Dokumen.');
+  if (kind === 'foto') throw new Error('Template "31. Dokumentasi Foto Musyawarah" belum diunggah di Admin → Template Dokumen → RKP Desa.');
   return rkpDoc(kind, muId ? await call('get', { entity: 'rkp_musyawarah', id: muId }) : undefined);
 }
 
@@ -3924,9 +4003,47 @@ const DOCX = (() => {
   }
   const PART = /^(word\/(document|header\d*|footer\d*|footnotes|endnotes)\.xml|xl\/sharedStrings\.xml|xl\/worksheets\/sheet\d+\.xml)$/;
   /** isi template (ArrayBuffer) -> { blob, missing } */
-  async function fill(buf, M, rows, xlsx) {
+  /* {{Foto Dokumentasi}} -> tabel foto 2 kolom (foto terakhir selebar halaman bila ganjil) */
+  async function sisipFoto(xml, files, o) {
+    const doc = new DOMParser().parseFromString(xml, 'application/xml');
+    const pg = Array.from(doc.getElementsByTagNameNS(W, 'p')).find(p => /^\s*\{\{\s*Foto[\s_]+Dokumentasi\s*\}\}\s*$/i.test(textOf(p)));
+    if (!pg) return xml;
+    const sp = xml.match(/<w:pgSz[^>]*w:w="(\d+)"/), mg = xml.match(/<w:pgMar[^>]*>/);
+    const pw = +(sp && sp[1]) || 11906, ml = +((mg && mg[0].match(/w:left="(\d+)"/) || [])[1]) || 1418, mr = +((mg && mg[0].match(/w:right="(\d+)"/) || [])[1]) || 1418;
+    const TW = pw - ml - mr, CW = Math.floor(TW / 2), cm = t => t / 567, n = o.fotos.length;
+    const H = n === 1 ? 11 : n <= 2 ? 7.5 : n <= 4 ? 7 : 5.6;
+    const slot = i => (n % 2 === 1 && i === n - 1) ? { w: cm(TW) - 0.3, full: 1 } : { w: cm(CW) - 0.3, full: 0 };
+    const jp = await Promise.all(o.fotos.map((f, i) => o.ambil(f.id, slot(i).w, H)));
+    const NS = 'xmlns:w="' + W + '" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"';
+    const relF = files.find(f => f.name === 'word/_rels/document.xml.rels'), ctF = files.find(f => f.name === '[Content_Types].xml');
+    let rel = dec.decode(relF.data), ct = dec.decode(ctF.data);
+    const esk = t => String(t || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const cell = i => {
+      const sl = slot(i), cx = Math.round(sl.w * 360000), cy = Math.round(H * 360000), id = 'rIdDokFoto' + (i + 1);
+      files.push({ name: 'word/media/dokfoto' + (i + 1) + '.jpg', data: jp[i] });
+      rel = rel.replace('</Relationships>', '<Relationship Id="' + id + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/dokfoto' + (i + 1) + '.jpg"/></Relationships>');
+      const ket = (o.fotos[i].ket || '').trim();
+      return '<w:tc><w:tcPr><w:tcW w:w="' + (sl.full ? TW : CW) + '" w:type="dxa"/>' + (sl.full ? '<w:gridSpan w:val="2"/>' : '') + '<w:vAlign w:val="center"/></w:tcPr><w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/><w:jc w:val="center"/></w:pPr><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="' + cx + '" cy="' + cy + '"/><wp:docPr id="' + (9100 + i) + '" name="Foto ' + (i + 1) + '"/><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="0" name="dokfoto' + (i + 1) + '.jpg"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="' + id + '"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="' + cx + '" cy="' + cy + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>' + (ket ? '<w:p><w:pPr><w:spacing w:before="20" w:after="20"/><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:sz w:val="16"/></w:rPr><w:t xml:space="preserve">' + esk(ket) + '</w:t></w:r></w:p>' : '') + '</w:tc>';
+    };
+    let rowsX = '';
+    for (let i = 0; i < n; i += 2) rowsX += '<w:tr><w:trPr><w:cantSplit/></w:trPr>' + cell(i) + (i + 1 < n && !(n % 2 === 1 && i === n - 1) ? cell(i + 1) : '') + '</w:tr>';
+    const bd = ['top', 'left', 'bottom', 'right', 'insideH', 'insideV'].map(k => '<w:' + k + ' w:val="single" w:sz="18" w:space="0" w:color="D9D9D9"/>').join('');
+    const tbl = '<w:tbl ' + NS + '><w:tblPr><w:tblW w:w="' + TW + '" w:type="dxa"/><w:jc w:val="center"/><w:tblBorders>' + bd + '</w:tblBorders><w:tblLayout w:type="fixed"/><w:tblCellMar><w:top w:w="50" w:type="dxa"/><w:left w:w="50" w:type="dxa"/><w:bottom w:w="50" w:type="dxa"/><w:right w:w="50" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid><w:gridCol w:w="' + CW + '"/><w:gridCol w:w="' + (TW - CW) + '"/></w:tblGrid>' + rowsX + '</w:tbl>';
+    const frag = new DOMParser().parseFromString(tbl, 'application/xml');
+    if (frag.getElementsByTagName('parsererror').length) throw new Error('Gagal menyusun tabel foto.');
+    pg.parentNode.insertBefore(doc.importNode(frag.documentElement, true), pg);
+    if (!/Extension="jpg"/i.test(ct)) ct = ct.replace('<Default ', '<Default Extension="jpg" ContentType="image/jpeg"/><Default ');
+    relF.data = enc.encode(rel); ctF.data = enc.encode(ct);
+    return new XMLSerializer().serializeToString(doc);
+  }
+  async function fill(buf, M, rows, xlsx, o) {
     const files = await unzip(buf), missing = [];
-    for (const f of files) if (PART.test(f.name)) f.data = enc.encode(fillXml(dec.decode(f.data), M, /document\.xml$/.test(f.name) ? rows : null, missing));
+    const foto = !xlsx && o && o.fotos && o.fotos.length && o.ambil;
+    for (const f of files) if (PART.test(f.name)) {
+      let x = dec.decode(f.data);
+      if (foto && /word\/document\.xml$/.test(f.name)) x = await sisipFoto(x, files, o);
+      f.data = enc.encode(fillXml(x, M, /document\.xml$/.test(f.name) ? rows : null, missing));
+    }
     return { blob: await zip(files, xlsx ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'), missing };
   }
   /* semua tanda {{…}} dalam template (untuk halaman Template) */
@@ -4210,10 +4327,24 @@ const namaFile = s => String(s || 'Dokumen').replace(/[\\/:*?"<>|]+/g, '_').repl
  * Isi template → pratinjau di aplikasi → pilih Unduh Word / Unduh PDF / Cetak.
  * o: { path, M, rows, nama, jenis ('rkp'|'surat'|'kk') }
  */
+/* foto -> JPEG terpotong pas ukuran kotak (cm) untuk disisipkan ke dokumen Word */
+async function fotoCrop(id, wcm, hcm) {
+  let url;
+  if (isSbFile(id)) url = (await callBerkas('get', { id })).url;
+  else { const f = await call('fileData', { id }); if (!f) throw new Error('Foto tidak ditemukan.'); url = 'data:' + f.mime + ';base64,' + f.data; }
+  const bmp = await createImageBitmap(await (await fetch(url)).blob());
+  const px = 90, W = Math.round(wcm * px), H = Math.round(hcm * px), c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d'), sc = Math.max(W / bmp.width, H / bmp.height), sw = W / sc, sh = H / sc;
+  g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
+  g.drawImage(bmp, (bmp.width - sw) / 2, (bmp.height - sh) * 0.3, sw, sh, 0, 0, W, H);
+  const b = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.85));
+  return new Uint8Array(await b.arrayBuffer());
+}
 async function buatDokumen(o) {
   const buf = await tplAmbil(o.path);
   const xlsx = /\.xlsx$/i.test(o.path);
-  const { blob, missing } = await DOCX.fill(buf, o.M, o.rows, xlsx);
+  let ft = []; try { ft = JSON.parse((o.M && o.M.__foto) || '[]'); } catch (x) { }
+  const { blob, missing } = await DOCX.fill(buf, o.M, o.rows, xlsx, ft.length ? { fotos: ft.slice(0, 7), ambil: fotoCrop } : null);
   const nama = namaFile(o.nama) + (xlsx ? '.xlsx' : '.docx');
   if (xlsx) saveBlob(blob, nama);
   return { nama, missing, blob, jenis: xlsx ? '' : o.jenis, xlsx };
@@ -4475,7 +4606,7 @@ ACT.cetakSurat = async t => {
 
 /* ---------------- RKP Desa ---------------- */
 function petaRkp(d) {
-  const s = d.setting || {}, mu = d.musyawarah || {}, y = Number(d.tahun_rkp) || '';
+  const s = d.setting || {}, mu = d.musyawarah || {}, y = rkpTh(d.tahun_rkp) || '';
   const M = {}; const put = (k, v) => { M[k] = v == null ? '' : String(v); };
   put('Desa', s.nama_desa); put('Kecamatan', s.kecamatan); put('Kabupaten', s.kabupaten); put('Provinsi', s.provinsi);
   put('Alamat', s.alamat); put('Kodepos', s.kode_pos); put('Kode Pos', s.kode_pos); put('email', s.email_desa);
@@ -4486,7 +4617,8 @@ function petaRkp(d) {
   put('Jam', dJam(mu.jam)); put('Tempat', mu.tempat);
   put('Pimpinan', mu.pimpinan); put('Unsur Pimpinan', mu.unsur_pimpinan);
   put('Notulen/Sekretaris', mu.notulen); put('Notulen', mu.notulen); put('Sekretaris', mu.notulen); put('Unsur Notulen', mu.unsur_notulen);
-  put('Wakil Masyarakat', mu.wakil_masyarakat);
+  put('Wakil Masyarakat', '');
+  put('Versi RKP', rkpLbl(d.tahun_rkp)); put('Judul Dokumentasi', rkpJudulMus(mu.musyawarah, y)); put('Foto Dokumentasi', ''); M.__foto = mu.foto || '';
   put('Tgl SK', dPanjang(mu.tgl_sk)); put('Nomor SK Tim Penyusun', mu.no_sk_penyusun); put('Nomor SK Tim Verifikasi', mu.no_sk_verifikasi);
   put('Kepala Desa', (d.kades && d.kades.nama) || s.nama_kades || TITIK);
   put('Ketua BPD', (d.ketua_bpd && d.ketua_bpd.nama) || TITIK);
@@ -4530,19 +4662,19 @@ async function buatRkp(path, extra) {
   const m = modal('Membuat dokumen', `<div class="stack"><b>${esc(nm.replace(/_/g, ' '))}</b><div class="skel"></div><div class="meta">Mengisi template…</div></div>`);
   try {
     const d = await call('docData', extra || { tahun_rkp: S.rkpYear });
-    const r = await buatDokumen({ path, M: petaRkp(d), rows: barisRkp(d), jenis: 'rkp', nama: nm.replace(/_/g, ' ').replace(/\s+/g, ' ') + ' - RKP ' + d.tahun_rkp });
+    const r = await buatDokumen({ path, M: petaRkp(d), rows: barisRkp(d), jenis: 'rkp', nama: nm.replace(/_/g, ' ').replace(/\s+/g, ' ') + ' - RKP ' + rkpLbl(d.tahun_rkp) });
     hasilDokumen(m, r);
   } catch (x) { m.body.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
 }
 ACT.mkdocW = t => { const k = (t.dataset.p.split('/').pop().match(/^(\d\d)\./) || [])[1]; if (k && RKP_CAT[k] && k !== '12' && k !== '13') return buatDokKode(k); if (k === '12' || k === '13') return pilihRab(k); return buatRkp(t.dataset.p, { tahun_rkp: S.rkpYear }); };
 /* ---------------- Penyusunan RKP: dokumen per tahapan, isian cepat, dashboard ---------------- */
 const RKP_CAT = {"05":{"f":"05._Data_Informasi_Pembiayaan_Desa.docx","t":["Desa","Kabupaten","Kecamatan","Kepala Desa","Ketua Tim","Provinsi","Tgu"],"tb":"F05"},"06":{"f":"06._Daftar_Prioritas_Usulan_Rencana_Program.docx","t":["Desa","Kabupaten","Kecamatan","Kepala Desa","Ketua Tim","Provinsi","Tahun RKP","Tgl Dok"],"tb":"F06"},"07":{"f":"07._Daftar_Usulan_Masy._Dipilah_SDGs_Desa.docx","t":["Desa","Kabupaten","Kecamatan","Kepala Desa","Ketua Tim","Provinsi","Tgl Dok"],"tb":"F07"},"08":{"f":"08._Daftar_Kerjasama_Desa.docx","t":["Desa","Kabupaten","Kecamatan","Kepala Desa","Ketua Tim","Provinsi","Tahun RKP","Tgl Dok"],"tb":"F08"},"09":{"f":"09._Daftar_Kerjasama_Dengan_Pihak_ketiga.docx","t":["Desa","Kabupaten","Kecamatan","Kepala Desa","Ketua Tim","Provinsi","Tahun RKP","Tgl Dok"],"tb":"F09"},"10":{"f":"10._Rancangan_RKP_Desa.docx","t":["Desa","Kabupaten","Kecamatan","Kepala Desa","Ketua Tim","Provinsi","Tahun RKP","Tgl Dok"],"tb":"F10"},"11":{"f":"11._Evaluasi_RKP_Desa_Tahun_Sebelumnya.docx","t":["Desa","Kabupaten","Kecamatan","Kepala Desa","Ketua Tim","Provinsi","Tahun ini","Tgl Dok"],"tb":"F11"},"12":{"f":"12._Gambar_Desain_Kegiatan.docx","t":["Dari Lembar","Desa","Jenis Prasarana","Judul Gambar","Kabupaten","Kecamatan","Lembar Ke","Lokasi Gambar"]},"13":{"f":"13._RAB_Kegiatan.docx","t":["Bidang RAB","Desa","Kabupaten","Kecamatan","Kegiatan RAB","Kepala Desa","Ketua Tim","No RAB","Provinsi","RAB Alat Harga","RAB Alat Jumlah","RAB Alat Satuan","RAB Alat Sub","RAB Alat Uraian","RAB Alat Volume","RAB Bahan Harga","RAB Bahan Jumlah","RAB Bahan Satuan","RAB Bahan Sub","RAB Bahan Uraian","RAB Bahan Volume","RAB Total","RAB Upah Harga","RAB Upah Jumlah","RAB Upah Satuan","RAB Upah Sub","RAB Upah Uraian","RAB Upah Volume","Tgl Dok"]},"14":{"f":"14._DU_RKP_Desa.docx","t":["Desa","Kabupaten","Kecamatan","Kepala Desa","Ketua Tim","Provinsi","Tahun RKP","Tgl Dok"],"tb":"F14"},"15":{"f":"15._BA._Hasil_Penyusunan_Rancangan_RKP_Desa.docx","t":["Desa","Hari","Jam","Kabupaten","Kecamatan","Kepala Desa","Provinsi","TP2","Tahun DU-RKP","Tahun RKP","Tahun ini","Tempat","Tgl","Tgl Dok"]},"16":{"f":"16._SK_Panitia_Musdes_Perencanaan_Desa_RKP_Desa.docx","t":["Alamat","Dasar Hukum","Desa","Hari","Kabupaten","Kecamatan","Ketua BPD","Kodepos","Nomor Dok","Panitia Jabatan","Panitia Nama","Panitia No","Panitia Unsur","Tahun Dok","Tahun RKP","Tgl","Tgl Dok"]},"17":{"f":"17._BA__Musdes_Perencanaan_Desa.docx","t":["Desa","Hadir L","Hadir P","Hari","Jam","Jumlah Hadir","Kabupaten","Kecamatan","Kepala Desa","Kesepakatan","Ketua BPD","Narasumber1","Narasumber2","Narasumber3","Notulen","Notulensi","Pimpinan","Provinsi","Tahun RKP","Tempat","Tgl","Tgl Dok","Unsur Notulen","Unsur Pimpinan","UnsurN1","UnsurN2","UnsurN3","Wakil Masyarakat"]},"18":{"f":"18._Pandangan_Resmi_BPD.docx","t":["Batas Barat","Batas Selatan","Batas Timur","Batas Utara","Dasar Hukum","Desa","Isi 1","Isi 10","Isi 11","Isi 12","Isi 13","Isi 14","Isi 15","Isi 16","Isi 17","Isi 18","Isi 19","Isi 2","Isi 20","Isi 21","Isi 22","Isi 3","Isi 4","Isi 5","Isi 6","Isi 7","Isi 8","Isi 9","Jarak Kabupaten","Jarak Kecamatan","Jarak Provinsi","Jenis Dataran","Jumlah Desa Kecamatan","Jumlah Dusun","Jumlah KK","Jumlah Polindes","Jumlah Posyandu","Kabupaten","Kecamatan","Kepadatan","Ketinggian","Ketua BPD","Luas Lahan","Luas Wilayah","Penduduk L","Penduduk P","Penduduk Total","Periode RPJM","Provinsi","Tahun RKP","Tgl Dok","Waktu Kabupaten","Waktu Kecamatan","Waktu Provinsi"]},"20":{"f":"20._Tata_Tertib_Musrenbang_RKP_Desa.docx","t":["Desa","Hari","Jumlah Utusan","Kabupaten","Kecamatan","Kepala Desa","Nomor SK Panitia","Notulen","Pimpinan","Tahun RKP","Tempat","Tgl","Tgl Dok","Wakil Masyarakat"]},"21":{"f":"21._Penyusunan_Prioritas_Kegiatan.docx","t":["Desa","Kabupaten","Kecamatan","Provinsi","Tahun RKP","Tgl Dok"],"tb":"F21"},"22":{"f":"22._BA._Musrenbang_Desa_RKP_Desa.docx","t":["Alamat","Desa","Hadir L","Hadir P","Hari","Jam","Jumlah Hadir","Kabupaten","Kecamatan","Kepala Desa","Kesepakatan","Kodepos","Narasumber1","Narasumber2","Narasumber3","Notulen","Notulensi","Pimpinan","Provinsi","Tahun DU-RKP","Tahun RKP","Tempat","Tgl","Tgl Dok","Unsur Notulen","Unsur Pimpinan","UnsurN1","UnsurN2","UnsurN3"]},"23":{"f":"23._SK_Panitia_Musdes_Pengesahan_RKP_Desa.docx","t":["Alamat","Dasar Hukum","Desa","Hari","Kabupaten","Kecamatan","Ketua BPD","Kodepos","Nomor Dok","Panitia Jabatan","Panitia Nama","Panitia No","Panitia Unsur","Tahun Dok","Tahun RKP","Tgl","Tgl Dok"]},"24":{"f":"24._BA__Musdes_Pengesahan_RKP_Desa.docx","t":["Desa","Hadir L","Hadir P","Hari","Jam","Jumlah Hadir","Kabupaten","Kecamatan","Kepala Desa","Kesepakatan","Ketua BPD","Narasumber1","Narasumber2","Narasumber3","Notulen","Notulensi","Pimpinan","Provinsi","Tahun RKP","Tempat","Tgl","Tgl Dok","Unsur Notulen","Unsur Pimpinan","UnsurN1","UnsurN2","UnsurN3","Wakil Masyarakat"]},"25":{"f":"25._Daftar_RKP_Desa.docx","t":["Desa","Kabupaten","Kecamatan","Kepala Desa","Ketua Tim","Provinsi","Tahun RKP","Tgl Dok"],"tb":"F25"},"26":{"f":"26._Rancangan_Perdes_RKP_Desa.docx","t":["Camat","Dasar Hukum","Desa","Hadir L","Hadir P","Hari","Isi 1","Isi 2","Isi 3","Isi 4","Jam","Kabupaten","Kecamatan","Kepala Desa","Ketua BPD","Nomor Dok","Nomor Lembaran","Pimpinan","Sekretaris Desa","Tahun DU-RKP","Tahun Dok","Tahun RKP","Tahun ini","Tempat","Tgl","Tgl Dok","Wakil Ketua BPD"]}};
-Object.assign(RKP_CAT, {"27": {"f": "27._Daftar_Usulan_Pelaksana_Kegiatan.docx", "t": ["Desa", "Kabupaten", "Kecamatan", "Kepala Desa", "Provinsi", "Tahun RKP", "Tgl Dok", "Ketua Tim", "Isi 1"], "l": {"Isi 1": "Daftar pelaksana (satu baris per kegiatan: kegiatan; ketua; sekretaris; bendahara; anggota)"}}, "28": {"f": "28._BA_Verifikasi_RAB_Kegiatan.docx", "t": ["Desa", "Kabupaten", "Kecamatan", "Kepala Desa", "Provinsi", "Tahun RKP", "Tgl Dok", "Dasar Hukum", "Hari", "Tgl", "Jam", "Tempat", "Ketua Verifikasi", "Isi 1", "Isi 2"], "l": {"Isi 1": "Hasil verifikasi RKP & RAB", "Isi 2": "Catatan perbaikan / rekomendasi", "Ketua Verifikasi": "Nama ketua tim verifikasi"}}, "29": {"f": "29._BA_Pembahasan_Raperdes_RKP_Desa.docx", "t": ["Desa", "Kabupaten", "Kecamatan", "Kepala Desa", "Provinsi", "Tahun RKP", "Tgl Dok", "Dasar Hukum", "Hari", "Tgl", "Jam", "Tempat", "Ketua BPD", "Pimpinan", "Isi 1", "Isi 2"], "l": {"Isi 1": "Peserta dari BPD (nama, satu baris satu orang)", "Isi 2": "Hasil pembahasan dan kesepakatan"}}, "30": {"f": "30._Surat_Penyampaian_Daftar_Usulan_RKP.docx", "t": ["Desa", "Kabupaten", "Kecamatan", "Kepala Desa", "Provinsi", "Tahun RKP", "Tgl Dok", "Alamat", "Kodepos", "Nomor Dok", "Isi 1"], "l": {"Isi 1": "Ringkasan daftar usulan (jumlah kegiatan, total pagu, dll.)"}}});
+Object.assign(RKP_CAT, {"31": {"f": "31._Dokumentasi_Foto_Musyawarah.docx", "t": ["Judul Dokumentasi", "Hari", "Tgl", "Foto Dokumentasi"], "l": {"Judul Dokumentasi": "Judul (otomatis dari jenis musyawarah)", "Foto Dokumentasi": "Kotak foto (diisi otomatis dari foto yang diunggah, maks. 7)"}}, "27": {"f": "27._Daftar_Usulan_Pelaksana_Kegiatan.docx", "t": ["Desa", "Kabupaten", "Kecamatan", "Kepala Desa", "Provinsi", "Tahun RKP", "Tgl Dok", "Ketua Tim", "Isi 1"], "l": {"Isi 1": "Daftar pelaksana (satu baris per kegiatan: kegiatan; ketua; sekretaris; bendahara; anggota)"}}, "28": {"f": "28._BA_Verifikasi_RAB_Kegiatan.docx", "t": ["Desa", "Kabupaten", "Kecamatan", "Kepala Desa", "Provinsi", "Tahun RKP", "Tgl Dok", "Dasar Hukum", "Hari", "Tgl", "Jam", "Tempat", "Ketua Verifikasi", "Isi 1", "Isi 2"], "l": {"Isi 1": "Hasil verifikasi RKP & RAB", "Isi 2": "Catatan perbaikan / rekomendasi", "Ketua Verifikasi": "Nama ketua tim verifikasi"}}, "29": {"f": "29._BA_Pembahasan_Raperdes_RKP_Desa.docx", "t": ["Desa", "Kabupaten", "Kecamatan", "Kepala Desa", "Provinsi", "Tahun RKP", "Tgl Dok", "Dasar Hukum", "Hari", "Tgl", "Jam", "Tempat", "Ketua BPD", "Pimpinan", "Isi 1", "Isi 2"], "l": {"Isi 1": "Peserta dari BPD (nama, satu baris satu orang)", "Isi 2": "Hasil pembahasan dan kesepakatan"}}, "30": {"f": "30._Surat_Penyampaian_Daftar_Usulan_RKP.docx", "t": ["Desa", "Kabupaten", "Kecamatan", "Kepala Desa", "Provinsi", "Tahun RKP", "Tgl Dok", "Alamat", "Kodepos", "Nomor Dok", "Isi 1"], "l": {"Isi 1": "Ringkasan daftar usulan (jumlah kegiatan, total pagu, dll.)"}}});
 const RKP_BID = { 1: 'Penyelenggaraan Pemerintahan Desa', 2: 'Pelaksanaan Pembangunan Desa', 3: 'Pembinaan Kemasyarakatan Desa', 4: 'Pemberdayaan Masyarakat Desa', 5: 'Penanggulangan Bencana, Keadaan Darurat dan Mendesak Desa' };
 const RKP_NAMA = { und: 'Undangan Musdes Pembentukan Tim', ba: 'BA Musdes Pembentukan Tim', skp: 'SK Tim Penyusun', skv: 'SK Tim Verifikasi', rktl: 'Rencana Kerja & Tindak Lanjut (Form 03)', f4: 'Program Masuk Desa (Form 04)',
   '05': 'Data & Informasi Pembiayaan (Form 05)', '06': 'Daftar Prioritas Usulan (Form 06)', '07': 'Usulan Dipilah per SDGs (Form 07)', '08': 'Daftar Kerja Sama Desa (Form 08)', '09': 'Kerja Sama dengan Pihak Ketiga (Form 09)', '10': 'Rancangan RKP Desa (Form 10)', '11': 'Evaluasi RKP Tahun Sebelumnya (Form 11)',
   '12': 'Gambar Desain Kegiatan (Form 12)', '13': 'RAB Kegiatan (Form 13)', '14': 'DU-RKP Desa (Form 14)', '15': 'BA Hasil Penyusunan Rancangan RKP', '16': 'SK Panitia Musdes Perencanaan (BPD)', '17': 'BA Musdes Perencanaan Desa', '18': 'Pandangan Resmi BPD',
-  '20': 'Tata Tertib Musrenbang', '21': 'Penyusunan Prioritas Kegiatan (Form 21)', '22': 'BA Musrenbang Desa', '23': 'SK Panitia Musdes Pengesahan (BPD)', '24': 'BA Musdes Pengesahan RKP', '25': 'Daftar RKP Desa (Form 25)', '26': 'Rancangan Perdes RKP Desa', '27': 'Daftar Usulan Pelaksana Kegiatan (Permendagri)', '28': 'BA Verifikasi RAB (Permendagri)', '29': 'BA Pembahasan Raperdes RKP Kades–BPD (Permendagri)', '30': 'Surat Penyampaian Daftar Usulan RKP ke Bupati (Permendagri)' };
+  '20': 'Tata Tertib Musrenbang', '21': 'Penyusunan Prioritas Kegiatan (Form 21)', '22': 'BA Musrenbang Desa', '23': 'SK Panitia Musdes Pengesahan (BPD)', '24': 'BA Musdes Pengesahan RKP', '25': 'Daftar RKP Desa (Form 25)', '26': 'Rancangan Perdes RKP Desa', '27': 'Daftar Usulan Pelaksana Kegiatan (Permendagri)', '28': 'BA Verifikasi RAB (Permendagri)', '29': 'BA Pembahasan Raperdes RKP Kades–BPD (Permendagri)', '30': 'Surat Penyampaian Daftar Usulan RKP ke Bupati (Permendagri)', '31': 'Dokumentasi Foto Musyawarah' };
 const RKP_TAHAP = [
   { t: 'Tahap 1 — Pembentukan Tim Penyusun', docs: ['und', 'ba', 'skp', 'skv', 'rktl', 'f4'] },
   { t: 'Tahap 2 — Pengkajian & rancangan RKP', docs: ['05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '27', '28'] },
@@ -4720,11 +4852,11 @@ async function buatDokKode(kode, rab) {
       M = petaDok(d, kode, isi); rows = barisDok(kode, isi);
       if (tb) {
         let lalu = [];
-        if (tb === 'F11') lalu = (await call('list', { entity: 'rkp_usulan', limit: 5000, filters: { tahun_rkp: String(Number(S.rkpYear) - 1) } })).rows;
+        if (tb === 'F11') lalu = (await call('list', { entity: 'rkp_usulan', limit: 5000, filters: { tahun_rkp: String(rkpTh(S.rkpYear) - 1) } })).rows;
         const r = petaTabel(tb, d, lalu); Object.assign(M, r.M); rows = rows.concat(r.rows);
       }
     }
-    const r = await buatDokumen({ path, M, rows, jenis: 'rkp', nama: nm + ' - RKP ' + S.rkpYear + (rab ? ' - ' + (rab.kegiatan || '') : '') });
+    const r = await buatDokumen({ path, M, rows, jenis: 'rkp', nama: nm + ' - RKP ' + rkpLbl(S.rkpYear) + (rab ? ' - ' + (rab.kegiatan || '') : '') });
     hasilDokumen(m, r);
     if (!rab && ((await rkpDokMap())[kode] || {}).status !== 'Selesai' && ((await rkpDokMap())[kode] || {}).status !== 'Siap TTD' && ((await rkpDokMap())[kode] || {}).status !== 'Draf') { await rkpSimpanDok(kode, { status: 'Draf' }); }
   } catch (x) { m.body.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
