@@ -276,6 +276,40 @@ table.tbl{border-collapse:collapse;width:100%;font-size:11.5px;font-variant-nume
 .tbl th{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:var(--surface2);position:sticky;top:0}
 .tbl .stk{position:sticky;left:0;background:var(--surface);z-index:1;min-width:130px;white-space:normal}
 .tbl th.stk{background:var(--surface2);z-index:2}
+
+/* ---------- RPJM Desa ---------- */
+.rpj-t{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.rpj-t b{font-size:15px}
+.rpj-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.rpj-kpi>div{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;display:flex;flex-direction:column;gap:2px}
+.rpj-kpi small{color:var(--muted);font-size:11px}.rpj-kpi b{font-size:15px}
+.rpj-f{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.rpj-wrap{overflow:auto;max-height:calc(100vh - 210px);min-height:240px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overscroll-behavior:contain}
+table.rpj{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%}
+table.rpj th{z-index:3;white-space:nowrap;vertical-align:bottom}table.rpj th b{font-size:11.5px;color:var(--ink);letter-spacing:0}
+table.rpj td{background:var(--surface);vertical-align:top}
+table.rpj .c0{position:sticky;left:0;z-index:2;width:38px;min-width:38px;text-align:right;color:var(--muted)}
+table.rpj .c1{position:sticky;left:38px;z-index:2;min-width:250px;max-width:300px;white-space:normal;box-shadow:1px 0 0 var(--line)}
+table.rpj th.c0,table.rpj th.c1{z-index:4;background:var(--surface2)}
+table.rpj .c1 small{display:block;color:var(--muted)}
+table.rpj .wr{white-space:normal;min-width:190px;max-width:260px}
+table.rpj .r{text-align:right}
+table.rpj .now{background:color-mix(in srgb,var(--gold-soft) 55%,var(--surface))}table.rpj th.now{background:var(--gold-soft)}
+table.rpj tr.g1 td{background:var(--pri-soft);font-weight:700;color:var(--pri-2)}
+table.rpj tr.g2 td{background:var(--surface2);font-weight:600}
+table.rpj tr.kr{cursor:pointer}table.rpj tr.kr:hover td{background:var(--surface2)}
+table.rpj tr.kosong td{background:color-mix(in srgb,var(--warn-soft) 40%,var(--surface))}
+table.rpj tfoot td{position:sticky;bottom:0;z-index:2;background:var(--surface2);font-weight:700;border-top:2px solid var(--line)}
+table.rpj tfoot td.c0,table.rpj tfoot td.c1{z-index:4}
+.tg{display:inline-block;font-style:normal;font-size:9px;font-weight:700;border-radius:4px;padding:0 3px;margin-left:3px;vertical-align:1px}
+.tg.r{background:var(--info-soft);color:var(--info)}.tg.a{background:var(--ok-soft);color:var(--ok)}
+.est{font-style:italic;color:var(--muted)}
+.rpj-a{display:flex;gap:8px;align-items:flex-start}.rpj-a .main{flex:1;white-space:pre-wrap}
+.rpj-v{display:flex;gap:8px;align-items:center;text-align:left;width:100%;cursor:pointer}.rpj-v .main{flex:1;display:flex;flex-direction:column}
+.rpj-dl{display:grid;grid-template-columns:max-content 1fr;gap:3px 12px;margin:0}.rpj-dl dt{color:var(--muted);font-size:11.5px}.rpj-dl dd{margin:0;white-space:pre-wrap}
+.rpj-by{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}.rpj-by .f input+input{margin-top:3px}
+.tbl td.r,.tbl th.r{text-align:right}
+.rpj-ol{margin:0;padding-left:20px;display:grid;gap:3px}
+@media (max-width:640px){table.rpj .c1{min-width:160px;max-width:180px}.rpj-wrap{max-height:calc(100vh - 170px)}}
 .tbl td.c,.tbl th.c{text-align:center;padding:4px 3px;min-width:24px}
 .k{display:inline-block;min-width:20px;padding:1px 3px;border-radius:5px;font-weight:700;font-size:10px}
 .k-H,.k-HD,.k-P{background:var(--ok-soft);color:var(--ok)} .k-T,.k-IT,.k-TD,.k-ITD{background:var(--warn-soft);color:var(--warn)} .k-D,.k-DL{background:var(--info-soft);color:var(--info)}
@@ -915,12 +949,12 @@ const UI = {
     row: r => ({ t: r.kegiatan, s: [r.no_rab, r.bidang].filter(Boolean).join(' · '), av: ic('hammer') })
   },
   rpjm_visimisi: {
-    t: 'RPJM Desa — Visi, Misi, Tujuan & Sasaran', ic: 'target', perm: 'perencanaan', sort: 'urut', asc: 1,
+    t: 'RPJM Desa (data lama) — Visi & Misi', ic: 'target', perm: 'perencanaan', write: 'admin', sort: 'urut', asc: 1,
     fields: [F('jenis', 'Jenis', 'select', { opt: ['Visi', 'Misi', 'Tujuan', 'Sasaran'], req: 1 }), F('no', 'No.', 'text'), F('induk', 'Induk', 'text', { hint: 'Mis. Misi 05 / Tujuan 04' }), F('urut', 'Urutan', 'number'), F('uraian', 'Uraian', 'textarea', { req: 1, wide: 1 })],
     row: r => ({ t: r.uraian, s: [r.jenis + (r.no ? ' ' + r.no : ''), r.induk].filter(Boolean).join(' · '), av: `<b>${esc((r.jenis || '?')[0])}</b>` })
   },
   rpjm_kegiatan: {
-    t: 'RPJM Desa — Rencana Kegiatan 2020–2027', ic: 'list', perm: 'perencanaan', sort: 'urut', asc: 1,
+    t: 'RPJM Desa (data lama) — Kegiatan', ic: 'list', perm: 'perencanaan', write: 'admin', sort: 'urut', asc: 1,
     fields: [F('kegiatan', 'Jenis Kegiatan', 'text', { req: 1, wide: 1 }), F('kode_bidang', 'Kode Bidang', 'text', { mono: 1 }), F('bidang', 'Bidang', 'text', { wide: 1 }), F('sub_bidang', 'Sub Bidang', 'text', { wide: 1 }),
       F('lokasi', 'Lokasi'), F('volume', 'Perkiraan Volume'), F('sasaran', 'Sasaran / Manfaat', 'text', { wide: 1 }), F('tahun_pelaksanaan', 'Tahun Pelaksanaan', 'text', { hint: 'Mis. 2023, 2024, 2025' }), F('jumlah', 'Prakiraan Biaya', 'money'), F('sumber', 'Sumber Dana'), F('urut', 'Urutan', 'number')],
     row: r => ({ t: r.kegiatan, s: [r.sub_bidang, r.sumber, r.tahun_pelaksanaan].filter(Boolean).join(' · '), r: fMoney(r.jumlah), av: `<span class="mono">${esc(r.kode_bidang || '–')}</span>` })
@@ -1121,7 +1155,7 @@ function MODS() {
     { k: 'pemerintahan', l: 'Pemerintahan', ic: 'landmark', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, 'r:penduduk'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga']] },
     { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
     { k: 'kesejahteraan', l: 'Kesejahteraan', ic: 'heart', items: [['Lembaga / Yayasan', 'landmark', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru Ngaji', 'book', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
-    { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['Generator RKP', 'sprout', ['rkpgen', {}], null, 'r:rkp'], ['Usulan Kegiatan', 'clip', ['list', { e: 'rkp_usulan' }], null, 'r:rkp'], ['RAB & Gambar', 'list', ['list', { e: 'rkp_rab' }], null, 'r:rkp'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Progres Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
+    { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RPJM Desa Berjalan', 'book', ['rpjm', {}], null, 'r:rkp'], ['Penyusunan RPJM Baru', 'edit', ['rpjmbaru', {}], null, 'r:rkp'], ['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['Generator RKP', 'sprout', ['rkpgen', {}], null, 'r:rkp'], ['Usulan Kegiatan', 'clip', ['list', { e: 'rkp_usulan' }], null, 'r:rkp'], ['RAB & Gambar', 'list', ['list', { e: 'rkp_rab' }], null, 'r:rkp'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Progres Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
     { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Rekap Pajak', 'coin', ['keupajak'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek']] },
     { k: 'soon', l: 'Segera Hadir', ic: 'sprout', items: Object.keys(SOON).map(k => [SOON[k].t, SOON[k].ic, ['soon', { k }], null, '*', 1]) }
   ];
@@ -2925,7 +2959,7 @@ function sppTotal(r) { let a = []; try { a = JSON.parse(r.rincian || '[]'); } ca
 const rp = n => 'Rp ' + Number(n || 0).toLocaleString('id-ID', { maximumFractionDigits: 2 });
 const rpS = n => Number(n) < 0 ? '(' + rp(-Number(n)) + ')' : rp(n);
 const keuTh = () => S.keuTh = S.keuTh || String(new Date().getFullYear());
-const thChips = act => { const y = new Date().getFullYear(); return `<div class="chips">${[y, y - 1, y - 2].map(v => `<button class="chip ${keuTh() === String(v) ? 'on' : ''}" data-act="${act}" data-v="${v}">${v}</button>`).join('')}</div>`; };
+const thChips = act => { const y = new Date().getFullYear(); return `<div class="chips">${[y, y - 1, y - 2].filter(v => v >= 2020).map(v => `<button class="chip ${keuTh() === String(v) ? 'on' : ''}" data-act="${act}" data-v="${v}">${v}</button>`).join('')}</div>`; };
 /* ---------- Dashboard keuangan ---------- */
 const KEU_WARNA = { Pendapatan: 'pend', 'Penerimaan Pembiayaan': 'pemb', 'Pengeluaran Pembiayaan': 'pemb', Belanja: 'bel' };
 const KEU_MASUK = { Pendapatan: 1, 'Penerimaan Pembiayaan': 1, 'Pajak Dipungut': 1, 'Saldo Awal': 1, Belanja: -1, 'Pengeluaran Pembiayaan': -1, 'Pajak Disetor': -1 };
@@ -3668,7 +3702,7 @@ const rkpNk = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').tri
 async function rkpAmbil() {
   await rkpMuatVer();
   const y = String(S.rkpYear), th = String(rkpTh(y)), L = (e, f) => call('list', { entity: e, limit: 5000, filters: f }).then(r => r.rows || []).catch(() => []);
-  const [mp, us, pb, pg, mu, tm, jd, rb, ag, rp, pbg] = await Promise.all([rkpDokMap(true), L('rkp_usulan', { tahun_rkp: y }), L('rkp_pembiayaan', { tahun_rkp: y }), L('rkp_pagu', { tahun_rkp: y }), L('rkp_musyawarah', { tahun_rkp: y }), L('rkp_tim', {}), L('rkp_jadwal', { tahun_rkp: y }), L('rkp_rab', { tahun_rkp: y }), L('keu_anggaran', { tahun: th }), L('rpjm_kegiatan', {}), L('pembangunan', {})]);
+  const [mp, us, pb, pg, mu, tm, jd, rb, ag, rp, pbg] = await Promise.all([rkpDokMap(true), L('rkp_usulan', { tahun_rkp: y }), L('rkp_pembiayaan', { tahun_rkp: y }), L('rkp_pagu', { tahun_rkp: y }), L('rkp_musyawarah', { tahun_rkp: y }), L('rkp_tim', {}), L('rkp_jadwal', { tahun_rkp: y }), L('rkp_rab', { tahun_rkp: y }), L('keu_anggaran', { tahun: th }), rpjmAktifRows(), L('pembangunan', {})]);
   const ids = new Set(mu.map(x => x.id));
   const D = { y, th: rkpTh(y), n: rkpVn(y), mp, us, pb, pg, mu, tm: tm.filter(x => ids.has(x.ref)), jd, rb, ag, rp, pbg };
   D.nu = us.filter(u => u.dokumen !== 'DU-RKP'); D.du = us.filter(u => u.dokumen === 'DU-RKP');
@@ -3713,7 +3747,7 @@ function dokKartu(dk, mp, w, D) {
     ${w ? `<div class="btns">${ada ? `<button class="btn sm" data-act="dokIsi" data-k="${esc(dk.k)}">${ic('edit')}Isi cepat</button>` : ''}<button class="btn sm pri" data-act="dokBuat" data-k="${esc(dk.k)}">${ic('file')}${lbl}</button>
     <select class="sel" data-act-change="dokStatus" data-k="${esc(dk.k)}" aria-label="Status ${esc(dk.n)}">${RKP_STATUS.map(x => `<option ${x === s ? 'selected' : ''}>${x}</option>`).join('')}</select></div>` : ''}</div>`;
 }
-const rkpYrChips = y => `<div class="chips">${[y - 1, y, y + 1].map(t => `<button class="chip ${t === y ? 'on' : ''}" data-act="yr" data-v="${t}">${t}</button>`).join('')}</div>`;
+const rkpYrChips = y => `<div class="chips">${[y - 1, y, y + 1].filter(t => t >= 2020).map(t => `<button class="chip ${t === y ? 'on' : ''}" data-act="yr" data-v="${t}">${t}</button>`).join('')}</div>`;
 function rkpBarisMus(j, D, w) {
   const ada = D.mu.filter(x => x.musyawarah === j).sort((a, c) => String(a.tanggal).localeCompare(String(c.tanggal))), r = ada[0];
   let nf = 0; try { nf = r ? JSON.parse(r.foto || '[]').length : 0; } catch (x) { }
@@ -3766,7 +3800,7 @@ VIEWS.rkp = async (p, main, alive) => {
         ${ttd.length ? `<div class="list">${ttd.map(x => `<button class="row" data-act="go" data-go='["rkptahap",{"t":${x.tahap}}]'><span class="av">${ic('file')}</span><span class="main"><span class="t">${esc(x.n)}</span><span class="s">Tahap ${x.tahap}</span></span></button>`).join('')}</div>` : '<div class="meta">Ubah status dokumen menjadi "Siap TTD" di halaman tahapan.</div>'}</div>
     </div>
     <div class="kd-c"><div class="kd-h"><b>Alur data</b></div><div class="meta">Satu kali input, dipakai di banyak dokumen: <b>Usulan kegiatan (Form 04)</b> → Form 06, 07, 08, 09, 10, 14, 21, 25 · <b>Rencana pembiayaan (Form 05)</b> → Form 05 · <b>RAB kegiatan</b> → Form 12 & 13 · <b>Musyawarah & tim</b> → undangan, BA, SK · <b>Dasar hukum</b> otomatis dari Referensi · usulan RKP → <b>APBDes</b> di Keuangan.</div></div>
-    <details class="more"><summary>Data pendukung</summary><div class="btns" style="margin-top:6px"><button class="btn" data-act="go" data-go='["list",{"e":"rkp_musyawarah"}]'>${ic('users')}Musyawarah & Tim</button><button class="btn" data-act="go" data-go='["list",{"e":"rkp_jadwal"}]'>${ic('cal')}Jadwal (Form 03)</button><button class="btn" data-act="go" data-go='["list",{"e":"rkp_pembiayaan"}]'>${ic('coin')}Pembiayaan (Form 05)</button><button class="btn" data-act="go" data-go='["list",{"e":"rkp_rab"}]'>${ic('list')}RAB & Gambar</button><button class="btn" data-act="go" data-go='["list",{"e":"rkp_rutin"}]'>${ic('clock')}Kegiatan Rutin</button><button class="btn" data-act="go" data-go='["list",{"e":"rpjm_visimisi"}]'>${ic('book')}RPJM: Visi & Misi</button><button class="btn" data-act="go" data-go='["list",{"e":"rpjm_kegiatan"}]'>${ic('book')}RPJM: Kegiatan</button><button class="btn" data-act="go" data-go='["refs"]'>${ic('book')}Referensi</button></div></details></div>`;
+    <details class="more"><summary>Data pendukung</summary><div class="btns" style="margin-top:6px"><button class="btn" data-act="go" data-go='["list",{"e":"rkp_musyawarah"}]'>${ic('users')}Musyawarah & Tim</button><button class="btn" data-act="go" data-go='["list",{"e":"rkp_jadwal"}]'>${ic('cal')}Jadwal (Form 03)</button><button class="btn" data-act="go" data-go='["list",{"e":"rkp_pembiayaan"}]'>${ic('coin')}Pembiayaan (Form 05)</button><button class="btn" data-act="go" data-go='["list",{"e":"rkp_rab"}]'>${ic('list')}RAB & Gambar</button><button class="btn" data-act="go" data-go='["list",{"e":"rkp_rutin"}]'>${ic('clock')}Kegiatan Rutin</button><button class="btn" data-act="go" data-go='["rpjm",{}]'>${ic('book')}RPJM Desa Berjalan</button><button class="btn" data-act="go" data-go='["refs"]'>${ic('book')}Referensi</button></div></details></div>`;
   kdTip();
   S.vh.yr = t => { S.rkpYear = t.dataset.v; S.rkpBuka = null; S.listState = null; S.dokMap = null; refresh(); };
   S.vh.rkpVer = t => { S.rkpYear = t.dataset.v; S.rkpBuka = null; S.listState = null; S.dokMap = null; refresh(); };
@@ -3797,6 +3831,318 @@ async function makeDocFlow(tpl, name, extra) {
       <div class="meta">Tersimpan di folder Output Perencanaan di Google Drive.</div></div>`;
   } catch (x) { m.body.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
 }
+/* =====================================================================
+   RPJM DESA — relasional & berversi (Permendagri 114/2014, Permendes PDTT)
+   Periode (Murni/Perubahan; Draft/Aktif/Arsip) → Arah (Visi, Misi, Tujuan,
+   Sasaran, Arah Kebijakan) → Kegiatan → Prakiraan biaya per tahun → Tautan RKP/APBDes
+   ===================================================================== */
+const RPJM_JENIS = ['Visi', 'Misi', 'Tujuan', 'Sasaran', 'Arah Kebijakan'];
+const RPJM_POLA = ['Swakelola', 'Kerjasama Antar Desa', 'Kerjasama Pihak Ketiga'];
+const RPJM_ST = { Aktif: 'ok', Draft: 'warn', Arsip: '' };
+const rpjmCall = (op, p) => call('rpjm', Object.assign({ op }, p || {}));
+const rpjmNom = () => S.rpjmNom ? Promise.resolve(S.rpjmNom) : rpjmCall('nomenklatur').then(d => (S.rpjmNom = d.bidang || []));
+const rpjmRef = () => S.rpjmRef ? Promise.resolve(S.rpjmRef) : call('list', { entity: 'ref_bidang', limit: 5000 }).then(r => (S.rpjmRef = r.rows || [])).catch(() => []);
+const rpjmTh = p => { const a = []; for (let y = +p.tahun_awal; y <= +p.tahun_akhir; y++) a.push(y); return a; };
+const rpjmAng = n => Number(n || 0).toLocaleString('id-ID', { maximumFractionDigits: 0 });
+const rpjmKosong = k => !k.nama || /^\(isi jenis kegiatan\)$/i.test(k.nama);
+const rpjmTot = k => Object.values(k.biaya || {}).reduce((s, b) => s + Number(b.jumlah || 0), 0);
+const rpjmSd = k => Array.from(new Set(Object.values(k.biaya || {}).flatMap(b => String(b.sumber || '').split(/[,;/]+/).map(x => x.trim()).filter(Boolean)))).join(', ');
+const rpjmTgl = v => v ? String(v).slice(0, 10).split('-').reverse().join('-') : '';
+/* Dashboard RKP: kegiatan RPJM Aktif dalam bentuk {kegiatan, tahun_pelaksanaan} */
+async function rpjmAktifRows() {
+  try {
+    const d = await rpjmCall('daftar'), a = (d.periode || []).find(x => x.status === 'Aktif'); if (!a) return [];
+    const m = await rpjmCall('matriks', { periode_id: a.id });
+    return (m.kegiatan || []).filter(k => !rpjmKosong(k)).map(k => ({ id: k.id, kegiatan: k.nama, tahun_pelaksanaan: Object.keys(k.biaya || {}).sort().join(', '), jumlah: rpjmTot(k) }));
+  } catch (x) { return []; }
+}
+
+VIEWS.rpjmbaru = (p, main, alive) => VIEWS.rpjm(Object.assign(p, { baru: 1 }), main, alive);
+VIEWS.rpjm = async (p, main, alive) => {
+  const baru = !!p.baru;
+  setTop(baru ? 'Penyusunan RPJM Desa Baru' : 'RPJM Desa Berjalan', 'Memuat…');
+  const d = await rpjmCall('daftar'); if (!alive()) return;
+  const P = d.periode || [], wr = !!d.bisa_ubah, aktif = P.find(x => x.status === 'Aktif');
+  const batas = aktif ? +aktif.tahun_akhir : 2027, grupBaru = P.filter(x => +x.tahun_awal > batas);
+  let cur = P.find(x => x.id === p.id) || null;
+  if (!cur) cur = baru ? (grupBaru.find(x => x.status === 'Draft') || grupBaru[grupBaru.length - 1]) : (aktif || P[P.length - 1]);
+  if (!cur) return rpjmMulai(p, main, batas, wr, baru);
+  const [m, nom] = await Promise.all([rpjmCall('matriks', { periode_id: cur.id }), rpjmNom()]); if (!alive()) return;
+  const per = m.periode, TH = rpjmTh(per), K = m.kegiatan || [], A = m.arah || [];
+  const ubah = wr && per.status === 'Draft', cy = new Date().getFullYear();
+  const st = S.rpjmSt = S.rpjmSt || { tab: 'mat', q: '', b: '' };
+  const nb = {}, ns = {}; nom.forEach(b => { nb[b.kode_bidang] = b.nama_bidang; (b.sub || []).forEach(s => { ns[s.kode_sub] = s.sub_bidang; }); });
+  const versi = P.filter(x => x.tahun_awal === per.tahun_awal).sort((a, b) => a.versi - b.versi);
+  const adaDraft = versi.some(x => x.status === 'Draft');
+  setTop(baru ? 'Penyusunan RPJM Desa Baru' : 'RPJM Desa Berjalan', per.nama);
+  const total = K.reduce((s, k) => s + rpjmTot(k), 0), isi = K.filter(k => !rpjmKosong(k)).length;
+  const nR = K.filter(k => Object.values(k.tautan || {}).some(t => t.rkp)).length, nA = K.filter(k => Object.values(k.tautan || {}).some(t => t.apbdes)).length;
+  const est = K.some(k => Object.values(k.biaya || {}).some(b => b.estimasi));
+  const btn = (act, ico, t, cls) => `<button class="btn sm ${cls || ''}" data-act="${act}">${ic(ico)}${t}</button>`;
+  main.innerHTML = `<div class="stack">
+    <div class="card stack rpj-h">
+      <div class="rpj-t"><b>${esc(per.nama)}</b><span class="pill ${RPJM_ST[per.status]}">${esc(per.status)}</span><span class="pill info">${esc(per.jenis)}${per.versi ? ' ke-' + per.versi : ''}</span></div>
+      <div class="meta">Periode ${per.tahun_awal}–${per.tahun_akhir} (${TH.length} tahun) · ${per.no_perdes ? 'Perdes No. ' + esc(per.no_perdes) + (per.tgl_perdes ? ' tgl ' + rpjmTgl(per.tgl_perdes) : '') : 'Nomor Perdes belum diisi'}${per.alasan ? ' · Alasan: ' + esc(per.alasan) : ''}</div>
+      ${versi.length > 1 ? `<div class="chips wrap">${versi.map(v => `<button class="chip ${v.id === per.id ? 'on' : ''}" data-act="rpjV" data-id="${esc(v.id)}">${v.tahun_awal}–${v.tahun_akhir} · ${v.versi ? 'Perubahan ' + v.versi : 'Awal'} <small>${esc(v.status)}</small></button>`).join('')}</div>` : ''}
+      <div class="btns">
+        ${ubah ? btn('rpjKeg', 'plus', 'Tambah Kegiatan', 'pri') : ''}
+        ${ubah && !K.length ? btn('rpjTpl', 'list', 'Isi Template dari Nomenklatur') : ''}
+        ${wr && per.status !== 'Draft' && !adaDraft && !baru ? btn('rpjSalin', 'edit', 'Buat Perubahan RPJM', 'pri') : ''}
+        ${wr && per.status !== 'Arsip' ? btn('rpjInfo', 'stamp', 'Info & Perdes') : ''}
+        ${ubah ? btn('rpjTetap', 'check', 'Tetapkan') : ''}
+        ${wr && per.status !== 'Arsip' && K.length ? btn('rpjCocok', 'target', 'Cocokkan RKP & APBDes') : ''}
+        ${btn('rpjRiwayat', 'clock', 'Riwayat Versi')}
+        ${K.length ? btn('rpjXls', 'down', 'Unduh Excel') : ''}
+        ${ubah ? btn('rpjHapusP', 'trash', 'Hapus Draft', 'danger') : ''}
+      </div>
+      ${per.status === 'Draft' ? `<div class="meta">${ic('edit')} Draft dapat diubah. Setelah lengkap tekan <b>Tetapkan</b>: versi ini menjadi Aktif dan versi Aktif sebelumnya otomatis menjadi Arsip (riwayat tetap tersimpan).</div>` : `<div class="meta">${ic('lock')} ${per.status === 'Aktif' ? 'RPJM Aktif terkunci. Untuk mengubah isi, tekan "Buat Perubahan RPJM" — sistem membuat salinan Draft tanpa menghapus versi ini.' : 'Versi Arsip (riwayat), hanya bisa dilihat.'}</div>`}
+    </div>
+    <div class="rpj-kpi">
+      <div><small>Kegiatan</small><b class="num">${isi}${isi !== K.length ? ' / ' + K.length : ''}</b></div>
+      <div><small>Pagu indikatif ${TH.length} tahun</small><b class="num">${rp(Math.round(total))}</b></div>
+      <div><small>Masuk RKP Desa</small><b class="num">${nR} kegiatan</b></div>
+      <div><small>Dianggarkan APBDes</small><b class="num">${nA} kegiatan</b></div>
+    </div>
+    <div class="chips"><button class="chip ${st.tab === 'mat' ? 'on' : ''}" data-act="rpjTab" data-v="mat">${ic('list')}Matriks Kegiatan</button><button class="chip ${st.tab === 'arah' ? 'on' : ''}" data-act="rpjTab" data-v="arah">${ic('target')}Visi, Misi & Arah Kebijakan <small>${A.length}</small></button></div>
+    <div id="rpjBody"></div></div>`;
+
+  const body = $('#rpjBody');
+  const drawMat = () => {
+    if (!K.length) { body.innerHTML = `<div class="empty">Belum ada kegiatan.${ubah ? ' Tekan "Isi Template dari Nomenklatur" agar baris bidang & sub-bidang tersedia, atau "Tambah Kegiatan".' : per.versi === 0 && per.status === 'Arsip' ? ' Dokumen awal ini hanya dicatat sebagai riwayat; rincian kegiatan ada pada versi Perubahan.' : ''}</div>`; return; }
+    const q = st.q.toLowerCase();
+    const L = K.filter(k => (!st.b || k.bidang_kode === st.b) && (!q || [k.nama, k.sub_bidang, k.lokasi, k.sasaran, k.kode_kegiatan].join(' ').toLowerCase().indexOf(q) >= 0));
+    const bids = Array.from(new Set(K.map(k => k.bidang_kode))).sort();
+    const sum = (rows, y) => rows.reduce((s, k) => s + Number(((k.biaya || {})[y] || {}).jumlah || 0), 0);
+    const nKol = 5 + TH.length + 3 + (per.induk_id ? 1 : 0);
+    let h = '', no = 0;
+    bids.forEach(bk => {
+      const RB = L.filter(k => k.bidang_kode === bk); if (!RB.length) return;
+      const nmB = nb[bk] || (RB[0].bidang || '').toUpperCase();
+      h += `<tr class="g1"><td class="c0"></td><td class="c1">${esc(String(+bk || bk))}. ${esc(nmB)}</td><td colspan="3"></td>${TH.map(y => `<td class="r num">${rpjmAng(sum(RB, y)) === '0' ? '' : rpjmAng(sum(RB, y))}</td>`).join('')}<td class="r num">${rpjmAng(RB.reduce((s, k) => s + rpjmTot(k), 0))}</td><td colspan="${nKol - 6 - TH.length}"></td></tr>`;
+      const subs = []; RB.forEach(k => { const s = (k.sub_bidang_kode || '') + '|' + (k.sub_bidang || ''); if (subs.indexOf(s) < 0) subs.push(s); });
+      subs.forEach(sk => {
+        const RS = RB.filter(k => (k.sub_bidang_kode || '') + '|' + (k.sub_bidang || '') === sk), sc = sk.split('|')[0];
+        h += `<tr class="g2"><td class="c0"></td><td class="c1">${sc ? `<span class="mono">${esc(sc)}</span> ` : ''}${esc(ns[sc] || sk.split('|')[1] || 'Tanpa sub bidang')}${ubah ? ` <button class="linkbtn" data-act="rpjKegSub" data-b="${esc(bk)}" data-s="${esc(sc)}">+ kegiatan</button>` : ''}</td><td colspan="${nKol - 2}"></td></tr>`;
+        RS.forEach(k => {
+          no++;
+          const kosong = rpjmKosong(k);
+          h += `<tr class="kr${kosong ? ' kosong' : ''}" data-act="rpjK" data-id="${esc(k.id)}" tabindex="0"><td class="c0 num">${no}</td><td class="c1">${kosong ? `<span class="muted">— jenis kegiatan belum diisi —</span>${ubah ? ' <span class="pill warn">Isi</span>' : ''}` : esc(k.nama)}${k.kode_kegiatan ? `<small class="mono">${esc(k.kode_kegiatan)}</small>` : ''}</td>
+            <td>${esc(k.lokasi || '')}</td><td>${esc([k.volume, k.satuan].filter(Boolean).join(' '))}</td><td class="wr">${esc(k.sasaran || '')}</td>
+            ${TH.map(y => { const b = (k.biaya || {})[y], t = (k.tautan || {})[y] || {}; return `<td class="r num${y === cy ? ' now' : ''}">${b ? `<span class="${b.estimasi ? 'est' : ''}">${rpjmAng(b.jumlah)}</span>` : ''}${t.rkp ? '<i class="tg r" title="Masuk RKP Desa ' + y + '">R</i>' : ''}${t.apbdes ? '<i class="tg a" title="Dianggarkan di APBDes ' + y + '">A</i>' : ''}</td>`; }).join('')}
+            <td class="r num"><b>${rpjmAng(rpjmTot(k))}</b></td><td>${esc(rpjmSd(k))}</td><td>${esc(k.pola || '')}</td>${per.induk_id ? `<td><span class="pill ${k.perubahan === 'Baru' ? 'info' : k.perubahan === 'Diubah' ? 'warn' : ''}">${esc(k.perubahan)}</span></td>` : ''}</tr>`;
+        });
+      });
+    });
+    body.innerHTML = `<div class="stack">
+      <div class="toolbar rpj-f"><label class="search" style="flex:1;min-width:180px">${ic('search')}<input id="rpjQ" placeholder="Cari kegiatan, lokasi, sasaran…" value="${esc(st.q)}"></label>
+        <div class="chips wrap"><button class="chip ${!st.b ? 'on' : ''}" data-act="rpjB" data-v="">Semua bidang</button>${bids.map(b => `<button class="chip ${st.b === b ? 'on' : ''}" data-act="rpjB" data-v="${esc(b)}" title="${esc(nb[b] || '')}">Bidang ${+b || b}</button>`).join('')}</div></div>
+      <div class="rpj-wrap"><table class="tbl rpj">
+        <thead><tr><th class="c0">No</th><th class="c1">Bidang / Sub Bidang / Jenis Kegiatan</th><th>Lokasi</th><th>Prakiraan Volume</th><th class="wr">Sasaran / Manfaat</th>
+          ${TH.map((y, i) => `<th class="r${y === cy ? ' now' : ''}">Tahun ke-${i + 1}<br><b>${y}</b></th>`).join('')}<th class="r">Jumlah (Rp)</th><th>Sumber Dana</th><th>Pola Pelaksanaan</th>${per.induk_id ? '<th>Perubahan</th>' : ''}</tr></thead>
+        <tbody>${h || `<tr><td colspan="${nKol}" class="muted" style="padding:14px">Tidak ada kegiatan untuk filter ini.</td></tr>`}</tbody>
+        <tfoot><tr><td class="c0"></td><td class="c1">JUMLAH</td><td colspan="3"></td>${TH.map(y => `<td class="r num">${rpjmAng(sum(L, y))}</td>`).join('')}<td class="r num">${rpjmAng(L.reduce((s, k) => s + rpjmTot(k), 0))}</td><td colspan="${nKol - 6 - TH.length}"></td></tr></tfoot>
+      </table></div>
+      <div class="meta">Angka dalam Rupiah. <i class="tg r">R</i> masuk RKP Desa tahun itu · <i class="tg a">A</i> dianggarkan di APBDes${est ? ' · <span class="est">angka miring</span> = estimasi bagi rata dari data RPJM lama (perbarui saat membuat Perubahan)' : ''}. Data RKP & APBDes hanya dibaca mulai tahun 2020. Geser tabel ke samping untuk melihat semua tahun; klik baris untuk rincian.</div></div>`;
+    const qi = $('#rpjQ'); qi.oninput = ev => { st.q = ev.target.value; const pos = ev.target.selectionStart; drawMat(); const n = $('#rpjQ'); n.focus(); n.setSelectionRange(pos, pos); };
+  };
+  const drawArah = () => {
+    body.innerHTML = `<div class="stack">${RPJM_JENIS.map(j => { const R = A.filter(a => a.jenis === j); return R.length || ubah ? `<div class="sec-h"><h2>${esc(j)}</h2>${ubah ? `<button class="btn sm" data-act="rpjArah" data-j="${esc(j)}">${ic('plus')}Tambah</button>` : ''}</div>
+      <div class="list">${R.map(a => `<div class="card rpj-a"><span class="pill">${esc(j)}${a.no ? ' ' + esc(a.no) : ''}</span><div class="main">${esc(a.uraian)}</div>${ubah ? `<span class="btns"><button class="btn sm" data-act="rpjArah" data-id="${esc(a.id)}">${ic('edit')}</button><button class="btn sm danger" data-act="rpjArahDel" data-id="${esc(a.id)}">${ic('trash')}</button></span>` : ''}</div>`).join('') || '<div class="meta">Belum diisi.</div>'}</div>` : ''; }).join('') || '<div class="empty">Belum ada visi & misi.</div>'}</div>`;
+  };
+  (st.tab === 'arah' ? drawArah : drawMat)();
+
+  const ganti = id => { p.id = id; refresh(); };
+  const errBox = (m, x) => { const e = $('.err', m.el); e.textContent = x.message; e.hidden = false; };
+  S.vh.rpjV = t => ganti(t.dataset.id);
+  S.vh.rpjTab = t => { st.tab = t.dataset.v; refresh(); };
+  S.vh.rpjB = t => { st.b = t.dataset.v; drawMat(); };
+  S.vh.rpjK = t => rpjmDetail(per, K.find(k => k.id === t.dataset.id), { ubah, nb, ns, TH, nom });
+  S.vh.rpjKeg = () => rpjmKegForm(per, null, {}, nom, TH);
+  S.vh.rpjKegSub = t => rpjmKegForm(per, null, { bidang_kode: t.dataset.b, sub_bidang_kode: t.dataset.s }, nom, TH);
+  S.vh.rpjTpl = async t => { t.disabled = true; try { const r = await rpjmCall('templateBaru', { periode_id: per.id }); toast(r.n + ' baris bidang/sub-bidang siap diisi.'); refresh(); } catch (x) { toast(x.message, 1); t.disabled = false; } };
+  S.vh.rpjCocok = async t => { t.disabled = true; try { const r = await rpjmCall('cocokkan', { periode_id: per.id }); toast('Tertaut otomatis: ' + r.rkp + ' usulan RKP dan ' + r.apbdes + ' baris APBDes.'); refresh(); } catch (x) { toast(x.message, 1); t.disabled = false; } };
+  S.vh.rpjXls = () => rpjmXls(per, K, nb, ns, TH);
+  S.vh.rpjRiwayat = () => {
+    modal('Riwayat Versi RPJM Desa', `<div class="list">${P.slice().reverse().map(v => `<button class="card rpj-v" data-x data-act="rpjV" data-id="${esc(v.id)}"><span class="main"><b>${esc(v.nama)}</b><small class="meta">${v.tahun_awal}–${v.tahun_akhir} · ${esc(v.jenis)}${v.versi ? ' ke-' + v.versi : ''} · ${v.n_kegiatan} kegiatan · ${rp(v.total)}${v.no_perdes ? ' · Perdes ' + esc(v.no_perdes) : ''}${v.alasan ? '<br>Alasan: ' + esc(v.alasan) : ''}</small></span><span class="pill ${RPJM_ST[v.status]}">${esc(v.status)}</span></button>`).join('')}</div><div class="meta" style="margin-top:8px">Setiap perubahan disimpan sebagai versi baru. Versi lama tidak pernah dihapus.</div>`);
+  };
+  S.vh.rpjSalin = () => {
+    const m = modal('Buat Perubahan RPJM Desa', `<form class="stack" id="rsF"><div class="meta">Sistem menyalin seluruh visi, misi, kegiatan dan prakiraan biaya dari <b>${esc(per.nama)}</b> menjadi <b>Draft Perubahan</b>. Versi sekarang tetap tersimpan sebagai riwayat.</div>
+      <div class="form"><div class="f"><label>Tahun awal</label><input value="${per.tahun_awal}" disabled></div><div class="f"><label for="rsA">Tahun akhir periode</label><input id="rsA" type="number" min="${per.tahun_awal}" max="${+per.tahun_awal + 7}" value="${per.tahun_akhir}"><span class="hint">Mis. 2025 → 2027 karena perpanjangan masa jabatan.</span></div>
+      <div class="f wide"><label for="rsN">Nama dokumen</label><input id="rsN" value="RPJM Desa ${per.tahun_awal}-${per.tahun_akhir} (Perubahan ${Math.max.apply(null, versi.map(v => v.versi)) + 1})"></div>
+      <div class="f wide"><label for="rsR">Alasan perubahan <i>*</i></label><textarea id="rsR" rows="3" required placeholder="Contoh: penyesuaian masa jabatan Kepala Desa (UU 3/2024), perubahan kebijakan kabupaten, bencana, dll."></textarea></div></div>
+      <div class="err" hidden></div><div class="btns"><button class="btn pri" id="rsOk">${ic('check')}Buat Draft Perubahan</button></div></form>`);
+    $('#rsA', m.el).oninput = ev => { $('#rsN', m.el).value = `RPJM Desa ${per.tahun_awal}-${ev.target.value} (Perubahan ${Math.max.apply(null, versi.map(v => v.versi)) + 1})`; };
+    $('#rsF', m.el).onsubmit = async ev => {
+      ev.preventDefault(); const b = $('#rsOk', m.el); b.disabled = true;
+      try { const r = await rpjmCall('salin', { periode_id: per.id, data: { tahun_akhir: $('#rsA', m.el).value, nama: $('#rsN', m.el).value.trim(), alasan: $('#rsR', m.el).value.trim() } }); m.close(); toast('Draft perubahan dibuat. Silakan ubah isinya.'); ganti(r.id); }
+      catch (x) { errBox(m, x); b.disabled = false; }
+    };
+  };
+  S.vh.rpjInfo = () => {
+    const d0 = per.status === 'Draft';
+    const m = modal('Info & Perdes RPJM Desa', `<form class="stack" id="riF"><div class="form">
+      <div class="f wide"><label for="riN">Nama dokumen</label><input id="riN" value="${esc(per.nama)}" ${d0 ? '' : 'disabled'}></div>
+      <div class="f"><label for="riP">Nomor Perdes RPJM Desa</label><input id="riP" value="${esc(per.no_perdes || '')}"></div>
+      <div class="f"><label for="riT">Tanggal ditetapkan</label><input id="riT" type="date" value="${esc(String(per.tgl_perdes || '').slice(0, 10))}"></div>
+      ${d0 ? `<div class="f wide"><label for="riA">Alasan perubahan / dasar penyusunan</label><textarea id="riA" rows="2">${esc(per.alasan || '')}</textarea></div>` : ''}
+      <div class="f wide"><label for="riC">Catatan</label><textarea id="riC" rows="2">${esc(per.catatan || '')}</textarea></div></div>
+      <div class="err" hidden></div><div class="btns"><button class="btn pri" id="riOk">${ic('check')}Simpan</button></div></form>`);
+    $('#riF', m.el).onsubmit = async ev => {
+      ev.preventDefault(); const b = $('#riOk', m.el); b.disabled = true;
+      const v = { no_perdes: $('#riP', m.el).value.trim(), tgl_perdes: $('#riT', m.el).value, catatan: $('#riC', m.el).value.trim() };
+      if (d0) Object.assign(v, { nama: $('#riN', m.el).value.trim(), alasan: $('#riA', m.el).value.trim() });
+      try { await rpjmCall('simpanPeriode', { periode_id: per.id, data: v }); m.close(); toast('Info RPJM disimpan.'); refresh(); } catch (x) { errBox(m, x); b.disabled = false; }
+    };
+  };
+  S.vh.rpjTetap = () => {
+    const kos = K.filter(rpjmKosong).length, lama = aktif && aktif.id !== per.id ? aktif : null;
+    const m = modal('Tetapkan RPJM Desa', `<form class="stack" id="rtF">
+      <div class="meta">Setelah ditetapkan, <b>${esc(per.nama)}</b> menjadi <b>Aktif</b> dan isinya terkunci.${lama ? ` <b>${esc(lama.nama)}</b> otomatis menjadi <b>Arsip</b> (riwayat).` : ''} RKP Desa akan mengambil kegiatan dari RPJM Aktif.</div>
+      ${lama && baru && cy <= +lama.tahun_akhir ? `<div class="err">${esc(lama.nama)} masih berlaku sampai ${lama.tahun_akhir}. Tetapkan RPJM baru ini hanya setelah disahkan dengan Perdes dan periode lama selesai.</div>` : ''}
+      ${kos ? `<div class="err">Masih ada ${kos} baris template yang jenis kegiatannya belum diisi. Isi atau hapus dulu.</div>` : ''}
+      <div class="form"><div class="f"><label for="rtP">Nomor Perdes RPJM Desa</label><input id="rtP" value="${esc(per.no_perdes || '')}"></div><div class="f"><label for="rtT">Tanggal ditetapkan</label><input id="rtT" type="date" value="${esc(String(per.tgl_perdes || '').slice(0, 10))}"></div></div>
+      <div class="err" hidden></div><div class="btns"><button class="btn pri" id="rtOk" ${kos ? 'disabled' : ''}>${ic('check')}Tetapkan sebagai RPJM Aktif</button></div></form>`);
+    $('#rtF', m.el).onsubmit = async ev => {
+      ev.preventDefault(); const b = $('#rtOk', m.el); b.disabled = true;
+      try { await rpjmCall('tetapkan', { periode_id: per.id, data: { no_perdes: $('#rtP', m.el).value.trim(), tgl_perdes: $('#rtT', m.el).value } }); m.close(); toast('RPJM Desa ditetapkan sebagai Aktif.'); refresh(); }
+      catch (x) { $$('.err', m.el).pop().textContent = x.message; $$('.err', m.el).pop().hidden = false; b.disabled = false; }
+    };
+  };
+  S.vh.rpjHapusP = () => {
+    const m = modal('Hapus Draft RPJM', `<div class="stack"><div>Hapus <b>${esc(per.nama)}</b> beserta ${K.length} kegiatannya? Versi Aktif/Arsip tidak terpengaruh.</div><div class="err" hidden></div><div class="btns"><button class="btn danger" id="rhOk">${ic('trash')}Hapus Draft</button><button class="btn" data-x>Batal</button></div></div>`);
+    $('#rhOk', m.el).onclick = async ev => { ev.target.disabled = true; try { await rpjmCall('hapusPeriode', { periode_id: per.id }); m.close(); toast('Draft dihapus.'); ganti(null); } catch (x) { errBox(m, x); ev.target.disabled = false; } };
+  };
+  S.vh.rpjArah = t => {
+    const a = A.find(x => x.id === t.dataset.id) || { jenis: t.dataset.j || 'Misi' };
+    const m = modal((a.id ? 'Ubah ' : 'Tambah ') + a.jenis, `<form class="stack" id="raF"><div class="form">
+      <div class="f"><label for="raJ">Jenis</label><select id="raJ">${RPJM_JENIS.map(j => `<option ${j === a.jenis ? 'selected' : ''}>${j}</option>`).join('')}</select></div>
+      <div class="f"><label for="raN">Nomor</label><input id="raN" value="${esc(a.no || '')}" placeholder="01"></div>
+      ${a.id ? `<div class="f"><label for="raU">Urutan</label><input id="raU" type="number" value="${a.urut}"></div>` : ''}
+      <div class="f wide"><label for="raT">Uraian <i>*</i></label><textarea id="raT" rows="4" required>${esc(a.uraian || '')}</textarea></div></div>
+      <div class="err" hidden></div><div class="btns"><button class="btn pri" id="raOk">${ic('check')}Simpan</button></div></form>`);
+    $('#raF', m.el).onsubmit = async ev => {
+      ev.preventDefault(); const b = $('#raOk', m.el); b.disabled = true;
+      try { await rpjmCall('simpanArah', { periode_id: per.id, data: { id: a.id || '', jenis: $('#raJ', m.el).value, no: $('#raN', m.el).value.trim(), urut: a.id ? $('#raU', m.el).value : '', uraian: $('#raT', m.el).value.trim() } }); m.close(); toast('Tersimpan.'); refresh(); }
+      catch (x) { errBox(m, x); b.disabled = false; }
+    };
+  };
+  S.vh.rpjArahDel = async t => { if (t.dataset.ok !== '1') { t.dataset.ok = '1'; t.innerHTML = ic('trash') + 'Yakin?'; return; } try { await rpjmCall('hapusArah', { periode_id: per.id, data: { id: t.dataset.id } }); toast('Dihapus.'); refresh(); } catch (x) { toast(x.message, 1); } };
+};
+
+/* Halaman awal "Penyusunan RPJM Baru" (belum ada periode baru) */
+function rpjmMulai(p, main, batas, wr, baru) {
+  const a = batas + 1, b = batas + 8;
+  setTop(baru ? 'Penyusunan RPJM Desa Baru' : 'RPJM Desa', 'Periode ' + a + '–' + b);
+  const tahap = ['Pembentukan Tim Penyusun RPJM Desa (SK Kepala Desa)', 'Penyelarasan arah kebijakan pembangunan kabupaten', 'Pengkajian keadaan desa (data desa, sketsa, kalender musim, bagan kelembagaan)', 'Penyusunan rancangan RPJM Desa', 'Musyawarah Desa & Musrenbang Desa', 'Penetapan Peraturan Desa tentang RPJM Desa'];
+  main.innerHTML = `<div class="stack">
+    <div class="card stack"><b>Persiapan RPJM Desa ${a}–${b}</b>
+      <div class="meta">RPJM Desa disusun paling lambat 3 bulan sejak Kepala Desa dilantik dan berlaku 8 tahun (UU 3/2024). Tahapan menurut Permendagri 114/2014:</div>
+      <ol class="rpj-ol">${tahap.map(t => `<li>${esc(t)}</li>`).join('')}</ol></div>
+    ${wr ? `<form class="card stack" id="rmF"><b>Mulai Draft RPJM Desa Baru</b><div class="form">
+      <div class="f"><label for="rmA">Tahun awal</label><input id="rmA" type="number" min="2020" value="${a}"></div>
+      <div class="f"><label for="rmB">Tahun akhir</label><input id="rmB" type="number" min="2020" value="${b}"><span class="hint">Maksimal 8 tahun.</span></div>
+      <div class="f wide"><label for="rmN">Nama dokumen</label><input id="rmN" value="RPJM Desa ${a}-${b}"></div>
+      <label class="switch" style="grid-column:1/-1"><input type="checkbox" id="rmT" checked> Siapkan template kosong: semua bidang & sub-bidang dari nomenklatur terbaru, tinggal mengisi jenis kegiatan & prakiraan biaya</label></div>
+      <div class="err" hidden></div><div class="btns"><button class="btn pri" id="rmOk">${ic('plus')}Mulai Penyusunan</button></div></form>` : '<div class="empty">Belum ada RPJM Desa periode berikutnya.</div>'}</div>`;
+  const f = $('#rmF'); if (!f) return;
+  const nm = () => { $('#rmN').value = 'RPJM Desa ' + $('#rmA').value + '-' + $('#rmB').value; };
+  $('#rmA').oninput = () => { $('#rmB').value = +$('#rmA').value + 7; nm(); }; $('#rmB').oninput = nm;
+  f.onsubmit = async ev => {
+    ev.preventDefault(); const bt = $('#rmOk'); bt.disabled = true;
+    try {
+      const r = await rpjmCall('simpanPeriode', { data: { tahun_awal: $('#rmA').value, tahun_akhir: $('#rmB').value, nama: $('#rmN').value.trim(), alasan: 'Penyusunan RPJM Desa periode baru' } });
+      if ($('#rmT').checked) { const t = await rpjmCall('templateBaru', { periode_id: r.id }); toast('Draft dibuat dengan ' + t.n + ' baris template.'); } else toast('Draft RPJM baru dibuat.');
+      p.id = r.id; refresh();
+    } catch (x) { const e = $('.err', f); e.textContent = x.message; e.hidden = false; bt.disabled = false; }
+  };
+}
+
+/* Rincian satu kegiatan: rencana RPJM vs RKP vs APBDes per tahun */
+function rpjmDetail(per, k, o) {
+  if (!k) return;
+  const kosong = rpjmKosong(k);
+  const m = modal(kosong ? 'Kegiatan (belum diisi)' : k.nama, `<div class="stack">
+    <div class="meta">${esc((+k.bidang_kode || k.bidang_kode) + '. ' + (o.nb[k.bidang_kode] || k.bidang || ''))} › ${esc(o.ns[k.sub_bidang_kode] || k.sub_bidang || '-')}${k.kode_kegiatan ? ' · <span class="mono">' + esc(k.kode_kegiatan) + '</span>' : ''}</div>
+    <dl class="rpj-dl">${[['Lokasi', k.lokasi], ['Prakiraan volume', [k.volume, k.satuan].filter(Boolean).join(' ')], ['Sasaran / manfaat', k.sasaran], ['Waktu pelaksanaan', k.waktu], ['Pola pelaksanaan', k.pola], ['Keterangan', k.ket], per.induk_id ? ['Status perubahan', k.perubahan] : null].filter(x => x && x[1]).map(x => `<dt>${x[0]}</dt><dd>${esc(x[1])}</dd>`).join('') || '<dd class="muted">Belum ada rincian.</dd>'}</dl>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tahun</th><th class="r">Rencana RPJM</th><th>Sumber</th><th class="r">Usulan RKP</th><th class="r">APBDes</th></tr></thead><tbody>${o.TH.map((y, i) => { const b = (k.biaya || {})[y], t = (k.tautan || {})[y] || {}; return `<tr><td>${y} <small class="muted">(ke-${i + 1})</small></td><td class="r">${b ? `<span class="${b.estimasi ? 'est' : ''}">${rp(b.jumlah)}</span>` : '–'}</td><td>${esc((b && b.sumber) || '')}</td><td class="r">${t.rkp ? rp(t.rkp_total) + ` <small class="muted">(${t.rkp})</small>` : '–'}</td><td class="r">${t.apbdes ? rp(t.apbdes_total) + ` <small class="muted">(${t.apbdes})</small>` : '–'}</td></tr>`; }).join('')}
+      <tr><td><b>Jumlah</b></td><td class="r"><b>${rp(rpjmTot(k))}</b></td><td></td><td></td><td></td></tr></tbody></table></div>
+    <div class="meta">Kolom RKP & APBDes terisi setelah tombol "Cocokkan RKP & APBDes" (pencocokan kode kegiatan / nama, tahun ≥ 2020).</div>
+    ${o.ubah ? `<div class="btns"><button class="btn pri" id="rdE">${ic('edit')}Ubah</button><button class="btn danger" id="rdH">${ic('trash')}Hapus</button></div>` : ''}</div>`, { big: 1 });
+  if (!o.ubah) return;
+  $('#rdE', m.el).onclick = () => { m.close(); rpjmKegForm(per, k, {}, o.nom, o.TH); };
+  $('#rdH', m.el).onclick = async ev => {
+    if (ev.target.dataset.ok !== '1') { ev.target.dataset.ok = '1'; ev.target.innerHTML = ic('trash') + 'Yakin hapus? Tekan lagi'; return; }
+    try { await rpjmCall('hapusKegiatan', { periode_id: per.id, kegiatan: { id: k.id } }); m.close(); toast('Kegiatan dihapus.'); refresh(); } catch (x) { toast(x.message, 1); }
+  };
+}
+
+/* Form kegiatan: pilih bidang → sub bidang → jenis kegiatan (nomenklatur), biaya per tahun */
+async function rpjmKegForm(per, k, pre, nom, TH) {
+  k = k || {}; const v = Object.assign({}, pre, k);
+  const kosong = rpjmKosong(k);
+  const subOpt = bk => ((nom.find(b => b.kode_bidang === bk) || {}).sub || []).slice().sort((a, b) => String(a.kode_sub).localeCompare(String(b.kode_sub)));
+  const m = modal(k.id ? 'Ubah Kegiatan RPJM' : 'Tambah Kegiatan RPJM', `<form class="stack" id="rkF"><div class="form">
+    <div class="f"><label for="rkB">Bidang <i>*</i></label><select id="rkB" required><option value="">— pilih —</option>${nom.map(b => `<option value="${esc(b.kode_bidang)}" ${b.kode_bidang === v.bidang_kode ? 'selected' : ''}>${esc((+b.kode_bidang || b.kode_bidang) + '. ' + b.nama_bidang)}</option>`).join('')}</select></div>
+    <div class="f"><label for="rkS">Sub bidang</label><select id="rkS"></select></div>
+    <div class="f wide"><label for="rkN">Jenis kegiatan <i>*</i></label><input id="rkN" list="rkDl" required value="${esc(kosong ? '' : v.nama || '')}" placeholder="Ketik atau pilih dari daftar kegiatan sub bidang"><datalist id="rkDl"></datalist><span class="hint" id="rkKode"></span></div>
+    <div class="f"><label for="rkL">Lokasi</label><input id="rkL" value="${esc(v.lokasi || 'Desa Pandanwangi')}" placeholder="RT/RW/Dusun"></div>
+    <div class="f"><label for="rkV">Prakiraan volume</label><input id="rkV" value="${esc(v.volume || '')}"></div>
+    <div class="f"><label for="rkSt">Satuan</label><input id="rkSt" value="${esc(v.satuan || '')}"></div>
+    <div class="f"><label for="rkP">Pola pelaksanaan</label><select id="rkP"><option value=""></option>${RPJM_POLA.map(x => `<option ${x === v.pola ? 'selected' : ''}>${x}</option>`).join('')}</select></div>
+    <div class="f wide"><label for="rkSs">Sasaran / manfaat</label><textarea id="rkSs" rows="2">${esc(v.sasaran || '')}</textarea></div>
+    <div class="f wide"><label for="rkK">Keterangan</label><input id="rkK" value="${esc(v.ket || '')}"></div></div>
+    <div class="lbl">Prakiraan biaya per tahun (Rp) & sumber dana</div>
+    <div class="rpj-by">${TH.map((y, i) => { const b = (v.biaya || {})[y] || {}; return `<div class="f"><label>Tahun ke-${i + 1} · ${y}</label><input data-money data-y="${y}" inputmode="numeric" value="${b.jumlah ? mFmt(b.jumlah) : ''}" placeholder="0" style="text-align:right"><input class="rkSd" data-y="${y}" list="rkSdL" value="${esc(b.sumber || '')}" placeholder="Sumber (DDS, ADD…)"></div>`; }).join('')}<datalist id="rkSdL">${OPT.sumberDana.map(s => `<option>${s}</option>`).join('')}</datalist></div>
+    <div class="btns"><input class="inp" id="rkTi" inputmode="numeric" placeholder="Total untuk dibagi rata" style="max-width:190px;text-align:right"><button type="button" class="btn sm" id="rkRata">Bagi rata</button><button type="button" class="btn sm" id="rkSama">Salin tahun ke-1 ke semua</button><span class="meta" id="rkTot"></span></div>
+    <div class="err" hidden></div><div class="btns"><button class="btn pri" id="rkOk">${ic('check')}Simpan</button></div></form>`, { big: 1 });
+  const $m = s => $(s, m.el), ins = () => $$('input[data-money]', m.el);
+  let kode = v.kode_kegiatan || '', ref = v.ref_id || '', refs = [];
+  const tot = () => { $m('#rkTot').textContent = 'Jumlah: ' + rp(ins().reduce((a, i) => a + Number(mIn(i) || 0), 0)); };
+  const showKode = () => { $m('#rkKode').innerHTML = kode ? 'Kode kegiatan: <span class="mono">' + esc(kode) + '</span>' : 'Kode kegiatan otomatis terisi bila memilih dari daftar.'; };
+  const fillSub = () => { const bk = $m('#rkB').value; $m('#rkS').innerHTML = '<option value="">— pilih —</option>' + subOpt(bk).map(s => `<option value="${esc(s.kode_sub)}" ${s.kode_sub === v.sub_bidang_kode ? 'selected' : ''}>${esc(s.kode_sub + ' ' + s.sub_bidang)}</option>`).join(''); fillKeg(); };
+  const fillKeg = () => { const sk = $m('#rkS').value, bk = $m('#rkB').value; $m('#rkDl').innerHTML = refs.filter(r => sk ? r.kode_sub === sk : r.kode_bidang === bk).map(r => `<option value="${esc(r.kegiatan)}">${esc(r.kode_kegiatan)}</option>`).join(''); };
+  $m('#rkB').onchange = () => { v.sub_bidang_kode = ''; fillSub(); };
+  $m('#rkS').onchange = fillKeg;
+  $m('#rkN').oninput = () => {
+    const n = $m('#rkN').value.trim().toLowerCase(), r = refs.find(x => String(x.kegiatan || '').trim().toLowerCase() === n);
+    if (r) { kode = r.kode_kegiatan; ref = r.id; if (!$m('#rkSt').value && r.satuan) $m('#rkSt').value = r.satuan; if (!$m('#rkS').value && r.kode_sub) { v.sub_bidang_kode = r.kode_sub; fillSub(); } }
+    else if (ref) { kode = ''; ref = ''; }
+    showKode();
+  };
+  m.el.addEventListener('input', ev => { if (ev.target.matches('[data-money]')) { liveMoney(ev.target); tot(); } else if (ev.target.id === 'rkTi') liveMoney(ev.target); });
+  $m('#rkSama').onclick = () => { const a = ins(), s = $$('.rkSd', m.el); a.slice(1).forEach(i => { i.value = a[0].value; }); s.slice(1).forEach(i => { i.value = s[0].value; }); tot(); };
+  $m('#rkRata').onclick = () => {
+    const n = Number(mIn($m('#rkTi')) || 0); if (!n) { $m('#rkTi').focus(); return; }
+    const a = ins(), isi = a.filter(i => Number(mIn(i) || 0) > 0), L = isi.length ? isi : a;
+    L.forEach(i => { i.value = mFmt(Math.round(n / L.length)); }); tot();
+  };
+  fillSub(); showKode(); tot();
+  rpjmRef().then(r => { refs = r; fillKeg(); });
+  $m('#rkF').onsubmit = async ev => {
+    ev.preventDefault(); const b = $m('#rkOk'); b.disabled = true;
+    const bk = $m('#rkB').value, sk = $m('#rkS').value, bd = nom.find(x => x.kode_bidang === bk) || {}, sb = (bd.sub || []).find(x => x.kode_sub === sk) || {};
+    const keg = { id: k.id || '', bidang_kode: bk, bidang: bd.nama_bidang || k.bidang || '', sub_bidang_kode: sk, sub_bidang: sb.sub_bidang || (sk ? '' : k.sub_bidang || ''), kode_kegiatan: kode, ref_id: ref, nama: $m('#rkN').value.trim(), lokasi: $m('#rkL').value.trim(), volume: $m('#rkV').value.trim(), satuan: $m('#rkSt').value.trim(), sasaran: $m('#rkSs').value.trim(), pola: $m('#rkP').value, ket: $m('#rkK').value.trim(), waktu: k.waktu || '' };
+    const biaya = ins().map(i => ({ tahun: i.dataset.y, jumlah: mIn(i) || 0, sumber: ($(`.rkSd[data-y="${i.dataset.y}"]`, m.el) || {}).value || '' }));
+    const th = biaya.filter(x => Number(x.jumlah) > 0).map(x => x.tahun); keg.waktu = th.length ? th.join(', ') : '';
+    try { await rpjmCall('simpanKegiatan', { periode_id: per.id, kegiatan: keg, biaya }); m.close(); toast('Kegiatan RPJM disimpan.'); refresh(); }
+    catch (x) { const e = $m('.err'); e.textContent = x.message; e.hidden = false; b.disabled = false; }
+  };
+}
+
+/* Ekspor matriks ke Excel (format kolom RPJM Desa Permendagri 114/2014) */
+function rpjmXls(per, K, nb, ns, TH) {
+  const B = v => ({ v, b: 1 }), rows = [[B('RENCANA PEMBANGUNAN JANGKA MENENGAH DESA (RPJM DESA)')], [B('DESA PANDANWANGI — ' + per.nama.toUpperCase())], [per.no_perdes ? 'Perdes No. ' + per.no_perdes : 'Status: ' + per.status], ['']];
+  rows.push(['No', 'Bidang', 'Sub Bidang', 'Jenis Kegiatan', 'Kode', 'Lokasi', 'Prakiraan Volume', 'Satuan', 'Sasaran/Manfaat'].concat(TH.map((y, i) => 'Th ke-' + (i + 1) + ' (' + y + ')'), ['Jumlah Biaya (Rp)', 'Sumber Dana', 'Pola Pelaksanaan']).map(B));
+  let no = 0;
+  K.slice().sort((a, b) => String(a.bidang_kode).localeCompare(String(b.bidang_kode)) || String(a.sub_bidang_kode || '').localeCompare(String(b.sub_bidang_kode || '')) || a.urut - b.urut).forEach(k => {
+    if (rpjmKosong(k)) return;
+    rows.push([++no, (+k.bidang_kode || k.bidang_kode) + '. ' + (nb[k.bidang_kode] || k.bidang || ''), ns[k.sub_bidang_kode] || k.sub_bidang || '', k.nama, k.kode_kegiatan || '', k.lokasi || '', k.volume || '', k.satuan || '', k.sasaran || '']
+      .concat(TH.map(y => Number(((k.biaya || {})[y] || {}).jumlah || 0) || ''), [rpjmTot(k), rpjmSd(k), k.pola || '']));
+  });
+  rows.push(['', '', '', B('JUMLAH'), '', '', '', '', ''].concat(TH.map(y => B(K.reduce((s, k) => s + Number(((k.biaya || {})[y] || {}).jumlah || 0), 0))), [B(K.reduce((s, k) => s + rpjmTot(k), 0)), '', '']));
+  saveBlob(XL.write([{ name: 'Matriks RPJM', rows, widths: [5, 30, 30, 40, 12, 18, 12, 10, 30].concat(TH.map(() => 14), [16, 14, 18]), head: false }]), namaFile(per.nama) + '.xlsx');
+}
+
 VIEWS.refs = async (p, main) => {
   setTop('Referensi Perencanaan');
   main.innerHTML = `<div class="list">${['ref_bidang', 'ref_sdgs', 'ref_hukum'].map(e => `<button class="row" data-act="go" data-go='${esc(JSON.stringify(['list', { e }]))}'><span class="av">${ic(UI[e].ic)}</span><span class="main"><span class="t">${esc(UI[e].t)}</span><span class="s">${e === 'ref_bidang' ? 'Kode bidang, sub bidang, kegiatan dan output' : e === 'ref_sdgs' ? '18 tujuan SDGs Desa' : 'Peraturan yang dicantumkan pada bagian "Mengingat"'}</span></span></button>`).join('')}</div>`;
