@@ -154,7 +154,7 @@ button.stat:hover{border-color:var(--pri)}
 .fslot{display:flex;flex-direction:column;gap:4px}.fslot .btn{justify-content:center}
 .fpic{aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:var(--surface2);border:1px dashed var(--line);display:grid}
 .fpic img{width:100%;height:100%;object-fit:cover}.fadd{display:grid;place-items:center;align-content:center;gap:4px;color:var(--muted);cursor:pointer;font-size:12.5px;font-weight:600}
-.fslot .fket{font-size:13px;padding:6px 8px}.fpic{position:relative}.fpic[data-no]::before{content:attr(data-no);position:absolute;top:5px;left:5px;z-index:1;min-width:20px;height:20px;border-radius:10px;background:rgba(0,0,0,.65);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;padding:0 6px}.fpic .fcr{position:absolute;right:5px;top:5px;z-index:1;border-radius:10px;background:var(--gold,#c9a227);color:#000;font-size:11px;font-weight:700;padding:1px 6px}.fbar{display:flex;gap:4px}.fbar .btn{flex:1;padding:5px 4px;min-width:0}.fbar .btn .ic{margin:0}
+.fslot .fket{font-size:13px;padding:6px 8px}.fpic{position:relative}.fpic[data-no]::before{content:attr(data-no);position:absolute;top:5px;left:5px;z-index:1;min-width:20px;height:20px;border-radius:10px;background:rgba(0,0,0,.65);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;padding:0 6px}.fpic .fcr{position:absolute;right:5px;top:5px;z-index:1;border-radius:10px;background:var(--gold,#c9a227);color:#000;font-size:11px;font-weight:700;padding:1px 6px}.fbt{display:grid;grid-template-columns:1fr 1fr;gap:4px}.fbt .btn{justify-content:center;padding:6px 4px;min-width:0;font-size:12px;gap:4px;white-space:nowrap}.fbt .btn .ic{width:14px;height:14px;margin:0;flex:none}.fbt .fgn,.fbt .fdel{grid-column:auto}.fbt .fdel{grid-column:1/-1}.fbt label.btn{cursor:pointer}
 .cropf{position:relative;width:100%;max-width:440px;margin:0 auto;overflow:hidden;background:#111;border-radius:8px;touch-action:none;cursor:grab;user-select:none}.cropf img{position:absolute;max-width:none;pointer-events:none}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px;margin-top:6px}
 .pslot{display:flex;flex-direction:column;gap:3px;align-items:stretch;text-align:center}
@@ -2484,11 +2484,11 @@ function rowsBox(box, f) {
 }
 function rowsVal(box) { return $$('tbody tr', box).map(tr => { const o = {}; $$('[data-c]', tr).forEach(i => { o[i.dataset.c] = i.matches('[data-money]') ? mIn(i) : i.value.trim(); }); return o; }).filter(o => Object.values(o).some(Boolean)); }
 /* Beberapa foto + keterangan (disimpan sebagai JSON [{id, ket}]) */
-const fotoBar = () => `<div class="fbar"><button type="button" class="btn sm fup" title="Geser ke depan" aria-label="Geser ke depan">${ic('back')}</button><button type="button" class="btn sm fdn" title="Geser ke belakang" aria-label="Geser ke belakang">${ic('next')}</button><button type="button" class="btn sm fcrop" title="Potong foto">${ic('crop')}Potong</button><button type="button" class="btn sm danger fdel" title="Hapus foto" aria-label="Hapus foto">${ic('trash')}</button></div>`;
+const fotoBar = () => `<div class="fbt"><button type="button" class="btn sm fup" title="Geser ke depan (urutan lebih awal)">${ic('back')}Maju</button><button type="button" class="btn sm fdn" title="Geser ke belakang (urutan lebih akhir)">Mundur${ic('next')}</button><button type="button" class="btn sm fcrop" title="Potong foto agar pas di dokumen">${ic('crop')}Potong</button><label class="btn sm fgn" title="Unggah ulang: ganti dengan foto lain">${ic('cam')}Ganti<input type="file" accept="${IMG_ANY}" class="fgi" hidden></label><button type="button" class="btn sm danger fdel" title="Hapus foto ini">${ic('trash')}Hapus foto</button></div>`;
 function fotoSlot(fo) {
   const cr = fo && fo.z ? ` data-cx="${esc(fo.cx)}" data-cy="${esc(fo.cy)}" data-z="${esc(fo.z)}"` : '';
   return `<div class="fslot"${fo ? ` data-id="${esc(fo.id)}"` : ''}${cr}><div class="fpic">${fo ? `<img src="${esc(thumb(fo.id, 240))}" alt="">` : `<label class="fadd">${ic('plus')}<span>Tambah foto</span><input type="file" accept="${IMG_ANY}" multiple hidden></label>`}</div>
-    <input class="fket" placeholder="Keterangan (opsional)" value="${esc(fo && fo.ket || '')}"${fo ? '' : ' hidden'}>${fo ? fotoBar() : ''}</div>`;
+    ${fo ? fotoBar() : ''}<input class="fket" placeholder="Keterangan (opsional)" value="${esc(fo && fo.ket || '')}"${fo ? '' : ' hidden'}></div>`;
 }
 /* sumber gambar penuh (untuk memotong & dokumen) */
 async function fotoUrl(id) {
@@ -2551,10 +2551,16 @@ function fotoBox(box) {
     slot._file = file;
     $('.fpic', slot).innerHTML = `<img src="${URL.createObjectURL(file)}" alt="">`;
     $('.fket', slot).hidden = false;
-    slot.insertAdjacentHTML('beforeend', fotoBar());
+    if (!$('.fbt', slot)) $('.fpic', slot).insertAdjacentHTML('afterend', fotoBar());
+  };
+  /* ganti foto pada kotak yang sudah ada: urutan & keterangan tetap, potongan direset */
+  const ganti = (slot, file) => {
+    delete slot.dataset.id; delete slot.dataset.cx; delete slot.dataset.cy; delete slot.dataset.z;
+    slot._file = file; $('.fpic', slot).innerHTML = `<img src="${URL.createObjectURL(file)}" alt="">`;
   };
   box.addEventListener('change', ev => {
     const inp = ev.target; if (inp.type !== 'file') return;
+    if (inp.classList.contains('fgi')) { const f1 = inp.files && inp.files[0]; if (f1) { ganti(inp.closest('.fslot'), f1); toast('Foto diganti. Simpan untuk menerapkan.'); } inp.value = ''; fotoRapi(box); return; }
     const files = Array.from(inp.files || []); let slot = inp.closest('.fslot');
     for (const file of files) {
       if (!slot) { if ($$('.fslot', box).length >= mx) { toast('Maksimal ' + mx + ' foto.', 1); break; } box.insertAdjacentHTML('beforeend', fotoSlot(null)); slot = box.lastElementChild; }
