@@ -2857,7 +2857,7 @@ VIEWS.form = async (p, main, alive) => {
       if (e === 'petugas' && !p.id && (virt.kelompok || virt.jabatan)) await call('save', { entity: 'petugas_jabatan', record: Object.assign({ ref: saved.id }, virt) });
       if (/^(aparat|petugas)/.test(e)) S.people = null;
       toast('Tersimpan.');
-      if (e === 'rkp_musyawarah' && saved && saved.id && val.tanggal) { const ag = await syncAgendaMus(saved.id); if (ag) toast('Tersimpan. Masuk juga ke Kegiatan → Agenda.'); }
+      if (e === 'rkp_musyawarah' && saved && saved.id && val.tanggal && val.jam) { const ag = await syncAgendaMus(saved.id); if (ag) toast('Tersimpan. Masuk juga ke Kegiatan → Agenda.'); }
       back();
       if (e === 'register_surat' && !p.id && jenisDikenal(saved.jenis_surat)) setTimeout(() => cetakSurat(saved), 500);
       if (e === 'jenis_surat') S.jenisSurat = null;   /* tunggu kembali ke daftar dulu */
@@ -3811,11 +3811,11 @@ async function extraMusyawarah(mu, el) {
 }
 ACT.addSub = t => go('form', { e: t.dataset.e, preset: JSON.parse(t.dataset.p) });
 ACT.addJab = t => go('form', { e: 'petugas_jabatan', preset: JSON.parse(t.dataset.p) }, true);
-/* Musyawarah RKP -> Agenda (menu Kegiatan): dibuat/diperbarui otomatis saat tanggal pelaksanaan terisi atau surat undangan dibuat */
+/* Musyawarah RKP -> Agenda (menu Kegiatan): dibuat/diperbarui otomatis saat form musyawarah disimpan dengan tanggal & jam pelaksanaan terisi */
 async function syncAgendaMus(muId) {
   try {
     const mu = await call('get', { entity: 'rkp_musyawarah', id: muId });
-    if (!mu || !mu.tanggal) return null;
+    if (!mu || !mu.tanggal || !mu.jam) return null;
     const ket = [mu.no_undangan && 'Nomor undangan: ' + mu.no_undangan, 'Otomatis dari Perencanaan → RKP Desa → Musyawarah & Tim'].filter(Boolean).join('. ');
     const rec = { nama: mu.musyawarah + ' RKP Desa ' + rkpLbl(mu.tahun_rkp), tanggal: mu.tanggal, jam: mu.jam || '', sampai: 'Selesai', tempat: mu.tempat || 'Balai Desa Pandanwangi', keterangan: ket, sumber_mus: mu.id };
     let ada = null;
@@ -3826,7 +3826,7 @@ async function syncAgendaMus(muId) {
     return baru && baru.id;
   } catch (x) { console.warn('Agenda musyawarah gagal disinkronkan', x); return null; }
 }
-ACT.pdoc = async t => { try { if (t.dataset.d === 'und') await syncAgendaMus(t.dataset.id); await dokRkp(t.dataset.d, t.dataset.id); } catch (x) { toast(x.message, 1); } };
+ACT.pdoc = async t => { try { await dokRkp(t.dataset.d, t.dataset.id); } catch (x) { toast(x.message, 1); } };
 /* dokumen utama RKP dari template Word di penyimpanan (cadangan: cetak ringkas bila template belum ada) */
 const DOK_RKP = { und: /^01\._?Undangan/i, ba: /^01\._?BA/i, skp: /^02\._?SK_Tim_Penyusun/i, skv: /^02\._?SK_Tim_Verifikasi/i, foto: /^31\./, rktl: /^03\./, f4: /^04\./, f5: /^05\./ };
 async function dokRkp(kind, muId) {
