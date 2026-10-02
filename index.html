@@ -4219,6 +4219,24 @@ async function buatDokumen(o) {
   return { nama, missing, blob, jenis: xlsx ? '' : o.jenis, xlsx };
 }
 /* pustaka pratinjau Word (dimuat sekali saat dibutuhkan) */
+/* Pratinjau/cetak saja (file Word tidak diubah): pemisah seksi "halaman baru" yang diikuti seksi "berkelanjutan" dengan ukuran kertas & margin sama dibuang, supaya tidak muncul halaman kosong seperti di Word */
+async function rapikanSeksi(blob) {
+  try {
+    const z = await window.JSZip.loadAsync(blob), f = z.file('word/document.xml'); if (!f) return blob;
+    let x = await f.async('string');
+    const re = /<w:sectPr\b[\s\S]*?<\/w:sectPr>/g, ms = [...x.matchAll(re)]; if (ms.length < 2) return blob;
+    const kunci = t => ((t.match(/<w:pgSz[^>]*>/) || [''])[0]) + ((t.match(/<w:pgMar[^>]*>/) || [''])[0]);
+    const buang = [];
+    for (let i = 0; i < ms.length - 1; i++) {
+      const nx = ms[i + 1][0];
+      if (/<w:type w:val="continuous"\s*\/>/.test(nx) && !/<w:type\b/.test(ms[i][0]) && kunci(nx) === kunci(ms[i][0]) && x.lastIndexOf('<w:pPr>', ms[i].index) > x.lastIndexOf('</w:pPr>', ms[i].index)) buang.push(ms[i]);
+    }
+    if (!buang.length) return blob;
+    for (let k = buang.length - 1; k >= 0; k--) x = x.slice(0, buang[k].index) + x.slice(buang[k].index + buang[k][0].length);
+    z.file('word/document.xml', x);
+    return await z.generateAsync({ type: 'blob', mimeType: blob.type || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+  } catch (e) { return blob; }
+}
 let DOCXV = null;
 function muatPratinjau() {
   if (DOCXV) return DOCXV;
@@ -4280,12 +4298,12 @@ function hasilDokumen(m, r, opt) {
   } else {
     muatPratinjau().then(() => {
       const inner = document.createElement('div'); pv.innerHTML = ''; pv.appendChild(inner);
-      return window.docx.renderAsync(r.blob, inner, null, { inWrapper: true, ignoreLastRenderedPageBreak: true, breakPages: true }).then(() => {
+      return rapikanSeksi(r.blob).then(bl => window.docx.renderAsync(bl, inner, null, { inWrapper: true, ignoreLastRenderedPageBreak: true, breakPages: true }).then(() => {
         const w = inner.querySelector('.docx-wrapper'); if (w) { w.style.background = 'transparent'; w.style.padding = '0'; }
         const sec = inner.querySelector('section.docx'); const lebar = sec ? sec.offsetWidth + 16 : 0;
         if (lebar && pv.clientWidth < lebar) inner.style.zoom = (pv.clientWidth - 4) / lebar;
         siap = true;
-      });
+      }));
     }).catch(x => { pv.innerHTML = `<div class="meta" style="padding:10px">Pratinjau tidak dapat ditampilkan (${esc(x.message)}). Dokumen tetap bisa diunduh.</div>`; });
   }
   $('#dlW', m.el).onclick = () => { saveBlob(r.blob, r.nama); st.innerHTML = ic('check') + ' Word diunduh.'; };
