@@ -4237,6 +4237,25 @@ async function rapikanSeksi(blob) {
         return wr[hex];
       };
       let n = 900;
+      /* garis: di dalam tabel dibuang (tidak tampak di Word, dan di pratinjau malah memecah baris "Kepada :"); di paragraf diganti gambar sebaris di paragraf baru (rata tengah, posisi vertikal sama) */
+      { const lm = [...x.matchAll(/<mc:AlternateContent>([\s\S]*?)<\/mc:AlternateContent>/g)];
+        const tw = (() => { const pz = +((x.match(/<w:pgSz[^>]*w:w="(\d+)"/) || [])[1]) || 11906, mg = x.match(/<w:pgMar[^>]*>/), kr = +((mg && mg[0].match(/w:left="(\d+)"/) || [])[1]) || 1418, kn = +((mg && mg[0].match(/w:right="(\d+)"/) || [])[1]) || 1418; return (pz - kr - kn) * 635; })();
+        for (let k = lm.length - 1; k >= 0; k--) {
+          const m = lm[k], ch = (m[1].match(/<mc:Choice[^>]*>([\s\S]*?)<\/mc:Choice>/) || [])[1] || '', ex = ch.match(/<wp:extent cx="(\d+)" cy="(\d+)"/);
+          if (!ex || /<pic:pic\b/.test(ch) || !/<wp:anchor\b/.test(ch) || +ex[2] > 38100) continue;
+          const o = m.index, e = o + m[0].length;
+          if (x.lastIndexOf('<w:tc>', o) > x.lastIndexOf('</w:tc>', o)) { x = x.slice(0, o) + x.slice(e); ubah = true; continue; }
+          const ps = Math.max(x.lastIndexOf('<w:p ', o), x.lastIndexOf('<w:p>', o)), pe = x.indexOf('</w:p>', e) + 6; if (ps < 0 || pe < 6) continue;
+          let P = x.slice(ps, o) + x.slice(e, pe);
+          const pv = +(((ch.match(/<wp:positionV[^>]*>\s*<wp:posOffset>(-?\d+)</) || [])[1])) || 0, sz = +((P.match(/<w:sz w:val="(\d+)"/) || [])[1]) || 24, aft = +((P.match(/<w:spacing[^>]*w:after="(\d+)"/) || [])[1]) || 0;
+          const ln = ch.match(/<a:ln\b([^>]*)>([\s\S]*?)<\/a:ln>|<a:ln\b([^>]*)\/>/) || [], tebal = Math.max(+(((ln[1] || ln[3] || '').match(/\bw="(\d+)"/) || [])[1]) || 9525, +ex[2]), hx = ((ln[2] || '').match(/<a:srgbClr val="(\w{6})"/) || [])[1] || acc;
+          const th = sz / 2 * 1.2, pvp = pv / 12700, bef = Math.max(0, pvp - th), tp = tebal / 12700, sisa = Math.max(0, Math.round((aft / 20 - bef - tp) * 20)), cx = Math.min(+ex[1], tw);
+          P = P.replace(/<w:spacing\b([^>]*?)\/>/, (q, at) => '<w:spacing' + at.replace(/\s*w:after="\d+"/, '') + ' w:after="0"/>');
+          if (!/<w:spacing\b/.test(P)) P = P.replace(/<w:pPr>/, '<w:pPr><w:spacing w:after="0"/>');
+          n++;
+          const gb = '<w:p><w:pPr><w:spacing w:before="' + Math.round(bef * 20) + '" w:after="' + sisa + '" w:line="' + Math.max(20, Math.round(tp * 20)) + '" w:lineRule="atLeast"/><w:ind w:left="0" w:right="0"/><w:jc w:val="center"/></w:pPr><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="' + cx + '" cy="' + tebal + '"/><wp:docPr id="' + n + '" name="garis' + n + '"/><wp:cNvGraphicFramePr/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="' + n + '" name="garis' + n + '"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="' + warna(hx) + '"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="' + cx + '" cy="' + tebal + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>';
+          x = x.slice(0, ps) + P + gb + x.slice(pe); ubah = true;
+        } }
       x = x.replace(/<mc:AlternateContent>([\s\S]*?)<\/mc:AlternateContent>/g, (all, isi) => {
         const ch = (isi.match(/<mc:Choice[^>]*>([\s\S]*?)<\/mc:Choice>/) || [])[1] || '', an = ch.match(/<wp:anchor\b[^>]*>/);
         if (!an) return all;
