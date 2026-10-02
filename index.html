@@ -6684,7 +6684,7 @@ VIEWS.rabproyek = async (p, main, alive) => {
   const progres = pb ? Number(pb.progres || 0) : 0, bast = bs[0];
   main.innerHTML = `<div class="stack rab">
     <div class="card stack rpj-h"><div class="rpj-t"><b>${esc(pr.nama)}</b><span class="pill ${RAB_STATUS[pr.status] || ''}">${esc(pr.status || 'Draf')}</span><span class="pill">${esc(tpl.n)}</span>${pr.versi > 1 ? `<span class="pill info">RAB Perubahan ${pr.versi - 1}</span>` : ''}${pr.no_rab ? `<span class="pill">No. ${esc(pr.no_rab)}</span>` : ''}</div>
-      <div class="chips">${['1 Identitas', '2 Ukuran & gambar', '3 RAB', '4 Bundel & pengesahan', '5 Pelaksanaan & BAST'].map((s, i) => `<a class="chip" href="#rab${i + 1}" data-x>${esc(s)}</a>`).join('')}</div>
+      <div class="chips">${['1 Identitas', '2 Ukuran & gambar', '3 RAB', '4 Bundel & pengesahan', '5 Pelaksanaan & BAST'].map((s, i) => `<button type="button" class="chip" onclick="document.getElementById('rab${i + 1}').scrollIntoView({behavior:'smooth',block:'start'})">${esc(s)}</button>`).join('')}</div>
       ${kunci ? `<div class="meta">${ic('lock')} RAB sudah disahkan${pr.tgl_rab ? ' tanggal ' + esc(fDate(pr.tgl_rab)) : ''}; harga & volume terkunci. Untuk mengubah, buat RAB Perubahan.</div>` : ''}</div>
     <div class="card stack" id="rab1"><div class="lbl">1. Identitas & tautan</div><div class="form">
       ${inp('rbNama', pr.nama, 'Nama pekerjaan', 'text', { wide: 1 })}${inp('rbLok', pr.lokasi, 'Lokasi (RT/RW, ruas)', 'text')}${inp('rbDus', pr.dusun, 'Dusun', 'select', { o: [''].concat(OPT.dusun) })}
@@ -6734,6 +6734,7 @@ VIEWS.rabproyek = async (p, main, alive) => {
   gambar();
   let tm = null, kotor = false;
   const simpan = async (extra) => { const o = gambar(); const rec = { id: pr.id, nama: o.nama, lokasi: o.lokasi, dusun: o.dusun, tahun: o.tahun, pola: o.pola, sumber_dana: o.sumber_dana, ketua_tpk: o.ketua_tpk, pka: o.pka, bu_persen: o.bu_persen, keu_kegiatan: o.keu_kegiatan || '', keu_kode: o.keu_kode || '', keu_pagu: o.keu_pagu || '', total: String(H.total) }; if (!kunci) rec.params = JSON.stringify(o._p); await call('save', { entity: 'rab_proyek', record: Object.assign(rec, extra || {}) }); Object.assign(pr, rec, extra || {}); kotor = false; return o; };
+  if (!kunci && w && String(H.total) !== String(pr.total || '')) simpan().catch(() => { });
   $$('input,select', main).forEach(el => { el.addEventListener('input', () => { gambar(); kotor = true; clearTimeout(tm); tm = setTimeout(() => simpan().catch(x => toast(x.message, 1)), 1200); }); el.addEventListener('change', () => { gambar(); clearTimeout(tm); simpan().catch(x => toast(x.message, 1)); }); });
   S.vh.rbBundel = async () => { try { const o = await simpan(); printDocs('Bundel RAB ' + o.nama, rabBundel(Object.assign({}, pr, o), H, M)); } catch (x) { toast(x.message, 1); } };
   S.vh.rbXls = async () => { try { const o = await simpan(); rabXls(Object.assign({}, pr, o), H); } catch (x) { toast(x.message, 1); } };
