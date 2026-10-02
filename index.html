@@ -154,7 +154,7 @@ button.stat:hover{border-color:var(--pri)}
 .fslot{display:flex;flex-direction:column;gap:4px}.fslot .btn{justify-content:center}
 .fpic{aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:var(--surface2);border:1px dashed var(--line);display:grid}
 .fpic img{width:100%;height:100%;object-fit:cover}.fadd{display:grid;place-items:center;align-content:center;gap:4px;color:var(--muted);cursor:pointer;font-size:12.5px;font-weight:600}
-.fslot .fket{font-size:13px;padding:6px 8px}.fpic{position:relative}.fpic[data-no]::before{content:attr(data-no);position:absolute;top:5px;left:5px;z-index:1;min-width:20px;height:20px;border-radius:10px;background:rgba(0,0,0,.65);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;padding:0 6px}.fpic .fcr{position:absolute;right:5px;top:5px;z-index:1;border-radius:10px;background:var(--gold,#c9a227);color:#000;font-size:11px;font-weight:700;padding:1px 6px}.fbt{display:grid;grid-template-columns:1fr 1fr;gap:4px}.fbt .btn{justify-content:center;padding:6px 4px;min-width:0;font-size:12px;gap:4px;white-space:nowrap}.fbt .btn .ic{width:14px;height:14px;margin:0;flex:none}.fbt .fgn,.fbt .fdel{grid-column:auto}.fbt .fdel{grid-column:1/-1}.fbt label.btn{cursor:pointer}
+.fslot .fket{font-size:13px;padding:6px 8px}.fpic{position:relative}.fpic[data-no]::before{content:attr(data-no);position:absolute;top:5px;left:5px;z-index:1;min-width:20px;height:20px;border-radius:10px;background:rgba(0,0,0,.65);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;padding:0 6px}.fpic .fcr{position:absolute;right:5px;top:5px;z-index:1;border-radius:10px;background:var(--gold,#c9a227);color:#000;font-size:11px;font-weight:700;padding:1px 6px}.pgp .fbt{grid-template-columns:1fr}.pimg{position:relative}.pimg .fcr{position:absolute;right:3px;top:3px;border-radius:10px;background:var(--gold,#c9a227);color:#000;font-size:10px;font-weight:700;padding:1px 5px}.fbt{display:grid;grid-template-columns:1fr 1fr;gap:4px}.fbt .btn{justify-content:center;padding:6px 4px;min-width:0;font-size:12px;gap:4px;white-space:nowrap}.fbt .btn .ic{width:14px;height:14px;margin:0;flex:none}.fbt .fgn,.fbt .fdel{grid-column:auto}.fbt .fdel{grid-column:1/-1}.fbt label.btn{cursor:pointer}
 .cropf{position:relative;width:100%;max-width:440px;margin:0 auto;overflow:hidden;background:#111;border-radius:8px;touch-action:none;cursor:grab;user-select:none}.cropf img{position:absolute;max-width:none;pointer-events:none}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px;margin-top:6px}
 .pslot{display:flex;flex-direction:column;gap:3px;align-items:stretch;text-align:center}
@@ -936,13 +936,13 @@ const UI = {
     row: r => ({ t: r.tujuan, s: r.parameter, av: `<b>${esc(r.no)}</b>` })
   },
   pembangunan: {
-    t: 'Kegiatan Pembangunan', ic: 'hammer', perm: 'pembangunan', folder: 'Pembangunan',
+    t: 'Progres Pembangunan', ic: 'hammer', perm: 'pembangunan', folder: 'Pembangunan',
     fields: [F('nama', 'Nama Pekerjaan', 'text', { req: 1, wide: 1, hint: 'Contoh: Penerangan Jalan Umum (PJU)' }), F('kode', 'Kode Kegiatan', 'text', { mono: 1 }), F('sumber_dana', 'Sumber Dana', 'select', { opt: OPT.sumber }),
       F('tahun_anggaran', 'Tahun Anggaran', 'number', { req: 1, def: () => new Date().getFullYear() }), F('pagu', 'Pagu Anggaran', 'money'), F('pelaksana', 'Pelaksana', 'text', { list: ['TPK Desa Pandanwangi', 'Swakelola', 'Penyedia'] }),
       F('tahapan', 'Tahapan'), F('tgl_pelaksanaan', 'Tanggal Mulai', 'date'), F('tgl_selesai', 'Tanggal Selesai', 'date'), F('lokasi', 'Lokasi Umum', 'text', { wide: 1, hint: 'Lokasi tiap titik diisi di bagian Titik Lokasi' }), F('ket', 'Keterangan', 'textarea', { wide: 1 })],
     year: 'tahun_anggaran', sort: 'tahun_anggaran',
     row: r => ({ t: r.nama, s: [r.sumber_dana, r.tahun_anggaran && 'TA ' + r.tahun_anggaran, r.lokasi].filter(Boolean).join(' · '), s2: (r.jml_titik ? r.jml_titik + ' titik' : 'Belum ada titik') + (r.pagu ? ' · ' + fMoney(r.pagu) : ''), img: r.foto_id, av: ic('hammer'), r: r.progres != null && r.progres !== '' ? r.progres + '%' : '' }),
-    print: { title: 'DAFTAR KEGIATAN PEMBANGUNAN', land: 1, cols: [['Nama Pekerjaan', 'nama'], ['Lokasi', 'lokasi'], ['Sumber Dana', 'sumber_dana'], ['Tahun', 'tahun_anggaran'], ['Pagu', r => fMoney(r.pagu)], ['Pelaksana', 'pelaksana'], ['Jml Titik', 'jml_titik'], ['Progres', r => r.progres ? r.progres + '%' : ''], ['Ket', 'ket']] }
+    print: { title: 'DAFTAR PROGRES PEMBANGUNAN', land: 1, cols: [['Nama Pekerjaan', 'nama'], ['Lokasi', 'lokasi'], ['Sumber Dana', 'sumber_dana'], ['Tahun', 'tahun_anggaran'], ['Pagu', r => fMoney(r.pagu)], ['Pelaksana', 'pelaksana'], ['Jml Titik', 'jml_titik'], ['Progres', r => r.progres ? r.progres + '%' : ''], ['Ket', 'ket']] }
   },
   pembangunan_titik: {
     t: 'Titik Lokasi', ic: 'pin', perm: 'pembangunan', sub: 1, folder: 'Pembangunan', sort: 'nama_titik', asc: 1,
@@ -1121,7 +1121,7 @@ function MODS() {
     { k: 'pemerintahan', l: 'Pemerintahan', ic: 'landmark', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, 'r:penduduk'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga']] },
     { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
     { k: 'kesejahteraan', l: 'Kesejahteraan', ic: 'heart', items: [['Lembaga / Yayasan', 'landmark', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru Ngaji', 'book', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
-    { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['Generator RKP', 'sprout', ['rkpgen', {}], null, 'r:rkp'], ['Usulan Kegiatan', 'clip', ['list', { e: 'rkp_usulan' }], null, 'r:rkp'], ['RAB & Gambar', 'list', ['list', { e: 'rkp_rab' }], null, 'r:rkp'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Kegiatan Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
+    { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['Generator RKP', 'sprout', ['rkpgen', {}], null, 'r:rkp'], ['Usulan Kegiatan', 'clip', ['list', { e: 'rkp_usulan' }], null, 'r:rkp'], ['RAB & Gambar', 'list', ['list', { e: 'rkp_rab' }], null, 'r:rkp'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Progres Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
     { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Rekap Pajak', 'coin', ['keupajak'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek']] },
     { k: 'soon', l: 'Segera Hadir', ic: 'sprout', items: Object.keys(SOON).map(k => [SOON[k].t, SOON[k].ic, ['soon', { k }], null, '*', 1]) }
   ];
@@ -2356,26 +2356,45 @@ async function extraPembangunan(pb, el) {
   const r = await call('list', { entity: 'pembangunan_titik', filters: { ref: pb.id }, limit: 200, sort: 'nama_titik', desc: false });
   const w = canWrite('pembangunan');
   const nextNama = 'Titik ' + String.fromCharCode(65 + r.rows.length);
-  el.innerHTML = `<div class="sec-h"><h2>Titik lokasi (${r.rows.length})</h2>${w ? `<button class="btn sm" data-act="addSub" data-e="pembangunan_titik" data-p='${esc(JSON.stringify({ ref: pb.id, nama_titik: nextNama }))}'>${ic('plus')}Tambah titik</button>` : ''}</div>` +
+  el.innerHTML = `<div class="sec-h"><h2>Titik lokasi (${r.rows.length})</h2><span class="btns"><button class="btn sm" data-act="cetakPb" data-id="${esc(pb.id)}">${ic('print')}Cetak Progres (F4)</button>${w ? `<button class="btn sm" data-act="addSub" data-e="pembangunan_titik" data-p='${esc(JSON.stringify({ ref: pb.id, nama_titik: nextNama }))}'>${ic('plus')}Tambah titik</button>` : ''}</span></div>` +
     (r.rows.length ? `<div class="stack">${r.rows.map(t => titikHtml(t, w)).join('')}</div>` : `<div class="card meta">Belum ada titik. ${w ? 'Tambahkan titik (mis. Titik A, B, C), lalu unggah foto progres 0%–100% di tiap titik.' : ''}</div>`);
 }
+/* tata letak foto progres di lembar F4 (sama dengan DOCX.sisipProgres): jumlah foto per titik menentukan tinggi bingkai */
+const progRasio = (i, n) => { const H = n === 1 ? 14 : n === 2 ? 10 : n <= 4 ? 8.5 : 6, W = (n % 2 === 1 && i === n - 1) ? 18.3 : 9.0; return W / H; };
+const cropPg = (t, pp) => { try { const c = JSON.parse(t['crop_' + pp] || 'null'); return c && c.z ? c : null; } catch (x) { return null; } };
 function titikHtml(t, w) {
   const p = pctOf(t);
   return `<div class="card titik" data-id="${esc(t.id)}" data-ref="${esc(t.ref)}"><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><b>${esc(t.nama_titik)}</b><span class="muted">${esc(t.lokasi || '')}</span>${p >= 0 ? `<span class="pill ${p === 100 ? 'ok' : 'info'}">${p}%</span>` : ''}<span style="margin-left:auto" class="btns">${parseLL(t.koordinat) ? `<a class="btn sm" href="${esc('https:' + '/' + '/www.google.com/maps/search/?api=1&query=' + parseLL(t.koordinat).join(','))}" target="_blank" rel="noopener">${ic('map')}Peta</a>` : ''}${w ? `<button class="btn sm" data-act="xedit" data-e="pembangunan_titik" data-id="${esc(t.id)}">${ic('edit')}Ubah</button><button class="btn sm danger" data-act="delTitik" data-id="${esc(t.id)}">${ic('trash')}</button>` : ''}</span></div>
-    <div class="pgrid">${OPT.progres.map(pp => { const id = t['foto_' + pp]; return `<div class="pslot ${id ? 'has' : ''}">${id ? `<button type="button" class="pimg" data-act="file" data-id="${esc(id)}" data-name="${esc(t.nama_titik + ' ' + pp + '%')}"><img src="${esc(thumb(id, 240))}" alt="Foto ${pp}%" loading="lazy"></button>` : `<span class="pimg empty">${ic('cam')}</span>`}<span class="plbl">${pp}%</span>${w ? `<label class="btn sm pup">${id ? 'Ganti' : 'Unggah'}<input type="file" accept="${IMG_ANY}" hidden data-pct="${pp}"></label>` : ''}</div>`; }).join('')}</div></div>`;
+    <div class="pgrid pgp">${OPT.progres.map(pp => { const id = t['foto_' + pp], cr = id && cropPg(t, pp); return `<div class="pslot ${id ? 'has' : ''}" data-pct="${pp}"${id ? ` data-fid="${esc(id)}"` : ''}${cr ? ` data-cr="${esc(JSON.stringify(cr))}"` : ''}>${id ? `<button type="button" class="pimg" data-act="file" data-id="${esc(id)}" data-name="${esc(t.nama_titik + ' ' + pp + '%')}"><img src="${esc(thumb(id, 240))}" alt="Foto ${pp}%" loading="lazy"${cr ? ` style="object-position:${cr.cx * 100}% ${cr.cy * 100}%"` : ''}>${cr ? '<span class="fcr">dipotong</span>' : ''}</button>` : `<span class="pimg empty">${ic('cam')}</span>`}<span class="plbl">${pp}%${t['tgl_' + pp] && id ? ' <small class="muted">' + esc(dDmy(t['tgl_' + pp])) + '</small>' : ''}</span>${w ? `<div class="fbt"><label class="btn sm pup fgn">${ic('cam')}<span class="lt">${id ? 'Ganti' : 'Unggah'}</span><input type="file" accept="${IMG_ANY}" hidden data-pct="${pp}"></label>${id ? `<button type="button" class="btn sm" data-act="potongPg">${ic('crop')}Potong</button><button type="button" class="btn sm danger fdel" data-act="hapusPg">${ic('trash')}Hapus</button>` : ''}</div>` : ''}</div>`; }).join('')}</div></div>`;
 }
+ACT.potongPg = t => {
+  const sl = t.closest('.pslot'), card = t.closest('.titik'), pct = sl.dataset.pct, all = $$('.pslot.has', card), idx = all.indexOf(sl);
+  let cr = null; try { cr = JSON.parse(sl.dataset.cr || 'null'); } catch (x) { }
+  const fake = { dataset: { id: sl.dataset.fid } }; if (cr) { fake.dataset.cx = cr.cx; fake.dataset.cy = cr.cy; fake.dataset.z = cr.z; }
+  fotoPotong(fake, idx, all.length, { asp: progRasio(idx, all.length), judul: $('b', card).textContent + ' ' + pct + '%', onOk: async d => {
+    try { await call('save', { entity: 'pembangunan_titik', record: { id: card.dataset.id, ['crop_' + pct]: d.z ? JSON.stringify({ cx: +d.cx, cy: +d.cy, z: +d.z }) : '' } }); toast('Potongan foto ' + pct + '% disimpan.'); const xx = card.closest('.xx'); if (xx) extraPembangunan({ id: card.dataset.ref }, xx); } catch (x) { toast(x.message, 1); }
+  } });
+};
+ACT.hapusPg = t => {
+  const sl = t.closest('.pslot'), card = t.closest('.titik'), pct = sl.dataset.pct;
+  const m = modal('Hapus foto progres', `<div class="stack"><div>Hapus foto progres <b>${esc(pct)}%</b> pada <b>${esc($('b', card).textContent)}</b>? Foto hilang dari daftar dan dokumen cetak; Anda bisa mengunggah lagi.</div><div class="btns"><button class="btn danger solid" id="yh">${ic('trash')}Ya, hapus</button><button class="btn" data-x>Batal</button></div></div>`);
+  $('#yh', m.el).onclick = async ev => {
+    ev.target.disabled = true;
+    try { await call('save', { entity: 'pembangunan_titik', record: { id: card.dataset.id, ['foto_' + pct]: '', ['tgl_' + pct]: '', ['crop_' + pct]: '' } }); await syncPembangunan(card.dataset.ref); m.close(); toast('Foto ' + pct + '% dihapus.'); const xx = card.closest('.xx'); if (xx) extraPembangunan({ id: card.dataset.ref }, xx); } catch (x) { toast(x.message, 1); ev.target.disabled = false; }
+  };
+};
 document.addEventListener('change', async ev => {
   const inp = ev.target;
   if (!inp.matches || !inp.matches('.titik input[data-pct]') || !inp.files[0]) return;
   const card = inp.closest('.titik'), pct = inp.dataset.pct, lab = inp.closest('label');
-  lab.classList.add('busy'); lab.firstChild.textContent = 'Mengunggah…';
+  lab.classList.add('busy'); $('.lt', lab).textContent = 'Mengunggah…';
   try {
     const up = await uploadFile(inp.files[0], 'Pembangunan');
-    await call('save', { entity: 'pembangunan_titik', record: { id: card.dataset.id, ['foto_' + pct]: up.id, ['tgl_' + pct]: isoToday() } });
+    await call('save', { entity: 'pembangunan_titik', record: { id: card.dataset.id, ['foto_' + pct]: up.id, ['tgl_' + pct]: isoToday(), ['crop_' + pct]: '' } });
     await syncPembangunan(card.dataset.ref, up.id);
     toast('Foto ' + pct + '% tersimpan.');
     const xx = card.closest('.xx'); if (xx) extraPembangunan({ id: card.dataset.ref }, xx);
-  } catch (x) { toast(x.message, 1); lab.classList.remove('busy'); lab.firstChild.textContent = 'Unggah'; }
+  } catch (x) { toast(x.message, 1); lab.classList.remove('busy'); $('.lt', lab).textContent = 'Unggah'; }
 });
 /* progres pekerjaan = rata-rata progres semua titik */
 async function syncPembangunan(ref, cover) {
@@ -2390,6 +2409,31 @@ ACT.delTitik = t => {
   confirmDel(box, async () => { await call('remove', { entity: 'pembangunan_titik', id: t.dataset.id }); await syncPembangunan(card.dataset.ref); toast('Titik dihapus.'); card.remove(); });
 };
 
+
+/* Cetak progres pembangunan 1 kegiatan: template F4 (pembangunan/Progres_Pembangunan_F4.docx), satu lembar per titik, hanya foto yang ada */
+const PB_TPL = 'pembangunan/Progres_Pembangunan_F4.docx';
+ACT.cetakPb = async t => {
+  const m = modal('Membuat laporan progres', '<div class="stack"><div class="skel"></div><div class="meta">Menyusun foto progres…</div></div>');
+  try {
+    const pb = await call('get', { entity: 'pembangunan', id: t.dataset.id });
+    const r = await call('list', { entity: 'pembangunan_titik', filters: { ref: pb.id }, limit: 200, sort: 'nama_titik', desc: false });
+    const grup = r.rows.map(tk => ({
+      judul: tk.nama_titik, sub: [tk.lokasi].filter(Boolean).join(' · '),
+      fotos: OPT.progres.filter(p => tk['foto_' + p]).map(p => Object.assign({ id: tk['foto_' + p], ket: 'Progres ' + p + '%' + (tk['tgl_' + p] ? ' · ' + dPanjang(tk['tgl_' + p]) : '') }, cropPg(tk, p) || {}))
+    })).filter(g => g.fotos.length);
+    if (!grup.length) throw new Error('Belum ada foto progres. Unggah foto pada titik lokasi terlebih dahulu.');
+    let ada = false; try { ada = (await tplDaftar(true)).some(x => x.path === PB_TPL); } catch (x) { }
+    if (!ada) throw new Error('Template "Progres Pembangunan F4" belum diunggah di Admin → Template Dokumen → Progres Pembangunan.');
+    const st = S.set || {}, M = {};
+    const put = (k, v) => { M[k] = v == null ? '' : String(v); };
+    put('Desa', st.nama_desa); put('Kecamatan', st.kecamatan); put('Kabupaten', st.kabupaten); put('Provinsi', st.provinsi);
+    put('Nama Pekerjaan', pb.nama); put('Lokasi', pb.lokasi); put('Sumber Dana', pb.sumber_dana); put('Tahun Anggaran', pb.tahun_anggaran);
+    put('Pagu', pb.pagu ? fMoney(pb.pagu) : ''); put('Pelaksana', pb.pelaksana); put('Tgl Mulai', dPanjang(pb.tgl_pelaksanaan)); put('Tgl Selesai', dPanjang(pb.tgl_selesai));
+    put('Progres', pb.progres == null ? '' : pb.progres); put('Jumlah Titik', r.rows.length); put('Foto Progres', '');
+    const res = await buatDokumen({ path: PB_TPL, M, rows: [], jenis: 'pembangunan', nama: 'Progres Pembangunan - ' + (pb.nama || ''), grup, judulPb: pb.nama });
+    hasilDokumen(m, res);
+  } catch (x) { m.body.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
+};
 /* ---------------- Kegiatan: foto, dokumen, riwayat ---------------- */
 async function extraKegiatan(kg, el) {
   const r = await call('list', { entity: 'kegiatan_berkas', filters: { ref: kg.id }, limit: 300, sort: '_waktu', desc: false });
@@ -2499,9 +2543,10 @@ async function fotoUrl(id) {
 /* perbandingan kotak foto di dokumen mengikuti posisi & jumlah foto (sama dengan penyusunan di DOCX.sisipFoto) */
 const fotoRasio = (i, n) => { const H = n === 1 ? 11 : n <= 2 ? 7.5 : n <= 4 ? 7 : 5.6, W = (n % 2 === 1 && i === n - 1) ? 18.3 : 9.0; return W / H; };
 /* jendela potong: geser untuk memilih bagian, geser bar untuk memperbesar */
-function fotoPotong(slot, idx, n) {
-  const asp = fotoRasio(idx, n);
-  const m = modal('Potong foto ' + (idx + 1), `<div class="stack"><div class="cropf" id="cf" style="aspect-ratio:${asp}"><div class="skel" style="position:absolute;inset:0"></div></div>
+function fotoPotong(slot, idx, n, opt) {
+  opt = opt || {};
+  const asp = opt.asp || fotoRasio(idx, n);
+  const m = modal('Potong foto ' + (opt.judul || idx + 1), `<div class="stack"><div class="cropf" id="cf" style="aspect-ratio:${asp}"><div class="skel" style="position:absolute;inset:0"></div></div>
     <div class="f"><label for="cz">Perbesar</label><input type="range" id="cz" min="1" max="3" step="0.02" value="${slot.dataset.z || 1}"></div>
     <div class="meta">Geser gambar untuk memilih bagian yang tampak di dokumen. Bingkai di atas ${n % 2 === 1 && idx === n - 1 ? 'selebar halaman' : 'selebar setengah halaman'} sesuai posisi foto ini sekarang; pilihan Anda tetap berlaku bila urutan diubah.</div>
     <div class="btns"><button class="btn pri" id="cok">${ic('check')}Selesai</button><button class="btn" id="cre">Atur ulang</button><button class="btn" data-x>Batal</button></div></div>`);
@@ -2532,7 +2577,7 @@ function fotoPotong(slot, idx, n) {
   $('#cok', m.el).onclick = () => {
     if (img && (st.z > 1.001 || Math.abs(st.fx - 0.5) > 0.003 || Math.abs(st.fy - 0.5) > 0.003)) { slot.dataset.cx = st.fx.toFixed(4); slot.dataset.cy = st.fy.toFixed(4); slot.dataset.z = st.z.toFixed(2); }
     else { delete slot.dataset.cx; delete slot.dataset.cy; delete slot.dataset.z; }
-    m.close(); fotoRapi(slot.parentNode);
+    m.close(); if (opt.onOk) opt.onOk(slot.dataset); else fotoRapi(slot.parentNode);
   };
 }
 /* nomor urut & tanda potong pada tiap foto */
@@ -4110,12 +4155,53 @@ const DOCX = (() => {
     relF.data = enc.encode(rel); ctF.data = enc.encode(ct);
     return new XMLSerializer().serializeToString(doc);
   }
+
+  /* {{Foto Progres}} -> satu lembar per titik: judul titik + foto progres (hanya yang ada), 2 kolom, foto terakhir selebar halaman bila ganjil */
+  async function sisipProgres(xml, files, o) {
+    const doc = new DOMParser().parseFromString(xml, 'application/xml');
+    const pg = Array.from(doc.getElementsByTagNameNS(W, 'p')).find(p => /^\s*\{\{\s*Foto[\s_]+Progres\s*\}\}\s*$/i.test(textOf(p)));
+    if (!pg) return xml;
+    const sp = xml.match(/<w:pgSz[^>]*w:w="(\d+)"/), mg = xml.match(/<w:pgMar[^>]*>/);
+    const pw = +(sp && sp[1]) || 12191, ml = +((mg && mg[0].match(/w:left="(\d+)"/) || [])[1]) || 850, mr = +((mg && mg[0].match(/w:right="(\d+)"/) || [])[1]) || 850;
+    const TW = pw - ml - mr, CW = Math.floor(TW / 2), cm = t => t / 567;
+    const NS = 'xmlns:w="' + W + '" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"';
+    const relF = files.find(f => f.name === 'word/_rels/document.xml.rels'), ctF = files.find(f => f.name === '[Content_Types].xml');
+    let rel = dec.decode(relF.data), ct = dec.decode(ctF.data);
+    const esk = t => String(t || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const run = (t, sz, b) => '<w:r><w:rPr>' + (b ? '<w:b/>' : '') + '<w:sz w:val="' + sz + '"/></w:rPr><w:t xml:space="preserve">' + esk(t) + '</w:t></w:r>';
+    const bd = ['top', 'left', 'bottom', 'right', 'insideH', 'insideV'].map(k => '<w:' + k + ' w:val="single" w:sz="18" w:space="0" w:color="D9D9D9"/>').join('');
+    let k = 0, out = '';
+    for (let gi = 0; gi < o.grup.length; gi++) {
+      const g = o.grup[gi], n = g.fotos.length, H = n === 1 ? 14 : n === 2 ? 10 : n <= 4 ? 8.5 : 6;
+      const slot = i => (n % 2 === 1 && i === n - 1) ? { w: cm(TW) - 0.3, full: 1 } : { w: cm(CW) - 0.3, full: 0 };
+      const jp = await Promise.all(g.fotos.map((f, i) => o.ambil(f.id, slot(i).w, H, f)));
+      if (gi > 0) out += '<w:p ' + NS + '><w:pPr><w:pageBreakBefore/><w:spacing w:before="0" w:after="40"/><w:jc w:val="center"/></w:pPr>' + run('LAPORAN PROGRES PEMBANGUNAN', 28, 1) + '</w:p><w:p ' + NS + '><w:pPr><w:spacing w:before="0" w:after="120"/><w:jc w:val="center"/></w:pPr>' + run(o.judul || '', 22, 1) + '</w:p>';
+      out += '<w:p ' + NS + '><w:pPr><w:keepNext/><w:spacing w:before="' + (gi ? 60 : 0) + '" w:after="100"/></w:pPr>' + run(g.judul, 24, 1) + (g.sub ? run('  ' + g.sub, 20, 0) : '') + '</w:p>';
+      const cell = i => {
+        k++; const sl = slot(i), cx = Math.round(sl.w * 360000), cy = Math.round(H * 360000), id = 'rIdProg' + k, ket = (g.fotos[i].ket || '').trim();
+        files.push({ name: 'word/media/progres' + k + '.jpg', data: jp[i] });
+        rel = rel.replace('</Relationships>', '<Relationship Id="' + id + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/progres' + k + '.jpg"/></Relationships>');
+        return '<w:tc><w:tcPr><w:tcW w:w="' + (sl.full ? TW : CW) + '" w:type="dxa"/>' + (sl.full ? '<w:gridSpan w:val="2"/>' : '') + '<w:vAlign w:val="center"/></w:tcPr><w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/><w:jc w:val="center"/></w:pPr><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="' + cx + '" cy="' + cy + '"/><wp:docPr id="' + (9500 + k) + '" name="Progres ' + k + '"/><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="0" name="progres' + k + '.jpg"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="' + id + '"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="' + cx + '" cy="' + cy + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>' + (ket ? '<w:p><w:pPr><w:spacing w:before="30" w:after="30"/><w:jc w:val="center"/></w:pPr>' + run(ket, 19, 1) + '</w:p>' : '') + '</w:tc>';
+      };
+      let rowsX = '';
+      for (let i = 0; i < n; i += 2) rowsX += '<w:tr><w:trPr><w:cantSplit/></w:trPr>' + cell(i) + (i + 1 < n && !(n % 2 === 1 && i === n - 1) ? cell(i + 1) : '') + '</w:tr>';
+      out += '<w:tbl ' + NS + '><w:tblPr><w:tblW w:w="' + TW + '" w:type="dxa"/><w:jc w:val="center"/><w:tblBorders>' + bd + '</w:tblBorders><w:tblLayout w:type="fixed"/><w:tblCellMar><w:top w:w="50" w:type="dxa"/><w:left w:w="50" w:type="dxa"/><w:bottom w:w="50" w:type="dxa"/><w:right w:w="50" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid><w:gridCol w:w="' + CW + '"/><w:gridCol w:w="' + (TW - CW) + '"/></w:tblGrid>' + rowsX + '</w:tbl>';
+    }
+    const frag = new DOMParser().parseFromString('<w:body ' + NS + '>' + out + '</w:body>', 'application/xml');
+    if (frag.getElementsByTagName('parsererror').length) throw new Error('Gagal menyusun lembar foto progres.');
+    Array.from(frag.documentElement.childNodes).forEach(nd => pg.parentNode.insertBefore(doc.importNode(nd, true), pg));
+    pg.parentNode.removeChild(pg);
+    if (!/Extension="jpg"/i.test(ct)) ct = ct.replace('<Default ', '<Default Extension="jpg" ContentType="image/jpeg"/><Default ');
+    relF.data = enc.encode(rel); ctF.data = enc.encode(ct);
+    return new XMLSerializer().serializeToString(doc);
+  }
   async function fill(buf, M, rows, xlsx, o) {
     const files = await unzip(buf), missing = [];
-    const foto = !xlsx && o && o.fotos && o.fotos.length && o.ambil;
+    const foto = !xlsx && o && o.fotos && o.fotos.length && o.ambil, prog = !xlsx && o && o.grup && o.grup.length && o.ambil;
     for (const f of files) if (PART.test(f.name)) {
       let x = dec.decode(f.data);
       if (foto && /word\/document\.xml$/.test(f.name)) x = await sisipFoto(x, files, o);
+      if (prog && /word\/document\.xml$/.test(f.name)) x = await sisipProgres(x, files, o);
       f.data = enc.encode(fillXml(x, M, /document\.xml$/.test(f.name) ? rows : null, missing));
     }
     return { blob: await zip(files, xlsx ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'), missing };
@@ -4419,7 +4505,7 @@ async function buatDokumen(o) {
   const buf = await tplAmbil(o.path);
   const xlsx = /\.xlsx$/i.test(o.path);
   let ft = []; try { ft = JSON.parse((o.M && o.M.__foto) || '[]'); } catch (x) { }
-  const { blob, missing } = await DOCX.fill(buf, o.M, o.rows, xlsx, ft.length ? { fotos: ft.slice(0, 7), ambil: fotoCrop } : null);
+  const { blob, missing } = await DOCX.fill(buf, o.M, o.rows, xlsx, ft.length ? { fotos: ft.slice(0, 7), ambil: fotoCrop } : o.grup ? { grup: o.grup, judul: o.judulPb, ambil: fotoCrop } : null);
   const nama = namaFile(o.nama) + (xlsx ? '.xlsx' : '.docx');
   if (xlsx) saveBlob(blob, nama);
   return { nama, missing, blob, jenis: xlsx ? '' : o.jenis, xlsx };
@@ -5102,6 +5188,7 @@ VIEWS.template = async (p, main) => {
     <div class="card meta" style="line-height:1.7"><b>Tanda SPP:</b> ${['Desa', 'Kecamatan', 'Kabupaten', 'Nomor SPP', 'Tanggal SPP', 'Tanggal Cair', 'Tahun', 'Jenis SPP', 'Bidang', 'Kode Kegiatan', 'Kegiatan', 'Uraian', 'Penerima', 'NPWP', 'Jenis Belanja', 'Jumlah', 'Jumlah Angka', 'Terbilang', 'Potongan', 'Netto', 'Netto Angka', 'Terbilang Netto', 'Kepala Desa', 'Sekretaris Desa', 'Bendahara', 'PKA', 'Jabatan PKA'].map(t => '{{' + t + '}}').join(' ')}<br>Baris rincian (diulang per rekening): {{R No}} {{R Kode}} {{R Uraian}} {{R Sumber}} {{R Jumlah}} · baris potongan: {{P Jenis}} {{P Jumlah}}. Tambahkan _U untuk huruf besar, mis. {{Kepala Desa_U}}.</div>
     <div class="sec-h"><h2>RKP Desa</h2><span class="btns"><button class="btn sm" data-act="tplUpBtn" data-p="rkp/">${ic('plus')}Tambah template</button><button class="btn sm" data-act="tplImpor">${ic('folder')}Ambil dari Google Drive</button></span></div>
     <div class="list">${list.filter(x => x.path.indexOf('rkp/') === 0 && !/_cadangan/.test(x.path)).map(x => baris(x.path)).join('') || '<div class="card meta">Belum ada. Tekan "Ambil dari Google Drive" untuk memindahkan template Google Docs lama.</div>'}</div>
+    <div class="sec-h"><h2>Progres Pembangunan</h2></div><div class="list">${baris(PB_TPL, 'Laporan Progres Pembangunan (F4) — tanda: {{Nama Pekerjaan}}, {{Lokasi}}, {{Sumber Dana}}, {{Tahun Anggaran}}, {{Pagu}}, {{Pelaksana}}, {{Tgl Mulai}}, {{Tgl Selesai}}, {{Progres}}, {{Foto Progres}}')}</div>
     <div class="sec-h"><h2>Draf KK</h2></div><div class="list">${baris('kk/draf_kk.docx', 'Draf Formulir KK (Word)')}${baris(KK_LATAR, 'Gambar latar Draf KK (JPG, A4 melintang 300 dpi) — dipakai untuk pratinjau, PDF & cetak')}</div>
     <div class="sec-h"><h2>Daftar tanda Surat Keterangan</h2></div><div class="meta">Jenis tambahan: setiap isian tambahan menjadi tanda dengan nama yang sama (mis. {{Nama Sekolah}}). {{Isi Surat}} = kalimat isi dari pengaturan jenis surat. Baris tabel yang memuat {{Isian Label}} diulang untuk semua isian tambahan.</div>
     <div class="card meta" style="line-height:1.7">${['Desa', 'Kecamatan', 'Kabupaten', 'Alamat Desa', 'Kode Pos', 'Kode Desa', 'No', 'Tahun', 'Tanggal Surat', 'Nama', 'NIK', 'No KK', 'TTL', 'Tempat Lahir', 'Tanggal Lahir', 'Umur', 'Jenis Kelamin', 'Agama', 'Pekerjaan', 'Status Perkawinan', 'Kewarganegaraan', 'Pendidikan', 'Alamat', 'Dusun', 'RT', 'RW', 'Keperluan', 'Kepala Desa', 'Alamat Domisili', 'Lama Tinggal', 'Nama Usaha', 'Jenis Usaha', 'Alamat Usaha', 'Mulai Usaha', 'Nama Bayi', 'JK Bayi', 'Hari Lahir Bayi', 'Tanggal Lahir Bayi', 'Jam Lahir', 'Tempat Lahir Bayi', 'Anak Ke', 'Nama Ayah', 'Nama Ibu', 'Hari Meninggal', 'Tanggal Meninggal', 'Jam Meninggal', 'Tempat Meninggal', 'Sebab Meninggal', 'Pelapor', 'Alamat Tujuan', 'Alasan Pindah', 'Jumlah Pengikut', 'Penghasilan', 'Penghasilan Terbilang', 'Jenis Surat', 'Isi Surat', 'Isian Label', 'Isian Nilai', 'Isian Titik2'].map(k => `<span class="mono">{{${esc(k)}}}</span>`).join(' · ')}</div>
