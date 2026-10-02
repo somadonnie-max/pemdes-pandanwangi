@@ -2257,6 +2257,7 @@ document.addEventListener('keydown', ev => { if ((ev.key === 'Enter' || ev.key =
 ACT.xedit = t => go('form', { e: t.dataset.e, id: t.dataset.id });
 ACT.xdel = t => {
   const box = t.closest('.xacts'), e = t.dataset.e, id = t.dataset.id;
+  if (e === 'kegiatan' && $('.xacts', box.parentNode) && /terusan otomatis dari Musyawarah RKP/.test(box.parentNode.textContent)) return toast('Agenda terusan dari RKP tidak bisa dihapus.', 1);
   confirmDel(box, async () => {
     await call('remove', { entity: e, id }); toast('Data dihapus.');
     if (S.cur.name === 'detail' && S.cur.params.id === id) return back();
@@ -2297,8 +2298,9 @@ async function renderDetail(e, x, el, full) {
   const galeri = u.fields.filter(f => f.t === 'fotos' && x[f.k]).map(f => { let a = []; try { a = JSON.parse(x[f.k]); } catch (er) { } return a.length ? `<div class="lbl">${esc(f.l)} (${a.length})</div><div class="pgrid">${a.map(fo => `<div class="pslot has"><button type="button" class="pimg" data-act="file" data-id="${esc(fo.id)}" data-name="${esc(fo.ket || f.l)}"><img src="${esc(thumb(fo.id, 240))}" alt="" loading="lazy"></button>${fo.ket ? `<span class="plbl">${esc(fo.ket)}</span>` : ''}</div>`).join('')}</div>` : ''; }).join('');
   const geoF = u.fields.find(f => f.t === 'geo' && x[f.k]);
   const geo = geoF ? x[geoF.k] : u.geo ? u.geo(x) : '';
-  const w = canWrite(e);
+  const w = canWrite(e) && !(e === 'kegiatan' && x.sumber_mus);
   el.innerHTML = `
+    ${e === 'kegiatan' && x.sumber_mus ? `<div class="card meta">${ic('lock')} Agenda ini terusan otomatis dari Musyawarah RKP (tanggal, jam, tempat, dan foto mengikuti data RKP). Tidak bisa diubah atau dihapus di sini; ubah lewat Perencanaan → RKP Desa → Musyawarah &amp; Tim.</div>` : ''}
     ${shown.length ? `<dl class="dl">${shown.map(f => `<div class="${f.t === 'textarea' || f.wide && String(x[f.k]).length > 40 ? 'w' : ''}"><dt>${esc(f.l)}</dt><dd>${valHtml(f, x[f.k])}</dd></div>`).join('')}</dl>` : ''}
     ${files.length ? `<div class="btns">${files.map(f => `<button class="btn sm" data-act="file" data-id="${esc(x[f.k])}" data-priv="${f.priv ? 1 : 0}" data-name="${esc(f.l)}">${ic(x[f.k] === '•' ? 'lock' : f.img ? 'eye' : 'file')}${esc(f.l)}</button>`).join('')}</div>` : ''}
     ${galeri}${rws}
@@ -2700,6 +2702,7 @@ VIEWS.form = async (p, main, alive) => {
   let rec = {};
   let flds = u.fields.filter(f => !(f.virt && p.id));
   if (p.id) rec = await call('get', { entity: e, id: p.id });
+  if (e === 'kegiatan' && rec.sumber_mus) throw new Error('Agenda ini terusan dari Musyawarah RKP, jadi tidak bisa diubah di sini. Ubah lewat Perencanaan → RKP Desa → Musyawarah & Tim.');
   else {
     u.fields.forEach(f => { if (f.def != null) rec[f.k] = typeof f.def === 'function' ? f.def() : f.def; });
     Object.assign(rec, p.preset || {});
@@ -3817,7 +3820,7 @@ async function syncAgendaMus(muId) {
     const mu = await call('get', { entity: 'rkp_musyawarah', id: muId });
     if (!mu || !mu.tanggal || !mu.jam) return null;
     const ket = [mu.no_undangan && 'Nomor undangan: ' + mu.no_undangan, 'Otomatis dari Perencanaan → RKP Desa → Musyawarah & Tim'].filter(Boolean).join('. ');
-    const rec = { nama: mu.musyawarah + ' RKP Desa ' + rkpLbl(mu.tahun_rkp), tanggal: mu.tanggal, jam: mu.jam || '', sampai: 'Selesai', tempat: mu.tempat || 'Balai Desa Pandanwangi', keterangan: ket, sumber_mus: mu.id };
+    const rec = { nama: mu.musyawarah + ' RKP Desa ' + rkpLbl(mu.tahun_rkp), tanggal: mu.tanggal, jam: mu.jam || '', sampai: 'Selesai', tempat: mu.tempat || 'Balai Desa Pandanwangi', keterangan: ket, sumber_mus: mu.id, foto: mu.foto || '' };
     let ada = null;
     if (mu.agenda_id) { try { ada = await call('get', { entity: 'kegiatan', id: mu.agenda_id }); } catch (x) { ada = null; } }
     if (ada && ada.id) { await call('save', { entity: 'kegiatan', record: Object.assign({ id: ada.id }, rec) }); return ada.id; }
