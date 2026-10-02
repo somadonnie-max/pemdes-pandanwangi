@@ -676,6 +676,8 @@ const OPT = {
 };
 const JAB_PETUGAS = ['Ketua', 'Wakil Ketua', 'Sekretaris', 'Bendahara', 'Anggota', 'Ketua BPD', 'Wakil Ketua BPD', 'Sekretaris BPD', 'Anggota BPD', 'Ketua LPMD', 'Ketua TP PKK', 'Ketua Karang Taruna', 'Direktur BUM Desa', 'Kader Posyandu', 'KPM', 'Linmas'];
 const F = (k, l, t, x) => Object.assign({ k, l, t: t || 'text' }, x || {});
+const RPJM_MUSY_OPT = ['Musdes Pembentukan Tim RPJM Desa', 'Musyawarah Dusun (Penggalian Gagasan)', 'Musdes Penyusunan RPJM Desa', 'Musrenbangdes RPJM Desa', 'Musdes Pengesahan RPJM Desa', 'Rapat Tim Penyusun RPJM Desa', 'Musyawarah Lainnya'];
+const RPJM_BID_OPT = ['1. Penyelenggaraan Pemerintahan Desa', '2. Pelaksanaan Pembangunan Desa', '3. Pembinaan Kemasyarakatan Desa', '4. Pemberdayaan Masyarakat Desa', '5. Penanggulangan Bencana, Darurat & Mendesak'];
 
 /* =====================================================================
    DEFINISI MENU & DATA
@@ -882,6 +884,28 @@ const UI = {
       F('foto', 'Foto Dokumentasi Kegiatan', 'fotos', { max: 7 })],
     folder: 'Perencanaan/Musyawarah',
     row: r => ({ t: r.musyawarah, s: fDay(r.tanggal) + (r.tempat ? ' · ' + r.tempat : ''), av: ic('users') })
+  },
+  rpjm_musyawarah: {
+    t: 'Musyawarah RPJM Desa', ic: 'users', perm: 'perencanaan', rpjm: 1,
+    fields: [F('musyawarah', 'Jenis Musyawarah', 'select', { opt: RPJM_MUSY_OPT, req: 1, wide: 1 }), F('dusun', 'Dusun', 'select', { opt: OPT.dusun, hint: 'Khusus Musyawarah Dusun (satu catatan per dusun)' }),
+      F('no_undangan', 'Nomor Undangan', 'text', { mono: 1 }), F('tgl_undangan', 'Tanggal Undangan', 'date'), F('kepada', 'Undangan kepada', 'text', { wide: 1, hint: 'Kosong = titik-titik untuk ditulis tangan' }),
+      F('tanggal', 'Tanggal Pelaksanaan', 'date', { req: 1 }), F('jam', 'Jam Mulai', 'time', { def: '19:00' }), F('tempat', 'Tempat', 'text', { def: 'Balai Desa Pandanwangi', wide: 1 }),
+      F('acara', 'Acara (isi undangan)', 'text', { wide: 1, hint: 'Kosong = otomatis sesuai jenis musyawarah' }),
+      F('pimpinan', 'Pimpinan Musyawarah', 'person', { fill: { unsur_pimpinan: 'jabatan' } }), F('unsur_pimpinan', 'Unsur Pimpinan', 'text', { def: 'Ketua BPD' }), F('notulen', 'Notulen / Sekretaris', 'person', { fill: { unsur_notulen: 'jabatan' } }), F('unsur_notulen', 'Unsur Notulen', 'text', { def: 'Sekretaris BPD' }),
+      F('jumlah_hadir', 'Jumlah Hadir', 'number'), F('hadir_l', 'Hadir Laki-laki', 'number'), F('hadir_p', 'Hadir Perempuan', 'number'),
+      F('tgl_sk', 'Tanggal SK (Tim/Panitia)', 'date'), F('no_sk', 'Nomor SK (Tim/Panitia)', 'text', { mono: 1 }), F('catatan', 'Catatan / Hasil Kesepakatan', 'textarea', { wide: 1 }),
+      F('foto', 'Foto Dokumentasi Kegiatan', 'fotos', { max: 7 })],
+    folder: 'Perencanaan/Musyawarah RPJM',
+    row: r => ({ t: r.musyawarah + (r.dusun ? ' — ' + String(r.dusun).replace(/^DUSUN /i, '') : ''), s: fDay(r.tanggal) + (r.tempat ? ' · ' + r.tempat : '') + (r.agenda_id ? ' · di Agenda' : ''), av: ic('users') })
+  },
+  rpjm_gagasan: {
+    t: 'Usulan Gagasan Dusun (RPJM)', ic: 'clip', perm: 'perencanaan', rpjm: 1, sort: 'dusun', asc: 1,
+    fields: [F('dusun', 'Dusun', 'select', { opt: OPT.dusun, req: 1 }), F('kelompok', 'Pengusul / Kelompok', 'text', { list: ['Musyawarah Dusun', 'RT', 'Kelompok Perempuan', 'Kelompok Tani', 'Karang Taruna', 'Tokoh Masyarakat', 'Masyarakat Miskin', 'Pemerhati Anak'] }),
+      F('kegiatan', 'Gagasan / Jenis Kegiatan', 'text', { req: 1, wide: 1 }), F('bidang', 'Bidang', 'select', { opt: RPJM_BID_OPT }), F('lokasi', 'Lokasi (RT/RW)'), F('volume', 'Prakiraan Volume'), F('satuan', 'Satuan', 'text', { list: ['Paket', 'Unit', 'Kegiatan', 'Orang', 'M', 'M2', 'M3', 'Titik'] }),
+      F('sasaran', 'Sasaran / Manfaat', 'text', { wide: 1 }), F('lk', 'Penerima Laki-laki', 'number'), F('pr', 'Penerima Perempuan', 'number'), F('rtm', 'Penerima RTM', 'number'),
+      F('prioritas', 'Prioritas', 'number'), F('status', 'Status', 'select', { opt: ['Usulan', 'Masuk RPJM', 'Ditunda / tidak masuk'], def: 'Usulan' }), F('ket', 'Keterangan', 'textarea', { wide: 1 })],
+    chips: { k: 'dusun', opt: OPT.dusun, lbl: s => s.replace('DUSUN ', '') },
+    row: r => ({ t: r.kegiatan, pill: r.status === 'Masuk RPJM' ? '<span class="pill ok">Masuk RPJM</span>' : r.status && r.status !== 'Usulan' ? '<span class="pill">' + esc(r.status) + '</span>' : '', s: [String(r.dusun || '').replace(/^DUSUN /i, ''), r.lokasi, [r.volume, r.satuan].filter(Boolean).join(' '), r.kelompok].filter(Boolean).join(' · '), av: ic('clip') })
   },
   rkp_tim: {
     t: 'Anggota Tim', ic: 'users', perm: 'perencanaan', sub: 1,
@@ -1155,7 +1179,7 @@ function MODS() {
     { k: 'pemerintahan', l: 'Pemerintahan', ic: 'landmark', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, 'r:penduduk'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga']] },
     { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
     { k: 'kesejahteraan', l: 'Kesejahteraan', ic: 'heart', items: [['Lembaga / Yayasan', 'landmark', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru Ngaji', 'book', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
-    { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RPJM Desa Berjalan', 'book', ['rpjm', {}], null, 'r:rkp'], ['Penyusunan RPJM Baru', 'edit', ['rpjmbaru', {}], null, 'r:rkp'], ['Dokumen RPJM Desa', 'file', ['rpjmdok', {}], null, 'r:rkp'], ['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['Generator RKP', 'sprout', ['rkpgen', {}], null, 'r:rkp'], ['Usulan Kegiatan', 'clip', ['list', { e: 'rkp_usulan' }], null, 'r:rkp'], ['RAB & Gambar', 'list', ['list', { e: 'rkp_rab' }], null, 'r:rkp'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Progres Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
+    { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RPJM Desa', 'book', ['rpjm', {}], null, 'r:rkp'], ['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['RAB & Gambar', 'list', ['list', { e: 'rkp_rab' }], null, 'r:rkp'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Progres Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
     { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Rekap Pajak', 'coin', ['keupajak'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek']] },
     { k: 'soon', l: 'Segera Hadir', ic: 'sprout', items: Object.keys(SOON).map(k => [SOON[k].t, SOON[k].ic, ['soon', { k }], null, '*', 1]) }
   ];
@@ -2189,6 +2213,7 @@ VIEWS.list = async (p, main, alive) => {
   const e = p.e, u = UI[e];
   if (!canRead(e)) throw new Error('Anda tidak punya akses ke menu ini.');
   if (u.rkp) await rkpMuatVer();
+  if (u.rpjm && !S.rpjmPid) { try { await rpjmPerAktif(); S.rpjmPid = S.rpjmDokPer && S.rpjmDokPer.id; } catch (x) { } }
   const st = S.listState = (S.listState && S.listState.e === e && S.listState.ctx === JSON.stringify(p)) ? S.listState : { e, ctx: JSON.stringify(p), q: '', chip: '', per: '', view: p.v || 0, rows: [], total: 0 };
   let chipOpt = u.chips ? u.chips.opt.slice() : null, chipN = {};
   if (u.chips && u.chips.dyn) {
@@ -2201,7 +2226,7 @@ VIEWS.list = async (p, main, alive) => {
   const yearNow = new Date().getFullYear();
   if (st.per === '' && u.year) st.per = String(yearNow);
   if (st.per === '' && u.month) st.per = isoToday().slice(0, 7);
-  setTop(p.title || u.t, u.rkp ? 'RKP Desa ' + rkpLbl(S.rkpYear) : '');
+  setTop(p.title || u.t, u.rkp ? 'RKP Desa ' + rkpLbl(S.rkpYear) : u.rpjm && S.rpjmDokPer && S.rpjmDokPer.id === S.rpjmPid ? S.rpjmDokPer.nama : '');
   const pers = u.year ? [String(yearNow), String(yearNow - 1), String(yearNow - 2), 'Semua'] : null;
   main.innerHTML = `<div class="stack">
     <div class="toolbar"><label class="search">${ic('search')}<input id="q" placeholder="Cari…" value="${esc(st.q)}" autocomplete="off"></label>
@@ -2218,6 +2243,7 @@ VIEWS.list = async (p, main, alive) => {
   const filters = () => {
     const f = {};
     if (u.rkp) f.tahun_rkp = S.rkpYear;
+    if (u.rpjm) f.periode_id = S.rpjmPid || '-';
     if (u.chips && st.chip) f[u.chips.k] = st.chip;
     if ((u.year || u.month) && st.per && st.per !== 'all') f[(u.year || u.month) + '__pre'] = st.per;
     if (u.views) Object.assign(f, u.views[st.view][1]());
@@ -2334,7 +2360,7 @@ async function renderDetail(e, x, el, full) {
   const geo = geoF ? x[geoF.k] : u.geo ? u.geo(x) : '';
   const w = canWrite(e) && !(e === 'kegiatan' && x.sumber_mus);
   el.innerHTML = `
-    ${e === 'kegiatan' && x.sumber_mus ? `<div class="card meta">${ic('lock')} Agenda ini terusan otomatis dari Musyawarah RKP (tanggal, jam, tempat, dan foto mengikuti data RKP). Tidak bisa diubah atau dihapus di sini; ubah lewat Perencanaan → RKP Desa → Musyawarah &amp; Tim.</div>` : ''}
+    ${e === 'kegiatan' && x.sumber_mus ? `<div class="card meta">${ic('lock')} Agenda ini terusan otomatis dari Musyawarah RKP/RPJM (tanggal, jam, tempat, dan foto mengikuti data musyawarah). Tidak bisa diubah atau dihapus di sini; ubah lewat Perencanaan → RKP/RPJM Desa → Musyawarah &amp; Tim.</div>` : ''}
     ${shown.length ? `<dl class="dl">${shown.map(f => `<div class="${f.t === 'textarea' || f.wide && String(x[f.k]).length > 40 ? 'w' : ''}"><dt>${esc(f.l)}</dt><dd>${valHtml(f, x[f.k])}</dd></div>`).join('')}</dl>` : ''}
     ${files.length ? `<div class="btns">${files.map(f => `<button class="btn sm" data-act="file" data-id="${esc(x[f.k])}" data-priv="${f.priv ? 1 : 0}" data-name="${esc(f.l)}">${ic(x[f.k] === '•' ? 'lock' : f.img ? 'eye' : 'file')}${esc(f.l)}</button>`).join('')}</div>` : ''}
     ${galeri}${rws}
@@ -2352,6 +2378,8 @@ async function renderDetail(e, x, el, full) {
   }
   if (e === 'keluarga') await extraKeluarga(x, xx, full);
   if (e === 'rkp_musyawarah') await extraMusyawarah(x, xx);
+  if (e === 'rpjm_musyawarah') await extraMusRpjm(x, xx);
+  if (e === 'rpjm_gagasan' && canWrite(e) && x.status !== 'Masuk RPJM') xx.innerHTML = `<div class="btns"><button class="btn sm pri" data-act="rpjGagKeg" data-id="${esc(x.id)}">${ic('plus')}Jadikan kegiatan RPJM</button></div>`;
   if (e === 'pembangunan') await extraPembangunan(x, xx);
   if (e === 'petugas') await extraPetugas(x, xx);
   if (e === 'penduduk') S.pendCache = Object.assign(S.pendCache || {}, { [x.id]: x });
@@ -2731,16 +2759,18 @@ function readForm(u, root) {
 }
 VIEWS.form = async (p, main, alive) => {
   const e = p.e, u = UI[e];
+  if (u.rpjm && !S.rpjmPid) { try { await rpjmPerAktif(); S.rpjmPid = S.rpjmDokPer && S.rpjmDokPer.id; } catch (x) { } }
   if (u.rkp) { await rkpMuatVer(); if (!canWrite(e)) throw new Error('RKP ' + rkpLbl(S.rkpYear) + ' hanya bisa dilihat karena sudah digantikan versi perubahan. Pilih versi terbaru di Dashboard RKP.'); }
   setTop(p.buat && NASKAH[e] ? NASKAH[e].buat : (p.id ? 'Ubah ' : 'Tambah ') + u.t);
   let rec = {};
   let flds = u.fields.filter(f => !(f.virt && p.id));
   if (p.id) rec = await call('get', { entity: e, id: p.id });
-  if (e === 'kegiatan' && rec.sumber_mus) throw new Error('Agenda ini terusan dari Musyawarah RKP, jadi tidak bisa diubah di sini. Ubah lewat Perencanaan → RKP Desa → Musyawarah & Tim.');
+  if (e === 'kegiatan' && rec.sumber_mus) throw new Error('Agenda ini terusan dari Musyawarah RKP/RPJM, jadi tidak bisa diubah di sini. Ubah lewat Perencanaan → RKP Desa atau RPJM Desa → Musyawarah.');
   else {
     u.fields.forEach(f => { if (f.def != null) rec[f.k] = typeof f.def === 'function' ? f.def() : f.def; });
     Object.assign(rec, p.preset || {});
     if (u.rkp) rec.tahun_rkp = S.rkpYear;
+    if (u.rpjm && !rec.periode_id) rec.periode_id = S.rpjmPid;
     const autoF = flds.find(f => f.auto);
     if (autoF) {
       try {
@@ -2888,13 +2918,14 @@ VIEWS.form = async (p, main, alive) => {
       if (p.id) val.id = p.id;
       Object.assign(val, p.preset && !p.id ? Object.fromEntries(Object.entries(p.preset).filter(([k]) => !(k in val))) : {});
       if (u.rkp && !val.tahun_rkp) val.tahun_rkp = rec.tahun_rkp || S.rkpYear;
+      if (u.rpjm && !val.periode_id) val.periode_id = rec.periode_id || S.rpjmPid;
       if (u.sub && !val.ref) val.ref = rec.ref;
       const virt = {}; u.fields.filter(f => f.virt).forEach(f => { if (f.k in val) { virt[f.k] = val[f.k]; delete val[f.k]; } });
       const saved = await call('save', { entity: e, record: val });
       if (e === 'petugas' && !p.id && (virt.kelompok || virt.jabatan)) await call('save', { entity: 'petugas_jabatan', record: Object.assign({ ref: saved.id }, virt) });
       if (/^(aparat|petugas)/.test(e)) S.people = null;
       toast('Tersimpan.');
-      if (e === 'rkp_musyawarah' && saved && saved.id && val.tanggal && val.jam) { const ag = await syncAgendaMus(saved.id); if (ag) toast('Tersimpan. Masuk juga ke Kegiatan → Agenda.'); }
+      if ((e === 'rkp_musyawarah' || e === 'rpjm_musyawarah') && saved && saved.id && val.tanggal && val.jam) { const ag = await syncAgendaMus(saved.id, e); if (ag) toast('Tersimpan. Masuk juga ke Kegiatan → Agenda.'); }
       back();
       if (e === 'register_surat' && !p.id && jenisDikenal(saved.jenis_surat)) setTimeout(() => cetakSurat(saved), 500);
       if (e === 'jenis_surat') S.jenisSurat = null;   /* tunggu kembali ke daftar dulu */
@@ -3860,7 +3891,7 @@ async function rpjmAktifRows() {
 VIEWS.rpjmbaru = (p, main, alive) => VIEWS.rpjm(Object.assign(p, { baru: 1 }), main, alive);
 VIEWS.rpjm = async (p, main, alive) => {
   const baru = !!p.baru;
-  setTop(baru ? 'Penyusunan RPJM Desa Baru' : 'RPJM Desa Berjalan', 'Memuat…');
+  setTop(baru ? 'Penyusunan RPJM Desa Baru' : 'RPJM Desa', 'Memuat…');
   const d = await rpjmCall('daftar'); if (!alive()) return;
   const P = d.periode || [], wr = !!d.bisa_ubah, aktif = P.find(x => x.status === 'Aktif');
   const batas = aktif ? +aktif.tahun_akhir : 2027, grupBaru = P.filter(x => +x.tahun_awal > batas);
@@ -3870,11 +3901,13 @@ VIEWS.rpjm = async (p, main, alive) => {
   const [m, nom] = await Promise.all([rpjmCall('matriks', { periode_id: cur.id }), rpjmNom()]); if (!alive()) return;
   const per = m.periode, TH = rpjmTh(per), K = m.kegiatan || [], A = m.arah || [];
   const ubah = wr && per.status === 'Draft', cy = new Date().getFullYear();
-  const st = S.rpjmSt = S.rpjmSt || { tab: 'mat', q: '', b: '' };
+  const st = S.rpjmSt = S.rpjmSt || { tab: 'dash', q: '', b: '' };
+  if (p.tab) { st.tab = p.tab; delete p.tab; }
   const nb = {}, ns = {}; nom.forEach(b => { nb[b.kode_bidang] = b.nama_bidang; (b.sub || []).forEach(s => { ns[s.kode_sub] = s.sub_bidang; }); });
   const versi = P.filter(x => x.tahun_awal === per.tahun_awal).sort((a, b) => a.versi - b.versi);
   const adaDraft = versi.some(x => x.status === 'Draft');
-  setTop(baru ? 'Penyusunan RPJM Desa Baru' : 'RPJM Desa Berjalan', per.nama);
+  setTop(baru ? 'Penyusunan RPJM Desa Baru' : 'RPJM Desa', per.nama);
+  S.rpjmPid = per.id; S.rpjmDokPer = per;
   const total = K.reduce((s, k) => s + rpjmTot(k), 0), isi = K.filter(k => !rpjmKosong(k)).length;
   const nR = K.filter(k => Object.values(k.tautan || {}).some(t => t.rkp)).length, nA = K.filter(k => Object.values(k.tautan || {}).some(t => t.apbdes)).length;
   const est = K.some(k => Object.values(k.biaya || {}).some(b => b.estimasi));
@@ -3893,6 +3926,7 @@ VIEWS.rpjm = async (p, main, alive) => {
         ${wr && per.status !== 'Arsip' && K.length ? btn('rpjCocok', 'target', 'Cocokkan RKP & APBDes') : ''}
         ${btn('rpjRiwayat', 'clock', 'Riwayat Versi')}
         ${btn('rpjDokGo', 'file', 'Dokumen RPJM (Word)')}
+        ${!baru ? btn('rpjBaruGo', 'edit', 'Penyusunan RPJM Baru') : ''}
         ${K.length ? btn('rpjXls', 'down', 'Unduh Excel') : ''}
         ${ubah ? btn('rpjHapusP', 'trash', 'Hapus Draft', 'danger') : ''}
       </div>
@@ -3904,7 +3938,7 @@ VIEWS.rpjm = async (p, main, alive) => {
       <div><small>Masuk RKP Desa</small><b class="num">${nR} kegiatan</b></div>
       <div><small>Dianggarkan APBDes</small><b class="num">${nA} kegiatan</b></div>
     </div>
-    <div class="chips"><button class="chip ${st.tab === 'mat' ? 'on' : ''}" data-act="rpjTab" data-v="mat">${ic('list')}Matriks Kegiatan</button><button class="chip ${st.tab === 'arah' ? 'on' : ''}" data-act="rpjTab" data-v="arah">${ic('target')}Visi, Misi & Arah Kebijakan <small>${A.length}</small></button></div>
+    <div class="chips"><button class="chip ${st.tab === 'dash' ? 'on' : ''}" data-act="rpjTab" data-v="dash">${ic('chart')}Dashboard</button><button class="chip ${st.tab === 'mat' ? 'on' : ''}" data-act="rpjTab" data-v="mat">${ic('list')}Matriks Kegiatan</button><button class="chip ${st.tab === 'arah' ? 'on' : ''}" data-act="rpjTab" data-v="arah">${ic('target')}Visi, Misi & Arah Kebijakan <small>${A.length}</small></button></div>
     <div id="rpjBody"></div></div>`;
 
   const body = $('#rpjBody');
@@ -3950,7 +3984,8 @@ VIEWS.rpjm = async (p, main, alive) => {
     body.innerHTML = `<div class="stack">${RPJM_JENIS.map(j => { const R = A.filter(a => a.jenis === j); return R.length || ubah ? `<div class="sec-h"><h2>${esc(j)}</h2>${ubah ? `<button class="btn sm" data-act="rpjArah" data-j="${esc(j)}">${ic('plus')}Tambah</button>` : ''}</div>
       <div class="list">${R.map(a => `<div class="card rpj-a"><span class="pill">${esc(j)}${a.no ? ' ' + esc(a.no) : ''}</span><div class="main">${esc(a.uraian)}</div>${ubah ? `<span class="btns"><button class="btn sm" data-act="rpjArah" data-id="${esc(a.id)}">${ic('edit')}</button><button class="btn sm danger" data-act="rpjArahDel" data-id="${esc(a.id)}">${ic('trash')}</button></span>` : ''}</div>`).join('') || '<div class="meta">Belum diisi.</div>'}</div>` : ''; }).join('') || '<div class="empty">Belum ada visi & misi.</div>'}</div>`;
   };
-  (st.tab === 'arah' ? drawArah : drawMat)();
+  if (st.tab === 'dash') rpjmDash(body, { per, K, A, TH, P, wr }).catch(x => { body.innerHTML = `<div class="err">${esc(x.message)}</div>`; });
+  else (st.tab === 'arah' ? drawArah : drawMat)();
 
   const ganti = id => { p.id = id; refresh(); };
   const errBox = (m, x) => { const e = $('.err', m.el); e.textContent = x.message; e.hidden = false; };
@@ -4099,10 +4134,14 @@ async function rpjmDokCtx(per) {
   const [m, nom] = await Promise.all([rpjmCall('matriks', { periode_id: per.id }), rpjmNom()]);
   let ind = null; const ip = m.periode && m.periode.induk_id; if (ip) { try { ind = await rpjmCall('matriks', { periode_id: ip }); } catch (x) { } }
   let d = {}; try { d = await call('docData', { tahun_rkp: S.rkpYear }); } catch (x) { }
-  return { per: m.periode || per, K: (m.kegiatan || []).filter(k => !rpjmKosong(k)), A: m.arah || [], ind, d, nom };
+  const L = (e, f) => call('list', { entity: e, filters: f, limit: 1000 }).then(r => r.rows || []).catch(() => []);
+  const [mus, gag] = await Promise.all([L('rpjm_musyawarah', { periode_id: per.id }), L('rpjm_gagasan', { periode_id: per.id })]);
+  const mb = mus.filter(x => x.musyawarah === RPJM_MUSY[0]).sort((a, b) => String(b.tanggal).localeCompare(String(a.tanggal)))[0];
+  if (mb) { const [tim, nara] = await Promise.all([L('rkp_tim', { ref: mb.id }), L('rkp_narasumber', { ref: mb.id })]); const tp = tim.filter(x => x.jenis_tim === 'Tim Penyusun').sort((a, b) => (Number(a.urut) || 0) - (Number(b.urut) || 0)); if (tp.length) d.tim = tp; if (nara.length) d.narasumber = nara; }
+  return { per: m.periode || per, K: (m.kegiatan || []).filter(k => !rpjmKosong(k)), A: m.arah || [], ind, d, nom, mus, gag };
 }
 function petaRpjmDok(ctx, kode, isi) {
-  isi = isi || {};
+  isi = Object.assign({}, rpjmIsiMus(ctx, kode), isi || {});
   const per = ctx.per, d = ctx.d || {}; d.tahun_rkp = d.tahun_rkp || S.rkpYear;
   const M = Object.assign({}, petaDesa());
   const tp = (d.tim || []).filter(x => x.jenis_tim === 'Tim Penyusun'), ns0 = d.narasumber || [];
@@ -4160,8 +4199,11 @@ function petaRpjmDok(ctx, kode, isi) {
     }
     for (let i = 1; i <= 8; i++) M['MX Tot Th' + i] = tt[i] ? rpjmAng(tt[i]) : ''; M['MX Tot Jumlah'] = gt ? rpjmAng(gt) : '';
   }
-  /* R03 gagasan dusun = kegiatan baru */
-  if (tags.indexOf('Gagasan Nama') >= 0) {
+  /* R03 gagasan dusun = usulan dusun (cadangan: kegiatan baru) */
+  if (tags.indexOf('Gagasan Nama') >= 0 && (ctx.gag || []).length) {
+    const G = ctx.gag.slice().sort((a, b) => OPT.dusun.indexOf(a.dusun) - OPT.dusun.indexOf(b.dusun) || (Number(a.prioritas) || 99) - (Number(b.prioritas) || 99));
+    rows.push({ key: 'Gagasan Nama', items: G.map((g, i) => ({ 'Gagasan No': (i + 1) + '.', 'Gagasan Nama': g.kegiatan + (g.dusun ? ' (' + rpjmDusun(g.dusun) + ')' : ''), 'Gagasan Lokasi': g.lokasi || rpjmDusun(g.dusun), 'Gagasan Volume': g.volume || '', 'Gagasan Satuan': g.satuan || '', 'Gagasan LK': g.lk || '', 'Gagasan PR': g.pr || '', 'Gagasan RTM': g.rtm || '' })), empty: { 'Gagasan No': '', 'Gagasan Nama': '', 'Gagasan Lokasi': '', 'Gagasan Volume': '', 'Gagasan Satuan': '', 'Gagasan LK': '', 'Gagasan PR': '', 'Gagasan RTM': '' } });
+  } else if (tags.indexOf('Gagasan Nama') >= 0) {
     const L = K.filter(k => k.perubahan === 'Baru').sort(ur);
     rows.push({ key: 'Gagasan Nama', items: L.map((k, i) => ({ 'Gagasan No': (i + 1) + '.', 'Gagasan Nama': k.nama, 'Gagasan Lokasi': k.lokasi || '', 'Gagasan Volume': k.volume || '', 'Gagasan Satuan': k.satuan || '', 'Gagasan LK': '', 'Gagasan PR': '', 'Gagasan RTM': '' })), empty: { 'Gagasan No': '', 'Gagasan Nama': '', 'Gagasan Lokasi': '', 'Gagasan Volume': '', 'Gagasan Satuan': '', 'Gagasan LK': '', 'Gagasan PR': '', 'Gagasan RTM': '' } });
   }
@@ -4198,6 +4240,15 @@ function petaRpjmDok(ctx, kode, isi) {
   }
   return { M: tambahU(M), rows };
 }
+/* isian dokumen diambil dari musyawarah RPJM yang sesuai bila isian cepat kosong */
+function rpjmIsiMus(ctx, kode) {
+  const j = RPJM_DOK_MUS[kode]; if (j == null || !(ctx.mus || []).length) return {};
+  const L = ctx.mus.filter(x => x.musyawarah === RPJM_MUSY[j]).sort((a, b) => String(b.tanggal).localeCompare(String(a.tanggal))), mu = L[0]; if (!mu) return {};
+  const o = { tanggal: mu.tanggal, jam: mu.jam, Tempat: mu.tempat, Pimpinan: mu.pimpinan, 'Unsur Pimpinan': mu.unsur_pimpinan, Notulen: mu.notulen, 'Unsur Notulen': mu.unsur_notulen, 'Jumlah Hadir': mu.jumlah_hadir, 'Hadir L': mu.hadir_l, 'Hadir P': mu.hadir_p, Kesepakatan: mu.catatan };
+  if (/^R(02|11|15)$/.test(kode)) { o['Nomor Dok'] = mu.no_sk; o.tgl_dok = mu.tgl_sk; }
+  Object.keys(o).forEach(k => { if (o[k] == null || String(o[k]).trim() === '') delete o[k]; else o[k] = String(o[k]); });
+  return o;
+}
 async function rpjmBuat(kode) {
   const per = S.rpjmDokPer, nm = RPJMD_NAMA[kode] || kode;
   const m = modal('Membuat dokumen', `<div class="stack"><b>${esc(nm)}</b><div class="skel"></div><div class="meta">Mengisi template…</div></div>`);
@@ -4219,7 +4270,8 @@ async function rpjmIsian(kode) {
   $('#riSimpan', m.body).onclick = async () => { try { await rpjmDokSimpan(per, kode, { isi: ambil() }); toast('Tersimpan'); m.close(); refresh(); } catch (x) { toast(x.message, 1); } };
   $('#riBuat', m.body).onclick = async () => { try { await rpjmDokSimpan(per, kode, { isi: ambil() }); m.close(); rpjmBuat(kode); } catch (x) { toast(x.message, 1); } };
 }
-ACT.rpjDokGo = () => go('rpjmdok', {});
+ACT.rpjDokGo = () => { if (S.rpjmPid) S.rpjmDokId = S.rpjmPid; go('rpjmdok', {}); };
+ACT.rpjBaruGo = () => go('rpjmbaru', {});
 ACT.rpjDokBuat = t => rpjmBuat(t.dataset.k);
 ACT.rpjDokIsi = t => rpjmIsian(t.dataset.k).catch(x => toast(x.message, 1));
 ACT.rpjDokStatus = async t => { try { await rpjmDokSimpan(S.rpjmDokPer, t.dataset.k, { status: t.value }); toast('Status disimpan'); } catch (x) { toast(x.message, 1); } };
@@ -4229,7 +4281,7 @@ VIEWS.rpjmdok = async (p, main, alive) => {
   const d = await rpjmCall('daftar'); if (alive && !alive()) return;
   const P = d.periode || [], w = can('perencanaan');
   const per = P.find(x => x.id === S.rpjmDokId) || P.find(x => x.status === 'Draft' && x.jenis === 'Perubahan') || P.find(x => x.status === 'Draft') || P.find(x => x.status === 'Aktif') || P[P.length - 1];
-  if (!per) { setTop('Dokumen RPJM Desa'); main.innerHTML = '<div class="card meta">Belum ada RPJM Desa. Buat dulu lewat menu RPJM Desa Berjalan.</div>'; return; }
+  if (!per) { setTop('Dokumen RPJM Desa'); main.innerHTML = '<div class="card meta">Belum ada RPJM Desa. Buat dulu lewat menu RPJM Desa.</div>'; return; }
   S.rpjmDokId = per.id; S.rpjmDokPer = per;
   const [mp, tpl] = await Promise.all([rpjmDokMap(per, true), tplDaftar().catch(() => [])]); if (alive && !alive()) return;
   const ada = k => (tpl || []).some(x => x.path.indexOf('rpjm/' + k + '.') === 0), st = k => (mp[k] || {}).status || 'Belum';
@@ -4243,12 +4295,263 @@ VIEWS.rpjmdok = async (p, main, alive) => {
     <div class="meta">Periode ${per.tahun_awal}–${per.tahun_akhir} · dokumen terisi dari data RPJM (kegiatan, visi-misi), pengaturan desa, dan tim penyusun · ${selesai}/${semua.length} selesai</div>
     <div class="kd-track" style="--kc:var(--ok)"><i style="width:${selesai / semua.length * 100}%"></i></div>
     ${P.length > 1 ? `<div class="chips wrap">${P.map(v => `<button class="chip ${v.id === per.id ? 'on' : ''}" data-act="rpjDokPer" data-id="${esc(v.id)}">${v.tahun_awal}–${v.tahun_akhir} · ${v.versi ? 'Perubahan ' + v.versi : 'Awal'} <small>${esc(v.status)}</small></button>`).join('')}</div>` : ''}
-    <div class="btns"><button class="btn sm" data-act="go" data-go='["rpjm",{"id":"${esc(per.id)}"}]'>${ic('book')}Buka matriks RPJM</button></div>
+    <div class="btns"><button class="btn sm" data-act="go" data-go='["rpjm",{"id":"${esc(per.id)}"}]'>${ic('chart')}Dashboard RPJM</button></div>
     ${tanpaTpl ? `<div class="meta"><span class="pill warn">${tanpaTpl} template belum diunggah</span> ${S.user.admin ? '<button class="btn sm" data-act="go" data-go=\'["template",{}]\'>Buka Template Dokumen</button>' : ''}</div>` : ''}</div>
     ${RPJMD_TAHAP.map(t => `<div class="kd-c"><div class="kd-h"><b>${esc(t.t)}</b><span class="meta">${esc(t.d)}</span></div><div class="rk-dl">${t.docs.map(kartu).join('')}</div></div>`).join('')}</div>`;
   $$('select[data-act-change]', main).forEach(s => s.onchange = () => ACT.rpjDokStatus(s));
 };
 
+
+/* =====================================================================
+   DASHBOARD RPJM DESA — dasar aturan, jadwal dari pelantikan Kepala Desa,
+   rencana kerja tim, 7 tahapan (Permendagri 114/2014 Pasal 7), musyawarah
+   (undangan, foto maks. 7 → Agenda), usulan gagasan dusun, realisasi per tahun
+   ===================================================================== */
+const RPJM_MUSY = RPJM_MUSY_OPT;
+const RPJM_TH7 = [
+  { n: 'Pembentukan Tim Penyusun', d: 'Musyawarah desa membentuk tim 7–11 orang (Sekdes ketua, Ketua LPM sekretaris, wajib ada perempuan), lalu SK Kepala Desa.', ps: 'Pasal 8', mus: [0], docs: ['R01', 'R02'], off: 14, pj: 'Kepala Desa & BPD' },
+  { n: 'Penyelarasan arah kebijakan Kabupaten', d: 'Tim mendata rencana program kabupaten/kota yang masuk desa, dipilah per 4 bidang. Isi di "Visi, Misi & Arah Kebijakan".', ps: 'Pasal 10–11', mus: [], docs: [], off: 28, pj: 'Tim Penyusun', data: 'arah' },
+  { n: 'Pengkajian keadaan desa', d: 'Penyelarasan data desa dan penggalian gagasan lewat Musyawarah Dusun (sketsa desa, kalender musim, bagan kelembagaan), lalu rekap usulan & laporan pengkajian.', ps: 'Pasal 12–19', mus: [1], docs: ['R03', 'R04', 'R05'], off: 45, pj: 'Tim Penyusun & Kepala Dusun', data: 'usul' },
+  { n: 'Musyawarah Desa', d: 'BPD membahas laporan pengkajian, arah kebijakan, dan rencana prioritas kegiatan; hasilnya berita acara.', ps: 'Pasal 20–22', mus: [2], docs: ['R06', 'R07', 'R08', 'R10'], off: 55, pj: 'BPD' },
+  { n: 'Penyusunan rancangan RPJM Desa', d: 'Tim menyusun rancangan (matriks & naskah) berdasarkan BA Musdes, BA hasil penyusunan, diperiksa Kepala Desa.', ps: 'Pasal 23–24', mus: [5], docs: ['R21', 'R20', 'R09'], off: 66, pj: 'Tim Penyusun', data: 'mat' },
+  { n: 'Musrenbang Desa', d: 'Kepala Desa menyelenggarakan Musrenbangdes untuk membahas & menyepakati rancangan RPJM Desa.', ps: 'Pasal 25–27', mus: [3], docs: ['R11', 'R12', 'R13', 'R14'], off: 78, pj: 'Kepala Desa' },
+  { n: 'Penetapan RPJM Desa', d: 'Rancangan Perdes dibahas dan disepakati bersama BPD, lalu ditetapkan dengan Peraturan Desa.', ps: 'Pasal 5 ayat (2) & 27', mus: [4], docs: ['R15', 'R16', 'R17', 'R18', 'R19'], off: 90, pj: 'Kepala Desa & BPD', wajib: 1 }];
+const RPJM_ATURAN = [
+  ['UU 6/2014 tentang Desa, diubah terakhir UU 3/2024', 'Pasal 79 ayat (2) huruf a: RPJM Desa untuk jangka waktu 8 tahun; masa jabatan Kepala Desa 8 tahun. Dasar Perubahan RPJM Desa 2020–2027/2028.'],
+  ['Permendagri 114/2014 tentang Pedoman Pembangunan Desa', 'Pasal 5(2): ditetapkan paling lama 3 bulan sejak pelantikan Kepala Desa · Pasal 7: tujuh tahapan · Pasal 8: tim 7–11 orang, wajib ada perempuan · Pasal 15: penggalian gagasan lewat musyawarah dusun/khusus · Pasal 28: perubahan RPJM Desa ditetapkan dengan Perdes.'],
+  ['Permendesa PDTT 21/2020', 'Pedoman umum pembangunan desa & pemberdayaan masyarakat (RPJM Desa berbasis data SDGs Desa/IDM).'],
+  ['Permendesa PDTT 16/2019 tentang Musyawarah Desa', 'Tata cara Musdes: penyelenggara BPD, undangan, peserta, berita acara.'],
+  ['Permendagri 111/2014 tentang Pedoman Teknis Peraturan di Desa', 'Penyusunan dan penetapan Perdes RPJM Desa.'],
+  ['Perbup Lumajang 40/2018', 'Petunjuk teknis penyusunan RPJM Desa dan RKP Desa di Kabupaten Lumajang.']];
+/* dokumen tambahan per musyawarah (bukan bagian dari 21 dokumen tahapan) */
+const RPJMD_EXTRA = { R00: 'Undangan Musyawarah RPJM (per musyawarah)', R22: 'Dokumentasi Foto Kegiatan RPJM (per musyawarah)' };
+Object.assign(RPJMD_CAT, { R00: { f: 'R00._Undangan_Musyawarah_RPJM.docx', t: ['Kop Pengundang_U', 'Desa_U', 'Kabupaten_U', 'Kecamatan_U', 'Alamat', 'Kodepos', 'Nomor Undangan', 'Jenis Musyawarah', 'Desa', 'Tgu', 'Kepada', 'Dasar Undangan', 'Hari', 'Tgl', 'Jam', 'Tempat', 'Acara', 'Jabatan Pengundang', 'Nama Pengundang_U'] }, R22: { f: 'R22._Dokumentasi_Foto_Kegiatan_RPJM.docx', t: ['Judul Dokumentasi', 'Hari', 'Tgl', 'Foto Dokumentasi'] } });
+const RPJM_DOK_MUS = { R01: 0, R02: 0, R03: 1, R06: 2, R07: 2, R08: 2, R10: 2, R09: 5, R11: 3, R12: 3, R13: 3, R14: 3, R15: 4, R16: 4, R17: 4 };
+const RPJM_BID = ['1. Penyelenggaraan Pemerintahan Desa', '2. Pelaksanaan Pembangunan Desa', '3. Pembinaan Kemasyarakatan Desa', '4. Pemberdayaan Masyarakat Desa', '5. Penanggulangan Bencana, Darurat & Mendesak'];
+const rpjmDusun = s => String(s || '').replace(/^DUSUN\s+/i, '').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+const rpjmIso = d => d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+const rpjmTambahHari = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const rpjmTambahBulan = (d, n) => { const x = new Date(d); x.setMonth(x.getMonth() + n); return x; };
+const rpjmUbahTxt = per => per && per.jenis === 'Perubahan' ? 'Perubahan ' : '';
+
+function rpjmPilihPer(P, id) {
+  return P.find(x => x.id === id) || P.find(x => x.id === S.rpjmPid) || P.find(x => x.status === 'Draft' && x.jenis === 'Perubahan') || P.find(x => x.status === 'Aktif') || P.find(x => x.status === 'Draft') || P[P.length - 1] || null;
+}
+async function rpjmDashData(per) {
+  const L = (e, lim) => call('list', { entity: e, filters: { periode_id: per.id }, limit: lim || 500 }).then(r => r.rows || []).catch(() => []);
+  const [mp, mus, gag, tpl] = await Promise.all([rpjmDokMap(per, true), L('rpjm_musyawarah', 300), L('rpjm_gagasan', 2000), tplDaftar().catch(() => [])]);
+  let jd = {}; try { jd = (mp._jadwal || {})._isi || {}; } catch (x) { }
+  const st = k => (mp[k] || {}).status || 'Belum';
+  const ada = k => (tpl || []).some(x => x.path.indexOf('rpjm/' + k + '.') === 0 && !/_cadangan/.test(x.path));
+  return { per, mp, mus, gag, tpl, jd, st, ada };
+}
+/* jadwal & rencana kerja: dihitung dari tanggal pelantikan Kades (atau tanggal acuan perubahan) */
+function rpjmJadwal(D, A) {
+  const base = parseD(D.jd.pelantikan || ''), now = isoToday(), ren = D.jd.rencana || {}, sel = D.jd.selesai || {}, pj = D.jd.pj || {};
+  return RPJM_TH7.map((t, i) => {
+    const no = i + 1, sar = base ? rpjmIso(t.wajib ? rpjmTambahBulan(base, 3) : rpjmTambahHari(base, t.off)) : '';
+    const M = D.mus.filter(m => t.mus.some(j => m.musyawarah === RPJM_MUSY[j])).sort((a, b) => String(a.tanggal).localeCompare(String(b.tanggal)));
+    const dw = t.docs, a = dw.filter(k => D.st(k) === 'Selesai').length, mulai = dw.some(k => D.st(k) !== 'Belum') || M.length > 0 || (t.data === 'usul' && D.gag.length > 0) || (t.data === 'arah' && (A || []).some(x => x.jenis === 'Arah Kebijakan'));
+    const tglReal = sel[no] || (dw.length && a === dw.length && M.length ? M[M.length - 1].tanggal : '');
+    const done = !!sel[no] || (dw.length > 0 && a === dw.length);
+    const target = ren[no] || sar;
+    const hari = target ? Math.round((parseD(target) - parseD(now)) / 864e5) : null;
+    const cls = done ? 'ok' : hari != null && hari < 0 ? 'bad' : hari != null && hari <= 7 ? 'warn' : mulai ? 'info' : '';
+    const stt = done ? 'Selesai' : hari != null && hari < 0 ? 'Terlambat' : mulai ? 'Berjalan' : hari != null && hari <= 7 ? 'Segera' : 'Belum mulai';
+    return { no, t, sar, target, tglReal, done, mulai, M, a, dw, hari, cls, st: stt, pj: pj[no] || t.pj };
+  });
+}
+function rpjmJadwalHtml(J, only) {
+  const L = only ? J.filter(m => m.no === only) : J;
+  return `<div class="rk-jl">${L.map(m => `<div class="rk-j ${m.cls}"><span class="rk-jd"><b>${m.target ? esc(dPanjang(m.target)) : '—'}</b><small class="meta">${m.t.wajib ? 'batas hukum' : 'rencana'}</small></span>
+    <span class="main"><b>${m.no}. ${esc(m.t.n)}</b><small class="meta">${esc(m.t.ps)} · PJ: ${esc(m.pj)}${m.dw.length ? ' · dokumen ' + m.a + '/' + m.dw.length : ''}${m.M.length ? ' · ' + m.M.length + ' musyawarah' : ''}${m.tglReal ? ' · selesai ' + esc(dPanjang(m.tglReal)) : ''}</small></span>
+    <span class="rk-r"><span class="pill ${m.cls}">${esc(m.st)}</span><small class="meta">${m.done || m.hari == null ? '' : rkpHariT(m.hari)}</small></span></div>`).join('')}</div>`;
+}
+/* kartu dokumen (dipakai di Dokumen RPJM & halaman tahap) */
+function rpjmKartuDok(k, D, w) {
+  const st = D.st(k);
+  return `<div class="card rk-d"><div class="rk-dt"><b>${esc(RPJMD_NAMA[k])}</b><span class="pill ${rkpPillS(st)}">${esc(st)}</span></div>
+    ${D.ada(k) ? '' : `<div class="meta"><span class="pill warn">Template belum diunggah</span> ${S.user.admin ? 'Admin → Template Dokumen → RPJM Desa' : 'Hubungi admin'}</div>`}
+    ${w ? `<div class="btns">${rpjmFields(k).length ? `<button class="btn sm" data-act="rpjDokIsi" data-k="${k}">${ic('edit')}Isi cepat</button>` : ''}<button class="btn sm pri" data-act="rpjDokBuat" data-k="${k}">${ic('file')}Cetak Word</button>
+    <select class="sel" data-act-change="rpjDokStatus" data-k="${k}" aria-label="Status ${esc(RPJMD_NAMA[k])}">${RPJMD_ST.map(x => `<option ${x === st ? 'selected' : ''}>${x}</option>`).join('')}</select></div>` : ''}</div>`;
+}
+/* ---------- tab Dashboard di halaman RPJM Desa ---------- */
+async function rpjmDash(body, o) {
+  const { per, K, A, TH, P, wr } = o;
+  body.innerHTML = '<div class="skel" style="height:220px"></div>';
+  const D = await rpjmDashData(per); S.rpjmDokPer = per; S.rpjmDokId = per.id;
+  const w = can('perencanaan'), J = rpjmJadwal(D, A), cy = new Date().getFullYear();
+  const semua = Object.keys(RPJMD_NAMA), sel = semua.filter(k => D.st(k) === 'Selesai').length, ttd = semua.filter(k => D.st(k) === 'Siap TTD');
+  const tel = J.filter(m => m.cls === 'bad').length, next = J.find(m => !m.done);
+  const pel = D.jd.pelantikan, ubah = per.jenis === 'Perubahan';
+  const batas = pel ? rpjmIso(rpjmTambahBulan(parseD(pel), 3)) : '';
+  /* realisasi per tahun */
+  const real = TH.map(y => {
+    const R = K.filter(k => !rpjmKosong(k) && Number(((k.biaya || {})[y] || {}).jumlah || 0) > 0), j = k => Number(((k.biaya || {})[y] || {}).jumlah || 0);
+    const r = R.filter(k => ((k.tautan || {})[y] || {}).rkp), a = R.filter(k => ((k.tautan || {})[y] || {}).apbdes);
+    return { y, n: R.length, rp: R.reduce((s, k) => s + j(k), 0), nr: r.length, na: a.length, rpa: a.reduce((s, k) => s + j(k), 0) };
+  });
+  const tN = real.reduce((s, x) => s + x.n, 0), tA = real.filter(x => x.y <= cy).reduce((s, x) => s + x.na, 0), tL = real.filter(x => x.y <= cy).reduce((s, x) => s + x.n, 0);
+  const maxRp = Math.max(1, ...real.map(x => x.rp));
+  const rpf = v => 'Rp ' + rpjmAng(v);
+  /* usulan per dusun */
+  const perD = {}; D.gag.forEach(g => { perD[g.dusun] = perD[g.dusun] || { n: 0, m: 0 }; perD[g.dusun].n++; if (g.status === 'Masuk RPJM') perD[g.dusun].m++; });
+  const musD = OPT.dusun.map(dn => ({ dn, m: D.mus.filter(m => m.musyawarah === RPJM_MUSY[1] && m.dusun === dn).sort((a, b) => String(b.tanggal).localeCompare(String(a.tanggal)))[0] }));
+  const stepper = J.map(m => {
+    const b = m.dw.length || 1, a = m.dw.length ? m.a : m.done ? 1 : 0;
+    return `<button class="card rk-s" data-act="go" data-go='["rpjmtahap",{"t":${m.no},"id":"${esc(per.id)}"}]'><span class="rk-n">${m.no}</span><span class="main"><b>${esc(m.t.n)}</b><small class="meta">${esc(m.t.ps)} · ${m.target ? 'target ' + esc(dPanjang(m.target)) : 'isi tanggal pelantikan untuk jadwal'}${m.M.length ? ' · ' + m.M.length + ' musyawarah' : ''}</small>
+      <span class="kd-track" style="--kc:var(--ok)"><i style="width:${a / b * 100}%"></i></span></span><span class="rk-r"><span class="pill ${m.cls}">${esc(m.st)}</span>${m.dw.length ? `<b class="num">${m.a}/${m.dw.length}</b>` : ''}</span></button>`;
+  }).join('');
+  body.innerHTML = `<div class="kd">
+    <div class="kd-c ${tel ? 'rk-alert' : ''}"><div class="kd-h"><b>Jadwal & rencana kerja tim</b><span>${tel ? `<span class="pill bad">${tel} terlambat</span> ` : ''}${w ? `<button class="btn sm" data-act="rpjJadwal">${ic('cal')}Atur jadwal</button>` : ''}</span></div>
+      ${pel ? `<div class="meta">${ubah ? 'Tanggal acuan perubahan' : 'Kepala Desa dilantik'}: <b>${esc(dPanjang(pel))}</b>${D.jd.acuan ? ' (' + esc(D.jd.acuan) + ')' : ''} · ${ubah ? 'target penetapan (disarankan 3 bulan)' : 'batas penetapan RPJM Desa (Pasal 5 ayat 2)'}: <b>${esc(dPanjang(batas))}</b> ${rkpHariT(Math.round((parseD(batas) - parseD(isoToday())) / 864e5))}</div>`
+      : `<div class="card meta" style="border-color:var(--warn)">${ic('cal')} Isi <b>tanggal pelantikan Kepala Desa</b>${ubah ? ' (atau tanggal acuan perubahan, mis. tanggal SK perpanjangan masa jabatan)' : ''} agar jadwal tiap tahap dihitung otomatis: RPJM Desa wajib ditetapkan paling lama 3 bulan sejak pelantikan. ${w ? '<button class="btn sm pri" data-act="rpjJadwal">Isi sekarang</button>' : ''}</div>`}
+      ${rpjmJadwalHtml(J)}</div>
+    ${w && next ? `<div class="kd-act"><button class="btn pri" data-act="go" data-go='["rpjmtahap",{"t":${next.no},"id":"${esc(per.id)}"}]'>${ic('next')}Lanjut: ${esc(next.t.n)}</button><button class="btn" data-act="rpjDokGo">${ic('file')}Dokumen RPJM (${sel}/${semua.length})</button><button class="btn" data-act="go" data-go='["rpjmbaru",{}]'>${ic('edit')}Penyusunan RPJM Baru</button></div>` : ''}
+    <div class="kd-kpi">
+      <div class="kd-k" style="--kc:var(--ok)"><span class="l">Dokumen selesai</span><b class="v">${sel}/${semua.length}</b><div class="kd-track"><i style="width:${sel / semua.length * 100}%"></i></div><span class="s">${ttd.length ? ttd.length + ' menunggu tanda tangan' : 'R01–R21'}</span></div>
+      <div class="kd-k" style="--kc:var(--c-bel)"><span class="l">Usulan gagasan dusun</span><b class="v">${D.gag.length}</b><span class="s">${D.gag.filter(g => g.status === 'Masuk RPJM').length} masuk RPJM · ${Object.keys(perD).length}/${OPT.dusun.length} dusun</span></div>
+      <div class="kd-k" style="--kc:var(--c-pend)"><span class="l">Musyawarah tercatat</span><b class="v">${D.mus.length}</b><span class="s">${musD.filter(x => x.m).length}/${OPT.dusun.length} musyawarah dusun</span></div>
+      <div class="kd-k" style="--kc:var(--info)"><span class="l">Realisasi s.d. ${cy}</span><b class="v">${tA}/${tL}</b><div class="kd-track"><i style="width:${tL ? tA / tL * 100 : 0}%"></i></div><span class="s">kegiatan rencana yang sudah masuk APBDes</span></div>
+    </div>
+    <div class="kd-c"><div class="kd-h"><b>Tahapan penyusunan ${esc(rpjmUbahTxt(per))}RPJM Desa</b><span class="meta">Permendagri 114/2014 Pasal 7 · pilih tahap untuk musyawarah & dokumen</span></div><div class="rk-sl">${stepper}</div></div>
+    <div class="kd-2">
+      <div class="kd-c"><div class="kd-h"><b>Usulan gagasan per dusun</b><span class="btns"><button class="btn sm" data-act="rpjGagList">${ic('list')}Daftar</button>${w ? `<button class="btn sm pri" data-act="rpjGagAdd">${ic('plus')}Usulan</button>` : ''}</span></div>
+        <div class="list">${musD.map(x => { const g = perD[x.dn] || { n: 0, m: 0 }; return `<div class="row" style="cursor:default"><span class="av">${ic('house')}</span><span class="main"><span class="t">${esc(rpjmDusun(x.dn))}</span><span class="s">${x.m ? 'Musdus ' + esc(dPanjang(x.m.tanggal)) : 'Musyawarah dusun belum dicatat'} · ${g.n} usulan${g.m ? ', ' + g.m + ' masuk RPJM' : ''}</span></span>${w ? `<span class="btns">${x.m ? `<button class="btn sm" data-act="rpjMusBuka" data-id="${esc(x.m.id)}">${ic('eye')}</button>` : `<button class="btn sm" data-act="rpjMusAdd" data-j="1" data-d="${esc(x.dn)}">${ic('plus')}Musdus</button>`}<button class="btn sm" data-act="rpjGagAdd" data-d="${esc(x.dn)}">${ic('plus')}Usulan</button></span>` : ''}</div>`; }).join('')}</div>
+        <div class="meta" style="margin-top:6px">Usulan mengisi R03 Rekapitulasi Gagasan Dusun. Dari daftar usulan, tombol "Jadikan kegiatan RPJM" memindahkannya ke matriks (saat RPJM berstatus Draft).</div></div>
+      <div class="kd-c"><div class="kd-h"><b>Realisasi per tahun</b><span class="meta">dari tombol "Cocokkan RKP & APBDes"</span></div>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tahun</th><th class="r">Rencana</th><th class="r">Masuk RKP</th><th class="r">APBDes</th><th style="min-width:110px">Anggaran rencana</th></tr></thead><tbody>${real.map(x => `<tr${x.y === cy ? ' style="font-weight:600"' : ''}><td>${x.y}</td><td class="r num">${x.n}</td><td class="r num">${x.nr}</td><td class="r num">${x.na}${x.n ? ' <small class="meta">(' + Math.round(x.na / x.n * 100) + '%)</small>' : ''}</td><td><div class="kd-track" style="--kc:var(--info)" title="${esc(rpf(x.rpa) + ' dari ' + rpf(x.rp))}"><i style="width:${x.rp / maxRp * 100}%;opacity:.35"></i></div><small class="meta num">${rpf(x.rp)}</small></td></tr>`).join('')}</tbody></table></div>
+        ${tN ? '' : '<div class="meta">Belum ada kegiatan berbiaya di matriks.</div>'}
+        ${wr && per.status !== 'Arsip' ? `<div class="btns" style="margin-top:6px"><button class="btn sm" data-act="rpjCocok">${ic('target')}Cocokkan RKP & APBDes</button></div>` : ''}</div>
+    </div>
+    <div class="kd-2">
+      <div class="kd-c"><div class="kd-h"><b>Dasar aturan</b></div><div class="list">${RPJM_ATURAN.map(a => `<div class="row" style="cursor:default"><span class="av">${ic('book')}</span><span class="main"><span class="t">${esc(a[0])}</span><span class="s" style="white-space:normal">${esc(a[1])}</span></span></div>`).join('')}</div></div>
+      <div class="kd-c"><div class="kd-h"><b>Dokumen & penyusunan</b></div>
+        <div class="kd-mini"><div><span>Dokumen selesai</span><b class="num">${sel}/${semua.length}</b></div><div><span>Template terunggah</span><b class="num">${semua.concat(['R00', 'R22']).filter(D.ada).length}/${semua.length + 2}</b></div><div><span>Musyawarah</span><b class="num">${D.mus.length}</b></div></div>
+        ${ttd.length ? `<div class="meta" style="margin-top:6px">Menunggu tanda tangan: ${esc(ttd.map(k => RPJMD_NAMA[k]).join('; '))}</div>` : ''}
+        <div class="btns" style="margin-top:8px"><button class="btn sm pri" data-act="rpjDokGo">${ic('file')}Dokumen RPJM Desa</button><button class="btn sm" data-act="rpjMusList">${ic('users')}Semua musyawarah</button><button class="btn sm" data-act="go" data-go='["rpjmbaru",{}]'>${ic('edit')}Penyusunan RPJM Baru</button></div>
+        <div class="meta" style="margin-top:6px">RPJM berlaku 8 tahun (UU 3/2024). Penyusunan RPJM baru dimulai setelah Kepala Desa periode berikutnya dilantik; batas penetapan 3 bulan sejak pelantikan.</div></div>
+    </div></div>`;
+  kdTip && kdTip();
+}
+/* ---------- halaman per tahap ---------- */
+VIEWS.rpjmtahap = async (p, main, alive) => {
+  const ti = Math.max(1, Math.min(7, Number(p.t) || 1)), t = RPJM_TH7[ti - 1];
+  setTop('Tahap ' + ti + ' · ' + t.n, 'RPJM Desa');
+  const d = await rpjmCall('daftar'); if (alive && !alive()) return;
+  const per = rpjmPilihPer(d.periode || [], p.id); if (!per) { main.innerHTML = '<div class="card meta">Belum ada RPJM Desa.</div>'; return; }
+  S.rpjmPid = per.id; S.rpjmDokPer = per; S.rpjmDokId = per.id;
+  const [D, m] = await Promise.all([rpjmDashData(per), rpjmCall('matriks', { periode_id: per.id })]); if (alive && !alive()) return;
+  const J = rpjmJadwal(D, m.arah || []), mj = J[ti - 1], w = can('perencanaan');
+  setTop('Tahap ' + ti + ' · ' + t.n, per.nama);
+  const musH = t.mus.map(j => {
+    const L = D.mus.filter(x => x.musyawarah === RPJM_MUSY[j]);
+    if (j === 1) return `<div class="kd-h" style="margin-top:4px"><b>${esc(RPJM_MUSY[j])}</b><span class="meta">satu catatan per dusun</span></div><div class="list">${OPT.dusun.map(dn => { const r = L.find(x => x.dusun === dn); return r ? rowHtml('rpjm_musyawarah', r) : `<div class="row" style="cursor:default"><span class="av">${ic('house')}</span><span class="main"><span class="t">${esc(rpjmDusun(dn))}</span><span class="s">Belum dicatat</span></span>${w ? `<button class="btn sm pri" data-act="rpjMusAdd" data-j="1" data-d="${esc(dn)}">${ic('plus')}Isi</button>` : ''}</div>`; }).join('')}</div>`;
+    return `<div class="kd-h" style="margin-top:4px"><b>${esc(RPJM_MUSY[j])}</b>${w ? `<button class="btn sm ${L.length ? '' : 'pri'}" data-act="rpjMusAdd" data-j="${j}">${ic('plus')}${L.length ? 'Tambah' : 'Isi'}</button>` : ''}</div>${L.length ? `<div class="list">${L.map(r => rowHtml('rpjm_musyawarah', r)).join('')}</div>` : '<div class="meta">Belum dicatat. Setelah disimpan dengan tanggal & jam, musyawarah otomatis masuk Kegiatan → Agenda.</div>'}`;
+  }).join('');
+  const dataH = t.data === 'arah' ? `<button class="btn sm" data-act="go" data-go='["rpjm",{"id":"${esc(per.id)}","tab":"arah"}]'>${ic('target')}Visi, Misi & Arah Kebijakan (${(m.arah || []).length})</button>`
+    : t.data === 'usul' ? `<button class="btn sm" data-act="rpjGagList">${ic('list')}Usulan gagasan dusun (${D.gag.length})</button>${w ? `<button class="btn sm" data-act="rpjGagAdd">${ic('plus')}Tambah usulan</button>` : ''}`
+      : t.data === 'mat' ? `<button class="btn sm" data-act="go" data-go='["rpjm",{"id":"${esc(per.id)}","tab":"mat"}]'>${ic('list')}Matriks kegiatan (${(m.kegiatan || []).filter(k => !rpjmKosong(k)).length})</button>` : '';
+  main.innerHTML = `<div class="kd">
+    <div class="card" style="padding:8px 11px"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><b>${esc(t.d)}</b><span class="pill ${mj.cls}">${esc(mj.st)}</span></div><div class="meta">${esc(t.ps)} Permendagri 114/2014 · Penanggung jawab: ${esc(mj.pj)}</div>${mj.dw.length ? `<div class="kd-track" style="--kc:var(--ok);margin-top:5px"><i style="width:${mj.a / mj.dw.length * 100}%"></i></div>` : ''}</div>
+    <div class="kd-c"><div class="kd-h"><b>Jadwal tahap ini</b>${w ? `<span class="btns"><button class="btn sm" data-act="rpjJadwal">${ic('cal')}Atur jadwal</button><button class="btn sm ${mj.done ? '' : 'pri'}" data-act="rpjTahapSelesai" data-t="${ti}" data-v="${mj.done ? 0 : 1}">${ic('check')}${mj.done ? 'Batalkan selesai' : 'Tandai selesai'}</button></span>` : ''}</div>${rpjmJadwalHtml(J, ti)}</div>
+    ${musH || dataH ? `<div class="kd-c"><div class="kd-h"><b>1. Musyawarah & data</b><span class="meta">undangan, foto dokumentasi (maks. 7), daftar hadir</span></div>${dataH ? `<div class="btns">${dataH}</div>` : ''}${musH}</div>` : ''}
+    ${t.docs.length ? `<div class="kd-c"><div class="kd-h"><b>2. Isi cepat & cetak dokumen</b><span class="meta">tanggal, tempat & pimpinan diambil dari musyawarah bila isian kosong</span></div><div class="rk-dl">${t.docs.map(k => rpjmKartuDok(k, D, w)).join('')}</div></div>` : ''}
+    <div class="btns">${ti > 1 ? `<button class="btn" data-act="go" data-go='["rpjmtahap",{"t":${ti - 1},"id":"${esc(per.id)}"}]'>${ic('back')}Tahap ${ti - 1}</button>` : ''}<button class="btn" data-act="go" data-go='["rpjm",{"id":"${esc(per.id)}"}]'>${ic('chart')}Dashboard RPJM</button>${ti < 7 ? `<button class="btn pri" data-act="go" data-go='["rpjmtahap",{"t":${ti + 1},"id":"${esc(per.id)}"}]'>Tahap ${ti + 1}${ic('next')}</button>` : ''}</div></div>`;
+  $$('select[data-act-change]', main).forEach(s => s.onchange = () => ACT.rpjDokStatus(s));
+};
+/* ---------- aksi ---------- */
+async function rpjmPerAktif() { if (S.rpjmDokPer && S.rpjmDokPer.id === S.rpjmPid) return S.rpjmDokPer; const d = await rpjmCall('daftar'); const per = rpjmPilihPer(d.periode || [], S.rpjmPid); S.rpjmDokPer = per; return per; }
+ACT.rpjMusAdd = async t => { const per = await rpjmPerAktif(); S.rpjmPid = per.id; const j = Number(t.dataset.j) || 0, pre = { periode_id: per.id, musyawarah: RPJM_MUSY[j] }; if (t.dataset.d) pre.dusun = t.dataset.d; if (j === 1) { pre.tempat = 'Balai ' + rpjmDusun(t.dataset.d || '') ; pre.unsur_pimpinan = 'Kepala Dusun'; } if (j === 0 || j === 2 || j === 4) pre.unsur_pimpinan = 'Ketua BPD'; if (j === 3) pre.unsur_pimpinan = 'Kepala Desa'; go('form', { e: 'rpjm_musyawarah', preset: pre }); };
+ACT.rpjMusBuka = t => go('detail', { e: 'rpjm_musyawarah', id: t.dataset.id });
+ACT.rpjMusList = async () => { const per = await rpjmPerAktif(); S.rpjmPid = per.id; go('list', { e: 'rpjm_musyawarah' }); };
+ACT.rpjGagList = async () => { const per = await rpjmPerAktif(); S.rpjmPid = per.id; go('list', { e: 'rpjm_gagasan' }); };
+ACT.rpjGagAdd = async t => { const per = await rpjmPerAktif(); S.rpjmPid = per.id; const pre = { periode_id: per.id, status: 'Usulan' }; if (t.dataset.d) pre.dusun = t.dataset.d; if (t.dataset.m) pre.musyawarah_id = t.dataset.m; go('form', { e: 'rpjm_gagasan', preset: pre }); };
+ACT.rpjTahapSelesai = async t => {
+  try { const per = await rpjmPerAktif(), mp = await rpjmDokMap(per, true), jd = Object.assign({}, (mp._jadwal || {})._isi || {}); jd.selesai = Object.assign({}, jd.selesai || {}); if (t.dataset.v === '1') jd.selesai[t.dataset.t] = isoToday(); else delete jd.selesai[t.dataset.t]; await rpjmDokSimpan(per, '_jadwal', { isi: jd, status: 'Draf' }); toast('Tersimpan'); refresh(); } catch (x) { toast(x.message, 1); }
+};
+ACT.rpjJadwal = async () => {
+  const per = await rpjmPerAktif(), mp = await rpjmDokMap(per, true), jd = (mp._jadwal || {})._isi || {}, ubah = per.jenis === 'Perubahan';
+  const base = () => parseD($('#rjP', m.el).value);
+  const sar = (t) => { const b = base(); return b ? rpjmIso(t.wajib ? rpjmTambahBulan(b, 3) : rpjmTambahHari(b, t.off)) : ''; };
+  const m = modal('Jadwal & rencana kerja — ' + per.nama, `<form class="stack" id="rjF">
+    <div class="form"><div class="f"><label for="rjP">${ubah ? 'Tanggal acuan perubahan' : 'Tanggal pelantikan Kepala Desa'} <i>*</i></label><input id="rjP" type="date" value="${esc(jd.pelantikan || '')}" required></div>
+    <div class="f"><label for="rjA">Keterangan acuan</label><input id="rjA" value="${esc(jd.acuan || (ubah ? 'SK perpanjangan masa jabatan Kepala Desa (UU 3/2024)' : 'Pelantikan Kepala Desa'))}"></div></div>
+    <div class="meta">${ubah ? 'Untuk Perubahan RPJM tidak ada batas hukum khusus; jadwal di bawah memakai pola 3 bulan sebagai target.' : 'Permendagri 114/2014 Pasal 5 ayat (2): RPJM Desa ditetapkan paling lama 3 bulan sejak pelantikan Kepala Desa.'} Kosongkan tanggal rencana untuk memakai saran otomatis.</div>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tahap</th><th>Saran</th><th>Rencana</th><th>Penanggung jawab</th><th>Selesai</th></tr></thead><tbody>${RPJM_TH7.map((t, i) => `<tr><td>${i + 1}. ${esc(t.n)}</td><td class="num rjS" data-i="${i}"></td><td><input type="date" class="inp rjR" data-i="${i + 1}" value="${esc((jd.rencana || {})[i + 1] || '')}"></td><td><input class="inp rjJ" data-i="${i + 1}" value="${esc((jd.pj || {})[i + 1] || t.pj)}"></td><td><input type="date" class="inp rjD" data-i="${i + 1}" value="${esc((jd.selesai || {})[i + 1] || '')}"></td></tr>`).join('')}</tbody></table></div>
+    <div class="err" hidden></div><div class="btns"><button class="btn pri" id="rjOk">${ic('check')}Simpan</button></div></form>`, { big: 1 });
+  const isiSaran = () => $$('.rjS', m.el).forEach(td => { const s = sar(RPJM_TH7[td.dataset.i]); td.textContent = s ? dDmy(s) : '—'; });
+  isiSaran(); $('#rjP', m.el).oninput = isiSaran;
+  $('#rjF', m.el).onsubmit = async ev => {
+    ev.preventDefault(); const b = $('#rjOk', m.el); b.disabled = true;
+    const ob = sel => { const o = {}; $$(sel, m.el).forEach(i => { if (i.value.trim()) o[i.dataset.i] = i.value.trim(); }); return o; };
+    const pj = ob('.rjJ'); RPJM_TH7.forEach((t, i) => { if (pj[i + 1] === t.pj) delete pj[i + 1]; });
+    try { await rpjmDokSimpan(per, '_jadwal', { isi: { pelantikan: $('#rjP', m.el).value, acuan: $('#rjA', m.el).value.trim(), rencana: ob('.rjR'), selesai: ob('.rjD'), pj }, status: 'Draf' }); m.close(); toast('Jadwal disimpan.'); refresh(); }
+    catch (x) { const e = $('.err', m.el); e.textContent = x.message; e.hidden = false; b.disabled = false; }
+  };
+};
+/* usulan gagasan → kegiatan RPJM (matriks) */
+ACT.rpjGagKeg = async t => {
+  try {
+    const g = await call('get', { entity: 'rpjm_gagasan', id: t.dataset.id }), d = await rpjmCall('daftar'), per = (d.periode || []).find(x => x.id === g.periode_id);
+    if (!per || per.status !== 'Draft') throw new Error('Kegiatan hanya bisa ditambahkan ke RPJM berstatus Draft. Buat Perubahan RPJM dulu di dashboard RPJM Desa.');
+    const nom = await rpjmNom(), n = Number(String(g.bidang || '').charAt(0)) || 0, b = nom.find(x => rpjmBidNo({ bidang_kode: x.kode_bidang }) === n);
+    const TH = rpjmTh(per);
+    await rpjmKegForm(per, null, { nama: g.kegiatan, lokasi: g.lokasi || ('Dusun ' + rpjmDusun(g.dusun)), volume: g.volume || '', satuan: g.satuan || '', sasaran: g.sasaran || '', bidang_kode: b ? b.kode_bidang : '', __after: () => call('save', { entity: 'rpjm_gagasan', record: { id: g.id, status: 'Masuk RPJM' } }) }, nom, TH);
+  } catch (x) { toast(x.message, 1); }
+};
+/* detail musyawarah RPJM: tim/narasumber, undangan, dokumentasi foto, usulan dusun */
+async function extraMusRpjm(mu, el) {
+  const j = RPJM_MUSY.indexOf(mu.musyawarah), w = canWrite('rkp_tim');
+  const [tim, nara, gag] = await Promise.all([j === 0 ? call('list', { entity: 'rkp_tim', filters: { ref: mu.id }, limit: 200, sort: 'urut', desc: false }).then(r => r.rows) : [], j === 2 || j === 3 || j === 4 ? call('list', { entity: 'rkp_narasumber', filters: { ref: mu.id }, limit: 100 }).then(r => r.rows) : [], j === 1 ? call('list', { entity: 'rpjm_gagasan', filters: { periode_id: mu.periode_id, dusun: mu.dusun || '' }, limit: 500 }).then(r => r.rows) : []]);
+  const sec = (title, rows, e, preset, note) => `<div class="sec-h"><h2>${title} (${rows.length})</h2>${w ? `<button class="btn sm" data-act="addSub" data-e="${e}" data-p='${esc(JSON.stringify(preset))}'>${ic('plus')}Tambah</button>` : ''}</div>` + (rows.length ? `<div class="list">${rows.map(r => rowHtml(e, r)).join('')}</div>` : `<div class="card meta">${note || 'Belum ada.'}</div>`);
+  el.innerHTML = `<div class="stack">
+    ${j === 0 ? sec('Tim Penyusun RPJM Desa', tim, 'rkp_tim', { ref: mu.id, jenis_tim: 'Tim Penyusun', urut: String(tim.length + 1) }, 'Belum ada. Tim 7–11 orang: Kepala Desa (pembina), Sekretaris Desa (ketua), Ketua LPM (sekretaris), anggota perangkat, LPM, kader, unsur masyarakat; wajib ada perempuan. Dipakai di SK Tim (R02).') : ''}
+    ${j === 2 || j === 3 || j === 4 ? sec('Narasumber', nara, 'rkp_narasumber', { ref: mu.id }) : ''}
+    ${j === 1 ? `<div class="sec-h"><h2>Usulan ${esc(rpjmDusun(mu.dusun))} (${gag.length})</h2>${w ? `<button class="btn sm" data-act="rpjGagAdd" data-d="${esc(mu.dusun || '')}" data-m="${esc(mu.id)}">${ic('plus')}Tambah usulan</button>` : ''}</div>${gag.length ? `<div class="list">${gag.map(r => rowHtml('rpjm_gagasan', r)).join('')}</div>` : '<div class="card meta">Belum ada usulan dari dusun ini.</div>'}` : ''}
+    <div class="btns"><span class="lbl">Dokumen (template Word):</span><button class="btn sm" data-act="rpjMusDok" data-d="und" data-id="${esc(mu.id)}">${ic('print')}Undangan</button><button class="btn sm" data-act="rpjMusDok" data-d="foto" data-id="${esc(mu.id)}">${ic('print')}Dokumentasi Foto</button>${RPJM_TH7.findIndex(t => t.mus.indexOf(j) >= 0) >= 0 ? `<button class="btn sm" data-act="go" data-go='["rpjmtahap",{"t":${RPJM_TH7.findIndex(t => t.mus.indexOf(j) >= 0) + 1},"id":"${esc(mu.periode_id)}"}]'>${ic('file')}Dokumen tahap ini</button>` : ''}</div></div>`;
+}
+function rpjmMusTeks(mu, per) {
+  const j = RPJM_MUSY.indexOf(mu.musyawarah), ub = rpjmUbahTxt(per), pr = per ? per.tahun_awal + '–' + per.tahun_akhir : '', dn = mu.dusun ? 'Dusun ' + rpjmDusun(mu.dusun) : '';
+  const acara = [
+    'Pembentukan Tim Penyusun ' + ub + 'RPJM Desa Tahun ' + pr,
+    'Penggalian gagasan masyarakat ' + dn + ' untuk penyusunan ' + ub + 'RPJM Desa Tahun ' + pr,
+    'Pembahasan hasil pengkajian keadaan desa, arah kebijakan, dan rencana prioritas kegiatan ' + ub + 'RPJM Desa Tahun ' + pr,
+    'Pembahasan dan penyepakatan Rancangan ' + ub + 'RPJM Desa Tahun ' + pr,
+    'Pembahasan dan pengesahan Rancangan Peraturan Desa tentang ' + ub + 'RPJM Desa Tahun ' + pr,
+    'Rapat Tim Penyusun ' + ub + 'RPJM Desa Tahun ' + pr][j] || mu.musyawarah;
+  const jenis = /^Musdes/i.test(mu.musyawarah) ? 'Musyawarah Desa' : /Musrenbang/i.test(mu.musyawarah) ? 'Musyawarah Perencanaan Pembangunan Desa' : j === 1 ? 'Musyawarah Dusun' : j === 5 ? 'Rapat Tim Penyusun' : mu.musyawarah;
+  return { j, acara: mu.acara || acara, jenis, bpd: /^Musdes/i.test(mu.musyawarah), dn };
+}
+ACT.rpjMusDok = async t => {
+  const kind = t.dataset.d, m = modal('Membuat dokumen', '<div class="stack"><div class="skel"></div><div class="meta">Mengisi template…</div></div>');
+  try {
+    const mu = await call('get', { entity: 'rpjm_musyawarah', id: t.dataset.id });
+    if (kind === 'foto') { let a = []; try { a = JSON.parse(mu.foto || '[]'); } catch (x) { } if (!a.length) throw new Error('Belum ada foto. Unggah foto lewat tombol Ubah pada musyawarah ini (maksimal 7).'); }
+    const dd = await rpjmCall('daftar'), per = (dd.periode || []).find(x => x.id === mu.periode_id) || {};
+    let d = {}; try { d = await call('docData', { tahun_rkp: S.rkpYear }); } catch (x) { }
+    const L = await tplDaftar().catch(() => []), kode = kind === 'und' ? 'R00' : 'R22';
+    let path = (L.find(x => x.path.indexOf('rpjm/' + kode + '.') === 0 && !/_cadangan/.test(x.path)) || {}).path;
+    if (!path && kind === 'foto') path = (L.find(x => /^rkp\/31\./.test(x.path)) || {}).path;
+    if (!path) throw new Error('Template "' + RPJMD_EXTRA[kode] + '" belum diunggah. Admin → Template Dokumen → RPJM Desa → unggah ' + RPJMD_CAT[kode].f + '.');
+    const T = rpjmMusTeks(mu, per), s = S.set || {}, desa = s.nama_desa || '';
+    const kades = (d.kades && d.kades.nama) || s.nama_kades || TITIK, bpd = (d.ketua_bpd && d.ketua_bpd.nama) || TITIK;
+    const M = Object.assign({}, petaDesa());
+    M['Jenis Musyawarah'] = T.jenis; M.Acara = T.acara;
+    M['Kop Pengundang'] = T.bpd ? 'BADAN PERMUSYAWARATAN DESA' : 'PEMERINTAH DESA';
+    M['Jabatan Pengundang'] = T.bpd ? 'Ketua BPD Desa ' + desa : 'Kepala Desa ' + desa; M['Nama Pengundang'] = T.bpd ? bpd : kades;
+    M.Kepada = mu.kepada || (T.j === 1 ? 'Tokoh masyarakat, kelompok perempuan, kelompok tani, dan warga ' + T.dn : '……………………………………………');
+    M['Dasar Undangan'] = per.jenis === 'Perubahan'
+      ? 'Sehubungan dengan ketentuan Pasal 79 ayat (2) huruf a Undang-Undang Nomor 3 Tahun 2024 tentang Perubahan Kedua atas Undang-Undang Nomor 6 Tahun 2014 tentang Desa, Rencana Pembangunan Jangka Menengah Desa (RPJM Desa) disusun untuk jangka waktu 8 (delapan) tahun, sehingga sesuai Pasal 28 Peraturan Menteri Dalam Negeri Nomor 114 Tahun 2014 tentang Pedoman Pembangunan Desa perlu dilakukan Perubahan RPJM Desa ' + desa + ' Tahun ' + per.tahun_awal + '–' + per.tahun_akhir + '.'
+      : 'Sehubungan dengan ketentuan Pasal 5 ayat (2) Peraturan Menteri Dalam Negeri Nomor 114 Tahun 2014 tentang Pedoman Pembangunan Desa, Rencana Pembangunan Jangka Menengah Desa (RPJM Desa) ditetapkan paling lama 3 (tiga) bulan terhitung sejak pelantikan Kepala Desa, dan penyusunannya dilakukan secara partisipatif melalui musyawarah sesuai Peraturan Bupati Lumajang Nomor 40 Tahun 2018.';
+    M['Nomor Undangan'] = mu.no_undangan || TITIK; M.Tgu = dPanjang(mu.tgl_undangan || isoToday());
+    M.Hari = dHari(mu.tanggal); M.Tgl = dPanjang(mu.tanggal); M.Jam = mu.jam ? dJam(mu.jam) : TITIK; M.Tempat = mu.tempat || ('Balai Desa ' + desa);
+    M['Judul Dokumentasi'] = (T.j === 1 ? 'MUSYAWARAH DUSUN ' + rpjmDusun(mu.dusun).toUpperCase() : T.jenis.toUpperCase()) + '\n' + T.acara.toUpperCase();
+    const MM = tambahU(M); if (kind === 'foto') MM.__foto = mu.foto || '';
+    const nm = (kind === 'und' ? 'Undangan ' : 'Dokumentasi Foto ') + mu.musyawarah + (mu.dusun ? ' ' + rpjmDusun(mu.dusun) : '') + ' - RPJM ' + (per.tahun_awal || '') + '-' + (per.tahun_akhir || '');
+    hasilDokumen(m, await buatDokumen({ path, M: MM, rows: [], jenis: 'rkp', nama: nm }));
+  } catch (x) { m.body.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
+};
 
 /* Halaman awal "Penyusunan RPJM Baru" (belum ada periode baru) */
 function rpjmMulai(p, main, batas, wr, baru) {
@@ -4345,7 +4648,7 @@ async function rpjmKegForm(per, k, pre, nom, TH) {
     const keg = { id: k.id || '', bidang_kode: bk, bidang: bd.nama_bidang || k.bidang || '', sub_bidang_kode: sk, sub_bidang: sb.sub_bidang || (sk ? '' : k.sub_bidang || ''), kode_kegiatan: kode, ref_id: ref, nama: $m('#rkN').value.trim(), lokasi: $m('#rkL').value.trim(), volume: $m('#rkV').value.trim(), satuan: $m('#rkSt').value.trim(), sasaran: $m('#rkSs').value.trim(), pola: $m('#rkP').value, ket: $m('#rkK').value.trim(), waktu: k.waktu || '' };
     const biaya = ins().map(i => ({ tahun: i.dataset.y, jumlah: mIn(i) || 0, sumber: ($(`.rkSd[data-y="${i.dataset.y}"]`, m.el) || {}).value || '' }));
     const th = biaya.filter(x => Number(x.jumlah) > 0).map(x => x.tahun); keg.waktu = th.length ? th.join(', ') : '';
-    try { await rpjmCall('simpanKegiatan', { periode_id: per.id, kegiatan: keg, biaya }); m.close(); toast('Kegiatan RPJM disimpan.'); refresh(); }
+    try { await rpjmCall('simpanKegiatan', { periode_id: per.id, kegiatan: keg, biaya }); if (pre && pre.__after) { try { await pre.__after(); } catch (x) { } } m.close(); toast('Kegiatan RPJM disimpan.'); refresh(); }
     catch (x) { const e = $m('.err'); e.textContent = x.message; e.hidden = false; b.disabled = false; }
   };
 }
@@ -4382,17 +4685,20 @@ async function extraMusyawarah(mu, el) {
 ACT.addSub = t => go('form', { e: t.dataset.e, preset: JSON.parse(t.dataset.p) });
 ACT.addJab = t => go('form', { e: 'petugas_jabatan', preset: JSON.parse(t.dataset.p) }, true);
 /* Musyawarah RKP -> Agenda (menu Kegiatan): dibuat/diperbarui otomatis saat form musyawarah disimpan dengan tanggal & jam pelaksanaan terisi */
-async function syncAgendaMus(muId) {
+async function syncAgendaMus(muId, ent) {
+  ent = ent || 'rkp_musyawarah';
   try {
-    const mu = await call('get', { entity: 'rkp_musyawarah', id: muId });
+    const mu = await call('get', { entity: ent, id: muId });
     if (!mu || !mu.tanggal || !mu.jam) return null;
-    const ket = [mu.no_undangan && 'Nomor undangan: ' + mu.no_undangan, 'Otomatis dari Perencanaan → RKP Desa → Musyawarah & Tim'].filter(Boolean).join('. ');
-    const rec = { nama: mu.musyawarah + ' RKP Desa ' + rkpLbl(mu.tahun_rkp), tanggal: mu.tanggal, jam: mu.jam || '', sampai: 'Selesai', tempat: mu.tempat || 'Balai Desa Pandanwangi', keterangan: ket, sumber_mus: mu.id, foto: mu.foto || '' };
+    const rp = ent === 'rpjm_musyawarah';
+    let perN = ''; if (rp) { try { const pd = ((await rpjmCall('daftar')).periode || []).find(x => x.id === mu.periode_id); perN = pd ? (pd.jenis === 'Perubahan' ? 'Perubahan ' : '') + 'RPJM Desa ' + pd.tahun_awal + '–' + pd.tahun_akhir : 'RPJM Desa'; } catch (x) { perN = 'RPJM Desa'; } }
+    const ket = [mu.no_undangan && 'Nomor undangan: ' + mu.no_undangan, rp ? 'Otomatis dari Perencanaan → RPJM Desa → Musyawarah' : 'Otomatis dari Perencanaan → RKP Desa → Musyawarah & Tim'].filter(Boolean).join('. ');
+    const rec = { nama: rp ? mu.musyawarah.replace(/ RPJM Desa$/, '') + (mu.dusun ? ' ' + String(mu.dusun).replace(/^DUSUN /i, 'Dusun ') : '') + ' — ' + perN : mu.musyawarah + ' RKP Desa ' + rkpLbl(mu.tahun_rkp), tanggal: mu.tanggal, jam: mu.jam || '', sampai: 'Selesai', tempat: mu.tempat || 'Balai Desa Pandanwangi', keterangan: ket, sumber_mus: mu.id, foto: mu.foto || '' };
     let ada = null;
     if (mu.agenda_id) { try { ada = await call('get', { entity: 'kegiatan', id: mu.agenda_id }); } catch (x) { ada = null; } }
     if (ada && ada.id) { await call('save', { entity: 'kegiatan', record: Object.assign({ id: ada.id }, rec) }); return ada.id; }
-    const baru = await call('save', { entity: 'kegiatan', record: Object.assign({ penyelenggara: 'Pemerintah Desa Pandanwangi', peserta: 'Tim Penyusun RKP Desa, BPD, dan unsur masyarakat' }, rec) });
-    if (baru && baru.id) await call('save', { entity: 'rkp_musyawarah', record: { id: mu.id, agenda_id: baru.id } });
+    const baru = await call('save', { entity: 'kegiatan', record: Object.assign({ penyelenggara: 'Pemerintah Desa Pandanwangi', peserta: rp ? 'Tim Penyusun RPJM Desa, BPD, dan unsur masyarakat' : 'Tim Penyusun RKP Desa, BPD, dan unsur masyarakat' }, rec) });
+    if (baru && baru.id) await call('save', { entity: ent, record: { id: mu.id, agenda_id: baru.id } });
     return baru && baru.id;
   } catch (x) { console.warn('Agenda musyawarah gagal disinkronkan', x); return null; }
 }
@@ -5775,8 +6081,8 @@ VIEWS.template = async (p, main) => {
     <div class="sec-h"><h2>RKP Desa</h2><span class="btns"><button class="btn sm" data-act="tplUpBtn" data-p="rkp/">${ic('plus')}Tambah template</button><button class="btn sm" data-act="tplImpor">${ic('folder')}Ambil dari Google Drive</button></span></div>
     <div class="list">${list.filter(x => x.path.indexOf('rkp/') === 0 && !/_cadangan/.test(x.path)).map(x => baris(x.path)).join('') || '<div class="card meta">Belum ada. Tekan "Ambil dari Google Drive" untuk memindahkan template Google Docs lama.</div>'}</div>
     <div class="sec-h"><h2>RPJM Desa (21 dokumen & lampiran)</h2><span class="btns"><button class="btn sm pri" data-act="tplUpBtn" data-p="rpjm/">${ic('plus')}Unggah banyak sekaligus</button></span></div>
-    <div class="meta">Unggah file R01–R21 (nama file diawali kode, mis. <i>R01._BA_Musyawarah…docx</i>). Dipakai di menu Perencanaan → Dokumen RPJM Desa. Template lama otomatis dicadangkan.</div>
-    <div class="list">${Object.keys(RPJMD_CAT).map(k => { const x = list.find(y => y.path.indexOf('rpjm/') === 0 && !/_cadangan/.test(y.path) && y.path.split('/').pop().indexOf(k + '.') === 0); return baris(x ? x.path : 'rpjm/' + RPJMD_CAT[k].f, k + ' — ' + (RPJMD_NAMA[k] || '')); }).join('')}</div>
+    <div class="meta">Unggah file R00–R22 (nama file diawali kode, mis. <i>R01._BA_Musyawarah…docx</i>). Dipakai di menu Perencanaan → Dokumen RPJM Desa. Template lama otomatis dicadangkan.</div>
+    <div class="list">${Object.keys(RPJMD_CAT).map(k => { const x = list.find(y => y.path.indexOf('rpjm/') === 0 && !/_cadangan/.test(y.path) && y.path.split('/').pop().indexOf(k + '.') === 0); return baris(x ? x.path : 'rpjm/' + RPJMD_CAT[k].f, k + ' — ' + (RPJMD_NAMA[k] || RPJMD_EXTRA[k] || '')); }).join('')}</div>
     <div class="sec-h"><h2>Progres Pembangunan</h2></div><div class="list">${baris(PB_TPL, 'Laporan Progres Pembangunan (F4) — tanda: {{Nama Pekerjaan}}, {{Lokasi}}, {{Sumber Dana}}, {{Tahun Anggaran}}, {{Pagu}}, {{Pelaksana}}, {{Tgl Mulai}}, {{Tgl Selesai}}, {{Progres}}, {{Foto Progres}}')}</div>
     <div class="sec-h"><h2>Draf KK</h2></div><div class="list">${baris('kk/draf_kk.docx', 'Draf Formulir KK (Word)')}${baris(KK_LATAR, 'Gambar latar Draf KK (JPG, A4 melintang 300 dpi) — dipakai untuk pratinjau, PDF & cetak')}</div>
     <div class="sec-h"><h2>Daftar tanda Surat Keterangan</h2></div><div class="meta">Jenis tambahan: setiap isian tambahan menjadi tanda dengan nama yang sama (mis. {{Nama Sekolah}}). {{Isi Surat}} = kalimat isi dari pengaturan jenis surat. Baris tabel yang memuat {{Isian Label}} diulang untuk semua isian tambahan.</div>
