@@ -2498,7 +2498,7 @@ async function renderDetail(e, x, el, full) {
     <div class="xk"></div>
     ${geo ? mapHtml(geo, 'Lokasi ' + (u.row(x).t || '')) : ''}
     <div class="xx"></div>
-    <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button><button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>` : ''}${e === 'penduduk' && canWrite('register_surat') ? `<button class="btn sm" data-act="regSurat" data-id="${esc(x.id)}">${ic('file')}Buat surat keterangan</button>` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak surat (Word)</button>` : ''}${e === 'keu_spp' ? `<button class="btn sm" data-act="sppWord" data-id="${esc(x.id)}">${ic('file')}SPP + SPTJM (Word)</button><button class="btn sm" data-act="kuitansi" data-id="${esc(x.id)}">${ic('print')}Cetak kuitansi</button>` : ''}${e === 'keu_spp' && w && x.status !== 'Dicairkan' ? `<button class="btn sm pri" data-act="keuCair" data-id="${esc(x.id)}">${ic('check')}Cairkan</button>` : ''}${e === 'keu_spp' && w && x.status === 'Dicairkan' ? `<button class="btn sm danger" data-act="keuBatal" data-id="${esc(x.id)}">${ic('x')}Batalkan pencairan</button>` : ''}${e === 'keu_trans' && w && x.jenis === 'Pajak Dipungut' ? `<button class="btn sm" data-act="setorPajak" data-id="${esc(x.id)}">${ic('send')}Setor pajak</button>` : ''}${NASKAH[e] && w ? `<button class="btn sm" data-act="cetakNaskah" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('print')}Buat dokumen (Word)</button>` : ''}${e === 'kegiatan' && w && kgBisaSelesai(x) ? `<button class="btn sm pri" data-act="kgSelesai" data-id="${esc(x.id)}">${ic('check')}Selesai</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>`;
+    <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button>${/^tanah_/.test(e) && !S.user.admin ? '' : `<button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>`}` : ''}${e === 'penduduk' && canWrite('register_surat') ? `<button class="btn sm" data-act="regSurat" data-id="${esc(x.id)}">${ic('file')}Buat surat keterangan</button>` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak surat (Word)</button>` : ''}${e === 'keu_spp' ? `<button class="btn sm" data-act="sppWord" data-id="${esc(x.id)}">${ic('file')}SPP + SPTJM (Word)</button><button class="btn sm" data-act="kuitansi" data-id="${esc(x.id)}">${ic('print')}Cetak kuitansi</button>` : ''}${e === 'keu_spp' && w && x.status !== 'Dicairkan' ? `<button class="btn sm pri" data-act="keuCair" data-id="${esc(x.id)}">${ic('check')}Cairkan</button>` : ''}${e === 'keu_spp' && w && x.status === 'Dicairkan' ? `<button class="btn sm danger" data-act="keuBatal" data-id="${esc(x.id)}">${ic('x')}Batalkan pencairan</button>` : ''}${e === 'keu_trans' && w && x.jenis === 'Pajak Dipungut' ? `<button class="btn sm" data-act="setorPajak" data-id="${esc(x.id)}">${ic('send')}Setor pajak</button>` : ''}${NASKAH[e] && w ? `<button class="btn sm" data-act="cetakNaskah" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('print')}Buat dokumen (Word)</button>` : ''}${e === 'kegiatan' && w && kgBisaSelesai(x) ? `<button class="btn sm pri" data-act="kgSelesai" data-id="${esc(x.id)}">${ic('check')}Selesai</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>`;
   const xk = $('.xk', el), xx = $('.xx', el);
   if (e === 'penduduk') {
     try {
@@ -8417,16 +8417,21 @@ VIEWS.tanah = async (p, main, alive) => {
   /* --- panel bidang --- */
   function buka(b) {
     pilihBidang(b);
-    if (untuk && w && b.status !== TB_ST[1]) return hubungkan(b, untuk);
+    if (untuk && w) {
+      const x0 = untuk, m = modal('Cocokkan bidang #' + b.no, `<div class="stack"><div>Hubungkan bidang <b>#${esc(b.no)}</b> (${tbRp(b.luas_m2)} m²${b.nama_wp ? ', sekarang milik ' + esc(b.nama_wp) : ''}) ke <b>${esc(x0.nama)}</b> (${esc(x0.nop || '')}, SPPT ${tbRp(x0.luas)} m²)?</div><div class="btns"><button class="btn pri" id="mYa">${ic('check')}Ya, hubungkan</button><button class="btn" id="mNo">Batal</button></div></div>`);
+      $('#mNo', m.el).onclick = () => m.close();
+      $('#mYa', m.el).onclick = async () => { m.close(); untuk = null; tampilMode(); await hubungkan(b, x0); };
+      return;
+    }
     const x = b.tanah_id ? wpById[b.tanah_id] : null, el = $('#tnPanel'); el.hidden = false;
     el.innerHTML = `<div class="tn-ph"><b>Bidang #${esc(b.no)}</b><span class="pill" style="background:${TB_WARNA[b.status]}22;color:inherit;border-color:${TB_WARNA[b.status]}">${esc(b.status)}${b.jenis ? ' · ' + esc(b.jenis) : ''}</span><button class="tn-x" data-act="tnTutup" aria-label="Tutup">×</button></div>
       <div class="meta">${tbRp(b.luas_m2)} m² · ${esc(judulKata(String(b.dusun || '-').replace(/^DUSUN /, '')))}${b.rt_rw ? ' · ' + esc(b.rt_rw) : ''}</div>
       ${x ? `<div class="tn-wp"><b>${esc(x.nama)}</b><span class="mono">${esc(x.nop || '')}</span><span>${esc(x.alamat_op || '')}</span><span>Luas SPPT ${tbRp(x.luas)} m² · PBB Rp ${tbRp(x.pbb)} · <b style="color:${x.status_bayar === 'Lunas' ? 'var(--ok,#16a34a)' : 'var(--bad)'}">${esc(x.status_bayar || '-')}</b></span></div>` : b.nama_wp ? `<div class="meta">${esc(b.nama_wp)} (${esc(b.nop || '')})</div>` : ''}
-      ${b.oleh ? `<div class="meta">Dicocokkan ${esc(b.oleh)}${b.tgl ? ', ' + esc(fDate(b.tgl)) : ''}</div>` : ''}
-      ${w ? `<div class="btns">${b.status !== TB_ST[1] ? `<button class="btn sm pri" data-act="tnPilih">${ic('users')}Pilih wajib pajak</button>` : `<button class="btn sm" data-act="tnPilih">${ic('edit')}Ganti</button>`}${b.status !== TB_ST[2] ? `<button class="btn sm" data-act="tnBukan">${ic('x')}Bukan objek pajak</button>` : ''}${b.status !== TB_ST[0] ? `<button class="btn sm danger" data-act="tnLepas">${ic('trash')}Lepas</button>` : ''}${x ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'tanah_desa', id: x.id }]))}'>${ic('eye')}Data WP</button>` : ''}<button class="btn sm" data-act="tnNext">${ic('next')}Bidang belum berikutnya</button></div>` : ''}`;
+      ${b.riwayat ? `<details class="meta"><summary>Riwayat (${String(b.riwayat).split('\n').length})</summary>${String(b.riwayat).split('\n').reverse().map(esc).join('<br>')}</details>` : ''}
+      ${w ? `<div class="btns">${b.status !== TB_ST[1] ? `<button class="btn sm pri" data-act="tnPilih">${ic('users')}Pilih wajib pajak</button>` : `<button class="btn sm" data-act="tnPilih">${ic('edit')}Ganti</button>`}${b.status !== TB_ST[2] ? `<button class="btn sm" data-act="tnBukan">${ic('x')}Bukan objek pajak</button>` : ''}${b.status !== TB_ST[0] ? `<button class="btn sm" data-act="tnLepas">${ic('back')}Batalkan cocok</button>` : ''}${x ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'tanah_desa', id: x.id }]))}'>${ic('eye')}Data WP</button>` : ''}<button class="btn sm" data-act="tnNext">${ic('next')}Bidang belum berikutnya</button></div>` : ''}`;
     S.vh.tnPilih = () => pilihWp(b);
     S.vh.tnBukan = () => bukanObjek(b);
-    S.vh.tnLepas = () => confirmDel($('#tnPanel .btns'), async () => { await lepas(b); });
+    S.vh.tnLepas = () => { const bx = $('#tnPanel .btns'); confirmDel(bx, async () => { await lepas(b); }); const q = bx.querySelector('.confirm'); if (q && q.firstChild) q.firstChild.textContent = 'Batalkan pencocokan bidang ini? Data wajib pajak tetap ada. '; const y = bx.querySelector('#yes'); if (y) y.textContent = 'Ya, batalkan'; };
   }
   S.vh.tnTutup = () => { $('#tnPanel').hidden = true; const lama = pilih; pilih = null; if (lama) gambar(lama); };
   S.vh.tnNext = () => {
@@ -8435,23 +8440,26 @@ VIEWS.tanah = async (p, main, alive) => {
     if (!cand) return toast('Semua bidang di tampilan ini sudah ditangani.');
     map.fitBounds(lyr[cand.id].getBounds(), { maxZoom: 19, padding: [60, 60] }); buka(cand);
   };
-  async function simpanB(b, data) { await call('save', { entity: 'tanah_bidang', record: Object.assign({ id: b.id }, data) }); Object.assign(b, data); gambar(b); statistik(); }
+  async function simpanB(b, data, catat) {
+    if (catat) data.riwayat = [String(b.riwayat || '').trim(), isoToday() + ' · ' + S.user.nama + ': ' + catat].filter(Boolean).join('\n').split('\n').slice(-12).join('\n');
+    await call('save', { entity: 'tanah_bidang', record: Object.assign({ id: b.id }, data) }); Object.assign(b, data); gambar(b); statistik();
+  }
   async function simpanWp(x, data) { await call('save', { entity: 'tanah_desa', record: Object.assign({ id: x.id }, data) }); Object.assign(x, data); }
   const bidangWp = x => String(x.bidang || '').split(',').map(s => s.trim()).filter(Boolean);
   async function lepasDariWp(b) { const x = b.tanah_id && wpById[b.tanah_id]; if (x) await simpanWp(x, { bidang: bidangWp(x).filter(n => n !== String(b.no)).join(', ') }); }
   async function hubungkan(b, x) {
     try {
       if (b.tanah_id && b.tanah_id !== x.id) await lepasDariWp(b);
-      await simpanB(b, { status: TB_ST[1], jenis: '', tanah_id: x.id, nop: x.nop || '', nama_wp: x.nama, oleh: S.user.nama, tgl: isoToday() });
+      await simpanB(b, { status: TB_ST[1], jenis: '', tanah_id: x.id, nop: x.nop || '', nama_wp: x.nama, oleh: S.user.nama, tgl: isoToday() }, 'dicocokkan ke ' + x.nama + ' (' + (x.nop || '') + ')');
       const a = bidangWp(x); if (a.indexOf(String(b.no)) < 0) a.push(String(b.no));
       await simpanWp(x, Object.assign({ bidang: a.join(', ') }, !x.dusun && b.dusun ? { dusun: b.dusun } : {}));
       toast('Bidang #' + b.no + ' → ' + x.nama); buka(b);
     } catch (er) { toast(er.message, 1); }
   }
-  async function lepas(b) { await lepasDariWp(b); await simpanB(b, { status: TB_ST[0], jenis: '', tanah_id: '', nop: '', nama_wp: '', oleh: S.user.nama, tgl: isoToday() }); toast('Bidang #' + b.no + ' dilepas.'); buka(b); }
+  async function lepas(b) { const lama = b.nama_wp || b.jenis || ''; await lepasDariWp(b); await simpanB(b, { status: TB_ST[0], jenis: '', tanah_id: '', nop: '', nama_wp: '', oleh: S.user.nama, tgl: isoToday() }, 'pencocokan dibatalkan' + (lama ? ' (sebelumnya ' + lama + ')' : '')); toast('Pencocokan bidang #' + b.no + ' dibatalkan. Data wajib pajak tidak terhapus.'); buka(b); }
   function bukanObjek(b) {
     const m = modal('Bidang #' + b.no + ' bukan objek pajak', `<div class="stack"><div class="chips wrap">${TB_BUKAN.map(j => `<button class="chip" data-j="${esc(j)}">${esc(j)}</button>`).join('')}</div><div class="meta">Untuk jalan, sungai, saluran, fasilitas umum, makam, dan sejenisnya.</div></div>`);
-    $$('[data-j]', m.el).forEach(c => c.onclick = async () => { try { await lepasDariWp(b); await simpanB(b, { status: TB_ST[2], jenis: c.dataset.j, tanah_id: '', nop: '', nama_wp: '', oleh: S.user.nama, tgl: isoToday() }); m.close(); buka(b); } catch (er) { toast(er.message, 1); } });
+    $$('[data-j]', m.el).forEach(c => c.onclick = async () => { try { await lepasDariWp(b); await simpanB(b, { status: TB_ST[2], jenis: c.dataset.j, tanah_id: '', nop: '', nama_wp: '', oleh: S.user.nama, tgl: isoToday() }, 'ditandai bukan objek pajak: ' + c.dataset.j); m.close(); buka(b); } catch (er) { toast(er.message, 1); } });
   }
   /* --- pilih wajib pajak dengan saran cerdas --- */
   function pilihWp(b) {
