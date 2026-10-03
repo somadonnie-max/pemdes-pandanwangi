@@ -235,6 +235,17 @@ button.stat:hover{border-color:var(--pri)}
 .tpl-tags{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface)}.tpl-tags summary,.tpl-help summary{cursor:pointer;font-weight:700;font-size:12.5px;display:flex;align-items:center;gap:6px}
 .tpl-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.tpl-chips .chip{font-size:11px}
 @media(max-width:760px){.tpl-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tn-stat{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch}.tn-k{flex:1 1 70px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:5px 8px;display:flex;flex-direction:column;min-width:0}.tn-k b{font-size:16px;line-height:1.1}.tn-k span{font-size:10.5px;color:var(--muted)}.tn-k.ok b{color:#16a34a}.tn-k.wa b{color:#d97706}
+.tn-bar{flex-basis:100%;height:6px;border-radius:9px;background:#f59e0b55;overflow:hidden;display:flex}.tn-bar i{display:block;height:100%}
+.tn-wrap{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line)}.tn-map{height:calc(100vh - 290px);min-height:380px;background:#1f2937}
+.tn-tools{position:absolute;top:8px;left:52px;right:52px;z-index:500}.tn-cari{display:flex;align-items:center;gap:6px;background:var(--surface);border-radius:9px;padding:4px 9px;box-shadow:0 2px 8px rgba(0,0,0,.25)}.tn-cari input{border:0;outline:0;background:none;flex:1;min-width:0;font-size:13px;padding:4px 0}
+.tn-hasil{margin-top:4px;background:var(--surface);border-radius:9px;box-shadow:0 4px 14px rgba(0,0,0,.3);max-height:260px;overflow:auto;display:flex;flex-direction:column}.tn-hasil button{border:0;background:none;text-align:left;padding:7px 10px;font-size:12.5px;display:flex;gap:6px;align-items:center;border-bottom:1px solid var(--line);cursor:pointer}.tn-hasil small{color:var(--muted)}
+.tn-leg{position:absolute;left:8px;bottom:8px;z-index:500;background:rgba(255,255,255,.92);color:#111;border-radius:8px;padding:4px 8px;font-size:10.5px;display:flex;gap:8px}.tn-leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:3px;vertical-align:-1px}
+.tn-panel{position:absolute;left:8px;right:8px;bottom:34px;z-index:600;background:var(--surface);border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.35);padding:10px 12px;display:flex;flex-direction:column;gap:6px;max-height:60%;overflow:auto}
+.tn-ph{display:flex;gap:8px;align-items:center}.tn-ph b{font-size:15px}.tn-x{margin-left:auto;border:0;background:none;font-size:22px;line-height:1;cursor:pointer;color:var(--muted)}
+.tn-wp{display:flex;flex-direction:column;gap:1px;font-size:12px;background:var(--surface2);border-radius:8px;padding:6px 8px}.tn-wp b{font-size:13.5px}
+.tn-modecard{display:flex;gap:8px;align-items:center;border-color:var(--pri);background:var(--pri-soft)}.tn-wpl{max-height:55vh;overflow:auto}
+@media(min-width:900px){.tn-panel{left:auto;width:360px;top:56px;bottom:auto}}
 .gtabs{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:3px;overflow-x:auto;scrollbar-width:none}
 .gtabs button{flex:1 0 auto;border:0;background:none;border-radius:7px;padding:5px 12px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap}
 .gtabs button.on{background:var(--surface);color:var(--pri);box-shadow:0 1px 2px rgba(0,0,0,.12)}
@@ -933,11 +944,22 @@ const UI = {
     print: { title: 'BUKU TANAH KAS DESA', land: 1, cols: [['Asal', 'asal'], ['No. Sertifikat/Letter C', 'no_sertifikat'], ['Luas (m²)', 'luas'], ['Kelas', 'kelas'], ['Perolehan', r => (r.perolehan || '') + '<br>' + fDate(r.tgl_perolehan)], ['Jenis', 'jenis'], ['Patok', 'patok'], ['Lokasi', 'lokasi'], ['Peruntukan', 'peruntukan'], ['Mutasi', 'mutasi'], ['Ket', 'ket']] }
   },
   tanah_desa: {
-    t: 'Tanah di Desa', ic: 'map', perm: 'tu_tanah',
-    fields: [F('nama', 'Nama Perorangan / Badan Hukum', 'text', { req: 1, wide: 1 }), F('luas', 'Jumlah Luas (m²)', 'number'), F('status_hak', 'Status Hak Tanah', 'select', { opt: ['Hak Milik', 'Hak Guna Bangunan', 'Hak Pakai', 'Hak Guna Usaha', 'Hak Pengelolaan', 'Tanah Negara', 'Letter C/Girik'] }),
-      F('luas_sertifikat', 'Luas Bersertifikat (m²)', 'number'), F('luas_belum', 'Luas Belum Bersertifikat (m²)', 'number'), F('penggunaan', 'Penggunaan Tanah', 'select', { opt: ['Perumahan', 'Perdagangan dan Jasa', 'Perkantoran', 'Industri', 'Fasilitas Umum', 'Sawah', 'Tegalan', 'Perkebunan', 'Peternakan/Perikanan', 'Hutan', 'Lainnya'] }), F('ket', 'Keterangan', 'text', { wide: 1 })],
-    row: r => ({ t: r.nama, s: [r.status_hak, r.penggunaan].filter(Boolean).join(' · '), r: r.luas ? Number(r.luas).toLocaleString('id-ID') + ' m²' : '', av: initials(r.nama) }),
-    print: { title: 'BUKU TANAH DI DESA', cols: [['Nama', 'nama'], ['Luas (m²)', 'luas'], ['Status Hak', 'status_hak'], ['Bersertifikat', 'luas_sertifikat'], ['Belum', 'luas_belum'], ['Penggunaan', 'penggunaan'], ['Ket', 'ket']] }
+    t: 'Tanah di Desa', ic: 'map', perm: 'tu_tanah', excel: 1, sort: 'nop', asc: 1,
+    fields: [F('nama', 'Nama Wajib Pajak / Pemilik', 'text', { req: 1, wide: 1 }), F('nop', 'NOP', 'text', { mono: 1 }), F('tahun_sppt', 'Tahun SPPT', 'number'),
+      F('alamat_op', 'Letak Objek Pajak', 'text', { wide: 1 }), F('alamat_wp', 'Alamat Wajib Pajak', 'text', { wide: 1 }), F('blok', 'Blok'), F('persil', 'Persil'), F('dusun', 'Dusun', 'select', { opt: OPT.dusun }),
+      F('luas', 'Luas Bumi (m²)', 'number'), F('luas_bangunan', 'Luas Bangunan (m²)', 'number'), F('pbb', 'PBB Terutang', 'money'), F('status_bayar', 'Status Bayar', 'select', { opt: ['Lunas', 'Belum Bayar'] }), F('tgl_bayar', 'Tanggal Bayar', 'date'),
+      F('status_hak', 'Status Hak Tanah', 'select', { opt: ['Hak Milik', 'Hak Guna Bangunan', 'Hak Pakai', 'Hak Guna Usaha', 'Hak Pengelolaan', 'Tanah Negara', 'Letter C/Girik'] }),
+      F('luas_sertifikat', 'Luas Bersertifikat (m²)', 'number'), F('luas_belum', 'Luas Belum Bersertifikat (m²)', 'number'), F('penggunaan', 'Penggunaan Tanah', 'select', { opt: ['Perumahan', 'Perdagangan dan Jasa', 'Perkantoran', 'Industri', 'Fasilitas Umum', 'Sawah', 'Tegalan', 'Perkebunan', 'Peternakan/Perikanan', 'Hutan', 'Lainnya'] }),
+      F('bidang', 'Nomor bidang di peta', 'text', { hint: 'Terisi otomatis saat dicocokkan di Peta bidang' }), F('ket', 'Keterangan', 'text', { wide: 1 })],
+    chips: { k: 'dusun', opt: OPT.dusun, lbl: s => s.replace('DUSUN ', '') },
+    row: r => ({ t: r.nama, s: [r.nop, r.alamat_op].filter(Boolean).join(' · '), s2: [r.luas ? Number(r.luas).toLocaleString('id-ID') + ' m²' : '', r.pbb ? 'PBB Rp ' + Number(r.pbb).toLocaleString('id-ID') : '', r.status_bayar].filter(Boolean).join(' · '), r: r.bidang ? '#' + r.bidang : '', av: initials(r.nama), pill: r.bidang ? '<span class="pill ok">Terpetakan</span>' : '' }),
+    print: { title: 'BUKU TANAH DI DESA', land: 1, cols: [['NOP', 'nop'], ['Nama', 'nama'], ['Letak Objek', 'alamat_op'], ['Luas Bumi (m²)', 'luas'], ['Bangunan (m²)', 'luas_bangunan'], ['Status Hak', 'status_hak'], ['Penggunaan', 'penggunaan'], ['Bidang', 'bidang'], ['Ket', 'ket']] }
+  },
+  tanah_bidang: {
+    t: 'Bidang Tanah', ic: 'map', perm: 'tu_tanah', m: 'tanah_desa', noAdd: 1, sort: 'no', asc: 1,
+    fields: [F('no', 'Nomor Bidang', 'text', { req: 1 }), F('luas_m2', 'Luas Peta (m²)', 'number'), F('dusun', 'Dusun', 'select', { opt: OPT.dusun }), F('rt_rw', 'RT/RW'),
+      F('status', 'Status', 'select', { opt: ['Belum dicocokkan', 'Sudah dicocokkan', 'Bukan objek pajak'] }), F('jenis', 'Jenis (bukan objek pajak)'), F('nop', 'NOP', 'text', { mono: 1 }), F('nama_wp', 'Wajib Pajak'), F('catatan', 'Catatan', 'text', { wide: 1 })],
+    row: r => ({ t: 'Bidang #' + r.no + (r.nama_wp ? ' — ' + r.nama_wp : ''), s: [r.status, r.dusun, r.luas_m2 ? Number(r.luas_m2).toLocaleString('id-ID') + ' m²' : ''].filter(Boolean).join(' · '), av: ic('map') })
   },
   penduduk: {
     t: 'Data Penduduk', ic: 'users', perm: 'penduduk', folder: 'Penduduk/KTP', file: 'foto_ktp_id',
@@ -1270,7 +1292,7 @@ function MODS() {
   return [
     { k: 'presensi', l: 'Presensi', ic: 'clock', items: [['Presensi Hari Ini', 'clock', ['presensi']], ['Riwayat Harian', 'list', ['harian']]] },
     { k: 'kegiatan', l: 'Kegiatan', ic: 'cal', items: [['Agenda', 'cal', ['list', { e: 'kegiatan', v: 0, title: 'Agenda' }], null, 'r:kegiatan'], ['Berita', 'mega', ['list', { e: 'berita' }], 'berita']] },
-    { k: 'arsip', l: 'Arsip', ic: 'folder', items: [grpItem('surat'), grpItem('hukum')].concat(['aparat', 'petugas', 'tanah_desa'].map(e => [UI[e].t, UI[e].ic, ['list', { e }], e])) },
+    { k: 'arsip', l: 'Arsip', ic: 'folder', items: [grpItem('surat'), grpItem('hukum')].concat(['aparat', 'petugas'].map(e => [UI[e].t, UI[e].ic, ['list', { e }], e])).concat([['Tanah di Desa', 'map', ['tanah'], 'tanah_desa']]) },
     { k: 'aset', l: 'Aset Desa', ic: 'box', items: [['Dashboard Aset', 'chart', ['asetdash'], null, 'r:aset'], ['Inventarisasi & Penatausahaan (KIB)', 'box', ['list', { e: 'aset' }], 'aset'],
       ['Pengadaan', 'plus', ['list', { e: 'aset_trx', chip: 'Pengadaan' }], 'aset_trx'], ['Penggunaan, Pemanfaatan & Penghapusan', 'list', ['list', { e: 'aset_trx' }], 'aset_trx'], ['Persediaan', 'box', ['list', { e: 'persediaan' }], 'persediaan'],
       ['Inventarisasi Fisik', 'check', ['list', { e: 'aset_cek' }], 'aset_cek'], ['Laporan Format SIPADES', 'print', ['sipadeslap'], null, 'r:aset'], ['Cetak Laporan Aset (format awal)', 'print', ['asetcetak'], null, 'r:aset'], ['Cetak Register Label', 'crop', ['asetlabel'], null, 'r:aset'],
@@ -2332,7 +2354,7 @@ VIEWS.list = async (p, main, alive) => {
   if (st.per === '' && u.month) st.per = isoToday().slice(0, 7);
   setTop(p.title || (GRUP_OF[e] ? GRUP[GRUP_OF[e]].t : u.t), u.rkp ? 'RKP Desa ' + rkpLbl(S.rkpYear) : u.rpjm && S.rpjmDokPer && S.rpjmDokPer.id === S.rpjmPid ? S.rpjmDokPer.nama : '');
   const pers = u.year ? [String(yearNow), String(yearNow - 1), String(yearNow - 2), 'Semua'] : null;
-  main.innerHTML = `<div class="stack">
+  main.innerHTML = `<div class="stack">${e === 'tanah_desa' ? tanahTabs('list') : ''}
     <div class="toolbar"><label class="search">${ic('search')}<input id="q" placeholder="Cari…" value="${esc(st.q)}" autocomplete="off"></label>
       ${u.month ? `<input type="month" class="inp" id="per" value="${esc(st.per)}" style="max-width:180px">` : ''}
       ${e === 'rkp_rutin' && canWrite(e) ? `<button class="btn sm" data-act="rkpRutinIsi">${ic('down')}Salin dari APBDes ${esc(keuTh())}</button>` : ''}${NASKAH[e] && canWrite(e) ? `<button class="btn sm pri" data-act="go" data-go='${esc(JSON.stringify(['form', { e, buat: 1 }]))}' title="${esc(NASKAH[e].buat)}">${ic('next')}Buat</button>` : ''}${u.print ? `<button class="btn sm" data-act="cetak" title="Cetak buku register">${ic('print')}Cetak</button>` : ''}${u.excel ? `<button class="btn sm" data-act="xlsOut">${ic('down')}Ekspor Excel</button>${canWrite(e) ? `<label class="btn sm">${ic('plus')}Impor Excel<input type="file" id="xlsIn" accept=".xlsx,.csv" hidden></label>` : ''}` : ''}${u.print2 ? `<button class="btn sm" data-act="cetak2">${ic('print')}${esc(u.print2.label)}</button>` : ''}</div>
@@ -2493,6 +2515,7 @@ async function renderDetail(e, x, el, full) {
   if (e === 'pembangunan') await extraPembangunan(x, xx);
   if (e === 'petugas') await extraPetugas(x, xx);
   if (e === 'aparat') extraAparat(x, xx, canWrite(e));
+  if (e === 'tanah_desa') xx.insertAdjacentHTML('afterbegin', `<div class="btns">${x.bidang ? `<button class="btn sm pri" data-act="go" data-go='${esc(JSON.stringify(['tanah', { fokus: x.id }]))}'>${ic('map')}Lihat di peta (#${esc(x.bidang)})</button>` : ''}${canWrite(e) ? `<button class="btn sm${x.bidang ? '' : ' pri'}" data-act="go" data-go='${esc(JSON.stringify(['tanah', { untuk: x.id }]))}'>${ic('target')}${x.bidang ? 'Tambah bidang lain' : 'Cocokkan di peta'}</button>` : ''}</div>`);
   if (e === 'penduduk') S.pendCache = Object.assign(S.pendCache || {}, { [x.id]: x });
 }
 /* ---- Pejabat penandatangan: diambil dari data Aparatur Desa ---- */
@@ -8301,6 +8324,211 @@ VIEWS.paketdesa = async (p, main) => {
       const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([sql], { type: 'application/sql' })); a.download = nm; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
       $('#pkOut').innerHTML = `Berkas <b>${esc(nm)}</b> (${(sql.length / 1048576).toFixed(1)} MB) sudah diunduh. Isi data referensi: ${Object.keys(cnt).map(k => esc(k) + ' ' + cnt[k]).join(' · ')}.`;
     } catch (x) { $('#pkOut').textContent = ''; er.textContent = x.message; er.hidden = false; }
+  };
+};
+
+/* =====================================================================
+   TANAH DI DESA — peta bidang (dari garis BPN) + pencocokan dengan wajib pajak (SPPT)
+   ===================================================================== */
+const TB_ST = ['Belum dicocokkan', 'Sudah dicocokkan', 'Bukan objek pajak'];
+const TB_WARNA = { 'Belum dicocokkan': '#f59e0b', 'Sudah dicocokkan': '#22c55e', 'Bukan objek pajak': '#94a3b8' };
+const TB_BUKAN = ['Jalan', 'Sungai / Saluran', 'Fasilitas umum', 'Makam', 'Tanah Kas Desa', 'Area TNI', 'Lainnya'];
+let LEAF = null;
+function muatLeaflet() {
+  if (LEAF) return LEAF;
+  LEAF = new Promise((ok, no) => {
+    const c = document.createElement('link'); c.rel = 'stylesheet'; c.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css'; document.head.appendChild(c);
+    const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+    s.onload = () => ok(window.L); s.onerror = () => { LEAF = null; no(new Error('Peta tidak bisa dimuat. Periksa internet.')); }; document.head.appendChild(s);
+  });
+  return LEAF;
+}
+async function ambilSemua(entity, filters) {
+  let rows = [], off = 0, total = 0;
+  for (;;) { const r = await call('list', { entity, filters: filters || {}, limit: 2000, offset: off, sort: entity === 'tanah_bidang' ? 'no' : undefined, desc: false }); rows = rows.concat(r.rows || []); total = r.total || 0; off += (r.rows || []).length; if (!(r.rows || []).length || off >= total) break; }
+  return rows;
+}
+function dusunSaya() {
+  const j = String((S.user && S.user.jabatan) || ''), m = j.match(/(?:kepala dusun|kasun)\s+(.+)/i);
+  if (!m) return '';
+  const d = ('DUSUN ' + m[1].trim()).toUpperCase().replace(/\bIII\b/, '3').replace(/\bII\b/, '2').replace(/\bI\b/, '1');
+  return OPT.dusun.indexOf(d) >= 0 ? d : '';
+}
+const tbPusat = b => { if (b._c) return b._c; let ring = []; try { ring = JSON.parse(b.geom)[0]; } catch (x) { } let x = 0, y = 0; ring.forEach(p => { x += p[0]; y += p[1]; }); b._c = ring.length ? [x / ring.length, y / ring.length] : [0, 0]; return b._c; };
+const tbJarak = (a, b) => { const k = 111320, dx = (a[0] - b[0]) * k * Math.cos(a[1] * Math.PI / 180), dy = (a[1] - b[1]) * k; return Math.sqrt(dx * dx + dy * dy); };
+const tbRp = n => Number(n || 0).toLocaleString('id-ID');
+const blokDari = nop => (String(nop || '').split('.')[4] || '');
+function tanahTabs(cur) { return `<div class="gtabs"><button class="${cur === 'peta' ? 'on' : ''}" data-act="go" data-go='["tanah"]'>${ic('map')} Peta bidang</button><button class="${cur === 'list' ? 'on' : ''}" data-act="go" data-go='["list",{"e":"tanah_desa"}]'>${ic('list')} Wajib pajak</button></div>`; }
+
+VIEWS.tanah = async (p, main, alive) => {
+  setTop('Tanah di Desa', 'Peta bidang & wajib pajak');
+  if (!canRead('tanah_desa')) throw new Error('Anda tidak punya akses ke menu ini.');
+  const w = canWrite('tanah_desa');
+  if (S.tnDusun == null) S.tnDusun = dusunSaya();
+  main.innerHTML = `<div class="stack tn">${tanahTabs('peta')}
+    <div class="chips">${['', ...OPT.dusun].map(d => `<button class="chip ${S.tnDusun === d ? 'on' : ''}" data-act="tnDus" data-v="${esc(d)}">${d ? esc(judulKata(d.replace(/^DUSUN /, ''))) : 'Semua dusun'}</button>`).join('')}</div>
+    <div id="tnStat" class="tn-stat"><div class="skel" style="height:46px"></div></div>
+    <div class="tn-wrap"><div id="tnMap" class="tn-map"></div>
+      <div class="tn-tools"><label class="tn-cari">${ic('search')}<input id="tnQ" placeholder="Cari nama, NOP, persil…" autocomplete="off"></label><div id="tnHasil" class="tn-hasil" hidden></div></div>
+      <div class="tn-leg">${TB_ST.map(s => `<span><i style="background:${TB_WARNA[s]}"></i>${s.replace(' dicocokkan', '')}</span>`).join('')}</div>
+      <div id="tnPanel" class="tn-panel" hidden></div></div>
+    <div id="tnMode"></div>
+    ${w ? `<details class="card tn-imp"><summary>${ic('down')} Impor data (admin)</summary><div class="stack" style="margin-top:8px">
+      <div class="btns"><label class="btn sm">${ic('file')}Impor SPPT (Excel ekspor pajak)<input type="file" id="tnXl" accept=".xlsx" hidden></label><label class="btn sm">${ic('map')}Impor bidang (GeoJSON)<input type="file" id="tnGj" accept=".geojson,.json" hidden></label></div>
+      <div class="meta">SPPT: file Excel "Data Ketetapan SPPT" dari web pajak; NOP yang sama diperbarui. Bidang: hasil QGIS (bidang_pandanwangi.geojson); nomor bidang yang sama diperbarui tanpa menghapus hasil pencocokan.</div><div id="tnImpLog" class="meta"></div></div></details>` : ''}
+  </div>`;
+  let L;
+  try { L = await muatLeaflet(); } catch (x) { $('#tnMap').innerHTML = `<div class="err">${esc(x.message)}</div>`; return; }
+  const [bid, wp] = await Promise.all([ambilSemua('tanah_bidang', S.tnDusun ? { dusun: S.tnDusun } : {}), S.tnWp && !p.segar ? S.tnWp : ambilSemua('tanah_desa')]);
+  if (!alive()) return;
+  S.tnWp = wp;
+  const wpById = {}; wp.forEach(x => { wpById[x.id] = x; });
+  const map = L.map('tnMap', { preferCanvas: true, zoomControl: true, attributionControl: false });
+  const sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 21, maxNativeZoom: 19 });
+  const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 21, maxNativeZoom: 19 });
+  sat.addTo(map); L.control.layers({ Satelit: sat, Peta: osm }, {}, { position: 'topright' }).addTo(map);
+  const lyr = {}, rend = L.canvas({ padding: .3 });
+  let pilih = null;
+  const gaya = b => ({ renderer: rend, color: b === pilih ? '#2563eb' : '#ffffff', weight: b === pilih ? 3 : .7, fillColor: TB_WARNA[b.status] || TB_WARNA[TB_ST[0]], fillOpacity: b === pilih ? .55 : .38 });
+  bid.forEach(b => {
+    if (!b.status) b.status = TB_ST[0];
+    let co; try { co = JSON.parse(b.geom); } catch (x) { return; }
+    const pg = L.polygon(co.map(r => r.map(q => [q[1], q[0]])), gaya(b)).addTo(map);
+    pg.on('click', () => buka(b)); lyr[b.id] = pg;
+  });
+  if (bid.length) map.fitBounds(L.featureGroup(Object.values(lyr)).getBounds(), { padding: [10, 10] });
+  else { map.setView([Number(S.set.kantor_lat) || -8.2383, Number(S.set.kantor_lng) || 113.1937], 15); $('#tnPanel').hidden = false; $('#tnPanel').innerHTML = `<div class="meta">Belum ada bidang${S.tnDusun ? ' di ' + esc(judulKata(S.tnDusun)) : ''}. ${w ? 'Impor GeoJSON di bagian Impor data.' : ''}</div>`; }
+  const statistik = () => {
+    const n = c => bid.filter(b => b.status === c).length, t = bid.length || 1, s1 = n(TB_ST[1]), s2 = n(TB_ST[2]), s0 = n(TB_ST[0]);
+    const wpD = S.tnDusun ? wp.filter(x => x.dusun === S.tnDusun) : wp, wpOk = wpD.filter(x => x.bidang).length;
+    $('#tnStat').innerHTML = `<div class="tn-k"><b>${tbRp(bid.length)}</b><span>bidang</span></div><div class="tn-k ok"><b>${tbRp(s1)}</b><span>cocok</span></div><div class="tn-k wa"><b>${tbRp(s0)}</b><span>belum</span></div><div class="tn-k"><b>${tbRp(wpOk)}/${tbRp(wpD.length)}</b><span>NOP terpetakan${S.tnDusun ? ' (dusun ini)' : ''}</span></div>
+      <div class="tn-bar"><i style="width:${s1 / t * 100}%;background:${TB_WARNA[TB_ST[1]]}"></i><i style="width:${s2 / t * 100}%;background:${TB_WARNA[TB_ST[2]]}"></i></div>`;
+  };
+  statistik();
+  const gambar = b => { const pg = lyr[b.id]; if (pg) pg.setStyle(gaya(b)); };
+  const pilihBidang = b => { const lama = pilih; pilih = b; if (lama) gambar(lama); gambar(b); };
+  /* --- mode "cocokkan untuk WP tertentu" (dari halaman detail wajib pajak) --- */
+  let untuk = p.untuk ? wpById[p.untuk] : null;
+  const tampilMode = () => { $('#tnMode').innerHTML = untuk ? `<div class="card tn-modecard">${ic('target')}<span>Ketuk bidang milik <b>${esc(untuk.nama)}</b> (${esc(untuk.nop || '')}, ${tbRp(untuk.luas)} m²)</span><button class="btn sm" data-act="tnModeX">Selesai</button></div>` : ''; };
+  tampilMode(); S.vh.tnModeX = () => { untuk = null; tampilMode(); };
+  /* --- panel bidang --- */
+  function buka(b) {
+    pilihBidang(b);
+    if (untuk && w && b.status !== TB_ST[1]) return hubungkan(b, untuk);
+    const x = b.tanah_id ? wpById[b.tanah_id] : null, el = $('#tnPanel'); el.hidden = false;
+    el.innerHTML = `<div class="tn-ph"><b>Bidang #${esc(b.no)}</b><span class="pill" style="background:${TB_WARNA[b.status]}22;color:inherit;border-color:${TB_WARNA[b.status]}">${esc(b.status)}${b.jenis ? ' · ' + esc(b.jenis) : ''}</span><button class="tn-x" data-act="tnTutup" aria-label="Tutup">×</button></div>
+      <div class="meta">${tbRp(b.luas_m2)} m² · ${esc(judulKata(String(b.dusun || '-').replace(/^DUSUN /, '')))}${b.rt_rw ? ' · ' + esc(b.rt_rw) : ''}</div>
+      ${x ? `<div class="tn-wp"><b>${esc(x.nama)}</b><span class="mono">${esc(x.nop || '')}</span><span>${esc(x.alamat_op || '')}</span><span>Luas SPPT ${tbRp(x.luas)} m² · PBB Rp ${tbRp(x.pbb)} · <b style="color:${x.status_bayar === 'Lunas' ? 'var(--ok,#16a34a)' : 'var(--bad)'}">${esc(x.status_bayar || '-')}</b></span></div>` : b.nama_wp ? `<div class="meta">${esc(b.nama_wp)} (${esc(b.nop || '')})</div>` : ''}
+      ${b.oleh ? `<div class="meta">Dicocokkan ${esc(b.oleh)}${b.tgl ? ', ' + esc(fDate(b.tgl)) : ''}</div>` : ''}
+      ${w ? `<div class="btns">${b.status !== TB_ST[1] ? `<button class="btn sm pri" data-act="tnPilih">${ic('users')}Pilih wajib pajak</button>` : `<button class="btn sm" data-act="tnPilih">${ic('edit')}Ganti</button>`}${b.status !== TB_ST[2] ? `<button class="btn sm" data-act="tnBukan">${ic('x')}Bukan objek pajak</button>` : ''}${b.status !== TB_ST[0] ? `<button class="btn sm danger" data-act="tnLepas">${ic('trash')}Lepas</button>` : ''}${x ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'tanah_desa', id: x.id }]))}'>${ic('eye')}Data WP</button>` : ''}<button class="btn sm" data-act="tnNext">${ic('next')}Bidang belum berikutnya</button></div>` : ''}`;
+    S.vh.tnPilih = () => pilihWp(b);
+    S.vh.tnBukan = () => bukanObjek(b);
+    S.vh.tnLepas = () => confirmDel($('#tnPanel .btns'), async () => { await lepas(b); });
+  }
+  S.vh.tnTutup = () => { $('#tnPanel').hidden = true; const lama = pilih; pilih = null; if (lama) gambar(lama); };
+  S.vh.tnNext = () => {
+    const c0 = pilih ? tbPusat(pilih) : map.getCenter() && [map.getCenter().lng, map.getCenter().lat];
+    const cand = bid.filter(b => b.status === TB_ST[0] && b !== pilih).sort((a, b2) => tbJarak(tbPusat(a), c0) - tbJarak(tbPusat(b2), c0))[0];
+    if (!cand) return toast('Semua bidang di tampilan ini sudah ditangani.');
+    map.fitBounds(lyr[cand.id].getBounds(), { maxZoom: 19, padding: [60, 60] }); buka(cand);
+  };
+  async function simpanB(b, data) { await call('save', { entity: 'tanah_bidang', record: Object.assign({ id: b.id }, data) }); Object.assign(b, data); gambar(b); statistik(); }
+  async function simpanWp(x, data) { await call('save', { entity: 'tanah_desa', record: Object.assign({ id: x.id }, data) }); Object.assign(x, data); }
+  const bidangWp = x => String(x.bidang || '').split(',').map(s => s.trim()).filter(Boolean);
+  async function lepasDariWp(b) { const x = b.tanah_id && wpById[b.tanah_id]; if (x) await simpanWp(x, { bidang: bidangWp(x).filter(n => n !== String(b.no)).join(', ') }); }
+  async function hubungkan(b, x) {
+    try {
+      if (b.tanah_id && b.tanah_id !== x.id) await lepasDariWp(b);
+      await simpanB(b, { status: TB_ST[1], jenis: '', tanah_id: x.id, nop: x.nop || '', nama_wp: x.nama, oleh: S.user.nama, tgl: isoToday() });
+      const a = bidangWp(x); if (a.indexOf(String(b.no)) < 0) a.push(String(b.no));
+      await simpanWp(x, Object.assign({ bidang: a.join(', ') }, !x.dusun && b.dusun ? { dusun: b.dusun } : {}));
+      toast('Bidang #' + b.no + ' → ' + x.nama); buka(b);
+    } catch (er) { toast(er.message, 1); }
+  }
+  async function lepas(b) { await lepasDariWp(b); await simpanB(b, { status: TB_ST[0], jenis: '', tanah_id: '', nop: '', nama_wp: '', oleh: S.user.nama, tgl: isoToday() }); toast('Bidang #' + b.no + ' dilepas.'); buka(b); }
+  function bukanObjek(b) {
+    const m = modal('Bidang #' + b.no + ' bukan objek pajak', `<div class="stack"><div class="chips wrap">${TB_BUKAN.map(j => `<button class="chip" data-j="${esc(j)}">${esc(j)}</button>`).join('')}</div><div class="meta">Untuk jalan, sungai, saluran, fasilitas umum, makam, dan sejenisnya.</div></div>`);
+    $$('[data-j]', m.el).forEach(c => c.onclick = async () => { try { await lepasDariWp(b); await simpanB(b, { status: TB_ST[2], jenis: c.dataset.j, tanah_id: '', nop: '', nama_wp: '', oleh: S.user.nama, tgl: isoToday() }); m.close(); buka(b); } catch (er) { toast(er.message, 1); } });
+  }
+  /* --- pilih wajib pajak dengan saran cerdas --- */
+  function pilihWp(b) {
+    const c0 = tbPusat(b), tetangga = bid.filter(o => o !== b && o.tanah_id && tbJarak(tbPusat(o), c0) < 120);
+    const blokT = {}; tetangga.forEach(o => { const x = wpById[o.tanah_id]; const k = x ? x.blok || blokDari(x.nop) : ''; if (k) blokT[k] = (blokT[k] || 0) + 1; });
+    const skor = x => {
+      const lb = Number(x.luas) || 0, lp = Number(b.luas_m2) || 0, rasio = lb && lp ? Math.min(lb, lp) / Math.max(lb, lp) : 0;
+      const bk = blokT[x.blok || blokDari(x.nop)] || 0, dus = x.dusun && b.dusun && x.dusun === b.dusun ? 1 : 0;
+      return { s: rasio * 60 + Math.min(bk, 5) * 6 + dus * 8 - (x.bidang ? 25 : 0), rasio, bk };
+    };
+    const m = modal('Pilih wajib pajak — bidang #' + b.no + ' (' + tbRp(b.luas_m2) + ' m²)', `<div class="stack"><label class="search">${ic('search')}<input id="wpQ" placeholder="Cari nama, NOP, alamat, persil…" autocomplete="off"></label>
+      <div class="meta">${Object.keys(blokT).length ? 'Tetangga yang sudah cocok ada di blok ' + Object.keys(blokT).map(k => '<b>' + esc(k) + '</b>').join(', ') + '. ' : ''}Urutan saran: luas mirip, blok sama dengan tetangga, dusun sama.</div><div id="wpL" class="list tn-wpl"></div></div>`);
+    const tulis = () => {
+      const q = $('#wpQ', m.el).value.trim().toLowerCase();
+      let L2 = wp.map(x => Object.assign({ x }, skor(x)));
+      if (q) L2 = L2.filter(o => [o.x.nama, o.x.nop, o.x.alamat_op, o.x.alamat_wp, o.x.persil].join(' ').toLowerCase().indexOf(q) >= 0);
+      L2.sort((a, c) => c.s - a.s);
+      $('#wpL', m.el).innerHTML = L2.slice(0, 40).map(o => `<button class="row" data-id="${esc(o.x.id)}"><span class="main"><span class="t">${esc(o.x.nama)}</span><span class="s"><span class="mono">${esc(o.x.nop || '')}</span> · ${tbRp(o.x.luas)} m²${o.x.persil ? ' · Persil ' + esc(o.x.persil) : ''}</span><span class="s2">${esc(o.x.alamat_op || '')}</span></span><span class="r">${o.rasio >= .85 ? `<span class="pill ok">luas ${Math.round(o.rasio * 100)}%</span>` : ''}${o.bk ? '<span class="pill info">blok tetangga</span>' : ''}${o.x.bidang ? `<span class="pill">sudah #${esc(o.x.bidang)}</span>` : ''}</span></button>`).join('') || '<div class="meta">Tidak ditemukan.</div>';
+    };
+    tulis(); let tm; $('#wpQ', m.el).oninput = () => { clearTimeout(tm); tm = setTimeout(tulis, 200); };
+    $('#wpL', m.el).onclick = async ev => { const r = ev.target.closest('[data-id]'); if (!r) return; m.close(); await hubungkan(b, wpById[r.dataset.id]); };
+    setTimeout(() => $('#wpQ', m.el).focus(), 60);
+  }
+  /* --- cari di peta --- */
+  const hasil = $('#tnHasil');
+  $('#tnQ').oninput = () => {
+    const q = $('#tnQ').value.trim().toLowerCase(); if (q.length < 2) { hasil.hidden = true; return; }
+    const A = bid.filter(b => String(b.no) === q || [b.nama_wp, b.nop].join(' ').toLowerCase().indexOf(q) >= 0).slice(0, 8);
+    const B2 = wp.filter(x => [x.nama, x.nop, x.persil, x.alamat_op].join(' ').toLowerCase().indexOf(q) >= 0).slice(0, 8);
+    hasil.hidden = false;
+    hasil.innerHTML = A.map(b => `<button data-b="${esc(b.id)}">${ic('map')} #${esc(b.no)} ${esc(b.nama_wp || b.status)}</button>`).join('') + B2.map(x => `<button data-w="${esc(x.id)}">${ic('user')} ${esc(x.nama)} <small>${esc(x.nop || '')}${x.bidang ? ' · #' + esc(x.bidang) : ' · belum dipetakan'}</small></button>`).join('') || '<div class="meta" style="padding:6px">Tidak ditemukan</div>';
+  };
+  hasil.onclick = ev => {
+    const t = ev.target.closest('button'); if (!t) return; hasil.hidden = true;
+    if (t.dataset.b) { const b = bid.find(o => o.id === t.dataset.b); map.fitBounds(lyr[b.id].getBounds(), { maxZoom: 19, padding: [60, 60] }); buka(b); return; }
+    const x = wpById[t.dataset.w], bs = bid.filter(o => o.tanah_id === x.id);
+    if (bs.length) { map.fitBounds(L.featureGroup(bs.map(o => lyr[o.id])).getBounds(), { maxZoom: 19, padding: [60, 60] }); buka(bs[0]); }
+    else if (w) { untuk = x; tampilMode(); toast('Ketuk bidang milik ' + x.nama + ' di peta.'); }
+    else toast(x.nama + ' belum dipetakan.');
+  };
+  if (p.fokus) { const bs = bid.filter(o => o.tanah_id === p.fokus); if (bs.length) { map.fitBounds(L.featureGroup(bs.map(o => lyr[o.id])).getBounds(), { maxZoom: 19, padding: [60, 60] }); buka(bs[0]); } }
+  S.vh.tnDus = t => { S.tnDusun = t.dataset.v; refresh(); };
+  setTimeout(() => map.invalidateSize(), 200);
+  /* --- impor --- */
+  const lg = s => { const e2 = $('#tnImpLog'); if (e2) e2.innerHTML = s; };
+  const kirim = async (entity, rows) => { let t = 0, u2 = 0, g = []; for (let i = 0; i < rows.length; i += 400) { lg('Menyimpan ' + Math.min(i + 400, rows.length) + ' / ' + rows.length + '…'); const r = await call('bulkSave', { entity, rows: rows.slice(i, i + 400) }); t += r.tambah; u2 += r.ubah; g = g.concat(r.gagal || []); } return { t, u: u2, g }; };
+  if ($('#tnXl')) $('#tnXl').onchange = async ev => {
+    const f = ev.target.files[0]; if (!f) return;
+    try {
+      const rows = await XL.read(f), hi = rows.findIndex(r => r.some(c => String(c).trim().toUpperCase() === 'NOP'));
+      if (hi < 0) throw new Error('Kolom NOP tidak ditemukan. Pakai file ekspor "Data Ketetapan SPPT".');
+      const H = rows[hi].map(c => String(c).trim().toLowerCase()), col = k => H.findIndex(h => h === k);
+      const ci = { nop: col('nop'), th: col('tahun'), nama: col('nama wp'), awp: col('alamat wp'), aop: col('alamat op'), lb: col('luas bumi'), lbg: col('luas bangunan'), pk: col('pokok'), st: col('status'), tb: col('tanggal bayar') };
+      const num = v => Number(String(v == null ? '' : v).replace(/\./g, '').replace(',', '.')) || 0;
+      const tgl = v => { const m2 = String(v || '').match(/^(\d{2})-(\d{2})-(\d{4})$/); return m2 ? m2[3] + '-' + m2[2] + '-' + m2[1] : ''; };
+      const dusOP = a => { const m2 = String(a || '').toUpperCase().match(/DSN\.?\s+([A-Z ]+?)(?:\s+RT\b|$)/); if (!m2) return ''; const d = ('DUSUN ' + m2[1].trim()).replace(/\bIII\b/, '3').replace(/\bII\b/, '2').replace(/\bI\b/, '1'); return OPT.dusun.indexOf(d) >= 0 ? d : ''; };
+      const out = rows.slice(hi + 1).filter(r => /^\d{2}\.\d{2}\.\d{3}\.\d{3}\.\d{3}\.\d{4}\.\d$/.test(String(r[ci.nop] || '').trim())).map(r => {
+        const nop = String(r[ci.nop]).trim(), aop = String(r[ci.aop] || '').trim(), o = { nop, nama: String(r[ci.nama] || '').trim(), tahun_sppt: String(r[ci.th] || ''), alamat_wp: String(r[ci.awp] || '').trim(), alamat_op: aop,
+          luas: num(r[ci.lb]), luas_bangunan: num(r[ci.lbg]), pbb: num(r[ci.pk]), status_bayar: String(r[ci.st] || '').trim(), tgl_bayar: tgl(r[ci.tb]), blok: blokDari(nop), persil: ((aop.match(/Persil\s*([\w\/.-]+)/i) || [])[1] || '') };
+        const d = dusOP(aop); if (d) o.dusun = d; return o;
+      });
+      if (!out.length) throw new Error('Tidak ada baris NOP yang terbaca.');
+      const h = await kirim('tanah_desa', out); S.tnWp = null;
+      lg(`SPPT: ${out.length} NOP dibaca · ${h.t} baru · ${h.u} diperbarui${h.g.length ? ' · ' + h.g.length + ' gagal (' + esc(h.g[0].pesan) + ')' : ''}.`); toast('Impor SPPT selesai.');
+    } catch (er) { lg('<span class="err">' + esc(er.message) + '</span>'); }
+    ev.target.value = '';
+  };
+  if ($('#tnGj')) $('#tnGj').onchange = async ev => {
+    const f = ev.target.files[0]; if (!f) return;
+    try {
+      const gj = JSON.parse(await f.text()), F2 = (gj.features || []).filter(x => x.geometry && /Polygon/.test(x.geometry.type));
+      const r6 = a => Array.isArray(a[0]) ? a.map(r6) : [Math.round(a[0] * 1e7) / 1e7, Math.round(a[1] * 1e7) / 1e7];
+      const ada = {}; (await ambilSemua('tanah_bidang')).forEach(x => { ada[x.no] = x; });
+      const out = F2.map((x, i) => { const pr = x.properties || {}, no = String(pr.id || pr.no || i + 1), co = x.geometry.type === 'Polygon' ? x.geometry.coordinates : x.geometry.coordinates[0];
+        const o = { no, luas_m2: Math.round(Number(pr.luas_m2 || 0) * 10) / 10, keliling_m: Number(pr.keliling_m || 0), dusun: pr.dusun || '', rt_rw: pr.rt_rw || '', geom: JSON.stringify(r6(co)) };
+        if (!ada[no]) o.status = TB_ST[0]; return o; });
+      const h = await kirim('tanah_bidang', out);
+      lg(`Bidang: ${out.length} dibaca · ${h.t} baru · ${h.u} diperbarui${h.g.length ? ' · ' + h.g.length + ' gagal (' + esc(h.g[0].pesan) + ')' : ''}.`); toast('Impor bidang selesai.'); setTimeout(refresh, 800);
+    } catch (er) { lg('<span class="err">' + esc(er.message) + '</span>'); }
+    ev.target.value = '';
   };
 };
 
