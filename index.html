@@ -8041,7 +8041,6 @@ function pkSql(r, o) {
 VIEWS.paketdesa = async (p, main) => {
   setTop('Paket Desa Baru', 'Database kosong untuk desa lain');
   if (!S.user || !S.user.admin) { main.innerHTML = '<div class="card"><p class="meta" style="margin:0">Hanya admin yang dapat membuat paket.</p></div>'; return; }
-  const cnt = {};
   main.innerHTML = `<div class="stack">
     <div class="card stack"><div class="lbl">Apa yang dibuat</div>
       <p class="meta" style="margin:0">Satu berkas <b>.sql</b> berisi seluruh struktur database aplikasi (tabel, fungsi, menu) ditambah data referensi umum: kode rekening APBDes, bidang/kegiatan, kode barang SIPADES, SDGs Desa, dasar hukum, AHSP, template Berita Acara & peraturan aset, serta satu akun admin.
@@ -8061,7 +8060,7 @@ VIEWS.paketdesa = async (p, main) => {
       <div id="pkOut" class="meta"></div></div></div>`;
   S.vh.pkGo = async () => {
     const o = { desa: $('#pkD').value.trim(), kec: $('#pkK').value.trim(), kab: $('#pkB').value.trim(), prov: $('#pkP').value.trim(), nama: $('#pkN').value.trim() || 'Admin Desa', email: $('#pkE').value.trim() };
-    const er = $('#pkErr'); er.hidden = true;
+    const er = $('#pkErr'), cnt = {}; er.hidden = true;
     if (!o.desa || !o.kec || !o.kab) { er.textContent = 'Isi nama desa, kecamatan, dan kabupaten.'; er.hidden = false; return; }
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(o.email)) { er.textContent = 'Isi email admin yang benar.'; er.hidden = false; return; }
     $('#pkOut').textContent = 'Mengambil struktur database…';
