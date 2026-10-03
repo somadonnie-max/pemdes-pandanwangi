@@ -224,15 +224,17 @@ button.stat:hover{border-color:var(--pri)}
 .f.wide{grid-column:1/-1}
 .logos{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}.logo-up{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px}.logo-up img{width:52px;height:52px;object-fit:contain;border-radius:8px;background:#fff;border:1px solid var(--line);flex-shrink:0}
 .tpl-list{display:flex;flex-direction:column;gap:6px}
-.tpl-it{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
-.tpl-ic{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:var(--pri-soft);color:var(--pri)}
-.tpl-mid{display:flex;flex-direction:column;gap:2px;min-width:0}.tpl-mid b{font-size:13px;line-height:1.3}.tpl-mid .meta{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+.tpl-list{gap:4px!important}
+.tpl-it{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:3px 8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:5px 8px}
+.tpl-ic{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;background:var(--pri-soft);color:var(--pri)}.tpl-ic .ic{width:15px;height:15px}
+.tpl-mid{display:flex;flex-direction:column;gap:1px;min-width:0}.tpl-mid b{font-size:12px;line-height:1.25}.tpl-mid .meta{display:flex;flex-wrap:wrap;gap:3px;align-items:center;font-size:10.5px}.tpl-mid .pill{font-size:9.5px;padding:0 6px}
+.tpl-chev{display:none;color:var(--muted)}
 .tpl-bt{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end}
 .ibtn{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:var(--surface);color:var(--txt,inherit);border-radius:7px;padding:4px 8px;font-size:11.5px;font-weight:600;cursor:pointer;white-space:nowrap}
 .ibtn .ic{width:14px;height:14px}.ibtn.pri{background:var(--pri);border-color:var(--pri);color:#fff}.ibtn.danger{color:var(--bad)}
 .tpl-tags{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface)}.tpl-tags summary,.tpl-help summary{cursor:pointer;font-weight:700;font-size:12.5px;display:flex;align-items:center;gap:6px}
 .tpl-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.tpl-chips .chip{font-size:11px}
-@media(max-width:760px){.tpl-it{grid-template-columns:auto minmax(0,1fr)}.tpl-bt{grid-column:1/-1;justify-content:flex-start}}
+@media(max-width:760px){.tpl-it{grid-template-columns:auto minmax(0,1fr) auto;cursor:pointer}.tpl-chev{display:block;transition:transform .15s}.tpl-it.open .tpl-chev{transform:rotate(180deg)}.tpl-bt{grid-column:1/-1;justify-content:flex-start;display:none;padding-top:4px}.tpl-it.open .tpl-bt{display:flex}}
 .gtabs{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:3px;overflow-x:auto;scrollbar-width:none}
 .gtabs button{flex:1 0 auto;border:0;background:none;border-radius:7px;padding:5px 12px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap}
 .gtabs button.on{background:var(--surface);color:var(--pri);box-shadow:0 1px 2px rgba(0,0,0,.12)}
@@ -840,7 +842,7 @@ const UI = {
   },
   aparat: {
     t: 'Aparatur Desa', ic: 'badge', perm: 'tu_aparat', folder: 'TU/Aparat', file: 'dok_sk_id',
-    fields: [F('no_urut', 'No. Urut', 'number'), F('nama', 'Nama Lengkap', 'text', { req: 1 }), F('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1, nikfill: 1, hint: 'Ketik 16 digit: data dari Data Penduduk terisi otomatis' }), F('jabatan', 'Jabatan', 'text', { req: 1 }), F('jabatan_tambahan', 'Jabatan / Tugas Tambahan', 'textarea', { wide: 1, rows: 2, hint: 'Satu per baris, mis. Bendahara Desa, Pengurus Barang, Operator SisKeuDes. Bisa juga ditambah dari halaman detail.' }), F('niap', 'NIAP'), F('nip', 'NIP / NRPDes', 'text', { mono: 1 }),
+    fields: [F('no_urut', 'No. Urut', 'number'), F('nama', 'Nama Lengkap', 'text', { req: 1 }), F('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1, nikfill: 1, hint: 'Ketik 16 digit: data dari Data Penduduk terisi otomatis' }), F('jabatan', 'Jabatan', 'text', { req: 1 }), F('jabatan_tambahan', 'Jabatan Tambahan (satu per baris)', 'textarea', { wide: 1, rows: 2 }), F('niap', 'NIAP'), F('nip', 'NIP / NRPDes', 'text', { mono: 1 }),
       F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk2 }), F('tempat_lahir', 'Tempat Lahir'), F('tgl_lahir', 'Tanggal Lahir', 'date'), F('alamat', 'Alamat', 'text', { wide: 1 }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }), F('agama', 'Agama', 'select', { opt: OPT.agama2 }), F('pangkat', 'Pangkat/Golongan'),
       F('pendidikan', 'Pendidikan Terakhir', 'select', { opt: OPT.pendidikan2 }), F('no_sk_angkat', 'Nomor SK Pengangkatan'), F('tgl_sk_angkat', 'Tanggal SK Pengangkatan', 'date'),
       F('no_sk_henti', 'Nomor SK Pemberhentian'), F('tgl_sk_henti', 'Tanggal SK Pemberhentian', 'date'), F('email', 'Email', 'email'), F('wa', 'Nomor WhatsApp', 'tel'), F('ket', 'Keterangan'),
@@ -2525,17 +2527,36 @@ function terapPejabat() {
 const JAB_TAMBAH = ['Bendahara Desa', 'Pengurus Barang / Aset', 'Operator SisKeuDes', 'Operator SIPADES', 'Operator Prodeskel', 'Operator DTSEN', 'Operator Aplikasi Pemdes', 'Petugas Pelayanan', 'Pengelola Arsip', 'PPID Desa', 'Ketua TPK', 'Sekretaris TPK', 'Plt. Sekretaris Desa', 'Pelaksana Kegiatan Anggaran (PKA)'];
 const jabTambah = r => String((r && r.jabatan_tambahan) || '').split(/\n|;/).map(x => x.trim()).filter(Boolean);
 function extraAparat(x, el, w) {
-  const a = jabTambah(x);
-  el.insertAdjacentHTML('afterbegin', `<div class="stack" style="gap:6px"><div class="lbl">Jabatan / tugas tambahan</div><div class="jbt">${a.map((j, i) => `<span class="pill info">${esc(j)}${w ? `<button type="button" data-act="jabDel" data-i="${i}" title="Hapus" aria-label="Hapus ${esc(j)}">×</button>` : ''}</span>`).join('') || '<span class="meta">Belum ada.</span>'}${w ? `<button class="btn sm" data-act="jabAdd">${ic('plus')}Tambah jabatan</button>` : ''}</div></div>`);
-  const simpan = async daftar => { await call('save', { entity: 'aparat', record: { id: x.id, jabatan_tambahan: daftar.join('\n') } }); S.people = null; S.pej = null; toast('Jabatan disimpan.'); muatPejabat(true).catch(() => { }); refresh(); };
-  S.vh.jabDel = t => { const b = a.slice(); b.splice(Number(t.dataset.i), 1); simpan(b).catch(er => toast(er.message, 1)); };
+  const a = jabTambah(x); let sk = {}; try { sk = JSON.parse(x.sk_tambahan || '{}') || {}; } catch (er) { sk = {}; }
+  let row = Array.from(el.parentNode.children).find(c => c.classList.contains('btns') && !c.classList.contains('xacts'));
+  if (!row) { row = document.createElement('div'); row.className = 'btns'; el.parentNode.insertBefore(row, el); }
+  row.insertAdjacentHTML('beforeend', a.map((j, i) => `<button class="btn sm jbb" data-act="jabMenu" data-i="${i}" title="Kelola jabatan ini">${ic('badge')}${esc(j)}</button>${sk[j] ? `<button class="btn sm" data-act="file" data-id="${esc(sk[j])}" data-name="SK ${esc(j)}">${ic('file')}SK ${esc(j)}</button>` : ''}`).join('') + (w ? `<button class="btn sm" data-act="jabAdd">${ic('plus')}Jabatan</button>` : ''));
+  const simpan = async (daftar, skBaru) => {
+    const rec = { id: x.id, jabatan_tambahan: daftar.join('\n') }; if (skBaru) rec.sk_tambahan = JSON.stringify(skBaru);
+    await call('save', { entity: 'aparat', record: rec }); S.people = null; S.pej = null; toast('Tersimpan.'); muatPejabat(true).catch(() => { }); refresh();
+  };
+  S.vh.jabMenu = t => {
+    const i = Number(t.dataset.i), j = a[i];
+    const m = modal(j, `<div class="stack"><div class="meta">${esc(x.nama)}</div>
+      <div class="btns">${sk[j] ? `<button class="btn sm" data-act="file" data-id="${esc(sk[j])}" data-name="SK ${esc(j)}">${ic('eye')}Lihat SK</button>` : ''}${w ? `<label class="btn sm pri">${ic('plus')}${sk[j] ? 'Ganti' : 'Unggah'} SK ${esc(j)}<input type="file" id="jbSk" accept="application/pdf,${IMG_ANY}" hidden></label>` : ''}</div>
+      ${w ? `<div class="btns" id="jbAct">${sk[j] ? `<button class="btn sm" id="jbSkDel">${ic('trash')}Hapus SK</button>` : ''}<button class="btn sm danger" id="jbDel">${ic('trash')}Hapus jabatan</button></div>` : ''}<div id="jbMsg" class="meta"></div></div>`);
+    if (!w) return;
+    $('#jbSk', m.el).onchange = async ev => { const f = ev.target.files[0]; if (!f) return; $('#jbMsg', m.el).textContent = 'Mengunggah…'; try { const up = await uploadFile(f, UI.aparat.folder || 'TU/Aparat'); await simpan(a, Object.assign({}, sk, { [j]: up.id })); m.close(); } catch (er) { $('#jbMsg', m.el).textContent = er.message; } };
+    const sd = $('#jbSkDel', m.el); if (sd) sd.onclick = () => confirmDel($('#jbAct', m.el), async () => { const b2 = Object.assign({}, sk); delete b2[j]; await simpan(a, b2); m.close(); });
+    $('#jbDel', m.el).onclick = () => confirmDel($('#jbAct', m.el), async () => { const d = a.slice(); d.splice(i, 1); const b2 = Object.assign({}, sk); delete b2[j]; await simpan(d, b2); m.close(); });
+  };
   S.vh.jabAdd = () => {
     const m = modal('Tambah jabatan — ' + x.nama, `<div class="stack"><div class="f"><label for="jbIn">Jabatan / tugas</label><input id="jbIn" list="jbDl" placeholder="mis. Pengurus Barang / Aset"><datalist id="jbDl">${JAB_TAMBAH.filter(j => a.indexOf(j) < 0).map(j => `<option value="${esc(j)}">`).join('')}</datalist></div>
       <div class="chips wrap">${JAB_TAMBAH.filter(j => a.indexOf(j) < 0).slice(0, 8).map(j => `<button type="button" class="chip" data-j="${esc(j)}">${esc(j)}</button>`).join('')}</div>
-      <div class="meta">Dipakai otomatis untuk penandatangan dokumen: <b>Bendahara Desa</b> (SPP, kuitansi) dan <b>Pengurus Barang / Aset</b> (dokumen aset).</div>
+      <div class="f"><label for="jbSkN">Dokumen SK (boleh menyusul)</label><input type="file" id="jbSkN" accept="application/pdf,${IMG_ANY}"></div>
       <div class="btns"><button class="btn pri" id="jbOk">${ic('check')}Simpan</button></div></div>`);
     $$('[data-j]', m.el).forEach(b => b.onclick = () => { $('#jbIn', m.el).value = b.dataset.j; });
-    $('#jbOk', m.el).onclick = async () => { const v = $('#jbIn', m.el).value.trim(); if (!v) return toast('Isi nama jabatan.', 1); try { await simpan(a.concat([v])); m.close(); } catch (er) { toast(er.message, 1); } };
+    $('#jbOk', m.el).onclick = async ev => {
+      const v = $('#jbIn', m.el).value.trim(); if (!v) return toast('Isi nama jabatan.', 1);
+      ev.target.disabled = true;
+      try { const f = $('#jbSkN', m.el).files[0]; let b2 = null; if (f) { ev.target.textContent = 'Mengunggah SK…'; const up = await uploadFile(f, UI.aparat.folder || 'TU/Aparat'); b2 = Object.assign({}, sk, { [v]: up.id }); } await simpan(a.concat([v]), b2); m.close(); }
+      catch (er) { toast(er.message, 1); ev.target.disabled = false; ev.target.innerHTML = ic('check') + 'Simpan'; }
+    };
     setTimeout(() => $('#jbIn', m.el).focus(), 50);
   };
 }
@@ -2877,7 +2898,7 @@ function fieldHtml(f, v, rec) {
     case 'geo': inp = `<div class="btns" style="flex-wrap:nowrap"><input id="${id}" value="${esc(v)}" placeholder="-8.2367, 113.1907" style="flex:1"><button type="button" class="btn sm" data-act="geo" data-t="${id}">${ic('pin')}Lokasi saya</button></div>`; break;
     case 'file': {
       const locked = v === '•';
-      inp = `<div class="filebox">${v ? `<button type="button" class="btn sm" data-act="file" data-id="${esc(v)}" data-priv="${f.priv ? 1 : 0}" data-name="${esc(f.l)}">${ic(locked ? 'lock' : 'eye')}Berkas tersimpan</button>` : ''}
+      inp = `<div class="filebox">${v ? `<span class="btns fkeep"><button type="button" class="btn sm" data-act="file" data-id="${esc(v)}" data-priv="${f.priv ? 1 : 0}" data-name="${esc(f.l)}">${ic(locked ? 'lock' : 'eye')}Berkas tersimpan</button>${locked ? '' : `<button type="button" class="btn sm danger" data-act="fileDel" data-k="${esc(f.k)}">${ic('trash')}Hapus</button>`}</span><input type="hidden" id="fd_${esc(f.k)}" value="">` : ''}
         ${locked ? '<span class="hint">Anda tidak punya izin mengganti dokumen kependudukan.</span>' : `<input type="file" id="${id}" accept="${f.img ? IMG_ANY : 'application/pdf,' + IMG_ANY + ',.doc,.docx,.xls,.xlsx'}"><span class="hint">${v ? 'Pilih berkas baru untuk mengganti.' : f.img ? 'Foto akan diperkecil otomatis.' : 'PDF atau foto, maks. 25 MB.'}</span>`}</div>`;
       break;
     }
@@ -2994,6 +3015,12 @@ VIEWS.form = async (p, main, alive) => {
   flds.filter(f => f.t === 'rows').forEach(f => { const b = $('#f_' + f.k, frm); if (b) rowsBox(b, f); });
   keuFormHook(e, frm, rec);
   if (e === 'surat_masuk') fwdHook(frm);
+  S.vh.fileDel = t => {
+    const k = t.dataset.k, box = t.closest('.fkeep');
+    confirmDel(box, async () => { $('#fd_' + k, frm).value = '1'; box.innerHTML = `<span class="meta">Berkas akan dihapus saat <b>Simpan</b>.</span><button type="button" class="btn sm" data-act="fileUndo" data-k="${esc(k)}">Batal</button>`; });
+    const q = box.querySelector('.confirm'); if (q && q.firstChild) q.firstChild.textContent = 'Hapus berkas ini dari data? ';
+  };
+  S.vh.fileUndo = () => refresh();
   /* NIK -> isi otomatis dari Data Penduduk (hanya kolom yang masih kosong) */
   const nikF = flds.find(f => f.nikfill), nikEl = nikF && $('#f_' + nikF.k, frm);
   if (nikEl && !nikEl.readOnly) nikEl.addEventListener('input', async () => {
@@ -3055,6 +3082,8 @@ VIEWS.form = async (p, main, alive) => {
     try {
       for (const f of u.fields.filter(f => f.t === 'file')) {
         const el = $('#f_' + f.k, frm);
+        const del = $('#fd_' + f.k, frm);
+        if (del && del.value === '1' && !(el && el.files && el.files[0])) { val[f.k] = ''; continue; }
         if (el && el.files && el.files[0]) {
           btn.textContent = 'Mengunggah ' + f.l.toLowerCase() + '…';
           const up = await uploadFile(el.files[0], u.folder || 'Lainnya');
@@ -4945,11 +4974,23 @@ VIEWS.akun = async (p, main) => {
   const th = store.get('theme') || '';
   main.innerHTML = `<div class="stack">
     <div class="card d-head prof"><div class="pfoto">${S.user.foto ? `<button type="button" class="pimgbtn" data-act="file" data-id="${esc(S.user.foto)}" data-name="Foto profil" aria-label="Lihat foto"><img src="${esc(thumb(S.user.foto, 400))}" alt="Foto ${esc(S.user.nama)}"></button>` : `<span class="pini">${esc(initials(S.user.nama))}</span>`}<label class="pcam" title="Ganti foto">${ic('cam')}<input type="file" id="fotoMe" accept="${IMG_ANY}" hidden></label></div><div style="flex:1;min-width:0"><h1 style="font-size:17px">${esc(S.user.nama)}</h1><div class="muted">${esc(S.user.jabatan)} · ${esc(S.user.email || '')}</div><div class="meta" style="margin-top:4px">Wajah presensi: ${S.user.wajah || S.faceOn ? 'terekam' : 'belum terekam'}</div><div style="margin-top:6px">${S.user.admin ? '<span class="pill pri">Admin</span>' : S.user.akses.length ? S.user.akses.map(k => `<span class="pill" style="margin:2px">${esc((S.perms.find(x => x.k === k) || {}).l || k)}</span>`).join('') : '<span class="pill">Hanya lihat & presensi</span>'}</div></div></div>
-    <form class="card stack" id="pinf"><div class="lbl">Ganti kata sandi</div><div class="form"><div class="f"><label for="pl">Kata sandi lama</label><input id="pl" type="password" autocomplete="current-password"></div><div class="f"><label for="pb">Kata sandi baru (min. 6 karakter)</label><input id="pb" type="password" autocomplete="new-password"></div><div class="f"><label for="pb2">Ulangi kata sandi baru</label><input id="pb2" type="password" autocomplete="new-password"></div></div><div id="perr2" class="err" hidden></div><div><button class="btn pri" type="submit">${ic('key')}Simpan kata sandi</button></div></form>
+    <div class="card stack" id="myData"><div class="lbl">Data saya (Aparatur Desa)</div><div class="skel"></div></div>
+    <div class="card"><button type="button" class="btn sm" data-act="pinShow">${ic('key')}Ubah kata sandi</button>
+    <form class="stack" id="pinf" hidden style="margin-top:8px"><div class="form"><div class="f"><label for="pl">Kata sandi lama</label><input id="pl" type="password" autocomplete="current-password"></div><div class="f"><label for="pb">Kata sandi baru (min. 6 karakter)</label><input id="pb" type="password" autocomplete="new-password"></div><div class="f"><label for="pb2">Ulangi kata sandi baru</label><input id="pb2" type="password" autocomplete="new-password"></div></div><div id="perr2" class="err" hidden></div><div><button class="btn pri" type="submit">${ic('key')}Simpan kata sandi</button></div></form></div>
     <div class="card stack"><div class="lbl">Tampilan</div><div class="chips">${[['', 'Ikuti perangkat'], ['light', 'Terang'], ['dark', 'Gelap']].map(t => `<button class="chip ${th === t[0] ? 'on' : ''}" data-act="theme" data-v="${t[0]}">${t[1]}</button>`).join('')}</div></div>
     ${isStandalone() ? '' : `<button class="btn" data-act="install">${ic('plus')}Pasang aplikasi di HP / komputer</button>`}
     <button class="btn danger" data-act="logout">${ic('out')}Keluar</button>
   </div>`;
+  S.vh.pinShow = t => { const f = $('#pinf'); f.hidden = !f.hidden; t.classList.toggle('pri', !f.hidden); if (!f.hidden) $('#pl').focus(); };
+  call('myData').then(r => {
+    const bx = $('#myData'); if (!bx) return;
+    if (!r || !r.ada) { bx.innerHTML = '<div class="lbl">Data saya</div><div class="meta">Data Anda belum tercatat di Arsip → Aparatur Desa (dicocokkan dari email atau nama). Minta admin menambahkannya.</div>'; return; }
+    const x = r.data, u = UI.aparat, jt = jabTambah(x); let sk = {}; try { sk = JSON.parse(x.sk_tambahan || '{}') || {}; } catch (er) { }
+    const sh = u.fields.filter(f => f.t !== 'file' && f.k !== 'jabatan_tambahan' && f.k !== 'nama' && x[f.k] !== '' && x[f.k] != null);
+    bx.innerHTML = `<div class="lbl">Data saya (Aparatur Desa)</div><dl class="dl">${sh.map(f => `<div class="${f.wide && String(x[f.k]).length > 40 ? 'w' : ''}"><dt>${esc(f.l)}</dt><dd>${valHtml(f, x[f.k])}</dd></div>`).join('')}${jt.length ? `<div class="w"><dt>Jabatan tambahan</dt><dd>${jt.map(esc).join(', ')}</dd></div>` : ''}</dl>
+      <div class="btns">${x.dok_sk_id ? `<button class="btn sm" data-act="file" data-id="${esc(x.dok_sk_id)}" data-name="Dokumen SK">${ic('file')}Dokumen SK</button>` : ''}${jt.filter(j => sk[j]).map(j => `<button class="btn sm" data-act="file" data-id="${esc(sk[j])}" data-name="SK ${esc(j)}">${ic('file')}SK ${esc(j)}</button>`).join('')}</div>
+      <div class="meta">Ada yang keliru? Minta admin atau Kaur TU & Umum mengubahnya di Arsip → Aparatur Desa.</div>`;
+  }).catch(er => { const bx = $('#myData'); if (bx) bx.innerHTML = `<div class="meta">${esc(er.message)}</div>`; });
   $('#pinf').onsubmit = async ev => {
     ev.preventDefault();
     const er = $('#perr2'); er.hidden = true;
@@ -5386,7 +5427,13 @@ const dHari = v => { const d = parseD(v); return d ? HARI[d.getDay()] : ''; };
 const dJam = v => { const p = String(v || '').split(/[.:]/); return p.length >= 2 ? pad2(p[0]) + ':' + pad2(p[1]) : String(v || ''); };
 const dRupiah = v => { const n = Number(String(v == null ? '' : v).replace(/[^\d-]/g, '')); return !n ? '-' : n.toLocaleString('id-ID') + ',-'; };
 const judulKata = s => String(s || '').toLowerCase().replace(/(^|[\s.,'/(-])([a-z])/g, (m, a, b) => a + b.toUpperCase());
-function tambahU(M) { Object.keys(M).forEach(k => { if (!/_U$/.test(k)) M[k + '_U'] = String(M[k]).toUpperCase(); }); return M; }
+/* huruf besar untuk nama orang: gelar di belakang koma tetap seperti aslinya (mis. "SUGIANTO, S.Pd") */
+function upNama(v) {
+  const t = String(v == null ? '' : v), i = t.indexOf(',');
+  if (i > 0) { const g = t.slice(i + 1).trim(); if (g && g.length <= 30 && g.split(/\s*,\s*/).every(x => /^[A-Za-z]{1,6}(\.[A-Za-z]{0,6})*\.?$/.test(x.replace(/\s/g, '')))) return t.slice(0, i).toUpperCase() + ', ' + g; }
+  return t.toUpperCase();
+}
+function tambahU(M) { Object.keys(M).forEach(k => { if (!/_U$/.test(k)) M[k + '_U'] = upNama(M[k]); }); return M; }
 function petaDesa() {
   const s = S.set || {};
   return { Desa: s.nama_desa || '', Kecamatan: s.kecamatan || '', Kabupaten: s.kabupaten || '', Provinsi: s.provinsi || '', 'Alamat Desa': s.alamat || '', Alamat: s.alamat || '', 'Kode Pos': s.kode_pos || '', Kodepos: s.kode_pos || '', email: s.email_desa || '', Email: s.email_desa || '', 'Kode Desa': s.kode_surat || '........' };
@@ -5886,7 +5933,7 @@ async function petaSurat(reg) {
   const def = SURAT[reg.jenis_surat] ? null : (S.jenisSurat || []).find(j => j.nama === reg.jenis_surat);
   const lbs = def ? isianJenis(def) : [];
   tambahU(M);
-  lbs.forEach((l, i) => { const v = reg['isian' + (i + 1)] || TITIK; M[l] = v; if (!/_U$/i.test(l)) M[l + '_U'] = String(v).toUpperCase(); });
+  lbs.forEach((l, i) => { const v = reg['isian' + (i + 1)] || TITIK; M[l] = v; if (!/_U$/i.test(l)) M[l + '_U'] = upNama(v); });
   M['Isi Surat'] = def && def.isi ? String(def.isi).replace(/\{\{\s*([^{}]+?)\s*\}\}/g, (m, k) => k in M ? M[k] : '') : '';
   M['Isi Surat_U'] = M['Isi Surat'].toUpperCase();
   M.rows = [{ key: 'Isian Label', items: lbs.map((l, i) => ({ 'Isian Label': l, 'Isian Titik2': ':', 'Isian Nilai': reg['isian' + (i + 1)] || TITIK })), empty: { 'Isian Label': '', 'Isian Titik2': '', 'Isian Nilai': '' } }];
@@ -6318,7 +6365,7 @@ VIEWS.template = async (p, main) => {
     if (o.edit) bt.push(`<button class="ibtn" data-act="xedit" data-e="jenis_surat" data-id="${esc(o.edit)}" title="Ubah isian jenis surat">${ic('edit')}<span>Isian</span></button>`);
     bt.push(B('tplUpBtn', 'plus', x ? 'Ganti' : 'Unggah', 'pri'));
     if (x && (bawaan || o.umum || o.hapus)) bt.push(B('tplDelBtn', 'trash', bawaan ? 'Kembali ke bawaan' : o.umum ? 'Pakai template umum' : 'Hapus', 'danger'));
-    return `<div class="tpl-it"><span class="tpl-ic">${ic(o.ic || 'file')}</span><div class="tpl-mid"><b>${esc(o.label)}</b><span class="meta">${st}${o.sub ? ' · ' + o.sub : ''}${x ? ' · ' + kb(x) + ' · ' + esc(String(x.waktu || '').slice(0, 10)) : ''}</span></div><div class="tpl-bt">${bt.join('')}</div></div>`;
+    return `<div class="tpl-it"><span class="tpl-ic">${ic(o.ic || 'file')}</span><div class="tpl-mid"><b>${esc(o.label)}</b><span class="meta">${st}${o.sub ? ' · ' + o.sub : ''}${x ? ' · ' + kb(x) + ' · ' + esc(String(x.waktu || '').slice(0, 10)) : ''}</span></div><span class="tpl-chev">${ic('down')}</span><div class="tpl-bt">${bt.join('')}</div></div>`;
   };
   const tags = (judul, arr, catatan) => `<details class="tpl-tags"><summary>${ic('list')} ${esc(judul)} <span class="meta">— ketuk tanda untuk menyalin</span></summary>${catatan ? `<div class="meta">${catatan}</div>` : ''}<div class="tpl-chips">${arr.map(k => `<button type="button" class="chip mono" data-act="tagCopy" data-t="${esc(k)}">{{${esc(k)}}}</button>`).join('')}</div></details>`;
   const sek = (judul, aksi, isi) => `<div class="sec-h"><h2>${judul}</h2>${aksi ? `<span class="btns">${aksi}</span>` : ''}</div><div class="tpl-list">${isi}</div>`;
@@ -6352,6 +6399,7 @@ VIEWS.template = async (p, main) => {
     ${tab[2]()}
     <input type="file" id="tplFile" accept=".docx,.xlsx,.jpg,.jpeg,.png" multiple hidden></div>`;
   S.vh.tplTab = t => { S.tplTab = t.dataset.v; refresh(); };
+  main.addEventListener('click', ev => { const it = ev.target.closest('.tpl-it'); if (!it || ev.target.closest('button,label,a')) return; const o = it.classList.contains('open'); $$('.tpl-it.open', main).forEach(x => x.classList.remove('open')); if (!o) it.classList.add('open'); });
   S.vh.tagCopy = t => { const v = '{{' + t.dataset.t + '}}'; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => toast(v + ' disalin.')).catch(() => toast(v)); };
   void ada;
   let target = '';
@@ -6791,7 +6839,7 @@ function spIdentitas(opt, extraKiri, kanan) {
   return `<div class="sp-id"><table>${baris.map(b => `<tr><td>${esc(b[0])}</td><td>:</td><td>${esc(b[1])}</td></tr>`).join('')}</table>${kanan ? `<table style="min-width:270px">${kanan.map(b => `<tr><td>${esc(b[0])}</td><td>${b[1] == null ? '' : ':'}</td><td>${esc(b[1] || '')}</td></tr>`).join('')}</table>` : ''}</div>`;
 }
 const spBA = opt => [['Lampiran', opt.lampiran || ''], ['', null], ['Berita Acara Inventarisasi Aset Desa', null], ['Nomor', opt.nomor || ''], ['Tanggal', sipTglEn(opt.ttd)]];
-function spTtd(opt) { const s = S.set || {}; return `<div class="sp-ttd"><div><br>MENGETAHUI<br>SEKRETARIS DESA<br>Selaku Pembantu Pengelola Barang Milik Desa<div class="sp"></div>${esc(String(s.nama_sekdes || '..............................').toUpperCase())}</div><div>${esc(sipTglEn(opt.ttd))}<br>PETUGAS / PENGURUS BARANG MILIK DESA<div class="sp"></div>${esc(String(s.nama_pengurus_aset || '..............................').toUpperCase())}</div></div>`; }
+function spTtd(opt) { const s = S.set || {}; return `<div class="sp-ttd"><div><br>MENGETAHUI<br>SEKRETARIS DESA<br>Selaku Pembantu Pengelola Barang Milik Desa<div class="sp"></div>${esc(upNama(s.nama_sekdes || '..............................'))}</div><div>${esc(sipTglEn(opt.ttd))}<br>PETUGAS / PENGURUS BARANG MILIK DESA<div class="sp"></div>${esc(String(s.nama_pengurus_aset || '..............................').toUpperCase())}</div></div>`; }
 function spTim(opt) { const T = (opt.tim || []).slice(0, 5); while (T.length < 5) T.push(null); return `<div class="sp-tim"><div class="h">TIM INVENTARISASI</div>${T.map((t, i) => `<div class="x"><span>${i + 1}. ${t ? esc(t.nama) : ''}</span><span>( &nbsp; ${t ? esc(t.jabatan_tim) : '&nbsp;'} &nbsp; )</span></div>`).join('')}</div>`; }
 /* susun halaman: judul, identitas, tabel (header berulang), total & tanda tangan di halaman terakhir */
 function spPages(cfg) {
@@ -7017,7 +7065,7 @@ function asetTplIsi(html, t, L) {
   R(new RegExp('Desa' + D + ',?\\s*tanggal(/bln/thn|' + D + ')', 'g'), esc(desa) + ', ' + fDate(tgl));
   R(new RegExp('Ditetapkan di' + D, 'g'), 'Ditetapkan di ' + esc(desa));
   R(new RegExp('pada tanggal' + D, 'g'), 'pada tanggal ' + fDate(tgl));
-  R(/Nama tanpa gelar dan Pangkat/g, esc(String(s.nama_kades || '').toUpperCase()));
+  R(/Nama tanpa gelar dan Pangkat/g, esc(upNama(s.nama_kades || '')));
   R(/Nama\s*:\s*\(pengelola\/pengurus barang milik Desa\)/g, 'Nama : ' + esc(s.nama_pengurus_aset || ''));
   if (/\(pengelola\/pengurus barang milik Desa\)|Nama : /.test(html || '')) { let k = 0; h = h.replace(/Jabatan\s*:\s*<\/p>/, 'Jabatan : Pengurus Barang Milik Desa</p>'); if (t && t.pejabat) h = h.replace(/Nama\s*:\s*<\/p>/, 'Nama : ' + esc(t.pejabat) + '</p>').replace(/Jabatan\s*:\s*<\/p>/, 'Jabatan : ' + esc(t.jabatan || '') + '</p>'); }
   if (t) {
