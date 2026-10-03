@@ -244,7 +244,10 @@ button.stat:hover{border-color:var(--pri)}
 .tn-panel{position:absolute;left:8px;right:8px;bottom:34px;z-index:600;background:var(--surface);border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.35);padding:10px 12px;display:flex;flex-direction:column;gap:6px;max-height:60%;overflow:auto}
 .tn-ph{display:flex;gap:8px;align-items:center}.tn-ph b{font-size:15px}.tn-x{margin-left:auto;border:0;background:none;font-size:22px;line-height:1;cursor:pointer;color:var(--muted)}
 .tn-wp{display:flex;flex-direction:column;gap:1px;font-size:12px;background:var(--surface2);border-radius:8px;padding:6px 8px}.tn-wp b{font-size:13.5px}
-.tn-modecard{display:flex;gap:8px;align-items:center;border-color:var(--pri);background:var(--pri-soft)}.tn-wpl{max-height:55vh;overflow:auto}
+.tn-modecard{display:flex;gap:8px;align-items:center;border-color:var(--pri);background:var(--pri-soft)}.tn-wpl{max-height:55vh;overflow:auto;display:flex;flex-direction:column;gap:0!important}
+.tn-wpl .row{display:flex;gap:8px;align-items:center;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:7px 4px;cursor:pointer;color:inherit;min-height:0}.tn-wpl .row:hover{background:var(--surface2)}
+.tn-wpl .main{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}.tn-wpl .t{font-weight:700;font-size:13px;white-space:normal}.tn-wpl .s,.tn-wpl .s2{font-size:11px;color:var(--muted);white-space:normal}.tn-wpl .r{display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0}
+.tn-srch{flex:0 0 auto!important;height:auto!important}
 @media(min-width:900px){.tn-panel{left:auto;width:360px;top:56px;bottom:auto}}
 .gtabs{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:3px;overflow-x:auto;scrollbar-width:none}
 .gtabs button{flex:1 0 auto;border:0;background:none;border-radius:7px;padding:5px 12px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap}
@@ -8459,7 +8462,7 @@ VIEWS.tanah = async (p, main, alive) => {
       const bk = blokT[x.blok || blokDari(x.nop)] || 0, dus = x.dusun && b.dusun && x.dusun === b.dusun ? 1 : 0;
       return { s: rasio * 60 + Math.min(bk, 5) * 6 + dus * 8 - (x.bidang ? 25 : 0), rasio, bk };
     };
-    const m = modal('Pilih wajib pajak — bidang #' + b.no + ' (' + tbRp(b.luas_m2) + ' m²)', `<div class="stack"><label class="search">${ic('search')}<input id="wpQ" placeholder="Cari nama, NOP, alamat, persil…" autocomplete="off"></label>
+    const m = modal('Pilih wajib pajak — bidang #' + b.no + ' (' + tbRp(b.luas_m2) + ' m²)', `<div class="stack"><label class="search tn-srch">${ic('search')}<input id="wpQ" placeholder="Cari nama, NOP, alamat, persil…" autocomplete="off"></label>
       <div class="meta">${Object.keys(blokT).length ? 'Tetangga yang sudah cocok ada di blok ' + Object.keys(blokT).map(k => '<b>' + esc(k) + '</b>').join(', ') + '. ' : ''}Urutan saran: luas mirip, blok sama dengan tetangga, dusun sama.</div><div id="wpL" class="list tn-wpl"></div></div>`);
     const tulis = () => {
       const q = $('#wpQ', m.el).value.trim().toLowerCase();
