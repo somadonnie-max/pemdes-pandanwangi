@@ -523,9 +523,10 @@ window.addEventListener('unhandledrejection', function (e) { var d = document.cr
    Data: Supabase (fungsi "api"). Berkas PDF/foto: Google Drive lewat
    Apps Script (FILE_URL). Tanpa alamat server -> mode contoh (demo).
    ===================================================================== */
-const SB_URL = 'https://niaqgsqfsztcsgdyzavt.supabase.co';
-const SB_KEY = 'sb_publishable_FrjuzHg6pJFQhJRIqBoXIw_5sL7E5sH';
-const FILE_URL = 'https://script.google.com/macros/s/AKfycbxShhsuYUC5jwQv0WGfxUarlhAnKvldxT8fbFmCHsSjnPg-PBDopSpX6WA1uSHAELe_/exec';
+const CFG = window.PEMDES_CFG || {};
+const SB_URL = String(CFG.supabaseUrl || 'https://niaqgsqfsztcsgdyzavt.supabase.co').replace(/\/+$/, '');
+const SB_KEY = CFG.supabaseKey || 'sb_publishable_FrjuzHg6pJFQhJRIqBoXIw_5sL7E5sH';
+const FILE_URL = CFG.appsScriptUrl || 'https://script.google.com/macros/s/AKfycbxShhsuYUC5jwQv0WGfxUarlhAnKvldxT8fbFmCHsSjnPg-PBDopSpX6WA1uSHAELe_/exec';
 const MODE = 'http';
 
 /* ---------------- utilitas ---------------- */
@@ -637,7 +638,21 @@ const IC = {
 const ic = (n, cls) => `<svg class="ic ${cls || ''}" viewBox="0 0 24 24" aria-hidden="true">${IC[n] || IC.file}</svg>`;
 
 /* ---------------- pilihan referensi ---------------- */
-const LOGO = document.getElementById('favi').href;
+let LOGO = document.getElementById('favi').href;
+/* Identitas desa: dari Pengaturan (S.set), cadangan dari tembolok perangkat, lalu bawaan */
+const DESA0 = 'Pandanwangi', KEC0 = 'Tempeh', KAB0 = 'Lumajang';
+const brandCache = () => { try { return JSON.parse(localStorage.getItem('pd_brand') || '{}') || {}; } catch (e) { return {}; } };
+function brand() { const s = (typeof S !== 'undefined' && S.set) || {}, b = brandCache(); return { desa: s.nama_desa || b.desa || CFG.namaDesa || DESA0, kec: s.kecamatan || b.kec || CFG.kecamatan || KEC0, kab: s.kabupaten || b.kab || CFG.kabupaten || KAB0 }; }
+const ND = () => brand().desa;
+(function () { const b = brandCache(); if (b.logo) { LOGO = b.logo; document.getElementById('favi').href = b.logo; } document.title = 'Pemdes ' + (b.desa || CFG.namaDesa || DESA0); })();
+function terapBrand() {
+  const s = S.set || {}, b = brand();
+  try { localStorage.setItem('pd_brand', JSON.stringify({ desa: b.desa, kec: b.kec, kab: b.kab, logo: s.logo_url || '' })); } catch (e) { }
+  if (s.logo_url) { LOGO = s.logo_url; document.getElementById('favi').href = s.logo_url; }
+  document.title = 'Pemdes ' + b.desa;
+  const dl = String(s.daftar_dusun || '').split(/\n|;/).map(x => x.trim()).filter(Boolean).map(x => (/^dusun\s/i.test(x) ? x : 'DUSUN ' + x).toUpperCase());
+  if (dl.length && typeof OPT !== 'undefined') OPT.dusun.splice(0, OPT.dusun.length, ...dl);
+}
 /* =====================================================================
    PAJAK BENDAHARA DESA — kalkulator otomatis (dipakai form SPP & cetak kuitansi)
    Dasar (cek ulang ke KPP setempat bila ada aturan baru):
@@ -857,7 +872,7 @@ const UI = {
       F('sifat', 'Sifat', 'select', { gen: 1, opt: ['Biasa', 'Segera', 'Sangat Segera', 'Penting', 'Rahasia'], def: 'Biasa' }), F('lampiran', 'Lampiran', 'text', { gen: 1, def: '-' }),
       F('kepada', 'Ditujukan Kepada', 'text', { req: 1, wide: 1 }), F('di', 'Di (tempat tujuan)', 'text', { gen: 1, def: 'Tempat' }), F('isi', 'Perihal / Isi Ringkas', 'textarea', { req: 1, wide: 1 }),
       F('acara_tgl', 'Hari/Tanggal Acara', 'date', { gen: 1, grp: ['Surat Undangan', 'Berita Acara'] }), F('acara_jam', 'Waktu Acara', 'text', { gen: 1, grp: ['Surat Undangan'], hint: 'mis. 09.00 WIB s.d. selesai' }),
-      F('acara_tempat', 'Tempat Acara', 'text', { gen: 1, grp: ['Surat Undangan', 'Berita Acara'], def: 'Balai Desa Pandanwangi' }), F('acara', 'Acara', 'text', { gen: 1, wide: 1, grp: ['Surat Undangan', 'Berita Acara'] }),
+      F('acara_tempat', 'Tempat Acara', 'text', { gen: 1, grp: ['Surat Undangan', 'Berita Acara'], def: () => 'Balai Desa ' + ND() }), F('acara', 'Acara', 'text', { gen: 1, wide: 1, grp: ['Surat Undangan', 'Berita Acara'] }),
       F('tugas_nama', 'Yang Ditugaskan / Diberi Rekomendasi', 'textarea', { gen: 1, grp: ['Surat Tugas', 'Surat Rekomendasi'], hint: 'Satu orang per baris, mis. "1. Nama – Jabatan"' }),
       F('tugas_untuk', 'Keperluan Tugas', 'text', { gen: 1, wide: 1, grp: ['Surat Tugas'] }), F('tugas_tgl', 'Tanggal Tugas', 'text', { gen: 1, grp: ['Surat Tugas'] }), F('tugas_tempat', 'Tempat Tugas', 'text', { gen: 1, grp: ['Surat Tugas'] }),
       F('kuasa_penerima', 'Penerima Kuasa', 'textarea', { gen: 1, grp: ['Surat Kuasa'], hint: 'Baris 1: nama; berikutnya jabatan/alamat' }), F('kuasa_untuk', 'Keperluan Kuasa', 'text', { gen: 1, wide: 1, grp: ['Surat Kuasa'] }),
@@ -927,7 +942,7 @@ const UI = {
   rkp_musyawarah: {
     t: 'Musyawarah & Tim RKP', ic: 'users', perm: 'perencanaan', rkp: 1,
     fields: [F('musyawarah', 'Jenis Musyawarah', 'select', { opt: OPT.musy, req: 1, wide: 1 }), F('no_undangan', 'Nomor Undangan', 'text', { mono: 1 }), F('tgl_undangan', 'Tanggal Undangan', 'date'),
-      F('tanggal', 'Tanggal Pelaksanaan', 'date', { req: 1 }), F('jam', 'Jam Mulai', 'time', { def: '19:00' }), F('tempat', 'Tempat', 'text', { def: 'Balai Desa Pandanwangi', wide: 1 }),
+      F('tanggal', 'Tanggal Pelaksanaan', 'date', { req: 1 }), F('jam', 'Jam Mulai', 'time', { def: '19:00' }), F('tempat', 'Tempat', 'text', { def: () => 'Balai Desa ' + ND(), wide: 1 }),
       F('pimpinan', 'Pimpinan Musyawarah', 'person', { fill: { unsur_pimpinan: 'jabatan' } }), F('unsur_pimpinan', 'Unsur Pimpinan', 'text', { def: 'Ketua BPD' }), F('notulen', 'Notulen / Sekretaris', 'person', { fill: { unsur_notulen: 'jabatan' } }), F('unsur_notulen', 'Unsur Notulen', 'text', { def: 'Sekretaris BPD' }),
       F('tgl_sk', 'Tanggal SK Tim', 'date'), F('no_sk_penyusun', 'Nomor SK Tim Penyusun', 'text', { mono: 1 }), F('no_sk_verifikasi', 'Nomor SK Tim Verifikasi', 'text', { mono: 1 }), F('catatan', 'Catatan / Hasil Musyawarah', 'textarea', { wide: 1 }),
       F('foto', 'Foto Dokumentasi Kegiatan', 'fotos', { max: 7 })],
@@ -938,7 +953,7 @@ const UI = {
     t: 'Musyawarah RPJM Desa', ic: 'users', perm: 'perencanaan', rpjm: 1,
     fields: [F('musyawarah', 'Jenis Musyawarah', 'select', { opt: RPJM_MUSY_OPT, req: 1, wide: 1 }), F('dusun', 'Dusun', 'select', { opt: OPT.dusun, hint: 'Khusus Musyawarah Dusun (satu catatan per dusun)' }),
       F('no_undangan', 'Nomor Undangan', 'text', { mono: 1 }), F('tgl_undangan', 'Tanggal Undangan', 'date'), F('kepada', 'Undangan kepada', 'text', { wide: 1, hint: 'Kosong = titik-titik untuk ditulis tangan' }),
-      F('tanggal', 'Tanggal Pelaksanaan', 'date', { req: 1 }), F('jam', 'Jam Mulai', 'time', { def: '19:00' }), F('tempat', 'Tempat', 'text', { def: 'Balai Desa Pandanwangi', wide: 1 }),
+      F('tanggal', 'Tanggal Pelaksanaan', 'date', { req: 1 }), F('jam', 'Jam Mulai', 'time', { def: '19:00' }), F('tempat', 'Tempat', 'text', { def: () => 'Balai Desa ' + ND(), wide: 1 }),
       F('acara', 'Acara (isi undangan)', 'text', { wide: 1, hint: 'Kosong = otomatis sesuai jenis musyawarah' }),
       F('pimpinan', 'Pimpinan Musyawarah', 'person', { fill: { unsur_pimpinan: 'jabatan' } }), F('unsur_pimpinan', 'Unsur Pimpinan', 'text', { def: 'Ketua BPD' }), F('notulen', 'Notulen / Sekretaris', 'person', { fill: { unsur_notulen: 'jabatan' } }), F('unsur_notulen', 'Unsur Notulen', 'text', { def: 'Sekretaris BPD' }),
       F('jumlah_hadir', 'Jumlah Hadir', 'number'), F('hadir_l', 'Hadir Laki-laki', 'number'), F('hadir_p', 'Hadir Perempuan', 'number'),
@@ -969,7 +984,7 @@ const UI = {
   },
   rkp_jadwal: {
     t: 'Jadwal & Tindak Lanjut (Form 03)', ic: 'cal', perm: 'perencanaan', rkp: 1, sort: 'tanggal', asc: 1,
-    fields: [F('no', 'No. Tahapan', 'text', { hint: 'Mis. 1, 2.a, 2.b' }), F('tanggal', 'Tanggal', 'date'), F('jam', 'Jam', 'time'), F('sampai', 'Sampai', 'text', { def: 'Selesai' }), F('tempat', 'Tempat', 'text', { def: 'Balai Desa Pandanwangi' }),
+    fields: [F('no', 'No. Tahapan', 'text', { hint: 'Mis. 1, 2.a, 2.b' }), F('tanggal', 'Tanggal', 'date'), F('jam', 'Jam', 'time'), F('sampai', 'Sampai', 'text', { def: 'Selesai' }), F('tempat', 'Tempat', 'text', { def: () => 'Balai Desa ' + ND() }),
       F('uraian', 'Uraian Kegiatan', 'textarea', { req: 1, wide: 1 }), F('keterangan', 'Keterangan', 'textarea', { wide: 1 }), F('keluaran', 'Keluaran', 'textarea', { wide: 1 })],
     row: r => ({ t: (r.no ? r.no + '. ' : '') + r.uraian, s: fDay(r.tanggal) + (r.tempat ? ' · ' + r.tempat : ''), av: ic('cal') })
   },
@@ -1059,7 +1074,7 @@ const UI = {
   kegiatan: {
     t: 'Agenda', ic: 'cal', perm: 'kegiatan', folder: 'Kegiatan', sort: 'tanggal',
     fields: [F('nama', 'Nama Kegiatan', 'text', { req: 1, wide: 1, hint: 'Contoh: Penyerahan BLT DD Tahap 3' }), F('tanggal', 'Tanggal', 'date', { req: 1, def: isoToday }), F('jam', 'Jam', 'time', { def: '09:00' }), F('sampai', 'Sampai', 'text', { def: 'Selesai' }),
-      F('tempat', 'Tempat', 'text', { wide: 1, def: 'Balai Desa Pandanwangi', list: ['Balai Desa Pandanwangi', 'Kantor Desa Pandanwangi', 'Kantor Kecamatan Tempeh', 'Pendopo Kabupaten Lumajang'] }), F('penyelenggara', 'Penyelenggara / Pengundang', 'text', { list: ['Pemerintah Desa Pandanwangi', 'Kecamatan Tempeh', 'BPD Desa Pandanwangi', 'DPMD Kab. Lumajang'] }),
+      F('tempat', 'Tempat', 'text', { wide: 1, def: () => 'Balai Desa ' + ND(), list: ['Balai Desa Pandanwangi', 'Kantor Desa Pandanwangi', 'Kantor Kecamatan Tempeh', 'Pendopo Kabupaten Lumajang'] }), F('penyelenggara', 'Penyelenggara / Pengundang', 'text', { list: ['Pemerintah Desa Pandanwangi', 'Kecamatan Tempeh', 'BPD Desa Pandanwangi', 'DPMD Kab. Lumajang'] }),
       F('peserta', 'Yang Hadir / Peserta', 'text', { wide: 1, def: 'Semua perangkat', list: ['Semua perangkat', 'Kepala Desa', 'Sekretaris Desa', 'Kaur TU & Umum', 'Kaur Keuangan', 'Kaur Perencanaan', 'Kasi Pemerintahan', 'Kasi Kesejahteraan', 'Kasi Pelayanan', 'Kepala Dusun'] }),
       F('keterangan', 'Keterangan / Persiapan', 'textarea', { wide: 1, hint: 'Mis. pakaian dinas, membawa dokumen, nomor undangan' }), F('materi', 'Materi', 'textarea', { wide: 1, rows: 8, hint: 'Isi materi / paparan kegiatan (boleh panjang). Diisi saat atau sesudah kegiatan.' }),
       F('ringkasan', 'Hasil / Kesimpulan Kegiatan', 'textarea', { wide: 1, hint: 'Diisi saat atau sesudah kegiatan' }),
@@ -1324,7 +1339,7 @@ function shell() {
     <button data-tab="menu">${ic('menu')}Menu</button>
     <button data-tab="akun">${ic('key')}Akun</button>
   </nav>`;
-  $('#side').innerHTML = `<div class="brand"><div class="seal logo"><img src="${LOGO}" alt="Logo Desa"></div><div><b>Pemdes ${esc(st.nama_desa || 'Pandanwangi')}</b><span>Kec. ${esc(st.kecamatan || '')}, ${esc(st.kabupaten || '')}</span></div></div>` + navHtml();
+  $('#side').innerHTML = `<div class="brand"><div class="seal logo"><img src="${LOGO}" alt="Logo Desa"></div><div><b>Pemdes ${esc(ND())}</b><span>Kec. ${esc(brand().kec)}, ${esc(brand().kab)}</span></div></div>` + navHtml();
   $('#btnBack').onclick = back;
   $('#tabs').onclick = e => { const b = e.target.closest('[data-tab]'); if (b) root(b.dataset.tab); };
   $('#side').onclick = e => { const b = e.target.closest('[data-go]'); if (b) { const g = JSON.parse(b.dataset.go); if (g[0] === 'home') return root('home'); S.stack = [{ name: 'home', params: {} }]; S.cur = null; go(g[0], g[1] || {}, true); } };
@@ -1542,7 +1557,7 @@ async function uploadFile(file, folder) {
    ===================================================================== */
 const G_ICON = '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>';
 function loginCard(inner) {
-  app.innerHTML = `<div class="login"><div class="login-card stack"><div class="brand" style="padding:0"><div class="seal logo"><img src="${LOGO}" alt="Logo Desa"></div><div><b>Pemdes Pandanwangi</b><span>Kec. Tempeh, Kab. Lumajang</span></div></div>${inner}</div></div>`;
+  app.innerHTML = `<div class="login"><div class="login-card stack"><div class="brand" style="padding:0"><div class="seal logo"><img src="${LOGO}" alt="Logo Desa"></div><div><b>Pemdes ${esc(ND())}</b><span>Kec. ${esc(brand().kec)}, Kab. ${esc(brand().kab)}</span></div></div>${inner}</div></div>`;
 }
 function loginScreen(msg) {
   loginCard(`<form class="stack" id="lf" novalidate><h1>Masuk</h1>
@@ -1664,11 +1679,12 @@ ACT.install = async () => {
     ? ['Buka aplikasi ini di <b>Safari</b>.', 'Ketuk tombol <b>Bagikan</b> (kotak dengan panah ke atas) di bawah layar.', 'Pilih <b>Tambah ke Layar Utama</b>, lalu ketuk <b>Tambah</b>.']
     : android
       ? ['Buka aplikasi ini di <b>Google Chrome</b>.', 'Ketuk menu <b>⋮</b> di kanan atas.', 'Pilih <b>Instal aplikasi</b> atau <b>Tambahkan ke layar utama</b>, lalu ketuk <b>Instal</b>.']
-      : ['Buka aplikasi ini di <b>Google Chrome</b> atau <b>Microsoft Edge</b>.', 'Klik ikon <b>pasang</b> di ujung kanan kolom alamat, atau menu <b>⋮</b> → <b>Instal Pemdes Pandanwangi</b>.'];
+      : ['Buka aplikasi ini di <b>Google Chrome</b> atau <b>Microsoft Edge</b>.', 'Klik ikon <b>pasang</b> di ujung kanan kolom alamat, atau menu <b>⋮</b> → <b>Instal Pemdes ' + esc(ND()) + '</b>.'];
   modal('Pasang aplikasi', `<div class="stack"><p style="margin:0">Setelah dipasang, ikon <b>Pemdes PW</b> muncul di layar utama dan aplikasi terbuka tanpa kolom alamat browser.</p><ol style="margin:0;padding-left:20px;line-height:1.7">${steps.map(x => `<li>${x}</li>`).join('')}</ol><p class="meta" style="margin:0">Jika pilihan itu tidak ada, aplikasi mungkin sudah terpasang. Cari ikon Pemdes PW di layar utama.</p></div>`);
 };
 
 async function boot() {
+  if (!/^https:\/\//.test(SB_URL)) { app.innerHTML = '<div class="login"><div class="login-card stack"><b>Aplikasi belum diatur</b><p class="meta" style="margin:0">Isi alamat Supabase dan kunci publik di berkas <b>config.js</b> (lihat Panduan Pemasangan langkah 5), lalu muat ulang halaman ini.</p></div></div>'; return; }
   const hp = new URLSearchParams(location.hash.slice(1));
   if (hp.get('access_token') || hp.get('error_description')) {
     history.replaceState(null, '', location.pathname + location.search);
@@ -1680,7 +1696,7 @@ async function boot() {
   if (!S.token) return loginScreen();
   try {
     const me = await call('me');
-    S.user = me.user; S.perms = me.perms; S.set = me.settings || {};
+    S.user = me.user; S.perms = me.perms; S.set = me.settings || {}; terapBrand();
     S.faceOn = !!S.user.wajah;
     S.rkpYear = S.rkpYear || S.set.tahun_rkp || String(new Date().getFullYear() + 1);
     enter();
@@ -1739,7 +1755,7 @@ function presSummary(p) {
 }
 
 VIEWS.home = async (p, main, alive) => {
-  setTop('Beranda', 'Pemdes ' + (S.set.nama_desa || 'Pandanwangi'));
+  setTop('Beranda', 'Pemdes ' + ND());
   const d = await call('home');
   S.homeData = d;
   if (!alive()) return;
@@ -3628,7 +3644,7 @@ VIEWS.sub = async (p, main) => {
   main.innerHTML = `<div class="grid">` + sb.items.filter(itemOk).map(it => `<button class="tile" data-act="go" data-go='${esc(JSON.stringify(it[2]))}'><span class="ti">${ic(it[1])}</span><b>${esc(it[0])}${c[it[3]] != null ? `<small class="num">${Number(c[it[3]]).toLocaleString('id-ID')} data</small>` : ''}</b></button>`).join('') + '</div>';
 };
 VIEWS.pstat = async (p, main, alive) => {
-  setTop('Ringkasan Penduduk', 'Desa Pandanwangi');
+  setTop('Ringkasan Penduduk', 'Desa ' + ND());
   const d = await call('pendudukStats');
   if (!alive()) return;
   const N = n => Number(n || 0).toLocaleString('id-ID'), pct = (n, t) => t ? (n / t * 100).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + '%' : '–';
@@ -4671,7 +4687,7 @@ async function rpjmKegForm(per, k, pre, nom, TH) {
     <div class="f"><label for="rkB">Bidang <i>*</i></label><select id="rkB" required><option value="">— pilih —</option>${nom.map(b => `<option value="${esc(b.kode_bidang)}" ${b.kode_bidang === v.bidang_kode ? 'selected' : ''}>${esc((+b.kode_bidang || b.kode_bidang) + '. ' + b.nama_bidang)}</option>`).join('')}</select></div>
     <div class="f"><label for="rkS">Sub bidang</label><select id="rkS"></select></div>
     <div class="f wide"><label for="rkN">Jenis kegiatan <i>*</i></label><input id="rkN" list="rkDl" required value="${esc(kosong ? '' : v.nama || '')}" placeholder="Ketik atau pilih dari daftar kegiatan sub bidang"><datalist id="rkDl"></datalist><span class="hint" id="rkKode"></span></div>
-    <div class="f"><label for="rkL">Lokasi</label><input id="rkL" value="${esc(v.lokasi || 'Desa Pandanwangi')}" placeholder="RT/RW/Dusun"></div>
+    <div class="f"><label for="rkL">Lokasi</label><input id="rkL" value="${esc(v.lokasi || 'Desa ' + ND())}" placeholder="RT/RW/Dusun"></div>
     <div class="f"><label for="rkV">Prakiraan volume</label><input id="rkV" value="${esc(v.volume || '')}"></div>
     <div class="f"><label for="rkSt">Satuan</label><input id="rkSt" value="${esc(v.satuan || '')}"></div>
     <div class="f"><label for="rkP">Pola pelaksanaan</label><select id="rkP"><option value=""></option>${RPJM_POLA.map(x => `<option ${x === v.pola ? 'selected' : ''}>${x}</option>`).join('')}</select></div>
@@ -4717,7 +4733,7 @@ async function rpjmKegForm(per, k, pre, nom, TH) {
 
 /* Ekspor matriks ke Excel (format kolom RPJM Desa Permendagri 114/2014) */
 function rpjmXls(per, K, nb, ns, TH) {
-  const B = v => ({ v, b: 1 }), rows = [[B('RENCANA PEMBANGUNAN JANGKA MENENGAH DESA (RPJM DESA)')], [B('DESA PANDANWANGI — ' + per.nama.toUpperCase())], [per.no_perdes ? 'Perdes No. ' + per.no_perdes : 'Status: ' + per.status], ['']];
+  const B = v => ({ v, b: 1 }), rows = [[B('RENCANA PEMBANGUNAN JANGKA MENENGAH DESA (RPJM DESA)')], [B('DESA ' + ND().toUpperCase() + ' — ' + per.nama.toUpperCase())], [per.no_perdes ? 'Perdes No. ' + per.no_perdes : 'Status: ' + per.status], ['']];
   rows.push(['No', 'Bidang', 'Sub Bidang', 'Jenis Kegiatan', 'Kode', 'Lokasi', 'Prakiraan Volume', 'Satuan', 'Sasaran/Manfaat'].concat(TH.map((y, i) => 'Th ke-' + (i + 1) + ' (' + y + ')'), ['Jumlah Biaya (Rp)', 'Sumber Dana', 'Pola Pelaksanaan']).map(B));
   let no = 0;
   K.slice().sort((a, b) => String(a.bidang_kode).localeCompare(String(b.bidang_kode)) || String(a.sub_bidang_kode || '').localeCompare(String(b.sub_bidang_kode || '')) || a.urut - b.urut).forEach(k => {
@@ -4755,11 +4771,11 @@ async function syncAgendaMus(muId, ent) {
     const rp = ent === 'rpjm_musyawarah';
     let perN = ''; if (rp) { try { const pd = ((await rpjmCall('daftar')).periode || []).find(x => x.id === mu.periode_id); perN = pd ? (pd.jenis === 'Perubahan' ? 'Perubahan ' : '') + 'RPJM Desa ' + rpjmLabel(pd, '–') : 'RPJM Desa'; } catch (x) { perN = 'RPJM Desa'; } }
     const ket = [mu.no_undangan && 'Nomor undangan: ' + mu.no_undangan, rp ? 'Otomatis dari Perencanaan → RPJM Desa → Musyawarah' : 'Otomatis dari Perencanaan → RKP Desa → Musyawarah & Tim'].filter(Boolean).join('. ');
-    const rec = { nama: rp ? mu.musyawarah.replace(/ RPJM Desa$/, '') + (mu.dusun ? ' ' + String(mu.dusun).replace(/^DUSUN /i, 'Dusun ') : '') + ' — ' + perN : mu.musyawarah + ' RKP Desa ' + rkpLbl(mu.tahun_rkp), tanggal: mu.tanggal, jam: mu.jam || '', sampai: 'Selesai', tempat: mu.tempat || 'Balai Desa Pandanwangi', keterangan: ket, sumber_mus: mu.id, foto: mu.foto || '' };
+    const rec = { nama: rp ? mu.musyawarah.replace(/ RPJM Desa$/, '') + (mu.dusun ? ' ' + String(mu.dusun).replace(/^DUSUN /i, 'Dusun ') : '') + ' — ' + perN : mu.musyawarah + ' RKP Desa ' + rkpLbl(mu.tahun_rkp), tanggal: mu.tanggal, jam: mu.jam || '', sampai: 'Selesai', tempat: mu.tempat || 'Balai Desa ' + ND(), keterangan: ket, sumber_mus: mu.id, foto: mu.foto || '' };
     let ada = null;
     if (mu.agenda_id) { try { ada = await call('get', { entity: 'kegiatan', id: mu.agenda_id }); } catch (x) { ada = null; } }
     if (ada && ada.id) { await call('save', { entity: 'kegiatan', record: Object.assign({ id: ada.id }, rec) }); return ada.id; }
-    const baru = await call('save', { entity: 'kegiatan', record: Object.assign({ penyelenggara: 'Pemerintah Desa Pandanwangi', peserta: rp ? 'Tim Penyusun RPJM Desa, BPD, dan unsur masyarakat' : 'Tim Penyusun RKP Desa, BPD, dan unsur masyarakat' }, rec) });
+    const baru = await call('save', { entity: 'kegiatan', record: Object.assign({ penyelenggara: 'Pemerintah Desa ' + ND(), peserta: rp ? 'Tim Penyusun RPJM Desa, BPD, dan unsur masyarakat' : 'Tim Penyusun RKP Desa, BPD, dan unsur masyarakat' }, rec) });
     if (baru && baru.id) await call('save', { entity: ent, record: { id: mu.id, agenda_id: baru.id } });
     return baru && baru.id;
   } catch (x) { console.warn('Agenda musyawarah gagal disinkronkan', x); return null; }
@@ -4873,20 +4889,24 @@ VIEWS.settings = async (p, main) => {
   setTop('Pengaturan');
   const s = S.set;
   const G = [
-    ['Profil desa', [['nama_desa', 'Nama desa'], ['kecamatan', 'Kecamatan'], ['kabupaten', 'Kabupaten'], ['provinsi', 'Provinsi'], ['alamat', 'Alamat kantor', 1], ['kode_pos', 'Kode pos'], ['email_desa', 'Email desa'], ['nama_kades', 'Nama Kepala Desa (untuk tanda tangan)'], ['logo_url', 'Tautan logo (gambar)', 1], ['tahun_rkp', 'Tahun RKP Desa berjalan'], ['kode_surat', 'Kode desa pada nomor surat (Nomor: 470/No/KODE/Tahun)']]],
+    ['Profil desa', [['nama_desa', 'Nama desa'], ['kecamatan', 'Kecamatan'], ['kabupaten', 'Kabupaten'], ['provinsi', 'Provinsi'], ['alamat', 'Alamat kantor', 1], ['kode_pos', 'Kode pos'], ['email_desa', 'Email desa'], ['nama_kades', 'Nama Kepala Desa (untuk tanda tangan)'], ['logo_url', 'Logo desa (tautan gambar, atau tekan Unggah logo di bawah)', 1], ['daftar_dusun', 'Daftar dusun (satu per baris)', 1, 'textarea'], ['tahun_rkp', 'Tahun RKP Desa berjalan'], ['kode_surat', 'Kode desa pada nomor surat (Nomor: 470/No/KODE/Tahun)']]],
     ['Jam kerja', [['jam_masuk_mulai', 'Presensi masuk dibuka', 0, 'time'], ['jam_masuk_batas', 'Batas masuk tepat waktu', 0, 'time'], ['jam_pulang_mulai', 'Pulang mulai (Senin–Kamis)', 0, 'time'], ['jam_pulang_jumat', 'Pulang mulai (Jumat)', 0, 'time'], ['jam_pulang_batas', 'Batas presensi pulang', 0, 'time']]],
-    ['Aset & RAB', [['kode_lokasi_aset', 'Kode lokasi SIPADES (mis. 35.8.5.2001)'], ['upb_aset', 'UPB SIPADES (mis. 1 . PEMERINTAH DESA PANDANWANGI)'], ['provinsi', 'Provinsi'], ['ibu_kota_desa', 'Ibu kota desa'], ['kode_pos', 'Kode pos'], ['kode_pengguna_aset', 'Kode pengguna barang (2 digit, bawaan 01)'], ['masa_jabatan_mulai', 'Masa jabatan Kepala Desa — tahun mulai', 0, 'number'], ['masa_jabatan_akhir', 'Masa jabatan Kepala Desa — tahun akhir', 0, 'number'], ['bu_swakelola', 'Biaya umum & keuntungan swakelola (%), bawaan 0', 0, 'number'], ['bu_penyedia', 'Biaya umum & keuntungan penyedia (%), bawaan 10', 0, 'number'], ['nama_sekdes', 'Nama Sekretaris Desa'], ['nama_bendahara', 'Nama Kaur Keuangan / Bendahara'], ['nama_pengurus_aset', 'Nama Pengurus Barang / Aset (Kaur Umum)'], ['nip_pengurus_aset', 'NIP Pengurus Barang (opsional)']]],
+    ['Aset & RAB', [['kode_lokasi_aset', 'Kode lokasi SIPADES (mis. 35.8.5.2001)'], ['upb_aset', 'UPB SIPADES (mis. 1 . PEMERINTAH DESA ...)'], ['provinsi', 'Provinsi'], ['ibu_kota_desa', 'Ibu kota desa'], ['kode_pos', 'Kode pos'], ['kode_pengguna_aset', 'Kode pengguna barang (2 digit, bawaan 01)'], ['masa_jabatan_mulai', 'Masa jabatan Kepala Desa — tahun mulai', 0, 'number'], ['masa_jabatan_akhir', 'Masa jabatan Kepala Desa — tahun akhir', 0, 'number'], ['bu_swakelola', 'Biaya umum & keuntungan swakelola (%), bawaan 0', 0, 'number'], ['bu_penyedia', 'Biaya umum & keuntungan penyedia (%), bawaan 10', 0, 'number'], ['nama_sekdes', 'Nama Sekretaris Desa'], ['nama_bendahara', 'Nama Kaur Keuangan / Bendahara'], ['nama_pengurus_aset', 'Nama Pengurus Barang / Aset (Kaur Umum)'], ['nip_pengurus_aset', 'NIP Pengurus Barang (opsional)']]],
     ['Lokasi kantor', [['kantor_lat', 'Lintang (latitude)'], ['kantor_lng', 'Bujur (longitude)'], ['radius_m', 'Radius presensi (meter)', 0, 'number']]],
     ['Verifikasi wajah', [['face_threshold', 'Batas kecocokan (0.45 ketat – 0.55 longgar, bawaan 0.5)']]]
   ];
   const lib = String(s.libur_mingguan || '').split(',');
   main.innerHTML = `<form class="stack" id="sf">
-    ${G.map(g => `<div class="card stack"><div class="lbl">${g[0]}</div><div class="form">${g[1].map(f => `<div class="f ${f[2] ? 'wide' : ''}"><label for="s_${f[0]}">${esc(f[1])}</label><input id="s_${f[0]}" type="${f[3] || 'text'}" value="${esc(s[f[0]] || '')}"></div>`).join('')}</div>
+    ${G.map(g => `<div class="card stack"><div class="lbl">${g[0]}</div><div class="form">${g[1].map(f => `<div class="f ${f[2] ? 'wide' : ''}"><label for="s_${f[0]}">${esc(f[1])}</label>${f[3] === 'textarea' ? `<textarea id="s_${f[0]}" rows="4">${esc(s[f[0]] || '')}</textarea>` : `<input id="s_${f[0]}" type="${f[3] || 'text'}" value="${esc(s[f[0]] || '')}">`}</div>`).join('')}</div>
+      ${g[0] === 'Profil desa' ? `<div class="btns" style="align-items:center"><img id="s_logop" src="${esc(s.logo_url || LOGO)}" alt="" style="width:44px;height:44px;object-fit:contain;border-radius:8px;background:#fff"><label class="btn sm">${ic('up')}Unggah logo<input type="file" id="s_logof" accept="image/*" hidden></label><span class="meta">Logo dikecilkan otomatis; tekan Simpan pengaturan.</span></div>` : ''}
       ${g[0] === 'Jam kerja' ? `<div class="f"><span class="lbl">Libur mingguan</span><div class="checks" id="libm">${['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'].map((d, i) => `<label><input type="checkbox" value="${i + 1}" ${lib.indexOf(String(i + 1)) >= 0 ? 'checked' : ''}>${d}</label>`).join('')}</div></div><button class="btn sm" type="button" data-act="go" data-go='["list",{"e":"hari_libur"}]' style="align-self:flex-start">${ic('cal')}Atur hari libur nasional & cuti bersama</button>` : ''}
       ${g[0] === 'Lokasi kantor' ? `<div class="btns"><button class="btn sm" type="button" data-act="here">${ic('pin')}Pakai lokasi saya sekarang</button><label class="switch"><input type="checkbox" id="s_wajib" ${s.wajib_radius === 'ya' ? 'checked' : ''}>Wajib di dalam radius untuk presensi masuk/pulang</label></div>` : ''}</div>`).join('')}
     <div id="serr" class="err" hidden></div>
     <div><button class="btn pri" type="submit">${ic('check')}Simpan pengaturan</button></div>
+    ${S.user && S.user.admin ? `<div class="card stack"><div class="lbl">Desa lain ingin memakai aplikasi ini?</div><p class="meta" style="margin:0">Buat berkas database kosong (tanpa data ${esc(ND())}) untuk dipasang di akun Supabase desa lain.</p><button class="btn sm" type="button" data-act="go" data-go='["paketdesa"]' style="align-self:flex-start">${ic('down')}Paket desa baru</button></div>` : ''}
     <div class="card stack"><div class="lbl">Penyimpanan foto KTP/KK</div><p class="meta" style="margin:0">Foto KTP/KK baru disimpan di penyimpanan khusus yang lebih cepat. Foto lama yang masih di Google Drive bisa dipindahkan (salinan di Drive tidak dihapus).</p><button class="btn sm" type="button" data-act="go" data-go='["template"]' style="align-self:flex-start">${ic('file')}Template dokumen (Word)</button><button class="btn sm" type="button" data-act="go" data-go='["pindahberkas"]' style="align-self:flex-start">${ic('users')}Pindahkan foto KTP/KK lama</button></div></form>`;
+  const lf = $('#s_logof');
+  if (lf) lf.onchange = () => { const f = lf.files[0]; if (!f) return; const im = new Image(); im.onload = () => { const k = Math.min(1, 160 / Math.max(im.width, im.height)), c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); let u = c.toDataURL('image/webp', .85); if (!/^data:image\/webp/.test(u)) u = c.toDataURL('image/png'); $('#s_logo_url').value = u; $('#s_logop').src = u; URL.revokeObjectURL(im.src); toast('Logo siap. Tekan Simpan pengaturan.'); }; im.src = URL.createObjectURL(f); };
   S.vh.here = () => navigator.geolocation ? navigator.geolocation.getCurrentPosition(pp => { $('#s_kantor_lat').value = pp.coords.latitude.toFixed(6); $('#s_kantor_lng').value = pp.coords.longitude.toFixed(6); toast('Lokasi diisi. Tekan Simpan.'); }, () => toast('Lokasi tidak dapat dibaca.', 1), { enableHighAccuracy: true, timeout: 15000 }) : toast('Perangkat tidak mendukung GPS.', 1);
   $('#sf').onsubmit = async ev => {
     ev.preventDefault();
@@ -4895,7 +4915,7 @@ VIEWS.settings = async (p, main) => {
     v.libur_mingguan = $$('#libm input:checked').map(i => i.value).join(',');
     v.wajib_radius = $('#s_wajib').checked ? 'ya' : 'tidak';
     v.face_threshold = v.face_threshold.replace(',', '.');
-    try { S.set = await call('settingsSave', { values: v }); S.rkpYear = S.set.tahun_rkp || S.rkpYear; toast('Pengaturan disimpan.'); }
+    try { S.set = await call('settingsSave', { values: v }); terapBrand(); S.rkpYear = S.set.tahun_rkp || S.rkpYear; toast('Pengaturan disimpan.'); }
     catch (x) { $('#serr').textContent = x.message; $('#serr').hidden = false; }
   };
 };
@@ -7961,6 +7981,99 @@ async function skSimpan(out, lapor) {
   return hasil;
 }
 const SK_NAMA = { rek: 'Parameter Rekening', rab: 'Rincian Anggaran (RAB/APBDes)', bku: 'Buku Kas Umum', cair: 'Register SPP - Pencairan', spp: 'Register SPP Pengeluaran', bkp: 'Buku Kas Pembantu Kegiatan' };
+/* =====================================================================
+   PAKET DESA BARU — membuat berkas SQL database kosong untuk desa lain
+   (struktur + data referensi umum, tanpa data desa ini)
+   ===================================================================== */
+const PK_EXT_SCHEMA = { pgcrypto: 1, 'uuid-ossp': 1, pg_trgm: 1, pg_stat_statements: 1 };
+function pkSkema(sk) {
+  const A = sk.indexOf('-- ===== TABLES ====='), B = sk.indexOf('-- ===== FUNCTIONS =====');
+  let head = sk.slice(0, A), tab = sk.slice(A, B), rest = sk.slice(B);
+  head = head.split('\n').filter(l => !/sipades_stage/.test(l)).map(l => {
+    const m = l.match(/^create extension if not exists ("?[\w-]+"?);$/);
+    if (!m) return l;
+    const nm = m[1].replace(/"/g, '');
+    if (nm === 'supabase_vault' || nm === 'pg_cron') return '-- (dilewati) ' + l;
+    return `do $x$ begin create extension if not exists ${m[1]}${PK_EXT_SCHEMA[nm] ? ' with schema extensions' : ''}; exception when others then raise notice 'ekstensi ${nm}: %', sqlerrm; end $x$;`;
+  }).join('\n');
+  const fk = [], defs = [];
+  let t = '';
+  tab = tab.split('\n').map(l => {
+    let m = l.match(/^create table if not exists private\.("?\w+"?) \($/);
+    if (m) { t = m[1]; return l; }
+    if (/^alter table .* FOREIGN KEY /.test(l)) { fk.push(l); return null; }
+    m = l.match(/^  ("?\w+"?) (.+?) default (.*private\..*?)( not null)?(,?)$/);
+    if (m && t) { defs.push(`alter table private.${t} alter column ${m[1]} set default ${m[3]};`); return `  ${m[1]} ${m[2]}${m[4] || ''}${m[5]}`; }
+    return l;
+  }).filter(l => l != null).join('\n');
+  const T = rest.indexOf('-- ===== TRIGGERS =====');
+  return [head, tab, '-- ===== RELASI ANTAR TABEL =====', fk.join('\n'), '', rest.slice(0, T),
+    '-- ===== NILAI BAWAAN KOLOM =====', defs.join('\n'), '', rest.slice(T)].join('\n');
+}
+const pkJson = v => '$PDJ$' + JSON.stringify(v) + '$PDJ$';
+const pkStr = v => "'" + String(v == null ? '' : v).replace(/'/g, "''") + "'";
+function pkSql(r, o) {
+  const st = Object.assign({}, r.setting || {}, { nama_desa: o.desa, kecamatan: o.kec, kabupaten: o.kab, provinsi: o.prov, tahun_rkp: String(new Date().getFullYear() + 1) });
+  const rec = r.record || [], L = [];
+  L.push('-- =====================================================================',
+    '-- DATABASE KOSONG APLIKASI PEMDES — Desa ' + o.desa,
+    '-- Dibuat ' + new Date().toLocaleString('id-ID') + ' dari aplikasi Pemdes ' + ND() + ' (hanya struktur & data referensi umum).',
+    '-- Cara pakai: Supabase → SQL Editor → New query → tempel seluruh isi berkas ini → Run.',
+    '-- =====================================================================',
+    'set check_function_bodies = off;', '');
+  L.push(pkSkema(r.skema || ''));
+  L.push('', '-- ===== DAFTAR MODUL (entity) =====',
+    `insert into private.entity select * from jsonb_populate_recordset(null::private.entity, ${pkJson(r.entity || [])}::jsonb) on conflict do nothing;`);
+  L.push('', '-- ===== PENGATURAN AWAL =====',
+    `insert into private.setting (key, value) select key, value from jsonb_each_text(${pkJson(st)}::jsonb) on conflict (key) do update set value = excluded.value;`,
+    "insert into private.setting (key, value) values ('salt', encode(extensions.gen_random_bytes(16), 'hex')) on conflict (key) do nothing;",
+    "insert into private.setting (key, value) values ('import_open', 'tidak') on conflict (key) do nothing;");
+  for (let i = 0; i < rec.length; i += 1500) {
+    L.push('', `-- ===== DATA REFERENSI (${i + 1}–${Math.min(rec.length, i + 1500)} dari ${rec.length}) =====`,
+      `insert into private.record (id, entity, data, _oleh) select x->>'id', x->>'entity', x->'data', 'paket' from jsonb_array_elements(${pkJson(rec.slice(i, i + 1500))}::jsonb) x on conflict do nothing;`);
+  }
+  L.push('', '-- ===== AKUN ADMIN PERTAMA (kata sandi awal 123456, wajib diganti saat masuk) =====',
+    `insert into private.app_user (id, nama, jabatan, email, admin, aktif, pin_hash, ganti_sandi, _oleh) values ('admin', ${pkStr(o.nama)}, 'Admin Aplikasi', ${pkStr(o.email.toLowerCase())}, true, true, private.pin_hash('admin', '123456'), true, 'paket') on conflict (id) do nothing;`,
+    '', "select 'SELESAI — database siap. Masuk ke aplikasi dengan email admin dan kata sandi 123456.' as hasil;");
+  return L.join('\n');
+}
+VIEWS.paketdesa = async (p, main) => {
+  setTop('Paket Desa Baru', 'Database kosong untuk desa lain');
+  if (!S.user || !S.user.admin) { main.innerHTML = '<div class="card"><p class="meta" style="margin:0">Hanya admin yang dapat membuat paket.</p></div>'; return; }
+  const cnt = {};
+  main.innerHTML = `<div class="stack">
+    <div class="card stack"><div class="lbl">Apa yang dibuat</div>
+      <p class="meta" style="margin:0">Satu berkas <b>.sql</b> berisi seluruh struktur database aplikasi (tabel, fungsi, menu) ditambah data referensi umum: kode rekening APBDes, bidang/kegiatan, kode barang SIPADES, SDGs Desa, dasar hukum, AHSP, template Berita Acara & peraturan aset, serta satu akun admin.
+      <b>Tidak ada</b> data penduduk, surat, keuangan, aset, aparat, atau foto desa ${esc(ND())}.</p>
+      <p class="meta" style="margin:0">Berkas ini dijalankan di <b>SQL Editor</b> proyek Supabase milik desa baru. Ikuti Panduan Pemasangan untuk langkah lengkapnya.</p></div>
+    <div class="card stack"><div class="lbl">Identitas desa baru</div>
+      <div class="form">
+        <div class="f"><label for="pkD">Nama desa</label><input id="pkD" placeholder="mis. Sumberejo"></div>
+        <div class="f"><label for="pkK">Kecamatan</label><input id="pkK"></div>
+        <div class="f"><label for="pkB">Kabupaten</label><input id="pkB"></div>
+        <div class="f"><label for="pkP">Provinsi</label><input id="pkP" value="${esc(S.set.provinsi || '')}"></div>
+        <div class="f"><label for="pkN">Nama admin</label><input id="pkN" placeholder="mis. Kaur TU dan Umum"></div>
+        <div class="f"><label for="pkE">Email Google admin</label><input id="pkE" type="email" placeholder="nama@gmail.com"></div>
+      </div>
+      <div id="pkErr" class="err" hidden></div>
+      <div class="btns"><button class="btn pri" type="button" data-act="pkGo">${ic('down')}Buat & unduh berkas SQL</button></div>
+      <div id="pkOut" class="meta"></div></div></div>`;
+  S.vh.pkGo = async () => {
+    const o = { desa: $('#pkD').value.trim(), kec: $('#pkK').value.trim(), kab: $('#pkB').value.trim(), prov: $('#pkP').value.trim(), nama: $('#pkN').value.trim() || 'Admin Desa', email: $('#pkE').value.trim() };
+    const er = $('#pkErr'); er.hidden = true;
+    if (!o.desa || !o.kec || !o.kab) { er.textContent = 'Isi nama desa, kecamatan, dan kabupaten.'; er.hidden = false; return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(o.email)) { er.textContent = 'Isi email admin yang benar.'; er.hidden = false; return; }
+    $('#pkOut').textContent = 'Mengambil struktur database…';
+    try {
+      const r = await call('paket');
+      (r.record || []).forEach(x => cnt[x.entity] = (cnt[x.entity] || 0) + 1);
+      const sql = pkSql(r, o), nm = 'database-kosong-desa-' + o.desa.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.sql';
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([sql], { type: 'application/sql' })); a.download = nm; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+      $('#pkOut').innerHTML = `Berkas <b>${esc(nm)}</b> (${(sql.length / 1048576).toFixed(1)} MB) sudah diunduh. Isi data referensi: ${Object.keys(cnt).map(k => esc(k) + ' ' + cnt[k]).join(' · ')}.`;
+    } catch (x) { $('#pkOut').textContent = ''; er.textContent = x.message; er.hidden = false; }
+  };
+};
+
 VIEWS.skimpor = async (p, main) => {
   setTop('Impor PDF Siskeudes');
   const st = S.skImp = { P: [], hasil: null };
