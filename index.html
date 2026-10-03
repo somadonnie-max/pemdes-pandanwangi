@@ -6784,6 +6784,7 @@ function asetTplIsi(html, t, L) {
   R(new RegExp('pada tanggal' + D, 'g'), 'pada tanggal ' + fDate(tgl));
   R(/Nama tanpa gelar dan Pangkat/g, esc(String(s.nama_kades || '').toUpperCase()));
   R(/Nama\s*:\s*\(pengelola\/pengurus barang milik Desa\)/g, 'Nama : ' + esc(s.nama_pengurus_aset || ''));
+  if (/\(pengelola\/pengurus barang milik Desa\)|Nama : /.test(html || '')) { let k = 0; h = h.replace(/Jabatan\s*:\s*<\/p>/, 'Jabatan : Pengurus Barang Milik Desa</p>'); if (t && t.pejabat) h = h.replace(/Nama\s*:\s*<\/p>/, 'Nama : ' + esc(t.pejabat) + '</p>').replace(/Jabatan\s*:\s*<\/p>/, 'Jabatan : ' + esc(t.jabatan || '') + '</p>'); }
   if (t) {
     let B = []; try { B = JSON.parse(t.barang || '[]'); } catch (x) { }
     const cari = v => { const id = String(v || '').split('|')[0].trim(); return (L || []).find(a => a.id_barang === id || asetIdBarang(a) === id) || { nama: String(v || '').split('|').slice(1).join('|').trim() || v }; };
@@ -6794,7 +6795,7 @@ function asetTplIsi(html, t, L) {
       const head = rows[0], cells = (head.match(/<t[hd][\s\S]*?<\/t[hd]>/g) || []).map(c => c.replace(/<[^>]+>/g, ' ').trim());
       const keep = [head]; if (rows[1] && /^\s*(<[^>]+>\s*)*1\s*(<[^>]+>\s*)*$/.test((rows[1].match(/<t[hd][\s\S]*?<\/t[hd]>/) || [''])[0])) keep.push(rows[1]);
       const isi = B.map((b, i) => { const a = cari(b.aset); return '<tr>' + cells.map(c => { const v = /^No/i.test(c) ? i + 1 : /Nama|Jenis/i.test(c) ? (a.nama || a.nama_rekening || '') : /Kode/i.test(c) ? (kodeAset(a.kode_barang) + (a.no_urut ? ' / Reg ' + sipReg(a) : '')) : /Jumlah/i.test(c) ? '1 ' + (a.satuan || 'Unit') : /Kondisi/i.test(c) ? (a.kondisi || '') : /Nilai|Harga/i.test(c) ? fMoney(b.jumlah || a.nilai) : /Merk/i.test(c) ? [a.merk, a.tipe].filter(Boolean).join(' / ') : /Tahun/i.test(c) ? (tahunOf(a.tgl_perolehan) || a.tahun || '') : /Ket/i.test(c) ? (b.kondisi || t.jenis_hapus || '') : ''; return `<td>${esc(String(v))}</td>`; }).join('') + '</tr>'; });
-      return '<table class="pt">' + keep.join('') + (isi.length ? isi.join('') : rows.slice(keep.length).join('')) + '</table>';
+      return '<table class="pt">' + keep.join('') + (isi.length ? isi.join('') : '<tr>' + cells.map(() => '<td>&nbsp;</td>').join('') + '</tr>') + '</table>';
     });
   }
   return h;
