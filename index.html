@@ -403,13 +403,14 @@ button.kd-k{cursor:pointer;font:inherit;color:inherit;text-align:left}button.kd-
 .ad-apb{border-left:4px solid var(--c-pend)}.ad-apb-k{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
 .ad-apb-k>div{background:var(--surface2);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column}.ad-apb-k b{font-size:18px}.ad-apb-k span{font-size:11px;color:var(--muted)}.ad-apb-k .ok b{color:var(--ok)}.ad-apb-k .warn b{color:var(--warn)}
 .ad .kd-kpi{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.ad{grid-template-columns:minmax(0,1fr)}.ad>*,.ad .kd-2>*{min-width:0}.ad .kd-tbl{width:100%}
 @media(max-width:640px){
 .ad{gap:8px}
 .ad-hero{padding:11px 12px;gap:8px;flex-wrap:nowrap;align-items:center}
 .ad-hero-l{flex:1;min-width:0;gap:1px}.ad-eyebrow{font-size:10.5px}.ad-big{font-size:24px}.ad-sub{font-size:11px}
 .ad-hero .chips{margin-top:4px!important;gap:4px}.ad-hero .chip{font-size:11px;padding:2px 8px;min-height:24px}
 .ad-hero-r{flex:none;gap:2px}.ad-ring{width:74px;height:74px}.ad-ring::before{inset:8px}.ad-ring b{font-size:16px;margin-top:20px}.ad-ring span{font-size:8px;padding:0 12px;margin-top:-20px}.ad-hero-r .meta{font-size:9.5px}
-.ad .kd-kpi{grid-template-columns:repeat(3,1fr);gap:6px}
+.ad .kd-kpi{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.ad .kd-2{grid-template-columns:minmax(0,1fr)}.ad .kd-tbl th{font-size:9.5px;white-space:normal}
 .ad .kd-k{padding:6px 7px;gap:1px;border-top-width:2px}.ad .kd-k .l{font-size:10px;gap:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ad .kd-k .l svg{width:11px;height:11px;flex:none}
 .ad .kd-k .v{font-size:17px}.ad .kd-k .s{font-size:9.5px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .ad .kd-2{gap:8px}.ad .kd-c{padding:9px 10px;gap:7px}.ad .kd-h>b{font-size:13px}.ad .kd-h .meta{font-size:10px}
@@ -421,8 +422,8 @@ button.kd-k{cursor:pointer;font:inherit;color:inherit;text-align:left}button.kd-
 .ad-apb-k{grid-template-columns:repeat(4,1fr);gap:4px}.ad-apb-k>div{padding:5px 6px}.ad-apb-k b{font-size:14px}.ad-apb-k span{font-size:9px;line-height:1.2}
 .ad .kd-tbl{font-size:10.5px}.ad .kd-tbl th,.ad .kd-tbl td{padding:3px 4px}
 .ad .list .row{min-height:0;padding:5px 7px;gap:7px}.ad .list .row .av{width:26px;height:26px;font-size:10px;flex:none}.ad .list .row .t{font-size:12px}.ad .list .row .s{font-size:10px}
-.ad .list .row .btn.sm{padding:3px 7px;font-size:10.5px;min-height:26px}
-.ad .kd-act{grid-template-columns:repeat(2,1fr);gap:5px}.ad .kd-act .btn{min-height:34px;font-size:11.5px;padding:4px 8px}
+.ad .list .row .btn.sm{padding:3px 7px;font-size:10.5px;min-height:26px}.ad .list .row{overflow:hidden}.ad .list .row .main{min-width:0;flex:1}.ad .list .row .pill{font-size:9.5px;padding:1px 5px}
+.ad .kd-act{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.ad .kd-act .btn{min-height:34px;font-size:11px;padding:4px 7px;white-space:normal;text-align:left;line-height:1.2;min-width:0}
 }
 .kg-r{display:flex;flex-direction:column;gap:6px}.kg-t{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.kg-t b{flex:1;min-width:160px}
 .kg-m{display:flex;gap:6px 12px;align-items:center;flex-wrap:wrap;font-size:12px}.kg-m .btn{margin-left:auto}
@@ -7047,7 +7048,7 @@ VIEWS.asetdash = async (p, main, alive) => {
       ${!apbOk ? '<div class="meta">Akun Anda tidak punya akses melihat APBDes, jadi pencocokan belanja modal tidak bisa ditampilkan.</div>'
         : !B.length ? `<div class="meta">Belum ada rincian belanja modal (rekening 5.3) di APBDes. Setelah APBDes 2020 sampai sekarang diinput, bagian ini otomatis menunjukkan belanja modal mana yang <b>sudah</b> dan <b>belum</b> dicatat sebagai aset. Hubungkan aset ke APBDes lewat isian <b>Rincian APBDes asal</b> di form aset.</div>`
         : `<div class="ad-apb-k"><div><b>${N(apbF.length)}</b><span>kegiatan belanja modal</span></div><div class="ok"><b>${N(apbSudah.length)}</b><span>sudah jadi aset</span></div><div class="warn"><b>${N(apbBelum.length)}</b><span>belum dicatat</span></div><div><b>${esc(asetRpS(apbBelum.reduce((t, x) => t + x.pagu, 0)))}</b><span>nilai belum dicatat</span></div></div>
-          ${perApbTh.length > 1 ? `<table class="tbl kd-tbl"><thead><tr><th>Tahun</th><th>Kegiatan</th><th>Sudah aset</th><th>Pagu belanja modal</th><th>Nilai aset tercatat</th></tr></thead><tbody>${perApbTh.map(x => `<tr><td>${esc(x.y)}</td><td class="r">${x.n}</td><td class="r">${x.ok} <span class="meta">(${x.n ? Math.round(x.ok / x.n * 100) : 0}%)</span></td><td class="r">${fMoney(x.pagu)}</td><td class="r">${fMoney(x.nAset)}</td></tr>`).join('')}</tbody></table>` : ''}
+          ${perApbTh.length > 1 ? `<table class="tbl kd-tbl"><thead><tr><th>Tahun</th><th>Kegiatan</th><th>Jadi aset</th><th>Pagu modal</th><th>Aset tercatat</th></tr></thead><tbody>${perApbTh.map(x => `<tr><td>${esc(x.y)}</td><td class="r">${x.n}</td><td class="r">${x.ok} <span class="meta">(${x.n ? Math.round(x.ok / x.n * 100) : 0}%)</span></td><td class="r">${esc(asetRpS(x.pagu))}</td><td class="r">${esc(asetRpS(x.nAset))}</td></tr>`).join('')}</tbody></table>` : ''}
           ${apbBelum.length ? `<div class="lbl">Belum dicatat sebagai aset${apbBelum.length > 12 ? ' (12 teratas menurut nilai)' : ''}</div><div class="list">${apbBelum.sort((a, b) => b.pagu - a.pagu).slice(0, 12).map(x => `<div class="row" style="cursor:default"><span class="av">${esc(String(x.b.tahun).slice(2))}</span><span class="main"><span class="t">${esc(x.b.uraian || x.b.kegiatan || x.b.rek)}</span><span class="s">${esc(x.b.kode_kegiatan || String(x.b.rek || '').split(' ')[0])} · ${x.n} rincian (${esc(Array.from(new Set(x.rinci)).slice(0, 3).join(', '))}) · ${fMoney(x.pagu)}</span></span>${canWrite('aset') ? `<button class="btn sm" data-act="addSub" data-e="aset" data-p='${esc(JSON.stringify({ nama: x.b.uraian || x.b.kegiatan || '', apbdes_ref: apbLabel(x.b), asal: 'APBDesa', perolehan: 'Pengadaan', nilai: String(x.pagu), tgl_perolehan: x.b.tahun + '-12-31', status: 'Draf', sipades: 'Belum', sumber_data: 'APBDes ' + x.b.tahun }))}'>${ic('plus')}Catat aset</button>` : ''}</div>`).join('')}</div>` : '<div class="meta">Semua belanja modal sudah tercatat sebagai aset.</div>'}`}
       ${asetApbdesTanpaRef.length ? `<div class="meta">${N(asetApbdesTanpaRef.length)} aset berasal "APBDesa" belum dihubungkan ke rincian APBDes.</div>` : ''}</div>
     <div class="kd-2">
