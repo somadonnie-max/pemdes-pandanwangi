@@ -224,17 +224,17 @@ button.stat:hover{border-color:var(--pri)}
 .f.wide{grid-column:1/-1}
 .logos{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}.logo-up{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px}.logo-up img{width:52px;height:52px;object-fit:contain;border-radius:8px;background:#fff;border:1px solid var(--line);flex-shrink:0}
 .tpl-list{display:flex;flex-direction:column;gap:6px}
-.tpl-list{gap:4px!important}
-.tpl-it{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:3px 8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:5px 8px}
-.tpl-ic{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;background:var(--pri-soft);color:var(--pri)}.tpl-ic .ic{width:15px;height:15px}
-.tpl-mid{display:flex;flex-direction:column;gap:1px;min-width:0}.tpl-mid b{font-size:12px;line-height:1.25}.tpl-mid .meta{display:flex;flex-wrap:wrap;gap:3px;align-items:center;font-size:10.5px}.tpl-mid .pill{font-size:9.5px;padding:0 6px}
-.tpl-chev{display:none;color:var(--muted)}
-.tpl-bt{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end}
-.ibtn{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:var(--surface);color:var(--txt,inherit);border-radius:7px;padding:4px 8px;font-size:11.5px;font-weight:600;cursor:pointer;white-space:nowrap}
-.ibtn .ic{width:14px;height:14px}.ibtn.pri{background:var(--pri);border-color:var(--pri);color:#fff}.ibtn.danger{color:var(--bad)}
+.tpl-list{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px!important}
+.tpl-it{display:flex;flex-direction:column;gap:5px;background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:7px 8px;min-width:0}
+.tpl-hd{display:flex;gap:6px;align-items:flex-start;min-width:0}
+.tpl-ic{width:24px;height:24px;border-radius:6px;display:grid;place-items:center;background:var(--pri-soft);color:var(--pri);flex-shrink:0}.tpl-ic .ic{width:14px;height:14px}
+.tpl-mid{display:flex;flex-direction:column;gap:1px;min-width:0}.tpl-mid b{font-size:11.5px;line-height:1.25;word-break:break-word}.tpl-mid .meta{font-size:10px;line-height:1.3}.tpl-mid .pill{font-size:9.5px;padding:0 6px}
+.tpl-bt{display:flex;flex-wrap:wrap;gap:3px;margin-top:auto}
+.ibtn{display:inline-flex;align-items:center;gap:3px;border:1px solid var(--line);background:var(--surface);color:var(--txt,inherit);border-radius:6px;padding:3px 6px;font-size:10.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.ibtn .ic{width:12px;height:12px}.ibtn.pri{background:var(--pri);border-color:var(--pri);color:#fff}.ibtn.danger{color:var(--bad)}
 .tpl-tags{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface)}.tpl-tags summary,.tpl-help summary{cursor:pointer;font-weight:700;font-size:12.5px;display:flex;align-items:center;gap:6px}
 .tpl-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.tpl-chips .chip{font-size:11px}
-@media(max-width:760px){.tpl-it{grid-template-columns:auto minmax(0,1fr) auto;cursor:pointer}.tpl-chev{display:block;transition:transform .15s}.tpl-it.open .tpl-chev{transform:rotate(180deg)}.tpl-bt{grid-column:1/-1;justify-content:flex-start;display:none;padding-top:4px}.tpl-it.open .tpl-bt{display:flex}}
+@media(max-width:760px){.tpl-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .gtabs{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:3px;overflow-x:auto;scrollbar-width:none}
 .gtabs button{flex:1 0 auto;border:0;background:none;border-radius:7px;padding:5px 12px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap}
 .gtabs button.on{background:var(--surface);color:var(--pri);box-shadow:0 1px 2px rgba(0,0,0,.12)}
@@ -6357,15 +6357,16 @@ VIEWS.template = async (p, main) => {
   /* satu baris template: status + tombol ikon */
   const item = o => {
     const x = cari(o.path), docx = /\.docx$/i.test(o.path), bawaan = o.bawaan || (docx && kitN.indexOf(o.path.split('/').pop().replace(/\.docx$/, '')) >= 0);
-    const st = x ? '<span class="pill ok">Template sendiri</span>' : bawaan ? '<span class="pill info">Bawaan aplikasi</span>' : o.umum ? '<span class="pill">Pakai template umum</span>' : '<span class="pill warn">Belum ada</span>';
+    const st = x || bawaan || o.umum ? '' : '<span class="pill warn">Belum ada</span>';
     const B = (act, icn, txt, cls, extra) => `<button class="ibtn ${cls || ''}" data-act="${act}" data-p="${esc(o.path)}" ${extra || ''} title="${esc(txt)}">${ic(icn)}<span>${esc(txt)}</span></button>`;
     const bt = [];
     if (x) bt.push(B('tplDl', 'file', 'Unduh')); else if (bawaan) bt.push(B('tplDlN', 'file', 'Unduh')); else if (o.umum) bt.push(B('tplDlAs', 'file', 'Unduh'));
     if (x && docx) bt.push(B('tplTags', 'list', 'Tanda'));
     if (o.edit) bt.push(`<button class="ibtn" data-act="xedit" data-e="jenis_surat" data-id="${esc(o.edit)}" title="Ubah isian jenis surat">${ic('edit')}<span>Isian</span></button>`);
     bt.push(B('tplUpBtn', 'plus', x ? 'Ganti' : 'Unggah', 'pri'));
-    if (x && (bawaan || o.umum || o.hapus)) bt.push(B('tplDelBtn', 'trash', bawaan ? 'Kembali ke bawaan' : o.umum ? 'Pakai template umum' : 'Hapus', 'danger'));
-    return `<div class="tpl-it"><span class="tpl-ic">${ic(o.ic || 'file')}</span><div class="tpl-mid"><b>${esc(o.label)}</b><span class="meta">${st}${o.sub ? ' · ' + o.sub : ''}${x ? ' · ' + kb(x) + ' · ' + esc(String(x.waktu || '').slice(0, 10)) : ''}</span></div><span class="tpl-chev">${ic('down')}</span><div class="tpl-bt">${bt.join('')}</div></div>`;
+    if (x && (bawaan || o.umum || o.hapus)) bt.push(B('tplDelBtn', 'trash', 'Hapus', 'danger'));
+    const mt = [st, o.sub, x ? kb(x) + ' · ' + esc(String(x.waktu || '').slice(0, 10)) : ''].filter(Boolean).join(' · ');
+    return `<div class="tpl-it"><div class="tpl-hd"><span class="tpl-ic">${ic(o.ic || 'file')}</span><div class="tpl-mid"><b>${esc(o.label)}</b>${mt ? `<span class="meta">${mt}</span>` : ''}</div></div><div class="tpl-bt">${bt.join('')}</div></div>`;
   };
   const tags = (judul, arr, catatan) => `<details class="tpl-tags"><summary>${ic('list')} ${esc(judul)} <span class="meta">— ketuk tanda untuk menyalin</span></summary>${catatan ? `<div class="meta">${catatan}</div>` : ''}<div class="tpl-chips">${arr.map(k => `<button type="button" class="chip mono" data-act="tagCopy" data-t="${esc(k)}">{{${esc(k)}}}</button>`).join('')}</div></details>`;
   const sek = (judul, aksi, isi) => `<div class="sec-h"><h2>${judul}</h2>${aksi ? `<span class="btns">${aksi}</span>` : ''}</div><div class="tpl-list">${isi}</div>`;
@@ -6375,7 +6376,7 @@ VIEWS.template = async (p, main) => {
   const TABS = [
     ['surat', 'Surat Keterangan', () => sek('Surat keterangan bawaan', '', Object.keys(SURAT).map(j => item({ path: suratPath(j), label: j.replace(/^Surat /, ''), ic: 'file' })).join(''))
       + sek('Jenis tambahan', `<button class="btn sm pri" data-act="go" data-go='["form",{"e":"jenis_surat"}]'>${ic('plus')}Jenis surat</button>`,
-        item({ path: 'surat/_umum.docx', label: 'Template umum', sub: 'dipakai jenis tambahan yang belum punya template sendiri', ic: 'folder', hapus: 1 })
+        item({ path: 'surat/_umum.docx', label: 'Template umum', sub: 'untuk jenis tambahan tanpa template', ic: 'folder', hapus: 1 })
         + tambahan.map(j => item({ path: slugJenis(j.nama), label: j.nama.replace(/^Surat /, ''), umum: 1, edit: j.id, sub: (j.aktif === 'Tidak' ? 'tidak aktif · ' : '') + (isianJenis(j).length ? 'isian: ' + esc(isianJenis(j).join(', ')) : 'tanpa isian tambahan') })).join(''))
       + tags('Daftar tanda Surat Keterangan', TAG_SURAT, 'Huruf besar: tambahkan <b>_U</b>, mis. <span class="mono">{{Nama_U}}</span>. Jenis tambahan: setiap isian menjadi tanda dengan nama yang sama. Baris tabel berisi <span class="mono">{{Isian Label}}</span> diulang untuk semua isian.')],
     ['naskah', 'Surat Keluar & Produk Hukum', () => sek('Surat keluar & produk hukum', `<button class="btn sm" data-act="tplUpBtn" data-p="naskah/">${ic('plus')}Jenis surat keluar</button>`, naskahDaftar.map(([path, label]) => item({ path, label, ic: /perdes|perkades|perbersama|sk_/.test(path) ? 'scale' : 'send' })).join(''))
@@ -6395,11 +6396,10 @@ VIEWS.template = async (p, main) => {
   const tab = TABS.find(t => t[0] === S.tplTab);
   main.innerHTML = `<div class="stack">
     <div class="gtabs" role="tablist">${TABS.map(t => `<button role="tab" class="${t[0] === S.tplTab ? 'on' : ''}" data-act="tplTab" data-v="${t[0]}">${esc(t[1])}</button>`).join('')}</div>
-    <details class="card tpl-help"><summary>${ic('book')} Cara mengubah template</summary><ol class="meta" style="margin:6px 0 0;padding-left:18px;line-height:1.7"><li>Tekan <b>Unduh</b>, buka file di Microsoft Word / WPS.</li><li>Ubah susunan dan kalimat sesukanya. Tulis isian dengan kurung kurawal ganda, mis. <span class="mono">{{Nama}}</span> (lihat daftar tanda di bawah).</li><li>Simpan sebagai .docx, lalu tekan <b>Ganti</b> untuk mengunggah.</li><li>Template <span class="pill info">Bawaan aplikasi</span> disusun otomatis; tekan <b>Kembali ke bawaan</b> untuk membuang template sendiri.</li></ol></details>
+    <details class="card tpl-help"><summary>${ic('book')} Cara mengubah template</summary><ol class="meta" style="margin:6px 0 0;padding-left:18px;line-height:1.7"><li>Tekan <b>Unduh</b>, buka file di Microsoft Word / WPS.</li><li>Ubah susunan dan kalimat sesukanya. Tulis isian dengan kurung kurawal ganda, mis. <span class="mono">{{Nama}}</span> (lihat daftar tanda di bawah).</li><li>Simpan sebagai .docx, lalu tekan <b>Ganti</b> untuk mengunggah.</li><li>Tekan <b>Hapus</b> untuk membuang template unggahan dan kembali memakai susunan bawaan aplikasi (bila ada).</li></ol></details>
     ${tab[2]()}
     <input type="file" id="tplFile" accept=".docx,.xlsx,.jpg,.jpeg,.png" multiple hidden></div>`;
   S.vh.tplTab = t => { S.tplTab = t.dataset.v; refresh(); };
-  main.addEventListener('click', ev => { const it = ev.target.closest('.tpl-it'); if (!it || ev.target.closest('button,label,a')) return; const o = it.classList.contains('open'); $$('.tpl-it.open', main).forEach(x => x.classList.remove('open')); if (!o) it.classList.add('open'); });
   S.vh.tagCopy = t => { const v = '{{' + t.dataset.t + '}}'; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => toast(v + ' disalin.')).catch(() => toast(v)); };
   void ada;
   let target = '';
