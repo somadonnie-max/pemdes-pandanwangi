@@ -7987,7 +7987,7 @@ const SK_NAMA = { rek: 'Parameter Rekening', rab: 'Rincian Anggaran (RAB/APBDes)
    ===================================================================== */
 const PK_EXT_SCHEMA = { pgcrypto: 1, 'uuid-ossp': 1, pg_trgm: 1, pg_stat_statements: 1 };
 function pkSkema(sk) {
-  const A = sk.indexOf('-- ===== TABLES ====='), B = sk.indexOf('-- ===== FUNCTIONS =====');
+  const A = sk.indexOf('\n-- ===== TABLES =====\n'), B = sk.indexOf('\n-- ===== FUNCTIONS =====\n');
   let head = sk.slice(0, A), tab = sk.slice(A, B), rest = sk.slice(B);
   head = head.split('\n').filter(l => !/sipades_stage/.test(l)).map(l => {
     const m = l.match(/^create extension if not exists ("?[\w-]+"?);$/);
@@ -8002,13 +8002,14 @@ function pkSkema(sk) {
     let m = l.match(/^create table if not exists private\.("?\w+"?) \($/);
     if (m) { t = m[1]; return l; }
     if (/^alter table .* FOREIGN KEY /.test(l)) { fk.push(l); return null; }
+    if (/^CREATE (UNIQUE )?INDEX /.test(l) && /private\./.test(l.replace(/ ON private\.\w+/, ''))) { defs.push(l); return null; }
     m = l.match(/^  ("?\w+"?) (.+?) default (.*private\..*?)( not null)?(,?)$/);
     if (m && t) { defs.push(`alter table private.${t} alter column ${m[1]} set default ${m[3]};`); return `  ${m[1]} ${m[2]}${m[4] || ''}${m[5]}`; }
     return l;
   }).filter(l => l != null).join('\n');
-  const T = rest.indexOf('-- ===== TRIGGERS =====');
+  const T = rest.indexOf('\n-- ===== TRIGGERS =====\n') + 1;
   return [head, tab, '-- ===== RELASI ANTAR TABEL =====', fk.join('\n'), '', rest.slice(0, T),
-    '-- ===== NILAI BAWAAN KOLOM =====', defs.join('\n'), '', rest.slice(T)].join('\n');
+    '-- ===== NILAI BAWAAN KOLOM & INDEKS BERFUNGSI =====', defs.join('\n'), '', rest.slice(T)].join('\n');
 }
 const pkJson = v => '$PDJ$' + JSON.stringify(v) + '$PDJ$';
 const pkStr = v => "'" + String(v == null ? '' : v).replace(/'/g, "''") + "'";
