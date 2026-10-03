@@ -222,6 +222,23 @@ button.stat:hover{border-color:var(--pri)}
 .form{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px 10px}
 .f{display:flex;flex-direction:column;gap:3px;min-width:0}
 .f.wide{grid-column:1/-1}
+.logos{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}.logo-up{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px}.logo-up img{width:52px;height:52px;object-fit:contain;border-radius:8px;background:#fff;border:1px solid var(--line);flex-shrink:0}
+.tpl-list{display:flex;flex-direction:column;gap:6px}
+.tpl-it{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.tpl-ic{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:var(--pri-soft);color:var(--pri)}
+.tpl-mid{display:flex;flex-direction:column;gap:2px;min-width:0}.tpl-mid b{font-size:13px;line-height:1.3}.tpl-mid .meta{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+.tpl-bt{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end}
+.ibtn{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:var(--surface);color:var(--txt,inherit);border-radius:7px;padding:4px 8px;font-size:11.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.ibtn .ic{width:14px;height:14px}.ibtn.pri{background:var(--pri);border-color:var(--pri);color:#fff}.ibtn.danger{color:var(--bad)}
+.tpl-tags{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface)}.tpl-tags summary,.tpl-help summary{cursor:pointer;font-weight:700;font-size:12.5px;display:flex;align-items:center;gap:6px}
+.tpl-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.tpl-chips .chip{font-size:11px}
+@media(max-width:760px){.tpl-it{grid-template-columns:auto minmax(0,1fr)}.tpl-bt{grid-column:1/-1;justify-content:flex-start}}
+.gtabs{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:3px;overflow-x:auto;scrollbar-width:none}
+.gtabs button{flex:1 0 auto;border:0;background:none;border-radius:7px;padding:5px 12px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap}
+.gtabs button.on{background:var(--surface);color:var(--pri);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.fwd{border:1px dashed var(--line);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:8px}
+.fwd .fwbox{border-top:1px solid var(--line);padding-top:8px}
+.jbt{display:flex;flex-wrap:wrap;gap:5px;align-items:center}.jbt .pill{display:inline-flex;align-items:center;gap:4px}.jbt .pill button{border:0;background:none;padding:0 0 0 2px;cursor:pointer;color:inherit;font-size:13px;line-height:1}
 .f label,.lbl{font-size:11px;font-weight:600;color:var(--muted)}
 .f label i{color:var(--bad);font-style:normal}
 .inp,.f input:not([type=checkbox]):not([type=radio]):not([type=file]),.f select,.f textarea{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:5px 8px;min-height:32px;outline:0;font-size:12.5px}
@@ -384,7 +401,9 @@ table.rpj tfoot td.c0,table.rpj tfoot td.c1{z-index:4}
 .sipl{display:grid;grid-template-columns:minmax(220px,280px) 1fr;gap:10px;align-items:start}.sipl-tree{max-height:78vh;overflow:auto;gap:4px}.sipl-tree .row.sm{padding:5px 8px;min-height:0}.sipl-tree .row.on{background:var(--pri-bg,var(--surface2));border-color:var(--pri)}
 .sipl>*{min-width:0}.sk-daftar{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:6px}.sk-daftar>div{display:flex;flex-direction:column;gap:1px;background:var(--surface2);border-radius:8px;padding:6px 9px;font-size:12px}.sipl-sel{display:none}.row .s2{display:flex;flex-wrap:wrap;gap:3px;align-items:center;margin-top:2px;font-size:10.5px}.row .s2 .pill{font-size:9.5px;padding:0 5px}.paper.sopdoc{padding:14mm 15mm}.sopdoc img{max-width:100%;height:auto}.sopdoc table{table-layout:auto}.sopdoc p{margin:3px 0}
 .fitp{overflow:hidden;padding:8px;gap:8px;align-items:center}.fitp .paper{margin:0;flex:none}
-@media(max-width:760px){.sipl-sel{display:block;width:100%;font-weight:600}.sipl-tree{display:none!important}.form.two{grid-template-columns:1fr 1fr}.form.two .f.wide{grid-column:1/-1}.row .t{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.sipl{grid-template-columns:1fr}.doc-prev.fitp{padding:6px;border-radius:8px}.sipl-tree{max-height:210px}.sipl-tree .row.sm .t{font-size:11.5px!important}.sipl-tree{max-height:240px}.sipr{grid-template-columns:120px 1fr 30px}}
+@media(max-width:760px){.form{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 8px}.form>.f.wide,.form>.f:has(textarea),.form>.f:has(.fotos),.form>.f:has(table),.form>.f:has(.checks),.form>.f:has(input[type=file]){grid-column:1/-1}
+.f label{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.25}.f .hint{font-size:10px;line-height:1.3}
+.f input:not([type=checkbox]):not([type=radio]):not([type=file]),.f select{padding:5px 6px;font-size:12px}.sipl-sel{display:block;width:100%;font-weight:600}.sipl-tree{display:none!important}.form.two{grid-template-columns:1fr 1fr}.form.two .f.wide{grid-column:1/-1}.row .t{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.sipl{grid-template-columns:1fr}.doc-prev.fitp{padding:6px;border-radius:8px}.sipl-tree{max-height:210px}.sipl-tree .row.sm .t{font-size:11.5px!important}.sipl-tree{max-height:240px}.sipr{grid-template-columns:120px 1fr 30px}}
 .sopdoc{font-family:'Times New Roman',serif;font-size:10.5pt;line-height:1.35;color:#000;background:#fff}.sopdoc table{border-collapse:collapse;width:100%;margin:6px 0}.sopdoc td,.sopdoc th{border:1px solid #000;padding:3px 5px;vertical-align:top}.sopdoc h1,.sopdoc h2,.sopdoc h3{text-align:center;margin:8px 0}
 .lbl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm}
 .ad-hero{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;padding:16px 18px;border-radius:var(--r);color:#fff;background:linear-gradient(135deg,#1b5e20 0%,#2e7d32 45%,#00897b 100%);box-shadow:var(--shadow)}
@@ -647,8 +666,9 @@ const ND = () => brand().desa;
 (function () { const b = brandCache(); if (b.logo) { LOGO = b.logo; document.getElementById('favi').href = b.logo; } document.title = 'Pemdes ' + (b.desa || CFG.namaDesa || DESA0); })();
 function terapBrand() {
   const s = S.set || {}, b = brand();
-  try { localStorage.setItem('pd_brand', JSON.stringify({ desa: b.desa, kec: b.kec, kab: b.kab, logo: s.logo_url || '' })); } catch (e) { }
-  if (s.logo_url) { LOGO = s.logo_url; document.getElementById('favi').href = s.logo_url; }
+  try { localStorage.setItem('pd_brand', JSON.stringify({ desa: b.desa, kec: b.kec, kab: b.kab, logo: s.logo_app || '' })); } catch (e) { }
+  if (s.logo_app) { LOGO = s.logo_app; document.getElementById('favi').href = s.logo_app; }
+  terapPejabat();
   document.title = 'Pemdes ' + b.desa;
   const dl = String(s.daftar_dusun || '').split(/\n|;/).map(x => x.trim()).filter(Boolean).map(x => (/^dusun\s/i.test(x) ? x : 'DUSUN ' + x).toUpperCase());
   if (dl.length && typeof OPT !== 'undefined') OPT.dusun.splice(0, OPT.dusun.length, ...dl);
@@ -819,14 +839,14 @@ const UI = {
     print: { title: 'BUKU KEPUTUSAN BPD', land: 1, cols: [['Nomor & Tanggal', r => r.nomor + '<br>' + fDate(r.tanggal)], ['Tentang', 'tentang'], ['Uraian Singkat', 'uraian'], ['Ket', 'ket']] }
   },
   aparat: {
-    t: 'Aparat Pemerintah Desa', ic: 'badge', perm: 'tu_aparat', folder: 'TU/Aparat', file: 'dok_sk_id',
-    fields: [F('no_urut', 'No. Urut', 'number'), F('nama', 'Nama Lengkap', 'text', { req: 1 }), F('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1, nikfill: 1, hint: 'Ketik 16 digit: data dari Data Penduduk terisi otomatis' }), F('jabatan', 'Jabatan', 'text', { req: 1 }), F('niap', 'NIAP'), F('nip', 'NIP / NRPDes', 'text', { mono: 1 }),
+    t: 'Aparatur Desa', ic: 'badge', perm: 'tu_aparat', folder: 'TU/Aparat', file: 'dok_sk_id',
+    fields: [F('no_urut', 'No. Urut', 'number'), F('nama', 'Nama Lengkap', 'text', { req: 1 }), F('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1, nikfill: 1, hint: 'Ketik 16 digit: data dari Data Penduduk terisi otomatis' }), F('jabatan', 'Jabatan', 'text', { req: 1 }), F('jabatan_tambahan', 'Jabatan / Tugas Tambahan', 'textarea', { wide: 1, rows: 2, hint: 'Satu per baris, mis. Bendahara Desa, Pengurus Barang, Operator SisKeuDes. Bisa juga ditambah dari halaman detail.' }), F('niap', 'NIAP'), F('nip', 'NIP / NRPDes', 'text', { mono: 1 }),
       F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk2 }), F('tempat_lahir', 'Tempat Lahir'), F('tgl_lahir', 'Tanggal Lahir', 'date'), F('alamat', 'Alamat', 'text', { wide: 1 }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }), F('agama', 'Agama', 'select', { opt: OPT.agama2 }), F('pangkat', 'Pangkat/Golongan'),
       F('pendidikan', 'Pendidikan Terakhir', 'select', { opt: OPT.pendidikan2 }), F('no_sk_angkat', 'Nomor SK Pengangkatan'), F('tgl_sk_angkat', 'Tanggal SK Pengangkatan', 'date'),
       F('no_sk_henti', 'Nomor SK Pemberhentian'), F('tgl_sk_henti', 'Tanggal SK Pemberhentian', 'date'), F('email', 'Email', 'email'), F('wa', 'Nomor WhatsApp', 'tel'), F('ket', 'Keterangan'),
       F('foto_id', 'Foto', 'file', { img: 1 }), F('dok_sk_id', 'Dokumen SK', 'file')],
     sort: 'no_urut',
-    row: r => ({ t: r.nama, s: r.jabatan, img: r.foto_id, av: initials(r.nama), r: r.no_urut ? '#' + r.no_urut : '' }),
+    row: r => ({ t: r.nama, s: [r.jabatan].concat(jabTambah(r)).join(' · '), img: r.foto_id, av: initials(r.nama), r: r.no_urut ? '#' + r.no_urut : '' }),
     print: {
       title: 'BUKU APARAT PEMERINTAH DESA', land: 1, cols: [['Nama', 'nama'], ['NIAP', 'niap'], ['NIP/NRPDes', 'nip'], ['L/P', r => (r.jk || '').slice(0, 1)], ['Tempat & Tgl Lahir', r => (r.tempat_lahir || '') + ', ' + fDate(r.tgl_lahir)], ['Agama', 'agama'], ['Pangkat', 'pangkat'], ['Jabatan', 'jabatan'], ['Pendidikan', 'pendidikan'],
         ['SK Pengangkatan', r => (r.no_sk_angkat || '') + '<br>' + fDate(r.tgl_sk_angkat)], ['SK Pemberhentian', r => (r.no_sk_henti || '') + '<br>' + fDate(r.tgl_sk_henti)], ['Ket', 'ket']]
@@ -861,7 +881,7 @@ const UI = {
       F('tujuan', 'Ditujukan Kepada', 'text', { def: 'Kepala Desa' }), F('isi', 'Perihal / Isi Ringkas', 'textarea', { req: 1, wide: 1 }), F('pengolah', 'Pengolah', 'text', { def: 'Kaur TU & Umum' }),
       F('disposisi', 'Disposisi', 'text'), F('ket', 'Keterangan', 'text', { def: 'Arsip' }), F('dok_id', 'Scan surat (PDF/foto)', 'file', { wide: 1 })],
     year: 'tgl_terima', sort: 'tgl_terima',
-    row: r => ({ t: r.isi, s: 'dari ' + r.dari + ' · ' + r.nomor, date: r.tgl_terima, file: r.dok_id, r: r.no_agenda ? 'No. ' + r.no_agenda : '' }),
+    row: r => ({ t: r.isi, s: 'dari ' + r.dari + ' · ' + r.nomor, date: r.tgl_terima, file: r.dok_id, r: r.no_agenda ? 'No. ' + r.no_agenda : '', pill: r.terusan ? `<span class="pill info">→ ${esc(r.terusan)}</span>` : '' }),
     print: { title: 'BUKU AGENDA SURAT MASUK', land: 1, cols: [['No. Agenda', 'no_agenda'], ['Tgl Terima', r => fDate(r.tgl_terima)], ['Nomor Surat', 'nomor'], ['Tgl Surat', r => fDate(r.tgl_surat)], ['Pengirim', 'dari'], ['Isi Singkat', 'isi'], ['Disposisi', 'disposisi'], ['Ket', 'ket']] }
   },
   surat_keluar: {
@@ -1093,7 +1113,7 @@ const UI = {
   },
   lembaga: {
     t: 'Lembaga / Yayasan', ic: 'landmark', perm: 'kesejahteraan', folder: 'Kesejahteraan/Lembaga', sort: 'nama', excel: 1,
-    fields: [F('nama', 'Nama Lembaga / Yayasan', 'text', { req: 1, wide: 1 }), F('jenis', 'Jenis', 'text', { req: 1, list: OPT.jenisLembaga }), F('no_sk', 'No. SK / Akta / Izin'), F('berdiri', 'Tahun Berdiri'),
+    fields: [F('nama', 'Nama Lembaga / Yayasan', 'text', { req: 1, wide: 1 }), F('jenis', 'Jenis', 'text', { req: 1, list: OPT.jenisLembaga }), F('no_sk', 'No. SK / Akta / Izin'), F('no_kemenkumham', 'No. SK Kemenkumham'), F('bidang', 'Bidang Kegiatan', 'text', { wide: 1 }), F('berdiri', 'Tahun Berdiri'),
       F('alamat', 'Alamat / Lokasi', 'text', { wide: 1, hint: 'Mis. Jl. ..., atau nama tempat' }), F('dusun', 'Dusun', 'select', { opt: OPT.dusun }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }),
       F('ketua_nik', 'NIK Ketua / Penanggung Jawab', 'text', { mono: 1, len: 16, sens: 1, nikfill: { pre: 'ketua_' }, hint: 'Ketik 16 digit: nama terisi otomatis dari Data Penduduk' }), F('ketua_nama', 'Nama Ketua / Penanggung Jawab', 'text', { up: 1 }),
       F('ketua_jabatan', 'Jabatan', 'text', { def: 'Ketua', list: ['Ketua', 'Pengasuh', 'Kepala Sekolah', 'Takmir', 'Pimpinan', 'Direktur'] }), F('telp', 'No. HP / Telepon', 'tel'), F('jml_anggota', 'Jumlah Anggota / Santri / Jamaah', 'number'),
@@ -1179,11 +1199,12 @@ const UI = {
   },
   register_surat: {
     t: 'Surat Keterangan', ic: 'file', perm: 'pelayanan', excel: 1,
-    fields: [F('tgl_surat', 'Tanggal Surat', 'date', { def: isoToday }), F('no', 'No. Register', 'text', { auto: 1 }), F('jenis_surat', 'Surat / Jenis Keterangan', 'text', { req: 1, wide: 1, list: ['Surat Keterangan Domisili', 'Surat Keterangan Tidak Mampu', 'Surat Keterangan Usaha', 'Surat Pengantar SKCK', 'Surat Keterangan Kelahiran', 'Surat Keterangan Kematian', 'Surat Keterangan Pindah', 'Surat Keterangan Belum Menikah', 'Surat Keterangan Penghasilan'] }),
+    fields: [F('tgl_surat', 'Tanggal Surat', 'date', { def: isoToday }), F('no', 'No. Register', 'text', { auto: 1 }), F('jenis_surat', 'Surat / Jenis Keterangan', 'text', { req: 1, wide: 1, list: ['Surat Keterangan Domisili', 'Surat Keterangan Tidak Mampu', 'Surat Keterangan Usaha', 'Surat Pengantar SKCK', 'Surat Keterangan Kelahiran', 'Surat Keterangan Kematian', 'Surat Keterangan Pindah', 'Surat Keterangan Belum Menikah', 'Surat Keterangan Penghasilan', 'Surat Keterangan Domisili Yayasan/Lembaga'] }),
       F('pemohon', 'Pemohon', 'select', { opt: ['Perorangan', 'Lembaga / Instansi'], def: 'Perorangan', hint: 'Lembaga / Instansi: yayasan, masjid, TPQ, sekolah, kelompok, instansi, dll.' }),
       F('lembaga_nama', 'Nama Lembaga / Instansi', 'text', { wide: 1, when: { k: 'pemohon', v: 'Lembaga / Instansi' }, listFrom: { e: 'lembaga', k: 'nama' }, hint: 'Ketik atau pilih dari data Lembaga/Yayasan: data lembaga & penanggung jawab terisi otomatis',
-        fill: x => ({ lembaga_jenis: x.jenis, lembaga_alamat: [x.alamat, x.dusun ? 'Dusun ' + judulKata(String(x.dusun).replace(/^DUSUN\s+/i, '')) : '', x.rt ? 'RT ' + x.rt : '', x.rw ? 'RW ' + x.rw : ''].filter(Boolean).join(' '), lembaga_no: x.no_sk, pj_jabatan: x.ketua_jabatan || 'Ketua', nik: String(x.ketua_nik || '').indexOf('•') >= 0 ? '' : x.ketua_nik, nama: x.ketua_nama }) }),
+        fill: x => ({ lembaga_jenis: x.jenis, lembaga_alamat: [x.alamat, x.dusun ? 'Dusun ' + judulKata(String(x.dusun).replace(/^DUSUN\s+/i, '')) : '', x.rt ? 'RT ' + x.rt : '', x.rw ? 'RW ' + x.rw : ''].filter(Boolean).join(' '), lembaga_no: x.no_sk, lembaga_bidang: x.bidang, lembaga_kemenkumham: x.no_kemenkumham, pj_jabatan: x.ketua_jabatan || 'Ketua', nik: String(x.ketua_nik || '').indexOf('•') >= 0 ? '' : x.ketua_nik, nama: x.ketua_nama }) }),
       F('lembaga_jenis', 'Jenis Lembaga', 'text', { when: { k: 'pemohon', v: 'Lembaga / Instansi' }, list: OPT.jenisLembaga }), F('lembaga_no', 'No. SK / Akta / Izin', 'text', { when: { k: 'pemohon', v: 'Lembaga / Instansi' } }),
+      F('lembaga_bidang', 'Bidang Kegiatan', 'text', { grp: ['Surat Keterangan Domisili Yayasan/Lembaga'], hint: 'mis. Pendidikan anak usia dini, Sosial keagamaan' }), F('lembaga_kemenkumham', 'No. SK Kemenkumham', 'text', { grp: ['Surat Keterangan Domisili Yayasan/Lembaga'], hint: 'Kosongkan bila belum ada' }),
       F('lembaga_alamat', 'Alamat Lembaga', 'text', { wide: 1, when: { k: 'pemohon', v: 'Lembaga / Instansi' } }),
       F('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1, nikfill: 1, hint: 'Ketik 16 digit: data dari Data Penduduk terisi otomatis' }), F('nama', 'Nama', 'text', { req: 1, up: 1, wide: 1, lblW: { k: 'pemohon', v: 'Lembaga / Instansi', l: 'Nama Penanggung Jawab' } }),
       F('pj_jabatan', 'Jabatan dalam Lembaga', 'text', { when: { k: 'pemohon', v: 'Lembaga / Instansi' }, list: ['Ketua', 'Pengasuh', 'Kepala Sekolah', 'Takmir', 'Pimpinan', 'Direktur', 'Sekretaris', 'Bendahara'] }),
@@ -1230,6 +1251,14 @@ function stPill(s) {
 const SOON = {};
 
 /* Sub-menu (tile yang berisi beberapa menu) */
+/* Grup menu: satu daftar dengan tab di atas (Masuk/Keluar/Ekspedisi; jenis produk hukum) */
+const GRUP = {
+  surat: { t: 'Surat', ic: 'inbox', es: [['surat_masuk', 'Masuk'], ['surat_keluar', 'Keluar'], ['ekspedisi', 'Ekspedisi']] },
+  hukum: { t: 'Produk Hukum', ic: 'scale', es: [['perdes', 'Perdes'], ['perkades', 'Perkades'], ['sk_kades', 'SK Kades'], ['sk_bpd', 'SK BPD'], ['perbersama', 'Per. Bersama']] }
+};
+const GRUP_OF = {}; Object.keys(GRUP).forEach(g => GRUP[g].es.forEach(([e]) => { GRUP_OF[e] = g; }));
+const grpEs = g => GRUP[g].es.filter(x => canRead(x[0]));
+const grpItem = g => { const a = grpEs(g), e0 = (a[0] || GRUP[g].es[0])[0]; return [GRUP[g].t, GRUP[g].ic, ['list', { e: e0 }], null, null, 0, null, g]; };
 function SUBS() {
   const it = e => [UI[e].t, UI[e].ic, ['list', { e }], e];
   return { surat: { t: 'Surat', items: ['surat_masuk', 'surat_keluar', 'ekspedisi'].map(it) }, hukum: { t: 'Produk Hukum', items: ['perdes', 'perkades', 'perbersama', 'sk_kades', 'sk_bpd'].map(it) } };
@@ -1239,7 +1268,7 @@ function MODS() {
   return [
     { k: 'presensi', l: 'Presensi', ic: 'clock', items: [['Presensi Hari Ini', 'clock', ['presensi']], ['Riwayat Harian', 'list', ['harian']]] },
     { k: 'kegiatan', l: 'Kegiatan', ic: 'cal', items: [['Agenda', 'cal', ['list', { e: 'kegiatan', v: 0, title: 'Agenda' }], null, 'r:kegiatan'], ['Berita', 'mega', ['list', { e: 'berita' }], 'berita']] },
-    { k: 'arsip', l: 'Arsip', ic: 'folder', items: [['Surat', 'inbox', ['sub', { k: 'surat' }], null, null, 0, 'surat'], ['Produk Hukum', 'scale', ['sub', { k: 'hukum' }], null, null, 0, 'hukum']].concat(['aparat', 'petugas', 'tanah_desa'].map(e => [UI[e].t, UI[e].ic, ['list', { e }], e])) },
+    { k: 'arsip', l: 'Arsip', ic: 'folder', items: [grpItem('surat'), grpItem('hukum')].concat(['aparat', 'petugas', 'tanah_desa'].map(e => [UI[e].t, UI[e].ic, ['list', { e }], e])) },
     { k: 'aset', l: 'Aset Desa', ic: 'box', items: [['Dashboard Aset', 'chart', ['asetdash'], null, 'r:aset'], ['Inventarisasi & Penatausahaan (KIB)', 'box', ['list', { e: 'aset' }], 'aset'],
       ['Pengadaan', 'plus', ['list', { e: 'aset_trx', chip: 'Pengadaan' }], 'aset_trx'], ['Penggunaan, Pemanfaatan & Penghapusan', 'list', ['list', { e: 'aset_trx' }], 'aset_trx'], ['Persediaan', 'box', ['list', { e: 'persediaan' }], 'persediaan'],
       ['Inventarisasi Fisik', 'check', ['list', { e: 'aset_cek' }], 'aset_cek'], ['Laporan Format SIPADES', 'print', ['sipadeslap'], null, 'r:aset'], ['Cetak Laporan Aset (format awal)', 'print', ['asetcetak'], null, 'r:aset'], ['Cetak Register Label', 'crop', ['asetlabel'], null, 'r:aset'],
@@ -1349,16 +1378,17 @@ function navHtml() {
   MODS().forEach(m => {
     const items = [].concat(...m.items.map(it => it[6] ? SUBS()[it[6]].items : [it])).filter(it => itemOk(it));
     if (!items.length) return;
-    h += `<div class="nav-h">${esc(m.l)}</div>` + items.map(it => `<button class="nav-i" data-go='${esc(JSON.stringify(it[2]))}'>${ic(it[1])}${esc(it[0])}</button>`).join('');
+    h += `<div class="nav-h">${esc(m.l)}</div>` + items.map(it => `<button class="nav-i" ${it[7] ? `data-grp="${it[7]}" ` : ''}data-go='${esc(JSON.stringify(it[2]))}'>${ic(it[1])}${esc(it[0])}</button>`).join('');
   });
   if (S.user.admin) h += `<div class="nav-h">Admin</div><button class="nav-i" data-go='["users"]'>${ic('key')}Pengguna & Hak Akses</button><button class="nav-i" data-go='["settings"]'>${ic('cog')}Pengaturan</button>`;
   h += `<div class="nav-h">Akun</div><button class="nav-i" data-go='["akun"]'>${ic('key')}${esc(S.user.nama)}</button>`;
   return h;
 }
-function itemOk(it) { if (it[6]) return SUBS()[it[6]].items.some(itemOk); if (it[3]) return canRead(it[3]); if (it[4]) return can(it[4]); return true; }
+function itemOk(it) { if (it[7]) return grpEs(it[7]).length > 0; if (it[6]) return SUBS()[it[6]].items.some(itemOk); if (it[3]) return canRead(it[3]); if (it[4]) return can(it[4]); return true; }
 function markNav() {
   const cur = JSON.stringify([S.cur.name].concat(Object.keys(S.cur.params || {}).length ? [S.cur.params] : []));
-  $$('#side .nav-i').forEach(b => b.classList.toggle('on', b.dataset.go === cur));
+  const g = S.cur.name === 'list' && S.cur.params && GRUP_OF[S.cur.params.e];
+  $$('#side .nav-i').forEach(b => b.classList.toggle('on', b.dataset.go === cur || !!(g && b.dataset.grp === g)));
   const tab = { home: 'home', presensi: 'presensi', menu: 'menu', akun: 'akun' }[S.cur.name];
   $$('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
 }
@@ -1557,7 +1587,7 @@ async function uploadFile(file, folder) {
    ===================================================================== */
 const G_ICON = '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>';
 function loginCard(inner) {
-  app.innerHTML = `<div class="login"><div class="login-card stack"><div class="brand" style="padding:0"><div class="seal logo"><img src="${LOGO}" alt="Logo Desa"></div><div><b>Pemdes ${esc(ND())}</b><span>Kec. ${esc(brand().kec)}, Kab. ${esc(brand().kab)}</span></div></div>${inner}</div></div>`;
+  app.innerHTML = `<div class="login"><div class="login-card stack"><div class="brand" style="padding:0"><div class="seal logo"><img src="${LOGO}" alt="Logo Desa"></div><div><b>Pemdes ${esc(ND())}</b>${brand().kec ? `<span>Kec. ${esc(brand().kec)}, Kab. ${esc(brand().kab)}</span>` : ''}</div></div>${inner}</div></div>`;
 }
 function loginScreen(msg) {
   loginCard(`<form class="stack" id="lf" novalidate><h1>Masuk</h1>
@@ -1696,7 +1726,7 @@ async function boot() {
   if (!S.token) return loginScreen();
   try {
     const me = await call('me');
-    S.user = me.user; S.perms = me.perms; S.set = me.settings || {}; terapBrand();
+    S.user = me.user; S.perms = me.perms; S.set = me.settings || {}; S.setAsli = null; terapBrand(); muatPejabat(true).catch(() => { });
     S.faceOn = !!S.user.wajah;
     S.rkpYear = S.rkpYear || S.set.tahun_rkp || String(new Date().getFullYear() + 1);
     enter();
@@ -2295,14 +2325,16 @@ VIEWS.list = async (p, main, alive) => {
     } catch (x) { }
   }
   const yearNow = new Date().getFullYear();
+  if (st.per === '' && u.year && S.grpPer && GRUP_OF[e]) { st.per = S.grpPer; S.grpPer = null; }
   if (st.per === '' && u.year) st.per = String(yearNow);
   if (st.per === '' && u.month) st.per = isoToday().slice(0, 7);
-  setTop(p.title || u.t, u.rkp ? 'RKP Desa ' + rkpLbl(S.rkpYear) : u.rpjm && S.rpjmDokPer && S.rpjmDokPer.id === S.rpjmPid ? S.rpjmDokPer.nama : '');
+  setTop(p.title || (GRUP_OF[e] ? GRUP[GRUP_OF[e]].t : u.t), u.rkp ? 'RKP Desa ' + rkpLbl(S.rkpYear) : u.rpjm && S.rpjmDokPer && S.rpjmDokPer.id === S.rpjmPid ? S.rpjmDokPer.nama : '');
   const pers = u.year ? [String(yearNow), String(yearNow - 1), String(yearNow - 2), 'Semua'] : null;
   main.innerHTML = `<div class="stack">
     <div class="toolbar"><label class="search">${ic('search')}<input id="q" placeholder="Cari…" value="${esc(st.q)}" autocomplete="off"></label>
       ${u.month ? `<input type="month" class="inp" id="per" value="${esc(st.per)}" style="max-width:180px">` : ''}
-      ${e === 'rkp_rutin' && canWrite(e) ? `<button class="btn sm" data-act="rkpRutinIsi">${ic('down')}Salin dari APBDes ${esc(keuTh())}</button>` : ''}${NASKAH[e] && canWrite(e) ? `<button class="btn sm pri" data-act="go" data-go='${esc(JSON.stringify(['form', { e, buat: 1 }]))}'>${ic('plus')}${esc(NASKAH[e].buat)}</button>` : ''}${u.print ? `<button class="btn sm" data-act="cetak">${ic('print')}Cetak buku</button>` : ''}${u.excel ? `<button class="btn sm" data-act="xlsOut">${ic('down')}Ekspor Excel</button>${canWrite(e) ? `<label class="btn sm">${ic('plus')}Impor Excel<input type="file" id="xlsIn" accept=".xlsx,.csv" hidden></label>` : ''}` : ''}${u.print2 ? `<button class="btn sm" data-act="cetak2">${ic('print')}${esc(u.print2.label)}</button>` : ''}</div>
+      ${e === 'rkp_rutin' && canWrite(e) ? `<button class="btn sm" data-act="rkpRutinIsi">${ic('down')}Salin dari APBDes ${esc(keuTh())}</button>` : ''}${NASKAH[e] && canWrite(e) ? `<button class="btn sm pri" data-act="go" data-go='${esc(JSON.stringify(['form', { e, buat: 1 }]))}' title="${esc(NASKAH[e].buat)}">${ic('next')}Buat</button>` : ''}${u.print ? `<button class="btn sm" data-act="cetak" title="Cetak buku register">${ic('print')}Cetak</button>` : ''}${u.excel ? `<button class="btn sm" data-act="xlsOut">${ic('down')}Ekspor Excel</button>${canWrite(e) ? `<label class="btn sm">${ic('plus')}Impor Excel<input type="file" id="xlsIn" accept=".xlsx,.csv" hidden></label>` : ''}` : ''}${u.print2 ? `<button class="btn sm" data-act="cetak2">${ic('print')}${esc(u.print2.label)}</button>` : ''}</div>
+    ${GRUP_OF[e] ? `<div class="gtabs" role="tablist">${grpEs(GRUP_OF[e]).map(([k, l]) => `<button role="tab" class="${k === e ? 'on' : ''}" data-act="grpTab" data-v="${k}">${esc(l)}</button>`).join('')}</div>` : ''}
     ${pers ? `<div class="chips">${pers.map(y => `<button class="chip ${st.per === y || (y === 'Semua' && st.per === 'all') ? 'on' : ''}" data-act="per" data-v="${y === 'Semua' ? 'all' : y}">${y}</button>`).join('')}</div>` : ''}
     ${u.views ? `<div class="chips">${u.views.map((v, i) => `<button class="chip ${st.view === i ? 'on' : ''}" data-act="view" data-v="${i}">${esc(v[0])}</button>`).join('')}</div>` : ''}
     ${u.chips ? `<div class="chips${u.chips.dyn ? ' wrap' : ''}"><button class="chip ${!st.chip ? 'on' : ''}" data-act="chip" data-v="">Semua</button>${chipOpt.map(o => `<button class="chip ${st.chip === o ? 'on' : ''}" data-act="chip" data-v="${esc(o)}">${esc(u.chips.lbl ? u.chips.lbl(o) : o)}${chipN[o] ? ` <small class="num">${chipN[o]}</small>` : ''}</button>`).join('')}</div>` : ''}
@@ -2344,6 +2376,7 @@ VIEWS.list = async (p, main, alive) => {
   S.vh.chip = t => { st.chip = t.dataset.v; refresh(); };
   S.vh.view = t => { st.view = Number(t.dataset.v); refresh(); };
   S.vh.per = t => { st.per = t.dataset.v; refresh(); };
+  S.vh.grpTab = t => { const v = t.dataset.v; if (v === e) return; const per = st.per; S.listState = null; S.grpPer = per; go('list', { e: v }, true); };
   S.vh.add = () => go('form', { e, preset: Object.assign({}, p.preset || {}, u.chips && st.chip ? { [u.chips.k]: st.chip } : {}) });
   const doPrint = async (cfg) => {
     toast('Menyiapkan dokumen…');
@@ -2424,7 +2457,7 @@ function mapHtml(v, title) {
 async function renderDetail(e, x, el, full) {
   const u = UI[e];
   const files = u.fields.filter(f => f.t === 'file' && x[f.k]);
-  const shown = u.fields.filter(f => f.t !== 'file' && f.t !== 'geo' && f.t !== 'fotos' && f.t !== 'rows' && x[f.k] !== '' && x[f.k] != null);
+  const shown = u.fields.filter(f => !(e === 'aparat' && f.k === 'jabatan_tambahan') && f.t !== 'file' && f.t !== 'geo' && f.t !== 'fotos' && f.t !== 'rows' && x[f.k] !== '' && x[f.k] != null);
   const rws = u.fields.filter(f => f.t === 'rows' && x[f.k]).map(f => { let a = []; try { a = JSON.parse(x[f.k]); } catch (er) { } return a.length ? `<div class="lbl">${esc(f.l)}</div><div class="tbl-wrap"><table class="tbl"><thead><tr>${f.cols.map(c => `<th>${esc(c[1])}</th>`).join('')}</tr></thead><tbody>${a.map(r => '<tr>' + f.cols.map(([k, , t]) => `<td${t === 'money' ? ' style="text-align:right"' : ''}>${esc(t === 'money' ? rp(r[k]) : r[k] || '')}</td>`).join('') + '</tr>').join('')}</tbody><tfoot><tr><td colspan="${f.cols.length - 1}"><b>Jumlah</b></td><td style="text-align:right"><b>${rp(a.reduce((t, r) => t + Number(r.jumlah || 0), 0))}</b></td></tr></tfoot></table></div>` : ''; }).join('');
   const galeri = u.fields.filter(f => f.t === 'fotos' && x[f.k]).map(f => { let a = []; try { a = JSON.parse(x[f.k]); } catch (er) { } return a.length ? `<div class="lbl">${esc(f.l)} (${a.length})</div><div class="pgrid">${a.map(fo => `<div class="pslot has"><button type="button" class="pimg" data-act="file" data-id="${esc(fo.id)}" data-name="${esc(fo.ket || f.l)}"><img src="${esc(thumb(fo.id, 240))}" alt="" loading="lazy"></button>${fo.ket ? `<span class="plbl">${esc(fo.ket)}</span>` : ''}</div>`).join('')}</div>` : ''; }).join('');
   const geoF = u.fields.find(f => f.t === 'geo' && x[f.k]);
@@ -2457,7 +2490,54 @@ async function renderDetail(e, x, el, full) {
   if (e === 'rpjm_gagasan' && canWrite(e) && x.status !== 'Masuk RPJM') xx.innerHTML = `<div class="btns"><button class="btn sm pri" data-act="rpjGagKeg" data-id="${esc(x.id)}">${ic('plus')}Jadikan kegiatan RPJM</button></div>`;
   if (e === 'pembangunan') await extraPembangunan(x, xx);
   if (e === 'petugas') await extraPetugas(x, xx);
+  if (e === 'aparat') extraAparat(x, xx, canWrite(e));
   if (e === 'penduduk') S.pendCache = Object.assign(S.pendCache || {}, { [x.id]: x });
+}
+/* ---- Pejabat penandatangan: diambil dari data Aparatur Desa ---- */
+const PEJ_KEY = { kades: ['nama_kades', 'nip_kades'], sekdes: ['nama_sekdes', 'nip_sekdes'], bendahara: ['nama_bendahara', 'nip_bendahara'], pengurus: ['nama_pengurus_aset', 'nip_pengurus_aset'] };
+async function muatPejabat(force) {
+  if (S.pej && !force) return S.pej;
+  const r = await call('list', { entity: 'aparat', limit: 300 });
+  const L = r.rows.filter(x => !x.tgl_sk_henti || String(x.tgl_sk_henti) > isoToday());
+  const nip = x => { const n = String((x && x.nip) || '').trim(); return /\d{6,}/.test(n.replace(/\s/g, '')) ? n : ''; };
+  const tamb = re => L.find(x => jabTambah(x).some(j => re.test(j))), jab = re => L.find(x => re.test(x.jabatan || ''));
+  const o = (x, asal) => x ? { nama: x.nama, nip: nip(x), jabatan: x.jabatan || '', asal, id: x.id } : null;
+  const kd = jab(/^(pj\.?|plt\.?)?\s*kepala desa\b/i), sd = tamb(/sekretaris desa/i), bd = tamb(/bendahara/i), pg = tamb(/(pengurus|pengelola)\s+(barang|aset)/i);
+  S.pej = {
+    kades: o(kd, 'jabatan'),
+    sekdes: sd ? o(sd, 'tambahan') : o(jab(/^(pj\.?|plt\.?)?\s*sekretaris desa/i), 'jabatan'),
+    bendahara: bd ? o(bd, 'tambahan') : o(jab(/bendahara/i) || jab(/(kaur|kepala urusan)\s+keuangan/i), 'jabatan'),
+    pengurus: pg ? o(pg, 'tambahan') : o(jab(/(kaur|kepala urusan)\s+(tata usaha|tu\b|umum)/i), 'jabatan')
+  };
+  /* admin: samakan nilai pengaturan di server agar dokumen buatan server ikut benar */
+  if (S.user && S.user.admin && S.set) {
+    const v = {}; Object.keys(PEJ_KEY).forEach(k => { const x = S.pej[k]; if (!x) return; if ((S.setAsli || S.set)[PEJ_KEY[k][0]] !== x.nama) v[PEJ_KEY[k][0]] = x.nama; if ((S.setAsli || S.set)[PEJ_KEY[k][1]] !== x.nip) v[PEJ_KEY[k][1]] = x.nip; });
+    if (Object.keys(v).length) { try { S.setAsli = await call('settingsSave', { values: v }); } catch (x) { } }
+  }
+  terapPejabat();
+  return S.pej;
+}
+function terapPejabat() {
+  const P = S.pej; if (!P || !S.set) return;
+  Object.keys(PEJ_KEY).forEach(k => { const x = P[k]; if (!x) return; S.set[PEJ_KEY[k][0]] = x.nama; S.set[PEJ_KEY[k][1]] = x.nip; });
+}
+/* ---- Aparatur: jabatan / tugas tambahan ---- */
+const JAB_TAMBAH = ['Bendahara Desa', 'Pengurus Barang / Aset', 'Operator SisKeuDes', 'Operator SIPADES', 'Operator Prodeskel', 'Operator DTSEN', 'Operator Aplikasi Pemdes', 'Petugas Pelayanan', 'Pengelola Arsip', 'PPID Desa', 'Ketua TPK', 'Sekretaris TPK', 'Plt. Sekretaris Desa', 'Pelaksana Kegiatan Anggaran (PKA)'];
+const jabTambah = r => String((r && r.jabatan_tambahan) || '').split(/\n|;/).map(x => x.trim()).filter(Boolean);
+function extraAparat(x, el, w) {
+  const a = jabTambah(x);
+  el.insertAdjacentHTML('afterbegin', `<div class="stack" style="gap:6px"><div class="lbl">Jabatan / tugas tambahan</div><div class="jbt">${a.map((j, i) => `<span class="pill info">${esc(j)}${w ? `<button type="button" data-act="jabDel" data-i="${i}" title="Hapus" aria-label="Hapus ${esc(j)}">×</button>` : ''}</span>`).join('') || '<span class="meta">Belum ada.</span>'}${w ? `<button class="btn sm" data-act="jabAdd">${ic('plus')}Tambah jabatan</button>` : ''}</div></div>`);
+  const simpan = async daftar => { await call('save', { entity: 'aparat', record: { id: x.id, jabatan_tambahan: daftar.join('\n') } }); S.people = null; S.pej = null; toast('Jabatan disimpan.'); muatPejabat(true).catch(() => { }); refresh(); };
+  S.vh.jabDel = t => { const b = a.slice(); b.splice(Number(t.dataset.i), 1); simpan(b).catch(er => toast(er.message, 1)); };
+  S.vh.jabAdd = () => {
+    const m = modal('Tambah jabatan — ' + x.nama, `<div class="stack"><div class="f"><label for="jbIn">Jabatan / tugas</label><input id="jbIn" list="jbDl" placeholder="mis. Pengurus Barang / Aset"><datalist id="jbDl">${JAB_TAMBAH.filter(j => a.indexOf(j) < 0).map(j => `<option value="${esc(j)}">`).join('')}</datalist></div>
+      <div class="chips wrap">${JAB_TAMBAH.filter(j => a.indexOf(j) < 0).slice(0, 8).map(j => `<button type="button" class="chip" data-j="${esc(j)}">${esc(j)}</button>`).join('')}</div>
+      <div class="meta">Dipakai otomatis untuk penandatangan dokumen: <b>Bendahara Desa</b> (SPP, kuitansi) dan <b>Pengurus Barang / Aset</b> (dokumen aset).</div>
+      <div class="btns"><button class="btn pri" id="jbOk">${ic('check')}Simpan</button></div></div>`);
+    $$('[data-j]', m.el).forEach(b => b.onclick = () => { $('#jbIn', m.el).value = b.dataset.j; });
+    $('#jbOk', m.el).onclick = async () => { const v = $('#jbIn', m.el).value.trim(); if (!v) return toast('Isi nama jabatan.', 1); try { await simpan(a.concat([v])); m.close(); } catch (er) { toast(er.message, 1); } };
+    setTimeout(() => $('#jbIn', m.el).focus(), 50);
+  };
 }
 /* tombol Selesai: kegiatan hari ini yang sudah dimulai (atau tanggalnya lewat tapi belum ditandai) */
 function kgBisaSelesai(x) {
@@ -2867,6 +2947,7 @@ VIEWS.form = async (p, main, alive) => {
   main.innerHTML = `<form class="card stack" id="frm" novalidate>
     ${e === 'petugas' && !p.id ? '<div id="dupNote"></div>' : ''}
     <div class="form">${flds.map(f => fieldHtml(f, rec[f.k], rec)).join('')}</div>
+    ${e === 'surat_masuk' ? fwdHtml(rec) : ''}
     <div id="ferr" class="err" hidden></div>
     <div class="btns"><button class="btn pri" type="submit" id="save">${ic('check')}Simpan</button><button class="btn" type="button" data-act="cancel">Batal</button></div>
   </form>`;
@@ -2883,6 +2964,8 @@ VIEWS.form = async (p, main, alive) => {
         if (f.dyn) { box.hidden = f.dyn > lbs.length; const lb = box.querySelector('label'); if (lb && lbs[f.dyn - 1]) lb.textContent = lbs[f.dyn - 1]; }
         else box.hidden = f.grp.indexOf(jv) < 0;
       });
+      const pm = $('#f_pemohon', frm);
+      if (jv === SK_DL && pm && pm.value !== 'Lembaga / Instansi') { pm.value = 'Lembaga / Instansi'; pm.dispatchEvent(new Event('change', { bubbles: true })); }
     };
     jf.addEventListener('input', sync); jf.addEventListener('change', sync); sync();
   }
@@ -2910,6 +2993,7 @@ VIEWS.form = async (p, main, alive) => {
   $$('.fotos', frm).forEach(fotoBox);
   flds.filter(f => f.t === 'rows').forEach(f => { const b = $('#f_' + f.k, frm); if (b) rowsBox(b, f); });
   keuFormHook(e, frm, rec);
+  if (e === 'surat_masuk') fwdHook(frm);
   /* NIK -> isi otomatis dari Data Penduduk (hanya kolom yang masih kosong) */
   const nikF = flds.find(f => f.nikfill), nikEl = nikF && $('#f_' + nikF.k, frm);
   if (nikEl && !nikEl.readOnly) nikEl.addEventListener('input', async () => {
@@ -2996,9 +3080,12 @@ VIEWS.form = async (p, main, alive) => {
       if (u.rpjm && !val.periode_id) val.periode_id = rec.periode_id || S.rpjmPid;
       if (u.sub && !val.ref) val.ref = rec.ref;
       const virt = {}; u.fields.filter(f => f.virt).forEach(f => { if (f.k in val) { virt[f.k] = val[f.k]; delete val[f.k]; } });
+      if (e === 'surat_masuk' && frm._fwdTag) val.terusan = frm._fwdTag(rec.terusan);
       const saved = await call('save', { entity: e, record: val });
+      if (e === 'surat_masuk' && frm._fwdSave) { const n = await frm._fwdSave(saved); if (n) toast('Tersimpan. Diteruskan ke ' + n + '.'); }
       if (e === 'petugas' && !p.id && (virt.kelompok || virt.jabatan)) await call('save', { entity: 'petugas_jabatan', record: Object.assign({ ref: saved.id }, virt) });
       if (/^(aparat|petugas)/.test(e)) S.people = null;
+      if (e === 'aparat') { S.jabCache = null; S.kades = null; muatPejabat(true).catch(() => { }); }
       toast('Tersimpan.');
       if (e === 'aset' && saved && saved.id) await asetSetelahSimpan(saved.id);
       if (e === 'aset_cek' && saved && saved.id) await asetCekSetelahSimpan(saved.id);
@@ -3010,6 +3097,59 @@ VIEWS.form = async (p, main, alive) => {
     } catch (x) { if (x.code === 'PAGU') er.innerHTML = paguErrHtml(x); else er.textContent = x.message; er.hidden = false; btn.disabled = false; btn.innerHTML = ic('check') + 'Simpan'; er.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
   };
 };
+/* ---- Surat masuk → Agenda kegiatan / Berita ---- */
+function fwdHtml(rec) {
+  const sudah = String(rec.terusan || ''), ag = canWrite('kegiatan') && !/Agenda/.test(sudah), br = canWrite('berita') && !/Berita/.test(sudah);
+  if (!ag && !br && !sudah) return '';
+  const KAT = ['Informasi', 'Himbauan', 'Pengumuman', 'Undangan', 'Surat Edaran', 'Lainnya'];
+  return `<div class="fwd"><div class="row" style="cursor:default;padding:0;gap:8px;flex-wrap:wrap"><span class="lbl" style="flex:1">Teruskan surat ini ke${sudah ? ` <span class="pill ok">Sudah: ${esc(sudah)}</span>` : ''}</span>
+      ${ag ? `<button type="button" class="btn sm" data-act="fwdT" data-k="ag">${ic('cal')}Agenda kegiatan</button>` : ''}${br ? `<button type="button" class="btn sm" data-act="fwdT" data-k="br">${ic('mega')}Berita</button>` : ''}</div>
+    ${ag ? `<div class="fwbox" id="fw_ag" hidden><div class="lbl" style="margin-bottom:6px">${ic('cal')} Isian agenda kegiatan</div><div class="form">
+      <div class="f wide"><label for="ag_nama">Nama kegiatan <i>*</i></label><input id="ag_nama"></div>
+      <div class="f"><label for="ag_tanggal">Tanggal <i>*</i></label><input id="ag_tanggal" type="date"></div>
+      <div class="f"><label for="ag_jam">Jam</label><input id="ag_jam" type="time" value="09:00"></div>
+      <div class="f"><label for="ag_tempat">Tempat</label><input id="ag_tempat" value="${esc('Balai Desa ' + ND())}"></div>
+      <div class="f"><label for="ag_peny">Penyelenggara</label><input id="ag_peny"></div>
+      <div class="f wide"><label for="ag_peserta">Yang hadir / peserta</label><input id="ag_peserta" value="Kepala Desa"></div>
+      <div class="f wide"><label for="ag_ket">Keterangan / persiapan</label><textarea id="ag_ket" rows="2"></textarea></div></div></div>` : ''}
+    ${br ? `<div class="fwbox" id="fw_br" hidden><div class="lbl" style="margin-bottom:6px">${ic('mega')} Isian berita</div><div class="form">
+      <div class="f wide"><label for="br_judul">Judul <i>*</i></label><input id="br_judul"></div>
+      <div class="f"><label for="br_kat">Kategori</label><select id="br_kat">${KAT.map(k => `<option>${k}</option>`).join('')}</select></div>
+      <div class="f"><label for="br_sampai">Tampil di Beranda sampai</label><input id="br_sampai" type="date"></div>
+      <div class="f wide"><label for="br_isi">Isi berita / informasi</label><textarea id="br_isi" rows="3"></textarea></div></div></div>` : ''}</div>`;
+}
+function fwdHook(frm) {
+  const box = $('.fwd', frm); if (!box) return;
+  const v = k => { const el = $('#f_' + k, frm); return el ? el.value.trim() : ''; };
+  const isi = (id, val) => { const el = $('#' + id, frm); if (el && !el.value.trim() && val) el.value = val; };
+  S.vh.fwdT = t => {
+    const k = t.dataset.k, b = $('#fw_' + k, frm); if (!b) return;
+    b.hidden = !b.hidden; t.classList.toggle('pri', !b.hidden);
+    if (b.hidden) return;
+    if (k === 'ag') { isi('ag_nama', v('isi')); isi('ag_tanggal', v('tgl_surat') || isoToday()); isi('ag_peny', v('dari')); isi('ag_ket', v('nomor') ? 'Surat masuk No. ' + v('nomor') + (v('dari') ? ' dari ' + v('dari') : '') : ''); }
+    else { isi('br_judul', v('isi')); isi('br_isi', v('isi')); if (/undangan/i.test(v('isi'))) $('#br_kat', frm).value = 'Undangan'; else if (/edaran/i.test(v('isi'))) $('#br_kat', frm).value = 'Surat Edaran'; }
+    b.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  };
+  const on = k => { const b = $('#fw_' + k, frm); return b && !b.hidden; };
+  frm._fwdTag = lama => { const a = String(lama || '').split(',').map(x => x.trim()).filter(Boolean); if (on('ag') && a.indexOf('Agenda') < 0) a.push('Agenda'); if (on('br') && a.indexOf('Berita') < 0) a.push('Berita'); return a.join(', '); };
+  const cek = () => {
+    if (on('ag') && (!$('#ag_nama', frm).value.trim() || !$('#ag_tanggal', frm).value)) throw new Error('Isi nama kegiatan dan tanggal agenda.');
+    if (on('br') && !$('#br_judul', frm).value.trim()) throw new Error('Isi judul berita.');
+  };
+  frm.addEventListener('submit', ev => { try { cek(); } catch (x) { ev.stopImmediatePropagation(); ev.preventDefault(); const er = $('#ferr'); er.textContent = x.message; er.hidden = false; } }, true);
+  frm._fwdSave = async sv => {
+    const hasil = [], ref = { surat_masuk_id: sv.id, dok_id: sv.dok_id || '' };
+    if (on('ag')) {
+      await call('save', { entity: 'kegiatan', record: Object.assign({ nama: $('#ag_nama', frm).value.trim(), tanggal: $('#ag_tanggal', frm).value, jam: $('#ag_jam', frm).value, sampai: 'Selesai', tempat: $('#ag_tempat', frm).value.trim(), penyelenggara: $('#ag_peny', frm).value.trim(), peserta: $('#ag_peserta', frm).value.trim(), keterangan: $('#ag_ket', frm).value.trim() }, ref) });
+      hasil.push('Agenda');
+    }
+    if (on('br')) {
+      await call('save', { entity: 'berita', record: Object.assign({ judul: $('#br_judul', frm).value.trim(), tanggal: sv.tgl_terima || isoToday(), kategori: $('#br_kat', frm).value, sumber: sv.dari || '', isi: $('#br_isi', frm).value.trim(), tampil_sampai: $('#br_sampai', frm).value }, ref) });
+      hasil.push('Berita');
+    }
+    return hasil.join(' & ');
+  };
+}
 /* Pilih nama dari data Aparat + Petugas Desa; kolom lain (unsur, tempat/tgl lahir) terisi otomatis */
 async function people() {
   if (S.people) return S.people;
@@ -4889,33 +5029,50 @@ VIEWS.settings = async (p, main) => {
   setTop('Pengaturan');
   const s = S.set;
   const G = [
-    ['Profil desa', [['nama_desa', 'Nama desa'], ['kecamatan', 'Kecamatan'], ['kabupaten', 'Kabupaten'], ['provinsi', 'Provinsi'], ['alamat', 'Alamat kantor', 1], ['kode_pos', 'Kode pos'], ['email_desa', 'Email desa'], ['nama_kades', 'Nama Kepala Desa (untuk tanda tangan)'], ['logo_url', 'Logo desa (tautan gambar, atau tekan Unggah logo di bawah)', 1], ['daftar_dusun', 'Daftar dusun (satu per baris)', 1, 'textarea'], ['tahun_rkp', 'Tahun RKP Desa berjalan'], ['kode_surat', 'Kode desa pada nomor surat (Nomor: 470/No/KODE/Tahun)']]],
+    ['Profil desa', [['nama_desa', 'Nama desa'], ['kecamatan', 'Kecamatan'], ['kabupaten', 'Kabupaten'], ['provinsi', 'Provinsi'], ['alamat', 'Alamat kantor', 1], ['kode_pos', 'Kode pos'], ['email_desa', 'Email desa'], ['daftar_dusun', 'Daftar dusun (satu per baris)', 1, 'textarea'], ['tahun_rkp', 'Tahun RKP Desa berjalan'], ['kode_surat', 'Kode desa pada nomor surat (Nomor: 470/No/KODE/Tahun)']]],
     ['Jam kerja', [['jam_masuk_mulai', 'Presensi masuk dibuka', 0, 'time'], ['jam_masuk_batas', 'Batas masuk tepat waktu', 0, 'time'], ['jam_pulang_mulai', 'Pulang mulai (Senin–Kamis)', 0, 'time'], ['jam_pulang_jumat', 'Pulang mulai (Jumat)', 0, 'time'], ['jam_pulang_batas', 'Batas presensi pulang', 0, 'time']]],
-    ['Aset & RAB', [['kode_lokasi_aset', 'Kode lokasi SIPADES (mis. 35.8.5.2001)'], ['upb_aset', 'UPB SIPADES (mis. 1 . PEMERINTAH DESA ...)'], ['provinsi', 'Provinsi'], ['ibu_kota_desa', 'Ibu kota desa'], ['kode_pos', 'Kode pos'], ['kode_pengguna_aset', 'Kode pengguna barang (2 digit, bawaan 01)'], ['masa_jabatan_mulai', 'Masa jabatan Kepala Desa — tahun mulai', 0, 'number'], ['masa_jabatan_akhir', 'Masa jabatan Kepala Desa — tahun akhir', 0, 'number'], ['bu_swakelola', 'Biaya umum & keuntungan swakelola (%), bawaan 0', 0, 'number'], ['bu_penyedia', 'Biaya umum & keuntungan penyedia (%), bawaan 10', 0, 'number'], ['nama_sekdes', 'Nama Sekretaris Desa'], ['nama_bendahara', 'Nama Kaur Keuangan / Bendahara'], ['nama_pengurus_aset', 'Nama Pengurus Barang / Aset (Kaur Umum)'], ['nip_pengurus_aset', 'NIP Pengurus Barang (opsional)']]],
+    ['Aset & RAB', [['kode_lokasi_aset', 'Kode lokasi SIPADES (mis. 35.8.5.2001)'], ['upb_aset', 'UPB SIPADES (mis. 1 . PEMERINTAH DESA ...)'], ['provinsi', 'Provinsi'], ['ibu_kota_desa', 'Ibu kota desa'], ['kode_pos', 'Kode pos'], ['kode_pengguna_aset', 'Kode pengguna barang (2 digit, bawaan 01)'], ['masa_jabatan_mulai', 'Masa jabatan Kepala Desa — tahun mulai', 0, 'number'], ['masa_jabatan_akhir', 'Masa jabatan Kepala Desa — tahun akhir', 0, 'number'], ['bu_swakelola', 'Biaya umum & keuntungan swakelola (%), bawaan 0', 0, 'number'], ['bu_penyedia', 'Biaya umum & keuntungan penyedia (%), bawaan 10', 0, 'number']]],
     ['Lokasi kantor', [['kantor_lat', 'Lintang (latitude)'], ['kantor_lng', 'Bujur (longitude)'], ['radius_m', 'Radius presensi (meter)', 0, 'number']]],
     ['Verifikasi wajah', [['face_threshold', 'Batas kecocokan (0.45 ketat – 0.55 longgar, bawaan 0.5)']]]
   ];
   const lib = String(s.libur_mingguan || '').split(',');
   main.innerHTML = `<form class="stack" id="sf">
     ${G.map(g => `<div class="card stack"><div class="lbl">${g[0]}</div><div class="form">${g[1].map(f => `<div class="f ${f[2] ? 'wide' : ''}"><label for="s_${f[0]}">${esc(f[1])}</label>${f[3] === 'textarea' ? `<textarea id="s_${f[0]}" rows="4">${esc(s[f[0]] || '')}</textarea>` : `<input id="s_${f[0]}" type="${f[3] || 'text'}" value="${esc(s[f[0]] || '')}">`}</div>`).join('')}</div>
-      ${g[0] === 'Profil desa' ? `<div class="btns" style="align-items:center"><img id="s_logop" src="${esc(s.logo_url || LOGO)}" alt="" style="width:44px;height:44px;object-fit:contain;border-radius:8px;background:#fff"><label class="btn sm">${ic('up')}Unggah logo<input type="file" id="s_logof" accept="image/*" hidden></label><span class="meta">Logo dikecilkan otomatis; tekan Simpan pengaturan.</span></div>` : ''}
+      ${g[0] === 'Profil desa' ? `<div class="logos">${[['logo_app', 'Logo aplikasi', 'Ikon aplikasi, layar masuk & menu samping'], ['logo_url', 'Logo dokumen (kop surat)', 'Dipakai di kop surat, SK, dan laporan cetak']].map(([k, l, h]) => `<div class="logo-up"><img id="s_${k}_p" src="${esc(s[k] || (k === 'logo_app' ? LOGO : ''))}" alt="" ${s[k] || k === 'logo_app' ? '' : 'hidden'}><div class="stack" style="gap:3px;min-width:0"><b>${l}</b><span class="meta">${h}</span><div class="btns"><label class="btn sm">${ic('cam')}Unggah<input type="file" data-logo="${k}" accept="image/*" hidden></label>${s[k] ? `<button type="button" class="btn sm" data-act="logoDel" data-k="${k}">${ic('trash')}Hapus</button>` : ''}</div></div><input type="hidden" id="s_${k}" value="${esc(s[k] || '')}"></div>`).join('')}</div>` : ''}
+      ${g[0] === 'Aset & RAB' ? `<div class="lbl">Penandatangan dokumen</div><div id="pejBox" class="meta">Memuat dari Aparatur Desa…</div>` : ''}
       ${g[0] === 'Jam kerja' ? `<div class="f"><span class="lbl">Libur mingguan</span><div class="checks" id="libm">${['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'].map((d, i) => `<label><input type="checkbox" value="${i + 1}" ${lib.indexOf(String(i + 1)) >= 0 ? 'checked' : ''}>${d}</label>`).join('')}</div></div><button class="btn sm" type="button" data-act="go" data-go='["list",{"e":"hari_libur"}]' style="align-self:flex-start">${ic('cal')}Atur hari libur nasional & cuti bersama</button>` : ''}
       ${g[0] === 'Lokasi kantor' ? `<div class="btns"><button class="btn sm" type="button" data-act="here">${ic('pin')}Pakai lokasi saya sekarang</button><label class="switch"><input type="checkbox" id="s_wajib" ${s.wajib_radius === 'ya' ? 'checked' : ''}>Wajib di dalam radius untuk presensi masuk/pulang</label></div>` : ''}</div>`).join('')}
     <div id="serr" class="err" hidden></div>
     <div><button class="btn pri" type="submit">${ic('check')}Simpan pengaturan</button></div>
     ${S.user && S.user.admin ? `<div class="card stack"><div class="lbl">Desa lain ingin memakai aplikasi ini?</div><p class="meta" style="margin:0">Buat berkas database kosong (tanpa data ${esc(ND())}) untuk dipasang di akun Supabase desa lain.</p><button class="btn sm" type="button" data-act="go" data-go='["paketdesa"]' style="align-self:flex-start">${ic('down')}Paket desa baru</button></div>` : ''}
     <div class="card stack"><div class="lbl">Penyimpanan foto KTP/KK</div><p class="meta" style="margin:0">Foto KTP/KK baru disimpan di penyimpanan khusus yang lebih cepat. Foto lama yang masih di Google Drive bisa dipindahkan (salinan di Drive tidak dihapus).</p><button class="btn sm" type="button" data-act="go" data-go='["template"]' style="align-self:flex-start">${ic('file')}Template dokumen (Word)</button><button class="btn sm" type="button" data-act="go" data-go='["pindahberkas"]' style="align-self:flex-start">${ic('users')}Pindahkan foto KTP/KK lama</button></div></form>`;
-  const lf = $('#s_logof');
-  if (lf) lf.onchange = () => { const f = lf.files[0]; if (!f) return; const im = new Image(); im.onload = () => { const k = Math.min(1, 160 / Math.max(im.width, im.height)), c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); let u = c.toDataURL('image/webp', .85); if (!/^data:image\/webp/.test(u)) u = c.toDataURL('image/png'); $('#s_logo_url').value = u; $('#s_logop').src = u; URL.revokeObjectURL(im.src); toast('Logo siap. Tekan Simpan pengaturan.'); }; im.src = URL.createObjectURL(f); };
+  /* logo aplikasi (ikon kecil, webp) dan logo dokumen (PNG agar bisa masuk Word) */
+  $$('[data-logo]').forEach(inp => inp.onchange = () => {
+    const f = inp.files[0], k = inp.dataset.logo; if (!f) return;
+    const im = new Image(); im.onload = () => {
+      const mx = k === 'logo_app' ? 192 : 360, z = Math.min(1, mx / Math.max(im.width, im.height)), c = document.createElement('canvas');
+      c.width = Math.round(im.width * z); c.height = Math.round(im.height * z); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      let u = k === 'logo_app' ? c.toDataURL('image/webp', .85) : c.toDataURL('image/png'); if (!/^data:image\/(webp|png)/.test(u)) u = c.toDataURL('image/png');
+      $('#s_' + k).value = u; const pv = $('#s_' + k + '_p'); pv.src = u; pv.hidden = false; URL.revokeObjectURL(im.src); toast('Logo siap. Tekan Simpan pengaturan.');
+    }; im.src = URL.createObjectURL(f);
+  });
+  S.vh.logoDel = t => { const k = t.dataset.k; $('#s_' + k).value = ''; const pv = $('#s_' + k + '_p'); if (k === 'logo_url') pv.hidden = true; t.remove(); toast('Logo dihapus. Tekan Simpan pengaturan.'); };
+  muatPejabat(true).then(P => {
+    const bx = $('#pejBox'); if (!bx) return;
+    const R2 = [['kades', 'Kepala Desa', 'jabatan "Kepala Desa"'], ['sekdes', 'Sekretaris Desa', 'jabatan "Sekretaris Desa" (atau tambahan "Plt. Sekretaris Desa")'], ['bendahara', 'Bendahara', 'tambahan "Bendahara Desa", bila tidak ada: Kaur Keuangan'], ['pengurus', 'Pengurus Barang / Aset', 'tambahan "Pengurus Barang / Aset", bila tidak ada: Kaur TU & Umum']];
+    bx.outerHTML = `<div class="list">${R2.map(([k, l, h]) => { const x = P[k]; return `<div class="row" style="cursor:${x ? 'pointer' : 'default'}" ${x ? `data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'aparat', id: x.id }]))}'` : ''}><span class="av">${ic('badge')}</span><span class="main"><span class="t">${x ? esc(x.nama) : '<span class="pill warn">Belum ada</span>'}</span><span class="s">${esc(l)}${x ? ' · ' + (x.nip ? 'NIP ' + esc(x.nip) : 'tanpa NIP') + (x.asal === 'tambahan' ? ' · jabatan tambahan' : '') : ' · diambil dari ' + esc(h)}</span></span></div>`; }).join('')}</div>
+      <div class="meta">Diambil otomatis dari <b>Arsip → Aparatur Desa</b>. Untuk mengganti, buka data orangnya lalu tekan <b>Tambah jabatan</b> (mis. Bendahara Desa atau Pengurus Barang / Aset). NIP kosong berarti memang tidak punya NIP.</div>`;
+  }).catch(x => { const bx = $('#pejBox'); if (bx) bx.textContent = x.message; });
   S.vh.here = () => navigator.geolocation ? navigator.geolocation.getCurrentPosition(pp => { $('#s_kantor_lat').value = pp.coords.latitude.toFixed(6); $('#s_kantor_lng').value = pp.coords.longitude.toFixed(6); toast('Lokasi diisi. Tekan Simpan.'); }, () => toast('Lokasi tidak dapat dibaca.', 1), { enableHighAccuracy: true, timeout: 15000 }) : toast('Perangkat tidak mendukung GPS.', 1);
   $('#sf').onsubmit = async ev => {
     ev.preventDefault();
     const v = {};
     G.forEach(g => g[1].forEach(f => v[f[0]] = $('#s_' + f[0]).value.trim()));
+    v.logo_app = $('#s_logo_app').value; v.logo_url = $('#s_logo_url').value;
     v.libur_mingguan = $$('#libm input:checked').map(i => i.value).join(',');
     v.wajib_radius = $('#s_wajib').checked ? 'ya' : 'tidak';
     v.face_threshold = v.face_threshold.replace(',', '.');
-    try { S.set = await call('settingsSave', { values: v }); terapBrand(); S.rkpYear = S.set.tahun_rkp || S.rkpYear; toast('Pengaturan disimpan.'); }
+    try { S.set = await call('settingsSave', { values: v }); S.setAsli = Object.assign({}, S.set); terapBrand(); S.rkpYear = S.set.tahun_rkp || S.rkpYear; toast('Pengaturan disimpan.'); }
     catch (x) { $('#serr').textContent = x.message; $('#serr').hidden = false; }
   };
 };
@@ -5379,6 +5536,14 @@ const NX = (() => {
     'word/_rels/document.xml.rels': '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rIdLogo" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/logo.png"/></Relationships>',
     'word/styles.xml': '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="id-ID"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style></w:styles>'
   };
+  /* Surat Keterangan Domisili Yayasan/Lembaga (bawaan) — KKA 400.10.3.1 Lembaga Masyarakat */
+  T.surat_domisili_lembaga = () => [...kop(), C('SURAT KETERANGAN DOMISILI', { bold: 1, u: 1, size: 26 }), C('Nomor : 400.10.3.1/{{No}}/{{Kode Desa}}/{{Tahun}}', { after: 240 }),
+    P('Yang bertanda tangan di bawah ini Kepala Desa {{Desa}}, Kecamatan {{Kecamatan}}, Kabupaten {{Kabupaten}}, menerangkan dengan sebenarnya bahwa:', { ind: 1 }),
+    tbl([3100, 250, W - 4070], [['Nama Yayasan / Lembaga', ':', [P([r('{{Nama Lembaga_U}}', { bold: 1 })], { after: 40, al: 'L' })]], ['Jenis Lembaga', ':', '{{Jenis Lembaga}}'], ['Bidang Kegiatan', ':', '{{Bidang Kegiatan}}'],
+      ['Nomor Akta Pendirian', ':', '{{No Akta}}'], ['SK Kemenkumham', ':', '{{SK Kemenkumham}}'], ['Ketua / Penanggung Jawab', ':', '{{Penanggung Jawab}}'], ['Jabatan', ':', '{{Jabatan}}'], ['Alamat Sekretariat', ':', '{{Alamat Lembaga}}']], 720),
+    P('Berdasarkan surat pengantar dari RT/RW setempat dan pendataan kami, yayasan/lembaga tersebut di atas benar-benar ada dan berdomisili / memiliki sekretariat di wilayah Desa {{Desa}}, Kecamatan {{Kecamatan}}, Kabupaten {{Kabupaten}}.', { ind: 1, before: 160 }),
+    P('Surat keterangan ini diberikan kepada yang bersangkutan untuk dipergunakan sebagai {{Keperluan}}.', { ind: 1 }),
+    P('Demikian surat keterangan domisili ini dibuat dengan sebenarnya agar dapat dipergunakan sebagaimana mestinya.', { ind: 1 }), ...ttdK()];
   const nama = Object.keys(T);
   async function buat(nm, logoBytes) {
     if (!T[nm]) return null;
@@ -5390,7 +5555,8 @@ const NX = (() => {
 })();
 async function naskahBawaan(nm) {
   if (NX.nama.indexOf(nm) < 0) return null;
-  const logo = new Uint8Array(await (await fetch('icon-512.png')).arrayBuffer());
+  const ld = String((S.set || {}).logo_url || ''), m = ld.match(/^data:image\/png;base64,(.+)$/);
+  const logo = m ? Uint8Array.from(atob(m[1]), c => c.charCodeAt(0)) : new Uint8Array(await (await fetch('icon-512.png')).arrayBuffer());
   return NX.buat(nm, logo);
 }
 /* ---------------- Naskah dinas: Surat Keluar & Produk Hukum ---------------- */
@@ -5655,8 +5821,10 @@ function hasilDokumen(m, r, opt) {
 /* ---------------- Surat keterangan ---------------- */
 const SURAT = {
   'Surat Keterangan Domisili': 'domisili', 'Surat Keterangan Tidak Mampu': 'tidak_mampu', 'Surat Keterangan Usaha': 'usaha', 'Surat Pengantar SKCK': 'skck',
-  'Surat Keterangan Kelahiran': 'kelahiran', 'Surat Keterangan Kematian': 'kematian', 'Surat Keterangan Pindah': 'pindah', 'Surat Keterangan Belum Menikah': 'belum_menikah', 'Surat Keterangan Penghasilan': 'penghasilan'
+  'Surat Keterangan Kelahiran': 'kelahiran', 'Surat Keterangan Kematian': 'kematian', 'Surat Keterangan Pindah': 'pindah', 'Surat Keterangan Belum Menikah': 'belum_menikah', 'Surat Keterangan Penghasilan': 'penghasilan',
+  'Surat Keterangan Domisili Yayasan/Lembaga': 'domisili_lembaga'
 };
+const SK_DL = 'Surat Keterangan Domisili Yayasan/Lembaga';
 const suratPath = jenis => SURAT[jenis] ? 'surat/surat_' + SURAT[jenis] + '.docx' : null;
 /* jenis surat tambahan buatan admin (entitas jenis_surat) */
 const isianJenis = d => String(d && d.isian || '').split(/\r?\n|,|;/).map(x => x.replace(/[{}]/g, '').replace(/\(\s*baris[^)]*\)/ig, '').trim()).filter(Boolean).slice(0, 8);
@@ -5700,9 +5868,9 @@ async function petaSurat(reg) {
     'Tempat Lahir': judulKata(v('tempat_lahir')), 'Tanggal Lahir': dPanjang(tl), TTL: [judulKata(v('tempat_lahir')), dPanjang(tl)].filter(Boolean).join(', '),
     Umur: tl ? umur(tl) + ' tahun' : (reg.umur || ''), 'Jenis Kelamin': judulKata(v('jk')), Agama: judulKata(v('agama')), Pekerjaan: judulKata(v('pekerjaan')),
     'Status Perkawinan': judulKata(v('status_kawin')),
-    Pemohon: reg.pemohon || 'Perorangan', 'Nama Lembaga': reg.lembaga_nama || TITIK, 'Jenis Lembaga': reg.lembaga_jenis || TITIK, 'Alamat Lembaga': reg.lembaga_alamat || TITIK,
-    'No SK Lembaga': reg.lembaga_no || TITIK, Jabatan: reg.pj_jabatan || TITIK, 'Penanggung Jawab': judulKata(v('nama')), Kewarganegaraan: String(p.warga_negara || 'WNI').toUpperCase() === 'WNI' ? 'Indonesia' : (p.warga_negara || ''), Pendidikan: judulKata(p.pendidikan || ''),
-    Alamat: alamat, Dusun: dusun, RT: v('rt'), RW: v('rw'), Keperluan: reg.keperluan || TITIK,
+    Pemohon: reg.pemohon || 'Perorangan', 'Nama Lembaga': reg.lembaga_nama || TITIK, 'Jenis Lembaga': reg.lembaga_jenis || TITIK, 'Alamat Lembaga': reg.lembaga_alamat || alamat || TITIK,
+    'No SK Lembaga': reg.lembaga_no || TITIK, 'No Akta': reg.lembaga_no || TITIK, 'Bidang Kegiatan': reg.lembaga_bidang || TITIK, 'SK Kemenkumham': reg.lembaga_kemenkumham || '-', Jabatan: reg.pj_jabatan || TITIK, 'Penanggung Jawab': judulKata(v('nama')), Kewarganegaraan: String(p.warga_negara || 'WNI').toUpperCase() === 'WNI' ? 'Indonesia' : (p.warga_negara || ''), Pendidikan: judulKata(p.pendidikan || ''),
+    Alamat: alamat, Dusun: dusun, RT: v('rt'), RW: v('rw'), Keperluan: reg.keperluan || (reg.jenis_surat === SK_DL ? 'kelengkapan persyaratan administrasi' : TITIK),
     'Alamat Domisili': reg.alamat_domisili || alamat, 'Lama Tinggal': reg.lama_tinggal || TITIK,
     'Nama Usaha': reg.usaha_nama || TITIK, 'Jenis Usaha': reg.usaha_jenis || TITIK, 'Alamat Usaha': reg.usaha_alamat || TITIK, 'Mulai Usaha': reg.usaha_mulai || TITIK,
     'Nama Bayi': judulKata(reg.bayi_nama) || TITIK, 'JK Bayi': judulKata(reg.bayi_jk) || TITIK, 'Tanggal Lahir Bayi': dPanjang(reg.bayi_tgl) || TITIK, 'Hari Lahir Bayi': dHari(reg.bayi_tgl) || TITIK,
@@ -6136,41 +6304,55 @@ VIEWS.template = async (p, main) => {
   const ada = new Set(list.map(x => x.path));
   const kitN = NX.nama;
   const lblN = nm => nm === 'naskah_surat_keluar' ? 'Surat Keluar – Surat Biasa (juga dipakai jenis yang belum punya template)' : /^naskah_surat_keluar_/.test(nm) ? 'Surat Keluar – ' + judulKata(nm.replace('naskah_surat_keluar_', '').replace(/_/g, ' ')) : UI[nm.replace('naskah_', '')] ? UI[nm.replace('naskah_', '')].t : nm;
-  const naskahDaftar = Array.from(new Set(kitN.map(n => 'surat/' + n + '.docx').concat(list.filter(x => /^surat\/naskah_/.test(x.path)).map(x => x.path)))).sort().map(pth => [pth, lblN(pth.split('/').pop().replace(/\.docx$/, ''))]);
-  const wajib = Object.keys(SURAT).map(j => ({ path: suratPath(j), label: j })).concat([{ path: 'kk/draf_kk.docx', label: 'Draf Formulir KK' }]);
-  const baris = (path, label) => {
-    const x = list.find(y => y.path === path);
-    return `<div class="it"><div class="row" style="cursor:default"><span class="av">${ic('file')}</span><span class="main"><span class="t">${esc(label || path.split('/').pop())}</span><span class="s">${x ? esc(path.split('/').pop()) + ' · ' + Math.round((x.size || 0) / 1024) + ' KB · diubah ' + esc(String(x.waktu || '').slice(0, 10)) : '<span class="pill warn">Belum ada</span>'}</span></span></div>
-      <div class="btns xacts">${x ? `<button class="btn sm" data-act="tplDl" data-p="${esc(path)}">${ic('eye')}Unduh${/\.docx$/i.test(path) ? ' untuk diedit' : ''}</button>${/\.docx$/i.test(path) ? `<button class="btn sm" data-act="tplTags" data-p="${esc(path)}">${ic('list')}Lihat tanda</button>` : ''}` : ''}<button class="btn sm pri" data-act="tplUpBtn" data-p="${esc(path)}">${ic('plus')}${x ? 'Ganti' : 'Unggah'}</button>${x && /^(rkp|rpjm)\//.test(path) ? `<button class="btn sm danger" data-act="tplDelBtn" data-p="${esc(path)}">${ic('trash')}</button>` : ''}</div></div>`;
+  const naskahDaftar = Array.from(new Set(kitN.filter(n => /^naskah_/.test(n)).map(n => 'surat/' + n + '.docx').concat(list.filter(x => /^surat\/naskah_/.test(x.path)).map(x => x.path)))).sort().map(pth => [pth, lblN(pth.split('/').pop().replace(/\.docx$/, ''))]);
+  const cari = pth => list.find(y => y.path === pth);
+  const kb = x => Math.max(1, Math.round((x.size || 0) / 1024)) + ' KB';
+  /* satu baris template: status + tombol ikon */
+  const item = o => {
+    const x = cari(o.path), docx = /\.docx$/i.test(o.path), bawaan = o.bawaan || (docx && kitN.indexOf(o.path.split('/').pop().replace(/\.docx$/, '')) >= 0);
+    const st = x ? '<span class="pill ok">Template sendiri</span>' : bawaan ? '<span class="pill info">Bawaan aplikasi</span>' : o.umum ? '<span class="pill">Pakai template umum</span>' : '<span class="pill warn">Belum ada</span>';
+    const B = (act, icn, txt, cls, extra) => `<button class="ibtn ${cls || ''}" data-act="${act}" data-p="${esc(o.path)}" ${extra || ''} title="${esc(txt)}">${ic(icn)}<span>${esc(txt)}</span></button>`;
+    const bt = [];
+    if (x) bt.push(B('tplDl', 'file', 'Unduh')); else if (bawaan) bt.push(B('tplDlN', 'file', 'Unduh')); else if (o.umum) bt.push(B('tplDlAs', 'file', 'Unduh'));
+    if (x && docx) bt.push(B('tplTags', 'list', 'Tanda'));
+    if (o.edit) bt.push(`<button class="ibtn" data-act="xedit" data-e="jenis_surat" data-id="${esc(o.edit)}" title="Ubah isian jenis surat">${ic('edit')}<span>Isian</span></button>`);
+    bt.push(B('tplUpBtn', 'plus', x ? 'Ganti' : 'Unggah', 'pri'));
+    if (x && (bawaan || o.umum || o.hapus)) bt.push(B('tplDelBtn', 'trash', bawaan ? 'Kembali ke bawaan' : o.umum ? 'Pakai template umum' : 'Hapus', 'danger'));
+    return `<div class="tpl-it"><span class="tpl-ic">${ic(o.ic || 'file')}</span><div class="tpl-mid"><b>${esc(o.label)}</b><span class="meta">${st}${o.sub ? ' · ' + o.sub : ''}${x ? ' · ' + kb(x) + ' · ' + esc(String(x.waktu || '').slice(0, 10)) : ''}</span></div><div class="tpl-bt">${bt.join('')}</div></div>`;
   };
+  const tags = (judul, arr, catatan) => `<details class="tpl-tags"><summary>${ic('list')} ${esc(judul)} <span class="meta">— ketuk tanda untuk menyalin</span></summary>${catatan ? `<div class="meta">${catatan}</div>` : ''}<div class="tpl-chips">${arr.map(k => `<button type="button" class="chip mono" data-act="tagCopy" data-t="${esc(k)}">{{${esc(k)}}}</button>`).join('')}</div></details>`;
+  const sek = (judul, aksi, isi) => `<div class="sec-h"><h2>${judul}</h2>${aksi ? `<span class="btns">${aksi}</span>` : ''}</div><div class="tpl-list">${isi}</div>`;
+  const TAG_SURAT = ['Desa', 'Kecamatan', 'Kabupaten', 'Alamat Desa', 'Kode Pos', 'Kode Desa', 'No', 'Tahun', 'Tanggal Surat', 'Kepala Desa', 'Nama', 'NIK', 'No KK', 'TTL', 'Tempat Lahir', 'Tanggal Lahir', 'Umur', 'Jenis Kelamin', 'Agama', 'Pekerjaan', 'Status Perkawinan', 'Kewarganegaraan', 'Pendidikan', 'Alamat', 'Dusun', 'RT', 'RW', 'Keperluan', 'Alamat Domisili', 'Lama Tinggal', 'Nama Usaha', 'Jenis Usaha', 'Alamat Usaha', 'Mulai Usaha', 'Nama Bayi', 'JK Bayi', 'Hari Lahir Bayi', 'Tanggal Lahir Bayi', 'Jam Lahir', 'Tempat Lahir Bayi', 'Anak Ke', 'Nama Ayah', 'Nama Ibu', 'Hari Meninggal', 'Tanggal Meninggal', 'Jam Meninggal', 'Tempat Meninggal', 'Sebab Meninggal', 'Pelapor', 'Alamat Tujuan', 'Alasan Pindah', 'Jumlah Pengikut', 'Penghasilan', 'Penghasilan Terbilang', 'Pemohon', 'Nama Lembaga', 'Jenis Lembaga', 'Bidang Kegiatan', 'No Akta', 'No SK Lembaga', 'SK Kemenkumham', 'Alamat Lembaga', 'Penanggung Jawab', 'Jabatan', 'Jenis Surat', 'Isi Surat', 'Isian Label', 'Isian Nilai', 'Isian Titik2'];
+  const TAG_SPP = ['Desa', 'Kecamatan', 'Kabupaten', 'Nomor SPP', 'Tanggal SPP', 'Tanggal Cair', 'Tahun', 'Jenis SPP', 'Bidang', 'Kode Kegiatan', 'Kegiatan', 'Uraian', 'Penerima', 'NPWP', 'Jenis Belanja', 'Jumlah', 'Jumlah Angka', 'Terbilang', 'Potongan', 'Netto', 'Netto Angka', 'Terbilang Netto', 'Kepala Desa', 'Sekretaris Desa', 'Bendahara', 'PKA', 'Jabatan PKA', 'R No', 'R Kode', 'R Uraian', 'R Sumber', 'R Jumlah', 'P Jenis', 'P Jumlah'];
+  const tambahan = S.jenisSurat.filter(j => !SURAT[j.nama]);
+  const TABS = [
+    ['surat', 'Surat Keterangan', () => sek('Surat keterangan bawaan', '', Object.keys(SURAT).map(j => item({ path: suratPath(j), label: j.replace(/^Surat /, ''), ic: 'file' })).join(''))
+      + sek('Jenis tambahan', `<button class="btn sm pri" data-act="go" data-go='["form",{"e":"jenis_surat"}]'>${ic('plus')}Jenis surat</button>`,
+        item({ path: 'surat/_umum.docx', label: 'Template umum', sub: 'dipakai jenis tambahan yang belum punya template sendiri', ic: 'folder', hapus: 1 })
+        + tambahan.map(j => item({ path: slugJenis(j.nama), label: j.nama.replace(/^Surat /, ''), umum: 1, edit: j.id, sub: (j.aktif === 'Tidak' ? 'tidak aktif · ' : '') + (isianJenis(j).length ? 'isian: ' + esc(isianJenis(j).join(', ')) : 'tanpa isian tambahan') })).join(''))
+      + tags('Daftar tanda Surat Keterangan', TAG_SURAT, 'Huruf besar: tambahkan <b>_U</b>, mis. <span class="mono">{{Nama_U}}</span>. Jenis tambahan: setiap isian menjadi tanda dengan nama yang sama. Baris tabel berisi <span class="mono">{{Isian Label}}</span> diulang untuk semua isian.')],
+    ['naskah', 'Surat Keluar & Produk Hukum', () => sek('Surat keluar & produk hukum', `<button class="btn sm" data-act="tplUpBtn" data-p="naskah/">${ic('plus')}Jenis surat keluar</button>`, naskahDaftar.map(([path, label]) => item({ path, label, ic: /perdes|perkades|perbersama|sk_/.test(path) ? 'scale' : 'send' })).join(''))
+      + '<div class="meta">Jenis surat keluar baru: beri nama file sesuai jenisnya, mis. <i>Surat Undangan Rapat.docx</i>, lalu ketik jenis yang sama di isian "Jenis Surat".</div>'
+      + tags('Daftar tanda Surat Keluar & Produk Hukum', TAG_NASKAH, 'Menimbang, Mengingat, Isi, Isi Surat, Tembusan, Yang Ditugaskan: tulis tanda sendirian dalam satu paragraf, maka setiap baris isian menjadi paragraf baru.')],
+    ['keu', 'Keuangan', () => sek('Keuangan', '', item({ path: 'keu/keu_spp.docx', label: 'SPP + Pernyataan Tanggung Jawab + Rincian + Kuitansi', ic: 'wallet', bawaan: 1 })) + tags('Daftar tanda SPP', TAG_SPP, 'Baris berawalan R diulang per rekening; baris berawalan P diulang per potongan pajak.')],
+    ['rkp', 'RKP Desa', () => sek('RKP Desa', `<button class="btn sm" data-act="tplUpBtn" data-p="rkp/">${ic('plus')}Template</button><button class="btn sm" data-act="tplImpor">${ic('folder')}Dari Google Drive</button>`,
+      list.filter(x => x.path.indexOf('rkp/') === 0 && !/_cadangan/.test(x.path)).map(x => item({ path: x.path, label: x.path.split('/').pop().replace(/\.docx$/i, '').replace(/_/g, ' '), ic: 'cal', hapus: 1 })).join('') || '<div class="card meta">Belum ada. Tekan "Dari Google Drive" untuk memindahkan template Google Docs lama.</div>')],
+    ['rpjm', 'RPJM Desa', () => sek('RPJM Desa (21 dokumen & lampiran)', `<button class="btn sm pri" data-act="tplUpBtn" data-p="rpjm/">${ic('plus')}Unggah banyak</button>`,
+      Object.keys(RPJMD_CAT).map(k => { const x = list.find(y => y.path.indexOf('rpjm/') === 0 && !/_cadangan/.test(y.path) && y.path.split('/').pop().indexOf(k + '.') === 0); return item({ path: x ? x.path : 'rpjm/' + RPJMD_CAT[k].f, label: k + ' — ' + (RPJMD_NAMA[k] || RPJMD_EXTRA[k] || ''), ic: 'target', hapus: 1 }); }).join(''))
+      + '<div class="meta">Nama file diawali kode, mis. <i>R01._BA_Musyawarah….docx</i>. Template lama otomatis dicadangkan.</div>'],
+    ['lain', 'Lainnya', () => sek('Progres Pembangunan', '', item({ path: PB_TPL, label: 'Laporan Progres Pembangunan (F4)', ic: 'hammer' }))
+      + tags('Daftar tanda Progres Pembangunan', ['Nama Pekerjaan', 'Lokasi', 'Sumber Dana', 'Tahun Anggaran', 'Pagu', 'Pelaksana', 'Tgl Mulai', 'Tgl Selesai', 'Progres', 'Foto Progres'])
+      + sek('Draf KK', '', item({ path: 'kk/draf_kk.docx', label: 'Draf Formulir KK (Word)', ic: 'house' }) + item({ path: KK_LATAR, label: 'Gambar latar Draf KK', sub: 'JPG A4 melintang 300 dpi — untuk pratinjau, PDF & cetak', ic: 'cam' }))]
+  ];
+  if (!TABS.some(t => t[0] === S.tplTab)) S.tplTab = 'surat';
+  const tab = TABS.find(t => t[0] === S.tplTab);
   main.innerHTML = `<div class="stack">
-    <div class="card meta">Template berupa file Word (.docx). Tulis tanda isian dengan kurung kurawal ganda, misalnya <b>{{Nama}}</b> atau <b>{{Nama_U}}</b> (huruf besar). Unduh template, ubah di Microsoft Word/WPS, lalu unggah lagi dengan tombol <b>Ganti</b>. Tanda yang tidak dikenal akan dikosongkan saat surat dibuat.</div>
-    <div class="sec-h"><h2>Surat Keterangan</h2></div><div class="list">${wajib.filter(w => w.path.indexOf('surat/') === 0).map(w => baris(w.path, w.label)).join('')}</div>
-    <div class="sec-h"><h2>Surat keterangan tambahan</h2><button class="btn sm pri" data-act="go" data-go='["form",{"e":"jenis_surat"}]'>${ic('plus')}Tambah jenis surat</button></div>
-    <div class="list">${baris('surat/_umum.docx', 'Template umum (dipakai jenis tambahan yang belum punya template sendiri)')}${S.jenisSurat.map(j => {
-      const p = slugJenis(j.nama), x = list.find(y => y.path === p);
-      return `<div class="it"><div class="row" style="cursor:default"><span class="av">${ic('file')}</span><span class="main"><span class="t">${esc(j.nama)}${j.aktif === 'Tidak' ? ' <span class="pill">Tidak aktif</span>' : ''}</span><span class="s">${x ? 'Template sendiri: ' + esc(p.split('/').pop()) : 'Memakai template umum'}${isianJenis(j).length ? ' · Isian: ' + esc(isianJenis(j).join(', ')) : ''}</span></span></div>
-        <div class="btns xacts"><button class="btn sm" data-act="xedit" data-e="jenis_surat" data-id="${esc(j.id)}">${ic('edit')}Ubah</button>${x ? `<button class="btn sm" data-act="tplDl" data-p="${esc(p)}">${ic('eye')}Unduh</button>` : `<button class="btn sm" data-act="tplDlAs" data-p="${esc(p)}">${ic('eye')}Unduh template umum sebagai awal</button>`}<button class="btn sm pri" data-act="tplUpBtn" data-p="${esc(p)}">${ic('plus')}${x ? 'Ganti template' : 'Unggah template sendiri'}</button>${x ? `<button class="btn sm danger" data-act="tplDelBtn" data-p="${esc(p)}">${ic('trash')}Pakai template umum</button>` : ''}</div></div>`;
-    }).join('') || ''}</div>
-    <div class="sec-h"><h2>Surat Keluar & Produk Hukum</h2><button class="btn sm" data-act="tplUpBtn" data-p="naskah/">${ic('plus')}Tambah template jenis surat keluar</button></div>
-    <div class="meta">Template bawaan dirakit otomatis bila belum diganti. Unduh, ubah di Word, lalu <b>Ganti</b> untuk memakai template sendiri. Jenis surat keluar baru: beri nama file sesuai jenisnya, mis. <i>Surat Undangan Rapat.docx</i>, lalu ketik jenis yang sama di isian "Jenis Surat".</div>
-    <div class="list">${naskahDaftar.map(([path, label]) => { const x = list.find(y => y.path === path); return `<div class="it"><div class="row" style="cursor:default"><span class="av">${ic('file')}</span><span class="main"><span class="t">${esc(label)}</span><span class="s">${x ? 'Template sendiri · ' + Math.round(x.size / 1024) + ' KB' : 'Template bawaan'}</span></span></div>
-      <div class="btns xacts"><button class="btn sm" data-act="tplDlN" data-p="${esc(path)}">${ic('eye')}Unduh untuk diedit</button><button class="btn sm" data-act="tplUpBtn" data-p="${esc(path)}">${ic('plus')}Ganti</button>${x ? `<button class="btn sm danger" data-act="tplDelBtn" data-p="${esc(path)}">${ic('trash')}Kembali ke bawaan</button>` : ''}</div></div>`; }).join('')}</div>
-    <div class="card meta" style="line-height:1.7"><b>Tanda Surat Keluar & Produk Hukum:</b> ${TAG_NASKAH.map(t => '{{' + esc(t) + '}}').join(' ')}<br>Menimbang, Mengingat, Isi, Isi Surat, Tembusan, Yang Ditugaskan: tulis tanda sendirian dalam satu paragraf, maka setiap baris isian menjadi paragraf baru.</div>
-    <div class="sec-h"><h2>Keuangan</h2></div>
-    <div class="list">${[['keu/keu_spp.docx', 'SPP + Pernyataan Tanggung Jawab Belanja + Rincian + Kuitansi']].map(([path, label]) => { const x = list.find(y => y.path === path); return `<div class="it"><div class="row" style="cursor:default"><span class="av">${ic('file')}</span><span class="main"><span class="t">${esc(label)}</span><span class="s">${x ? 'Template sendiri · ' + Math.round(x.size / 1024) + ' KB' : 'Template bawaan'}</span></span></div>
-      <div class="btns xacts"><button class="btn sm" data-act="tplDlN" data-p="${esc(path)}">${ic('eye')}Unduh untuk diedit</button><button class="btn sm" data-act="tplUpBtn" data-p="${esc(path)}">${ic('plus')}Ganti</button>${x ? `<button class="btn sm danger" data-act="tplDelBtn" data-p="${esc(path)}">${ic('trash')}Kembali ke bawaan</button>` : ''}</div></div>`; }).join('')}</div>
-    <div class="card meta" style="line-height:1.7"><b>Tanda SPP:</b> ${['Desa', 'Kecamatan', 'Kabupaten', 'Nomor SPP', 'Tanggal SPP', 'Tanggal Cair', 'Tahun', 'Jenis SPP', 'Bidang', 'Kode Kegiatan', 'Kegiatan', 'Uraian', 'Penerima', 'NPWP', 'Jenis Belanja', 'Jumlah', 'Jumlah Angka', 'Terbilang', 'Potongan', 'Netto', 'Netto Angka', 'Terbilang Netto', 'Kepala Desa', 'Sekretaris Desa', 'Bendahara', 'PKA', 'Jabatan PKA'].map(t => '{{' + t + '}}').join(' ')}<br>Baris rincian (diulang per rekening): {{R No}} {{R Kode}} {{R Uraian}} {{R Sumber}} {{R Jumlah}} · baris potongan: {{P Jenis}} {{P Jumlah}}. Tambahkan _U untuk huruf besar, mis. {{Kepala Desa_U}}.</div>
-    <div class="sec-h"><h2>RKP Desa</h2><span class="btns"><button class="btn sm" data-act="tplUpBtn" data-p="rkp/">${ic('plus')}Tambah template</button><button class="btn sm" data-act="tplImpor">${ic('folder')}Ambil dari Google Drive</button></span></div>
-    <div class="list">${list.filter(x => x.path.indexOf('rkp/') === 0 && !/_cadangan/.test(x.path)).map(x => baris(x.path)).join('') || '<div class="card meta">Belum ada. Tekan "Ambil dari Google Drive" untuk memindahkan template Google Docs lama.</div>'}</div>
-    <div class="sec-h"><h2>RPJM Desa (21 dokumen & lampiran)</h2><span class="btns"><button class="btn sm pri" data-act="tplUpBtn" data-p="rpjm/">${ic('plus')}Unggah banyak sekaligus</button></span></div>
-    <div class="meta">Unggah file R00–R22 (nama file diawali kode, mis. <i>R01._BA_Musyawarah…docx</i>). Dipakai di menu Perencanaan → Dokumen RPJM Desa. Template lama otomatis dicadangkan.</div>
-    <div class="list">${Object.keys(RPJMD_CAT).map(k => { const x = list.find(y => y.path.indexOf('rpjm/') === 0 && !/_cadangan/.test(y.path) && y.path.split('/').pop().indexOf(k + '.') === 0); return baris(x ? x.path : 'rpjm/' + RPJMD_CAT[k].f, k + ' — ' + (RPJMD_NAMA[k] || RPJMD_EXTRA[k] || '')); }).join('')}</div>
-    <div class="sec-h"><h2>Progres Pembangunan</h2></div><div class="list">${baris(PB_TPL, 'Laporan Progres Pembangunan (F4) — tanda: {{Nama Pekerjaan}}, {{Lokasi}}, {{Sumber Dana}}, {{Tahun Anggaran}}, {{Pagu}}, {{Pelaksana}}, {{Tgl Mulai}}, {{Tgl Selesai}}, {{Progres}}, {{Foto Progres}}')}</div>
-    <div class="sec-h"><h2>Draf KK</h2></div><div class="list">${baris('kk/draf_kk.docx', 'Draf Formulir KK (Word)')}${baris(KK_LATAR, 'Gambar latar Draf KK (JPG, A4 melintang 300 dpi) — dipakai untuk pratinjau, PDF & cetak')}</div>
-    <div class="sec-h"><h2>Daftar tanda Surat Keterangan</h2></div><div class="meta">Jenis tambahan: setiap isian tambahan menjadi tanda dengan nama yang sama (mis. {{Nama Sekolah}}). {{Isi Surat}} = kalimat isi dari pengaturan jenis surat. Baris tabel yang memuat {{Isian Label}} diulang untuk semua isian tambahan.</div>
-    <div class="card meta" style="line-height:1.7">${['Desa', 'Kecamatan', 'Kabupaten', 'Alamat Desa', 'Kode Pos', 'Kode Desa', 'No', 'Tahun', 'Tanggal Surat', 'Nama', 'NIK', 'No KK', 'TTL', 'Tempat Lahir', 'Tanggal Lahir', 'Umur', 'Jenis Kelamin', 'Agama', 'Pekerjaan', 'Status Perkawinan', 'Kewarganegaraan', 'Pendidikan', 'Alamat', 'Dusun', 'RT', 'RW', 'Keperluan', 'Kepala Desa', 'Alamat Domisili', 'Lama Tinggal', 'Nama Usaha', 'Jenis Usaha', 'Alamat Usaha', 'Mulai Usaha', 'Nama Bayi', 'JK Bayi', 'Hari Lahir Bayi', 'Tanggal Lahir Bayi', 'Jam Lahir', 'Tempat Lahir Bayi', 'Anak Ke', 'Nama Ayah', 'Nama Ibu', 'Hari Meninggal', 'Tanggal Meninggal', 'Jam Meninggal', 'Tempat Meninggal', 'Sebab Meninggal', 'Pelapor', 'Alamat Tujuan', 'Alasan Pindah', 'Jumlah Pengikut', 'Penghasilan', 'Penghasilan Terbilang', 'Jenis Surat', 'Isi Surat', 'Isian Label', 'Isian Nilai', 'Isian Titik2'].map(k => `<span class="mono">{{${esc(k)}}}</span>`).join(' · ')}</div>
+    <div class="gtabs" role="tablist">${TABS.map(t => `<button role="tab" class="${t[0] === S.tplTab ? 'on' : ''}" data-act="tplTab" data-v="${t[0]}">${esc(t[1])}</button>`).join('')}</div>
+    <details class="card tpl-help"><summary>${ic('book')} Cara mengubah template</summary><ol class="meta" style="margin:6px 0 0;padding-left:18px;line-height:1.7"><li>Tekan <b>Unduh</b>, buka file di Microsoft Word / WPS.</li><li>Ubah susunan dan kalimat sesukanya. Tulis isian dengan kurung kurawal ganda, mis. <span class="mono">{{Nama}}</span> (lihat daftar tanda di bawah).</li><li>Simpan sebagai .docx, lalu tekan <b>Ganti</b> untuk mengunggah.</li><li>Template <span class="pill info">Bawaan aplikasi</span> disusun otomatis; tekan <b>Kembali ke bawaan</b> untuk membuang template sendiri.</li></ol></details>
+    ${tab[2]()}
     <input type="file" id="tplFile" accept=".docx,.xlsx,.jpg,.jpeg,.png" multiple hidden></div>`;
+  S.vh.tplTab = t => { S.tplTab = t.dataset.v; refresh(); };
+  S.vh.tagCopy = t => { const v = '{{' + t.dataset.t + '}}'; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => toast(v + ' disalin.')).catch(() => toast(v)); };
   void ada;
   let target = '';
   const fin = $('#tplFile');
