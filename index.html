@@ -7791,7 +7791,7 @@ async function skBacaPdf(file) {
 function skJenis(lines) {
   const h = lines.slice(0, 30).map(l => l.s).join(' ').toUpperCase();
   if (/PARAMETER REKENING/.test(h)) return 'rek';
-  if (/RENCANA ANGGARAN BIAYA|RINCIAN ANGGARAN/.test(h)) return 'rab';
+  if (/RENCANA ANGGARAN (BIAYA|PENDAPATAN|PEMBIAYAAN)|RINCIAN ANGGARAN/.test(h)) return 'rab';
   if (/BUKU KAS PEMBANTU KEGIATAN/.test(h)) return 'bkp';
   if (/BUKU KAS UMUM/.test(h)) return 'bku';
   if (/REGISTER PENCAIRAN/.test(h)) return 'cair';
