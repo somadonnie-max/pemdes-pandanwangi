@@ -249,6 +249,7 @@ button.stat:hover{border-color:var(--pri)}
 .tn-wpl .main{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}.tn-wpl .t{font-weight:700;font-size:13px;white-space:normal}.tn-wpl .s,.tn-wpl .s2{font-size:11px;color:var(--muted);white-space:normal}.tn-wpl .r{display:flex;flex-direction:column;gap:3px;align-items:flex-end;flex-shrink:0}
 .tn-srch{flex:0 0 auto!important;height:auto!important}
 @media(min-width:900px){.tn-panel{left:auto;width:360px;top:56px;bottom:auto}}
+@media(max-width:760px){.tn{gap:6px!important}.tn-stat{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.tn-k{padding:3px 6px;border-radius:8px}.tn-k b{font-size:13px}.tn-k span{font-size:9.5px}.tn-bar{grid-column:1/-1;height:4px}.tn-map{height:calc(100vh - 215px);min-height:360px}}
 .gtabs{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:3px;overflow-x:auto;scrollbar-width:none}
 .gtabs button{flex:1 0 auto;border:0;background:none;border-radius:7px;padding:5px 12px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap}
 .gtabs button.on{background:var(--surface);color:var(--pri);box-shadow:0 1px 2px rgba(0,0,0,.12)}
@@ -8404,7 +8405,7 @@ VIEWS.tanah = async (p, main, alive) => {
   const statistik = () => {
     const n = c => bid.filter(b => b.status === c).length, t = bid.length || 1, s1 = n(TB_ST[1]), s2 = n(TB_ST[2]), s0 = n(TB_ST[0]);
     const wpD = S.tnDusun ? wp.filter(x => x.dusun === S.tnDusun) : wp, wpOk = wpD.filter(x => x.bidang).length;
-    $('#tnStat').innerHTML = `<div class="tn-k"><b>${tbRp(bid.length)}</b><span>bidang</span></div><div class="tn-k ok"><b>${tbRp(s1)}</b><span>cocok</span></div><div class="tn-k wa"><b>${tbRp(s0)}</b><span>belum</span></div><div class="tn-k"><b>${tbRp(wpOk)}/${tbRp(wpD.length)}</b><span>NOP terpetakan${S.tnDusun ? ' (dusun ini)' : ''}</span></div>
+    $('#tnStat').innerHTML = `<div class="tn-k"><b>${tbRp(bid.length)}</b><span>bidang</span></div><div class="tn-k ok"><b>${tbRp(s1)}</b><span>cocok</span></div><div class="tn-k wa"><b>${tbRp(s0)}</b><span>belum</span></div><div class="tn-k"><b>${tbRp(wpOk)}/${tbRp(wpD.length)}</b><span>terpetakan</span></div>
       <div class="tn-bar"><i style="width:${s1 / t * 100}%;background:${TB_WARNA[TB_ST[1]]}"></i><i style="width:${s2 / t * 100}%;background:${TB_WARNA[TB_ST[2]]}"></i></div>`;
   };
   statistik();
