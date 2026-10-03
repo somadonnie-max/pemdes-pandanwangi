@@ -2189,6 +2189,8 @@ async function excelImport(e, file, done) {
     map.forEach((f, c) => { if (f) o[f.k] = xlVal(f, r[c]); });
     const lenBad = fs.find(f => f.len && o[f.k] && o[f.k].indexOf('•') < 0 && !new RegExp('^\\d{' + f.len + '}$').test(o[f.k]));
     if (lenBad) return bad.push({ baris: o._baris, pesan: lenBad.l + ' harus ' + lenBad.len + ' digit angka.' });
+    if (u.rpjm && !o.periode_id) o.periode_id = S.rpjmPid;
+    if (u.rkp && !o.tahun_rkp) o.tahun_rkp = S.rkpYear;
     recs.push(o);
   });
   const nId = recs.filter(r => r.id).length;
@@ -3943,7 +3945,7 @@ VIEWS.rpjm = async (p, main, alive) => {
       <div><small>Masuk RKP Desa</small><b class="num">${nR} kegiatan</b></div>
       <div><small>Dianggarkan APBDes</small><b class="num">${nA} kegiatan</b></div>
     </div>
-    <div class="chips"><button class="chip ${st.tab === 'dash' ? 'on' : ''}" data-act="rpjTab" data-v="dash">${ic('chart')}Dashboard</button><button class="chip ${st.tab === 'mat' ? 'on' : ''}" data-act="rpjTab" data-v="mat">${ic('list')}Matriks Kegiatan</button><button class="chip ${st.tab === 'arah' ? 'on' : ''}" data-act="rpjTab" data-v="arah">${ic('target')}Visi, Misi & Arah Kebijakan <small>${A.length}</small></button></div>
+    <div class="chips"><button class="chip ${st.tab === 'dash' ? 'on' : ''}" data-act="rpjTab" data-v="dash">${ic('chart')}Dashboard</button><button class="chip ${st.tab === 'mat' ? 'on' : ''}" data-act="rpjTab" data-v="mat">${ic('list')}Matriks Kegiatan</button><button class="chip ${st.tab === 'arah' ? 'on' : ''}" data-act="rpjTab" data-v="arah">${ic('target')}Visi, Misi & Arah Kebijakan <small>${A.length}</small></button><button class="chip" data-act="rpjPkd">${ic('search')}Pengkajian Keadaan Desa</button></div>
     <div id="rpjBody"></div></div>`;
 
   const body = $('#rpjBody');
@@ -3996,6 +3998,7 @@ VIEWS.rpjm = async (p, main, alive) => {
   const errBox = (m, x) => { const e = $('.err', m.el); e.textContent = x.message; e.hidden = false; };
   S.vh.rpjV = t => ganti(t.dataset.id);
   S.vh.rpjTab = t => { st.tab = t.dataset.v; refresh(); };
+  S.vh.rpjPkd = () => go('rpjmpkd', { pid: per.id });
   S.vh.rpjB = t => { st.b = t.dataset.v; drawMat(); };
   S.vh.rpjK = t => rpjmDetail(per, K.find(k => k.id === t.dataset.id), { ubah, nb, ns, TH, nom });
   S.vh.rpjKeg = () => rpjmKegForm(per, null, {}, nom, TH);
@@ -7049,6 +7052,143 @@ function spjDokumen(spp, D, H, foto, pajakTr) {
   const pajak = [`<div class="paper">${head('REKAPITULASI PAJAK SPJ')}<table class="pt"><thead><tr><th>No</th><th>Jenis pajak</th><th>Dari bukti SPJ (Rp)</th><th>Disetor (Rp)</th><th>NTPN</th></tr></thead><tbody>${Object.keys(H.pajak).map((k, i) => { const T = pajakTr.filter(t => t.pajak === k && t.jenis === 'Pajak Disetor'); return `<tr><td style="text-align:center">${i + 1}</td><td>${esc(k)}</td><td style="text-align:right">${rp0(H.pajak[k])}</td><td style="text-align:right">${rp0(T.reduce((a, t) => a + spjN(t.jumlah), 0))}</td><td>${esc(T.map(t => t.ntpn).filter(Boolean).join(', '))}</td></tr>`; }).join('')}</tbody><tfoot><tr><td></td><td><b>Jumlah</b></td><td style="text-align:right"><b>${rp0(Object.values(H.pajak).reduce((a, b) => a + b, 0))}</b></td><td></td><td></td></tr></tfoot></table>${ttd('Kasi/Kaur Pelaksana Kegiatan', D.ba.pka, 'Kaur Keuangan', s.nama_bendahara)}</div>`];
   return { rekap, kuitansi, baperiksa, baterima, hadir, upah, laporan, pajak };
 }
+
+/* ---------------- Pengkajian Keadaan Desa (RPJM) ---------------- */
+const PKD_J = [
+  { j: 'Sumber Daya Alam', k: 'A.II', g: 'Data desa', c: [['Uraian Sumber Daya Alam', 'uraian'], ['Volume', 'volume'], ['Satuan', 'satuan'], ['Keterangan', 'ket']] },
+  { j: 'Sumber Daya Manusia', k: 'A.III', g: 'Data desa', c: [['Uraian Sumber Daya Manusia', 'uraian'], ['Jumlah', 'volume'], ['Satuan', 'satuan'], ['Keterangan', 'ket']] },
+  { j: 'Sumber Daya Pembangunan', k: 'A.IV', g: 'Data desa', c: [['Uraian Sumber Daya Pembangunan', 'uraian'], ['Jumlah', 'volume'], ['Satuan', 'satuan'], ['Keterangan', 'ket']] },
+  { j: 'Sumber Daya Sosial Budaya', k: 'A.V', g: 'Data desa', c: [['Uraian Sumber Daya Sosial Budaya', 'uraian'], ['Jumlah', 'volume'], ['Satuan', 'satuan'], ['Keterangan', 'ket']] },
+  { j: 'Sketsa Desa', k: 'A.VIII', g: 'Penggalian gagasan', c: [['RT/RW/Blok', 'lokasi'], ['Daftar Masalah', 'masalah'], ['Daftar Potensi', 'potensi']] },
+  { j: 'Kalender Musim', k: 'A.IX', g: 'Penggalian gagasan', c: [['RT/RW/Blok', 'lokasi'], ['Daftar Masalah', 'masalah'], ['Daftar Potensi', 'potensi']] },
+  { j: 'Bagan Kelembagaan', k: 'A.X', g: 'Penggalian gagasan', c: [['Lembaga', 'lembaga'], ['Daftar Masalah', 'masalah'], ['Daftar Potensi', 'potensi']] },
+  { j: 'Pemeringkatan Masalah', k: 'Lokakarya 1', g: 'Lokakarya', bid: 1, skor: ['Dirasakan banyak orang', 'Sangat parah', 'Menghambat peningkatan pendapatan', 'Sering terjadi', 'Tersedia potensi'], c: [['Masalah', 'masalah'], ['Lokasi', 'lokasi']] },
+  { j: 'Pengkajian Tindakan', k: 'Lokakarya 2', g: 'Lokakarya', bid: 1, c: [['Masalah', 'masalah'], ['Penyebab', 'penyebab'], ['Potensi', 'potensi'], ['Alternatif Tindakan', 'alternatif'], ['Tindakan yang Layak', 'tindakan']] },
+  { j: 'Pemeringkatan Tindakan', k: 'Lokakarya 3', g: 'Lokakarya', bid: 1, skor: ['Bermanfaat bagi RTM', 'Mendesak dilaksanakan', 'Dukungan potensi sumber daya', 'Bisa dikerjakan', 'Keberlanjutan'], c: [['Tindakan yang Layak', 'tindakan']] },
+  { j: 'Pengelompokan Bidang', k: 'Lokakarya 4', g: 'Lokakarya', bid: 1, c: [['Tindakan yang Layak', 'tindakan'], ['Lokasi', 'lokasi'], ['Kewenangan', 'kewenangan'], ['Volume', 'volume'], ['Satuan', 'satuan'], ['Sumber Dana', 'sumber'], ['LK', 'lk'], ['PR', 'pr'], ['A-RTM', 'rtm']] }
+];
+const PKD_JN = PKD_J.map(x => x.j);
+const pkdDef = j => PKD_J.find(x => x.j === j) || PKD_J[0];
+const pkdW = ks => ({ k: 'jenis', v: PKD_J.filter(x => ks(x)).map(x => x.j) });
+const pkdHas = f => x => x.c.some(c => c[1] === f);
+Object.assign(UI, {
+  rpjm_pkd: {
+    t: 'Pengkajian Keadaan Desa', ic: 'search', perm: 'perencanaan', rpjm: 1, sort: 'urut', asc: 1, excel: 1, noAdd: 1,
+    fields: [F('jenis', 'Jenis Pengkajian', 'select', { opt: PKD_JN, req: 1 }), F('bidang', 'Bidang', 'select', { opt: RPJM_BID_OPT, when: pkdW(x => x.bid) }), F('urut', 'No. Urut', 'number'),
+      F('uraian', 'Uraian', 'text', { wide: 1, when: pkdW(pkdHas('uraian')) }), F('lembaga', 'Lembaga', 'text', { when: pkdW(pkdHas('lembaga')) }), F('lokasi', 'Lokasi (RT/RW/Dusun)', 'text', { when: pkdW(pkdHas('lokasi')) }),
+      F('masalah', 'Masalah', 'textarea', { wide: 1, when: pkdW(pkdHas('masalah')) }), F('penyebab', 'Penyebab', 'textarea', { wide: 1, when: pkdW(pkdHas('penyebab')) }), F('potensi', 'Potensi', 'textarea', { wide: 1, when: pkdW(pkdHas('potensi')) }),
+      F('alternatif', 'Alternatif Tindakan', 'textarea', { wide: 1, when: pkdW(pkdHas('alternatif')) }), F('tindakan', 'Tindakan yang Layak', 'text', { wide: 1, when: pkdW(pkdHas('tindakan')) }),
+      F('volume', 'Volume / Jumlah', 'text', { when: pkdW(pkdHas('volume')) }), F('satuan', 'Satuan', 'text', { when: pkdW(pkdHas('satuan')) }), F('kewenangan', 'Jenis Kewenangan', 'text', { when: pkdW(pkdHas('kewenangan')), list: ['DESA', 'KABUPATEN', 'PROVINSI', 'PUSAT'] }),
+      F('sumber', 'Sumber Dana', 'text', { when: pkdW(pkdHas('sumber')), list: ['DD', 'ADD', 'PAD', 'BKK', 'BHPRD', 'Swadaya', 'Pihak Ketiga'] }), F('lk', 'Penerima Laki-laki', 'number', { when: pkdW(pkdHas('lk')) }), F('pr', 'Penerima Perempuan', 'number', { when: pkdW(pkdHas('pr')) }), F('rtm', 'Penerima A-RTM', 'number', { when: pkdW(pkdHas('rtm')) }),
+      F('s1', 'Dirasakan banyak orang', 'number', { when: pkdW(x => x.skor), lblW: { k: 'jenis', v: 'Pemeringkatan Tindakan', l: 'Bermanfaat bagi RTM' } }),
+      F('s2', 'Sangat parah', 'number', { when: pkdW(x => x.skor), lblW: { k: 'jenis', v: 'Pemeringkatan Tindakan', l: 'Mendesak dilaksanakan' } }),
+      F('s3', 'Menghambat peningkatan pendapatan', 'number', { when: pkdW(x => x.skor), lblW: { k: 'jenis', v: 'Pemeringkatan Tindakan', l: 'Dukungan potensi sumber daya' } }),
+      F('s4', 'Sering terjadi', 'number', { when: pkdW(x => x.skor), lblW: { k: 'jenis', v: 'Pemeringkatan Tindakan', l: 'Bisa dikerjakan' } }),
+      F('s5', 'Tersedia potensi', 'number', { when: pkdW(x => x.skor), lblW: { k: 'jenis', v: 'Pemeringkatan Tindakan', l: 'Keberlanjutan' } }),
+      F('nilai', 'Jumlah Nilai', 'number', { when: pkdW(x => x.skor), hint: 'Otomatis = jumlah 5 skor' }), F('peringkat', 'Peringkat', 'number', { when: pkdW(x => x.skor) }),
+      F('ket', 'Keterangan', 'text', { wide: 1 })],
+    calc: v => { if (!pkdDef(v.jenis).skor) return null; const t = ['s1', 's2', 's3', 's4', 's5'].reduce((s, k) => s + (Number(v[k]) || 0), 0); return t ? { nilai: String(t) } : null; },
+    chips: { k: 'jenis', opt: PKD_JN },
+    row: r => ({ t: r.uraian || r.masalah || r.tindakan || r.lembaga || '(tanpa uraian)', s: [r.jenis, r.bidang, r.lokasi || r.lembaga, r.volume && (r.volume + ' ' + (r.satuan || ''))].filter(Boolean).join(' · '), r: r.nilai ? 'Nilai ' + r.nilai + (r.peringkat ? ' · #' + r.peringkat : '') : '', av: ic('search') })
+  }
+});
+const pkdUrut = (a, b) => (Number(a.urut) || 9999) - (Number(b.urut) || 9999) || String(a._waktu || '').localeCompare(String(b._waktu || ''));
+const pkdCols = d => {
+  const c = d.c.slice();
+  if (d.skor) d.skor.forEach((s, i) => c.push([s, 's' + (i + 1)])), c.push(['Jumlah Nilai', 'nilai'], ['Peringkat', 'peringkat']);
+  return c;
+};
+async function pkdSemua(pid) {
+  let rows = [], off = 0, tot = 1;
+  while (off < tot) { const r = await call('list', { entity: 'rpjm_pkd', filters: { periode_id: pid }, offset: off, limit: 2000 }); rows = rows.concat(r.rows); tot = r.total; off += r.rows.length; if (!r.rows.length) break; }
+  return rows;
+}
+function pkdHalaman(d, rows, per) {
+  const cols = pkdCols(d), bids = d.bid ? RPJM_BID_OPT.filter(b => rows.some(r => r.bidang === b)).concat(rows.some(r => !r.bidang) ? [''] : []) : [null];
+  const tabel = (R, judulB) => `${judulB ? `<h3 style="text-align:left;margin:10px 0 4px">BIDANG ${esc(judulB.replace(/^\d+\.\s*/, '').toUpperCase())}</h3>` : ''}<table class="pt"><thead><tr><th>No</th>${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${R.map((r, i) => `<tr><td style="text-align:center">${i + 1}</td>${cols.map(c => `<td${/^(s\d|nilai|peringkat|lk|pr|rtm|volume)$/.test(c[1]) ? ' style="text-align:center"' : ''}>${esc(r[c[1]] || '')}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${cols.length + 1}" style="text-align:center">-</td></tr>`}</tbody></table>`;
+  const land = cols.length > 5;
+  return `<div class="paper ${land ? 'land' : ''}">${kop()}<div style="text-align:right;font-size:10pt">${esc(d.k)}</div><h2>${esc(d.j === 'Bagan Kelembagaan' ? 'Daftar Potensi dan Masalah Bagan Kelembagaan (Diagram Venn)' : /^Sumber Daya/.test(d.j) ? 'Daftar ' + d.j : d.g === 'Penggalian gagasan' ? 'Daftar Potensi dan Masalah ' + d.j : d.j)}</h2><h3>DESA ${esc(String(S.set.nama_desa || '').toUpperCase())} — PENYUSUNAN ${esc(String(per.nama || '').toUpperCase())}</h3>
+    ${bids.map(b => tabel(rows.filter(r => b === null || (r.bidang || '') === b).sort(d.skor ? ((a, c) => (Number(a.peringkat) || 999) - (Number(c.peringkat) || 999)) : pkdUrut), b)).join('')}${ttdKades(isoToday())}</div>`;
+}
+VIEWS.rpjmpkd = async (p, main, alive) => {
+  const d0 = await rpjmCall('daftar'); if (alive && !alive()) return;
+  const P = d0.periode || [], per = P.find(x => x.id === (p.pid || S.rpjmPid)) || await rpjmPerAktif();
+  S.rpjmPid = per.id;
+  const st = S.pkdSt = S.pkdSt && S.pkdSt.pid === per.id ? S.pkdSt : { pid: per.id, j: p.j || PKD_JN[0], b: '' };
+  if (p.j && !S.backNav) st.j = p.j;
+  const rows = await pkdSemua(per.id); if (alive && !alive()) return;
+  setTop('Pengkajian Keadaan Desa', per.nama);
+  const w = canWrite('rpjm_pkd'), d = pkdDef(st.j), cols = pkdCols(d);
+  const n = j => rows.filter(r => r.jenis === j).length;
+  let R = rows.filter(r => r.jenis === st.j && (!st.b || r.bidang === st.b));
+  R.sort(d.skor ? ((a, c) => (a.bidang || '').localeCompare(c.bidang || '') || (Number(a.peringkat) || 999) - (Number(c.peringkat) || 999)) : ((a, c) => (a.bidang || '').localeCompare(c.bidang || '') || pkdUrut(a, c)));
+  const grp = ['Data desa', 'Penggalian gagasan', 'Lokakarya'];
+  main.innerHTML = `<div class="stack">
+    <div class="card stack"><div><b>Pengkajian Keadaan Desa</b> <span class="pill">${esc(per.nama)}</span></div>
+      <div class="meta">Permendagri 114/2014 Pasal 12–17: penyelarasan data desa, penggalian gagasan (sketsa desa, kalender musim, bagan kelembagaan) dan lokakarya (pemeringkatan masalah, pengkajian tindakan, pemeringkatan tindakan, pengelompokan bidang). Hasilnya menjadi bahan Rancangan RPJM Desa.</div>
+      ${grp.map(g => `<div><div class="lbl">${esc(g)}</div><div class="chips wrap">${PKD_J.filter(x => x.g === g).map(x => `<button class="chip ${st.j === x.j ? 'on' : ''}" data-act="pkdJ" data-v="${esc(x.j)}">${esc(x.j)} <small>${n(x.j)}</small></button>`).join('')}</div></div>`).join('')}
+      <div class="btns">${w ? `<button class="btn sm pri" data-act="pkdAdd">${ic('plus')}Tambah</button>` : ''}<button class="btn sm" data-act="pkdCetak">${ic('print')}Cetak ${esc(d.j)}</button><button class="btn sm" data-act="pkdCetakAll">${ic('print')}Cetak semua</button><button class="btn sm" data-act="pkdXls">${ic('down')}Ekspor Excel</button>${w ? `<label class="btn sm">${ic('inbox')}Impor Excel<input type="file" id="pkdIn" accept=".xlsx" hidden></label>` : ''}
+        ${w && d.skor ? `<button class="btn sm" data-act="pkdRank">${ic('chart')}Hitung nilai & peringkat</button>` : ''}${w && d.j === 'Pengkajian Tindakan' ? `<button class="btn sm" data-act="pkdKeRank">${ic('next')}Teruskan ke Pemeringkatan Tindakan</button>` : ''}${w && d.j === 'Pengelompokan Bidang' ? `<button class="btn sm" data-act="pkdKeGag">${ic('next')}Jadikan usulan gagasan</button>` : ''}${w && P.length > 1 ? `<button class="btn sm" data-act="pkdSalin">${ic('file')}Salin dari periode lain</button>` : ''}</div></div>
+    ${d.bid ? `<div class="chips"><button class="chip ${!st.b ? 'on' : ''}" data-act="pkdB" data-v="">Semua bidang</button>${RPJM_BID_OPT.slice(0, 5).map(b => `<button class="chip ${st.b === b ? 'on' : ''}" data-act="pkdB" data-v="${esc(b)}">Bidang ${esc(b[0])}</button>`).join('')}</div>` : ''}
+    <div class="meta">${esc(d.k)} · ${R.length} baris${w ? ' · ketuk baris untuk mengubah' : ''}</div>
+    ${R.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>No</th>${d.bid ? '<th>Bidang</th>' : ''}${cols.map(c => `<th>${esc(c[0])}</th>`).join('')}</tr></thead><tbody>${R.map((r, i) => `<tr ${w ? `data-act="pkdEd" data-id="${esc(r.id)}" style="cursor:pointer"` : ''}><td>${i + 1}</td>${d.bid ? `<td>${esc((r.bidang || '').replace(/\..*/, ''))}</td>` : ''}${cols.map(c => `<td>${esc(r[c[1]] || '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>` : `<div class="card empty">${ic('search')}Belum ada data ${esc(d.j)} untuk periode ini.</div>`}
+  </div>`;
+  const rf = () => refresh();
+  S.vh.pkdJ = t => { st.j = t.dataset.v; st.b = ''; rf(); };
+  S.vh.pkdB = t => { st.b = t.dataset.v; rf(); };
+  S.vh.pkdAdd = () => go('form', { e: 'rpjm_pkd', preset: Object.assign({ jenis: st.j, periode_id: per.id, urut: String(n(st.j) + 1) }, st.b ? { bidang: st.b } : {}) });
+  S.vh.pkdEd = t => go('form', { e: 'rpjm_pkd', id: t.dataset.id });
+  S.vh.pkdCetak = () => printDocs(d.j + ' ' + per.nama, [pkdHalaman(d, rows.filter(r => r.jenis === d.j), per)]);
+  S.vh.pkdCetakAll = () => printDocs('Pengkajian Keadaan Desa ' + per.nama, PKD_J.filter(x => n(x.j)).map(x => pkdHalaman(x, rows.filter(r => r.jenis === x.j), per)));
+  S.vh.pkdXls = async () => { try { await excelExport('rpjm_pkd', rows.filter(r => r.jenis === st.j), 'Pengkajian ' + st.j + ' ' + per.nama); } catch (x) { toast(x.message, 1); } };
+  if ($('#pkdIn')) $('#pkdIn').onchange = async ev => { const f = ev.target.files[0]; ev.target.value = ''; if (!f) return; try { await excelImport('rpjm_pkd', f, rf); } catch (x) { toast(x.message, 1); } };
+  S.vh.pkdRank = async t => {
+    t.disabled = true;
+    try {
+      const A = rows.filter(r => r.jenis === st.j), out = [];
+      const byB = {}; A.forEach(r => { (byB[r.bidang || ''] = byB[r.bidang || ''] || []).push(r); });
+      Object.values(byB).forEach(L => {
+        L.forEach(r => { r._n = ['s1', 's2', 's3', 's4', 's5'].reduce((s, k) => s + (Number(r[k]) || 0), 0); });
+        L.slice().sort((a, b) => b._n - a._n || pkdUrut(a, b)).forEach((r, i) => out.push({ id: r.id, nilai: String(r._n), peringkat: String(i + 1) }));
+      });
+      for (let i = 0; i < out.length; i += 250) await call('bulkSave', { entity: 'rpjm_pkd', rows: out.slice(i, i + 250) });
+      toast('Nilai & peringkat diperbarui (' + out.length + ' baris).'); rf();
+    } catch (x) { toast(x.message, 1); t.disabled = false; }
+  };
+  S.vh.pkdKeRank = async t => {
+    const A = rows.filter(r => r.jenis === 'Pengkajian Tindakan' && r.tindakan), ada = new Set(rows.filter(r => r.jenis === 'Pemeringkatan Tindakan').map(r => (r.bidang || '') + '|' + String(r.tindakan).toLowerCase()));
+    const baru = A.filter(r => !ada.has((r.bidang || '') + '|' + String(r.tindakan).toLowerCase())).map((r, i) => ({ periode_id: per.id, jenis: 'Pemeringkatan Tindakan', bidang: r.bidang || '', tindakan: r.tindakan, urut: String(i + 1) }));
+    if (!baru.length) return toast('Semua tindakan sudah ada di Pemeringkatan Tindakan.');
+    if (!confirm2(t, baru.length + ' tindakan akan ditambahkan ke Pemeringkatan Tindakan. Tekan lagi untuk lanjut.')) return;
+    try { await call('bulkSave', { entity: 'rpjm_pkd', rows: baru }); st.j = 'Pemeringkatan Tindakan'; toast(baru.length + ' tindakan diteruskan. Isi skornya lalu tekan Hitung nilai & peringkat.'); rf(); } catch (x) { toast(x.message, 1); }
+  };
+  S.vh.pkdKeGag = async t => {
+    const A = rows.filter(r => r.jenis === 'Pengelompokan Bidang' && r.tindakan);
+    if (!A.length) return toast('Belum ada data pengelompokan bidang.');
+    if (!confirm2(t, A.length + ' tindakan akan dibuat sebagai Usulan Gagasan (status Usulan). Tekan lagi untuk lanjut.')) return;
+    const dus = l => { const u = String(l || '').toUpperCase(); return OPT.dusun.find(x => u.indexOf(x.replace('DUSUN ', '')) >= 0) || ''; };
+    try {
+      await call('bulkSave', { entity: 'rpjm_gagasan', rows: A.map(r => ({ periode_id: per.id, dusun: dus(r.lokasi) || OPT.dusun[1], kelompok: 'Lokakarya Pengkajian Keadaan Desa', kegiatan: r.tindakan, bidang: r.bidang || '', lokasi: r.lokasi || '', volume: r.volume || '', satuan: r.satuan || '', lk: r.lk || '', pr: r.pr || '', rtm: r.rtm || '', status: 'Usulan', ket: 'Dari Pengelompokan Bidang' })) });
+      toast(A.length + ' usulan gagasan dibuat.');
+    } catch (x) { toast(x.message, 1); }
+  };
+  S.vh.pkdSalin = () => {
+    const lain = P.filter(x => x.id !== per.id);
+    const m = modal('Salin Pengkajian Keadaan Desa', `<div class="stack"><p style="margin:0">Salin data pengkajian dari periode lain ke <b>${esc(per.nama)}</b> sebagai bahan awal, lalu perbarui angkanya. Data yang sudah ada di periode ini tidak dihapus.</p>
+      <div class="f"><label for="pkdDari">Dari periode</label><select id="pkdDari">${lain.map(x => `<option value="${esc(x.id)}">${esc(x.nama)}</option>`).join('')}</select></div>
+      <div class="f"><label><input type="checkbox" id="pkdHanya" checked> Hanya jenis "${esc(st.j)}"</label></div>
+      <div class="btns"><button class="btn pri" id="pkdGo">${ic('file')}Salin</button></div></div>`);
+    $('#pkdGo', m.el).onclick = async ev => {
+      ev.currentTarget.disabled = true;
+      try {
+        let src = await pkdSemua($('#pkdDari', m.el).value); if ($('#pkdHanya', m.el).checked) src = src.filter(r => r.jenis === st.j);
+        const recs = src.map(r => { const o = Object.assign({}, r); ['id', 'seq', '_oleh', '_waktu'].forEach(k => delete o[k]); o.periode_id = per.id; return o; });
+        for (let i = 0; i < recs.length; i += 250) await call('bulkSave', { entity: 'rpjm_pkd', rows: recs.slice(i, i + 250) });
+        m.close ? m.close() : m.el.remove(); toast(recs.length + ' baris disalin.'); rf();
+      } catch (x) { toast(x.message, 1); ev.currentTarget.disabled = false; }
+    };
+  };
+};
 
 /* ---------------- mulai ---------------- */
 applyTheme();
