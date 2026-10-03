@@ -382,9 +382,9 @@ table.rpj tfoot td.c0,table.rpj tfoot td.c1{z-index:4}
 .sipr{display:grid;grid-template-columns:150px 1fr 30px;align-items:center;gap:6px;padding:3px 0;border-bottom:1px dashed var(--line);font-size:12.5px}
 .sipr .l{color:var(--muted);font-size:11.5px}.sipr .v{overflow-wrap:anywhere}.sipr .iconbtn{width:28px;height:28px}
 .sipl{display:grid;grid-template-columns:minmax(220px,280px) 1fr;gap:10px;align-items:start}.sipl-tree{max-height:78vh;overflow:auto;gap:4px}.sipl-tree .row.sm{padding:5px 8px;min-height:0}.sipl-tree .row.on{background:var(--pri-bg,var(--surface2));border-color:var(--pri)}
-.sipl>*{min-width:0}.paper.sopdoc{padding:14mm 15mm}.sopdoc img{max-width:100%;height:auto}.sopdoc table{table-layout:auto}.sopdoc p{margin:3px 0}
+.sipl>*{min-width:0}.sipl-sel{display:none}.row .s2{display:flex;flex-wrap:wrap;gap:3px;align-items:center;margin-top:2px;font-size:10.5px}.row .s2 .pill{font-size:9.5px;padding:0 5px}.paper.sopdoc{padding:14mm 15mm}.sopdoc img{max-width:100%;height:auto}.sopdoc table{table-layout:auto}.sopdoc p{margin:3px 0}
 .fitp{overflow:hidden;padding:8px;gap:8px;align-items:center}.fitp .paper{margin:0;flex:none}
-@media(max-width:760px){.sipl{grid-template-columns:1fr}.doc-prev.fitp{padding:6px;border-radius:8px}.sipl-tree{max-height:210px}.sipl-tree .row.sm .t{font-size:11.5px!important}.sipl-tree{max-height:240px}.sipr{grid-template-columns:120px 1fr 30px}}
+@media(max-width:760px){.sipl-sel{display:block;width:100%;font-weight:600}.sipl-tree{display:none!important}.form.two{grid-template-columns:1fr 1fr}.form.two .f.wide{grid-column:1/-1}.row .t{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.sipl{grid-template-columns:1fr}.doc-prev.fitp{padding:6px;border-radius:8px}.sipl-tree{max-height:210px}.sipl-tree .row.sm .t{font-size:11.5px!important}.sipl-tree{max-height:240px}.sipr{grid-template-columns:120px 1fr 30px}}
 .sopdoc{font-family:'Times New Roman',serif;font-size:10.5pt;line-height:1.35;color:#000;background:#fff}.sopdoc table{border-collapse:collapse;width:100%;margin:6px 0}.sopdoc td,.sopdoc th{border:1px solid #000;padding:3px 5px;vertical-align:top}.sopdoc h1,.sopdoc h2,.sopdoc h3{text-align:center;margin:8px 0}
 .lbl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm}
 .ad-hero{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;padding:16px 18px;border-radius:var(--r);color:#fff;background:linear-gradient(135deg,#1b5e20 0%,#2e7d32 45%,#00897b 100%);box-shadow:var(--shadow)}
@@ -6404,7 +6404,7 @@ Object.assign(UI, {
     calc: v => (v.kib === KIB_OPT[3] && asetNum(v.panjang) && asetNum(v.lebar)) ? { luas: String(Math.round(asetNum(v.panjang) * asetNum(v.lebar) * 100) / 100) } : null,
     chips: { k: 'kib', opt: KIB_OPT, lbl: s => s.replace(/^(.)\. .*/, 'KIB $1') },
     views: [['Aktif', () => ({ status: 'Aktif' })], ['Draf / data lama', () => ({ status: 'Draf' })], ['Belum di SIPADES', () => ({ sipades: 'Belum' })], ['Dihapus', () => ({ status: 'Dihapus' })], ['Semua', () => ({})]],
-    row: r => ({ t: r.nama || r.nama_rekening, s: [kodeFmt(r.kode_barang) || 'kode belum diisi', r.no_urut ? 'Reg ' + String(r.no_urut).padStart(5, '0') : '', r.nama_rekening, tahunOf(r.tgl_perolehan) || r.tahun].filter(Boolean).join(' · '), r: fMoney(r.nilai), av: `<b>${esc(kibHuruf(r) || '?')}</b>`, pill: (r.status === 'Draf' ? '<span class="pill warn">Draf</span>' : r.status === 'Dihapus' ? '<span class="pill">Dihapus</span>' : '') + (r.sipades === 'Sudah' ? ' <span class="pill ok">SIPADES</span>' : '') + (r.kondisi && r.kondisi !== 'Baik' ? ` <span class="pill ${r.kondisi === 'Rusak Berat' ? 'bad' : 'warn'}">${esc(r.kondisi)}</span>` : '') })
+    row: r => ({ t: r.nama || r.nama_rekening, s: [kodeAset(r.kode_barang) || 'kode belum diisi', r.no_urut ? 'Reg ' + String(r.no_urut).padStart(5, '0') : '', r.nama_rekening, tahunOf(r.tgl_perolehan) || r.tahun].filter(Boolean).join(' · '), r: fMoney(r.nilai), av: `<b>${esc(kibHuruf(r) || '?')}</b>`, raw2: 1, s2: (r.status === 'Draf' ? '<span class="pill warn">Draf</span> ' : r.status === 'Dihapus' ? '<span class="pill">Dihapus</span> ' : '') + (r.sipades === 'Sudah' ? '<span class="pill ok">SIPADES</span> ' : '<span class="pill">Belum SIPADES</span> ') + (r.kondisi && r.kondisi !== 'Baik' ? `<span class="pill ${r.kondisi === 'Rusak Berat' ? 'bad' : 'warn'}">${esc(r.kondisi)}</span>` : '') + (r.ruang ? ' <span class="meta">' + esc(r.ruang) + '</span>' : '') })
   },
   aset_mutasi: {
     t: 'Mutasi Aset', ic: 'list', perm: 'aset', m: 'aset', sub: 1, sort: 'tanggal',
@@ -6748,8 +6748,8 @@ VIEWS.sipadeslap = async (p, main, alive) => {
   const st = S.sipLap = S.sipLap || { nama: 'Laporan KIB Tanah', awal: y + '-01-01', akhir: y + '-12-31', ttd: isoToday(), lampiran: '', nomor: '' };
   if (p && p.lap) st.nama = p.lap;
   main.innerHTML = `<div class="stack">${SIP_CSS}<div class="sipl">
-    <div class="card stack sipl-tree">${Object.keys(SIP_LAP).map(g => `<div><div class="lbl">${esc(g)}</div>${SIP_LAP[g].map(n => `<button class="row sm ${st.nama === n ? 'on' : ''}" data-act="slPilih" data-v="${esc(n)}"><span class="main"><span class="t" style="font-size:12.5px">${esc(n)}</span></span></button>`).join('')}</div>`).join('')}</div>
-    <div class="stack"><div class="card stack"><div class="lbl">Filter parameter</div><div class="form">
+    <select class="inp sipl-sel" id="slSel" aria-label="Pilih laporan">${Object.keys(SIP_LAP).map(g => `<optgroup label="${esc(g)}">${SIP_LAP[g].map(n => `<option ${st.nama === n ? 'selected' : ''}>${esc(n)}</option>`).join('')}</optgroup>`).join('')}</select><div class="card stack sipl-tree">${Object.keys(SIP_LAP).map(g => `<div><div class="lbl">${esc(g)}</div>${SIP_LAP[g].map(n => `<button class="row sm ${st.nama === n ? 'on' : ''}" data-act="slPilih" data-v="${esc(n)}"><span class="main"><span class="t" style="font-size:12.5px">${esc(n)}</span></span></button>`).join('')}</div>`).join('')}</div>
+    <div class="stack"><div class="card stack"><div class="lbl">Filter parameter</div><div class="form two">
       <div class="f"><label for="slA">Periode laporan — dari</label><input id="slA" type="date" value="${esc(st.awal)}"></div><div class="f"><label for="slB">s/d</label><input id="slB" type="date" value="${esc(st.akhir)}"></div>
       <div class="f"><label for="slT">Tgl tanda tangan</label><input id="slT" type="date" value="${esc(st.ttd)}"></div>
       <div class="f"><label for="slL">Lampiran (LHI)</label><input id="slL" value="${esc(st.lampiran)}"></div><div class="f"><label for="slN">Nomor BA Inventarisasi (LHI)</label><input id="slN" value="${esc(st.nomor)}"></div></div>
@@ -6759,6 +6759,7 @@ VIEWS.sipadeslap = async (p, main, alive) => {
   const ambil = () => { st.awal = $('#slA').value; st.akhir = $('#slB').value; st.ttd = $('#slT').value; st.lampiran = $('#slL').value; st.nomor = $('#slN').value; return Object.assign({}, st, { tim: D.tim }); };
   const prev = () => { $('#slPrev').innerHTML = sipLaporan(st.nama, D, ambil()); fitPapers($('#slPrev')); };
   prev(); $$('#slA,#slB,#slT,#slL,#slN', main).forEach(i => i.onchange = prev);
+  $('#slSel').onchange = ev => { st.nama = ev.target.value; $$('.sipl-tree .row', main).forEach(b => b.classList.toggle('on', b.dataset.v === st.nama)); prev(); };
   S.vh.slPilih = t => { st.nama = t.dataset.v; $$('.sipl-tree .row', main).forEach(b => b.classList.toggle('on', b.dataset.v === st.nama)); prev(); };
   S.vh.slCetak = () => printDocs(st.nama, [SIP_CSS + sipLaporan(st.nama, D, ambil())]);
   S.vh.slSemua = () => { const o = ambil(); printDocs('KIB & LHI', [SIP_CSS].concat(SIP_LAP['Inventarisasi dan Penatausahaan'].map(n => sipLaporan(n, D, o)))); };
@@ -6927,7 +6928,7 @@ VIEWS.asetcetak = async (p, main) => {
   main.innerHTML = '<div class="skel" style="height:200px"></div>';
   const L = await asetSemua({});
   main.innerHTML = `<div class="stack"><div class="card stack"><div class="chips wrap">${ASET_LAP.map(j => `<button class="chip ${st.j === j ? 'on' : ''}" data-act="acJ" data-v="${esc(j)}">${esc(j)}</button>`).join('')}</div>
-    <div class="form"><div class="f"><label for="acT">Tahun</label><input id="acT" type="number" value="${esc(st.tahun)}"></div><div class="f"><label for="acS">Semester</label><select id="acS"><option value="1" ${st.semester === '1' ? 'selected' : ''}>I (Januari–Juni)</option><option value="2" ${st.semester === '2' ? 'selected' : ''}>II (Juli–Desember)</option></select></div></div>
+    <div class="form two"><div class="f"><label for="acT">Tahun</label><input id="acT" type="number" value="${esc(st.tahun)}"></div><div class="f"><label for="acS">Semester</label><select id="acS"><option value="1" ${st.semester === '1' ? 'selected' : ''}>I (Januari–Juni)</option><option value="2" ${st.semester === '2' ? 'selected' : ''}>II (Juli–Desember)</option></select></div></div>
     <div class="btns"><button class="btn pri" data-act="acCetak">${ic('print')}Cetak / PDF</button><button class="btn" data-act="acXls">${ic('down')}Excel</button><button class="btn" data-act="acAll">${ic('print')}Cetak semua KIB</button><button class="btn" data-act="go" data-go='["sipadeslap"]'>${ic('print')}Format SIPADES</button>${S.user.admin ? `<button class="btn" data-act="go" data-go='["asettpl"]'>${ic('edit')}Atur kop & penandatangan</button>` : ''}</div>
     <div class="meta">${L.length} aset tercatat. Kolom tabel mengikuti format KIB dan tidak bisa diubah; kop, logo, penandatangan, dan redaksi diatur di editor template.</div></div><div id="acPrev" class="doc-prev fitp"></div></div>`;
   const opt = () => ({ tahun: $('#acT').value, semester: $('#acS').value });
