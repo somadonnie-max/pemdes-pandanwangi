@@ -382,8 +382,10 @@ table.rpj tfoot td.c0,table.rpj tfoot td.c1{z-index:4}
 .sipr{display:grid;grid-template-columns:150px 1fr 30px;align-items:center;gap:6px;padding:3px 0;border-bottom:1px dashed var(--line);font-size:12.5px}
 .sipr .l{color:var(--muted);font-size:11.5px}.sipr .v{overflow-wrap:anywhere}.sipr .iconbtn{width:28px;height:28px}
 .sipl{display:grid;grid-template-columns:minmax(220px,280px) 1fr;gap:10px;align-items:start}.sipl-tree{max-height:78vh;overflow:auto;gap:4px}.sipl-tree .row.sm{padding:5px 8px;min-height:0}.sipl-tree .row.on{background:var(--pri-bg,var(--surface2));border-color:var(--pri)}
-@media(max-width:760px){.sipl{grid-template-columns:1fr}.sipl-tree{max-height:240px}.sipr{grid-template-columns:120px 1fr 30px}}
-.sopdoc{font-family:'Times New Roman',serif;font-size:12pt;line-height:1.45;color:#000;background:#fff}.sopdoc table{border-collapse:collapse;width:100%;margin:6px 0}.sopdoc td,.sopdoc th{border:1px solid #000;padding:3px 5px;vertical-align:top}.sopdoc h1,.sopdoc h2,.sopdoc h3{text-align:center;margin:8px 0}
+.sipl>*{min-width:0}.paper.sopdoc{padding:14mm 15mm}.sopdoc img{max-width:100%;height:auto}.sopdoc table{table-layout:auto}.sopdoc p{margin:3px 0}
+.fitp{overflow:hidden;padding:8px;gap:8px;align-items:center}.fitp .paper{margin:0;flex:none}
+@media(max-width:760px){.sipl{grid-template-columns:1fr}.doc-prev.fitp{padding:6px;border-radius:8px}.sipl-tree{max-height:210px}.sipl-tree .row.sm .t{font-size:11.5px!important}.sipl-tree{max-height:240px}.sipr{grid-template-columns:120px 1fr 30px}}
+.sopdoc{font-family:'Times New Roman',serif;font-size:10.5pt;line-height:1.35;color:#000;background:#fff}.sopdoc table{border-collapse:collapse;width:100%;margin:6px 0}.sopdoc td,.sopdoc th{border:1px solid #000;padding:3px 5px;vertical-align:top}.sopdoc h1,.sopdoc h2,.sopdoc h3{text-align:center;margin:8px 0}
 .lbl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm}
 .ad-hero{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;padding:16px 18px;border-radius:var(--r);color:#fff;background:linear-gradient(135deg,#1b5e20 0%,#2e7d32 45%,#00897b 100%);box-shadow:var(--shadow)}
 .ad-hero-l{display:flex;flex-direction:column;gap:3px;min-width:0}.ad-eyebrow{font-size:12px;opacity:.9;display:flex;align-items:center;gap:6px}.ad-eyebrow svg{width:15px;height:15px}
@@ -6753,9 +6755,9 @@ VIEWS.sipadeslap = async (p, main, alive) => {
       <div class="f"><label for="slL">Lampiran (LHI)</label><input id="slL" value="${esc(st.lampiran)}"></div><div class="f"><label for="slN">Nomor BA Inventarisasi (LHI)</label><input id="slN" value="${esc(st.nomor)}"></div></div>
       <div class="btns"><button class="btn pri" data-act="slCetak">${ic('print')}Tampilkan / cetak</button><button class="btn" data-act="slSemua">${ic('print')}Cetak semua KIB & LHI</button><button class="btn" data-act="slXls">${ic('down')}Excel format SIPADES</button></div>
       <div class="meta">Format, judul, kolom, dan tanda tangan meniru laporan SIPADES 3.0.1, sehingga bisa dipakai saat server SIPADES mati. Penandatangan: Sekretaris Desa & Pengurus Barang (Pengaturan → Aset & RAB); Tim Inventarisasi dari menu Perangkat & Tim Inventarisasi. Data yang dihitung hanya aset berstatus Aktif.</div></div>
-      <div class="card" style="overflow:auto;background:#f3f3f3"><div id="slPrev" style="zoom:.62"></div></div></div></div></div>`;
+      <div class="doc-prev fitp" id="slPrev"></div></div></div></div>`;
   const ambil = () => { st.awal = $('#slA').value; st.akhir = $('#slB').value; st.ttd = $('#slT').value; st.lampiran = $('#slL').value; st.nomor = $('#slN').value; return Object.assign({}, st, { tim: D.tim }); };
-  const prev = () => { $('#slPrev').innerHTML = sipLaporan(st.nama, D, ambil()); };
+  const prev = () => { $('#slPrev').innerHTML = sipLaporan(st.nama, D, ambil()); fitPapers($('#slPrev')); };
   prev(); $$('#slA,#slB,#slT,#slL,#slN', main).forEach(i => i.onchange = prev);
   S.vh.slPilih = t => { st.nama = t.dataset.v; $$('.sipl-tree .row', main).forEach(b => b.classList.toggle('on', b.dataset.v === st.nama)); prev(); };
   S.vh.slCetak = () => printDocs(st.nama, [SIP_CSS + sipLaporan(st.nama, D, ambil())]);
@@ -6776,16 +6778,23 @@ VIEWS.asetlabel = async (p, main, alive) => {
   const pilih = () => L.filter(a => (!st.kib || kibHuruf(a) === st.kib) && (!st.q || ((a.nama || '') + ' ' + (a.nama_rekening || '') + ' ' + (a.ruang || '')).toLowerCase().indexOf(st.q.toLowerCase()) >= 0));
   main.innerHTML = `<div class="stack"><div class="card stack"><div class="chips wrap"><button class="chip ${!st.kib ? 'on' : ''}" data-act="lbK" data-v="">Semua</button>${KIB_OPT.map(k => `<button class="chip ${st.kib === k[0] ? 'on' : ''}" data-act="lbK" data-v="${k[0]}">KIB ${k[0]}</button>`).join('')}</div>
     <input class="inp" id="lbQ" placeholder="Cari nama / ruang" value="${esc(st.q)}"><div class="btns"><button class="btn pri" data-act="lbCetak">${ic('print')}Cetak label (${pilih().length})</button></div>
-    <div class="meta">Label berisi lambang desa, nama barang, Id Barang (nomor register SIPADES) dan tahun. 3 kolom × 8 baris per A4.</div></div><div id="lbPrev" class="card"></div></div>`;
+    <div class="meta">Label berisi lambang desa, nama barang, Id Barang (nomor register SIPADES) dan tahun. 3 kolom × 8 baris per A4.</div></div><div id="lbPrev" class="doc-prev fitp"></div></div>`;
   const lbl = a => `<div class="lb"><div class="h">${esc(String((S.set || {}).upb_aset || ('PEMERINTAH DESA ' + ((S.set || {}).nama_desa || ''))).toUpperCase())}</div><div class="n">${esc(a.nama || a.nama_rekening)}</div><div class="i">${esc(asetIdBarang(a) || kodeFmt(a.kode_barang))}</div><div class="f"><span>${esc(kodeFmt(a.kode_barang))} Reg ${sipReg(a)}</span><span>${esc(tahunOf(a.tgl_perolehan) || '')}</span></div></div>`;
   const css = '<style>.lbs{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm}.lb{border:1.2px solid #000;border-radius:2mm;padding:2mm;font-family:Arial;font-size:7pt;height:31mm;display:flex;flex-direction:column}.lb .h{font-weight:700;font-size:6.5pt;text-align:center;border-bottom:1px solid #000;padding-bottom:1mm}.lb .n{font-weight:700;font-size:8.5pt;margin:1.4mm 0;flex:1}.lb .i{font-family:monospace;font-size:7pt;word-break:break-all}.lb .f{display:flex;justify-content:space-between;font-size:6.4pt;margin-top:1mm}</style>';
-  const draw = () => { $('#lbPrev').innerHTML = css + `<div class="lbs">${pilih().slice(0, 24).map(lbl).join('')}</div>`; };
+  const draw = () => { $('#lbPrev').innerHTML = `<div class="paper" style="padding:10mm">${css}<div class="lbs">${pilih().slice(0, 24).map(lbl).join('')}</div></div>`; fitPapers($('#lbPrev')); };
   draw(); $('#lbQ').oninput = ev => { st.q = ev.target.value; draw(); };
   S.vh.lbK = t => { st.kib = t.dataset.v; refresh(); };
   S.vh.lbCetak = () => { const R = pilih(), pg = []; for (let i = 0; i < R.length; i += 24) pg.push(`<div class="paper" style="padding:10mm">${css}<div class="lbs">${R.slice(i, i + 24).map(lbl).join('')}</div></div>`); printDocs('Label aset', pg.length ? pg : ['<div class="paper">Tidak ada aset.</div>']); };
 };
 /* baca SOP */
 /* isi otomatis template BA/SK SIPADES dari transaksi aset */
+/* pratinjau kertas: diperkecil pas lebar layar (pengguna bisa zoom sendiri) */
+function fitPapers(box) {
+  if (!box) return;
+  const run = () => { const avail = box.clientWidth - 16; if (avail <= 0) return; $$('.paper', box).forEach(pp => { pp.style.zoom = 1; const w = pp.offsetWidth; pp.style.zoom = w > avail ? (avail / w).toFixed(4) : 1; }); };
+  run(); requestAnimationFrame(run);
+  if (!box._fitObs && window.ResizeObserver) { box._fitObs = new ResizeObserver(() => run()); box._fitObs.observe(box); }
+}
 function asetTplIsi(html, t, L) {
   const s = S.set || {}, desa = s.nama_desa || '', DESA = desa.toUpperCase(), KAB = String(s.kabupaten || '').toUpperCase();
   const D = '(?:\\s*(?:…|[.…]{2,})[.…\\s]*)';
@@ -6824,7 +6833,8 @@ function asetTplIsi(html, t, L) {
   return h;
 }
 function asetDokModal(judul, html) {
-  const m = modal(judul, `<div class="stack"><div class="meta">Dokumen bisa diketik/diubah langsung di bawah sebelum dicetak. Titik-titik yang tersisa silakan dilengkapi.</div><div class="btns"><button class="btn pri" id="adkPrint">${ic('print')}Cetak / PDF</button></div><div class="doc-prev"><div class="paper sopdoc" id="adkDoc" contenteditable="true" style="outline:none">${html}</div></div></div>`, { big: 1 });
+  const m = modal(judul, `<div class="stack"><div class="meta">Dokumen bisa diketik/diubah langsung di bawah sebelum dicetak. Titik-titik yang tersisa silakan dilengkapi.</div><div class="btns"><button class="btn pri" id="adkPrint">${ic('print')}Cetak / PDF</button></div><div class="doc-prev fitp" id="adkBox"><div class="paper sopdoc" id="adkDoc" contenteditable="true" style="outline:none">${html}</div></div></div>`, { big: 1 });
+  fitPapers($('#adkBox', m.el));
   $('#adkPrint', m.el).onclick = () => { const h = $('#adkDoc', m.el).innerHTML; m.close(); printDocs(judul, [`<div class="paper sopdoc">${h}</div>`]); };
 }
 async function asetDokTrx(t) {
@@ -6841,7 +6851,8 @@ VIEWS.asetsop = async (p, main) => {
   main.innerHTML = `<div class="stack"><div class="chips">${ASET_DOK_JENIS.map(j => `<button class="chip ${st.j === j ? 'on' : ''}" data-act="sopJ" data-v="${esc(j)}">${esc(j)} (${L.filter(x => (x.jenis || 'SOP') === j).length})</button>`).join('')}</div>
     <div class="list">${LJ.map(x => `<button class="row ${cur && cur.id === x.id ? 'on' : ''}" data-act="sopP" data-v="${esc(x.id)}" style="${cur && cur.id === x.id ? 'border-color:var(--pri)' : ''}"><span class="av">${ic(isTpl ? 'file' : 'book')}</span><span class="main"><span class="t">${esc(x.judul)}</span><span class="s">${esc([x.untuk && 'Transaksi: ' + x.untuk, x.nomor, x.tgl && fDate(x.tgl)].filter(Boolean).join(' · '))}</span></span></button>`).join('') || '<div class="card empty">Belum ada dokumen.</div>'}</div>
     ${cur ? `<div class="btns"><button class="btn sm pri" data-act="sopCetak">${ic('print')}${isTpl ? 'Isi & cetak (kosong)' : 'Cetak'}</button>${isTpl ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['list', { e: 'aset_trx', chip: cur.untuk || '' }]))}'>${ic('list')}Pilih transaksi ${esc(cur.untuk || '')} untuk diisi otomatis</button>` : ''}${canWrite('aset_sop') ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['form', { e: 'aset_sop', id: cur.id }]))}'>${ic('edit')}Ubah</button>` : ''}</div>
-    <div class="card sopdoc" style="overflow:auto">${tampil || '<div class="meta">Belum ada isi.</div>'}</div>` : ''}</div>`;
+    <div class="doc-prev fitp" id="sopPrev"><div class="paper sopdoc">${tampil || '<div class="meta">Belum ada isi.</div>'}</div></div>` : ''}</div>`;
+  fitPapers($('#sopPrev'));
   S.vh.sopJ = t => { st.j = t.dataset.v; st.id = ''; refresh(); };
   S.vh.sopP = t => { st.id = t.dataset.v; refresh(); };
   S.vh.sopCetak = () => isTpl ? asetDokModal(cur.judul, tampil) : printDocs(cur.judul, [`<div class="paper sopdoc">${tampil}</div>`]);
@@ -6918,9 +6929,9 @@ VIEWS.asetcetak = async (p, main) => {
   main.innerHTML = `<div class="stack"><div class="card stack"><div class="chips wrap">${ASET_LAP.map(j => `<button class="chip ${st.j === j ? 'on' : ''}" data-act="acJ" data-v="${esc(j)}">${esc(j)}</button>`).join('')}</div>
     <div class="form"><div class="f"><label for="acT">Tahun</label><input id="acT" type="number" value="${esc(st.tahun)}"></div><div class="f"><label for="acS">Semester</label><select id="acS"><option value="1" ${st.semester === '1' ? 'selected' : ''}>I (Januari–Juni)</option><option value="2" ${st.semester === '2' ? 'selected' : ''}>II (Juli–Desember)</option></select></div></div>
     <div class="btns"><button class="btn pri" data-act="acCetak">${ic('print')}Cetak / PDF</button><button class="btn" data-act="acXls">${ic('down')}Excel</button><button class="btn" data-act="acAll">${ic('print')}Cetak semua KIB</button><button class="btn" data-act="go" data-go='["sipadeslap"]'>${ic('print')}Format SIPADES</button>${S.user.admin ? `<button class="btn" data-act="go" data-go='["asettpl"]'>${ic('edit')}Atur kop & penandatangan</button>` : ''}</div>
-    <div class="meta">${L.length} aset tercatat. Kolom tabel mengikuti format KIB dan tidak bisa diubah; kop, logo, penandatangan, dan redaksi diatur di editor template.</div></div><div id="acPrev" class="card" style="overflow:auto"></div></div>`;
+    <div class="meta">${L.length} aset tercatat. Kolom tabel mengikuti format KIB dan tidak bisa diubah; kop, logo, penandatangan, dan redaksi diatur di editor template.</div></div><div id="acPrev" class="doc-prev fitp"></div></div>`;
   const opt = () => ({ tahun: $('#acT').value, semester: $('#acS').value });
-  const prev = () => { st.tahun = $('#acT').value; st.semester = $('#acS').value; const r = asetLaporan(st.j, L, opt()); $('#acPrev').innerHTML = `<div style="zoom:.6">${r.html}</div>`; };
+  const prev = () => { st.tahun = $('#acT').value; st.semester = $('#acS').value; const r = asetLaporan(st.j, L, opt()); $('#acPrev').innerHTML = r.html; fitPapers($('#acPrev')); };
   prev(); $('#acT').onchange = prev; $('#acS').onchange = prev;
   S.vh.acJ = t => { st.j = t.dataset.v; refresh(); };
   S.vh.acCetak = () => printDocs(st.j, [asetLaporan(st.j, L, opt()).html]);
@@ -6940,9 +6951,9 @@ VIEWS.asettpl = async (p, main) => {
   main.innerHTML = `<div class="stack"><div class="card stack"><div class="meta">Yang bisa diubah hanya kop, penandatangan, dan redaksi. Tabel KIB, Buku Inventaris, dan laporan dikunci sesuai format baku. Logo memakai logo di Pengaturan.</div>
     <div class="form">${F2.map(f => `<div class="f ${/redaksi|alamat/.test(f[0]) ? 'wide' : ''}"><label for="t_${f[0]}">${esc(f[1])}</label><input id="t_${f[0]}" value="${esc(s[f[0]] || '')}" placeholder="${esc(f[2])}"></div>`).join('')}</div>
     <div class="btns"><button class="btn pri" data-act="atSimpan">${ic('check')}Simpan untuk semua laporan aset</button><button class="btn" data-act="go" data-go='["asetcetak"]'>${ic('print')}Ke Cetak Laporan</button></div></div>
-    <div class="card" style="overflow:auto"><div class="lbl">Pratinjau</div><div id="atPrev" style="zoom:.6"></div></div></div>`;
+    <div class="lbl">Pratinjau</div><div id="atPrev" class="doc-prev fitp"></div></div>`;
   const ambil = () => { const v = {}; F2.forEach(f => { v[f[0]] = $('#t_' + f[0]).value.trim(); }); return v; };
-  const prev = () => { const keep = S.set; S.set = Object.assign({}, keep, ambil()); $('#atPrev').innerHTML = asetHalaman('KARTU INVENTARIS BARANG (KIB) D', 'JALAN, IRIGASI DAN JARINGAN · CONTOH', ASET_KOLOM.D, [], null).replace('<tbody>', '<tbody><tr><td colspan="15" style="text-align:center;background:#f3f3f3">Tabel baku — terkunci</td></tr>'); S.set = keep; };
+  const prev = () => { const keep = S.set; S.set = Object.assign({}, keep, ambil()); $('#atPrev').innerHTML = asetHalaman('KARTU INVENTARIS BARANG (KIB) D', 'JALAN, IRIGASI DAN JARINGAN · CONTOH', ASET_KOLOM.D, [], null).replace('<tbody>', '<tbody><tr><td colspan="15" style="text-align:center;background:#f3f3f3">Tabel baku — terkunci</td></tr>'); S.set = keep; fitPapers($('#atPrev')); };
   prev(); $$('[id^=t_]', main).forEach(i => i.oninput = prev);
   S.vh.atSimpan = async () => { try { S.set = await call('settingsSave', { values: ambil() }); toast('Template laporan aset disimpan.'); } catch (x) { toast(x.message, 1); } };
 };
