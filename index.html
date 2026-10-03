@@ -686,7 +686,7 @@ function terapBrand() {
   if (s.logo_app) { LOGO = s.logo_app; document.getElementById('favi').href = s.logo_app; }
   terapPejabat();
   document.title = 'Pemdes ' + b.desa;
-  const dl = String(s.daftar_dusun || '').split(/\n|;/).map(x => x.trim()).filter(Boolean).map(x => (/^dusun\s/i.test(x) ? x : 'DUSUN ' + x).toUpperCase());
+  const dl = Array.from(new Set(String(s.daftar_dusun || '').split(/\n|;/).map(x => x.replace(/\s+/g, ' ').trim()).filter(Boolean).map(x => (/^dusun\s/i.test(x) ? x : 'DUSUN ' + x).toUpperCase())));
   if (dl.length && typeof OPT !== 'undefined') OPT.dusun.splice(0, OPT.dusun.length, ...dl);
 }
 /* =====================================================================
