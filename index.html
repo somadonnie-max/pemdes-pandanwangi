@@ -382,7 +382,7 @@ table.rpj tfoot td.c0,table.rpj tfoot td.c1{z-index:4}
 .sipr{display:grid;grid-template-columns:150px 1fr 30px;align-items:center;gap:6px;padding:3px 0;border-bottom:1px dashed var(--line);font-size:12.5px}
 .sipr .l{color:var(--muted);font-size:11.5px}.sipr .v{overflow-wrap:anywhere}.sipr .iconbtn{width:28px;height:28px}
 .sipl{display:grid;grid-template-columns:minmax(220px,280px) 1fr;gap:10px;align-items:start}.sipl-tree{max-height:78vh;overflow:auto;gap:4px}.sipl-tree .row.sm{padding:5px 8px;min-height:0}.sipl-tree .row.on{background:var(--pri-bg,var(--surface2));border-color:var(--pri)}
-.sipl>*{min-width:0}.sipl-sel{display:none}.row .s2{display:flex;flex-wrap:wrap;gap:3px;align-items:center;margin-top:2px;font-size:10.5px}.row .s2 .pill{font-size:9.5px;padding:0 5px}.paper.sopdoc{padding:14mm 15mm}.sopdoc img{max-width:100%;height:auto}.sopdoc table{table-layout:auto}.sopdoc p{margin:3px 0}
+.sipl>*{min-width:0}.sk-daftar{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:6px}.sk-daftar>div{display:flex;flex-direction:column;gap:1px;background:var(--surface2);border-radius:8px;padding:6px 9px;font-size:12px}.sipl-sel{display:none}.row .s2{display:flex;flex-wrap:wrap;gap:3px;align-items:center;margin-top:2px;font-size:10.5px}.row .s2 .pill{font-size:9.5px;padding:0 5px}.paper.sopdoc{padding:14mm 15mm}.sopdoc img{max-width:100%;height:auto}.sopdoc table{table-layout:auto}.sopdoc p{margin:3px 0}
 .fitp{overflow:hidden;padding:8px;gap:8px;align-items:center}.fitp .paper{margin:0;flex:none}
 @media(max-width:760px){.sipl-sel{display:block;width:100%;font-weight:600}.sipl-tree{display:none!important}.form.two{grid-template-columns:1fr 1fr}.form.two .f.wide{grid-column:1/-1}.row .t{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.sipl{grid-template-columns:1fr}.doc-prev.fitp{padding:6px;border-radius:8px}.sipl-tree{max-height:210px}.sipl-tree .row.sm .t{font-size:11.5px!important}.sipl-tree{max-height:240px}.sipr{grid-template-columns:120px 1fr 30px}}
 .sopdoc{font-family:'Times New Roman',serif;font-size:10.5pt;line-height:1.35;color:#000;background:#fff}.sopdoc table{border-collapse:collapse;width:100%;margin:6px 0}.sopdoc td,.sopdoc th{border:1px solid #000;padding:3px 5px;vertical-align:top}.sopdoc h1,.sopdoc h2,.sopdoc h3{text-align:center;margin:8px 0}
@@ -1233,7 +1233,7 @@ function MODS() {
     { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
     { k: 'kesejahteraan', l: 'Kesejahteraan', ic: 'heart', items: [['Lembaga / Yayasan', 'landmark', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru Ngaji', 'book', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
     { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RPJM Desa', 'book', ['rpjm', {}], null, 'r:rkp'], ['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['RAB & Gambar', 'hammer', ['rab', {}], null, 'r:rab'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Progres Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
-    { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['SPJ', 'check', ['spj', {}], null, 'r:spj'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Rekap Pajak', 'coin', ['keupajak'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek']] },
+    { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['SPJ', 'check', ['spj', {}], null, 'r:spj'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Rekap Pajak', 'coin', ['keupajak'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek'], ['Impor PDF Siskeudes', 'down', ['skimpor'], null, 'w:keu_anggaran']] },
     { k: 'soon', l: 'Segera Hadir', ic: 'sprout', items: Object.keys(SOON).map(k => [SOON[k].t, SOON[k].ic, ['soon', { k }], null, '*', 1]) }
   ];
 }
@@ -7746,6 +7746,284 @@ VIEWS.rpjmpkd = async (p, main, alive) => {
         m.close ? m.close() : m.el.remove(); toast(recs.length + ' baris disalin.'); rf();
       } catch (x) { toast(x.message, 1); ev.currentTarget.disabled = false; }
     };
+  };
+};
+
+/* =====================================================================
+   IMPOR PDF SISKEUDES — baca laporan PDF (hasil "Microsoft Print to PDF")
+   Didukung: Parameter Rekening, RAB/Rincian APBDes (murni & perubahan),
+   Buku Kas Umum, Register SPP - Pencairan, Register SPP Pengeluaran,
+   Buku Kas Pembantu Kegiatan.
+   ===================================================================== */
+const SK_NUM = /^\(?-?[\d.]+,\d{2}\)?$/;
+const skNum = s => { s = String(s || '').trim(); const neg = /^\(|^-/.test(s); const v = Number(s.replace(/[()\-\s]/g, '').replace(/\./g, '').replace(',', '.')) || 0; return neg ? -v : v; };
+const skAmt = v => { v = Math.round(v * 100) / 100; return v === Math.trunc(v) ? String(v) : v.toFixed(2); };
+const skTgl = s => { const m = String(s || '').match(/(\d{2})\/(\d{2})\/(\d{4})/); return m ? m[3] + '-' + m[2] + '-' + m[1] : ''; };
+const skKeg = k => { const p = String(k || '').replace(/\.$/, '').split('.'); return p.length >= 3 ? Number(p[0]) + '.' + Number(p[1]) + '.' + p.slice(2).join('.') : p.join('.'); };
+const SK_SUMBER = ['PAD', 'ADD', 'DDS', 'PBH', 'PBK', 'PBP', 'SWD', 'DLL', 'DD', 'SILPA', 'PBKP', 'BKK', 'BKP'];
+const SK_SD_PREF = [['4.1', 'PAD'], ['4.2.1', 'DDS'], ['4.2.2', 'PBH'], ['4.2.3', 'ADD'], ['4.2.4', 'PBP'], ['4.2.5', 'PBK'], ['4.3', 'DLL']];
+
+/* teks PDF → baris → sel (potongan teks yang berdekatan digabung) */
+async function skBacaPdf(file) {
+  const pdfjs = await muatPdfJs();
+  const doc = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise;
+  const lines = [];
+  for (let p = 1; p <= doc.numPages; p++) {
+    const pg = await doc.getPage(p), tc = await pg.getTextContent();
+    const it = tc.items.filter(i => i.str && i.str.trim()).map(i => ({ x: i.transform[4], y: i.transform[5], w: i.width || 0, h: Math.abs(i.transform[3]) || Math.abs(i.transform[0]) || 7, t: i.str }));
+    it.sort((a, b) => b.y - a.y || a.x - b.x);
+    let cur = null;
+    for (const i of it) { if (!cur || Math.abs(cur.y - i.y) > Math.max(1.5, i.h * 0.35)) { cur = { y: i.y, p, it: [] }; lines.push(cur); } cur.it.push(i); }
+  }
+  for (const l of lines) {
+    l.it.sort((a, b) => a.x - b.x);
+    const cells = [];
+    for (const i of l.it) {
+      const c = cells[cells.length - 1], gap = c ? i.x - c.x2 : 99;
+      if (c && gap < i.h * 0.75) { c.t += (gap > i.h * 0.12 && !/\s$/.test(c.t) ? ' ' : '') + i.t; c.x2 = Math.max(c.x2, i.x + i.w); }
+      else cells.push({ x: i.x, x2: i.x + i.w, t: i.t });
+    }
+    l.c = cells.map(c => ({ x: c.x, x2: c.x2, t: c.t.replace(/\s+/g, ' ').trim() })).filter(c => c.t);
+    l.s = l.c.map(c => c.t).join(' ');
+  }
+  return lines.filter(l => l.c.length);
+}
+function skJenis(lines) {
+  const h = lines.slice(0, 30).map(l => l.s).join(' ').toUpperCase();
+  if (/PARAMETER REKENING/.test(h)) return 'rek';
+  if (/RENCANA ANGGARAN BIAYA|RINCIAN ANGGARAN/.test(h)) return 'rab';
+  if (/BUKU KAS PEMBANTU KEGIATAN/.test(h)) return 'bkp';
+  if (/BUKU KAS UMUM/.test(h)) return 'bku';
+  if (/REGISTER PENCAIRAN/.test(h)) return 'cair';
+  if (/REGISTER SURAT PERMINTAAN PEMBAYARAN|REGISTER SPP/.test(h)) return 'spp';
+  return '';
+}
+const skTahun = lines => { const m = lines.slice(0, 40).map(l => l.s).join(' ').match(/TAHUN(?: ANGGARAN)?\s+(\d{4})/i); return m ? m[1] : ''; };
+
+function skParseRek(lines) {
+  const R = [];
+  for (const l of lines) {
+    const m = l.c[0].t.match(/^(\d(?:\.\d+)*)\.?$/); if (!m || !l.c[1] || !/^[456]/.test(m[1])) continue;
+    if (SK_NUM.test(l.c[1].t)) continue;
+    R.push({ kode: m[1], uraian: l.c[1].t, akun: m[1][0], level: String(m[1].split('.').length) });
+  }
+  return R;
+}
+function skParseRab(lines) {
+  const head = lines.slice(0, 12).map(l => l.s).join(' ').toUpperCase(), ubah = /PERUBAHAN/.test(head);
+  const R = [], warn = [];
+  let bid = null, keg = null, rek = null, paket = '', last = null;
+  for (const l of lines) {
+    const s = l.s, c0 = l.c[0].t, nums = l.c.filter(c => SK_NUM.test(c.t));
+    let m;
+    if ((m = s.match(/^(?:\d\.\s*)?Bidang\s*:\s*(\d+)\.?\s+(.*)$/i))) { bid = { kode: m[1], nama: m[2] }; last = null; continue; }
+    if (/^(?:\d\.\s*)?Sub Bidang\s*:/i.test(s)) { last = null; continue; }
+    if ((m = s.match(/^(?:\d\.\s*)?Kegiatan\s*:\s*([\d.]+?)\.?\s+(.*)$/i))) { keg = { kode: skKeg(m[1]), nama: m[2] }; paket = ''; last = null; continue; }
+    if ((m = c0.match(/^(\d(?:\.\d+){3})\.?$/)) && nums.length) { rek = { kode: m[1], nama: (l.c[1] && !SK_NUM.test(l.c[1].t)) ? l.c[1].t : '' }; last = null; continue; }
+    if (/^\d(\.\d+){0,2}\.?$/.test(c0) && nums.length) { last = null; continue; }
+    const mr = c0.match(/^(\d{2,3})\.\s*(.*)$/);
+    if (mr && nums.length) {
+      const si = l.c.findIndex((c, i) => i > 0 && SK_SUMBER.indexOf(c.t.toUpperCase()) >= 0);
+      if (si < 0) { paket = (mr[2] || (l.c[1] && l.c[1].t) || '').trim(); last = null; continue; }
+      const ura = [mr[2]].concat(l.c.slice(1, si).map(c => c.t)).filter(Boolean).join(' ').trim();
+      const after = l.c.slice(si + 1).map(c => c.t), ni = after.map((t, i) => SK_NUM.test(t) ? i : -1).filter(i => i >= 0);
+      const vol = t => { const v = String(t || '').match(/^([\d.,]+)\s*(.*)$/); return v ? [v[1].replace(/\./g, '').replace(',', '.'), v[2].trim()] : ['', String(t || '').trim()]; };
+      let o;
+      if (ubah && ni.length >= 4) {
+        const v1 = ni[0] > 0 ? after[ni[0] - 1] : '', v2 = ni[2] > ni[1] + 1 ? after[ni[2] - 1] : v1;
+        const [n1, s1] = vol(v1), [n2, s2] = vol(v2), h1 = skNum(after[ni[0]]), j1 = skNum(after[ni[1]]), h2 = skNum(after[ni[2]]), j2 = skNum(after[ni[3]]);
+        o = { volume: n1, satuan: s1, harga: skAmt(h1), jumlah: skAmt(j1), jumlah_pak: skAmt(j2), ket: (n1 !== n2 || s1 !== s2 || h1 !== h2) ? 'Perubahan: ' + [n2, s2].filter(Boolean).join(' ') + ' × Rp ' + fMoney(h2).replace(/^Rp\s*/, '') : '' };
+      } else if (ni.length >= 2) {
+        const v1 = ni[0] > 0 ? after[ni[0] - 1] : '', [n1, s1] = vol(v1);
+        o = { volume: n1, satuan: s1, harga: skAmt(skNum(after[ni[0]])), jumlah: skAmt(skNum(after[ni[1]])) };
+      } else { warn.push('Baris tidak terbaca: ' + s.slice(0, 120)); continue; }
+      if (!rek) { warn.push('Rincian tanpa kode rekening: ' + ura); continue; }
+      last = Object.assign({ rek: rek.kode + (rek.nama ? ' ' + rek.nama : ''), uraian: ura, sumber: after[-1] || l.c[si].t.toUpperCase(), _x: l.c[1] ? l.c[1].x : l.c[0].x }, o);
+      if (paket) last.ket = ['Paket: ' + paket, last.ket].filter(Boolean).join('; ');
+      if (keg && /^[56]/.test(rek.kode)) Object.assign(last, { kegiatan: keg.nama, kode_kegiatan: keg.kode, kode_bidang: bid ? bid.kode : keg.kode.split('.')[0], bidang: bid ? bid.nama : '' });
+      R.push(last); continue;
+    }
+    if (last && !nums.length && l.c.length === 1 && !/^(JUMLAH|Printed|Halaman|PEMERINTAH|Mengesahkan|KEPALA|SEKRETARIS)/i.test(s) && Math.abs(l.c[0].x - last._x) < 40) { last.uraian += ' ' + s; continue; }
+    if (nums.length) last = null;
+  }
+  R.forEach(r => delete r._x);
+  return { rows: R, ubah, warn };
+}
+function skParseBku(lines) {
+  const R = [], warn = [];
+  let ent = null, lastb = '';
+  for (const l of lines) {
+    const c = l.c.map(x => x.t);
+    if (/^\d+$/.test(c[0]) && /^\d{2}\/\d{2}\/\d{4}$/.test(c[1] || '')) { ent = { no: Number(c[0]), tgl: skTgl(c[1]), ur: c.slice(2).join(' ') }; lastb = ''; continue; }
+    if (!ent) continue;
+    const ni = c.map((t, i) => SK_NUM.test(t) ? i : -1).filter(i => i >= 0);
+    if (ni.length < 4 || /^(Jumlah|Total)/i.test(l.s)) continue;
+    let k = 0, kode = '';
+    if (/^\d(\.\d+)+\.?$/.test(c[0])) { kode = c[0].replace(/\.$/, ''); k = 1; }
+    const ru = c.slice(k, ni[0]).join(' ');
+    const bk = c.slice(ni[1] + 1, ni[2]).find(t => /\//.test(t)); if (bk) lastb = bk;
+    R.push(Object.assign({}, ent, { kode, ru, masuk: skNum(c[ni[0]]), keluar: skNum(c[ni[1]]), bukti: lastb, saldo: skNum(c[ni[ni.length - 1]]) }));
+  }
+  return { rows: R, warn };
+}
+function skParseCair(lines) {
+  const R = {};
+  for (const l of lines) {
+    const c = l.c.map(x => x.t), i = c.findIndex(t => /\/SPP\//i.test(t)); if (i < 0) continue;
+    const ni = c.map((t, j) => SK_NUM.test(t) ? j : -1).filter(j => j >= 0); if (ni.length < 3) continue;
+    const tg = c.filter(t => /^\d{2}\/\d{2}\/\d{4}$/.test(t)), nc = c.find((t, j) => j > ni[2] && /\//.test(t)) || '';
+    const rest = c.slice(ni[2] + 1).filter(t => t !== nc && !/^\d{2}\/\d{2}\/\d{4}$/.test(t));
+    R[c[i]] = { no: c[i], tgl: skTgl(tg[0]), jenis: c[i + 2] && !SK_NUM.test(c[i + 2]) ? c[i + 2] : '', jumlah: skNum(c[ni[0]]), potongan: skNum(c[ni[1]]), netto: skNum(c[ni[2]]), no_cair: nc, tgl_cair: skTgl(tg[1] || tg[0]), bayar: rest[0] || 'Tunai' };
+  }
+  return R;
+}
+function skParseSpp(lines) {
+  const R = {};
+  for (const l of lines) {
+    const c = l.c.map(x => x.t), i = c.findIndex(t => /\/SPP\//i.test(t)); if (i < 0) continue;
+    const ni = c.findIndex((t, j) => j > i && SK_NUM.test(t)); if (ni < 0) continue;
+    R[c[i]] = { uraian: c.slice(i + 1, ni).join(' '), jumlah: skNum(c[ni]), tgl: skTgl(c.find(t => /^\d{2}\/\d{2}\/\d{4}$/.test(t))) };
+  }
+  return R;
+}
+function skParseBkp(lines) {
+  const R = {}; let keg = null;
+  for (const l of lines) {
+    const m = l.s.match(/^(?:\d\.\s*)?Kegiatan\s*:\s*([\d.]+?)\.?\s+(.*)$/i);
+    if (m) { keg = { kode: skKeg(m[1]), nama: m[2] }; continue; }
+    const b = l.c.find(c => /\/SPP\//i.test(c.t));
+    if (b && keg) R[b.t] = keg;
+  }
+  return R;
+}
+/* gabungkan semua berkas → rekaman aplikasi */
+function skSusun(P, rekNama) {
+  const out = { keu_rek: [], keu_anggaran: [], keu_spp: [], keu_trans: [] }, warn = [];
+  const nm = k => rekNama[k] || '';
+  P.filter(p => p.jenis === 'rek').forEach(p => p.rows.forEach(r => { out.keu_rek.push(r); rekNama[r.kode] = r.uraian; }));
+  P.filter(p => p.jenis === 'rab').forEach(p => p.rows.forEach(r => { const k = r.rek.split(' ')[0]; if (!rekNama[k] && r.rek.indexOf(' ') > 0) rekNama[k] = r.rek.slice(k.length + 1); out.keu_anggaran.push(Object.assign({ tahun: p.tahun }, r)); }));
+  const cair = Object.assign({}, ...P.filter(p => p.jenis === 'cair').map(p => p.rows)), sppU = Object.assign({}, ...P.filter(p => p.jenis === 'spp').map(p => p.rows)), kegM = Object.assign({}, ...P.filter(p => p.jenis === 'bkp').map(p => p.rows));
+  const sd = k => (SK_SD_PREF.find(([a]) => k.indexOf(a) === 0) || [])[1] || '';
+  const pj = t => { t = String(t).toUpperCase(); return /PPN/.test(t) ? 'PPN' : /21/.test(t) ? 'PPh 21' : /22/.test(t) ? 'PPh 22' : /23/.test(t) ? 'PPh 23' : /4\s*\(?2|FINAL/.test(t) ? 'PPh Final 4(2)' : 'Pajak Daerah'; };
+  const rinc = {};
+  P.filter(p => p.jenis === 'bku').forEach(p => p.rows.forEach(x => {
+    const k = x.kode, b = { tahun: p.tahun, tanggal: x.tgl, no_bukti: x.bukti || '', uraian: x.ur }, rk = k ? k + ' ' + (nm(k) || x.ru) : '';
+    const sp = /\/SPP\//i.test(x.bukti) ? x.bukti : '', kas = sp && cair[sp] && /bank|cms|transfer/i.test(cair[sp].bayar) ? 'Bank' : 'Tunai';
+    if (/^Saldo Pindahan/i.test(x.ru)) out.keu_trans.push(Object.assign(b, { jenis: 'Penerimaan Pembiayaan', rek: '6.1.1.01 ' + (nm('6.1.1.01') || 'SILPA Tahun Sebelumnya'), uraian: 'SILPA tahun sebelumnya (saldo awal ' + p.tahun + ')', jumlah: skAmt(x.masuk), kas: 'Bank' }));
+    else if (!k && /Kas di Bendahara/i.test(x.ru)) out.keu_trans.push(Object.assign(b, { jenis: 'Mutasi Kas', uraian: 'Penarikan bank: ' + x.ur, jumlah: skAmt(x.keluar || x.masuk), kas: 'Bank', kas_ke: 'Tunai' }));
+    else if (!k && /Rekening Kas Desa|Bank/i.test(x.ru)) out.keu_trans.push(Object.assign(b, { jenis: 'Mutasi Kas', uraian: 'Setor ke bank: ' + x.ur, jumlah: skAmt(x.keluar || x.masuk), kas: 'Tunai', kas_ke: 'Bank' }));
+    else if (/^4|^6\.1/.test(k)) { if (x.masuk) out.keu_trans.push(Object.assign(b, { jenis: k[0] === '4' ? 'Pendapatan' : 'Penerimaan Pembiayaan', rek: rk, jumlah: skAmt(x.masuk), sumber: sd(k), kas: 'Bank' })); }
+    else if (/^5|^6\.2/.test(k)) {
+      if (!x.keluar) { warn.push('Pengembalian belanja dilewati: ' + x.ur); return; }
+      const d = Object.assign(b, { jenis: k[0] === '5' ? 'Belanja' : 'Pengeluaran Pembiayaan', rek: rk, jumlah: skAmt(x.keluar), kas });
+      const kg = sp && kegM[sp]; if (kg) Object.assign(d, { kegiatan: kg.nama, kode_kegiatan: kg.kode });
+      if (sp) { d._spp = sp; (rinc[sp] = rinc[sp] || []).push({ rek: rk, uraian: x.ur, sumber: '', jumlah: d.jumlah }); }
+      out.keu_trans.push(d);
+    } else if (/^7/.test(k)) {
+      if (x.masuk) out.keu_trans.push(Object.assign({}, b, { jenis: 'Pajak Dipungut', pajak: pj(x.ru), uraian: 'Pungutan ' + pj(x.ru) + ' — ' + x.ur, jumlah: skAmt(x.masuk), kas: 'Tunai' }));
+      if (x.keluar) out.keu_trans.push(Object.assign({}, b, { jenis: 'Pajak Disetor', pajak: pj(x.ru), uraian: 'Penyetoran ' + pj(x.ru) + ' — ' + x.ur, jumlah: skAmt(x.keluar), kas: 'Tunai' }));
+    } else if (/^1\.1\.1/.test(k)) out.keu_trans.push(Object.assign(b, { jenis: 'Pajak Disetor', pajak: pj(x.ur), uraian: 'Penyetoran ' + pj(x.ur) + ' (deposit pajak) — ' + x.ur, jumlah: skAmt(x.keluar || x.masuk), kas: 'Tunai' }));
+    else warn.push('Baris BKU dilewati (' + (k || 'tanpa kode') + '): ' + x.ru + ' — ' + x.ur);
+  }));
+  const th = (P.find(p => p.tahun) || {}).tahun || String(new Date().getFullYear());
+  const semuaSpp = Object.keys(Object.assign({}, cair, rinc));
+  semuaSpp.forEach(no => {
+    const c = cair[no] || {}, u = sppU[no] || {}, kg = kegM[no];
+    const d = { tahun: th, no, tanggal: c.tgl || u.tgl || '', jenis: kg ? 'Definitif' : 'Pembiayaan', uraian: u.uraian || '', rincian: JSON.stringify(rinc[no] || []), kas: /bank|cms|transfer/i.test(c.bayar || '') ? 'Bank' : 'Tunai', status: 'Dicairkan', tgl_cair: c.tgl_cair || c.tgl || '',
+      ket: 'Diimpor dari Siskeudes. ' + (c.no_cair ? 'Pencairan ' + c.no_cair + ' (' + (c.bayar || 'Tunai') + ')' : '') + (c.potongan ? '; potongan pajak ' + fMoney(c.potongan) + ' dicatat di Transaksi Kas' : '') };
+    if (kg) Object.assign(d, { kegiatan: kg.nama, kode_kegiatan: kg.kode });
+    out.keu_spp.push(d);
+  });
+  return { out, warn };
+}
+/* kunci pencocokan supaya impor ulang tidak menggandakan data */
+const SK_KEY = {
+  keu_rek: r => r.kode,
+  keu_anggaran: r => [r.tahun, String(r.rek || '').split(' ')[0], r.kode_kegiatan || '', String(r.uraian || '').toLowerCase().replace(/\s+/g, ' ').trim()].join('|'),
+  keu_spp: r => [r.tahun, r.no].join('|'),
+  keu_trans: r => [r.tahun, r.tanggal, r.jenis, r.no_bukti || '', String(r.rek || '').split(' ')[0], skAmt(Number(r.jumlah) || 0), r.pajak || ''].join('|')
+};
+async function skSimpan(out, lapor) {
+  const hasil = {};
+  const ambil = async (e, f) => { let rows = [], off = 0; for (;;) { const r = await call('list', { entity: e, filters: f || {}, limit: 2000, offset: off }); rows = rows.concat(r.rows || []); off += (r.rows || []).length; if (!(r.rows || []).length || off >= (r.total || 0)) break; } return rows; };
+  const tahun = (out.keu_anggaran[0] || out.keu_trans[0] || out.keu_spp[0] || {}).tahun;
+  const tandai = (e, rows, ada) => { const pakai = {}, idx = {}; ada.forEach(a => { const k = SK_KEY[e](a); (idx[k] = idx[k] || []).push(a.id); });
+    return rows.map(r => { const k = SK_KEY[e](r), n = pakai[k] = (pakai[k] || 0) + 1, id = (idx[k] || [])[n - 1]; const o = Object.assign({}, r); if (id) o.id = id; return o; }); };
+  const kirim = async (e, rows) => { let t = 0, u = 0, g = []; for (let i = 0; i < rows.length; i += 200) { lapor('Menyimpan ' + e.replace('keu_', '') + ' ' + Math.min(i + 200, rows.length) + '/' + rows.length + '…'); const r = await call('bulkSave', { entity: e, rows: rows.slice(i, i + 200).map((x, j) => Object.assign({ _baris: String(i + j + 1) }, x)) }); t += r.tambah; u += r.ubah; g = g.concat(r.gagal || []); } hasil[e] = { tambah: t, ubah: u, gagal: g }; };
+  if (out.keu_rek.length) await kirim('keu_rek', tandai('keu_rek', out.keu_rek, await ambil('keu_rek')));
+  if (out.keu_anggaran.length) await kirim('keu_anggaran', tandai('keu_anggaran', out.keu_anggaran, await ambil('keu_anggaran', { tahun })));
+  if (out.keu_spp.length) await kirim('keu_spp', tandai('keu_spp', out.keu_spp, await ambil('keu_spp', { tahun })));
+  if (out.keu_trans.length) {
+    const sppId = {}; (await ambil('keu_spp', { tahun })).forEach(s => { sppId[s.no] = s.id; });
+    const tr = out.keu_trans.map(t => { const o = Object.assign({}, t); if (o._spp && sppId[o._spp]) o.ref_spp = sppId[o._spp]; delete o._spp; return o; });
+    await kirim('keu_trans', tandai('keu_trans', tr, await ambil('keu_trans', { tahun })));
+  }
+  return hasil;
+}
+const SK_NAMA = { rek: 'Parameter Rekening', rab: 'Rincian Anggaran (RAB/APBDes)', bku: 'Buku Kas Umum', cair: 'Register SPP - Pencairan', spp: 'Register SPP Pengeluaran', bkp: 'Buku Kas Pembantu Kegiatan' };
+VIEWS.skimpor = async (p, main) => {
+  setTop('Impor PDF Siskeudes');
+  const st = S.skImp = { P: [], hasil: null };
+  main.innerHTML = `<div class="stack">
+    <div class="card stack"><div class="sec-h" style="margin:0"><h2>${ic('down')} Impor laporan PDF Siskeudes</h2></div>
+      <div class="meta">Di Siskeudes buka laporan → <b>Cetak</b> → pilih printer <b>Microsoft Print to PDF</b> → simpan. Pilih beberapa PDF sekaligus di bawah; aplikasi mengenali jenisnya otomatis. Data tahun yang sama dicocokkan, jadi impor ulang memperbarui data, tidak menggandakan.</div>
+      <div class="sk-daftar">${[['Parameter Rekening APB Desa', 'Laporan → Parameter → Rekening', 'kode rekening'], ['RAB 1 - Rincian Anggaran Pendapatan / Belanja / Pembiayaan', 'Laporan → Anggaran (murni atau perubahan)', 'APBDes'], ['Buku Kas Umum', 'Laporan → Penatausahaan → Buku Kas Umum (sumber dana dikosongkan)', 'penerimaan, belanja, pajak, mutasi kas'], ['Register SPP - Pencairan', 'Laporan → Penatausahaan', 'SPP & tanggal cair'], ['Register SPP Pengeluaran', 'Laporan → Penatausahaan', 'uraian SPP'], ['Buku Kas Pembantu Kegiatan', 'Laporan → Penatausahaan', 'kegiatan tiap SPP/belanja']].map((x, i) => `<div><b>${i + 1}. ${esc(x[0])}</b><span class="meta">${esc(x[1])} · mengisi ${esc(x[2])}</span></div>`).join('')}</div>
+      <div class="meta">Urutan terbaik: impor sekaligus semua PDF satu tahun anggaran. Minimal RAB (untuk APBDes) dan Buku Kas Umum (untuk realisasi).</div>
+      <label class="btn pri" style="align-self:flex-start">${ic('file')}Pilih PDF Siskeudes<input type="file" id="skF" accept="application/pdf,.pdf" multiple hidden></label>
+      <div id="skSt" class="meta"></div></div>
+    <div id="skHasil"></div></div>`;
+  const tampil = () => {
+    const P = st.P; if (!P.length) { $('#skHasil').innerHTML = ''; return; }
+    const tahun = Array.from(new Set(P.map(p => p.tahun).filter(Boolean)));
+    const { out, warn } = skSusun(P, Object.assign({}, st.rekNama || {})); st.out = out;
+    const sum = (a, k) => a.reduce((s, r) => s + (Number(r[k]) || 0), 0);
+    const jn = j => out.keu_trans.filter(t => t.jenis === j);
+    const ang = out.keu_anggaran, ak = pre => ang.filter(r => String(r.rek).indexOf(pre) === 0);
+    const bku = P.filter(p => p.jenis === 'bku').map(p => p.rows).flat(), saldo = bku.length ? bku[bku.length - 1].saldo : null;
+    const w = warn.concat(...P.map(p => p.warn || []));
+    $('#skHasil').innerHTML = `<div class="stack">
+      <div class="card"><div class="lbl">Berkas terbaca</div><div class="list">${P.map((p, i) => `<div class="row" style="cursor:default"><span class="av">${ic(p.jenis ? 'check' : 'x')}</span><span class="main"><span class="t">${esc(p.nama)}</span><span class="s">${p.jenis ? esc(SK_NAMA[p.jenis]) + (p.ubah ? ' (Perubahan)' : '') + ' · tahun ' + esc(p.tahun || '?') + ' · ' + p.n + ' baris data' : 'Jenis laporan tidak dikenali — dilewati'}</span></span><button class="iconbtn" data-act="skHapus" data-i="${i}" title="Buang">${ic('x')}</button></div>`).join('')}</div></div>
+      ${tahun.length > 1 ? `<div class="err">Berkas berisi lebih dari satu tahun anggaran (${esc(tahun.join(', '))}). Impor satu tahun sekali jalan.</div>` : ''}
+      <div class="card stack"><div class="lbl">Ringkasan yang akan disimpan${tahun[0] ? ' · Tahun ' + esc(tahun[0]) : ''}</div>
+        <table class="tbl kd-tbl"><tbody>
+          ${out.keu_rek.length ? `<tr><td>Kode rekening</td><td class="r">${out.keu_rek.length}</td><td></td></tr>` : ''}
+          ${ang.length ? `<tr><td>Rincian APBDes</td><td class="r">${ang.length}</td><td class="r">Pendapatan ${fMoney(sum(ak('4'), 'jumlah_pak') || sum(ak('4'), 'jumlah'))}<br>Belanja ${fMoney(sum(ak('5'), 'jumlah_pak') || sum(ak('5'), 'jumlah'))}<br>Pembiayaan ${fMoney(sum(ak('6'), 'jumlah_pak') || sum(ak('6'), 'jumlah'))}</td></tr>` : ''}
+          ${out.keu_spp.length ? `<tr><td>SPP (status Dicairkan)</td><td class="r">${out.keu_spp.length}</td><td></td></tr>` : ''}
+          ${out.keu_trans.length ? `<tr><td>Transaksi kas</td><td class="r">${out.keu_trans.length}</td><td class="r">Pendapatan ${fMoney(sum(jn('Pendapatan'), 'jumlah'))}<br>Belanja ${fMoney(sum(jn('Belanja'), 'jumlah'))}<br>Pajak dipungut ${fMoney(sum(jn('Pajak Dipungut'), 'jumlah'))} · disetor ${fMoney(sum(jn('Pajak Disetor'), 'jumlah'))}</td></tr>` : ''}
+          ${saldo != null ? `<tr><td>Saldo akhir menurut BKU</td><td></td><td class="r"><b>${fMoney(saldo)}</b></td></tr>` : ''}
+        </tbody></table>
+        ${out.keu_trans.length && !P.some(p => p.jenis === 'bkp') ? '<div class="meta">Tanpa <b>Buku Kas Pembantu Kegiatan</b>, belanja tidak terhubung ke kegiatan (Laporan Realisasi per kegiatan jadi tidak lengkap).</div>' : ''}
+        ${w.length ? `<details><summary class="meta">${w.length} catatan/peringatan</summary><div class="meta" style="max-height:200px;overflow:auto">${w.slice(0, 200).map(esc).join('<br>')}</div></details>` : ''}
+        <div class="btns"><button class="btn pri" data-act="skSimpan" ${tahun.length > 1 || !(ang.length + out.keu_trans.length + out.keu_spp.length + out.keu_rek.length) ? 'disabled' : ''}>${ic('check')}Simpan ke aplikasi</button></div></div>
+      ${st.hasil ? `<div class="card stack"><div class="lbl">Hasil impor</div>${Object.entries(st.hasil).map(([e, r]) => `<div>${esc(e.replace('keu_', '').replace('anggaran', 'APBDes'))}: <b>${r.tambah}</b> baru, <b>${r.ubah}</b> diperbarui${r.gagal.length ? `, <span style="color:var(--bad)">${r.gagal.length} gagal</span> <span class="meta">(${esc(r.gagal.slice(0, 3).map(g => 'baris ' + g.baris + ': ' + g.pesan).join('; '))})</span>` : ''}</div>`).join('')}
+        <div class="btns"><button class="btn sm" data-act="go" data-go='["list",{"e":"keu_anggaran"}]'>APBDes</button><button class="btn sm" data-act="go" data-go='["keubuku"]'>Buku Kas</button><button class="btn sm" data-act="go" data-go='["keulap"]'>Laporan Realisasi</button></div></div>` : ''}</div>`;
+  };
+  $('#skF').onchange = async ev => {
+    const fs = Array.from(ev.target.files || []); ev.target.value = '';
+    for (const f of fs) {
+      $('#skSt').textContent = 'Membaca ' + f.name + '…';
+      try {
+        const L = await skBacaPdf(f), j = skJenis(L), th = skTahun(L);
+        let o = { nama: f.name, jenis: j, tahun: th, rows: [], n: 0 };
+        if (j === 'rek') o.rows = skParseRek(L);
+        else if (j === 'rab') { const r = skParseRab(L); o.rows = r.rows; o.ubah = r.ubah; o.warn = r.warn; }
+        else if (j === 'bku') { const r = skParseBku(L); o.rows = r.rows; o.warn = r.warn; }
+        else if (j === 'cair') o.rows = skParseCair(L);
+        else if (j === 'spp') o.rows = skParseSpp(L);
+        else if (j === 'bkp') o.rows = skParseBkp(L);
+        o.n = Array.isArray(o.rows) ? o.rows.length : Object.keys(o.rows).length;
+        st.P = st.P.filter(x => x.nama !== f.name).concat(o);
+      } catch (x) { st.P.push({ nama: f.name, jenis: '', rows: [], n: 0, warn: [x.message] }); }
+    }
+    try { if (!st.rekNama) { st.rekNama = {}; ((await call('list', { entity: 'keu_rek', limit: 2000 })).rows || []).forEach(r => { st.rekNama[r.kode] = r.uraian; }); } } catch (x) { st.rekNama = {}; }
+    $('#skSt').textContent = ''; st.hasil = null; tampil();
+  };
+  S.vh.skHapus = t => { st.P.splice(Number(t.dataset.i), 1); tampil(); };
+  S.vh.skSimpan = async t => {
+    t.disabled = true;
+    try { st.hasil = await skSimpan(st.out, m => { $('#skSt').textContent = m; }); toast('Impor Siskeudes selesai.'); }
+    catch (x) { toast(x.message, 1); }
+    $('#skSt').textContent = ''; tampil();
   };
 };
 
