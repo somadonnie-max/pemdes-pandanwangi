@@ -708,13 +708,13 @@ input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-sof
   .sheet.dock .sh-q .btn.pri{background:var(--pri0);color:#fff}
   body.docked .tabs{z-index:66}
   .sheet.dock .sh-h [data-x]{display:none}
+  .sheet.dock .sh-box::before{display:none}
+  .sheet.dock .sh-box{bottom:calc(var(--dockb) - 16px)!important;padding-bottom:26px!important}
   body.docked .btn.fab{opacity:0;pointer-events:none;transition:opacity .12s}
   .sheet.dock .sh-box{position:fixed;left:50%;bottom:var(--dockb);width:var(--dockw);max-width:none;max-height:calc(100vh - var(--dockb) - 70px);border-radius:16px 16px 0 0;padding:10px 11px 10px;overflow:visible;display:flex;flex-direction:column;
     background:var(--navc);color:var(--pri-ink);box-shadow:0 -6px 18px rgba(0,0,0,.28);opacity:0;transform:translateX(-50%) scaleY(.25);transform-origin:50% 100%;transition:transform .28s cubic-bezier(.2,.8,.2,1),opacity .18s;
     --ink:var(--pri-ink);--muted:color-mix(in srgb,var(--pri-ink) 70%,transparent);--surface:color-mix(in srgb,var(--pri-ink) 8%,transparent);--surface2:color-mix(in srgb,var(--pri-ink) 13%,transparent);--line:color-mix(in srgb,var(--pri-ink) 20%,transparent);--mc:var(--pri-ink)!important}
   .sheet.dock.on .sh-box{opacity:1;transform:translateX(-50%)}
-  .sheet.dock .sh-box::before{content:"";position:absolute;left:-12px;bottom:0;width:12px;height:12px;margin:0;border-radius:0;background:radial-gradient(circle at 0 0,transparent 11.5px,var(--navc) 12px);display:block}
-  .sheet.dock .sh-box::after{content:"";position:absolute;right:-12px;bottom:0;width:12px;height:12px;background:radial-gradient(circle at 100% 0,transparent 11.5px,var(--navc) 12px)}
   .sheet.dock .sh-b,.sheet.dock .sh-box>div:not(.sh-h){overflow:auto;min-height:0}
   .sheet.dock .sh-h{margin-bottom:6px}.sheet.dock .sh-h h3{font-size:14px;color:var(--pri-ink)}.sheet.dock .sh-h .iconbtn{width:28px;height:28px;color:var(--pri-ink)}
   .sheet.dock .mc-ic{background:color-mix(in srgb,var(--pri-ink) 15%,transparent)!important;color:var(--pri-ink)!important}
@@ -6178,7 +6178,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '103', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '104', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
