@@ -669,13 +669,31 @@ details.more>summary{cursor:pointer;color:var(--muted);font-size:11.5px;font-wei
 
 .dview .btn:not(.pri):not(.danger):not(.solid):not([data-act="xedit"]):not([data-act="xdel"]){background:#c2410c;border-color:#c2410c;color:#fff}
 .dview .btn:not(.pri):not(.danger):not(.solid):not([data-act="xedit"]):not([data-act="xdel"]):hover{background:#9a3412;border-color:#9a3412}
-:root[data-theme="dark"] .dview .btn:not(.pri):not(.danger):not(.solid):not([data-act="xedit"]):not([data-act="xdel"]){background:#9a3412;border-color:#c2410c;color:#ffedd5}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .dview .btn:not(.pri):not(.danger):not(.solid):not([data-act="xedit"]):not([data-act="xdel"]){background:#9a3412;border-color:#c2410c;color:#ffedd5}}
+:root[data-theme="dark"] .dview .btn:not(.pri):not(.danger):not(.solid):not([data-act="xedit"]):not([data-act="xdel"]){background:#f08a3c;border-color:#f08a3c;color:#1a0d03}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .dview .btn:not(.pri):not(.danger):not(.solid):not([data-act="xedit"]):not([data-act="xdel"]){background:#f08a3c;border-color:#f08a3c;color:#1a0d03}}
 .dview .confirm .btn{background:var(--surface);color:var(--ink);border-color:var(--line)}
 .idnote:empty{display:none}.idnote.bad{color:var(--bad)}.idnote a{color:var(--pri);font-weight:600}
 input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-soft)}
 .kkbox{border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:var(--surface2);display:flex;flex-direction:column;gap:2px}.kkbox .mono{font-size:12px;color:var(--muted)}
 .ortuin{display:flex;gap:6px;align-items:stretch}.ortuin input{flex:1;min-width:0}.ortupick{flex:none}.pmhd{padding:6px 11px;font-size:11px;opacity:.7}.oplist{max-height:55vh;overflow:auto}
+.silbox{display:flex;flex-direction:column;gap:4px}.sil{border:1px solid var(--line);border-radius:10px;background:var(--surface);max-height:236px;overflow:auto;overscroll-behavior:contain}
+.srow{display:grid;grid-template-columns:auto 1fr auto;column-gap:7px;align-items:center;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;color:inherit;padding:5px 9px;font:inherit;cursor:pointer;min-height:38px}.srow:last-child{border-bottom:0}div.srow{cursor:default}
+.srow .sl{grid-row:span 2;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;color:var(--pri);width:74px;line-height:1.2}
+.srow .sn{font-size:11px;font-weight:600;line-height:1.3}.srow .si{grid-column:2;font-size:9.5px;color:var(--muted);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.srow .pill{font-size:9px;padding:0 5px;vertical-align:1px}.srow .shub{grid-row:1/span 2;grid-column:3;min-height:26px;padding:2px 8px;font-size:11px}
+:root[data-accent="biru"]{--pri:#1d4ed8;--pri-2:#1e40af;--pri-ink:#fff;--pri-soft:#dbe6fb}
+@media (prefers-color-scheme:dark){:root[data-accent="biru"]:not([data-theme="light"]){--pri:#6ea8fe;--pri-2:#4d8ef0;--pri-ink:#06183a;--pri-soft:#16284a}}
+:root[data-accent="biru"][data-theme="dark"]{--pri:#6ea8fe;--pri-2:#4d8ef0;--pri-ink:#06183a;--pri-soft:#16284a}
+:root[data-accent="merah"]{--pri:#b91c1c;--pri-2:#991b1b;--pri-ink:#fff;--pri-soft:#fbe0e0}
+@media (prefers-color-scheme:dark){:root[data-accent="merah"]:not([data-theme="light"]){--pri:#f28b82;--pri-2:#e46b62;--pri-ink:#2a0605;--pri-soft:#41191a}}
+:root[data-accent="merah"][data-theme="dark"]{--pri:#f28b82;--pri-2:#e46b62;--pri-ink:#2a0605;--pri-soft:#41191a}
+:root[data-accent="ungu"]{--pri:#6d28d9;--pri-2:#5b21b6;--pri-ink:#fff;--pri-soft:#ebe2fb}
+@media (prefers-color-scheme:dark){:root[data-accent="ungu"]:not([data-theme="light"]){--pri:#b39dfa;--pri-2:#9a7ef2;--pri-ink:#1c0a3d;--pri-soft:#2c1f4a}}
+:root[data-accent="ungu"][data-theme="dark"]{--pri:#b39dfa;--pri-2:#9a7ef2;--pri-ink:#1c0a3d;--pri-soft:#2c1f4a}
+:root[data-accent="cokelat"]{--pri:#8a5a2b;--pri-2:#734a22;--pri-ink:#fff;--pri-soft:#f1e6d9}
+@media (prefers-color-scheme:dark){:root[data-accent="cokelat"]:not([data-theme="light"]){--pri:#d9a66f;--pri-2:#c48d55;--pri-ink:#2a1a08;--pri-soft:#3a2a17}}
+:root[data-accent="cokelat"][data-theme="dark"]{--pri:#d9a66f;--pri-2:#c48d55;--pri-ink:#2a1a08;--pri-soft:#3a2a17}
+.accs{display:flex;gap:8px;flex-wrap:wrap}.acc{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:4px 10px 4px 5px;font-size:12px;font-weight:600;cursor:pointer}.acc i{width:18px;height:18px;border-radius:50%;background:var(--c);display:block}.acc.on{border-color:var(--pri);box-shadow:0 0 0 2px var(--pri-soft)}
 </style>
 </head>
 <body>
@@ -777,6 +795,7 @@ const IC = {
   key: '<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3"/>',
   out: '<path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4"/><path d="M10 17l-5-5 5-5M5 12h11"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
+  link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
   search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
   back: '<path d="M15 5l-7 7 7 7"/>',
   menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
@@ -3876,35 +3895,67 @@ function ortuHooks(frm, p) {
     dd.addEventListener('pointerdown', ev => ev.preventDefault());
     dd.addEventListener('click', ev => { const b = ev.target.closest('[data-i]'); if (b) pakai(hasil[Number(b.dataset.i)]); });
     document.addEventListener('click', ev => { if (!box.contains(ev.target)) dd.hidden = true; });
-    bt.onclick = () => {
-      const m = modal('Pilih ' + (k === 'ayah' ? 'Ayah' : 'Ibu') + ' dari Data Penduduk', `<div class="stack"><input id="opQ" placeholder="Ketik nama (min. 3 huruf) atau NIK" value="${esc(nm.value)}" autocomplete="off"><div id="opR" class="list oplist"></div></div>`);
-      const qi = $('#opQ', m.el), rr = $('#opR', m.el); let rows = [], t2;
-      const cari = async () => {
-        const q = qi.value.trim(); if (q.length < 3) { rr.innerHTML = '<div class="meta">Ketik minimal 3 huruf.</div>'; return; }
-        rr.innerHTML = '<div class="meta">Mencari…</div>';
-        try { rows = await cariPend(q, jk, p.id); } catch (x) { rows = []; }
-        if (qi.value.trim() !== q) return;
-        rr.innerHTML = rows.length ? rows.map((o, i) => `<button type="button" class="row" data-i="${i}"><span class="av">${esc(initials(o.nama))}</span><span class="main"><span class="t">${esc(o.nama)}</span><span class="s">${esc(pendInfo(o))}</span></span></button>`).join('') : '<div class="meta">Tidak ditemukan. Nama tetap bisa diketik manual.</div>';
-      };
-      qi.addEventListener('input', () => { clearTimeout(t2); t2 = setTimeout(cari, 300); });
-      rr.addEventListener('click', ev => { const b = ev.target.closest('[data-i]'); if (!b) return; pakai(rows[Number(b.dataset.i)]); m.close(); });
-      setTimeout(() => qi.focus(), 50); cari();
-    };
+    bt.onclick = () => pilihPendModal('Pilih ' + (k === 'ayah' ? 'Ayah' : 'Ibu') + ' dari Data Penduduk', jk, p.id, nm.value, pakai);
   });
 }
+/* pemilih penduduk (modal) dipakai tombol Pilih & Hubungkan */
+function pilihPendModal(judul, jk, selfId, awal, onPick) {
+  const m = modal(judul, `<div class="stack"><input id="opQ" placeholder="Ketik nama (min. 3 huruf) atau NIK" value="${esc(awal || '')}" autocomplete="off"><div id="opR" class="list oplist"></div></div>`);
+  const qi = $('#opQ', m.el), rr = $('#opR', m.el); let rows = [], t2;
+  const cari = async () => {
+    const q = qi.value.trim(); if (q.length < 3) { rr.innerHTML = '<div class="meta">Ketik minimal 3 huruf.</div>'; return; }
+    rr.innerHTML = '<div class="meta">Mencari…</div>';
+    try { rows = await cariPend(q, jk, selfId); } catch (x) { rows = []; }
+    if (qi.value.trim() !== q) return;
+    rr.innerHTML = rows.length ? rows.map((o, i) => `<button type="button" class="row" data-i="${i}"><span class="av">${esc(initials(o.nama))}</span><span class="main"><span class="t">${esc(o.nama)}</span><span class="s">${esc(pendInfo(o))}</span></span></button>`).join('') : '<div class="meta">Tidak ditemukan.</div>';
+  };
+  qi.addEventListener('input', () => { clearTimeout(t2); t2 = setTimeout(cari, 300); });
+  rr.addEventListener('click', ev => { const b = ev.target.closest('[data-i]'); if (!b) return; m.close(); onPick(rows[Number(b.dataset.i)]); });
+  setTimeout(() => qi.focus(), 50); cari();
+}
+/* ---- Silsilah: leluhur (s.d. buyut), saudara, anak, cucu ---- */
+const pGet = id => id ? call('get', { entity: 'penduduk', id }).catch(() => null) : Promise.resolve(null);
+const pList = f => call('list', { entity: 'penduduk', filters: f, limit: 50 }).then(r => r.rows || []).catch(() => []);
 async function silsilahHtml(x) {
   if (!canRead('penduduk')) return '';
-  const [ay, ib, a1, a2] = await Promise.all([
-    x.ayah_id ? call('get', { entity: 'penduduk', id: x.ayah_id }).catch(() => null) : null,
-    x.ibu_id ? call('get', { entity: 'penduduk', id: x.ibu_id }).catch(() => null) : null,
-    call('list', { entity: 'penduduk', filters: { ayah_id: x.id }, limit: 50 }).then(r => r.rows || []).catch(() => []),
-    call('list', { entity: 'penduduk', filters: { ibu_id: x.id }, limit: 50 }).then(r => r.rows || []).catch(() => [])
-  ]);
-  const m = {}; a1.concat(a2).forEach(r => { m[r.id] = r; }); const anak = Object.values(m).sort((a, b) => String(a.tgl_lahir || '').localeCompare(String(b.tgl_lahir || '')));
-  const ortu = (lbl, o, nama) => o ? `<button class="row" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'penduduk', id: o.id }]))}'><span class="av">${esc(initials(o.nama))}</span><span class="main"><span class="t">${esc(o.nama)} <small class="muted">· ${lbl}</small></span><span class="s">${esc(pendInfo(o))}</span></span></button>` : nama ? `<div class="row"><span class="av">?</span><span class="main"><span class="t">${esc(nama)} <small class="muted">· ${lbl}</small></span><span class="s">Belum dihubungkan ke Data Penduduk (pilih lewat Ubah)</span></span></div>` : '';
-  const isi = ortu('Ayah', ay, x.ayah) + ortu('Ibu', ib, x.ibu) + anak.map(a => ortu(String(a.jk || '').toUpperCase() === 'PEREMPUAN' ? 'Anak (P)' : 'Anak (L)', a)).join('');
-  return `<div class="sec-h"><h2>${ic('users')} Silsilah (orang tua & anak)</h2></div>` + (isi ? `<div class="list">${isi}</div>` : '<div class="meta">Belum ada data orang tua atau anak yang terhubung.</div>');
+  const w = canWrite('penduduk'), out = [];
+  const LV = { 1: ['Ayah', 'Ibu'], 2: ['Kakek', 'Nenek'], 3: ['Buyut (L)', 'Buyut (P)'] };
+  async function naik(o, lv, dari) {
+    if (!o || lv > 3) return;
+    const [ay, ib] = await Promise.all([pGet(o.ayah_id), pGet(o.ibu_id)]);
+    const sisi = dari ? ' · dari ' + dari : '';
+    [[ay, o.ayah, 'ayah', 0], [ib, o.ibu, 'ibu', 1]].forEach(([r, nm, k, i]) => {
+      if (r) out.push({ lbl: LV[lv][i] + sisi, o: r, lv });
+      else if (nm) out.push({ lbl: LV[lv][i] + sisi, nm, own: o.id, k, lv });
+    });
+    await Promise.all([naik(ay, lv + 1, lv === 1 ? 'ayah' : dari), naik(ib, lv + 1, lv === 1 ? 'ibu' : dari)]);
+  }
+  const [, sd1, sd2, a1, a2] = await Promise.all([naik(x, 1, ''), x.ayah_id ? pList({ ayah_id: x.ayah_id }) : [], x.ibu_id ? pList({ ibu_id: x.ibu_id }) : [], pList({ ayah_id: x.id }), pList({ ibu_id: x.id })]);
+  const uq = a => { const m = {}; a.forEach(r => { if (r.id !== x.id) m[r.id] = r; }); return Object.values(m).sort((p, q) => String(p.tgl_lahir || '').localeCompare(String(q.tgl_lahir || ''))); };
+  out.sort((p, q) => q.lv - p.lv);
+  const sdr = uq(sd1.concat(sd2)), anak = uq(a1.concat(a2));
+  const cucu = anak.length ? uq((await Promise.all(anak.slice(0, 12).map(a => Promise.all([pList({ ayah_id: a.id }), pList({ ibu_id: a.id })])))).flat(2)) : [];
+  const jkL = r => String(r.jk || '').toUpperCase() === 'PEREMPUAN' ? 'P' : 'L';
+  sdr.forEach(r => out.push({ lbl: 'Saudara (' + jkL(r) + ')', o: r }));
+  anak.forEach(r => out.push({ lbl: 'Anak (' + jkL(r) + ')', o: r }));
+  cucu.forEach(r => out.push({ lbl: 'Cucu (' + jkL(r) + ')', o: r }));
+  const st = r => /meninggal/i.test(r.status || '') ? `<span class="pill bad">Meninggal${r.tgl_meninggal ? ' ' + dmyStrip(r.tgl_meninggal) : ''}</span>` : /pindah/i.test(r.status || '') ? `<span class="pill warn">Pindah${r.tgl_pindah ? ' ' + dmyStrip(r.tgl_pindah) : ''}</span>` : '';
+  const row = e => e.o
+    ? `<button class="srow" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'penduduk', id: e.o.id }]))}'><span class="sl">${esc(e.lbl)}</span><span class="sn">${esc(e.o.nama)} ${st(e.o)}</span><span class="si">${esc(pendInfo(Object.assign({}, e.o, { status: '' })))}</span></button>`
+    : `<div class="srow"><span class="sl">${esc(e.lbl)}</span><span class="sn">${esc(e.nm)} <span class="pill">belum terhubung</span></span>${w ? `<button class="btn sm shub" data-act="silHub" data-own="${esc(e.own)}" data-k="${e.k}" data-nm="${esc(e.nm)}" data-self="${esc(x.id)}">${ic('link')}Hubungkan</button>` : ''}</div>`;
+  return `<div class="silbox" data-sid="${esc(x.id)}"><div class="sec-h"><h2>${ic('users')} Silsilah${out.length ? ' (' + out.length + ')' : ''}</h2></div>` + (out.length ? `<div class="sil">${out.map(row).join('')}</div>` : '<div class="meta">Belum ada orang tua, saudara atau anak yang terhubung. Isi Nama Ayah/Ibu lewat Ubah.</div>') + '</div>';
 }
+ACT.silHub = t => {
+  const k = t.dataset.k, own = t.dataset.own, self = t.dataset.self;
+  pilihPendModal('Hubungkan ' + (k === 'ayah' ? 'ayah' : 'ibu') + ': ' + t.dataset.nm, k === 'ayah' ? 'LAKI-LAKI' : 'PEREMPUAN', own, t.dataset.nm, async o => {
+    try {
+      await call('save', { entity: 'penduduk', record: { id: own, [k + '_id']: o.id, [k]: o.nama } });
+      toast('Terhubung dengan ' + o.nama + '.');
+      const box = document.querySelector('.silbox[data-sid="' + self + '"]'), x = await pGet(self);
+      if (box && x) box.outerHTML = await silsilahHtml(x);
+    } catch (er) { toast(er.message, 1); }
+  });
+};
 /* ---- Detail penduduk: tanah yang dimiliki & riwayat surat keterangan ---- */
 async function extraPendudukLink(x, el) {
   const nikOk = /^\d{16}$/.test(String(x.nik || ''));
@@ -6030,7 +6081,8 @@ VIEWS.akun = async (p, main) => {
     <div class="card"><button type="button" class="btn sm" data-act="pinShow">${ic('key')}Ubah kata sandi</button>
     <form class="stack" id="pinf" hidden style="margin-top:8px"><div class="form"><div class="f"><label for="pl">Kata sandi lama</label><input id="pl" type="password" autocomplete="current-password"></div><div class="f"><label for="pb">Kata sandi baru (min. 6 karakter)</label><input id="pb" type="password" autocomplete="new-password"></div><div class="f"><label for="pb2">Ulangi kata sandi baru</label><input id="pb2" type="password" autocomplete="new-password"></div></div><div id="perr2" class="err" hidden></div><div><button class="btn pri" type="submit">${ic('key')}Simpan kata sandi</button></div></form></div>
     ${pkAkunHtml()}
-    <div class="card stack"><div class="lbl">Tampilan</div><div class="chips">${[['', 'Ikuti perangkat'], ['light', 'Terang'], ['dark', 'Gelap']].map(t => `<button class="chip ${th === t[0] ? 'on' : ''}" data-act="theme" data-v="${t[0]}">${t[1]}</button>`).join('')}</div></div>
+    <div class="card stack"><div class="lbl">Tampilan</div><div class="chips">${[['', 'Ikuti perangkat'], ['light', 'Terang'], ['dark', 'Gelap']].map(t => `<button class="chip ${th === t[0] ? 'on' : ''}" data-act="theme" data-v="${t[0]}">${t[1]}</button>`).join('')}</div>
+      <div class="lbl" style="margin-top:4px">Warna tema</div><div class="accs">${[['', 'Hijau', '#0f5a46'], ['biru', 'Biru', '#1d4ed8'], ['merah', 'Merah', '#b91c1c'], ['ungu', 'Ungu', '#6d28d9'], ['cokelat', 'Cokelat', '#8a5a2b']].map(a => `<button class="acc ${(store.get('accent') || '') === a[0] ? 'on' : ''}" data-act="accent" data-v="${a[0]}" style="--c:${a[2]}"><i></i>${a[1]}</button>`).join('')}</div></div>
     ${isStandalone() ? '' : `<button class="btn" data-act="install">${ic('plus')}Pasang aplikasi di HP / komputer</button>`}
     ${tentangHtml()}
     <button class="btn danger" data-act="logout">${ic('out')}Keluar</button>
@@ -6050,6 +6102,7 @@ VIEWS.akun = async (p, main) => {
     catch (x) { er.textContent = x.message; er.hidden = false; }
   };
   S.vh.theme = t => { store.set('theme', t.dataset.v || null); applyTheme(); refresh(); };
+  S.vh.accent = t => { store.set('accent', t.dataset.v || null); applyTheme(); refresh(); };
   S.vh.logout = doLogout;
   $('#fotoMe').onchange = async ev => {
     const f = ev.target.files[0]; if (!f) return;
@@ -6085,7 +6138,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '96', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '97', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -6110,7 +6163,7 @@ function tentangHtml() {
     <div class="ab-c">© ${new Date().getFullYear()} Pemerintah Desa ${esc(ND())}</div>
   </div>`;
 }
-function applyTheme() { const t = store.get('theme'); if (t) document.documentElement.setAttribute('data-theme', t); else document.documentElement.removeAttribute('data-theme'); warnaBilah(); }
+function applyTheme() { const t = store.get('theme'), a = store.get('accent'), de = document.documentElement; if (t) de.setAttribute('data-theme', t); else de.removeAttribute('data-theme'); if (a) de.setAttribute('data-accent', a); else de.removeAttribute('data-accent'); warnaBilah(); }
 function warnaBilah() {
   const top = window.matchMedia && matchMedia('(min-width:900px)').matches;
   const c = getComputedStyle(document.documentElement).getPropertyValue(top ? '--pri' : '--bg').trim();
