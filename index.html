@@ -667,8 +667,10 @@ details.more>summary{cursor:pointer;color:var(--muted);font-size:11.5px;font-wei
 .fmsg{text-align:center;font-weight:600;min-height:20px;display:flex;gap:6px;justify-content:center;align-items:center;flex-wrap:wrap}
 #fscan.done .fmsg{color:var(--ok)}
 
-.dview .btn:not(.pri):not(.danger):not(.solid):not([data-act="xedit"]):not([data-act="xdel"]){background:color-mix(in srgb,var(--warn) 16%,var(--surface));border-color:color-mix(in srgb,var(--warn) 45%,transparent);color:color-mix(in srgb,var(--warn) 62%,var(--ink))}
-.dview .btn:not(.pri):not(.danger):not(.solid):hover{background:color-mix(in srgb,var(--warn) 26%,var(--surface))}
+.dview .btn:not(.pri):not(.danger):not(.solid):not([data-act="xedit"]):not([data-act="xdel"]){background:#c2410c;border-color:#c2410c;color:#fff}
+.dview .btn:not(.pri):not(.danger):not(.solid):not([data-act="xedit"]):not([data-act="xdel"]):hover{background:#9a3412;border-color:#9a3412}
+:root[data-theme="dark"] .dview .btn:not(.pri):not(.danger):not(.solid):not([data-act="xedit"]):not([data-act="xdel"]){background:#9a3412;border-color:#c2410c;color:#ffedd5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .dview .btn:not(.pri):not(.danger):not(.solid):not([data-act="xedit"]):not([data-act="xdel"]){background:#9a3412;border-color:#c2410c;color:#ffedd5}}
 .dview .confirm .btn{background:var(--surface);color:var(--ink);border-color:var(--line)}
 .idnote:empty{display:none}.idnote.bad{color:var(--bad)}.idnote a{color:var(--pri);font-weight:600}
 input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-soft)}
@@ -682,7 +684,7 @@ input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-sof
 <div id="layer"></div>
 
 <script>
-window.addEventListener('error', function (e) { var d = document.createElement('pre'); d.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#b3261e;color:#fff;padding:10px;border-radius:8px;white-space:pre-wrap;font:12px monospace'; d.textContent = 'Galat: ' + e.message + ' (baris ' + e.lineno + ':' + e.colno + ')'; document.body.appendChild(d); });
+window.addEventListener('error', function (e) { if (/ResizeObserver loop/i.test(e.message || '')) { e.stopImmediatePropagation && e.stopImmediatePropagation(); return; } var d = document.createElement('pre'); d.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#b3261e;color:#fff;padding:10px;border-radius:8px;white-space:pre-wrap;font:12px monospace'; d.textContent = 'Galat: ' + e.message + ' (baris ' + e.lineno + ':' + e.colno + ')'; document.body.appendChild(d); });
 window.addEventListener('unhandledrejection', function (e) { var d = document.createElement('pre'); d.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#b3261e;color:#fff;padding:10px;border-radius:8px;white-space:pre-wrap;font:12px monospace'; d.textContent = 'Galat: ' + (e.reason && e.reason.message || e.reason); document.body.appendChild(d); });
 </script>
 <script>
@@ -6083,7 +6085,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '95', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '96', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
