@@ -357,6 +357,8 @@ body.privblur #main,body.privblur #layer,body.privblur .tabs{filter:blur(18px);t
 .pd-m{display:flex;gap:10px;align-items:center;font-size:11.5px;color:var(--muted)}.pd-m span{display:flex;gap:4px;align-items:center}.pd-m a{color:var(--pri);font-weight:600}
 .hadir{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:7px 10px}.hadir.libur{background:color-mix(in srgb,var(--gold) 9%,var(--surface));border-color:color-mix(in srgb,var(--gold) 30%,var(--line))}
 .hd-ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:color-mix(in srgb,var(--gold) 18%,transparent);color:var(--gold);flex:none}.hd-ic svg{width:16px;height:16px}.hd-k{font-weight:700;font-size:13.5px}
+.mut{display:flex;flex-direction:column;gap:4px;padding:8px 10px}.mut b{display:flex;gap:6px;align-items:center}.mut b svg{width:15px;height:15px}.mut span{font-size:12px;color:var(--muted)}
+.mut.mati{background:color-mix(in srgb,#64748b 12%,var(--surface));border-color:color-mix(in srgb,#64748b 35%,var(--line))}.mut.pindah{background:color-mix(in srgb,var(--gold) 10%,var(--surface));border-color:color-mix(in srgb,var(--gold) 30%,var(--line))}
 .ds{padding:0;overflow:hidden}.ds-top{display:flex;gap:10px;align-items:center;padding:10px 12px;background:linear-gradient(135deg,var(--pri,#15803d),color-mix(in srgb,var(--pri,#15803d) 60%,#0f172a));color:#fff}.ds-badge{width:34px;height:34px;border-radius:12px;background:rgba(255,255,255,.18);display:grid;place-items:center;flex:none}.ds-badge svg{width:22px;height:22px}.ds-cap{font-size:11px;opacity:.85}.ds-jab{font-size:14px;font-weight:700;line-height:1.25}.ds-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.ds-chips span{font-size:11px;background:rgba(255,255,255,.2);border-radius:99px;padding:2px 8px}
 .ds-stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));border-bottom:1px solid var(--line)}.ds-stat div{padding:6px 8px;text-align:center}.ds-stat div+div{border-left:1px solid var(--line)}.ds-stat b{display:block;font-size:12px}.ds-stat small{font-size:9.5px;color:var(--muted)}
 .ds-sec{padding:7px 12px 2px}.ds-h{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}.ds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0 12px}.ds-it{display:flex;gap:8px;align-items:center;padding:2px 0}.ds-ic{width:22px;height:22px;border-radius:8px;background:color-mix(in srgb,var(--pri,#15803d) 12%,transparent);color:var(--pri,#15803d);display:grid;place-items:center;flex:none}.ds-ic svg{width:12px;height:12px}.ds-it small{display:block;font-size:9.5px;color:var(--muted);line-height:1.2}.ds-it b{display:block;font-size:12px;font-weight:600;line-height:1.25;word-break:break-word}.ds-it a{color:var(--pri,#15803d)}
@@ -881,6 +883,7 @@ const OPT = {
   hubungan: ['KEPALA KELUARGA', 'SUAMI', 'ISTRI', 'ANAK', 'MENANTU', 'CUCU', 'ORANG TUA', 'MERTUA', 'FAMILI LAIN', 'PEMBANTU', 'LAINNYA'],
   darah: ['A', 'B', 'AB', 'O', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'TIDAK TAHU'],
   statusPend: ['Aktif', 'Meninggal Dunia', 'Pindah', 'Pendatang'],
+  pekerjaan: ["BELUM / TIDAK BEKERJA", "MENGURUS RUMAH TANGGA", "PELAJAR / MAHASISWA", "PENSIUNAN", "PEGAWAI NEGERI SIPIL (PNS)", "TENTARA NASIONAL INDONESIA (TNI)", "KEPOLISIAN RI (POLRI)", "KARYAWAN SWASTA", "KARYAWAN BUMN", "KARYAWAN BUMD", "KARYAWAN HONORER", "BURUH HARIAN LEPAS", "PETANI / PEKEBUN", "PETERNAK", "NELAYAN / PERIKANAN", "BURUH TANI / PERKEBUNAN", "BURUH NELAYAN / PERIKANAN", "BURUH PETERNAKAN", "PERDAGANGAN", "INDUSTRI", "KONSTRUKSI", "TRANSPORTASI", "WIRASWASTA", "PEMBANTU RUMAH TANGGA", "SOPIR", "PELAUT", "PIALANG", "ARSITEK", "AKUNTAN", "KONSULTAN", "DOKTER", "BIDAN", "PERAWAT", "APOTEKER", "PSIKIATER / PSIKOLOG", "PENGACARA", "NOTARIS", "PENELITI", "DOSEN", "GURU", "PILOT", "PENYIAR TELEVISI", "PENYIAR RADIO", "WARTAWAN", "SENIMAN", "PERANCANG BUSANA", "PENTERJEMAH", "TUKANG CUKUR", "TUKANG LISTRIK", "TUKANG BATU", "TUKANG KAYU", "TUKANG SOL SEPATU", "TUKANG LAS / PANDAI BESI", "TUKANG JAHIT", "TUKANG GIGI", "PENATA RIAS", "PENATA BUSANA", "PENATA RAMBUT", "MEKANIK", "JURU MASAK", "PRESIDEN", "WAKIL PRESIDEN", "ANGGOTA DPR-RI", "ANGGOTA DPD", "ANGGOTA BPK", "ANGGOTA MAHKAMAH KONSTITUSI", "ANGGOTA KABINET / KEMENTERIAN", "DUTA BESAR", "GUBERNUR", "WAKIL GUBERNUR", "BUPATI", "WAKIL BUPATI", "WALIKOTA", "WAKIL WALIKOTA", "ANGGOTA DPRD PROVINSI", "ANGGOTA DPRD KABUPATEN/KOTA", "KEPALA DESA", "PERANGKAT DESA", "IMAM MASJID", "PENDETA", "PASTOR", "BIARAWATI", "USTADZ / MUBALIGH", "TABIB", "PARAJI", "PARANORMAL", "PROMOTOR ACARA"],
   wn: ['WNI', 'WNA'],
   inv: ['Tanah', 'Peralatan dan Mesin', 'Gedung dan Bangunan', 'Jalan, Jaringan dan Irigasi', 'Aset Tetap Lainnya', 'Konstruksi dalam Pengerjaan', 'Inventaris Kantor'],
   kondisi: ['Baik', 'Rusak Ringan', 'Rusak Berat'],
@@ -1083,7 +1086,7 @@ const UI = {
       F('pm_nama', 'Nama Pemilik saat ini', 'text', { up: 1, wide: 1, opick: 2 }), F('pm_penduduk_id', '', 'hidden'),
       F('pm_nik', 'NIK Pemilik', 'text', { mono: 1, len: 16, sens: 1, nikfill: { pre: 'pm_' } }), F('pm_kk', 'Nomor KK', 'text', { mono: 1, len: 16, sens: 1, hint: 'Kosongkan bila tidak tahu (diisi 0000000000000000)' }),
       F('pm_jk', 'Jenis Kelamin', 'select', { opt: OPT.jk }), F('pm_tempat_lahir', 'Tempat Lahir', 'text', { up: 1 }), F('pm_tgl_lahir', 'Tanggal Lahir', 'date'), F('pm_agama', 'Agama', 'select', { opt: OPT.agama }),
-      F('pm_pekerjaan', 'Pekerjaan', 'text', { up: 1 }), F('pm_alamat', 'Alamat / Dusun', 'text', { up: 1, wide: 1 }), F('pm_rt', 'RT', 'text', { pad: 3 }), F('pm_rw', 'RW', 'text', { pad: 3 }),
+      F('pm_pekerjaan', 'Pekerjaan', 'text', { up: 1, dd: OPT.pekerjaan }), F('pm_alamat', 'Alamat / Dusun', 'text', { up: 1, wide: 1 }), F('pm_rt', 'RT', 'text', { pad: 3 }), F('pm_rw', 'RW', 'text', { pad: 3 }),
       F('pm_desa', 'Desa / Kelurahan', 'text', { up: 1 }), F('pm_kec', 'Kecamatan', 'text', { up: 1 }), F('pm_kab', 'Kabupaten', 'text', { up: 1 })],
     chips: { k: 'dusun', opt: OPT.dusun, lbl: s => s.replace('DUSUN ', '') },
     row: r => ({ t: r.nama + (r.pm_nama && r.pm_nama !== r.nama ? ' → ' + r.pm_nama : ''), s: [r.nop, r.alamat_op].filter(Boolean).join(' · '), s2: [r.luas ? Number(r.luas).toLocaleString('id-ID') + ' m²' : '', r.pbb ? 'PBB Rp ' + Number(r.pbb).toLocaleString('id-ID') : '', r.status_bayar].filter(Boolean).join(' · '), r: r.bidang ? '#' + r.bidang : '', av: initials(r.nama), pill: (r.bidang ? '<span class="pill ok">Terpetakan</span>' : '') + pendPill(r.pm_status_pend, 'Pemilik') }),
@@ -1099,14 +1102,14 @@ const UI = {
     t: 'Data Penduduk', ic: 'users', perm: 'penduduk', folder: 'Penduduk/KTP', file: 'foto_ktp_id',
     fields: [F('nik', 'NIK', 'text', { req: 1, mono: 1, len: 16, sens: 1 }), F('kk', 'Nomor KK', 'text', { mono: 1, len: 16, sens: 1 }), F('nama', 'Nama Lengkap', 'text', { req: 1, up: 1, wide: 1 }),
       F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk, req: 1 }), F('tempat_lahir', 'Tempat Lahir', 'text', { up: 1 }), F('tgl_lahir', 'Tanggal Lahir', 'date'), F('agama', 'Agama', 'select', { opt: OPT.agama }),
-      F('pendidikan', 'Pendidikan', 'select', { opt: OPT.pendidikan }), F('pekerjaan', 'Pekerjaan', 'text', { up: 1, list: ['BELUM/TIDAK BEKERJA', 'MENGURUS RUMAH TANGGA', 'PELAJAR/MAHASISWA', 'PETANI/PEKEBUN', 'BURUH TANI/PERKEBUNAN', 'BURUH HARIAN LEPAS', 'KARYAWAN SWASTA', 'WIRASWASTA', 'PEDAGANG', 'PNS', 'PERANGKAT DESA', 'GURU', 'PENSIUNAN'] }),
+      F('pendidikan', 'Pendidikan', 'select', { opt: OPT.pendidikan }), F('pekerjaan', 'Pekerjaan', 'select', { opt: OPT.pekerjaan }),
       F('gol_darah', 'Golongan Darah', 'select', { opt: OPT.darah }), F('status_kawin', 'Status Perkawinan', 'select', { opt: OPT.kawin }), F('hubungan', 'Hubungan dalam Keluarga', 'select', { opt: OPT.hubungan }),
       F('warga_negara', 'Kewarganegaraan', 'select', { opt: OPT.wn, def: 'WNI' }), F('no_paspor', 'No. Paspor', 'text', { sens: 1 }), F('no_kitap', 'No. KITAP', 'text', { sens: 1 }), F('ayah', 'Nama Ayah', 'text', { up: 1 }), F('ibu', 'Nama Ibu', 'text', { up: 1 }),
-      F('dusun', 'Dusun', 'select', { opt: OPT.dusun, req: 1 }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }), F('status', 'Status Penduduk', 'select', { opt: OPT.statusPend, def: 'Aktif' }),
-      F('tgl_meninggal', 'Tanggal Meninggal', 'date'), F('tgl_pindah', 'Tanggal Pindah', 'date'), F('tgl_datang', 'Tanggal Datang', 'date'), F('ket', 'Keterangan', 'text'), F('foto_ktp_id', 'Foto KTP', 'file', { img: 1, priv: 1, wide: 1 })],
+      F('dusun', 'Dusun', 'select', { opt: OPT.dusun, req: 1 }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }), F('status', 'Status Penduduk', 'select', { opt: OPT.statusPend, noform: 1 }),
+      F('tgl_meninggal', 'Tanggal Meninggal', 'date', { noform: 1 }), F('tgl_pindah', 'Tanggal Pindah', 'date', { noform: 1 }), F('tgl_datang', 'Tanggal Datang', 'date'), F('ket', 'Keterangan', 'text'), F('foto_ktp_id', 'Foto KTP', 'file', { img: 1, priv: 1, wide: 1 })],
     chips: { k: 'dusun', opt: OPT.dusun, lbl: s => s.replace('DUSUN ', '') }, sort: 'nama',
     views: [['Aktif', () => ({ _kel: 'aktif' })], ['Meninggal', () => ({ _kel: 'meninggal' })], ['Pindah', () => ({ _kel: 'pindah' })], ['Luar desa', () => ({ _kel: 'luar' })], ['Semua', () => ({})]],
-    row: r => ({ t: r.nama, s: `<span class="mono">${esc(r.nik)}</span> · ${esc((r.jk || '').slice(0, 1))}${r.tgl_lahir ? ' · ' + umur(r.tgl_lahir) + ' th' : ''} · ${esc(String(r.dusun || '').replace('DUSUN ', ''))} RT ${esc(r.rt)}/${esc(r.rw)}`, raw: 1, s2: [r.hubungan, r.pekerjaan, r.status_kawin, r.pendidikan].filter(Boolean).join(' · '), av: initials(r.nama), pill: r.status && r.status !== 'Aktif' ? `<span class="pill ${/meninggal/i.test(r.status) ? 'bad' : 'warn'}">${esc(r.status)}</span>` : '' }),
+    row: r => ({ t: r.nama, s: `<span class="mono">${esc(r.nik)}</span> · ${esc((r.jk || '').slice(0, 1))}${r.tgl_lahir ? ' · ' + umur(r.tgl_lahir) + ' th' : ''} · ${esc(String(r.dusun || '').replace('DUSUN ', ''))} RT ${esc(r.rt)}/${esc(r.rw)}`, raw: 1, s2: [r.hubungan, r.pekerjaan, r.status_kawin, r.pendidikan].filter(Boolean).join(' · '), av: initials(r.nama), pill: stPendPill(r) }),
     excel: 1,
   },
   keluarga: {
@@ -1367,7 +1370,7 @@ const UI = {
       F('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1, nikfill: 1, hint: 'Ketik 16 digit: data dari Data Penduduk terisi otomatis' }), F('nama', 'Nama', 'text', { req: 1, up: 1, wide: 1, lblW: { k: 'pemohon', v: 'Lembaga / Instansi', l: 'Nama Penanggung Jawab' } }),
       F('pj_jabatan', 'Jabatan dalam Lembaga', 'text', { when: { k: 'pemohon', v: 'Lembaga / Instansi' }, list: ['Ketua', 'Pengasuh', 'Kepala Sekolah', 'Takmir', 'Pimpinan', 'Direktur', 'Sekretaris', 'Bendahara'] }),
       F('tempat_lahir', 'Tempat Lahir', 'text', { up: 1 }), F('tgl_lahir', 'Tanggal Lahir', 'date'), F('umur', 'Tahun Lahir / Umur'),
-      F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk }), F('agama', 'Agama', 'select', { opt: OPT.agama }), F('pekerjaan', 'Pekerjaan', 'text', { up: 1, list: ['BELUM/TIDAK BEKERJA', 'MENGURUS RUMAH TANGGA', 'PELAJAR/MAHASISWA', 'PETANI/PEKEBUN', 'BURUH TANI/PERKEBUNAN', 'BURUH HARIAN LEPAS', 'KARYAWAN SWASTA', 'WIRASWASTA', 'PEDAGANG', 'PNS', 'PERANGKAT DESA', 'GURU', 'PENSIUNAN'] }), F('status_kawin', 'Status Perkawinan', 'text', { up: 1, list: OPT.kawin }),
+      F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk }), F('agama', 'Agama', 'select', { opt: OPT.agama }), F('pekerjaan', 'Pekerjaan', 'text', { up: 1, dd: OPT.pekerjaan }), F('status_kawin', 'Status Perkawinan', 'text', { up: 1, list: OPT.kawin }),
       F('dusun', 'Dusun', 'select', { opt: OPT.dusun }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }), F('keperluan', 'Keperluan', 'textarea', { wide: 1 }),
       F('alamat_domisili', 'Alamat Domisili (kosongkan bila sama dengan alamat)', 'text', { wide: 1, grp: ['Surat Keterangan Domisili'] }), F('lama_tinggal', 'Tinggal Sejak', 'text', { hint: 'mis. tahun 2015', grp: ['Surat Keterangan Domisili'] }),
       F('usaha_nama', 'Nama Usaha', 'text', { grp: ['Surat Keterangan Usaha'] }), F('usaha_jenis', 'Jenis Usaha', 'text', { grp: ['Surat Keterangan Usaha'] }), F('usaha_alamat', 'Alamat Usaha', 'text', { wide: 1, grp: ['Surat Keterangan Usaha'] }), F('usaha_mulai', 'Mulai Usaha (tahun)', 'text', { grp: ['Surat Keterangan Usaha'] }),
@@ -1404,9 +1407,11 @@ const orangF = (pre, judul, o = {}) => {
     .concat(o.kk ? [X('kk', 'Nomor KK', 'text', { mono: 1, len: 16, sens: 1, hint: 'Kosongkan bila tidak tahu (diisi 0000000000000000)' })] : [])
     .concat(o.jk ? [F(pre + 'jk', '', 'hidden', { def: o.jk })] : [X('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk })])
     .concat([X('tempat_lahir', 'Tempat Lahir', 'text', { up: 1 }), X('tgl_lahir', 'Tanggal Lahir', 'date'), X('wn', 'Kewarganegaraan', 'select', { opt: OPT.wn, def: 'WNI' }), X('agama', 'Agama', 'select', { opt: OPT.agama }),
-      X('pekerjaan', 'Pekerjaan', 'text', { up: 1 }), X('alamat', o.wil === false ? 'Alamat lengkap' : 'Alamat / Dusun', 'text', { up: 1, wide: 1 })])
+      X('pekerjaan', 'Pekerjaan', 'text', { up: 1, dd: OPT.pekerjaan }), X('alamat', o.wil === false ? 'Alamat lengkap' : 'Alamat / Dusun', 'text', { up: 1, wide: 1 })])
     .concat(o.wil === false ? [] : [X('rt', 'RT', 'text', { pad: 3 }), X('rw', 'RW', 'text', { pad: 3 }), X('desa', 'Desa / Kelurahan', 'text', { up: 1 }), X('kec', 'Kecamatan', 'text', { up: 1 }), X('kab', 'Kabupaten', 'text', { up: 1 })]);
 };
+const dmyStrip = d => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(d || '')); return m ? m[3] + '-' + m[2] + '-' + m[1] : ''; };
+const stPendPill = r => { if (!r.status || r.status === 'Aktif') return ''; const mati = /meninggal/i.test(r.status), pdh = /pindah/i.test(r.status); const tg = dmyStrip(mati ? r.tgl_meninggal : pdh ? r.tgl_pindah : r.tgl_datang); return `<span class="pill ${mati ? 'bad' : 'warn'}">${esc((mati ? 'Meninggal' : r.status) + (tg ? ' ' + tg : ''))}</span>`; };
 const pendPill = (st, who) => st ? `<span class="pill ${st === 'Meninggal' ? 'bad' : 'warn'}">${who ? esc(who) + ' ' : ''}${esc(st === 'Meninggal' ? 'meninggal' : st === 'Pindah' ? 'pindah' : 'luar desa')}</span>` : '';
 const NTCR_J = ['Nikah', 'Talak', 'Cerai', 'Rujuk'];
 const NK = { when: { k: 'jenis', v: 'Nikah' } };
@@ -1941,7 +1946,7 @@ function dashInfo(k, D, H) {
   return '';
 }
 async function menuDash(p, main, alive) {
-  setTop('Menu', 'Dasbor ' + ND());
+  setTop('Menu', 'Dashboard ' + ND());
   const [D, H] = await Promise.all([call('dashboard').catch(() => ({})), S.homeData ? Promise.resolve(S.homeData) : call('home').then(d => (S.homeData = d)).catch(() => ({}))]);
   if (!alive()) return;
   const c = H.counts || {}, pm = D.pemerintahan, ps = D.pelayanan || {}, ku = D.keuangan, as = D.aset, h = H.hariIni;
@@ -3119,6 +3124,7 @@ async function renderDetail(e, x, el, full) {
   if (e === 'petugas') await extraPetugas(x, xx);
   if (e === 'aparat') extraAparat(x, xx, canWrite(e));
   if (e === 'tanah_desa') xx.insertAdjacentHTML('afterbegin', `<div class="btns">${x.bidang ? `<button class="btn sm pri" data-act="go" data-go='${esc(JSON.stringify(['tanah', { fokus: x.id }]))}'>${ic('map')}Lihat di peta (#${esc(x.bidang)})</button>` : ''}${canWrite(e) ? `<button class="btn sm${x.bidang ? '' : ' pri'}" data-act="go" data-go='${esc(JSON.stringify(['tanah', { untuk: x.id }]))}'>${ic('target')}${x.bidang ? 'Tambah bidang lain' : 'Cocokkan di peta'}</button>` : ''}</div>`);
+  if (e === 'penduduk') xx.insertAdjacentHTML('afterbegin', mutasiHtml(x));
   if (e === 'penduduk') await extraPendudukLink(x, xx);
   if (e === 'penduduk') await extraPendudukSosial(x, xx);
   if (e === 'ntcr') ntcrExtra(x, xx);
@@ -3350,9 +3356,9 @@ VIEWS.detail = async (p, main, alive) => {
   main.innerHTML = `<div class="card stack"><div class="d-head">${imgF ? `<img class="photo" src="${esc(thumb(x[imgF.k], 300))}" alt="">` : d.av != null ? `<span class="av" style="width:40px;height:40px">${/^</.test(d.av) ? d.av : esc(d.av)}</span>` : ''}<div style="flex:1;min-width:0"><h1>${esc(d.t)}</h1><div class="muted ${d.mono ? 'mono' : ''}">${d.raw ? d.s : esc(d.s)}</div>${d.pill ? `<div style="margin-top:4px">${d.pill}</div>` : ''}</div></div><div class="stack" id="dbody"></div></div>`;
   await renderDetail(e, x, $('#dbody'), true);
 };
-function confirmDel(box, fn) {
+function confirmDel(box, fn, msg, lbl) {
   const old = box.innerHTML;
-  box.innerHTML = `<div class="confirm">Hapus data ini secara permanen? <button class="btn sm danger solid" id="yes">Ya, hapus</button><button class="btn sm" id="no">Batal</button></div>`;
+  box.innerHTML = `<div class="confirm">${esc(msg || 'Hapus data ini secara permanen?')} <button class="btn sm danger solid" id="yes">${esc(lbl || (msg ? 'Ya' : 'Ya, hapus'))}</button><button class="btn sm" id="no">Batal</button></div>`;
   $('#no', box).onclick = () => { box.innerHTML = old; };
   $('#yes', box).onclick = async ev => { ev.target.disabled = true; try { await fn(); } catch (er) { toast(er.message, 1); box.innerHTML = old; } };
 }
@@ -3526,6 +3532,8 @@ function fieldHtml(f, v, rec) {
       break;
     }
     case 'select': {
+      const nsp = t => String(t).replace(/\s+/g, '').toUpperCase();
+      if (v && f.opt.indexOf(v) < 0) { const sama = f.opt.find(o => nsp(o) === nsp(v)); if (sama) v = sama; }
       const opts = f.opt.slice(); if (v && opts.indexOf(v) < 0) opts.unshift(v);
       inp = `<select id="${id}"><option value="">— pilih —</option>${opts.map(o => `<option ${o === v ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`; break;
     }
@@ -3579,7 +3587,7 @@ VIEWS.form = async (p, main, alive) => {
   if (u.rkp) { await rkpMuatVer(); if (!canWrite(e)) throw new Error('RKP ' + rkpLbl(S.rkpYear) + ' hanya bisa dilihat karena sudah digantikan versi perubahan. Pilih versi terbaru di Dashboard RKP.'); }
   setTop(p.buat && NASKAH[e] ? NASKAH[e].buat : (p.id ? 'Ubah ' : 'Tambah ') + u.t);
   let rec = {};
-  let flds = u.fields.filter(f => !(f.virt && p.id));
+  let flds = u.fields.filter(f => !(f.virt && p.id) && !f.noform);
   if (p.id) rec = await call('get', { entity: e, id: p.id });
   if (e === 'kegiatan' && rec.sumber_mus) throw new Error('Agenda ini terusan dari Musyawarah RKP/RPJM, jadi tidak bisa diubah di sini. Ubah lewat Perencanaan → RKP Desa atau RPJM Desa → Musyawarah.');
   else {
@@ -3978,6 +3986,71 @@ async function extraPendudukSosial(x, el) {
   }
   if (h) el.insertAdjacentHTML('beforeend', `<div class="stack">${h}</div>`);
 }
+/* ---- Mutasi penduduk: Nyatakan Meninggal / Nyatakan Pindah (dari detail penduduk) ---- */
+const SEBAB_MATI = ['Sakit biasa / tua', 'Wabah penyakit', 'Kecelakaan', 'Kriminalitas', 'Bunuh diri', 'Lainnya'];
+const TEMPAT_MATI = ['Rumah', 'Rumah Sakit', 'Puskesmas', 'Perjalanan', 'Lainnya'];
+const ALASAN_PINDAH = ['Pekerjaan', 'Pendidikan', 'Keamanan', 'Kesehatan', 'Perumahan', 'Keluarga', 'Lainnya'];
+const JENIS_PINDAH = ['Kepala keluarga', 'Kepala keluarga dan seluruh anggota keluarga', 'Kepala keluarga dan sebagian anggota keluarga', 'Anggota keluarga'];
+function mutasiHtml(x) {
+  const st = String(x.status || ''), w = canWrite('penduduk');
+  if (/meninggal/i.test(st)) return `<div class="card mut mati"><b>${ic('heart')} Meninggal dunia${x.tgl_meninggal ? ' · ' + esc(fDate(x.tgl_meninggal)) : ''}</b><span>${esc([x.mati_jam ? 'pukul ' + x.mati_jam : '', x.mati_tempat, x.mati_sebab ? 'sebab: ' + x.mati_sebab : '', x.mati_pelapor ? 'pelapor: ' + x.mati_pelapor : ''].filter(Boolean).join(' · '))}</span>
+    <div class="btns">${x.dok_mati_id ? `<button class="btn sm" data-act="file" data-id="${esc(x.dok_mati_id)}" data-priv="1" data-name="Surat kematian">${ic('file')}Surat kematian</button>` : ''}${w ? `<button class="btn sm" data-act="mutSurat" data-id="${esc(x.id)}">${ic('file')}Buat Surat Ket. Kematian</button>` : ''}${S.user.admin ? `<button class="btn sm" data-act="mutBatal" data-id="${esc(x.id)}">${ic('back')}Batalkan status</button>` : ''}</div></div>`;
+  if (/pindah/i.test(st)) return `<div class="card mut pindah"><b>${ic('send')} Pindah${x.tgl_pindah ? ' · ' + esc(fDate(x.tgl_pindah)) : ''}</b><span>${esc([x.pindah_tujuan, x.pindah_alasan ? 'alasan: ' + x.pindah_alasan : '', x.pindah_jenis].filter(Boolean).join(' · '))}</span>
+    <div class="btns">${x.dok_pindah_id ? `<button class="btn sm" data-act="file" data-id="${esc(x.dok_pindah_id)}" data-priv="1" data-name="Surat pindah">${ic('file')}Surat pindah</button>` : ''}${S.user.admin ? `<button class="btn sm" data-act="mutBatal" data-id="${esc(x.id)}">${ic('back')}Batalkan status</button>` : ''}</div></div>`;
+  return w ? `<div class="btns"><button class="btn sm" data-act="mutMati" data-id="${esc(x.id)}">${ic('heart')}Nyatakan Meninggal</button><button class="btn sm" data-act="mutPindah" data-id="${esc(x.id)}">${ic('send')}Nyatakan Pindah</button></div>` : '';
+}
+async function mutasiForm(id, jenis) {
+  const x = await call('get', { entity: 'penduduk', id });
+  const mati = jenis === 'mati';
+  const opt = a => a.map(o => `<option>${esc(o)}</option>`).join('');
+  const m = modal(mati ? 'Nyatakan Meninggal' : 'Nyatakan Pindah', `<form class="stack" id="mutF"><div class="meta"><b>${esc(x.nama)}</b> · ${esc(String(x.dusun || '').replace(/^DUSUN /, ''))} RT ${esc(x.rt || '')}/${esc(x.rw || '')}</div><div class="form">
+    ${mati ? `<div class="f"><label>Tanggal meninggal <i>*</i></label><input type="date" id="mu_tgl" max="${isoToday()}" value="${isoToday()}"></div>
+      <div class="f"><label>Jam</label><input type="time" id="mu_jam"></div>
+      <div class="f"><label>Tempat meninggal <i>*</i></label><select id="mu_tempat"><option value="">— pilih —</option>${opt(TEMPAT_MATI)}</select></div>
+      <div class="f"><label>Sebab</label><select id="mu_sebab"><option value="">— pilih —</option>${opt(SEBAB_MATI)}</select></div>
+      <div class="f wide"><label>Keterangan tempat (mis. nama rumah sakit)</label><input id="mu_tempat2"></div>
+      <div class="f"><label>Nama pelapor</label><input id="mu_pelapor"></div>
+      <div class="f"><label>Hubungan pelapor</label><input id="mu_hub" list="mu_hubl"><datalist id="mu_hubl">${['Suami', 'Istri', 'Anak', 'Orang tua', 'Saudara', 'Ketua RT', 'Lainnya'].map(o => `<option value="${o}">`).join('')}</datalist></div>
+      <div class="f wide"><label>Surat kematian / dokumen (foto atau PDF)</label><input type="file" id="mu_dok" accept="application/pdf,${IMG_ANY}"></div>`
+    : `<div class="f"><label>Tanggal pindah <i>*</i></label><input type="date" id="mu_tgl" value="${isoToday()}"></div>
+      <div class="f"><label>Jenis kepindahan</label><select id="mu_jenis"><option value="">— pilih —</option>${opt(JENIS_PINDAH)}</select></div>
+      <div class="f wide"><label>Alamat tujuan <i>*</i></label><input id="mu_alamat" placeholder="Jalan / dusun / RT RW"></div>
+      <div class="f"><label>Desa / kelurahan tujuan</label><input id="mu_desa"></div><div class="f"><label>Kecamatan tujuan</label><input id="mu_kec"></div>
+      <div class="f"><label>Kabupaten / kota tujuan</label><input id="mu_kab"></div><div class="f"><label>Provinsi tujuan</label><input id="mu_prov"></div>
+      <div class="f"><label>Alasan pindah</label><select id="mu_alasan"><option value="">— pilih —</option>${opt(ALASAN_PINDAH)}</select></div>
+      <div class="f wide"><label>Surat pindah (SKPWNI) / dokumen</label><input type="file" id="mu_dok" accept="application/pdf,${IMG_ANY}"></div>`}
+    <div class="f wide"><label>Keterangan</label><textarea id="mu_ket" rows="2"></textarea></div></div>
+    <div class="err" id="mu_err" hidden></div><div class="btns"><button class="btn pri" type="submit">${ic('check')}Simpan</button><button class="btn" type="button" data-x>Batal</button></div></form>`);
+  const v = k => { const el = $('#mu_' + k, m.el); return el ? el.value.trim() : ''; };
+  $('#mutF', m.el).onsubmit = async ev => {
+    ev.preventDefault();
+    const er = $('#mu_err', m.el), btn = ev.submitter || $('button[type=submit]', m.el); er.hidden = true;
+    if (!v('tgl')) { er.textContent = 'Isi tanggal.'; er.hidden = false; return; }
+    if (mati && !v('tempat')) { er.textContent = 'Pilih tempat meninggal.'; er.hidden = false; return; }
+    if (!mati && !v('alamat')) { er.textContent = 'Isi alamat tujuan.'; er.hidden = false; return; }
+    btn.disabled = true;
+    try {
+      const rec = { id };
+      const f = $('#mu_dok', m.el).files[0];
+      if (f) { btn.textContent = 'Mengunggah dokumen…'; const up = await uploadFile(f, 'Penduduk/Mutasi'); rec[mati ? 'dok_mati_id' : 'dok_pindah_id'] = up.id; }
+      if (mati) Object.assign(rec, { status: 'Meninggal Dunia', tgl_meninggal: v('tgl'), mati_jam: v('jam'), mati_tempat: [v('tempat'), v('tempat2')].filter(Boolean).join(' – '), mati_sebab: v('sebab'), mati_pelapor: [v('pelapor'), v('hub') ? '(' + v('hub') + ')' : ''].filter(Boolean).join(' ') });
+      else Object.assign(rec, { status: 'Pindah', tgl_pindah: v('tgl'), pindah_jenis: v('jenis'), pindah_alasan: v('alasan'), pindah_tujuan: [v('alamat'), v('desa') && 'Desa ' + v('desa'), v('kec') && 'Kec. ' + v('kec'), v('kab') && 'Kab. ' + v('kab'), v('prov')].filter(Boolean).join(', ') });
+      if (v('ket')) rec.ket = [x.ket, v('ket')].filter(Boolean).join('; ');
+      await call('save', { entity: 'penduduk', record: rec });
+      m.close(); toast(mati ? 'Tercatat meninggal dunia.' : 'Tercatat pindah.'); refresh();
+    } catch (x2) { er.textContent = x2.message; er.hidden = false; btn.disabled = false; btn.innerHTML = ic('check') + 'Simpan'; }
+  };
+}
+ACT.mutMati = t => mutasiForm(t.dataset.id, 'mati').catch(x => toast(x.message, 1));
+ACT.mutPindah = t => mutasiForm(t.dataset.id, 'pindah').catch(x => toast(x.message, 1));
+ACT.mutBatal = t => { const box = t.closest('.btns'); confirmDel(box, async () => { await call('save', { entity: 'penduduk', record: { id: t.dataset.id, status: 'Aktif', tgl_meninggal: '', tgl_pindah: '' } }); toast('Status dikembalikan menjadi Aktif.'); refresh(); }, 'Kembalikan status menjadi Aktif?'); };
+ACT.mutSurat = async t => {
+  try {
+    const x = await call('get', { entity: 'penduduk', id: t.dataset.id });
+    const jen = (S.jenisSurat || []).map(j => j.nama).concat(Object.keys(typeof SURAT !== 'undefined' ? SURAT : {})).find(n => /kematian/i.test(n)) || 'Surat Keterangan Kematian';
+    go('form', { e: 'register_surat', preset: { penduduk_id: x.id, nama: x.nama || '', nik: x.nik || '', tempat_lahir: x.tempat_lahir || '', tgl_lahir: x.tgl_lahir || '', jk: x.jk || '', dusun: x.dusun || '', rt: x.rt || '', rw: x.rw || '', jenis_surat: jen, mati_tgl: x.tgl_meninggal || '', mati_jam: x.mati_jam || '', mati_tempat: x.mati_tempat || '', mati_sebab: x.mati_sebab || '', pelapor: x.mati_pelapor || '' } });
+  } catch (x) { toast(x.message, 1); }
+};
 /* ---- Surat masuk → Agenda kegiatan / Berita ---- */
 function fwdHtml(rec) {
   const sudah = String(rec.terusan || ''), ag = canWrite('kegiatan') && !/Agenda/.test(sudah), br = canWrite('berita') && !/Berita/.test(sudah);
@@ -5885,7 +5958,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '91', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '92', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
