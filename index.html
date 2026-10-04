@@ -3998,6 +3998,7 @@ async function silsilahHtml(x) {
     ? `<button class="srow" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'penduduk', id: e.o.id }]))}'><span class="sl">${esc(e.lbl)}</span><span class="sn">${esc(e.o.nama)} ${st(e.o)}</span><span class="si">${esc(pendInfo(Object.assign({}, e.o, { status: '' })))}</span></button>`
     : e.ket ? `<div class="srow"><span class="sl">${esc(e.lbl)}</span><span class="sn">${esc(e.nm)} <span class="pill ${e.ket === 'Meninggal' ? 'bad' : 'warn'}">${esc(e.ket)}</span></span>${w ? `<button class="sket" data-act="silKetX" data-own="${esc(e.own)}" data-k="${e.k}" data-self="${esc(x.id)}" title="Batalkan keterangan">ubah</button>` : ''}</div>`
     : `<div class="srow"><span class="sl">${esc(e.lbl)}</span><span class="sn">${esc(e.nm)} <span class="pill">belum terhubung</span></span>${w ? `<button class="btn sm shub" data-act="silHub" data-own="${esc(e.own)}" data-k="${e.k}" data-nm="${esc(e.nm)}" data-self="${esc(x.id)}">${ic('link')}Hubungkan</button>` : ''}</div>`;
+  if (!out.length) return '';
   return `<div class="silbox" data-sid="${esc(x.id)}"><div class="sec-h"><h2>${ic('users')} Silsilah${out.length ? ' (' + out.length + ')' : ''}</h2></div>` + (out.length ? `<div class="sil">${out.map(row).join('')}</div>` : '<div class="meta">Belum ada orang tua, saudara atau anak yang terhubung. Isi Nama Ayah/Ibu lewat Ubah.</div>') + '</div>';
 }
 ACT.silHub = t => {
@@ -4029,8 +4030,8 @@ async function extraPendudukLink(x, el) {
   ]);
   const uniq = a => { const m = {}; (a || []).forEach(r => { m[r.id] = r; }); return Object.values(m); };
   let h = '';
-  if (tn) { const T = uniq(tn); h += `<div class="sec-h"><h2>${ic('map')} Tanah yang dimiliki (${T.length})</h2></div>` + (T.length ? `<div class="list">${T.map(r => rowHtml('tanah_desa', r)).join('')}</div>${T.some(r => r.bidang) ? `<div class="btns"><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['tanah', { fokus: T.find(r => r.bidang).id }]))}'>${ic('map')}Lihat di peta</button></div>` : ''}` : '<div class="meta">Belum tercatat sebagai pemilik tanah.</div>'); }
-  if (sr) { const R2 = uniq(sr).sort((a, b) => String(b.tgl_surat || '').localeCompare(String(a.tgl_surat || ''))); h += `<div class="sec-h"><h2>${ic('file')} Riwayat surat keterangan (${R2.length})</h2></div>` + (R2.length ? `<div class="list">${R2.map(r => rowHtml('register_surat', r)).join('')}</div>` : '<div class="meta">Belum pernah mengurus surat keterangan.</div>'); }
+  if (tn && uniq(tn).length) { const T = uniq(tn); h += `<div class="sec-h"><h2>${ic('map')} Tanah yang dimiliki (${T.length})</h2></div>` + (T.length ? `<div class="list">${T.map(r => rowHtml('tanah_desa', r)).join('')}</div>${T.some(r => r.bidang) ? `<div class="btns"><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['tanah', { fokus: T.find(r => r.bidang).id }]))}'>${ic('map')}Lihat di peta</button></div>` : ''}` : '<div class="meta">Belum tercatat sebagai pemilik tanah.</div>'); }
+  if (sr && uniq(sr).length) { const R2 = uniq(sr).sort((a, b) => String(b.tgl_surat || '').localeCompare(String(a.tgl_surat || ''))); h += `<div class="sec-h"><h2>${ic('file')} Riwayat surat keterangan (${R2.length})</h2></div>` + (R2.length ? `<div class="list">${R2.map(r => rowHtml('register_surat', r)).join('')}</div>` : '<div class="meta">Belum pernah mengurus surat keterangan.</div>'); }
   try { h = (await silsilahHtml(x)) + h; } catch (x2) { }
   if (h) el.insertAdjacentHTML('beforeend', `<div class="stack">${h}</div>`);
 }
@@ -4216,7 +4217,7 @@ async function extraPendudukSosial(x, el) {
   const u = umur(x.tgl_lahir), tag = [];
   if (x.tgl_lahir && u >= 60) tag.push('Lansia (' + u + ' th)'); if (x.tgl_lahir && u < 5) tag.push('Balita');
   let h = '';
-  if (nt || rw.length) {
+  if ((nt && nt.length) || rw.length) {
     const N2 = (nt || []).sort((a, b) => String(b.tgl_peristiwa || b.tanggal || '').localeCompare(String(a.tgl_peristiwa || a.tanggal || '')));
     h += `<div class="sec-h"><h2>${ic('users')} Riwayat perkawinan</h2></div>` + (N2.length ? `<div class="list">${N2.map(r => rowHtml('ntcr', r)).join('')}</div>` : '')
       + (rw.length ? `<div class="card meta" style="padding:6px 10px">${rw.slice().reverse().map(z => `${esc(fDate(z.waktu))}: status perkawinan ${esc(z.dari || '–')} → <b>${esc(z.ke)}</b>${z.alasan ? ' — ' + esc(z.alasan) : ''}`).join('<br>')}</div>` : '')
@@ -6202,7 +6203,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '107', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '108', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
