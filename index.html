@@ -959,13 +959,13 @@ const UI = {
       F('bidang', 'Nomor bidang di peta', 'text', { hint: 'Terisi otomatis saat dicocokkan di Peta bidang' }), F('ket', 'Keterangan', 'text', { wide: 1 }),
       F('_h_sert', 'Sertifikat', 'head'), F('sert_nama', 'Sertifikat atas nama', 'text', { up: 1 }), F('sert_no', 'Nomor Sertifikat', 'text', { mono: 1 }),
       F('_h_pm', 'Pemilik saat ini', 'head', { hint: 'Ketik nama lalu pilih dari Data Penduduk. Bila tidak ada (mis. warga luar desa), isi manual: saat disimpan otomatis masuk Data Penduduk (luar desa) dan Data Keluarga.' }),
-      F('pm_nama', 'Nama Pemilik saat ini', 'text', { up: 1, wide: 1, pmpick: 1 }), F('pm_penduduk_id', '', 'hidden'),
+      F('pm_nama', 'Nama Pemilik saat ini', 'text', { up: 1, wide: 1, opick: 2 }), F('pm_penduduk_id', '', 'hidden'),
       F('pm_nik', 'NIK Pemilik', 'text', { mono: 1, len: 16, sens: 1, nikfill: { pre: 'pm_' } }), F('pm_kk', 'Nomor KK', 'text', { mono: 1, len: 16, sens: 1, hint: 'Kosongkan bila tidak tahu (diisi 0000000000000000)' }),
       F('pm_jk', 'Jenis Kelamin', 'select', { opt: OPT.jk }), F('pm_tempat_lahir', 'Tempat Lahir', 'text', { up: 1 }), F('pm_tgl_lahir', 'Tanggal Lahir', 'date'), F('pm_agama', 'Agama', 'select', { opt: OPT.agama }),
       F('pm_pekerjaan', 'Pekerjaan', 'text', { up: 1 }), F('pm_alamat', 'Alamat / Dusun', 'text', { up: 1, wide: 1 }), F('pm_rt', 'RT', 'text', { pad: 3 }), F('pm_rw', 'RW', 'text', { pad: 3 }),
       F('pm_desa', 'Desa / Kelurahan', 'text', { up: 1 }), F('pm_kec', 'Kecamatan', 'text', { up: 1 }), F('pm_kab', 'Kabupaten', 'text', { up: 1 })],
     chips: { k: 'dusun', opt: OPT.dusun, lbl: s => s.replace('DUSUN ', '') },
-    row: r => ({ t: r.nama + (r.pm_nama && r.pm_nama !== r.nama ? ' → ' + r.pm_nama : ''), s: [r.nop, r.alamat_op].filter(Boolean).join(' · '), s2: [r.luas ? Number(r.luas).toLocaleString('id-ID') + ' m²' : '', r.pbb ? 'PBB Rp ' + Number(r.pbb).toLocaleString('id-ID') : '', r.status_bayar].filter(Boolean).join(' · '), r: r.bidang ? '#' + r.bidang : '', av: initials(r.nama), pill: r.bidang ? '<span class="pill ok">Terpetakan</span>' : '' }),
+    row: r => ({ t: r.nama + (r.pm_nama && r.pm_nama !== r.nama ? ' → ' + r.pm_nama : ''), s: [r.nop, r.alamat_op].filter(Boolean).join(' · '), s2: [r.luas ? Number(r.luas).toLocaleString('id-ID') + ' m²' : '', r.pbb ? 'PBB Rp ' + Number(r.pbb).toLocaleString('id-ID') : '', r.status_bayar].filter(Boolean).join(' · '), r: r.bidang ? '#' + r.bidang : '', av: initials(r.nama), pill: (r.bidang ? '<span class="pill ok">Terpetakan</span>' : '') + pendPill(r.pm_status_pend, 'Pemilik') }),
     print: { title: 'BUKU TANAH DI DESA', land: 1, cols: [['NOP', 'nop'], ['Nama', 'nama'], ['Letak Objek', 'alamat_op'], ['Luas Bumi (m²)', 'luas'], ['Bangunan (m²)', 'luas_bangunan'], ['Status Hak', 'status_hak'], ['Penggunaan', 'penggunaan'], ['Bidang', 'bidang'], ['Ket', 'ket']] }
   },
   tanah_bidang: {
@@ -1273,6 +1273,83 @@ const UI = {
     row: r => ({ t: r.rincian, s: r.jenis, av: `<b>${esc(r.no)}</b>`, pill: r.status !== 'Aktif' ? '<span class="pill">Tidak aktif</span>' : '' })
   }
 };
+/* ---- blok data orang (dipakai Tanah, NTCR, Rentan): pilih dari Data Penduduk atau isi manual ---- */
+const orangF = (pre, judul, o = {}) => {
+  const w = o.when ? { when: o.when } : {};
+  const X = (k, l, t, op) => F(pre + k, l, t, Object.assign({}, w, op || {}));
+  return [X('_h', judul, 'head', { hint: o.hint || (o.buat ? 'Ketik nama lalu pilih dari Data Penduduk. Bila tidak ada (mis. warga luar desa), isi manual: saat disimpan otomatis masuk Data Penduduk (luar desa).' : 'Ketik nama lalu pilih dari Data Penduduk, atau isi manual.') }),
+    X('nama', 'Nama', 'text', { up: 1, wide: 1, opick: o.buat ? 2 : 1, ortu: o.ortu, req: o.req }), F(pre + 'penduduk_id', '', 'hidden'),
+    X('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1 })]
+    .concat(o.kk ? [X('kk', 'Nomor KK', 'text', { mono: 1, len: 16, sens: 1, hint: 'Kosongkan bila tidak tahu (diisi 0000000000000000)' })] : [])
+    .concat(o.jk ? [F(pre + 'jk', '', 'hidden', { def: o.jk })] : [X('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk })])
+    .concat([X('tempat_lahir', 'Tempat Lahir', 'text', { up: 1 }), X('tgl_lahir', 'Tanggal Lahir', 'date'), X('wn', 'Kewarganegaraan', 'select', { opt: OPT.wn, def: 'WNI' }), X('agama', 'Agama', 'select', { opt: OPT.agama }),
+      X('pekerjaan', 'Pekerjaan', 'text', { up: 1 }), X('alamat', o.wil === false ? 'Alamat lengkap' : 'Alamat / Dusun', 'text', { up: 1, wide: 1 })])
+    .concat(o.wil === false ? [] : [X('rt', 'RT', 'text', { pad: 3 }), X('rw', 'RW', 'text', { pad: 3 }), X('desa', 'Desa / Kelurahan', 'text', { up: 1 }), X('kec', 'Kecamatan', 'text', { up: 1 }), X('kab', 'Kabupaten', 'text', { up: 1 })]);
+};
+const pendPill = (st, who) => st ? `<span class="pill ${st === 'Meninggal' ? 'bad' : 'warn'}">${who ? esc(who) + ' ' : ''}${esc(st === 'Meninggal' ? 'meninggal' : st === 'Pindah' ? 'pindah' : 'luar desa')}</span>` : '';
+const NTCR_J = ['Nikah', 'Talak', 'Cerai', 'Rujuk'];
+const NK = { when: { k: 'jenis', v: 'Nikah' } };
+const RENTAN_KT = ['Warga miskin', 'Keluarga miskin', 'Yatim', 'Piatu', 'Yatim piatu', 'Anak terlantar', 'Lansia', 'Penyandang disabilitas', 'Perempuan kepala keluarga', 'Ibu hamil', 'Ibu menyusui', 'Balita', 'Stunting', 'Kelompok marginal lainnya'];
+const RENTAN_GRP = { miskin: ['Warga miskin', 'Keluarga miskin', 'Kelompok marginal lainnya'], anak: ['Yatim', 'Piatu', 'Yatim piatu', 'Anak terlantar'], lansia: ['Lansia'], dis: ['Penyandang disabilitas'], pkk: ['Perempuan kepala keluarga'], ibu: ['Ibu hamil', 'Ibu menyusui'], balita: ['Balita', 'Stunting'] };
+const RENTAN_BANSOS = ['BLT Dana Desa', 'PKH', 'BPNT / Sembako', 'PBI JK (BPJS Kesehatan)', 'PIP / KIP', 'ATENSI (Kemensos)', 'Bantuan Rumah Tidak Layak Huni', 'Alat bantu disabilitas', 'Bantuan pangan (beras)', 'Zakat / BAZNAS', 'Bantuan Pemkab', 'Bantuan Pemprov', 'Lainnya'];
+const RT_WALI = { when: { k: 'kategori', v: ['Yatim', 'Piatu', 'Yatim piatu', 'Anak terlantar', 'Lansia', 'Penyandang disabilitas'] } };
+const UI_NTCR = {
+  ntcr: {
+    t: 'Buku NTCR', ic: 'users', year: 'tanggal', sort: 'tanggal', excel: 1,
+    fields: [F('no', 'No. Register', 'number', { hint: 'Kosongkan: nomor urut otomatis per tahun' }), F('tanggal', 'Tanggal Register', 'date', { req: 1, def: isoToday }), F('jenis', 'Jenis Peristiwa', 'select', { opt: NTCR_J, req: 1 }),
+      F('tahap', 'Tahap', 'select', Object.assign({ opt: ['Pengantar (belum akad)', 'Sudah menikah (tercatat KUA)'], def: 'Pengantar (belum akad)', hint: 'Status perkawinan di Data Penduduk berubah setelah "Sudah menikah"' }, NK)),
+      F('nomor', 'Nomor Surat Pengantar (N1)', 'text', Object.assign({ hint: 'Kosongkan: 400.12.3/No/Kode desa/Tahun' }, NK)),
+      ...orangF('s_', 'Suami / Calon Suami', { jk: 'LAKI-LAKI', kk: 1, buat: 1, req: 1, ortu: ['sa_', 'si_'] }),
+      F('s_status_sblm', 'Status sebelum menikah', 'select', Object.assign({ opt: ['Jejaka', 'Duda cerai hidup', 'Duda cerai mati', 'Beristri'] }, NK)), F('s_istri_ke', 'Istri ke- (bila beristri)', 'number', NK), F('s_pasangan_dulu', 'Nama istri terdahulu', 'text', Object.assign({ up: 1 }, NK)),
+      ...orangF('sa_', 'Ayah Calon Suami', { jk: 'LAKI-LAKI', wil: false, when: NK.when }), ...orangF('si_', 'Ibu Calon Suami', { jk: 'PEREMPUAN', wil: false, when: NK.when }),
+      ...orangF('i_', 'Istri / Calon Istri', { jk: 'PEREMPUAN', kk: 1, buat: 1, req: 1, ortu: ['ia_', 'ii_'] }),
+      F('i_status_sblm', 'Status sebelum menikah', 'select', Object.assign({ opt: ['Perawan', 'Janda cerai hidup', 'Janda cerai mati'] }, NK)), F('i_pasangan_dulu', 'Nama suami terdahulu', 'text', Object.assign({ up: 1 }, NK)),
+      ...orangF('ia_', 'Ayah Calon Istri', { jk: 'LAKI-LAKI', wil: false, when: NK.when }), ...orangF('ii_', 'Ibu Calon Istri', { jk: 'PEREMPUAN', wil: false, when: NK.when }),
+      F('_h_pr', 'Peristiwa', 'head', { hint: 'Nikah: akad di KUA. Talak/Cerai: ikrar talak/putusan Pengadilan Agama. Rujuk: pencatatan rujuk di KUA.' }),
+      F('tgl_peristiwa', 'Tanggal akad / ikrar / putusan / rujuk', 'date'), F('jam_akad', 'Jam akad', 'time', NK), F('tempat_peristiwa', 'Tempat (KUA / Pengadilan Agama)', 'text', { wide: 1, list: ['KUA Kecamatan', 'Pengadilan Agama'] }),
+      F('wali_nama', 'Nama wali nikah', 'text', Object.assign({ up: 1 }, NK)), F('wali_hub', 'Hubungan wali', 'text', Object.assign({ list: ['Ayah kandung', 'Kakek', 'Saudara laki-laki kandung', 'Saudara laki-laki seayah', 'Paman', 'Wali hakim'] }, NK)), F('mahar', 'Mas kawin', 'text', NK),
+      F('no_akta', 'Nomor Akta Nikah / Akta Cerai / Kutipan Rujuk', 'text', { mono: 1 }), F('tgl_akta', 'Tanggal akta / putusan', 'date'),
+      F('ket', 'Keterangan', 'textarea', { wide: 1 }), F('dok_id', 'Dokumen (Buku Nikah / Akta Cerai / Putusan)', 'file')],
+    views: [['Semua', () => ({})]].concat(NTCR_J.map(j => [j, () => ({ jenis: j })])),
+    row: r => ({ t: (r.s_nama || '–') + ' & ' + (r.i_nama || '–'), s: [(r.jenis || '') + (r.jenis === 'Nikah' && !/^Sudah/.test(r.tahap || '') ? ' (pengantar)' : ''), fDate(r.tgl_peristiwa || r.tanggal), r.no_akta, r.tempat_peristiwa].filter(Boolean).join(' · '), r: r.no ? 'No. ' + r.no : '', av: (r.jenis || '?').slice(0, 1), pill: pendPill(r.s_status_pend, 'Suami') + pendPill(r.i_status_pend, 'Istri'), file: r.dok_id }),
+    print: { title: 'BUKU REGISTER NIKAH, TALAK, CERAI DAN RUJUK (NTCR)', land: 1, cols: [['No', 'no'], ['Tgl Register', r => fDate(r.tanggal)], ['Peristiwa', r => esc(r.jenis || '') + (r.jenis === 'Nikah' ? '<br><small>' + esc(r.tahap || '') + '</small>' : '')],
+      ['Suami', r => `<b>${esc(r.s_nama || '')}</b>${r.sa_nama ? ' bin ' + esc(r.sa_nama) : ''}<br>${esc([r.s_tgl_lahir ? umur(r.s_tgl_lahir) + ' th' : '', r.s_pekerjaan, r.s_alamat].filter(Boolean).join(', '))}${r.s_status_pend ? '<br><i>' + esc(r.s_status_pend) + '</i>' : ''}`],
+      ['Istri', r => `<b>${esc(r.i_nama || '')}</b>${r.ia_nama ? ' binti ' + esc(r.ia_nama) : ''}<br>${esc([r.i_tgl_lahir ? umur(r.i_tgl_lahir) + ' th' : '', r.i_pekerjaan, r.i_alamat].filter(Boolean).join(', '))}${r.i_status_pend ? '<br><i>' + esc(r.i_status_pend) + '</i>' : ''}`],
+      ['Tgl & Tempat Peristiwa', r => fDate(r.tgl_peristiwa) + (r.tempat_peristiwa ? '<br>' + esc(r.tempat_peristiwa) : '')], ['No. Akta', r => esc(r.no_akta || '') + (r.tgl_akta ? '<br>' + fDate(r.tgl_akta) : '')], ['Ket', 'ket']] }
+  },
+  rentan: {
+    t: 'Data Penduduk Rentan / Sosial', ic: 'heart', sort: 'r_nama', asc: 1, excel: 1,
+    fields: [...orangF('r_', 'Identitas warga', { kk: 1, buat: 1, req: 1 }),
+      F('_h_kt', 'Kategori', 'head', { hint: 'Boleh lebih dari satu. Dasar: Permendesa PDT No. 13 Tahun 2025 Pasal 77 (warga/keluarga miskin, kelompok rentan, kelompok marginal, penerima bantuan sosial).' }),
+      F('kategori', 'Kategori', 'checks', { opt: RENTAN_KT, req: 1, wide: 1 }),
+      F('desil', 'Desil DTSEN', 'select', { opt: ['Desil 1', 'Desil 2', 'Desil 3', 'Desil 4', 'Desil 5', 'Desil 6–10', 'Belum terdata'], when: { k: 'kategori', v: RENTAN_GRP.miskin } }),
+      F('dis_jenis', 'Ragam disabilitas', 'checks', { opt: ['Fisik', 'Intelektual', 'Mental', 'Sensorik netra', 'Sensorik rungu', 'Sensorik wicara', 'Ganda / multi'], wide: 1, hint: 'UU No. 8 Tahun 2016', when: { k: 'kategori', v: 'Penyandang disabilitas' } }),
+      F('dis_tingkat', 'Tingkat hambatan', 'select', { opt: ['Ringan', 'Sedang', 'Berat'], when: { k: 'kategori', v: 'Penyandang disabilitas' } }), F('dis_alat', 'Alat bantu (dipakai / dibutuhkan)', 'text', { when: { k: 'kategori', v: 'Penyandang disabilitas' } }),
+      F('wali_nama', 'Nama orang tua / wali / pengasuh', 'text', Object.assign({ up: 1 }, RT_WALI)), F('wali_hub', 'Hubungan', 'text', Object.assign({ list: ['Ayah', 'Ibu', 'Kakek', 'Nenek', 'Paman', 'Bibi', 'Saudara', 'Anak', 'Panti asuhan', 'Lainnya'] }, RT_WALI)), F('wali_hp', 'No. HP wali', 'tel', RT_WALI),
+      F('hpl', 'Hari perkiraan lahir (HPL)', 'date', { when: { k: 'kategori', v: 'Ibu hamil' } }),
+      F('gizi_tgl', 'Tanggal pengukuran', 'date', { when: { k: 'kategori', v: 'Stunting' } }), F('gizi_tb', 'Tinggi badan (cm)', 'number', { when: { k: 'kategori', v: 'Stunting' } }), F('gizi_bb', 'Berat badan (kg)', 'number', { when: { k: 'kategori', v: 'Stunting' } }),
+      F('_h_bs', 'Bantuan sosial yang diterima', 'head', { hint: 'Kosongkan bila belum menerima bantuan.' }),
+      F('bantuan', 'Bantuan', 'rows', { cols: [['program', 'Program / jenis', 'list'], ['sumber', 'Sumber'], ['tahun', 'Tahun'], ['ket', 'Keterangan']], _list: RENTAN_BANSOS }),
+      F('_h_st', 'Status data', 'head'),
+      F('status', 'Status', 'select', { opt: ['Aktif', 'Tidak lagi'], def: 'Aktif', hint: '"Tidak lagi" bila sudah tidak termasuk kategori di atas' }), F('tgl_data', 'Tanggal pendataan', 'date', { def: isoToday }),
+      F('sumber_data', 'Sumber data', 'text', { list: ['Musyawarah Desa', 'DTSEN', 'Posyandu', 'Pendataan RT/RW', 'Laporan warga', 'Dinas Sosial'] }), F('ket', 'Keterangan', 'textarea', { wide: 1 }), F('dok_id', 'Dokumen pendukung', 'file')],
+    views: [['Aktif', () => ({ status: 'Aktif' })], ['Miskin', () => ({ status: 'Aktif', kg_miskin: 'Ya' })], ['Anak yatim/terlantar', () => ({ status: 'Aktif', kg_anak: 'Ya' })], ['Lansia', () => ({ status: 'Aktif', kg_lansia: 'Ya' })],
+      ['Disabilitas', () => ({ status: 'Aktif', kg_dis: 'Ya' })], ['Perempuan KK', () => ({ status: 'Aktif', kg_pkk: 'Ya' })], ['Ibu hamil/menyusui', () => ({ status: 'Aktif', kg_ibu: 'Ya' })], ['Balita/stunting', () => ({ status: 'Aktif', kg_balita: 'Ya' })],
+      ['Penerima bantuan', () => ({ status: 'Aktif', kg_bantuan: 'Ya' })], ['Tidak lagi', () => ({ status: 'Tidak lagi' })], ['Semua', () => ({})]],
+    row: r => ({ t: r.r_nama, s: esc(r.kategori || ''), raw: 1, s2: [String(r.r_alamat || '').replace(/^DUSUN /, ''), r.r_rt ? 'RT ' + r.r_rt + '/' + (r.r_rw || '') : '', rentanBansos(r)].filter(Boolean).join(' · '), av: initials(r.r_nama), pill: pendPill(r.r_status_pend) + (r.status === 'Tidak lagi' ? '<span class="pill">tidak lagi</span>' : ''), file: r.dok_id }),
+    print: { title: 'BUKU DATA PENDUDUK RENTAN / SOSIAL', land: 1, cols: [['Nama', r => `<b>${esc(r.r_nama || '')}</b>${r.r_status_pend ? '<br><i>' + esc(r.r_status_pend) + '</i>' : ''}`], ['NIK', 'r_nik'], ['L/P · Umur', r => esc(String(r.r_jk || '').slice(0, 1)) + (r.r_tgl_lahir ? ' · ' + umur(r.r_tgl_lahir) + ' th' : '')],
+      ['Alamat', r => esc([r.r_alamat, r.r_rt ? 'RT ' + r.r_rt + '/' + (r.r_rw || '') : ''].filter(Boolean).join(' '))], ['Kategori', 'kategori'],
+      ['Keterangan Kategori', r => esc([r.desil, r.dis_jenis ? 'Disabilitas ' + r.dis_jenis + (r.dis_tingkat ? ' (' + r.dis_tingkat + ')' : '') : '', r.wali_nama ? 'Wali: ' + r.wali_nama + (r.wali_hub ? ' (' + r.wali_hub + ')' : '') : '', r.hpl ? 'HPL ' + fDate(r.hpl) : ''].filter(Boolean).join('; '))],
+      ['Bantuan', r => esc(rentanBansos(r))], ['Status', 'status'], ['Ket', 'ket']] }
+  }
+};
+function rentanBansos(r) { let a = []; try { a = JSON.parse(r.bantuan || '[]'); } catch (x) { } return a.filter(b => b && b.program).map(b => b.program + (b.tahun ? ' ' + b.tahun : '')).join(', '); }
+function rentanFlags(val) {
+  const k = String(val.kategori || '').split(/\s*,\s*/);
+  Object.keys(RENTAN_GRP).forEach(g => { val['kg_' + g] = RENTAN_GRP[g].some(x => k.indexOf(x) >= 0) ? 'Ya' : ''; });
+  val.kg_bantuan = rentanBansos(val) ? 'Ya' : '';
+}
+Object.assign(UI, UI_NTCR);
 function kgPill(r) {
   const t = isoToday();
   if (r.selesai) return '<span class="pill">Selesai</span>';
@@ -1311,7 +1388,7 @@ function MODS() {
       ['Inventarisasi Fisik', 'check', ['list', { e: 'aset_cek' }], 'aset_cek'], ['Laporan Format SIPADES', 'print', ['sipadeslap'], null, 'r:aset'], ['Cetak Laporan Aset (format awal)', 'print', ['asetcetak'], null, 'r:aset'], ['Cetak Register Label', 'crop', ['asetlabel'], null, 'r:aset'],
       ['Data Ruangan', 'house', ['list', { e: 'aset_ruang' }], 'aset_ruang'], ['Perangkat & Tim Inventarisasi', 'users', ['list', { e: 'aset_tim' }], 'aset_tim'], ['Kode Rekening Aset', 'list', ['list', { e: 'ref_kode_barang' }], 'ref_kode_barang'], ['SOP, Template BA/SK & Pedoman', 'book', ['asetsop'], null, 'r:aset']] },
     { k: 'pemerintahan', l: 'Pemerintahan', ic: 'landmark', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, 'r:penduduk'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga'], ['Tanah di Desa', 'map', ['tanah'], 'tanah_desa']] },
-    { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
+    { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Buku NTCR', 'users', ['list', { e: 'ntcr' }], 'ntcr'], ['Rentan / Sosial', 'heart', ['list', { e: 'rentan' }], 'rentan'], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
     { k: 'kesejahteraan', l: 'Kesejahteraan', ic: 'heart', items: [['Lembaga / Yayasan', 'landmark', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru Ngaji', 'book', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
     { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RPJM Desa', 'book', ['rpjm', {}], null, 'r:rkp'], ['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['RAB & Gambar', 'hammer', ['rab', {}], null, 'r:rab'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Progres Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
     { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['SPJ', 'check', ['spj', {}], null, 'r:spj'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Rekap Pajak', 'coin', ['keupajak'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek'], ['Impor PDF Siskeudes', 'down', ['skimpor'], null, 'w:keu_anggaran']] },
@@ -2367,7 +2444,7 @@ VIEWS.list = async (p, main, alive) => {
   if (st.per === '' && u.month) st.per = isoToday().slice(0, 7);
   setTop(p.title || (GRUP_OF[e] ? GRUP[GRUP_OF[e]].t : u.t), u.rkp ? 'RKP Desa ' + rkpLbl(S.rkpYear) : u.rpjm && S.rpjmDokPer && S.rpjmDokPer.id === S.rpjmPid ? S.rpjmDokPer.nama : '');
   const pers = u.year ? [String(yearNow), String(yearNow - 1), String(yearNow - 2), 'Semua'] : null;
-  main.innerHTML = `<div class="stack">${e === 'tanah_desa' ? tanahTabs('list') : ''}
+  main.innerHTML = `<div class="stack">${e === 'tanah_desa' ? tanahTabs('list') : ''}${e === 'rentan' ? rentanTabs('list') : ''}
     <div class="toolbar"><label class="search">${ic('search')}<input id="q" placeholder="Cari…" value="${esc(st.q)}" autocomplete="off"></label>
       ${u.month ? `<input type="month" class="inp" id="per" value="${esc(st.per)}" style="max-width:180px">` : ''}
       ${e === 'rkp_rutin' && canWrite(e) ? `<button class="btn sm" data-act="rkpRutinIsi">${ic('down')}Salin dari APBDes ${esc(keuTh())}</button>` : ''}${NASKAH[e] && canWrite(e) ? `<button class="btn sm pri" data-act="go" data-go='${esc(JSON.stringify(['form', { e, buat: 1 }]))}' title="${esc(NASKAH[e].buat)}">${ic('next')}Buat</button>` : ''}${u.print ? `<button class="btn sm" data-act="cetak" title="Cetak buku register">${ic('print')}Cetak</button>` : ''}${u.excel ? `<button class="btn sm" data-act="xlsOut">${ic('down')}Ekspor Excel</button>${canWrite(e) ? `<label class="btn sm">${ic('plus')}Impor Excel<input type="file" id="xlsIn" accept=".xlsx,.csv" hidden></label>` : ''}` : ''}${u.print2 ? `<button class="btn sm" data-act="cetak2">${ic('print')}${esc(u.print2.label)}</button>` : ''}</div>
@@ -2494,7 +2571,7 @@ function mapHtml(v, title) {
 async function renderDetail(e, x, el, full) {
   const u = UI[e];
   const files = u.fields.filter(f => f.t === 'file' && x[f.k]);
-  const shown = u.fields.filter(f => !(e === 'aparat' && f.k === 'jabatan_tambahan') && f.t !== 'file' && f.t !== 'geo' && f.t !== 'fotos' && f.t !== 'rows' && x[f.k] !== '' && x[f.k] != null);
+  const shown = u.fields.filter(f => !(e === 'aparat' && f.k === 'jabatan_tambahan') && f.t !== 'file' && f.t !== 'geo' && f.t !== 'fotos' && f.t !== 'rows' && f.t !== 'hidden' && f.t !== 'head' && x[f.k] !== '' && x[f.k] != null);
   const rws = u.fields.filter(f => f.t === 'rows' && x[f.k]).map(f => { let a = []; try { a = JSON.parse(x[f.k]); } catch (er) { } return a.length ? `<div class="lbl">${esc(f.l)}</div><div class="tbl-wrap"><table class="tbl"><thead><tr>${f.cols.map(c => `<th>${esc(c[1])}</th>`).join('')}</tr></thead><tbody>${a.map(r => '<tr>' + f.cols.map(([k, , t]) => `<td${t === 'money' ? ' style="text-align:right"' : ''}>${esc(t === 'money' ? rp(r[k]) : r[k] || '')}</td>`).join('') + '</tr>').join('')}</tbody><tfoot><tr><td colspan="${f.cols.length - 1}"><b>Jumlah</b></td><td style="text-align:right"><b>${rp(a.reduce((t, r) => t + Number(r.jumlah || 0), 0))}</b></td></tr></tfoot></table></div>` : ''; }).join('');
   const galeri = u.fields.filter(f => f.t === 'fotos' && x[f.k]).map(f => { let a = []; try { a = JSON.parse(x[f.k]); } catch (er) { } return a.length ? `<div class="lbl">${esc(f.l)} (${a.length})</div><div class="pgrid">${a.map(fo => `<div class="pslot has"><button type="button" class="pimg" data-act="file" data-id="${esc(fo.id)}" data-name="${esc(fo.ket || f.l)}"><img src="${esc(thumb(fo.id, 240))}" alt="" loading="lazy"></button>${fo.ket ? `<span class="plbl">${esc(fo.ket)}</span>` : ''}</div>`).join('')}</div>` : ''; }).join('');
   const geoF = u.fields.find(f => f.t === 'geo' && x[f.k]);
@@ -2530,6 +2607,8 @@ async function renderDetail(e, x, el, full) {
   if (e === 'aparat') extraAparat(x, xx, canWrite(e));
   if (e === 'tanah_desa') xx.insertAdjacentHTML('afterbegin', `<div class="btns">${x.bidang ? `<button class="btn sm pri" data-act="go" data-go='${esc(JSON.stringify(['tanah', { fokus: x.id }]))}'>${ic('map')}Lihat di peta (#${esc(x.bidang)})</button>` : ''}${canWrite(e) ? `<button class="btn sm${x.bidang ? '' : ' pri'}" data-act="go" data-go='${esc(JSON.stringify(['tanah', { untuk: x.id }]))}'>${ic('target')}${x.bidang ? 'Tambah bidang lain' : 'Cocokkan di peta'}</button>` : ''}</div>`);
   if (e === 'penduduk') await extraPendudukLink(x, xx);
+  if (e === 'penduduk') await extraPendudukSosial(x, xx);
+  if (e === 'ntcr') ntcrExtra(x, xx);
   if (e === 'penduduk') S.pendCache = Object.assign(S.pendCache || {}, { [x.id]: x });
 }
 /* ---- Pejabat penandatangan: diambil dari data Aparatur Desa ---- */
@@ -2909,7 +2988,7 @@ function fieldHtml(f, v, rec) {
   const wide = f.wide || /textarea|file|sdgs|refpick|fotos|rows/.test(f.t) ? ' wide' : '';
   v = v == null ? '' : String(v);
   let inp;
-  if (f.t === 'head') return `<div class="f wide fsec"><b>${esc(f.l)}</b>${hint}</div>`;
+  if (f.t === 'head') return `<div class="f wide fsec" id="${id}"><b>${esc(f.l)}</b>${hint}</div>`;
   if (f.t === 'hidden') return `<input type="hidden" id="${id}" value="${esc(v)}">`;
   switch (f.t) {
     case 'textarea': inp = `<textarea id="${id}" rows="${f.rows || 3}">${esc(v)}</textarea>`; break;
@@ -2941,6 +3020,7 @@ function fieldHtml(f, v, rec) {
         ${locked ? '<span class="hint">Anda tidak punya izin mengganti dokumen kependudukan.</span>' : `<input type="file" id="${id}" accept="${f.img ? IMG_ANY : 'application/pdf,' + IMG_ANY + ',.doc,.docx,.xls,.xlsx'}"><span class="hint">${v ? 'Pilih berkas baru untuk mengganti.' : f.img ? 'Foto akan diperkecil otomatis.' : 'PDF atau foto, maks. 25 MB.'}</span>`}</div>`;
       break;
     }
+    case 'checks': { const sel = String(v).split(/\s*,\s*/); inp = `<div class="checks" id="${id}">${f.opt.map(o => `<label><input type="checkbox" value="${esc(o)}" ${sel.indexOf(o) >= 0 ? 'checked' : ''}>${esc(o)}</label>`).join('')}</div>`; break; }
     case 'sdgs': inp = `<div class="checks" id="${id}">${(S.sdgs || []).map(s => `<label title="${esc(s.parameter)}"><input type="checkbox" value="${esc(s.no)}" ${String(v).split(',').indexOf(String(s.no)) >= 0 ? 'checked' : ''}>${esc(s.no)}. ${esc(s.tujuan)}</label>`).join('') || '<span class="hint">Referensi SDGs belum ada.</span>'}</div>`; break;
     case 'person': inp = `<div class="pick"><input id="${id}" value="${esc(v)}" autocomplete="off" data-person="${esc(JSON.stringify(f.fill || {}))}" placeholder="Ketik nama, pilih dari daftar"><div class="pickl" hidden></div></div>`; break;
     case 'refpick': inp = `<div class="btns" style="flex-wrap:nowrap"><input id="${id}" value="${esc(v)}" style="flex:1"><button type="button" class="btn sm" data-act="pick">${ic('list')}Pilih kode</button></div>`; break;
@@ -2962,6 +3042,7 @@ function readForm(u, root) {
     if (!el || f.t === 'file' || f.t === 'fotos' || f.t === 'head') return;
     if (f.t === 'rows') { v[f.k] = JSON.stringify(rowsVal(el)); return; }
     if (f.t === 'sdgs') v[f.k] = $$('input:checked', el).map(i => i.value).join(',');
+    else if (f.t === 'checks') v[f.k] = $$('input:checked', el).map(i => i.value).join(', ');
     else if (f.t === 'money') v[f.k] = mIn(el);
     else {
       let s = el.value.trim();
@@ -3035,7 +3116,7 @@ VIEWS.form = async (p, main, alive) => {
   if (whenF.length) {
     const sync2 = () => whenF.forEach(f => {
       const el = $('#f_' + f.k, frm), box = el && el.closest('.f'); if (!box) return;
-      if (f.when) { const c = $('#f_' + f.when.k, frm); box.hidden = !c || [].concat(f.when.v).indexOf(c.value) < 0; }
+      if (f.when) { const c = $('#f_' + f.when.k, frm), cv = !c ? [] : c.classList.contains('checks') ? $$('input:checked', c).map(i => i.value) : [c.value]; box.hidden = ![].concat(f.when.v).some(x => cv.indexOf(x) >= 0); }
       if (f.lblW) { const c = $('#f_' + f.lblW.k, frm), lb = box.querySelector('label'); if (lb && lb.firstChild) lb.firstChild.textContent = c && c.value === f.lblW.v ? f.lblW.l : f.l; }
     });
     frm.addEventListener('change', sync2); sync2();
@@ -3054,7 +3135,7 @@ VIEWS.form = async (p, main, alive) => {
   flds.filter(f => f.t === 'rows').forEach(f => { const b = $('#f_' + f.k, frm); if (b) rowsBox(b, f); });
   keuFormHook(e, frm, rec);
   if (e === 'surat_masuk') fwdHook(frm);
-  if (e === 'tanah_desa') pemilikHook(frm);
+  orangHooks(frm, flds);
   S.vh.fileDel = t => {
     const k = t.dataset.k, box = t.closest('.fkeep');
     confirmDel(box, async () => { $('#fd_' + k, frm).value = '1'; box.innerHTML = `<span class="meta">Berkas akan dihapus saat <b>Simpan</b>.</span><button type="button" class="btn sm" data-act="fileUndo" data-k="${esc(k)}">Batal</button>`; });
@@ -3150,7 +3231,9 @@ VIEWS.form = async (p, main, alive) => {
       if (u.sub && !val.ref) val.ref = rec.ref;
       const virt = {}; u.fields.filter(f => f.virt).forEach(f => { if (f.k in val) { virt[f.k] = val[f.k]; delete val[f.k]; } });
       if (e === 'surat_masuk' && frm._fwdTag) val.terusan = frm._fwdTag(rec.terusan);
-      if (e === 'tanah_desa') await pemilikSimpan(val, btn);
+      await orangSimpanSemua(e, val, btn, frm);
+      if (e === 'rentan') rentanFlags(val);
+      if (e === 'ntcr') await ntcrNomor(val);
       const saved = await call('save', { entity: e, record: val });
       if (e === 'surat_masuk' && frm._fwdSave) { const n = await frm._fwdSave(saved); if (n) toast('Tersimpan. Diteruskan ke ' + n + '.'); }
       if (e === 'petugas' && !p.id && (virt.kelompok || virt.jabatan)) await call('save', { entity: 'petugas_jabatan', record: Object.assign({ ref: saved.id }, virt) });
@@ -3180,20 +3263,23 @@ async function extraPendudukLink(x, el) {
   if (sr) { const R2 = uniq(sr).sort((a, b) => String(b.tgl_surat || '').localeCompare(String(a.tgl_surat || ''))); h += `<div class="sec-h"><h2>${ic('file')} Riwayat surat keterangan (${R2.length})</h2></div>` + (R2.length ? `<div class="list">${R2.map(r => rowHtml('register_surat', r)).join('')}</div>` : '<div class="meta">Belum pernah mengurus surat keterangan.</div>'); }
   if (h) el.insertAdjacentHTML('beforeend', `<div class="stack">${h}</div>`);
 }
-/* ---- Tanah: pemilik saat ini (dari Data Penduduk atau baru, luar desa) ---- */
-function pemilikHook(frm) {
-  const nm = $('#f_pm_nama', frm); if (!nm) return;
+/* ---- Orang (Tanah: pemilik, NTCR: suami/istri/orang tua, Rentan: warga) dari Data Penduduk atau baru (luar desa) ---- */
+const ORANG_BUAT = { tanah_desa: [['pm_', 'Pemilik']], ntcr: [['s_', 'Suami', { ayah: 'sa_nama', ibu: 'si_nama' }], ['i_', 'Istri', { ayah: 'ia_nama', ibu: 'ii_nama' }]], rentan: [['r_', 'Warga']] };
+const ST_SBLM = { L: { 'BELUM KAWIN': 'Jejaka', 'CERAI HIDUP': 'Duda cerai hidup', 'CERAI MATI': 'Duda cerai mati', 'KAWIN TERCATAT': 'Beristri', 'KAWIN BELUM TERCATAT': 'Beristri', 'KAWIN': 'Beristri' }, P: { 'BELUM KAWIN': 'Perawan', 'CERAI HIDUP': 'Janda cerai hidup', 'CERAI MATI': 'Janda cerai mati' } };
+function orangHooks(frm, flds) { flds.filter(f => f.opick).forEach(f => orangHook(frm, f.k.slice(0, -4), f)); }
+function orangHook(frm, pre, f) {
+  const nm = $('#f_' + pre + 'nama', frm); if (!nm || nm.readOnly) return;
   const box = nm.closest('.f'); box.classList.add('pmbox');
   const dd = document.createElement('div'); dd.className = 'pmdd'; dd.hidden = true; box.appendChild(dd);
   const note = document.createElement('span'); note.className = 'pmok'; box.appendChild(note);
-  const pid = $('#f_pm_penduduk_id', frm);
-  const tandai = () => { note.textContent = pid.value ? '✓ Terhubung ke Data Penduduk' : nm.value.trim() ? 'Belum ada di daftar: isi data di bawah, akan disimpan sebagai penduduk luar desa' : ''; };
+  const pid = $('#f_' + pre + 'penduduk_id', frm);
+  const tandai = () => { note.textContent = pid && pid.value ? '✓ Terhubung ke Data Penduduk' : nm.value.trim() ? (f.opick === 2 ? 'Belum ada di daftar: isi data di bawah, akan disimpan sebagai penduduk luar desa' : 'Tidak dipilih dari daftar: isi data di bawah secara manual') : ''; };
   tandai();
   let tm, hasil = [];
   nm.addEventListener('input', () => {
-    if (pid.value) { pid.value = ''; }
+    if (pid && pid.value) pid.value = '';
     tandai(); clearTimeout(tm); const q = nm.value.trim();
-    if (q.length < 3) { dd.hidden = true; return; }
+    if (q.length < 3 || !canRead('penduduk')) { dd.hidden = true; return; }
     tm = setTimeout(async () => {
       try { hasil = (await call('list', { entity: 'penduduk', q, limit: 8 })).rows || []; } catch (x) { hasil = []; }
       dd.innerHTML = hasil.map((p, i) => `<button type="button" data-i="${i}"><b>${esc(p.nama)}</b> <small>${esc(String(p.dusun || '').replace(/^DUSUN /, ''))}${p.rt ? ' RT ' + esc(p.rt) + '/' + esc(p.rw || '') : ''}${p.tgl_lahir ? ' · lahir ' + esc(fDate(p.tgl_lahir)) : ''}${p.status && p.status !== 'Aktif' ? ' · ' + esc(p.status) : ''}</small></button>`).join('') || '<div class="meta" style="padding:6px 9px">Tidak ada di Data Penduduk — isi manual di bawah.</div>';
@@ -3202,24 +3288,127 @@ function pemilikHook(frm) {
   });
   dd.addEventListener('click', ev => {
     const b = ev.target.closest('[data-i]'); if (!b) return; const p = hasil[Number(b.dataset.i)];
-    const set = (k, v) => { const el = $('#f_pm_' + k, frm); if (!el) return; if (el.tagName === 'SELECT') { const o = Array.from(el.options).find(o => o.value && o.value.toLowerCase() === String(v || '').toLowerCase()); el.value = o ? o.value : ''; } else el.value = v || ''; };
-    nm.value = p.nama; pid.value = p.id;
-    set('nik', p.nik); set('kk', p.kk); set('jk', p.jk); set('tempat_lahir', p.tempat_lahir); set('tgl_lahir', p.tgl_lahir); set('agama', p.agama); set('pekerjaan', p.pekerjaan);
-    const luar = /luar/i.test(p.status || ''); set('alamat', luar ? p.dusun : p.dusun); set('rt', p.rt); set('rw', p.rw);
-    set('desa', luar ? '' : (S.set.nama_desa || '').toUpperCase()); set('kec', luar ? '' : (S.set.kecamatan || '').toUpperCase()); set('kab', luar ? '' : (S.set.kabupaten || '').toUpperCase());
+    const set = (k, v, kosong) => { const el = $('#f_' + k, frm); if (!el || el.readOnly || el.type === 'hidden' && /_jk$/.test(k)) return; if (kosong && el.value.trim()) return; if (el.tagName === 'SELECT') { const o = Array.from(el.options).find(o => o.value && o.value.toLowerCase() === String(v || '').toLowerCase()); el.value = o ? o.value : ''; } else el.value = v || ''; };
+    const luar = /luar/i.test(p.status || '') || (OPT.dusun || []).indexOf(p.dusun) < 0;
+    nm.value = p.nama; if (pid) pid.value = p.id;
+    ['nik', 'kk', 'jk', 'tempat_lahir', 'tgl_lahir', 'agama', 'pekerjaan', 'rt', 'rw'].forEach(k => set(pre + k, p[k]));
+    set(pre + 'wn', p.warga_negara || 'WNI');
+    if ($('#f_' + pre + 'desa', frm)) {
+      set(pre + 'alamat', p.dusun);
+      set(pre + 'desa', luar ? '' : (S.set.nama_desa || '').toUpperCase()); set(pre + 'kec', luar ? '' : (S.set.kecamatan || '').toUpperCase()); set(pre + 'kab', luar ? '' : (S.set.kabupaten || '').toUpperCase());
+    } else set(pre + 'alamat', [p.dusun, p.rt ? 'RT ' + p.rt + '/RW ' + (p.rw || '') : '', luar ? '' : 'DESA ' + (S.set.nama_desa || '').toUpperCase() + ', KEC. ' + (S.set.kecamatan || '').toUpperCase() + ', KAB. ' + (S.set.kabupaten || '').toUpperCase()].filter(Boolean).join(', '));
+    if (f.ortu) { set(f.ortu[0] + 'nama', p.ayah, 1); set(f.ortu[1] + 'nama', p.ibu, 1); }
+    const sb = ST_SBLM[pre === 'i_' ? 'P' : 'L'][String(p.status_kawin || '').toUpperCase()]; if (sb) set(pre + 'status_sblm', sb, 1);
     dd.hidden = true; tandai();
   });
   document.addEventListener('click', ev => { if (!box.contains(ev.target)) dd.hidden = true; });
 }
-async function pemilikSimpan(val, btn) {
-  if (!val.pm_nama || val.pm_penduduk_id) return;
-  const nik = String(val.pm_nik || '').trim();
+async function orangSimpanSemua(e, val, btn, frm) { for (const [pre, lbl, o] of (ORANG_BUAT[e] || [])) await orangSimpan(e, val, pre, lbl, o || {}, btn, frm); }
+async function orangSimpan(e, val, pre, lbl, o, btn, frm) {
+  const g = k => val[pre + k] || '';
+  if (!g('nama') || g('penduduk_id')) return;
+  const nik = String(g('nik')).trim();
   if (nik.indexOf('•') >= 0) return;
-  if (!/^\d{16}$/.test(nik)) throw new Error('Pemilik "' + val.pm_nama + '" belum ada di Data Penduduk: isi NIK 16 digit dan jenis kelaminnya agar bisa disimpan sebagai penduduk luar desa.');
-  if (btn) btn.textContent = 'Menyimpan pemilik ke Data Penduduk…';
-  const r = await call('tanahPemilik', { pemilik: { nama: val.pm_nama, nik, kk: val.pm_kk, jk: val.pm_jk, tempat_lahir: val.pm_tempat_lahir, tgl_lahir: val.pm_tgl_lahir, agama: val.pm_agama, pekerjaan: val.pm_pekerjaan, alamat: val.pm_alamat, rt: val.pm_rt, rw: val.pm_rw, desa: val.pm_desa, kec: val.pm_kec, kab: val.pm_kab } });
-  val.pm_penduduk_id = r.penduduk_id; val.pm_kk = r.kk;
-  toast('Pemilik ditambahkan ke Data Penduduk (luar desa)' + (r.keluarga_id ? ' dan Data Keluarga.' : '.'));
+  if (!/^\d{16}$/.test(nik)) throw new Error(lbl + ' "' + g('nama') + '" belum ada di Data Penduduk: pilih dari daftar, atau isi NIK 16 digit agar disimpan sebagai penduduk luar desa.');
+  if (btn) btn.textContent = 'Menyimpan ' + lbl.toLowerCase() + ' ke Data Penduduk…';
+  const r = await call('pendudukBaru', { untuk: e, orang: { nama: g('nama'), nik, kk: g('kk'), jk: g('jk'), tempat_lahir: g('tempat_lahir'), tgl_lahir: g('tgl_lahir'), agama: g('agama'), pekerjaan: g('pekerjaan'), wn: g('wn'),
+    alamat: g('alamat'), rt: g('rt'), rw: g('rw'), desa: g('desa'), kec: g('kec'), kab: g('kab'), ayah: o.ayah ? val[o.ayah] : '', ibu: o.ibu ? val[o.ibu] : '' } });
+  val[pre + 'penduduk_id'] = r.penduduk_id; val[pre + 'kk'] = r.kk;
+  const h = frm && $('#f_' + pre + 'penduduk_id', frm); if (h) h.value = r.penduduk_id;
+  const k = frm && $('#f_' + pre + 'kk', frm); if (k) k.value = r.kk;
+  toast(lbl + ' ditambahkan ke Data Penduduk (luar desa)' + (r.keluarga_id ? ' dan Data Keluarga.' : '.'));
+}
+async function ntcrNomor(val) {
+  const th = String(val.tanggal || isoToday()).slice(0, 4);
+  if (!String(val.no || '').trim()) { const r = await call('list', { entity: 'ntcr', filters: { tanggal__pre: th }, limit: 1, sort: 'no', desc: true }); val.no = String(Math.max(r.total, Number((r.rows[0] || {}).no) || 0) + 1); }
+  if (val.jenis === 'Nikah' && !String(val.nomor || '').trim()) val.nomor = ['400.12.3', val.no, (S.set && S.set.kode_surat) || '', th].join('/');
+  if (val.jenis !== 'Nikah') val.tahap = '';
+}
+/* ---- Rentan: tab daftar & lansia/balita otomatis ---- */
+function rentanTabs(cur) { return `<div class="gtabs">${[['list', 'heart', 'Data rentan', '["list",{"e":"rentan"}]'], ['lansia', 'users', 'Lansia 60+', '["rentanauto",{"j":"lansia"}]'], ['balita', 'users', 'Balita', '["rentanauto",{"j":"balita"}]']].map(([k, i, t, g]) => `<button class="${cur === k ? 'on' : ''}" data-act="go" data-go='${g}'>${ic(i)} ${t}</button>`).join('')}</div>`; }
+VIEWS.rentanauto = async (p, main) => {
+  const j = p.j === 'balita' ? 'balita' : 'lansia';
+  setTop(j === 'lansia' ? 'Lansia (60 tahun ke atas)' : 'Balita (di bawah 5 tahun)', 'Otomatis dari Data Penduduk aktif');
+  main.innerHTML = `<div class="stack">${rentanTabs(j)}<div class="skel" style="height:120px"></div></div>`;
+  const r = await call('rentanAuto', { jenis: j });
+  const rows = r.rows || [], perD = {}, grp = {};
+  const kel = j === 'lansia' ? x => { const u = umur(x.tgl_lahir); return u >= 80 ? '80+ th' : u >= 70 ? '70–79 th' : '60–69 th'; } : x => { const u = umur(x.tgl_lahir); return u + ' th'; };
+  rows.forEach(x => { const d = String(x.dusun || '').replace(/^DUSUN /, ''); perD[d] = (perD[d] || 0) + 1; const g = kel(x); grp[g] = (grp[g] || 0) + 1; });
+  S.raQ = S.raQ || '';
+  const isi = () => { const q = S.raQ.toLowerCase(); const a = q ? rows.filter(x => (x.nama + ' ' + x.dusun).toLowerCase().indexOf(q) >= 0) : rows; return a.length ? `<div class="list">${a.slice(0, 400).map(x => rowHtml('penduduk', x)).join('')}</div>${a.length > 400 ? `<div class="meta">Menampilkan 400 dari ${a.length}. Gunakan pencarian.</div>` : ''}` : '<div class="card meta">Tidak ada data.</div>'; };
+  main.innerHTML = `<div class="stack">${rentanTabs(j)}
+    <div class="stats"><div class="stat"><b>${N(rows.length)}</b><span>Jumlah ${j}</span></div>${Object.keys(grp).sort().map(k => `<div class="stat"><b>${N(grp[k])}</b><span>${esc(k)}</span></div>`).join('')}</div>
+    <div class="chips">${Object.keys(perD).sort().map(k => `<span class="chip">${esc(k)} <b>${N(perD[k])}</b></span>`).join('')}</div>
+    <div class="meta">Dihitung dari tanggal lahir penduduk aktif (6 dusun). Kondisi khusus (terlantar, sakit, butuh pendamping, penerima bantuan) catat di tab <b>Data rentan</b> lewat rincian penduduk → <b>Catat data rentan</b>.</div>
+    <input type="search" id="raQ" placeholder="Cari nama / dusun" value="${esc(S.raQ)}"><div id="raL">${isi()}</div></div>`;
+  $('#raQ').addEventListener('input', ev => { S.raQ = ev.target.value; $('#raL').innerHTML = isi(); });
+};
+/* ---- NTCR: cetak formulir N1, N2, N4, N5 (PMA No. 20 Tahun 2019) ---- */
+function ntcrExtra(x, el) {
+  if (x.jenis !== 'Nikah') return;
+  const B = (n, s, t) => `<button class="btn sm" data-act="ntcrN" data-n="${n}" data-s="${s}">${ic('file')}${t}</button>`;
+  el.insertAdjacentHTML('afterbegin', `<div class="card stack" style="padding:8px 10px"><div class="lbl">Cetak formulir nikah (PMA No. 20 Tahun 2019)</div><div class="btns">${B('n1', 's', 'N1 Pengantar – Suami')}${B('n1', 'i', 'N1 Pengantar – Istri')}${B('n2', 's', 'N2 Permohonan Kehendak')}${B('n4', 's', 'N4 Persetujuan Calon Pengantin')}${B('n5', 's', 'N5 Izin Orang Tua – Suami')}${B('n5', 'i', 'N5 Izin Orang Tua – Istri')}</div><div class="meta">N1 dibuat oleh desa tempat tinggal calon pengantin; N2, N4, N5 disiapkan desa dan ditandatangani calon pengantin/orang tua. N5 hanya untuk calon pengantin yang belum berusia 21 tahun.</div></div>`);
+  S.vh.ntcrN = t => cetakNtcr(x, t.dataset.n, t.dataset.s);
+}
+function petaNtcr(r, siapa) {
+  const v = k => r[k] == null || r[k] === '' ? '' : String(r[k]);
+  const alamat = pre => [v(pre + 'alamat'), v(pre + 'rt') ? 'RT ' + v(pre + 'rt') + '/RW ' + v(pre + 'rw') : '', v(pre + 'desa') ? 'Desa ' + judulKata(v(pre + 'desa')) : '', v(pre + 'kec') ? 'Kec. ' + judulKata(v(pre + 'kec')) : '', v(pre + 'kab') ? 'Kab. ' + judulKata(v(pre + 'kab')) : ''].filter(Boolean).join(', ');
+  const orang = (pre, lbl, M) => {
+    const t = { Nama: v(pre + 'nama'), NIK: v(pre + 'nik'), 'Jenis Kelamin': judulKata(v(pre + 'jk')), 'Tempat Lahir': judulKata(v(pre + 'tempat_lahir')), 'Tanggal Lahir': dPanjang(v(pre + 'tgl_lahir')), Umur: v(pre + 'tgl_lahir') ? umur(v(pre + 'tgl_lahir')) + ' tahun' : '',
+      Kewarganegaraan: v(pre + 'wn') === 'WNA' ? 'WNA' : 'Indonesia', Agama: judulKata(v(pre + 'agama')), Pekerjaan: judulKata(v(pre + 'pekerjaan')), Alamat: alamat(pre) };
+    t.TTL = [t['Tempat Lahir'], t['Tanggal Lahir']].filter(Boolean).join(', ');
+    Object.keys(t).forEach(k => { M[(lbl ? lbl + ' ' : '') + k] = t[k] || TITIK; });
+  };
+  const M = petaDesa();
+  const tgl = r.tanggal || isoToday();
+  Object.assign(M, { 'Kepala Desa': S.set.nama_kades || TITIK, Nomor: v('nomor') || TITIK, No: v('no'), Tahun: String(tgl).slice(0, 4), 'Tanggal Surat': dPanjang(tgl),
+    'Hari Akad': dHari(r.tgl_peristiwa) || TITIK, 'Tanggal Akad': dPanjang(r.tgl_peristiwa) || TITIK, 'Jam Akad': v('jam_akad') ? v('jam_akad').slice(0, 5) + ' WIB' : TITIK, 'Tempat Akad': v('tempat_peristiwa') || TITIK,
+    Wali: v('wali_nama') || TITIK, 'Hubungan Wali': v('wali_hub') || TITIK, 'Mas Kawin': v('mahar') || TITIK, 'No Akta': v('no_akta') || TITIK });
+  const st = pre => { const s = v(pre + 'status_sblm'); return s === 'Beristri' && v(pre + 'istri_ke') ? 'Beristri ke-' + v(pre + 'istri_ke') : s; };
+  [['s_', 'Suami', 'sa_', 'si_'], ['i_', 'Istri', 'ia_', 'ii_']].forEach(([p, L, a, b]) => {
+    orang(p, L, M); orang(a, 'Ayah ' + L, M); orang(b, 'Ibu ' + L, M);
+    M[L + ' Bin'] = v(a + 'nama') || TITIK; M[L + ' Status'] = st(p) || TITIK; M[L + ' Pasangan Terdahulu'] = v(p + 'pasangan_dulu') || '-';
+  });
+  const [p, a, b, q] = siapa === 'i' ? ['i_', 'ia_', 'ii_', 's_'] : ['s_', 'sa_', 'si_', 'i_'];
+  orang(p, '', M); orang(a, 'Ayah', M); orang(b, 'Ibu', M); orang(q, 'Pasangan', M);
+  M.Bin = v(a + 'nama') || TITIK; M['Bin Binti'] = siapa === 'i' ? 'binti' : 'bin'; M['Status Perkawinan'] = st(p) || TITIK; M['Pasangan Terdahulu'] = v(p + 'pasangan_dulu') || '-';
+  M['Pasangan Bin'] = v(siapa === 'i' ? 'sa_nama' : 'ia_nama') || TITIK; M['Pasangan Bin Binti'] = siapa === 'i' ? 'bin' : 'binti';
+  return tambahU(M);
+}
+const TAG_NTCR = ['Desa', 'Kecamatan', 'Kabupaten', 'Kepala Desa', 'Nomor', 'No', 'Tahun', 'Tanggal Surat', 'Nama', 'NIK', 'Bin', 'Bin Binti', 'Jenis Kelamin', 'TTL', 'Tempat Lahir', 'Tanggal Lahir', 'Umur', 'Kewarganegaraan', 'Agama', 'Pekerjaan', 'Alamat', 'Status Perkawinan', 'Pasangan Terdahulu',
+  'Ayah Nama', 'Ayah NIK', 'Ayah TTL', 'Ayah Kewarganegaraan', 'Ayah Agama', 'Ayah Pekerjaan', 'Ayah Alamat', 'Ibu Nama', 'Ibu NIK', 'Ibu TTL', 'Ibu Agama', 'Ibu Pekerjaan', 'Ibu Alamat', 'Pasangan Nama', 'Pasangan Bin', 'Pasangan NIK', 'Pasangan TTL', 'Pasangan Alamat',
+  'Suami Nama', 'Suami Bin', 'Suami NIK', 'Suami TTL', 'Suami Status', 'Istri Nama', 'Istri Bin', 'Istri NIK', 'Istri TTL', 'Istri Status', 'Hari Akad', 'Tanggal Akad', 'Jam Akad', 'Tempat Akad', 'Wali', 'Hubungan Wali', 'Mas Kawin', 'No Akta'];
+async function cetakNtcr(r, n, siapa) {
+  const lbl = { n1: 'N1 Pengantar Nikah', n2: 'N2 Permohonan Kehendak Perkawinan', n4: 'N4 Persetujuan Calon Pengantin', n5: 'N5 Surat Izin Orang Tua' }[n];
+  const nm = siapa === 'i' ? r.i_nama : r.s_nama;
+  const m = modal('Membuat dokumen', `<div class="stack"><b>${esc(lbl)}</b><div class="skel"></div><div class="meta">Mengisi template…</div></div>`);
+  try {
+    if (!S.set.nama_kades) { try { S.set.nama_kades = await namaKades() || ''; } catch (x) { } }
+    hasilDokumen(m, await buatDokumen({ path: 'ntcr/ntcr_' + n + '.docx', M: petaNtcr(r, siapa), rows: [], jenis: 'surat', nama: lbl + ' - ' + (n === 'n2' || n === 'n4' ? r.s_nama + ' & ' + r.i_nama : nm) }));
+  } catch (x) { m.body.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
+}
+/* ---- Detail penduduk: riwayat perkawinan (NTCR) & data sosial ---- */
+async function extraPendudukSosial(x, el) {
+  const id = x.id, uniq = a => { const m = {}; (a || []).forEach(r => { m[r.id] = r; }); return Object.values(m); };
+  const [nt, rn] = await Promise.all([
+    canRead('ntcr') ? Promise.all([call('list', { entity: 'ntcr', filters: { s_penduduk_id: id }, limit: 50 }), call('list', { entity: 'ntcr', filters: { i_penduduk_id: id }, limit: 50 })]).then(a => uniq(a.flatMap(r => r.rows || []))).catch(() => null) : null,
+    canRead('rentan') ? call('list', { entity: 'rentan', filters: { r_penduduk_id: id }, limit: 20 }).then(r => r.rows || []).catch(() => null) : null
+  ]);
+  let rw = []; try { rw = Array.isArray(x.riwayat_kawin) ? x.riwayat_kawin : JSON.parse(x.riwayat_kawin || '[]'); } catch (er) { }
+  const u = umur(x.tgl_lahir), tag = [];
+  if (x.tgl_lahir && u >= 60) tag.push('Lansia (' + u + ' th)'); if (x.tgl_lahir && u < 5) tag.push('Balita');
+  let h = '';
+  if (nt || rw.length) {
+    const N2 = (nt || []).sort((a, b) => String(b.tgl_peristiwa || b.tanggal || '').localeCompare(String(a.tgl_peristiwa || a.tanggal || '')));
+    h += `<div class="sec-h"><h2>${ic('users')} Riwayat perkawinan</h2></div>` + (N2.length ? `<div class="list">${N2.map(r => rowHtml('ntcr', r)).join('')}</div>` : '')
+      + (rw.length ? `<div class="card meta" style="padding:6px 10px">${rw.slice().reverse().map(z => `${esc(fDate(z.waktu))}: status perkawinan ${esc(z.dari || '–')} → <b>${esc(z.ke)}</b>${z.alasan ? ' — ' + esc(z.alasan) : ''}`).join('<br>')}</div>` : '')
+      + (!N2.length && !rw.length ? '<div class="meta">Belum ada catatan di Buku NTCR.</div>' : '');
+  }
+  if (rn) {
+    h += `<div class="sec-h"><h2>${ic('heart')} Data rentan / sosial${tag.length ? ' <span class="pill info">' + esc(tag.join(', ')) + '</span>' : ''}</h2>${canWrite('rentan') ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['form', { e: 'rentan', preset: { r_nama: x.nama || '', r_penduduk_id: x.id, r_nik: x.nik || '', r_kk: x.kk || '', r_jk: x.jk || '', r_tempat_lahir: x.tempat_lahir || '', r_tgl_lahir: x.tgl_lahir || '', r_agama: x.agama || '', r_pekerjaan: x.pekerjaan || '', r_wn: x.warga_negara || 'WNI', r_alamat: x.dusun || '', r_rt: x.rt || '', r_rw: x.rw || '', r_desa: /luar/i.test(x.status || '') ? '' : (S.set.nama_desa || '').toUpperCase(), r_kec: /luar/i.test(x.status || '') ? '' : (S.set.kecamatan || '').toUpperCase(), r_kab: /luar/i.test(x.status || '') ? '' : (S.set.kabupaten || '').toUpperCase() } }]))}'>${ic('plus')}Catat data rentan</button>` : ''}</div>`
+      + (rn.length ? `<div class="list">${rn.map(r => rowHtml('rentan', r)).join('')}</div>` : '<div class="meta">Belum tercatat sebagai penduduk rentan/penerima bantuan.</div>');
+  }
+  if (h) el.insertAdjacentHTML('beforeend', `<div class="stack">${h}</div>`);
 }
 /* ---- Surat masuk → Agenda kegiatan / Berita ---- */
 function fwdHtml(rec) {
@@ -5686,6 +5875,47 @@ const NX = (() => {
     P('Berdasarkan surat pengantar dari RT/RW setempat dan pendataan kami, yayasan/lembaga tersebut di atas benar-benar ada dan berdomisili / memiliki sekretariat di wilayah Desa {{Desa}}, Kecamatan {{Kecamatan}}, Kabupaten {{Kabupaten}}.', { ind: 1, before: 160 }),
     P('Surat keterangan ini diberikan kepada yang bersangkutan untuk dipergunakan sebagai {{Keperluan}}.', { ind: 1 }),
     P('Demikian surat keterangan domisili ini dibuat dengan sebenarnya agar dapat dipergunakan sebagaimana mestinya.', { ind: 1 }), ...ttdK()];
+  /* Formulir nikah — PMA No. 20 Tahun 2019 (Model N1, N2, N4, N5) */
+  const nModel = m => P([r(m, { size: 20 })], { al: 'R', after: 60 });
+  const nList = (rows, ind) => tbl([450, 3300, 250, W - 4000 - (ind || 0)], rows.map((x, i) => [(i + 1) + '.', x[0], ':', x[1]]), ind || 0);
+  const nOrang = (pf, bin) => [['Nama lengkap dan alias', '{{' + pf + 'Nama_U}}']].concat(bin ? [[bin, '{{' + pf + 'Bin}}']] : []).concat([['Nomor Induk Kependudukan', '{{' + pf + 'NIK}}'], ['Tempat dan tanggal lahir', '{{' + pf + 'TTL}}'],
+    ['Kewarganegaraan', '{{' + pf + 'Kewarganegaraan}}'], ['Agama', '{{' + pf + 'Agama}}'], ['Pekerjaan', '{{' + pf + 'Pekerjaan}}'], ['Alamat', '{{' + pf + 'Alamat}}']]);
+  const nTtd2 = (a, an, b, bn) => tbl([4680, 4680], [[[C(a, { after: 1100 }), C(an, { bold: 1, u: 1 })], [C(b, { after: 1100 }), C(bn, { bold: 1, u: 1 })]]]);
+  const DOKN2 = ['Surat pengantar perkawinan dari desa/kelurahan tempat tinggal calon pengantin;', 'Fotokopi akta kelahiran atau surat keterangan kelahiran;', 'Fotokopi kartu tanda penduduk / surat keterangan telah melakukan perekaman KTP elektronik;', 'Fotokopi kartu keluarga;',
+    'Surat rekomendasi perkawinan dari KUA kecamatan setempat bagi calon pengantin yang menikah di luar wilayah kecamatan tempat tinggalnya;', 'Persetujuan kedua calon pengantin;', 'Izin tertulis orang tua atau wali bagi calon pengantin yang belum mencapai usia 21 tahun;',
+    'Dispensasi kawin dari pengadilan bagi calon pengantin yang belum mencapai usia 19 tahun;', 'Surat izin dari atasan/kesatuan bagi calon pengantin anggota TNI/POLRI;', 'Penetapan izin poligami dari pengadilan agama bagi suami yang hendak beristri lebih dari seorang;',
+    'Akta cerai atau kutipan buku pendaftaran talak/cerai bagi duda/janda cerai, atau akta kematian/surat keterangan kematian suami/istri bagi duda/janda ditinggal mati;', 'Pas foto ukuran 2x3 sebanyak 4 lembar dan 4x6 sebanyak 2 lembar dengan latar belakang biru.'];
+  Object.assign(T, {
+    ntcr_n1: () => [nModel('Model N1'), tbl([3000, 250, W - 3250], [['KANTOR DESA/KELURAHAN', ':', '{{Desa_U}}'], ['KECAMATAN', ':', '{{Kecamatan_U}}'], ['KABUPATEN/KOTA', ':', '{{Kabupaten_U}}']]), P('', { after: 120 }),
+      C('FORMULIR PENGANTAR NIKAH', { bold: 1, u: 1, size: 26 }), C('Nomor : {{Nomor}}', { after: 200 }),
+      P('Yang bertanda tangan di bawah ini menerangkan dengan sesungguhnya bahwa:'),
+      nList([['Nama', '{{Nama_U}}'], ['Nomor Induk Kependudukan', '{{NIK}}'], ['Jenis kelamin', '{{Jenis Kelamin}}'], ['Tempat dan tanggal lahir', '{{TTL}}'], ['Kewarganegaraan', '{{Kewarganegaraan}}'], ['Agama', '{{Agama}}'], ['Pekerjaan', '{{Pekerjaan}}'], ['Alamat', '{{Alamat}}'], ['Status perkawinan', '{{Status Perkawinan}}'], ['Nama istri/suami terdahulu', '{{Pasangan Terdahulu}}']]),
+      P('Adalah benar anak dari pernikahan seorang pria:', { before: 120 }), nList(nOrang('Ayah ')),
+      P('dengan seorang wanita:', { before: 120 }), nList(nOrang('Ibu ')),
+      P('Demikian surat pengantar ini dibuat dengan mengingat sumpah jabatan dan untuk dipergunakan sebagaimana mestinya.', { before: 160, ind: 1 }), ...ttdK()],
+    ntcr_n2: () => [nModel('Model N2'),
+      tbl([5000, W - 5000], [[[tbl([1200, 250, 3400], [['Perihal', ':', [P([r('Permohonan Kehendak Perkawinan', { bold: 1 })], { after: 40, al: 'L' })]]])], [L('{{Desa}}, {{Tanggal Surat}}', { after: 120 }), L('Kepada Yth.'), L('Kepala KUA Kecamatan {{Kecamatan}}'), L('di {{Kabupaten}}')]]]), P('', { after: 160 }),
+      P("Assalamu'alaikum Wr. Wb."), P('Dengan hormat, kami mengajukan permohonan kehendak perkawinan untuk atas nama:', { ind: 1 }),
+      tbl([3000, 250, W - 3610], [['Calon Suami', ':', '{{Suami Nama_U}} bin {{Suami Bin}}'], ['Calon Istri', ':', '{{Istri Nama_U}} binti {{Istri Bin}}'], ['Hari / Tanggal / Jam', ':', '{{Hari Akad}}, {{Tanggal Akad}}, {{Jam Akad}}'], ['Tempat akad nikah', ':', '{{Tempat Akad}}']], 360),
+      P('Bersama ini kami sampaikan surat-surat yang diperlukan untuk diperiksa sebagai berikut:', { before: 120, ind: 1 }),
+      ...DOKN2.map((t, i) => P((i + 1) + '. ' + t, { hang: 720, hangBy: 360, after: 20 })),
+      P('Kiranya dapat dilakukan pemeriksaan kelengkapan persyaratan pendaftaran kehendak perkawinan sesuai dengan ketentuan peraturan perundang-undangan.', { before: 120, ind: 1 }),
+      P("Wassalamu'alaikum Wr. Wb.", { after: 160 }),
+      tbl([4680, 4680], [[[C('Diterima tanggal ......................'), C('Yang menerima,'), C('Kepala KUA / Penghulu / PPN LN,', { after: 1100 }), C('(.................................)')], [C(' '), C('Pemohon,'), C(' ', { after: 1100 }), C('{{Suami Nama_U}}', { bold: 1, u: 1 })]]])],
+    ntcr_n4: () => [nModel('Model N4'), C('PERSETUJUAN CALON PENGANTIN', { bold: 1, u: 1, size: 26, after: 240 }),
+      P('Yang bertanda tangan di bawah ini:'), P([r('A. Calon Suami', { bold: 1 })], { after: 40 }), nList(nOrang('Suami ', 'Bin'), 360),
+      P([r('B. Calon Istri', { bold: 1 })], { before: 120, after: 40 }), nList(nOrang('Istri ', 'Binti'), 360),
+      P('Menyatakan dengan sesungguhnya bahwa atas dasar sukarela, dengan kesadaran sendiri, tanpa ada paksaan dari siapapun juga, setuju untuk melangsungkan perkawinan.', { before: 160, ind: 1 }),
+      P('Demikian surat persetujuan ini dibuat untuk dapat dipergunakan seperlunya.', { ind: 1 }), P('{{Desa}}, {{Tanggal Surat}}', { al: 'R', before: 120, after: 120 }),
+      nTtd2('Calon Suami,', '{{Suami Nama_U}}', 'Calon Istri,', '{{Istri Nama_U}}')],
+    ntcr_n5: () => [nModel('Model N5'), C('SURAT IZIN ORANG TUA', { bold: 1, u: 1, size: 26, after: 240 }),
+      P('Yang bertanda tangan di bawah ini:'), P([r('A. Ayah kandung', { bold: 1 })], { after: 40 }), nList(nOrang('Ayah '), 360),
+      P([r('B. Ibu kandung', { bold: 1 })], { before: 120, after: 40 }), nList(nOrang('Ibu '), 360),
+      P('adalah ayah dan ibu kandung dari:', { before: 120 }), nList(nOrang('', 'Bin/Binti'), 360),
+      P('memberikan izin kepada anak kami untuk melaksanakan perkawinan dengan:', { before: 120 }), nList(nOrang('Pasangan ', 'Bin/Binti'), 360),
+      P('Demikian surat izin ini dibuat dengan kesadaran tanpa ada paksaan dari siapapun dan untuk dipergunakan seperlunya.', { before: 160, ind: 1 }), P('{{Desa}}, {{Tanggal Surat}}', { al: 'R', before: 120, after: 120 }),
+      nTtd2('Ayah,', '{{Ayah Nama_U}}', 'Ibu,', '{{Ibu Nama_U}}')]
+  });
   const nama = Object.keys(T);
   async function buat(nm, logoBytes) {
     if (!T[nm]) return null;
@@ -6477,6 +6707,8 @@ VIEWS.template = async (p, main) => {
     ['naskah', 'Surat Keluar & Produk Hukum', () => sek('Surat keluar & produk hukum', `<button class="btn sm" data-act="tplUpBtn" data-p="naskah/">${ic('plus')}Jenis surat keluar</button>`, naskahDaftar.map(([path, label]) => item({ path, label, ic: /perdes|perkades|perbersama|sk_/.test(path) ? 'scale' : 'send' })).join(''))
       + '<div class="meta">Jenis surat keluar baru: beri nama file sesuai jenisnya, mis. <i>Surat Undangan Rapat.docx</i>, lalu ketik jenis yang sama di isian "Jenis Surat".</div>'
       + tags('Daftar tanda Surat Keluar & Produk Hukum', TAG_NASKAH, 'Menimbang, Mengingat, Isi, Isi Surat, Tembusan, Yang Ditugaskan: tulis tanda sendirian dalam satu paragraf, maka setiap baris isian menjadi paragraf baru.')],
+    ['ntcr', 'Buku NTCR', () => sek('Formulir nikah (PMA No. 20 Tahun 2019)', '', [['n1', 'N1 Pengantar Nikah'], ['n2', 'N2 Permohonan Kehendak Perkawinan'], ['n4', 'N4 Persetujuan Calon Pengantin'], ['n5', 'N5 Surat Izin Orang Tua']].map(([n, l]) => item({ path: 'ntcr/ntcr_' + n + '.docx', label: l, ic: 'users' })).join(''))
+      + tags('Daftar tanda Buku NTCR', TAG_NTCR, 'Tanpa awalan = calon pengantin yang dipilih saat mencetak (N1/N5); <b>Ayah</b>/<b>Ibu</b> = orang tuanya; <b>Pasangan</b> = calon pasangannya. Awalan <b>Suami</b>, <b>Istri</b>, <b>Ayah Suami</b>, <b>Ibu Istri</b>, dst. juga tersedia (Nama, NIK, TTL, Agama, Pekerjaan, Alamat, Kewarganegaraan).')],
     ['keu', 'Keuangan', () => sek('Keuangan', '', item({ path: 'keu/keu_spp.docx', label: 'SPP + Pernyataan Tanggung Jawab + Rincian + Kuitansi', ic: 'wallet', bawaan: 1 })) + tags('Daftar tanda SPP', TAG_SPP, 'Baris berawalan R diulang per rekening; baris berawalan P diulang per potongan pajak.')],
     ['rkp', 'RKP Desa', () => sek('RKP Desa', `<button class="btn sm" data-act="tplUpBtn" data-p="rkp/">${ic('plus')}Template</button><button class="btn sm" data-act="tplImpor">${ic('folder')}Dari Google Drive</button>`,
       list.filter(x => x.path.indexOf('rkp/') === 0 && !/_cadangan/.test(x.path)).map(x => item({ path: x.path, label: x.path.split('/').pop().replace(/\.docx$/i, '').replace(/_/g, ' '), ic: 'cal', hapus: 1 })).join('') || '<div class="card meta">Belum ada. Tekan "Dari Google Drive" untuk memindahkan template Google Docs lama.</div>')],
