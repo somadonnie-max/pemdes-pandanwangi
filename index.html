@@ -349,6 +349,11 @@ body.privblur #main,body.privblur #layer,body.privblur .tabs{filter:blur(18px);t
 .dm-it{display:flex;align-items:center;gap:6px;min-width:0;border:0;background:none;padding:5px 6px;border-radius:8px;cursor:pointer;color:var(--ink);font-size:11.5px;line-height:1.2;text-align:left;transition:background .12s}
 .dm-it:hover{background:color-mix(in srgb,var(--mc) 9%,transparent)}.dm-it svg{width:14px;height:14px;flex:none;color:var(--mc)}.dm-it span{flex:1;min-width:0}.dm-it em{font-style:normal;font-size:9.5px;font-weight:700;color:var(--mc);background:color-mix(in srgb,var(--mc) 11%,transparent);border-radius:99px;padding:0 6px}
 .dm-it[hidden]{display:none}
+.hjam{border:0;background:none;color:inherit;font:inherit;font-weight:700;cursor:pointer;padding:2px 6px;border-radius:6px;text-decoration:underline dotted;text-underline-offset:3px}.hjam:hover{background:var(--surface2)}
+.pd{display:flex;flex-direction:column;gap:8px}.pd-h{display:flex;gap:10px;align-items:center}.pd-h .pini{width:40px;height:40px;border-radius:50%;background:var(--pri-soft);color:var(--pri);display:grid;place-items:center;font-weight:700;flex:none}.pd-h small{display:block;font-size:11px;color:var(--muted)}
+.pd-r{border:1px solid var(--line);border-radius:11px;padding:8px 10px;display:flex;flex-direction:column;gap:5px}.pd-r.on{border-color:var(--pri);box-shadow:0 0 0 2px color-mix(in srgb,var(--pri) 18%,transparent)}
+.pd-t{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.pd-t b{font-size:17px}.pd-k{font-size:12.5px;display:flex;gap:5px;align-items:flex-start}.pd-k svg,.pd-m svg{width:13px;height:13px;flex:none;margin-top:2px}
+.pd-m{display:flex;gap:10px;align-items:center;font-size:11.5px;color:var(--muted)}.pd-m span{display:flex;gap:4px;align-items:center}.pd-m a{color:var(--pri);font-weight:600}
 .ds{padding:0;overflow:hidden}.ds-top{display:flex;gap:10px;align-items:center;padding:10px 12px;background:linear-gradient(135deg,var(--pri,#15803d),color-mix(in srgb,var(--pri,#15803d) 60%,#0f172a));color:#fff}.ds-badge{width:34px;height:34px;border-radius:12px;background:rgba(255,255,255,.18);display:grid;place-items:center;flex:none}.ds-badge svg{width:22px;height:22px}.ds-cap{font-size:11px;opacity:.85}.ds-jab{font-size:14px;font-weight:700;line-height:1.25}.ds-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.ds-chips span{font-size:11px;background:rgba(255,255,255,.2);border-radius:99px;padding:2px 8px}
 .ds-stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));border-bottom:1px solid var(--line)}.ds-stat div{padding:6px 8px;text-align:center}.ds-stat div+div{border-left:1px solid var(--line)}.ds-stat b{display:block;font-size:12px}.ds-stat small{font-size:9.5px;color:var(--muted)}
 .ds-sec{padding:7px 12px 2px}.ds-h{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}.ds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0 12px}.ds-it{display:flex;gap:8px;align-items:center;padding:2px 0}.ds-ic{width:22px;height:22px;border-radius:8px;background:color-mix(in srgb,var(--pri,#15803d) 12%,transparent);color:var(--pri,#15803d);display:grid;place-items:center;flex:none}.ds-ic svg{width:12px;height:12px}.ds-it small{display:block;font-size:9.5px;color:var(--muted);line-height:1.2}.ds-it b{display:block;font-size:12px;font-weight:600;line-height:1.25;word-break:break-word}.ds-it a{color:var(--pri,#15803d)}
@@ -2411,14 +2416,31 @@ VIEWS.harian = async (p, main, alive) => {
       const rows = await call('presensiHarian', { dari: st.bln + '-01', sampai: st.bln + '-' + String(akhir).padStart(2, '0'), q: st.q });
       if (!alive()) return;
       const tg = d => { const x = parseD(d); return x ? x.getDate() + '/' + (x.getMonth() + 1) + '/' + x.getFullYear() : d; };
-      const c = (v, k) => v ? `<td class="c ${k}">${esc(String(v).replace(':', '.'))}</td>` : '<td class="c"></td>';
+      const c = (v, k, r, j) => v ? `<td class="c ${k}"><button type="button" class="hjam" data-act="hDet" data-t="${esc(r.tanggal)}" data-u="${esc(r.user_id)}" data-n="${esc(r.nama)}" data-j="${esc(j)}">${esc(String(v).replace(':', '.'))}</button></td>` : '<td class="c"></td>';
       $('#hcnt').textContent = rows.length ? rows.length + ' baris' : '';
-      $('#hrows').innerHTML = rows.length ? `<div class="tbl-wrap"><table class="tbl harian"><thead><tr><th>Tanggal</th><th class="stk">Nama Perangkat</th><th class="c">Hadir</th><th class="c">Hadir Terlambat</th><th class="c">Pulang</th><th class="c">Dinas Luar</th><th class="c">Izin</th><th class="c">Sakit</th></tr></thead><tbody>${rows.map(r => `<tr${r.ket ? ` title="${esc(r.ket)}"` : ''}><td class="num">${esc(tg(r.tanggal))}</td><td class="stk">${esc(r.nama)}</td>${c(r.hadir, 'ok')}${c(r.terlambat, 'warn')}${c(r.pulang, '')}${c(r.dl, 'info')}${c(r.izin, '')}${c(r.sakit, '')}</tr>`).join('')}</tbody></table></div>` : '<div class="card empty">' + ic('clock') + 'Belum ada presensi pada bulan ini.</div>';
+      $('#hrows').innerHTML = rows.length ? `<div class="tbl-wrap"><table class="tbl harian"><thead><tr><th>Tanggal</th><th class="stk">Nama Perangkat</th><th class="c">Hadir</th><th class="c">Hadir Terlambat</th><th class="c">Pulang</th><th class="c">Dinas Luar</th><th class="c">Izin</th><th class="c">Sakit</th></tr></thead><tbody>${rows.map(r => `<tr${r.ket ? ` title="${esc(r.ket)}"` : ''}><td class="num">${esc(tg(r.tanggal))}</td><td class="stk">${esc(r.nama)}</td>${c(r.hadir, 'ok', r, 'Masuk')}${c(r.terlambat, 'warn', r, 'Masuk')}${c(r.pulang, '', r, 'Pulang')}${c(r.dl, 'info', r, 'Dinas Luar')}${c(r.izin, '', r, 'Izin')}${c(r.sakit, '', r, 'Sakit')}</tr>`).join('')}</tbody></table></div>` : '<div class="card empty">' + ic('clock') + 'Belum ada presensi pada bulan ini.</div>';
     } catch (x) { $('#hrows').innerHTML = `<div class="err">${esc(x.message)}</div>`; }
   };
   $('#hbln').onchange = e => { st.bln = e.target.value || isoToday().slice(0, 7); muat(); };
   let tq; $('#hq').oninput = e => { clearTimeout(tq); tq = setTimeout(() => { st.q = e.target.value.trim(); muat(); }, 350); };
   muat();
+};
+/* detail presensi satu orang pada satu tanggal (dari Riwayat Harian) */
+ACT.hDet = async t => {
+  const m = modal('Detail presensi', '<div class="skel" style="height:120px"></div>');
+  try {
+    const rows = await call('presensiDetail', { tanggal: t.dataset.t, user_id: t.dataset.u });
+    const W = { Masuk: 'ok', Pulang: 'info', 'Dinas Luar': 'gold', Izin: 'warn', Sakit: 'warn' };
+    const x0 = rows[0] || {};
+    m.body.innerHTML = `<div class="pd">
+      <div class="pd-h"><span class="pini">${esc(initials(t.dataset.n || x0.nama || '?'))}</span><span><b>${esc(t.dataset.n || x0.nama || '')}</b><small>${esc(x0.jabatan || '')}</small><small>${esc(fDay(t.dataset.t))}</small></span></div>
+      ${rows.length ? rows.map(r => { const geo = r.lat && r.lng ? r.lat + ',' + r.lng : ''; const jr = Number(r.jarak_m || 0); const on = r.jenis === t.dataset.j;
+        return `<div class="pd-r${on ? ' on' : ''}"><div class="pd-t"><b class="num">${esc(String(r.jam || '').slice(0, 5))}</b><span class="pill ${W[r.jenis] || ''}">${esc(r.jenis || '')}</span>${r.status && r.status !== r.jenis ? `<span class="pill ${/Terlambat|Awal/.test(r.status) ? 'warn' : 'ok'}">${esc(r.status)}</span>` : ''}</div>
+          ${r.keterangan ? `<div class="pd-k">${ic('file')} ${esc(r.keterangan)}</div>` : ''}
+          <div class="pd-m">${geo ? `<span>${ic('pin')} ${jr ? (jr >= 1000 ? (jr / 1000).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' km' : jr + ' m') + ' dari kantor' : 'Di kantor'}</span><a href="https://www.google.com/maps?q=${encodeURIComponent(geo)}" target="_blank" rel="noopener">Lihat lokasi</a>` : '<span>Tanpa lokasi</span>'}</div>
+          ${r.foto_id ? `<button class="btn sm" data-act="file" data-id="${esc(r.foto_id)}" data-name="Foto presensi">${ic('cam')}Foto / lampiran</button>` : ''}</div>`; }).join('') : '<div class="meta">Data presensi tidak ditemukan.</div>'}
+    </div>`;
+  } catch (x) { m.body.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
 };
 VIEWS.presensi = async (p, main, alive) => {
   setTop('Presensi Hari Ini', fDay(isoToday()));
@@ -5770,7 +5792,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '85', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '86', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
