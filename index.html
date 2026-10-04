@@ -251,6 +251,11 @@ button.stat:hover{border-color:var(--pri)}
 @media(min-width:900px){.tn-panel{left:auto;width:360px;top:56px;bottom:auto}}
 @media(max-width:760px){.tn{gap:6px!important}.tn-stat{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.tn-k{padding:3px 6px;border-radius:8px}.tn-k b{font-size:13px}.tn-k span{font-size:9.5px}.tn-bar{grid-column:1/-1;height:4px}.tn-map{height:calc(100vh - 215px);min-height:360px}}
 .fsec{border-top:1px solid var(--line);padding-top:8px;margin-top:4px}.fsec b{font-size:12.5px;color:var(--pri)}
+.ds{padding:0;overflow:hidden}.ds-top{display:flex;gap:12px;align-items:center;padding:14px;background:linear-gradient(135deg,var(--pri,#15803d),color-mix(in srgb,var(--pri,#15803d) 60%,#0f172a));color:#fff}.ds-badge{width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.18);display:grid;place-items:center;flex:none}.ds-badge svg{width:22px;height:22px}.ds-cap{font-size:11px;opacity:.85}.ds-jab{font-size:16px;font-weight:700;line-height:1.25}.ds-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.ds-chips span{font-size:11px;background:rgba(255,255,255,.2);border-radius:99px;padding:2px 8px}
+.ds-stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));border-bottom:1px solid var(--line)}.ds-stat div{padding:9px 12px;text-align:center}.ds-stat div+div{border-left:1px solid var(--line)}.ds-stat b{display:block;font-size:13.5px}.ds-stat small{font-size:11px;color:var(--muted)}
+.ds-sec{padding:10px 14px 4px}.ds-h{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}.ds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px 12px}.ds-it{display:flex;gap:9px;align-items:flex-start;padding:5px 0}.ds-ic{width:28px;height:28px;border-radius:8px;background:color-mix(in srgb,var(--pri,#15803d) 12%,transparent);color:var(--pri,#15803d);display:grid;place-items:center;flex:none}.ds-ic svg{width:15px;height:15px}.ds-it small{display:block;font-size:11px;color:var(--muted)}.ds-it b{font-size:13px;font-weight:600;word-break:break-word}.ds-it a{color:var(--pri,#15803d)}
+.ds>.btns,.ds>.meta{padding:4px 14px 12px}
+.about{font-size:10.5px;line-height:1.55;color:var(--muted);padding:10px 4px 2px;border-top:1px solid var(--line)}.about b{color:var(--ink)}.about a{color:var(--pri,#15803d)}.ab-app{font-size:11px;margin-bottom:2px}.ab-h{font-weight:700;margin-top:6px;text-transform:uppercase;letter-spacing:.05em}.about details{margin-top:6px}.about summary{cursor:pointer;font-weight:600;color:var(--ink)}.about ol{margin:4px 0;padding-left:16px}.ab-c{margin-top:6px;text-align:center}
 .pmbox{position:relative}.pmdd{position:absolute;left:0;right:0;top:100%;z-index:50;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.25);max-height:260px;overflow:auto}.pmdd button{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:6px 9px;font-size:12.5px;cursor:pointer;color:inherit}.pmdd small{color:var(--muted)}.pmok{font-size:11px;color:#16a34a}
 .gtabs{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:3px;overflow-x:auto;scrollbar-width:none}
 .gtabs button{flex:1 0 auto;border:0;background:none;border-radius:7px;padding:5px 12px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap}
@@ -5263,17 +5268,14 @@ VIEWS.akun = async (p, main) => {
     <form class="stack" id="pinf" hidden style="margin-top:8px"><div class="form"><div class="f"><label for="pl">Kata sandi lama</label><input id="pl" type="password" autocomplete="current-password"></div><div class="f"><label for="pb">Kata sandi baru (min. 6 karakter)</label><input id="pb" type="password" autocomplete="new-password"></div><div class="f"><label for="pb2">Ulangi kata sandi baru</label><input id="pb2" type="password" autocomplete="new-password"></div></div><div id="perr2" class="err" hidden></div><div><button class="btn pri" type="submit">${ic('key')}Simpan kata sandi</button></div></form></div>
     <div class="card stack"><div class="lbl">Tampilan</div><div class="chips">${[['', 'Ikuti perangkat'], ['light', 'Terang'], ['dark', 'Gelap']].map(t => `<button class="chip ${th === t[0] ? 'on' : ''}" data-act="theme" data-v="${t[0]}">${t[1]}</button>`).join('')}</div></div>
     ${isStandalone() ? '' : `<button class="btn" data-act="install">${ic('plus')}Pasang aplikasi di HP / komputer</button>`}
+    ${tentangHtml()}
     <button class="btn danger" data-act="logout">${ic('out')}Keluar</button>
   </div>`;
   S.vh.pinShow = t => { const f = $('#pinf'); f.hidden = !f.hidden; t.classList.toggle('pri', !f.hidden); if (!f.hidden) $('#pl').focus(); };
   call('myData').then(r => {
     const bx = $('#myData'); if (!bx) return;
     if (!r || !r.ada) { bx.innerHTML = '<div class="lbl">Data saya</div><div class="meta">Data Anda belum tercatat di Arsip → Aparatur Desa (dicocokkan dari email atau nama). Minta admin menambahkannya.</div>'; return; }
-    const x = r.data, u = UI.aparat, jt = jabTambah(x); let sk = {}; try { sk = JSON.parse(x.sk_tambahan || '{}') || {}; } catch (er) { }
-    const sh = u.fields.filter(f => f.t !== 'file' && f.k !== 'jabatan_tambahan' && f.k !== 'nama' && x[f.k] !== '' && x[f.k] != null);
-    bx.innerHTML = `<div class="lbl">Data saya (Aparatur Desa)</div><dl class="dl">${sh.map(f => `<div class="${f.wide && String(x[f.k]).length > 40 ? 'w' : ''}"><dt>${esc(f.l)}</dt><dd>${valHtml(f, x[f.k])}</dd></div>`).join('')}${jt.length ? `<div class="w"><dt>Jabatan tambahan</dt><dd>${jt.map(esc).join(', ')}</dd></div>` : ''}</dl>
-      <div class="btns">${x.dok_sk_id ? `<button class="btn sm" data-act="file" data-id="${esc(x.dok_sk_id)}" data-name="Dokumen SK">${ic('file')}Dokumen SK</button>` : ''}${jt.filter(j => sk[j]).map(j => `<button class="btn sm" data-act="file" data-id="${esc(sk[j])}" data-name="SK ${esc(j)}">${ic('file')}SK ${esc(j)}</button>`).join('')}</div>
-      <div class="meta">Ada yang keliru? Minta admin atau Kaur TU & Umum mengubahnya di Arsip → Aparatur Desa.</div>`;
+    bx.outerHTML = dataSayaHtml(r.data);
   }).catch(er => { const bx = $('#myData'); if (bx) bx.innerHTML = `<div class="meta">${esc(er.message)}</div>`; });
   $('#pinf').onsubmit = async ev => {
     ev.preventDefault();
@@ -5295,6 +5297,54 @@ VIEWS.akun = async (p, main) => {
     } catch (x) { toast(x.message, 1); box.classList.remove('busy'); }
   };
 };
+/* ---- Akun: Data saya (Aparatur Desa) ---- */
+const waLink = n => { let d = String(n || '').replace(/\D/g, ''); if (!d) return ''; if (d[0] === '0') d = '62' + d.slice(1); return 'https://wa.me/' + d; };
+const waTampil = n => { let d = String(n || '').replace(/\D/g, ''); if (d.indexOf('62') === 0) d = '0' + d.slice(2); return d.replace(/^(\d{4})(\d{4})(\d+)$/, '$1-$2-$3'); };
+function masaKerja(tgl) { const d = parseD(tgl); if (!d) return ''; const t = new Date(); let m = (t.getFullYear() - d.getFullYear()) * 12 + t.getMonth() - d.getMonth(); if (t.getDate() < d.getDate()) m--; if (m < 0) return ''; const y = Math.floor(m / 12); return (y ? y + ' tahun ' : '') + (m % 12 ? (m % 12) + ' bulan' : y ? '' : 'kurang dari 1 bulan'); }
+function dataSayaHtml(x) {
+  const jt = jabTambah(x); let sk = {}; try { sk = JSON.parse(x.sk_tambahan || '{}') || {}; } catch (er) { }
+  const it = (icn, l, v, raw) => v ? `<div class="ds-it"><span class="ds-ic">${ic(icn)}</span><span><small>${esc(l)}</small><b>${raw ? v : esc(v)}</b></span></div>` : '';
+  const alamat = [x.alamat, x.rt ? 'RT ' + x.rt + (x.rw ? '/RW ' + x.rw : '') : ''].filter(Boolean).join(', ');
+  const ttl = [x.tempat_lahir, fDate(x.tgl_lahir)].filter(Boolean).join(', ') + (x.tgl_lahir ? ' (' + umur(x.tgl_lahir) + ' th)' : '');
+  const mk = masaKerja(x.tgl_sk_angkat);
+  const sec = (t, isi) => isi ? `<div class="ds-sec"><div class="ds-h">${esc(t)}</div><div class="ds-grid">${isi}</div></div>` : '';
+  const dok = (x.dok_sk_id ? `<button class="btn sm" data-act="file" data-id="${esc(x.dok_sk_id)}" data-name="Dokumen SK">${ic('file')}SK ${esc(x.jabatan || 'Pengangkatan')}</button>` : '') + jt.filter(j => sk[j]).map(j => `<button class="btn sm" data-act="file" data-id="${esc(sk[j])}" data-name="SK ${esc(j)}">${ic('file')}SK ${esc(j)}</button>`).join('');
+  return `<div class="card ds" id="myData">
+    <div class="ds-top"><div class="ds-badge">${ic('badge')}</div><div style="min-width:0"><div class="ds-cap">Aparatur Desa ${esc(ND())}${x.no_urut ? ' · No. ' + esc(x.no_urut) : ''}</div><div class="ds-jab">${esc(x.jabatan || '-')}</div>
+      ${jt.length ? `<div class="ds-chips">${jt.map(j => `<span>${esc(j)}</span>`).join('')}</div>` : ''}</div></div>
+    ${mk || x.tgl_sk_angkat ? `<div class="ds-stat">${mk ? `<div><b>${esc(mk)}</b><small>Masa jabatan</small></div>` : ''}${x.tgl_sk_angkat ? `<div><b>${esc(fDate(x.tgl_sk_angkat))}</b><small>Diangkat</small></div>` : ''}${x.pendidikan ? `<div><b>${esc(x.pendidikan)}</b><small>Pendidikan</small></div>` : ''}</div>` : ''}
+    ${sec('Kontak', it('mega', 'WhatsApp', x.wa ? `<a href="${esc(waLink(x.wa))}" target="_blank" rel="noopener">${esc(waTampil(x.wa))}</a>` : '', 1) + it('send', 'Email', x.email ? `<a href="mailto:${esc(x.email)}">${esc(x.email)}</a>` : '', 1) + it('pin', 'Alamat', alamat))}
+    ${sec('Identitas', it('user', 'Nama lengkap', x.nama) + it('cal', 'Tempat, tanggal lahir', ttl) + it('users', 'Jenis kelamin', x.jk) + it('book', 'Agama', x.agama) + it('lock', 'NIK', x.nik))}
+    ${sec('Kepegawaian', it('badge', 'NIP / NRPDes', x.nip) + it('badge', 'NIAP', x.niap) + it('stamp', 'Pangkat / golongan', x.pangkat) + it('file', 'SK pengangkatan', [x.no_sk_angkat, x.tgl_sk_angkat ? 'tgl ' + fDate(x.tgl_sk_angkat) : ''].filter(Boolean).join(', ')) + it('x', 'SK pemberhentian', [x.no_sk_henti, x.tgl_sk_henti ? 'tgl ' + fDate(x.tgl_sk_henti) : ''].filter(Boolean).join(', ')) + it('list', 'Keterangan', x.ket))}
+    ${dok ? `<div class="btns">${dok}</div>` : ''}
+    <div class="meta" style="font-size:11px">Ada yang keliru? Minta admin atau Kaur TU & Umum mengubahnya di Arsip → Aparatur Desa.</div></div>`;
+}
+/* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
+const APP_INFO = { ver: '79', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+function tentangHtml() {
+  const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
+  const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
+  return `<div class="about">
+    <div class="ab-app"><b>${esc('Aplikasi Pemdes ' + ND())}</b> · Versi ${esc(APP_INFO.ver)} · diperbarui ${esc(fDate(APP_INFO.tgl))}</div>
+    <div>Sistem informasi administrasi Pemerintah Desa ${esc(ND())}: arsip, kependudukan, pelayanan, aset, perencanaan, keuangan, dan presensi.</div>
+    <div class="ab-h">Pembuat & pengelola</div>
+    <div><b>${esc(APP_INFO.nama)}</b> — ${esc(APP_INFO.jab)}</div>
+    <div>Kantor: ${esc(kantor)}</div>
+    <div>Rumah: ${esc(APP_INFO.rumah)}${kec ? ', Kec. ' + esc(kec) : ''}${kab ? ', Kab. ' + esc(kab) : ''}</div>
+    <div>WhatsApp: <a href="${esc(waLink(APP_INFO.wa))}" target="_blank" rel="noopener">${esc(waTampil(APP_INFO.wa))}</a> · Email: <a href="mailto:${esc(APP_INFO.email)}?subject=${encodeURIComponent('Aplikasi Pemdes ' + ND())}">${esc(APP_INFO.email)}</a>${st.email_desa ? ` · Email desa: <a href="mailto:${esc(st.email_desa)}">${esc(st.email_desa)}</a>` : ''}</div>
+    <details><summary>Privasi & kebijakan penggunaan</summary>
+      <ol>
+        <li>Aplikasi ini khusus untuk perangkat desa dan petugas yang diberi akun. Akun bersifat pribadi; jangan meminjamkan kata sandi.</li>
+        <li>Data penduduk (NIK, KK, foto KTP/KK) hanya untuk pelayanan dan administrasi pemerintahan desa. NIK/KK tersamar bagi pengguna tanpa hak "Lihat NIK/KK".</li>
+        <li>Data tidak dijual atau dibagikan kepada pihak lain di luar keperluan pemerintahan dan ketentuan peraturan perundang-undangan.</li>
+        <li>Presensi mencatat waktu dan lokasi GPS; pola wajah disimpan sebagai angka, bukan foto.</li>
+        <li>Setiap perubahan data tercatat (siapa dan kapan). Gunakan data sesuai tugas dan jaga kerahasiaannya, sesuai UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi.</li>
+        <li>Temukan kesalahan data atau kendala aplikasi? Hubungi pengelola melalui WhatsApp/email di atas.</li>
+      </ol>
+      <a href="privasi.html" target="_blank" rel="noopener">Kebijakan privasi lengkap</a></details>
+    <div class="ab-c">© ${new Date().getFullYear()} Pemerintah Desa ${esc(ND())}</div>
+  </div>`;
+}
 function applyTheme() { const t = store.get('theme'); if (t) document.documentElement.setAttribute('data-theme', t); else document.documentElement.removeAttribute('data-theme'); }
 
 VIEWS.users = async (p, main, alive) => {
@@ -8914,7 +8964,7 @@ VIEWS.skimpor = async (p, main) => {
 applyTheme();
 /* dipakai oleh atribut onclick di HTML */
 window.refresh = refresh; window.loginScreen = loginScreen; window.boot = boot;
-window.__pwTest = { go, root, logoutLocal, store, NX };
+window.__pwTest = { go, root, logoutLocal, store, NX, S, dataSayaHtml, tentangHtml };
 boot();
 })();
 </script>
