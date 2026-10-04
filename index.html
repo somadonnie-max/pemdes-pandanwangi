@@ -353,6 +353,7 @@ body.privblur #main,body.privblur #layer,body.privblur .tabs{filter:blur(18px);t
 .pd{display:flex;flex-direction:column;gap:8px}.pd-h{display:flex;gap:10px;align-items:center}.pd-h .pini{width:40px;height:40px;border-radius:50%;background:var(--pri-soft);color:var(--pri);display:grid;place-items:center;font-weight:700;flex:none}.pd-h small{display:block;font-size:11px;color:var(--muted)}
 .pd-r{border:1px solid var(--line);border-radius:11px;padding:8px 10px;display:flex;flex-direction:column;gap:5px}.pd-r.on{border-color:var(--pri);box-shadow:0 0 0 2px color-mix(in srgb,var(--pri) 18%,transparent)}
 .pd-t{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.pd-t b{font-size:17px}.pd-k{font-size:12.5px;display:flex;gap:5px;align-items:flex-start}.pd-k svg,.pd-m svg{width:13px;height:13px;flex:none;margin-top:2px}
+.pd-act{display:flex;flex-wrap:wrap;gap:6px}.pd-act .busy{opacity:.5;pointer-events:none}.pd-ed{display:flex;flex-direction:column;gap:6px}.pd-ed textarea{width:100%}
 .pd-m{display:flex;gap:10px;align-items:center;font-size:11.5px;color:var(--muted)}.pd-m span{display:flex;gap:4px;align-items:center}.pd-m a{color:var(--pri);font-weight:600}
 .hadir{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:7px 10px}.hadir.libur{background:color-mix(in srgb,var(--gold) 9%,var(--surface));border-color:color-mix(in srgb,var(--gold) 30%,var(--line))}
 .hd-ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:color-mix(in srgb,var(--gold) 18%,transparent);color:var(--gold);flex:none}.hd-ic svg{width:16px;height:16px}.hd-k{font-weight:700;font-size:13.5px}
@@ -2436,22 +2437,48 @@ VIEWS.harian = async (p, main, alive) => {
   let tq; $('#hq').oninput = e => { clearTimeout(tq); tq = setTimeout(() => { st.q = e.target.value.trim(); muat(); }, 350); };
   muat();
 };
-/* detail presensi satu orang pada satu tanggal (dari Riwayat Harian) */
+/* detail presensi satu orang pada satu tanggal (dari Riwayat Harian).
+   Pengguna: hanya presensi sendiri — ubah keterangan; tambah dokumen/foto khusus Izin, Sakit, Dinas Luar. Admin: semua. */
 ACT.hDet = async t => {
   const m = modal('Detail presensi', '<div class="skel" style="height:120px"></div>');
-  try {
-    const rows = await call('presensiDetail', { tanggal: t.dataset.t, user_id: t.dataset.u });
-    const W = { Masuk: 'ok', Pulang: 'info', 'Dinas Luar': 'gold', Izin: 'warn', Sakit: 'warn' };
+  const W = { Masuk: 'ok', Pulang: 'info', 'Dinas Luar': 'gold', Izin: 'warn', Sakit: 'warn' };
+  let rows = [];
+  const lamp = r => { try { const a = JSON.parse(r.lampiran || '[]'); return Array.isArray(a) ? a : []; } catch (x) { return []; } };
+  const boleh = r => S.user.admin || r.user_id === S.user.id;
+  const bolehDok = r => S.user.admin || (r.user_id === S.user.id && /^(Izin|Sakit|Dinas Luar)$/.test(r.jenis || ''));
+  const gambar = () => {
     const x0 = rows[0] || {};
     m.body.innerHTML = `<div class="pd">
       <div class="pd-h"><span class="pini">${esc(initials(t.dataset.n || x0.nama || '?'))}</span><span><b>${esc(t.dataset.n || x0.nama || '')}</b><small>${esc(x0.jabatan || '')}</small><small>${esc(fDay(t.dataset.t))}</small></span></div>
-      ${rows.length ? rows.map(r => { const geo = r.lat && r.lng ? r.lat + ',' + r.lng : ''; const jr = Number(r.jarak_m || 0); const on = r.jenis === t.dataset.j;
-        return `<div class="pd-r${on ? ' on' : ''}"><div class="pd-t"><b class="num">${esc(String(r.jam || '').slice(0, 5))}</b><span class="pill ${W[r.jenis] || ''}">${esc(r.jenis || '')}</span>${r.status && r.status !== r.jenis ? `<span class="pill ${/Terlambat|Awal/.test(r.status) ? 'warn' : 'ok'}">${esc(r.status)}</span>` : ''}</div>
-          ${r.keterangan ? `<div class="pd-k">${ic('file')} ${esc(r.keterangan)}</div>` : ''}
+      ${rows.length ? rows.map((r, i) => { const geo = r.lat && r.lng ? r.lat + ',' + r.lng : ''; const jr = Number(r.jarak_m || 0); const on = r.jenis === t.dataset.j; const L = lamp(r);
+        return `<div class="pd-r${on ? ' on' : ''}" data-i="${i}"><div class="pd-t"><b class="num">${esc(String(r.jam || '').slice(0, 5))}</b><span class="pill ${W[r.jenis] || ''}">${esc(r.jenis || '')}</span>${r.status && r.status !== r.jenis ? `<span class="pill ${/Terlambat|Awal/.test(r.status) ? 'warn' : 'ok'}">${esc(r.status)}</span>` : ''}</div>
+          <div class="pd-k">${ic('file')} <span class="pd-kt">${r.keterangan ? esc(r.keterangan) : '<i class="muted">Tanpa keterangan</i>'}</span></div>
           <div class="pd-m">${geo ? `<span>${ic('pin')} ${jr ? (jr >= 1000 ? (jr / 1000).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' km' : jr + ' m') + ' dari kantor' : 'Di kantor'}</span><a href="https://www.google.com/maps?q=${encodeURIComponent(geo)}" target="_blank" rel="noopener">Lihat lokasi</a>` : '<span>Tanpa lokasi</span>'}</div>
-          ${r.foto_id ? `<button class="btn sm" data-act="file" data-id="${esc(r.foto_id)}" data-name="Foto presensi">${ic('cam')}Foto / lampiran</button>` : ''}</div>`; }).join('') : '<div class="meta">Data presensi tidak ditemukan.</div>'}
+          ${r.foto_id || L.length ? `<div class="btns">${r.foto_id ? `<button class="btn sm" data-act="file" data-id="${esc(r.foto_id)}" data-name="Foto presensi">${ic('cam')}Foto presensi</button>` : ''}${L.map((f, k) => `<button class="btn sm" data-act="file" data-id="${esc(f.id)}" data-name="${esc(f.nama || 'Lampiran')}">${ic('file')}${esc(f.nama || 'Lampiran ' + (k + 1))}</button>`).join('')}</div>` : ''}
+          ${boleh(r) ? `<div class="pd-act">${`<button class="btn sm" data-pd="ket">${ic('edit')}Ubah keterangan</button>`}${bolehDok(r) && L.length < 5 ? `<label class="btn sm">${ic('plus')}Tambah dokumen/foto<input type="file" data-pd="dok" accept="image/*,application/pdf" hidden></label>` : ''}${S.user.admin ? `<button class="btn sm" data-pd="adm">${ic('cog')}Ubah lengkap (admin)</button>` : ''}</div>
+            <div class="pd-ed" hidden><textarea rows="2" maxlength="500">${esc(r.keterangan || '')}</textarea><div class="btns"><button class="btn sm pri" data-pd="simpan">${ic('check')}Simpan</button><button class="btn sm" data-pd="batal">Batal</button></div></div>` : ''}
+        </div>`; }).join('') : '<div class="meta">Data presensi tidak ditemukan.</div>'}
+      ${rows.some(r => !boleh(r)) || !rows.length ? '' : '<div class="meta" style="font-size:11px">Jam, jenis, dan lokasi presensi tidak bisa diubah. Yang bisa diubah: keterangan, serta tambah dokumen/foto untuk Izin, Sakit, atau Dinas Luar.</div>'}
     </div>`;
-  } catch (x) { m.body.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
+  };
+  const simpan = async (r, data) => { const x = await call('presensiUbah', Object.assign({ id: r.id }, data)); Object.assign(r, x); gambar(); toast('Tersimpan.'); };
+  m.body.addEventListener('click', async ev => {
+    const b = ev.target.closest('[data-pd]'); if (!b || b.dataset.pd === 'dok') return;
+    const box = b.closest('.pd-r'), r = rows[Number(box.dataset.i)];
+    if (b.dataset.pd === 'ket') { $('.pd-ed', box).hidden = false; $('.pd-act', box).hidden = true; $('textarea', box).focus(); }
+    if (b.dataset.pd === 'batal') { $('.pd-ed', box).hidden = true; $('.pd-act', box).hidden = false; }
+    if (b.dataset.pd === 'simpan') { b.disabled = true; try { await simpan(r, { keterangan: $('textarea', box).value }); } catch (x) { toast(x.message, 1); b.disabled = false; } }
+    if (b.dataset.pd === 'adm') { m.close(); go('form', { e: 'presensi', id: r.id }); }
+  });
+  m.body.addEventListener('change', async ev => {
+    const inp = ev.target.closest('[data-pd="dok"]'); if (!inp || !inp.files[0]) return;
+    const box = inp.closest('.pd-r'), r = rows[Number(box.dataset.i)], f = inp.files[0], lb = inp.closest('label');
+    lb.classList.add('busy');
+    try { const up = await uploadFile(f, 'Presensi'); await simpan(r, { lampiran: lamp(r).concat([{ id: up.id, nama: f.name.slice(0, 60) }]) }); }
+    catch (x) { toast(x.message, 1); lb.classList.remove('busy'); }
+  });
+  try { rows = await call('presensiDetail', { tanggal: t.dataset.t, user_id: t.dataset.u }); gambar(); }
+  catch (x) { m.body.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
 };
 VIEWS.presensi = async (p, main, alive) => {
   setTop('Presensi Hari Ini', fDay(isoToday()));
@@ -5803,7 +5830,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '87', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '88', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
