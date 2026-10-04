@@ -970,7 +970,7 @@ const UI = {
   },
   aparat: {
     t: 'Aparatur Desa', ic: 'badge', perm: 'tu_aparat', folder: 'TU/Aparat', file: 'dok_sk_id',
-    fields: [F('no_urut', 'No. Urut', 'number'), F('nama', 'Nama Lengkap', 'text', { req: 1 }), F('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1, nikfill: 1, hint: 'Ketik 16 digit: data dari Data Penduduk terisi otomatis' }), F('jabatan', 'Jabatan', 'text', { req: 1 }), F('jabatan_tambahan', 'Jabatan Tambahan (satu per baris)', 'textarea', { wide: 1, rows: 2 }), F('niap', 'NIAP'), F('nip', 'NIP / NRPDes', 'text', { mono: 1 }),
+    fields: [F('no_urut', 'No. Urut', 'number'), F('nama', 'Nama Lengkap', 'text', { req: 1 }), F('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1, nikfill: 1, hint: 'Ketik 16 digit: data dari Data Penduduk terisi otomatis' }), F('jabatan', 'Jabatan', 'text', { req: 1, dd: () => jabDaftar(), hint: 'Ketuk untuk memilih. Bila mengisi kekosongan jabatan, pilih yang berawalan "Plt."' }), F('jabatan_tambahan', 'Jabatan Tambahan (satu per baris)', 'textarea', { wide: 1, rows: 2 }), F('niap', 'NIAP'), F('nip', 'NIP / NRPDes', 'text', { mono: 1 }),
       F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk2 }), F('tempat_lahir', 'Tempat Lahir'), F('tgl_lahir', 'Tanggal Lahir', 'date'), F('alamat', 'Alamat', 'text', { wide: 1 }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }), F('agama', 'Agama', 'select', { opt: OPT.agama2 }), F('pangkat', 'Pangkat/Golongan'),
       F('pendidikan', 'Pendidikan Terakhir', 'select', { opt: OPT.pendidikan2 }), F('no_sk_angkat', 'Nomor SK Pengangkatan'), F('tgl_sk_angkat', 'Tanggal SK Pengangkatan', 'date'),
       F('no_sk_henti', 'Nomor SK Pemberhentian'), F('tgl_sk_henti', 'Tanggal SK Pemberhentian', 'date'), F('email', 'Email', 'email'), F('wa', 'Nomor WhatsApp', 'tel'), F('ket', 'Keterangan'),
@@ -2511,7 +2511,7 @@ VIEWS.presensi = async (p, main, alive) => {
   clockTick($('#clk'));
   S.vh.absen = t => absenForm(t.dataset.j);
 };
-const isKades = () => /^\s*kepala desa\s*$/i.test((S.user && S.user.jabatan) || '');
+const isKades = () => !!(S.user && (S.user.kades || /^\s*(plt\.?\s*)?kepala desa\s*$/i.test(S.user.jabatan || '')));
 function absenForm(jenis) {
   const st = S.set;
   const needFace = /Masuk|Pulang|Dinas Luar/.test(jenis);
@@ -3143,6 +3143,12 @@ function terapPejabat() {
   Object.keys(PEJ_KEY).forEach(k => { const x = P[k]; if (!x) return; S.set[PEJ_KEY[k][0]] = x.nama; S.set[PEJ_KEY[k][1]] = x.nip; });
 }
 /* ---- Aparatur: jabatan / tugas tambahan ---- */
+/* jabatan baku perangkat desa (+ versi "Plt." untuk kekosongan jabatan) */
+function jabDaftar() {
+  const dus = (OPT.dusun || []).map(d => 'Kepala ' + judulKata(String(d).toLowerCase()).replace(/^Dusun /, 'Dusun '));
+  const pokok = ['Kepala Desa', 'Sekretaris Desa', 'Kepala Urusan Tata Usaha & Umum', 'Kepala Urusan Keuangan', 'Kepala Urusan Perencanaan', 'Kepala Seksi Pemerintahan', 'Kepala Seksi Kesejahteraan', 'Kepala Seksi Pelayanan'].concat(dus);
+  return pokok.concat(['Staf Desa'], pokok.map(j => 'Plt. ' + j));
+}
 const JAB_TAMBAH = ['Bendahara Desa', 'Pengurus Barang / Aset', 'Operator SisKeuDes', 'Operator SIPADES', 'Operator Prodeskel', 'Operator DTSEN', 'Operator Aplikasi Pemdes', 'Petugas Pelayanan', 'Pengelola Arsip', 'PPID Desa', 'Ketua TPK', 'Sekretaris TPK', 'Plt. Sekretaris Desa', 'Pelaksana Kegiatan Anggaran (PKA)'];
 const jabTambah = r => String((r && r.jabatan_tambahan) || '').split(/\n|;/).map(x => x.trim()).filter(Boolean);
 function extraAparat(x, el, w) {
@@ -3165,10 +3171,11 @@ function extraAparat(x, el, w) {
     $('#jbDel', m.el).onclick = () => confirmDel($('#jbAct', m.el), async () => { const d = a.slice(); d.splice(i, 1); const b2 = Object.assign({}, sk); delete b2[j]; await simpan(d, b2); m.close(); });
   };
   S.vh.jabAdd = () => {
-    const m = modal('Tambah jabatan — ' + x.nama, `<div class="stack"><div class="f"><label for="jbIn">Jabatan / tugas</label><input id="jbIn" list="jbDl" placeholder="mis. Pengurus Barang / Aset"><datalist id="jbDl">${JAB_TAMBAH.filter(j => a.indexOf(j) < 0).map(j => `<option value="${esc(j)}">`).join('')}</datalist></div>
+    const m = modal('Tambah jabatan — ' + x.nama, `<div class="stack"><div class="f"><label for="jbIn">Jabatan / tugas</label><input id="jbIn" placeholder="Ketuk untuk memilih, mis. Plt. Kepala Dusun Krajan 1"></div>
       <div class="chips wrap">${JAB_TAMBAH.filter(j => a.indexOf(j) < 0).slice(0, 8).map(j => `<button type="button" class="chip" data-j="${esc(j)}">${esc(j)}</button>`).join('')}</div>
       <div class="f"><label for="jbSkN">Dokumen SK (boleh menyusul)</label><input type="file" id="jbSkN" accept="application/pdf,${IMG_ANY}"></div>
       <div class="btns"><button class="btn pri" id="jbOk">${ic('check')}Simpan</button></div></div>`);
+    ddAttach($('#jbIn', m.el), JAB_TAMBAH.concat(jabDaftar().filter(j => /^Plt\./.test(j))).filter(j => a.indexOf(j) < 0));
     $$('[data-j]', m.el).forEach(b => b.onclick = () => { $('#jbIn', m.el).value = b.dataset.j; });
     $('#jbOk', m.el).onclick = async ev => {
       const v = $('#jbIn', m.el).value.trim(); if (!v) return toast('Isi nama jabatan.', 1);
@@ -3771,8 +3778,9 @@ async function extraPendudukLink(x, el) {
 const ORANG_BUAT = { tanah_desa: [['pm_', 'Pemilik']], ntcr: [['s_', 'Suami', { ayah: 'sa_nama', ibu: 'si_nama' }], ['i_', 'Istri', { ayah: 'ia_nama', ibu: 'ii_nama' }]], rentan: [['r_', 'Warga']] };
 const ST_SBLM = { L: { 'BELUM KAWIN': 'Jejaka', 'CERAI HIDUP': 'Duda cerai hidup', 'CERAI MATI': 'Duda cerai mati', 'KAWIN TERCATAT': 'Beristri', 'KAWIN BELUM TERCATAT': 'Beristri', 'KAWIN': 'Beristri' }, P: { 'BELUM KAWIN': 'Perawan', 'CERAI HIDUP': 'Janda cerai hidup', 'CERAI MATI': 'Janda cerai mati' } };
 /* isian dengan daftar pilihan yang muncul di bawahnya saat diketuk (bisa juga diketik) */
-function ddHook(frm, f) {
-  const el = $('#f_' + f.k, frm); if (!el || el.readOnly) return;
+function ddHook(frm, f) { const el = $('#f_' + f.k, frm); if (el && !el.readOnly) ddAttach(el, typeof f.dd === 'function' ? f.dd() : f.dd); }
+function ddAttach(el, opsi) {
+  const f = { dd: opsi };
   el.setAttribute('autocomplete', 'off');
   const box = document.createElement('div'); box.className = 'pmbox'; el.parentNode.insertBefore(box, el); box.appendChild(el);
   const dd = document.createElement('div'); dd.className = 'pmdd'; dd.hidden = true; box.appendChild(dd);
@@ -5833,7 +5841,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '89', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '90', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
