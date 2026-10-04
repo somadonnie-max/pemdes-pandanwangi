@@ -698,6 +698,29 @@ input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-sof
 @media (prefers-color-scheme:dark){:root[data-accent="cokelat"]:not([data-theme="light"]){--pri:#d9a66f;--pri-2:#c48d55;--pri-ink:#2a1a08;--pri-soft:#3a2a17;--bg:#15100b;--surface:#1e1811;--surface2:#282017;--line:#392e22;--ink:#efe8df;--muted:#ab9e8e}}
 :root[data-accent="cokelat"][data-theme="dark"]{--pri:#d9a66f;--pri-2:#c48d55;--pri-ink:#2a1a08;--pri-soft:#3a2a17;--bg:#15100b;--surface:#1e1811;--surface2:#282017;--line:#392e22;--ink:#efe8df;--muted:#ab9e8e}
 .trow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.trow>.lbl{margin:0;order:2}.accs{display:flex;gap:12px;align-items:center;min-height:32px}.acc{width:22px;height:22px;border-radius:50%;background:var(--c);border:0;padding:0;cursor:pointer;transition:width .15s,height .15s;flex:none}.acc.on{width:30px;height:30px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+
+@media (max-width:899px){
+  .sheet.dock{z-index:65}
+  body.docked .tabs{z-index:66}
+  body.docked .btn.fab{opacity:0;pointer-events:none;transition:opacity .12s}
+  .sheet.dock .sh-box{position:fixed;left:50%;bottom:var(--dockb);width:var(--dockw);max-width:none;max-height:calc(100vh - var(--dockb) - 70px);border-radius:16px 16px 0 0;padding:10px 11px 10px;overflow:visible;display:flex;flex-direction:column;
+    background:var(--navc);color:var(--pri-ink);box-shadow:0 -6px 18px rgba(0,0,0,.28);opacity:0;transform:translateX(-50%) scaleY(.25);transform-origin:50% 100%;transition:transform .28s cubic-bezier(.2,.8,.2,1),opacity .18s;
+    --ink:var(--pri-ink);--muted:color-mix(in srgb,var(--pri-ink) 70%,transparent);--surface:color-mix(in srgb,var(--pri-ink) 8%,transparent);--surface2:color-mix(in srgb,var(--pri-ink) 13%,transparent);--line:color-mix(in srgb,var(--pri-ink) 20%,transparent);--mc:var(--pri-ink)!important}
+  .sheet.dock.on .sh-box{opacity:1;transform:translateX(-50%)}
+  .sheet.dock .sh-box::before{content:"";position:absolute;left:-12px;bottom:0;width:12px;height:12px;margin:0;border-radius:0;background:radial-gradient(circle at 0 0,transparent 11.5px,var(--navc) 12px);display:block}
+  .sheet.dock .sh-box::after{content:"";position:absolute;right:-12px;bottom:0;width:12px;height:12px;background:radial-gradient(circle at 100% 0,transparent 11.5px,var(--navc) 12px)}
+  .sheet.dock .sh-b,.sheet.dock .sh-box>div:not(.sh-h){overflow:auto;min-height:0}
+  .sheet.dock .sh-h{margin-bottom:6px}.sheet.dock .sh-h h3{font-size:14px;color:var(--pri-ink)}.sheet.dock .sh-h .iconbtn{width:28px;height:28px;color:var(--pri-ink)}
+  .sheet.dock .mc-ic{background:color-mix(in srgb,var(--pri-ink) 15%,transparent)!important;color:var(--pri-ink)!important}
+  .sheet.dock .sh-items{gap:5px}.sheet.dock .sh-it{min-height:38px;padding:5px 6px;font-size:11.5px;gap:6px}.sheet.dock .sh-it .ti{width:24px;height:24px}.sheet.dock .sh-it .ti svg{width:13px;height:13px}
+  .sheet.dock .sh-it:hover{background:color-mix(in srgb,var(--pri-ink) 16%,transparent)}
+  .sheet.dock p{font-size:13px}
+  .sheet.dock .sh-st{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin-bottom:6px}.sheet.dock .sh-st>div{padding:5px 8px}.sheet.dock .sh-st b{font-size:15px}.sheet.dock .sh-st small{font-size:10px}
+  .sheet.dock .btn:not(.danger){background:color-mix(in srgb,var(--pri-ink) 14%,transparent);border-color:transparent;color:var(--pri-ink)}
+  .sheet.dock .btn.danger.solid{background:#dc2626;border-color:#dc2626;color:#fff}
+  .sheet.dock .meta,.sheet.dock small{color:var(--muted)}
+  .sheet.dock .bar{background:color-mix(in srgb,var(--pri-ink) 15%,transparent)}
+}
 </style>
 </head>
 <body>
@@ -1681,7 +1704,7 @@ function navBack() {
 function back() { if (history.state && history.state.pw === 'app' && S.stack.length) history.back(); else navBack(); }
 /* d = kedalaman riwayat di atas titik awal aplikasi (0 = titik awal) */
 function exitAsk(d) {
-  const m = modal('Keluar aplikasi', `<div class="stack"><p style="margin:0">Apakah Anda mau keluar dari aplikasi?</p><div class="btns"><button class="btn danger solid" id="exYa">Ya</button><button class="btn" id="exNo">Tidak</button></div></div>`, { onClose: () => { if (!S.exiting && !d) history.pushState({ pw: 'app', d: 1 }, ''); } });
+  const m = sheet('Keluar aplikasi?', `<div class="stack"><p style="margin:0">Apakah Anda mau keluar dari aplikasi?</p><div class="btns"><button class="btn danger solid" id="exYa">Ya, keluar</button><button class="btn" id="exNo">Tidak</button></div></div>`, { onClose: () => { if (!S.exiting && !d) history.pushState({ pw: 'app', d: 1 }, ''); } });
   $('#exNo', m.el).onclick = () => m.close();
   $('#exYa', m.el).onclick = () => { S.exiting = true; m.close(); history.go(-(d + 1)); setTimeout(() => { try { window.close(); } catch (x) { } S.exiting = false; }, 500); };
 }
@@ -1691,6 +1714,7 @@ window.addEventListener('popstate', ev => {
   const keep = () => { if (!d) history.pushState({ pw: 'app', d: 1 }, ''); };
   const md = $$('#layer .modal');
   if (md.length) { const x = $('[data-x]', md[md.length - 1]); if (x) x.click(); else md[md.length - 1].remove(); keep(); return; }
+  const sh = $$('#layer .sheet'); if (sh.length) { const x = $('[data-x]', sh[sh.length - 1]); if (x) x.click(); else sh[sh.length - 1].remove(); keep(); return; }
   if (S.stack.length) { navBack(); keep(); return; }
   if (S.cur && S.cur.name !== 'home') { S.cur = { name: 'home', params: {} }; show(); keep(); return; }
   exitAsk(d);
@@ -1912,10 +1936,16 @@ function homeCards(d) {
 function sheet(title, html, o) {
   o = o || {};
   const m = document.createElement('div');
-  m.className = 'sheet';
+  const tb = $('.tabs'), tbr = tb && tb.getBoundingClientRect();
+  const dock = o.dock !== false && window.matchMedia && matchMedia('(max-width:899px)').matches && tbr && tbr.width > 120 && getComputedStyle(tb).display !== 'none';
+  m.className = 'sheet' + (dock ? ' dock' : '');
+  if (dock) { m.style.setProperty('--dockw', Math.round(tbr.width - 44) + 'px'); m.style.setProperty('--dockb', Math.round(innerHeight - tbr.top - 1) + 'px'); document.body.classList.add('docked'); }
   m.innerHTML = `<div class="sh-box" role="dialog" aria-label="${esc(title)}" style="${o.warna ? '--mc:' + o.warna : ''}"><div class="sh-h">${o.ikon ? `<span class="mc-ic">${ic(o.ikon)}</span>` : ''}<h3>${esc(title)}</h3><button class="iconbtn" data-x aria-label="Tutup">${ic('x')}</button></div><div class="sh-b">${html}</div></div>`;
-  const close = () => { m.classList.remove('on'); setTimeout(() => m.remove(), 220); document.removeEventListener('keydown', esc1); };
+  let tutup = false;
+  const tabC = () => close();
+  const close = () => { if (tutup) return; tutup = true; m.classList.remove('on'); setTimeout(() => { m.remove(); if (!$('#layer .sheet.dock')) document.body.classList.remove('docked'); o.onClose && o.onClose(); }, 220); document.removeEventListener('keydown', esc1); if (tb) tb.removeEventListener('click', tabC); };
   const esc1 = e => { if (e.key === 'Escape') close(); };
+  if (dock && tb) tb.addEventListener('click', tabC);
   m.addEventListener('click', e => { if (e.target === m || e.target.closest('[data-x]')) close(); else if (e.target.closest('[data-go]')) { const g = JSON.parse(e.target.closest('[data-go]').dataset.go); close(); go(g[0], g[1] || {}); } });
   document.addEventListener('keydown', esc1);
   $('#layer').appendChild(m);
@@ -6107,7 +6137,7 @@ VIEWS.akun = async (p, main) => {
   };
   S.vh.theme = t => { store.set('theme', t.dataset.v || null); applyTheme(); refresh(); };
   S.vh.accent = t => { store.set('accent', t.dataset.v || null); applyTheme(); refresh(); };
-  S.vh.logout = doLogout;
+  S.vh.logout = () => { const m = sheet('Keluar dari akun?', `<div class="stack"><p style="margin:0">Anda perlu masuk lagi (Google atau sidik jari/Face ID) untuk memakai aplikasi.</p><div class="btns"><button class="btn danger solid" id="loYa">${ic('out')}Ya, keluar</button><button class="btn" id="loNo">Batal</button></div></div>`, { ikon: 'out' }); $('#loNo', m.el).onclick = () => m.close(); $('#loYa', m.el).onclick = () => { m.close(); doLogout(); }; };
   $('#fotoMe').onchange = async ev => {
     const f = ev.target.files[0]; if (!f) return;
     const box = $('.pfoto'); box.classList.add('busy');
@@ -6142,7 +6172,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '100', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '101', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
