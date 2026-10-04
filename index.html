@@ -326,6 +326,29 @@ body.privblur #main,body.privblur #layer,body.privblur .tabs{filter:blur(18px);t
 .dl-bt{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.dl-cara{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.5}
 .dl-bar{position:absolute;left:0;bottom:0;height:3px;background:var(--pri);width:100%;transform-origin:left;animation:dlbar 9s linear forwards}.dl-pop.hold .dl-bar{animation-play-state:paused;opacity:.3}@keyframes dlbar{to{transform:scaleX(0)}}
 @media (min-width:900px){.dl-pop{left:auto;right:20px;bottom:20px;transform:translateY(20px) scale(.97)}.dl-pop.on{transform:none}}
+.dash{display:flex;flex-direction:column;gap:9px}
+.dring{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(128px,1fr);gap:7px;overflow-x:auto;scrollbar-width:none;margin:0 -2px;padding:2px}.dring::-webkit-scrollbar{display:none}
+.dr{display:flex;gap:8px;align-items:center;padding:8px 9px;border-radius:13px;background:linear-gradient(135deg,color-mix(in srgb,var(--mc) 16%,var(--surface)),var(--surface));border:1px solid color-mix(in srgb,var(--mc) 25%,var(--line))}
+.dr .mc-ic{width:28px;height:28px;border-radius:9px}.dr .mc-ic svg{width:15px;height:15px}.dr b{display:block;font-size:14px;line-height:1.15;color:var(--ink)}.dr small{font-size:10px;color:var(--muted);white-space:nowrap}
+.dsearch{margin:0;flex:none}
+.dgrid{columns:1;column-gap:9px}@media (min-width:700px){.dgrid{columns:2}}@media (min-width:1250px){.dgrid{columns:3}}
+.dm{break-inside:avoid;margin:0 0 9px;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative}
+.dm::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--mc)}
+.dm header{display:flex;align-items:center;gap:8px;padding:8px 10px 6px 12px;background:linear-gradient(90deg,color-mix(in srgb,var(--mc) 10%,transparent),transparent 70%)}
+.dm header .mc-ic{width:26px;height:26px;border-radius:8px}.dm header .mc-ic svg{width:14px;height:14px}.dm h3{flex:1;margin:0;font-size:13px}.dm-n{font-size:9.5px;color:var(--mc);font-weight:700;background:color-mix(in srgb,var(--mc) 12%,transparent);border-radius:99px;padding:1px 7px}
+.dm-info{padding:2px 10px 6px 12px}.dm-info:empty{display:none}
+.dks{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:5px}
+.dk{background:var(--surface2);border-radius:8px;padding:5px 7px;min-width:0}.dk b{display:block;font-size:13px;line-height:1.2;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dk small{display:block;font-size:9.5px;color:var(--muted);line-height:1.2}.dk i{display:block;font-style:normal;font-size:9px;color:var(--mc);font-weight:600}
+.dbar{margin-top:6px}.dbar-t{display:flex;height:6px;border-radius:6px;overflow:hidden;background:var(--surface2)}.dbar-t i{display:block;height:100%}
+.dbar-l{display:flex;flex-wrap:wrap;gap:3px 10px;font-size:9.5px;color:var(--muted);margin-top:3px}.dbar-l .lg::before{content:"";display:inline-block;width:7px;height:7px;border-radius:2px;background:var(--c);margin-right:3px;vertical-align:-1px}
+.dnote{font-size:10.5px;color:var(--muted);margin-top:5px;display:flex;align-items:center;gap:4px}.dnote svg{width:12px;height:12px}.dnote b{color:var(--ink);font-weight:600}
+.dsub{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:8px 0 4px;display:flex;align-items:center;gap:4px}.dsub svg{width:12px;height:12px}
+.dtop{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}.dtop span{font-size:9.5px;border:1px solid var(--line);border-radius:99px;padding:1px 7px;color:var(--muted)}.dtop b{color:var(--mc)}
+.dpros{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:5px}.dpro{background:var(--surface2);border-radius:8px;padding:6px 7px}.dpro-h{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:3px}.dpro-h b{font-size:12.5px;color:var(--ink)}.dpro small{display:block;font-size:9px;color:var(--muted);margin-top:3px}
+.dm-items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:6px 8px 9px 11px;border-top:1px dashed var(--line)}
+.dm-it{display:flex;align-items:center;gap:6px;min-width:0;border:0;background:none;padding:5px 6px;border-radius:8px;cursor:pointer;color:var(--ink);font-size:11.5px;line-height:1.2;text-align:left;transition:background .12s}
+.dm-it:hover{background:color-mix(in srgb,var(--mc) 9%,transparent)}.dm-it svg{width:14px;height:14px;flex:none;color:var(--mc)}.dm-it span{flex:1;min-width:0}.dm-it em{font-style:normal;font-size:9.5px;font-weight:700;color:var(--mc);background:color-mix(in srgb,var(--mc) 11%,transparent);border-radius:99px;padding:0 6px}
+.dm-it[hidden]{display:none}
 .ds{padding:0;overflow:hidden}.ds-top{display:flex;gap:12px;align-items:center;padding:14px;background:linear-gradient(135deg,var(--pri,#15803d),color-mix(in srgb,var(--pri,#15803d) 60%,#0f172a));color:#fff}.ds-badge{width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.18);display:grid;place-items:center;flex:none}.ds-badge svg{width:22px;height:22px}.ds-cap{font-size:11px;opacity:.85}.ds-jab{font-size:16px;font-weight:700;line-height:1.25}.ds-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.ds-chips span{font-size:11px;background:rgba(255,255,255,.2);border-radius:99px;padding:2px 8px}
 .ds-stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));border-bottom:1px solid var(--line)}.ds-stat div{padding:9px 12px;text-align:center}.ds-stat div+div{border-left:1px solid var(--line)}.ds-stat b{display:block;font-size:13.5px}.ds-stat small{font-size:11px;color:var(--muted)}
 .ds-sec{padding:10px 14px 4px}.ds-h{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}.ds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px 12px}.ds-it{display:flex;gap:9px;align-items:flex-start;padding:5px 0}.ds-ic{width:28px;height:28px;border-radius:8px;background:color-mix(in srgb,var(--pri,#15803d) 12%,transparent);color:var(--pri,#15803d);display:grid;place-items:center;flex:none}.ds-ic svg{width:15px;height:15px}.ds-it small{display:block;font-size:11px;color:var(--muted)}.ds-it b{font-size:13px;font-weight:600;word-break:break-word}.ds-it a{color:var(--pri,#15803d)}
@@ -1865,6 +1888,64 @@ function modBuka(k) {
 }
 ACT.modOpen = t => modBuka(t.dataset.k);
 
+/* =====================================================================
+   MENU = DASBOR: semua modul + sub-menu + angka penting
+   ===================================================================== */
+const nfD = n => Number(n || 0).toLocaleString('id-ID');
+const rpRingkas = n => { n = Number(n || 0); return n >= 1e9 ? 'Rp' + (n / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' M' : n >= 1e6 ? 'Rp' + (n / 1e6).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' jt' : 'Rp' + nfD(n); };
+const pctD = (a, b) => b ? Math.min(100, Math.round(a / b * 100)) : 0;
+const dK = (v, l, sub) => `<div class="dk"><b>${v}</b><small>${esc(l)}</small>${sub ? `<i>${sub}</i>` : ''}</div>`;
+const dBar = (parts, lbl) => `<div class="dbar"><div class="dbar-t">${parts.map(p => `<i style="width:${p[0]}%;background:${p[1]}" title="${esc(p[2] || '')}"></i>`).join('')}</div>${lbl ? `<div class="dbar-l">${lbl}</div>` : ''}</div>`;
+const dPro = (l, a, b, w) => { const p = pctD(a, b); return `<div class="dpro"><div class="dpro-h"><span>${esc(l)}</span><b>${p}%</b></div><div class="dbar-t"><i style="width:${p}%;background:${w}"></i></div><small>${rpRingkas(a)} dari ${rpRingkas(b)}</small></div>`; };
+function dashInfo(k, D, H) {
+  const g = D[k] || {};
+  if (k === 'presensi') {
+    const s = presSummary(H.presensi || {}), h = H.hariIni;
+    return (h ? `<div class="dks">${dK(h.hadir + '/' + h.total, 'Hadir hari ini')}${dK(h.izin, 'Izin / sakit')}${dK(Math.max(0, h.total - h.hadir - h.izin), 'Belum')}</div>` + dBar([[pctD(h.hadir, h.total), 'var(--ok)'], [pctD(h.izin, h.total), 'var(--gold)']]) : '') + `<div class="dnote">${esc(s.text)}</div>`;
+  }
+  if (k === 'kegiatan') { const a = (H.agenda || [])[0]; return `<div class="dks">${dK(nfD(g.mendatang), 'Agenda mendatang')}${dK(nfD(g.bulan), 'Bulan ini')}${dK(nfD(g.berita), 'Berita')}</div>${a ? `<div class="dnote">${ic('cal')} ${esc(fDate(a.tanggal))}${a.jam ? ' ' + esc(String(a.jam).slice(0, 5)) : ''} · <b>${esc(a.nama)}</b></div>` : ''}`; }
+  if (k === 'arsip') return `<div class="dks">${g.sm_th != null ? dK(nfD(g.sm_th), 'Surat masuk ' + new Date().getFullYear(), g.sm_bln ? '+' + g.sm_bln + ' bln ini' : '') : ''}${g.sk_th != null ? dK(nfD(g.sk_th), 'Surat keluar', g.sk_bln ? '+' + g.sk_bln + ' bln ini' : '') : ''}${g.skkades != null ? dK(nfD(g.skkades), 'SK Kades', g.skkades_th ? g.skkades_th + ' tahun ini' : '') : ''}${g.perdes != null ? dK(nfD(g.perdes), 'Perdes') : ''}${g.aparat != null ? dK(nfD(g.aparat), 'Aparatur') : ''}${g.petugas != null ? dK(nfD(g.petugas), 'Petugas & lembaga') : ''}</div>`;
+  if (k === 'aset') return `<div class="dks">${dK(nfD(g.n), 'Aset aktif')}${dK(rpRingkas(g.nilai), 'Nilai buku')}${dK(nfD(g.tanah), 'Bidang tanah')}${dK(nfD(g.ruang), 'Ruangan')}</div>` + dBar([[pctD(g.baik, g.n), 'var(--ok)', 'Baik'], [pctD(g.rr, g.n), 'var(--gold)', 'Rusak ringan'], [pctD(g.rb, g.n), '#dc2626', 'Rusak berat']], `<span class="lg" style="--c:var(--ok)">Baik ${nfD(g.baik)}</span><span class="lg" style="--c:var(--gold)">Rusak ringan ${nfD(g.rr)}</span><span class="lg" style="--c:#dc2626">Rusak berat ${nfD(g.rb)}</span>`);
+  if (k === 'pemerintahan') {
+    const t = D.tanah;
+    return (g.pend != null ? `<div class="dks">${dK(nfD(g.pend), 'Penduduk aktif')}${dK(nfD(g.kk), 'Kepala keluarga')}${dK(nfD(g.lahir), 'Lahir ' + new Date().getFullYear())}${dK(nfD(g.mati), 'Meninggal')}${dK(nfD(g.pindah), 'Pindah')}${dK(nfD(g.luar), 'Luar desa')}</div>` + dBar([[pctD(g.l, g.pend), '#2563eb', 'Laki-laki'], [pctD(g.p, g.pend), '#db2777', 'Perempuan']], `<span class="lg" style="--c:#2563eb">L ${nfD(g.l)}</span><span class="lg" style="--c:#db2777">P ${nfD(g.p)}</span>`) : '')
+      + (t ? `<div class="dsub">${ic('map')} Tanah di Desa</div><div class="dks">${dK(nfD(t.wp), 'Wajib pajak')}${dK(rpRingkas(t.pbb), 'PBB terutang')}${dK(nfD(t.cocok) + '/' + nfD(t.bidang), 'Bidang dicocokkan')}</div>` + dBar([[pctD(t.lunas, t.wp), 'var(--ok)']], `PBB lunas ${nfD(t.lunas)} dari ${nfD(t.wp)} (${pctD(t.lunas, t.wp)}%)`) : '');
+  }
+  if (k === 'pelayanan') {
+    const n = g.ntcr || {};
+    return `<div class="dks">${g.srt_th != null ? dK(nfD(g.srt_th), 'Surat ket. ' + new Date().getFullYear(), g.srt_bln ? '+' + g.srt_bln + ' bln ini' : '') : ''}${g.ntcr !== undefined || Object.keys(n).length ? dK(nfD((n.Nikah || 0)), 'Nikah', [n.Cerai || n.Talak ? 'cerai ' + ((n.Cerai || 0) + (n.Talak || 0)) : '', n.Rujuk ? 'rujuk ' + n.Rujuk : ''].filter(Boolean).join(' · ')) : ''}${g.rentan != null ? dK(nfD(g.rentan), 'Warga rentan', g.bansos ? g.bansos + ' terima bansos' : '') : ''}${g.lansia != null ? dK(nfD(g.lansia), 'Lansia 60+') : ''}${g.balita != null ? dK(nfD(g.balita), 'Balita') : ''}</div>`
+      + (g.srt_top && g.srt_top.length ? `<div class="dtop">${g.srt_top.map(x => `<span>${esc(String(x[0]).replace(/^Surat Keterangan /, ''))} <b>${nfD(x[1])}</b></span>`).join('')}</div>` : '');
+  }
+  if (k === 'kesejahteraan') return `<div class="dks">${g.lembaga != null ? dK(nfD(g.lembaga), 'Lembaga / yayasan') : ''}${g.guru != null ? dK(nfD(g.guru), 'Guru ngaji') : ''}</div>`;
+  if (k === 'rkp') { const r = D.rkp || {}, b = D.bangun; return `<div class="dks">${r.tahun ? dK(nfD(r.usulan), 'Usulan RKP ' + r.tahun) : ''}${r.rpjm != null ? dK(nfD(r.rpjm), 'Kegiatan RPJM') : ''}${r.gagasan != null ? dK(nfD(r.gagasan), 'Gagasan') : ''}${b ? dK(nfD(b.n), 'Pembangunan', b.selesai ? b.selesai + ' selesai' : '') : ''}</div>${b && b.n ? dBar([[b.progres, 'var(--ok)']], 'Rata-rata progres pembangunan ' + b.progres + '%') : ''}`; }
+  if (k === 'keuangan') return `<div class="dpros">${dPro('Pendapatan ' + (g.tahun || ''), g.real_pend, g.pagu_pend, 'var(--ok)')}${dPro('Belanja ' + (g.tahun || ''), g.real_bel, g.pagu_bel, '#2563eb')}</div><div class="dks">${dK(rpRingkas((g.real_pend || 0) - (g.real_bel || 0)), 'Selisih kas')}${dK(nfD(g.spp), 'SPP tahun ini')}</div>`;
+  if (k === 'admin') return `<div class="dks">${dK(nfD(g.pengguna), 'Pengguna aktif')}${dK(nfD(g.passkey), 'Perangkat sidik jari')}${dK(nfD(g.aktivitas), 'Aktivitas 24 jam')}</div>`;
+  return '';
+}
+async function menuDash(p, main, alive) {
+  setTop('Menu', 'Dasbor ' + ND());
+  const [D, H] = await Promise.all([call('dashboard').catch(() => ({})), S.homeData ? Promise.resolve(S.homeData) : call('home').then(d => (S.homeData = d)).catch(() => ({}))]);
+  if (!alive()) return;
+  const c = H.counts || {}, pm = D.pemerintahan, ps = D.pelayanan || {}, ku = D.keuangan, as = D.aset, h = H.hariIni;
+  const ring = [pm && [nfD(pm.pend), 'Penduduk', 'users', '#15803d'], pm && [nfD(pm.kk), 'KK', 'house', '#0f766e'], ps.srt_th != null && [nfD(ps.srt_th), 'Surat ket. thn ini', 'file', '#db2777'],
+    as && [rpRingkas(as.nilai), 'Nilai aset', 'box', '#0369a1'], ku && [pctD(ku.real_bel, ku.pagu_bel) + '%', 'Realisasi belanja', 'wallet', '#ca8a04'], h && [h.hadir + '/' + h.total, 'Hadir hari ini', 'clock', '#7c3aed']].filter(Boolean);
+  const kartu = modDaftar().map(m => {
+    const w = MOD_WARNA[m.k] || 'var(--pri)';
+    const items = m.list.map(it => `<button class="dm-it${it[5] ? ' soon' : ''}" data-act="go" data-go='${esc(JSON.stringify(it[2]))}'>${ic(it[1])}<span>${esc(it[0])}</span>${it[3] && c[it[3]] != null ? `<em>${nfD(c[it[3]])}</em>` : ''}</button>`).join('');
+    return `<section class="dm" style="--mc:${w}"><header><span class="mc-ic">${ic(m.ic)}</span><h3>${esc(m.l)}</h3><span class="dm-n">${m.list.length} menu</span></header><div class="dm-info">${dashInfo(m.k, D, H)}</div><div class="dm-items">${items}</div></section>`;
+  }).join('');
+  main.innerHTML = `<div class="dash">
+    ${ring.length ? `<div class="dring">${ring.map(r => `<div class="dr" style="--mc:${r[3]}"><span class="mc-ic">${ic(r[2])}</span><span><b>${esc(r[0])}</b><small>${esc(r[1])}</small></span></div>`).join('')}</div>` : ''}
+    <label class="search dsearch">${ic('search')}<input id="dq" placeholder="Cari menu…" autocomplete="off"></label>
+    <div class="dgrid" id="dgrid">${kartu}</div></div>`;
+  $('#dq').oninput = ev => {
+    const q = ev.target.value.trim().toLowerCase();
+    $$('#dgrid .dm').forEach(sec => {
+      let ada = 0; $$('.dm-it', sec).forEach(b => { const ok = !q || b.textContent.toLowerCase().indexOf(q) >= 0 || $('h3', sec).textContent.toLowerCase().indexOf(q) >= 0; b.hidden = !ok; ada += ok; });
+      sec.hidden = !ada; $('.dm-info', sec).hidden = !!q;
+    });
+  };
+}
 /* ---- Riwayat aktivitas: Supabase Realtime (siaran "aktivitas") + ambil data sesuai hak akses ---- */
 const AKT = { rows: [], ws: null, hb: null, poll: null, ref: 0, tunda: null };
 const waktuLalu = w => { const s = Math.max(0, (Date.now() - new Date(w).getTime()) / 1000); return s < 50 ? 'baru saja' : s < 3600 ? Math.round(s / 60) + ' mnt lalu' : s < 86400 ? Math.round(s / 3600) + ' jam lalu' : fDate(String(w).slice(0, 10)); };
@@ -2303,10 +2384,7 @@ function modsHtml(c) {
   if (S.user.admin) h += `<div class="sec-h"><h2>Admin</h2></div><div class="grid"><button class="tile" data-act="go" data-go='["users"]'><span class="ti">${ic('key')}</span><b>Pengguna & Hak Akses</b></button><button class="tile" data-act="go" data-go='["settings"]'><span class="ti">${ic('cog')}</span><b>Pengaturan</b></button><button class="tile" data-act="go" data-go='["template"]'><span class="ti">${ic('file')}</span><b>Template Dokumen</b></button></div>`;
   return h;
 }
-VIEWS.menu = async (p, main) => {
-  setTop('Menu');
-  main.innerHTML = `<div class="stack">${modsHtml()}</div>`;
-};
+VIEWS.menu = menuDash;   /* Menu = dasbor (lihat menuDash) */
 
 /* ---------------- Presensi ---------------- */
 /* Catatan aturan presensi (ringkas, mengikuti jam di Pengaturan) */
@@ -5692,7 +5770,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta admin atau Kaur TU & Umum mengubahnya di Arsip → Aparatur Desa.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '83', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '84', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
