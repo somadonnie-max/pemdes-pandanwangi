@@ -2491,7 +2491,8 @@ VIEWS.presensi = async (p, main, alive) => {
   const st = S.set, W = presWin(d.jam);
   const selesai = presSelesai(rec);
   const tutup = !!d.libur || W.tahap === 'belum' || W.tahap === 'tutup' || selesai;
-  const pagiOK = !tutup && W.tahap === 'pagi', pulangOK = !tutup && W.tahap === 'pulang';
+  const kades = isKades();
+  const pagiOK = !tutup && (W.tahap === 'pagi' || (kades && W.tahap === 'pulang')), pulangOK = !tutup && (W.tahap === 'pulang' || kades);
   const dis = { Masuk: !pagiOK || has('Masuk'), 'Dinas Luar': !pagiOK || has('Dinas Luar'), Izin: !pagiOK || has('Izin'), Sakit: !pagiOK, Pulang: !pulangOK || !(has('Masuk') || has('Dinas Luar')) };
   const J = [['Masuk', 'masuk', 'check', W.mulai + '–' + W.batas + ' tepat waktu'], ['Pulang', 'pulang', 'out', W.pul + '–' + W.tutup], ['Dinas Luar', 'dl', 'send', 'Sampai ' + W.pul], ['Izin', 'izin', 'file', 'Sampai ' + W.pul], ['Sakit', 'sakit', 'heart', 'Sampai ' + W.pul]];
   const info = d.libur ? '' : selesai ? 'Presensi Anda hari ini sudah selesai.' : W.tahap === 'belum' ? 'Presensi dibuka pukul ' + W.mulai + '.' : W.tahap === 'tutup' ? 'Presensi hari ini sudah ditutup (batas ' + W.tutup + ').' : W.tahap === 'pagi' ? 'Sekarang: presensi masuk, dinas luar, izin, atau sakit (sampai ' + W.pul + ').' : 'Sekarang: presensi pulang (sampai ' + W.tutup + ').';
@@ -2499,6 +2500,7 @@ VIEWS.presensi = async (p, main, alive) => {
     <section class="hero"><div class="who"><div class="hi">${esc(fDay(isoToday()))}</div><h1>${esc(presSummary(d).text)}</h1></div><div class="clock num" id="clk" style="position:relative;z-index:1"></div></section>
     ${d.libur ? `<div class="card"><b>Hari ini libur (${esc(d.libur)}).</b><div class="muted">Presensi tidak diperlukan.</div></div>` : ''}
     ${info ? `<div class="card" style="padding:7px 10px"><b>${esc(info)}</b></div>` : ''}
+    ${kades && !d.libur ? `<div class="card" style="padding:7px 10px;background:var(--pri-soft)">${ic('badge')} <b>Kepala Desa:</b> presensi bebas lokasi, tanpa status terlambat / pulang awal, dan tidak dihitung di rekap kehadiran.</div>` : ''}
     ${!d.wajah && !d.libur ? `<div class="card"><b>Wajah Anda belum terekam.</b> <span class="muted">Aplikasi akan meminta Anda merekam wajah saat presensi (sekali saja). Foto tidak disimpan.</span></div>` : ''}
     <div class="jgrid">${J.map(j => `<button class="jbtn ${j[1]}" data-act="absen" data-j="${j[0]}" ${dis[j[0]] ? 'disabled' : ''}><span class="ti">${ic(j[2])}</span>${j[0]}<small>${esc(j[3])}</small></button>`).join('')}</div>
     <div class="sec-h"><h2>Catatan hari ini</h2></div>
@@ -2509,6 +2511,7 @@ VIEWS.presensi = async (p, main, alive) => {
   clockTick($('#clk'));
   S.vh.absen = t => absenForm(t.dataset.j);
 };
+const isKades = () => /^\s*kepala desa\s*$/i.test((S.user && S.user.jabatan) || '');
 function absenForm(jenis) {
   const st = S.set;
   const needFace = /Masuk|Pulang|Dinas Luar/.test(jenis);
@@ -2518,7 +2521,7 @@ function absenForm(jenis) {
   /* Sesudah Dinas Luar: presensi pulang boleh di luar kantor bila sudah lewat jam pulang */
   /* Masuk wajib di kantor; Pulang di kantor kecuali hari ini Dinas Luar; lainnya di mana saja */
   const sudahDL = jenis === 'Pulang' && (S.presRec || []).some(x => x.jenis === 'Dinas Luar');
-  const wajibKantor = jenis === 'Masuk' || (jenis === 'Pulang' && !sudahDL);
+  const wajibKantor = !isKades() && (jenis === 'Masuk' || (jenis === 'Pulang' && !sudahDL));
   const m = modal('Presensi ' + jenis, `<div class="stack">
     <div class="gps" id="gps">${ic('pin')}<span>Mencari lokasi Anda…</span></div>
     ${sudahDL ? `<div class="card" style="box-shadow:none;background:var(--surface2);padding:7px 10px">Anda tercatat <b>Dinas Luar</b> hari ini, jadi presensi pulang boleh dari luar kantor desa.</div>` : ''}
@@ -5830,7 +5833,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '88', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '89', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
