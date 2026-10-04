@@ -354,6 +354,8 @@ body.privblur #main,body.privblur #layer,body.privblur .tabs{filter:blur(18px);t
 .pd-r{border:1px solid var(--line);border-radius:11px;padding:8px 10px;display:flex;flex-direction:column;gap:5px}.pd-r.on{border-color:var(--pri);box-shadow:0 0 0 2px color-mix(in srgb,var(--pri) 18%,transparent)}
 .pd-t{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.pd-t b{font-size:17px}.pd-k{font-size:12.5px;display:flex;gap:5px;align-items:flex-start}.pd-k svg,.pd-m svg{width:13px;height:13px;flex:none;margin-top:2px}
 .pd-m{display:flex;gap:10px;align-items:center;font-size:11.5px;color:var(--muted)}.pd-m span{display:flex;gap:4px;align-items:center}.pd-m a{color:var(--pri);font-weight:600}
+.hadir{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:7px 10px}.hadir.libur{background:color-mix(in srgb,var(--gold) 9%,var(--surface));border-color:color-mix(in srgb,var(--gold) 30%,var(--line))}
+.hd-ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:color-mix(in srgb,var(--gold) 18%,transparent);color:var(--gold);flex:none}.hd-ic svg{width:16px;height:16px}.hd-k{font-weight:700;font-size:13.5px}
 .ds{padding:0;overflow:hidden}.ds-top{display:flex;gap:10px;align-items:center;padding:10px 12px;background:linear-gradient(135deg,var(--pri,#15803d),color-mix(in srgb,var(--pri,#15803d) 60%,#0f172a));color:#fff}.ds-badge{width:34px;height:34px;border-radius:12px;background:rgba(255,255,255,.18);display:grid;place-items:center;flex:none}.ds-badge svg{width:22px;height:22px}.ds-cap{font-size:11px;opacity:.85}.ds-jab{font-size:14px;font-weight:700;line-height:1.25}.ds-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.ds-chips span{font-size:11px;background:rgba(255,255,255,.2);border-radius:99px;padding:2px 8px}
 .ds-stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));border-bottom:1px solid var(--line)}.ds-stat div{padding:6px 8px;text-align:center}.ds-stat div+div{border-left:1px solid var(--line)}.ds-stat b{display:block;font-size:12px}.ds-stat small{font-size:9.5px;color:var(--muted)}
 .ds-sec{padding:7px 12px 2px}.ds-h{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}.ds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0 12px}.ds-it{display:flex;gap:8px;align-items:center;padding:2px 0}.ds-ic{width:22px;height:22px;border-radius:8px;background:color-mix(in srgb,var(--pri,#15803d) 12%,transparent);color:var(--pri,#15803d);display:grid;place-items:center;flex:none}.ds-ic svg{width:12px;height:12px}.ds-it small{display:block;font-size:9.5px;color:var(--muted);line-height:1.2}.ds-it b{display:block;font-size:12px;font-weight:600;line-height:1.25;word-break:break-word}.ds-it a{color:var(--pri,#15803d)}
@@ -2361,12 +2363,21 @@ VIEWS.home = async (p, main, alive) => {
       <div class="h-time"><div class="clock num" id="clk"></div><div class="hi">${esc(fDay(isoToday()))}</div>${tombol}</div>
     </section>
     ${installHtml()}
+    ${hadirHtml(d)}
     <div class="hgrid"><div class="hmain">${agenda}${homeCards(d)}</div>
       <aside class="hside">${aktHtml()}</aside></div>
   </div>`;
   clockTick($('#clk'));
   aktMuat(); aktSambung();
 };
+/* kotak kehadiran hari ini; saat libur berisi keterangan liburnya */
+function hadirHtml(d) {
+  const lib = d.presensi && d.presensi.libur, h = d.hariIni;
+  if (lib) return `<div class="card hadir libur"><span class="hd-ic">${ic('cal')}</span><div style="flex:1;min-width:0"><span class="lbl">Hari ini libur</span><div class="hd-k">${esc(lib)}</div></div>${h ? `<button class="btn sm" data-act="go" data-go='["rekap"]'>${ic('chart')}Rekap</button>` : ''}</div>`;
+  if (!h) return '';
+  return `<div class="card hadir"><div style="flex:1;min-width:180px"><div style="display:flex;justify-content:space-between;gap:6px"><span class="lbl">Kehadiran hari ini</span><span class="num"><b>${h.hadir}</b>/${h.total} hadir · ${h.izin} izin/sakit</span></div>
+    <div class="bar" style="margin-top:4px"><i style="width:${h.total ? h.hadir / h.total * 100 : 0}%;background:var(--ok)"></i><i style="width:${h.total ? h.izin / h.total * 100 : 0}%;background:var(--gold)"></i></div></div><button class="btn sm" data-act="go" data-go='["rekap"]'>${ic('chart')}Rekap</button></div>`;
+}
 function agendaHtml(rows, berita) {
   const t = isoToday(), bs = new Date(Date.now() + 864e5), besok = bs.getFullYear() + '-' + String(bs.getMonth() + 1).padStart(2, '0') + '-' + String(bs.getDate()).padStart(2, '0');
   const lbl = d => d === t ? 'Hari ini' : d === besok ? 'Besok' : fDay(d).split(',')[0];
@@ -5792,7 +5803,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '86', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '87', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
