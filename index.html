@@ -180,7 +180,7 @@ button.stat:hover{border-color:var(--pri)}
 .tbl.lap tr.sub td{background:var(--surface2)}.tbl.lap tr.tot td{border-top:2px solid var(--line)}.tbl.rwt td{padding:3px}.tbl.rwt input,.tbl.rwt select{width:100%;padding:5px 6px;font-size:13px}
 .agf{display:flex;justify-content:flex-end;gap:14px;border-top:1px solid var(--line);padding-top:6px;margin-top:2px}.agf .linkbtn{display:inline-flex;align-items:center;gap:3px;font-size:13px;font-weight:600}.agf .linkbtn svg{width:14px;height:14px}
 .clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.aturan ul{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted)}.aturan ul b{color:var(--ink)}.aturan>b{display:flex;gap:6px;align-items:center}
+.aturan{font-size:12px}.aturan ul{margin:5px 0 0;padding-left:16px;display:flex;flex-direction:column;gap:2px;font-size:11px;line-height:1.4;color:var(--muted)}.aturan ul b{color:var(--ink)}.aturan>b{display:flex;gap:6px;align-items:center}
 .tbl.harian td.c{min-width:64px}.tbl.harian td.ok{color:var(--ok);font-weight:600}.tbl.harian td.warn{color:var(--warn);font-weight:600}.tbl.harian td.info{color:var(--info,var(--pri));font-weight:600}
 .agenda .ag:first-of-type{border-top:0}.ag .dt{min-width:54px;text-align:center;border-radius:8px;background:var(--surface2);padding:3px 4px;font-size:11px;line-height:1.25}.ag .dt b{display:block;font-size:17px}
 .ag.today .dt{background:var(--pri);color:var(--pri-ink)}
@@ -666,6 +666,13 @@ details.more>summary{cursor:pointer;color:var(--muted);font-size:11.5px;font-wei
 .fbar i{display:block;height:100%;width:0;background:var(--pri);transition:width .3s}
 .fmsg{text-align:center;font-weight:600;min-height:20px;display:flex;gap:6px;justify-content:center;align-items:center;flex-wrap:wrap}
 #fscan.done .fmsg{color:var(--ok)}
+
+.dview #dbody .btn:not(.pri):not(.danger):not(.solid):not([data-act="xedit"]):not([data-act="xdel"]){background:color-mix(in srgb,var(--warn) 16%,var(--surface));border-color:color-mix(in srgb,var(--warn) 45%,transparent);color:color-mix(in srgb,var(--warn) 62%,var(--ink))}
+.dview #dbody .btn:not(.pri):not(.danger):not(.solid):hover{background:color-mix(in srgb,var(--warn) 26%,var(--surface))}
+.dview #dbody .confirm .btn{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.idnote:empty{display:none}.idnote.bad{color:var(--bad)}.idnote a{color:var(--pri);font-weight:600}
+input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-soft)}
+.kkbox{border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:var(--surface2);display:flex;flex-direction:column;gap:2px}.kkbox .mono{font-size:12px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -3353,7 +3360,7 @@ VIEWS.detail = async (p, main, alive) => {
   if (!alive()) return;
   const d = u.row(x);
   const imgF = u.fields.find(f => f.t === 'file' && f.img && x[f.k] && x[f.k] !== '•' && !f.priv);
-  main.innerHTML = `<div class="card stack"><div class="d-head">${imgF ? `<img class="photo" src="${esc(thumb(x[imgF.k], 300))}" alt="">` : d.av != null ? `<span class="av" style="width:40px;height:40px">${/^</.test(d.av) ? d.av : esc(d.av)}</span>` : ''}<div style="flex:1;min-width:0"><h1>${esc(d.t)}</h1><div class="muted ${d.mono ? 'mono' : ''}">${d.raw ? d.s : esc(d.s)}</div>${d.pill ? `<div style="margin-top:4px">${d.pill}</div>` : ''}</div></div><div class="stack" id="dbody"></div></div>`;
+  main.innerHTML = `<div class="card stack dview"><div class="d-head">${imgF ? `<img class="photo" src="${esc(thumb(x[imgF.k], 300))}" alt="">` : d.av != null ? `<span class="av" style="width:40px;height:40px">${/^</.test(d.av) ? d.av : esc(d.av)}</span>` : ''}<div style="flex:1;min-width:0"><h1>${esc(d.t)}</h1><div class="muted ${d.mono ? 'mono' : ''}">${d.raw ? d.s : esc(d.s)}</div>${d.pill ? `<div style="margin-top:4px">${d.pill}</div>` : ''}</div></div><div class="stack" id="dbody"></div></div>`;
   await renderDetail(e, x, $('#dbody'), true);
 };
 function confirmDel(box, fn, msg, lbl) {
@@ -3671,6 +3678,7 @@ VIEWS.form = async (p, main, alive) => {
     const q = box.querySelector('.confirm'); if (q && q.firstChild) q.firstChild.textContent = 'Hapus berkas ini dari data? ';
   };
   S.vh.fileUndo = () => refresh();
+  idHooks(frm, e, flds, p, rec);
   /* NIK -> isi otomatis dari Data Penduduk (hanya kolom yang masih kosong) */
   const nikF = flds.find(f => f.nikfill), nikEl = nikF && $('#f_' + nikF.k, frm);
   if (nikEl && !nikEl.readOnly) nikEl.addEventListener('input', async () => {
@@ -3727,7 +3735,9 @@ VIEWS.form = async (p, main, alive) => {
     const miss = flds.filter(f => f.req && f.t !== 'file' && !String(val[f.k] || '').trim());
     if (miss.length) { er.textContent = 'Lengkapi: ' + miss.map(f => f.l).join(', ') + '.'; er.hidden = false; $('#f_' + miss[0].k).focus(); return; }
     const bad = u.fields.find(f => f.len && val[f.k] && val[f.k].indexOf('•') < 0 && !new RegExp('^\\d{' + f.len + '}$').test(val[f.k]));
-    if (bad) { er.textContent = bad.l + ' harus ' + bad.len + ' digit angka.'; er.hidden = false; return; }
+    if (bad) { er.textContent = bad.l + ' harus ' + bad.len + ' digit angka.'; er.hidden = false; $('#f_' + bad.k, frm) && $('#f_' + bad.k, frm).focus(); return; }
+    const dupF = flds.find(f => { const x = $('#f_' + f.k, frm); return x && x._dup; });
+    if (dupF) { const o = $('#f_' + dupF.k, frm)._dup; er.textContent = 'Sudah ada ' + dupF.l + ' ini dengan nama ' + (o.nama || o.kepala || '') + '. ' + dupF.l + ' tidak boleh dobel.'; er.hidden = false; $('#f_' + dupF.k, frm).focus(); return; }
     btn.disabled = true; btn.textContent = 'Menyimpan…';
     try {
       for (const f of u.fields.filter(f => f.t === 'file')) {
@@ -3773,12 +3783,63 @@ VIEWS.form = async (p, main, alive) => {
       if (e === 'aset_cek' && saved && saved.id) await asetCekSetelahSimpan(saved.id);
       if ((e === 'rkp_musyawarah' || e === 'rpjm_musyawarah') && saved && saved.id && val.tanggal && val.jam) { const ag = await syncAgendaMus(saved.id, e); if (ag) toast('Tersimpan. Masuk juga ke Kegiatan → Agenda.'); }
       back();
+      if (e === 'penduduk' && frm._kel && frm._kel.id) { const kid = frm._kel.id; setTimeout(() => go('detail', { e: 'keluarga', id: kid }), 350); }
       if (e === 'register_surat' && !p.id && jenisDikenal(saved.jenis_surat)) setTimeout(() => cetakSurat(saved), 500);
       if (e === 'jenis_surat') S.jenisSurat = null;   /* tunggu kembali ke daftar dulu */
       if (NASKAH[e] && p.buat) setTimeout(() => cetakNaskah(e, saved), 500);
     } catch (x) { if (x.code === 'PAGU') er.innerHTML = paguErrHtml(x); else er.textContent = x.message; er.hidden = false; btn.disabled = false; btn.innerHTML = ic('check') + 'Simpan'; er.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
   };
 };
+/* ---- Cek NIK / No. KK: 16 digit angka, tidak boleh dobel, KK → gabung keluarga ---- */
+function idHooks(frm, e, flds, p, rec) {
+  const DUP = { penduduk: 'nik', keluarga: 'kk' };
+  flds.filter(f => f.len).forEach(f => {
+    const el = $('#f_' + f.k, frm); if (!el || el.readOnly) return;
+    const box = el.closest('.f'); if (!box) return;
+    const nt = document.createElement('span'); nt.className = 'hint idnote'; nt.setAttribute('aria-live', 'polite'); box.appendChild(nt);
+    const say = (h, bad) => { nt.innerHTML = h; nt.classList.toggle('bad', !!bad); el.classList.toggle('inbad', !!bad); };
+    let tmr;
+    const cek = async () => {
+      el._dup = null;
+      const v = el.value.trim();
+      if (!v || v.indexOf('•') >= 0) return say('');
+      if (/\D/.test(v)) return say(esc(f.l) + ' hanya boleh berisi angka.', 1);
+      if (v.length !== f.len) return say(esc(f.l) + ' baru ' + v.length + ' digit — harus ' + f.len + ' digit.', 1);
+      say('');
+      if (v === String(rec[f.k] || '')) return;
+      try {
+        if (DUP[e] === f.k) {
+          const r = await call('list', { entity: e, filters: { [f.k]: v }, limit: 3 });
+          if (el.value.trim() !== v) return;
+          const o = (r.rows || []).find(x => x.id !== p.id);
+          if (o) { el._dup = o; return say(`Sudah ada ${esc(f.l)} ini dengan nama <b>${esc(o.nama || o.kepala || '')}</b>${o.dusun ? ' (' + esc(String(o.dusun).replace(/^DUSUN /, '')) + ' RT ' + esc(o.rt || '') + '/' + esc(o.rw || '') + ')' : ''}. ${esc(f.l)} tidak boleh dobel. <a href="#" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: o.id }]))}'>Buka datanya</a>`, 1); }
+          say('✓ ' + esc(f.l) + ' belum terdaftar.');
+        }
+        if (e === 'penduduk' && f.k === 'kk' && canRead('keluarga')) kkGabung(frm, v, say);
+      } catch (x) { }
+    };
+    el.addEventListener('input', () => { clearTimeout(tmr); tmr = setTimeout(cek, 250); });
+    if (el.value) cek();
+  });
+}
+async function kkGabung(frm, v, say) {
+  const r = await call('list', { entity: 'keluarga', filters: { kk: v }, limit: 2 });
+  const el = $('#f_kk', frm); if (!el || el.value.trim() !== v) return;
+  const k = (r.rows || [])[0];
+  if (!k) { frm._kel = null; return say('No. KK ini belum ada di Data Keluarga. Setelah simpan, tambahkan juga di menu Data Keluarga.'); }
+  if (frm._kel && frm._kel.id === k.id) return;
+  const ds = String(k.dusun || '').replace(/^DUSUN /, '');
+  const m = modal('Masukkan ke keluarga ini?', `<div class="stack"><div class="kkbox"><div class="mono">${esc(k.kk && k.kk.indexOf('•') < 0 ? k.kk : v)}</div><b>${esc(k.kepala || '')}</b><div class="meta">${esc(ds)}${k.rt ? ' RT ' + esc(k.rt) + '/' + esc(k.rw || '') : ''}${k.alamat ? ' · ' + esc(k.alamat) : ''}</div></div>
+    <div class="meta">No. KK ini sudah terdaftar. Bila dimasukkan, dusun, RT dan RW terisi otomatis dari data keluarga. Setelah simpan, halaman keluarga ini akan dibuka agar hubungan anggota lain bisa diperiksa.</div>
+    <div class="btns"><button class="btn pri" id="kkYa">${ic('check')}Ya, masukkan</button><button class="btn" id="kkTidak">Tidak</button></div></div>`);
+  $('#kkTidak', m.el).onclick = () => { frm._kel = null; m.close(); say('No. KK terdaftar atas nama ' + esc(k.kepala || '') + ', tidak digabungkan.'); };
+  $('#kkYa', m.el).onclick = () => {
+    frm._kel = k; m.close();
+    const set = (key, val) => { const x = $('#f_' + key, frm); if (!x || !val) return; if (x.tagName === 'SELECT' && !Array.from(x.options).some(o => o.value === val)) return; x.value = val; x.dispatchEvent(new Event('change', { bubbles: true })); };
+    ['dusun', 'rt', 'rw', 'alamat', 'lokasi'].forEach(key => set(key, k[key]));
+    say(`✓ Masuk keluarga <b>${esc(k.kepala || '')}</b> (${esc(ds)} RT ${esc(k.rt || '')}/${esc(k.rw || '')}). Halaman keluarga dibuka setelah simpan.`);
+  };
+}
 /* ---- Detail penduduk: tanah yang dimiliki & riwayat surat keterangan ---- */
 async function extraPendudukLink(x, el) {
   const nikOk = /^\d{16}$/.test(String(x.nik || ''));
@@ -5958,7 +6019,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '92', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '93', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
