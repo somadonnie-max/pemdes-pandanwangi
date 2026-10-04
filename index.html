@@ -667,9 +667,9 @@ details.more>summary{cursor:pointer;color:var(--muted);font-size:11.5px;font-wei
 .fmsg{text-align:center;font-weight:600;min-height:20px;display:flex;gap:6px;justify-content:center;align-items:center;flex-wrap:wrap}
 #fscan.done .fmsg{color:var(--ok)}
 
-.dview #dbody .btn:not(.pri):not(.danger):not(.solid):not([data-act="xedit"]):not([data-act="xdel"]){background:color-mix(in srgb,var(--warn) 16%,var(--surface));border-color:color-mix(in srgb,var(--warn) 45%,transparent);color:color-mix(in srgb,var(--warn) 62%,var(--ink))}
-.dview #dbody .btn:not(.pri):not(.danger):not(.solid):hover{background:color-mix(in srgb,var(--warn) 26%,var(--surface))}
-.dview #dbody .confirm .btn{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.dview .btn:not(.pri):not(.danger):not(.solid):not([data-act="xedit"]):not([data-act="xdel"]){background:color-mix(in srgb,var(--warn) 16%,var(--surface));border-color:color-mix(in srgb,var(--warn) 45%,transparent);color:color-mix(in srgb,var(--warn) 62%,var(--ink))}
+.dview .btn:not(.pri):not(.danger):not(.solid):hover{background:color-mix(in srgb,var(--warn) 26%,var(--surface))}
+.dview .confirm .btn{background:var(--surface);color:var(--ink);border-color:var(--line)}
 .idnote:empty{display:none}.idnote.bad{color:var(--bad)}.idnote a{color:var(--pri);font-weight:600}
 input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-soft)}
 .kkbox{border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:var(--surface2);display:flex;flex-direction:column;gap:2px}.kkbox .mono{font-size:12px;color:var(--muted)}
@@ -3095,6 +3095,7 @@ function mapHtml(v, title) {
 }
 /* Isi detail satu data. Dipakai di daftar (lipat-buka) dan di halaman detail. */
 async function renderDetail(e, x, el, full) {
+  el.classList.add('dview');
   const u = UI[e];
   const files = u.fields.filter(f => f.t === 'file' && x[f.k]);
   const shown = u.fields.filter(f => !(e === 'aparat' && f.k === 'jabatan_tambahan') && f.t !== 'file' && f.t !== 'geo' && f.t !== 'fotos' && f.t !== 'rows' && f.t !== 'hidden' && f.t !== 'head' && x[f.k] !== '' && x[f.k] != null);
@@ -3361,7 +3362,7 @@ VIEWS.detail = async (p, main, alive) => {
   if (!alive()) return;
   const d = u.row(x);
   const imgF = u.fields.find(f => f.t === 'file' && f.img && x[f.k] && x[f.k] !== '•' && !f.priv);
-  main.innerHTML = `<div class="card stack dview"><div class="d-head">${imgF ? `<img class="photo" src="${esc(thumb(x[imgF.k], 300))}" alt="">` : d.av != null ? `<span class="av" style="width:40px;height:40px">${/^</.test(d.av) ? d.av : esc(d.av)}</span>` : ''}<div style="flex:1;min-width:0"><h1>${esc(d.t)}</h1><div class="muted ${d.mono ? 'mono' : ''}">${d.raw ? d.s : esc(d.s)}</div>${d.pill ? `<div style="margin-top:4px">${d.pill}</div>` : ''}</div></div><div class="stack" id="dbody"></div></div>`;
+  main.innerHTML = `<div class="card stack"><div class="d-head">${imgF ? `<img class="photo" src="${esc(thumb(x[imgF.k], 300))}" alt="">` : d.av != null ? `<span class="av" style="width:40px;height:40px">${/^</.test(d.av) ? d.av : esc(d.av)}</span>` : ''}<div style="flex:1;min-width:0"><h1>${esc(d.t)}</h1><div class="muted ${d.mono ? 'mono' : ''}">${d.raw ? d.s : esc(d.s)}</div>${d.pill ? `<div style="margin-top:4px">${d.pill}</div>` : ''}</div></div><div class="stack" id="dbody"></div></div>`;
   await renderDetail(e, x, $('#dbody'), true);
 };
 function confirmDel(box, fn, msg, lbl) {
@@ -6082,7 +6083,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '94', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '95', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
