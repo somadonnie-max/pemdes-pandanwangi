@@ -73,6 +73,15 @@ main{flex:1;width:100%;max-width:1100px;margin:0 auto;padding:10px 10px 84px}
 .tabs button{flex:1;border:0;background:none;padding:6px 4px 7px;display:flex;flex-direction:column;align-items:center;gap:1px;font-size:10.5px;font-weight:600;color:var(--muted);cursor:pointer}
 .tabs button.on{color:var(--pri)}
 .tabs .ic{width:19px;height:19px}
+@media (max-width:899px){
+  .top{position:relative;top:auto;background:transparent;color:var(--ink);padding-top:calc(6px + env(safe-area-inset-top,0px))}
+  .top .iconbtn:hover{background:var(--surface2)}
+  .tabs{left:14px;right:14px;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:440px;margin:0 auto;padding:4px;gap:2px;border:1px solid var(--line);border-radius:22px;background:color-mix(in srgb,var(--surface) 88%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 10px 28px rgba(15,23,42,.18)}
+  .tabs button{padding:6px 2px;border-radius:17px;gap:2px;transition:background .15s,color .15s}
+  .tabs button.on{background:var(--pri-soft);color:var(--pri)}
+  main{padding-bottom:100px}
+  .dl-pop{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+}
 @media (min-width:900px){
   .side{display:flex;flex-direction:column;width:224px;flex:none;position:sticky;top:0;height:100vh;overflow:auto;background:var(--surface);border-right:1px solid var(--line);padding:12px 8px}
   .tabs{display:none}
@@ -251,15 +260,24 @@ button.stat:hover{border-color:var(--pri)}
 @media(min-width:900px){.tn-panel{left:auto;width:360px;top:56px;bottom:auto}}
 @media(max-width:760px){.tn{gap:6px!important}.tn-stat{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.tn-k{padding:3px 6px;border-radius:8px}.tn-k b{font-size:13px}.tn-k span{font-size:9.5px}.tn-bar{grid-column:1/-1;height:4px}.tn-map{height:calc(100vh - 215px);min-height:360px}}
 .fsec{border-top:1px solid var(--line);padding-top:8px;margin-top:4px}.fsec b{font-size:12.5px;color:var(--pri)}
-.mcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:6px}
-.mcard{position:relative;display:flex;flex-direction:column;gap:8px;align-items:flex-start;text-align:left;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface);cursor:pointer;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease,border-color .18s;color:inherit}
+.hero2{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px}
+.h-foto{width:54px;height:54px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,.55);background:rgba(255,255,255,.18);display:grid;place-items:center;padding:0;cursor:pointer;position:relative;z-index:1;color:var(--pri-ink);font-weight:700;font-size:18px}
+.h-foto img{width:100%;height:100%;object-fit:cover}
+.h-who{min-width:0;position:relative;z-index:1}.h-who h1{font-size:15px;line-height:1.2;overflow:hidden;text-overflow:ellipsis}.h-jab{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.h-st{margin-top:3px;font-size:11px}
+.h-time{display:flex;flex-direction:column;align-items:flex-end;gap:2px;position:relative;z-index:1;text-align:right}
+.hero2 .clock{font-size:15px}.h-time .hi{font-size:10.5px;max-width:120px;line-height:1.25}.h-time .btn{margin-top:4px;padding:4px 9px;font-size:11.5px;min-height:28px}
+.ag-all{display:inline-flex;align-items:center;gap:3px;font-size:12.5px;font-weight:600}.ag-all svg{width:14px;height:14px}
+.home2 .agenda{margin-bottom:12px}
+.mcards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:6px}
+@media (min-width:640px){.mcards{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}}
+.mcard{position:relative;display:flex;flex-direction:row;gap:8px;align-items:center;text-align:left;padding:9px 9px 9px 9px;min-height:58px;border:1px solid var(--line);border-radius:14px;background:var(--surface);cursor:pointer;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease,border-color .18s;color:inherit}
 .mcard::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--mc)}
-.mcard::after{content:"";position:absolute;right:-28px;top:-28px;width:84px;height:84px;border-radius:50%;background:color-mix(in srgb,var(--mc) 9%,transparent)}
+.mcard::after{content:"";position:absolute;right:-24px;top:-24px;width:64px;height:64px;border-radius:50%;background:color-mix(in srgb,var(--mc) 9%,transparent)}
 .mcard:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(15,23,42,.10);border-color:color-mix(in srgb,var(--mc) 45%,var(--line))}
 .mcard:active{transform:scale(.98)}
-.mc-ic{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:color-mix(in srgb,var(--mc,var(--pri)) 14%,transparent);color:var(--mc,var(--pri));flex:none;position:relative;z-index:1}.mc-ic svg{width:20px;height:20px}
-.mc-t{display:flex;flex-direction:column;min-width:0;position:relative;z-index:1}.mc-t b{font-size:14px}.mc-t small{font-size:11.5px;color:var(--muted);line-height:1.3;margin-top:2px}
-.mc-n{position:absolute;right:10px;top:12px;font-size:10.5px;font-weight:700;color:var(--mc);background:color-mix(in srgb,var(--mc) 12%,transparent);border-radius:99px;padding:1px 7px;z-index:1}
+.mc-ic{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--mc,var(--pri)) 14%,transparent);color:var(--mc,var(--pri));flex:none;position:relative;z-index:1}.mc-ic svg{width:17px;height:17px}
+.mc-t{display:flex;flex-direction:column;min-width:0;position:relative;z-index:1}.mc-t b{font-size:13px;padding-right:18px}.mc-t small{font-size:10.5px;color:var(--muted);line-height:1.25;margin-top:1px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mc-n{position:absolute;right:7px;top:7px;font-size:9.5px;font-weight:700;color:var(--mc);background:color-mix(in srgb,var(--mc) 12%,transparent);border-radius:99px;padding:1px 7px;z-index:1}
 .hgrid{display:grid;gap:12px}.hside{display:flex;flex-direction:column;gap:12px;min-width:0}
 @media (min-width:1000px){.hgrid{grid-template-columns:minmax(0,1fr) 360px;align-items:start}.hside{position:sticky;top:64px}}
 .sheet{position:fixed;inset:0;z-index:65;background:rgba(8,20,15,0);display:flex;align-items:flex-end;justify-content:center;transition:background .22s ease}
@@ -2242,15 +2260,18 @@ VIEWS.home = async (p, main, alive) => {
   const hour = new Date().getHours();
   const salam = hour < 11 ? 'Selamat pagi' : hour < 15 ? 'Selamat siang' : hour < 18 ? 'Selamat sore' : 'Selamat malam';
   const agenda = canRead('kegiatan') || canRead('berita') ? agendaHtml(canRead('kegiatan') ? d.agenda || [] : [], canRead('berita') ? d.berita || [] : []) : '';
+  const foto = S.user.foto ? `<img src="${esc(thumb(S.user.foto, 200))}" alt="">` : `<span>${esc(initials(S.user.nama))}</span>`;
+  const tombol = sum.next ? `<button class="btn sm" data-act="go" data-go='["presensi"]'>${ic('clock')}Presensi ${esc(sum.next.toLowerCase())}</button>`
+    : `<button class="btn sm" data-act="go" data-go='["harian"]'>${ic('list')}Riwayat</button>`;
   main.innerHTML = `<div class="stack home2">
-    <section class="hero">
-      <div class="who"><div class="hi">${salam},</div><h1>${esc(S.user.nama)}</h1></div>
-      <div style="text-align:right;position:relative;z-index:1"><div class="clock num" id="clk"></div><div class="hi">${esc(fDay(isoToday()))}</div></div>
-      <div class="hrow"><span class="hi">${esc(sum.text)}</span>${sum.next ? `<button class="btn sm" data-act="go" data-go='["presensi"]'>${ic('clock')}Presensi ${esc(sum.next.toLowerCase())}</button>` : ''}</div>
+    <section class="hero hero2">
+      <button class="h-foto" data-act="go" data-go='["akun"]' aria-label="Akun">${foto}</button>
+      <div class="h-who"><div class="hi">${salam},</div><h1>${esc(S.user.nama)}</h1>${S.user.jabatan ? `<div class="hi h-jab">${esc(S.user.jabatan)}</div>` : ''}</div>
+      <div class="h-time"><div class="clock num" id="clk"></div><div class="hi">${esc(fDay(isoToday()))}</div>${tombol}</div>
     </section>
     ${installHtml()}
-    <div class="hgrid"><div class="hmain"><div class="sec-h" style="margin:0"><h2>Modul</h2><span class="meta">Ketuk kartu untuk membuka</span></div>${homeCards(d)}</div>
-      <aside class="hside">${aktHtml()}${agenda}</aside></div>
+    <div class="hgrid"><div class="hmain">${agenda}<div class="sec-h" style="margin:0"><h2>Modul</h2></div>${homeCards(d)}</div>
+      <aside class="hside">${aktHtml()}</aside></div>
   </div>`;
   clockTick($('#clk'));
   aktMuat(); aktSambung();
@@ -2258,11 +2279,14 @@ VIEWS.home = async (p, main, alive) => {
 function agendaHtml(rows, berita) {
   const t = isoToday(), bs = new Date(Date.now() + 864e5), besok = bs.getFullYear() + '-' + String(bs.getMonth() + 1).padStart(2, '0') + '-' + String(bs.getDate()).padStart(2, '0');
   const lbl = d => d === t ? 'Hari ini' : d === besok ? 'Besok' : fDay(d).split(',')[0];
+  const tb = `<button class="linkbtn ag-all" data-act="modOpen" data-k="kegiatan">Lihat semua ${ic('next')}</button>`;
+  const tiga = (rows.map(r => ['a', r]).concat((berita || []).map(r => ['b', r]))).slice(0, 3);
+  const aS = new Set(tiga.filter(x => x[0] === 'a').map(x => x[1])), bS = new Set(tiga.filter(x => x[0] === 'b').map(x => x[1]));
+  rows = rows.filter(r => aS.has(r)); berita = (berita || []).filter(r => bS.has(r));
   const items = rows.map(r => { const dd = new Date(r.tanggal + 'T00:00:00'); return `<button class="ag ${r.tanggal === t ? 'today' : ''}" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'kegiatan', id: r.id }]))}'><span class="dt">${esc(lbl(r.tanggal))}<b class="num">${dd.getDate()}</b>${esc(BULAN[dd.getMonth()].slice(0, 3))}</span><span style="flex:1;min-width:0"><b>${esc(r.nama)}</b><span class="meta" style="display:block">${r.jam ? ic('clock') + ' ' + esc(String(r.jam).slice(0, 5)) + ' WIB · ' : ''}${esc(r.tempat || '')}</span>${r.peserta ? `<span class="meta" style="display:block">${ic('users')} ${esc(r.peserta)}</span>` : ''}</span></button>`; }).join('');
   const bItems = (berita || []).map(r => `<button class="ag bt" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'berita', id: r.id }]))}'><span class="dt">${ic('mega')}<span>${esc(r.kategori || 'Info')}</span></span><span style="flex:1;min-width:0"><b>${esc(r.judul)}</b><span class="meta" style="display:block">${esc([fDate(r.tanggal), r.sumber].filter(Boolean).join(' · '))}</span>${r.ringkas ? `<span class="meta clamp2">${esc(r.ringkas)}</span>` : ''}</span></button>`).join('');
-  const tb = (canWrite('kegiatan') ? `<button class="btn sm" data-act="go" data-go='["form",{"e":"kegiatan"}]'>${ic('plus')}Agenda</button>` : '') + (canWrite('berita') ? `<button class="btn sm" data-act="go" data-go='["form",{"e":"berita"}]'>${ic('plus')}Berita</button>` : '');
   return `<div class="card agenda"><div class="sec-h" style="margin:0 0 4px"><h2>${ic('cal')} Update kegiatan</h2><span class="btns">${tb}</span></div>${items + bItems || '<div class="meta">Belum ada agenda atau berita. Agenda yang akan datang dan berita terbaru tampil di sini.</div>'}
-    <div class="agf">${canRead('kegiatan') ? `<button class="linkbtn" data-act="go" data-go='["list",{"e":"kegiatan","v":0,"title":"Agenda"}]'>Semua agenda ${ic('next')}</button>` : ''}${canRead('berita') ? `<button class="linkbtn" data-act="go" data-go='["list",{"e":"berita"}]'>Semua berita ${ic('next')}</button>` : ''}</div></div>`;
+</div>`;
 }
 function modsHtml(c) {
   let h = '';
@@ -5650,7 +5674,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta admin atau Kaur TU & Umum mengubahnya di Arsip → Aparatur Desa.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '80', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '81', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
