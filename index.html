@@ -362,7 +362,17 @@ body.privblur #main,body.privblur #layer,body.privblur .tabs{filter:blur(18px);t
 .ds-sec{padding:7px 12px 2px}.ds-h{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}.ds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0 12px}.ds-it{display:flex;gap:8px;align-items:center;padding:2px 0}.ds-ic{width:22px;height:22px;border-radius:8px;background:color-mix(in srgb,var(--pri,#15803d) 12%,transparent);color:var(--pri,#15803d);display:grid;place-items:center;flex:none}.ds-ic svg{width:12px;height:12px}.ds-it small{display:block;font-size:9.5px;color:var(--muted);line-height:1.2}.ds-it b{display:block;font-size:12px;font-weight:600;line-height:1.25;word-break:break-word}.ds-it a{color:var(--pri,#15803d)}
 .ds>.btns,.ds>.meta{padding:4px 12px 10px}
 .about{font-size:10.5px;line-height:1.55;color:var(--muted);padding:10px 4px 2px;border-top:1px solid var(--line)}.about b{color:var(--ink)}.about a{color:var(--pri,#15803d)}.ab-app{font-size:11px;margin-bottom:2px}.ab-h{font-weight:700;margin-top:6px;text-transform:uppercase;letter-spacing:.05em}.about details{margin-top:6px}.about summary{cursor:pointer;font-weight:600;color:var(--ink)}.about ol{margin:4px 0;padding-left:16px}.ab-c{margin-top:6px;text-align:center}
-.pmbox{position:relative}.pmdd{position:absolute;left:0;right:0;top:100%;z-index:50;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.25);max-height:260px;overflow:auto}.pmdd button{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:6px 9px;font-size:12.5px;cursor:pointer;color:inherit}.pmdd small{color:var(--muted)}.pmdd button.on{font-weight:700;color:var(--pri)}.pmok{font-size:11px;color:#16a34a}
+.pmbox{position:relative}.pmdd{position:absolute;left:0;right:0;top:100%;z-index:50;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.25);max-height:260px;overflow:auto}.pmdd button{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;padding:6px 9px;font-size:12.5px;cursor:pointer;color:inherit}.pmdd small{color:var(--muted)}.pmdd button.on{font-weight:700;color:var(--pri)}
+.pmdd,.pickl{background:var(--ink)!important;color:var(--bg)!important;border:0!important;border-radius:11px!important;box-shadow:0 10px 26px rgba(0,0,0,.35)!important;max-height:280px;overflow:auto;z-index:70!important;margin-top:3px}
+.pmdd button,.pickl button{color:inherit!important;border-bottom:1px solid color-mix(in srgb,var(--bg) 12%,transparent)!important;border-top:0!important;padding:8px 11px!important;font-size:13px}
+.pmdd button:last-child,.pickl button:last-child{border-bottom:0!important}
+.pmdd button:hover,.pickl button:hover{background:color-mix(in srgb,var(--bg) 12%,transparent)!important}
+.pmdd small,.pickl small,.pmdd .meta,.pickl .meta{color:color-mix(in srgb,var(--bg) 62%,var(--ink))!important}
+.pmdd button.on{color:inherit!important;background:color-mix(in srgb,var(--bg) 16%,transparent)!important;font-weight:700}.pmdd button.on::after{content:"✓";float:right;opacity:.85}
+.pmdd button.dis{opacity:.4;cursor:default}
+.pmdd.up{top:auto!important;bottom:100%;margin:0 0 3px}
+.selwrap{position:relative;display:inline-block;max-width:100%;vertical-align:middle}.selwrap.blk{display:block}.selwrap.blk>select{width:100%}
+.selhit{position:absolute;inset:0;cursor:pointer;z-index:1}.selwrap select:disabled+.selhit{cursor:not-allowed}.pmok{font-size:11px;color:#16a34a}
 .gtabs{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:3px;overflow-x:auto;scrollbar-width:none}
 .gtabs button{flex:1 0 auto;border:0;background:none;border-radius:7px;padding:5px 12px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap}
 .gtabs button.on{background:var(--surface);color:var(--pri);box-shadow:0 1px 2px rgba(0,0,0,.12)}
@@ -3784,12 +3794,46 @@ function ddAttach(el, opsi) {
   el.setAttribute('autocomplete', 'off');
   const box = document.createElement('div'); box.className = 'pmbox'; el.parentNode.insertBefore(box, el); box.appendChild(el);
   const dd = document.createElement('div'); dd.className = 'pmdd'; dd.hidden = true; box.appendChild(dd);
-  const isi = () => { const q = el.value.trim().toLowerCase(); const a = f.dd.filter(o => !q || o.toLowerCase().indexOf(q) >= 0 || f.dd.indexOf(el.value) >= 0); dd.innerHTML = a.map(o => `<button type="button" data-v="${esc(o)}"${o === el.value ? ' class="on"' : ''}>${esc(o)}</button>`).join(''); dd.hidden = !a.length; };
+  const isi = () => { const q = el.value.trim().toLowerCase(); const a = f.dd.filter(o => !q || o.toLowerCase().indexOf(q) >= 0 || f.dd.indexOf(el.value) >= 0).slice(0, 80); dd.innerHTML = a.map(o => `<button type="button" data-v="${esc(o)}"${o === el.value ? ' class="on"' : ''}>${esc(o)}</button>`).join(''); dd.hidden = !a.length; };
   el.addEventListener('focus', isi); el.addEventListener('click', isi); el.addEventListener('input', isi);
   dd.addEventListener('pointerdown', ev => ev.preventDefault());
   dd.addEventListener('click', ev => { const b = ev.target.closest('[data-v]'); if (!b) return; el.value = b.dataset.v; dd.hidden = true; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); el.blur(); });
   el.addEventListener('blur', () => setTimeout(() => { dd.hidden = true; }, 150));
 }
+/* ---- Semua pilihan (select & isian ber-saran) memakai daftar di bawah kotak, warna kebalikan tema ---- */
+function pickClose() { if (S.pickEl) { S.pickEl.remove(); S.pickEl = null; } }
+function pickOpen(sel) {
+  pickClose();
+  const dd = document.createElement('div'); dd.className = 'pmdd selpick';
+  dd.innerHTML = Array.from(sel.options).map((o, i) => `<button type="button" data-i="${i}" class="${i === sel.selectedIndex ? 'on' : ''}${o.disabled ? ' dis' : ''}">${esc(o.text)}</button>`).join('') || '<div class="meta" style="padding:6px 9px">Tidak ada pilihan.</div>';
+  sel.parentNode.appendChild(dd); S.pickEl = dd;
+  const r = dd.getBoundingClientRect(); if (r.bottom > innerHeight - 70 && r.height < sel.getBoundingClientRect().top - 60) dd.classList.add('up');
+  const on = dd.querySelector('.on'); if (on) on.scrollIntoView({ block: 'nearest' });
+  dd.addEventListener('pointerdown', ev => ev.preventDefault());
+  dd.addEventListener('click', ev => {
+    const b = ev.target.closest('[data-i]'); if (!b || b.classList.contains('dis')) return;
+    sel.selectedIndex = Number(b.dataset.i); pickClose();
+    sel.dispatchEvent(new Event('input', { bubbles: true })); sel.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+}
+function enhanceForm(root) {
+  $$('select:not([data-sel])', root).forEach(sel => {
+    if (sel.multiple || sel.size > 1 || sel.closest('.nosel')) return;
+    sel.dataset.sel = '1';
+    const w = document.createElement('span'); w.className = 'selwrap' + (sel.closest('.f') || sel.closest('td') ? ' blk' : '');
+    sel.parentNode.insertBefore(w, sel); w.appendChild(sel);
+    const h = document.createElement('span'); h.className = 'selhit'; w.appendChild(h);
+    h.addEventListener('click', ev => { ev.preventDefault(); ev.stopPropagation(); if (sel.disabled) return; if (S.pickEl && S.pickEl.parentNode === w) return pickClose(); sel.focus({ preventScroll: true }); pickOpen(sel); });
+  });
+  $$('input[list]:not([data-dl])', root).forEach(inp => {
+    const dl = document.getElementById(inp.getAttribute('list')); inp.dataset.dl = '1'; if (!dl) return;
+    const opts = Array.from(dl.options).map(o => o.value).filter(Boolean); inp.removeAttribute('list');
+    if (opts.length && !inp.readOnly) ddAttach(inp, opts);
+  });
+}
+document.addEventListener('click', e => { if (S.pickEl && !e.target.closest('.selwrap')) pickClose(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') pickClose(); });
+new MutationObserver(() => { clearTimeout(S.encT); S.encT = setTimeout(() => enhanceForm(document.body), 30); }).observe(document.body, { childList: true, subtree: true });
 function orangHooks(frm, flds) { flds.filter(f => f.opick).forEach(f => orangHook(frm, f.k.slice(0, -4), f)); }
 function orangHook(frm, pre, f) {
   const nm = $('#f_' + pre + 'nama', frm); if (!nm || nm.readOnly) return;
@@ -5841,7 +5885,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '90', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '91', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
