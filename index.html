@@ -708,6 +708,7 @@ input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-sof
   .sheet.dock .sh-q .btn.pri{background:var(--pri0);color:#fff}
   body.docked .tabs{z-index:66}
   .sheet.dock .sh-h [data-x]{display:none}
+  .sheet.dock input,.sheet.dock select,.sheet.dock textarea{background:var(--bg0)!important;color:var(--ink0)!important;border-color:var(--line0)!important}.sheet.dock input::placeholder{color:var(--muted0)}.sheet.dock #opQ{width:100%;padding:8px 10px;border:1px solid;border-radius:9px;font:inherit;font-size:13px}
   .sheet.dock .sh-box::before{display:none}
   .sheet.dock .sh-box{bottom:calc(var(--dockb) - 16px)!important;padding-bottom:26px!important}
   body.docked .btn.fab{opacity:0;pointer-events:none;transition:opacity .12s}
@@ -727,6 +728,7 @@ input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-sof
   .sheet.dock .meta,.sheet.dock small{color:var(--muted)}
   .sheet.dock .bar{background:color-mix(in srgb,var(--pri-ink) 15%,transparent)}
 }
+.sket{grid-row:1/span 2;grid-column:3;border:0;background:none;color:var(--muted);font-size:10px;text-decoration:underline;cursor:pointer;padding:2px 4px}.opket{border-top:1px dashed var(--line);padding-top:8px;display:flex;flex-direction:column;gap:5px}
 </style>
 </head>
 <body>
@@ -3939,19 +3941,20 @@ function ortuHooks(frm, p) {
   });
 }
 /* pemilih penduduk (modal) dipakai tombol Pilih & Hubungkan */
-function pilihPendModal(judul, jk, selfId, awal, onPick) {
-  const m = modal(judul, `<div class="stack"><input id="opQ" placeholder="Ketik nama (min. 3 huruf) atau NIK" value="${esc(awal || '')}" autocomplete="off"><div id="opR" class="list oplist"></div></div>`);
+function pilihPendModal(judul, jk, selfId, awal, onPick, onKet) {
+  const m = sheet(judul, `<div class="stack"><input id="opQ" placeholder="Ketik nama (min. 3 huruf) atau NIK" value="${esc(awal || '')}" autocomplete="off" inputmode="search"><div id="opR" class="list oplist"></div>${onKet ? `<div class="opket"><div class="meta">Tidak ada di Data Penduduk?</div><div class="btns"><button type="button" class="btn sm" data-ket="Meninggal">${ic('heart')}Sudah meninggal</button><button type="button" class="btn sm" data-ket="Luar desa">${ic('send')}Luar desa</button></div></div>` : ''}</div>`, { ikon: 'users' });
   const qi = $('#opQ', m.el), rr = $('#opR', m.el); let rows = [], t2;
   const cari = async () => {
     const q = qi.value.trim(); if (q.length < 3) { rr.innerHTML = '<div class="meta">Ketik minimal 3 huruf.</div>'; return; }
     rr.innerHTML = '<div class="meta">Mencari…</div>';
     try { rows = await cariPend(q, jk, selfId); } catch (x) { rows = []; }
     if (qi.value.trim() !== q) return;
-    rr.innerHTML = rows.length ? rows.map((o, i) => `<button type="button" class="row" data-i="${i}"><span class="av">${esc(initials(o.nama))}</span><span class="main"><span class="t">${esc(o.nama)}</span><span class="s">${esc(pendInfo(o))}</span></span></button>`).join('') : '<div class="meta">Tidak ditemukan.</div>';
+    rr.innerHTML = rows.length ? rows.map((o, i) => `<button type="button" class="row" data-i="${i}"><span class="av">${esc(initials(o.nama))}</span><span class="main"><span class="t">${esc(o.nama)}</span><span class="s">${esc(pendInfo(o))}</span></span></button>`).join('') : '<div class="meta">Tidak ditemukan nama yang cocok.</div>';
   };
   qi.addEventListener('input', () => { clearTimeout(t2); t2 = setTimeout(cari, 300); });
   rr.addEventListener('click', ev => { const b = ev.target.closest('[data-i]'); if (!b) return; m.close(); onPick(rows[Number(b.dataset.i)]); });
-  setTimeout(() => qi.focus(), 50); cari();
+  m.el.addEventListener('click', ev => { const b = ev.target.closest('[data-ket]'); if (!b || !onKet) return; m.close(); onKet(b.dataset.ket); });
+  cari();
 }
 /* ---- Silsilah: leluhur (s.d. buyut), saudara, anak, cucu ---- */
 const pGet = id => id ? call('get', { entity: 'penduduk', id }).catch(() => null) : Promise.resolve(null);
@@ -3966,7 +3969,7 @@ async function silsilahHtml(x) {
     const sisi = dari ? ' · dari ' + dari : '';
     [[ay, o.ayah, 'ayah', 0], [ib, o.ibu, 'ibu', 1]].forEach(([r, nm, k, i]) => {
       if (r) out.push({ lbl: LV[lv][i] + sisi, o: r, lv });
-      else if (nm) out.push({ lbl: LV[lv][i] + sisi, nm, own: o.id, k, lv });
+      else if (nm) out.push({ lbl: LV[lv][i] + sisi, nm, own: o.id, k, lv, ket: o[k + '_ket'] || '' });
     });
     await Promise.all([naik(ay, lv + 1, lv === 1 ? 'ayah' : dari), naik(ib, lv + 1, lv === 1 ? 'ibu' : dari)]);
   }
@@ -3982,6 +3985,7 @@ async function silsilahHtml(x) {
   const st = r => /meninggal/i.test(r.status || '') ? `<span class="pill bad">Meninggal${r.tgl_meninggal ? ' ' + dmyStrip(r.tgl_meninggal) : ''}</span>` : /pindah/i.test(r.status || '') ? `<span class="pill warn">Pindah${r.tgl_pindah ? ' ' + dmyStrip(r.tgl_pindah) : ''}</span>` : '';
   const row = e => e.o
     ? `<button class="srow" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'penduduk', id: e.o.id }]))}'><span class="sl">${esc(e.lbl)}</span><span class="sn">${esc(e.o.nama)} ${st(e.o)}</span><span class="si">${esc(pendInfo(Object.assign({}, e.o, { status: '' })))}</span></button>`
+    : e.ket ? `<div class="srow"><span class="sl">${esc(e.lbl)}</span><span class="sn">${esc(e.nm)} <span class="pill ${e.ket === 'Meninggal' ? 'bad' : 'warn'}">${esc(e.ket)}</span></span>${w ? `<button class="sket" data-act="silKetX" data-own="${esc(e.own)}" data-k="${e.k}" data-self="${esc(x.id)}" title="Batalkan keterangan">ubah</button>` : ''}</div>`
     : `<div class="srow"><span class="sl">${esc(e.lbl)}</span><span class="sn">${esc(e.nm)} <span class="pill">belum terhubung</span></span>${w ? `<button class="btn sm shub" data-act="silHub" data-own="${esc(e.own)}" data-k="${e.k}" data-nm="${esc(e.nm)}" data-self="${esc(x.id)}">${ic('link')}Hubungkan</button>` : ''}</div>`;
   return `<div class="silbox" data-sid="${esc(x.id)}"><div class="sec-h"><h2>${ic('users')} Silsilah${out.length ? ' (' + out.length + ')' : ''}</h2></div>` + (out.length ? `<div class="sil">${out.map(row).join('')}</div>` : '<div class="meta">Belum ada orang tua, saudara atau anak yang terhubung. Isi Nama Ayah/Ibu lewat Ubah.</div>') + '</div>';
 }
@@ -3994,8 +3998,17 @@ ACT.silHub = t => {
       const box = document.querySelector('.silbox[data-sid="' + self + '"]'), x = await pGet(self);
       if (box && x) box.outerHTML = await silsilahHtml(x);
     } catch (er) { toast(er.message, 1); }
-  });
+  }, ket => silKetSimpan(own, k, ket, self));
 };
+async function silKetSimpan(own, k, ket, self) {
+  try {
+    await call('save', { entity: 'penduduk', record: { id: own, [k + '_ket']: ket } });
+    toast(ket ? 'Ditandai: ' + ket + '.' : 'Keterangan dihapus.');
+    const box = document.querySelector('.silbox[data-sid="' + self + '"]'), x = await pGet(self);
+    if (box && x) box.outerHTML = await silsilahHtml(x);
+  } catch (er) { toast(er.message, 1); }
+}
+ACT.silKetX = t => silKetSimpan(t.dataset.own, t.dataset.k, '', t.dataset.self);
 /* ---- Detail penduduk: tanah yang dimiliki & riwayat surat keterangan ---- */
 async function extraPendudukLink(x, el) {
   const nikOk = /^\d{16}$/.test(String(x.nik || ''));
@@ -6178,7 +6191,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '105', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '106', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
