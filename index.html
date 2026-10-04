@@ -673,6 +673,7 @@ details.more>summary{cursor:pointer;color:var(--muted);font-size:11.5px;font-wei
 .idnote:empty{display:none}.idnote.bad{color:var(--bad)}.idnote a{color:var(--pri);font-weight:600}
 input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-soft)}
 .kkbox{border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:var(--surface2);display:flex;flex-direction:column;gap:2px}.kkbox .mono{font-size:12px;color:var(--muted)}
+.ortuin{display:flex;gap:6px;align-items:stretch}.ortuin input{flex:1;min-width:0}.ortupick{flex:none}.pmhd{padding:6px 11px;font-size:11px;opacity:.7}.oplist{max-height:55vh;overflow:auto}
 </style>
 </head>
 <body>
@@ -1111,7 +1112,7 @@ const UI = {
       F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk, req: 1 }), F('tempat_lahir', 'Tempat Lahir', 'text', { up: 1 }), F('tgl_lahir', 'Tanggal Lahir', 'date'), F('agama', 'Agama', 'select', { opt: OPT.agama }),
       F('pendidikan', 'Pendidikan', 'select', { opt: OPT.pendidikan }), F('pekerjaan', 'Pekerjaan', 'select', { opt: OPT.pekerjaan }),
       F('gol_darah', 'Golongan Darah', 'select', { opt: OPT.darah }), F('status_kawin', 'Status Perkawinan', 'select', { opt: OPT.kawin }), F('hubungan', 'Hubungan dalam Keluarga', 'select', { opt: OPT.hubungan }),
-      F('warga_negara', 'Kewarganegaraan', 'select', { opt: OPT.wn, def: 'WNI' }), F('no_paspor', 'No. Paspor', 'text', { sens: 1 }), F('no_kitap', 'No. KITAP', 'text', { sens: 1 }), F('ayah', 'Nama Ayah', 'text', { up: 1 }), F('ibu', 'Nama Ibu', 'text', { up: 1 }),
+      F('warga_negara', 'Kewarganegaraan', 'select', { opt: OPT.wn, def: 'WNI' }), F('no_paspor', 'No. Paspor', 'text', { sens: 1 }), F('no_kitap', 'No. KITAP', 'text', { sens: 1 }), F('ayah', 'Nama Ayah', 'text', { up: 1, hint: 'Ketik nama: bila ada di Data Penduduk muncul pilihan, atau ketuk Pilih' }), F('ayah_id', '', 'hidden'), F('ibu', 'Nama Ibu', 'text', { up: 1, hint: 'Ketik nama: bila ada di Data Penduduk muncul pilihan, atau ketuk Pilih' }), F('ibu_id', '', 'hidden'),
       F('dusun', 'Dusun', 'select', { opt: OPT.dusun, req: 1 }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }), F('status', 'Status Penduduk', 'select', { opt: OPT.statusPend, noform: 1 }),
       F('tgl_meninggal', 'Tanggal Meninggal', 'date', { noform: 1 }), F('tgl_pindah', 'Tanggal Pindah', 'date', { noform: 1 }), F('tgl_datang', 'Tanggal Datang', 'date'), F('ket', 'Keterangan', 'text'), F('foto_ktp_id', 'Foto KTP', 'file', { img: 1, priv: 1, wide: 1 })],
     chips: { k: 'dusun', opt: OPT.dusun, lbl: s => s.replace('DUSUN ', '') }, sort: 'nama',
@@ -3679,6 +3680,7 @@ VIEWS.form = async (p, main, alive) => {
   };
   S.vh.fileUndo = () => refresh();
   idHooks(frm, e, flds, p, rec);
+  if (e === 'penduduk') ortuHooks(frm, p);
   /* NIK -> isi otomatis dari Data Penduduk (hanya kolom yang masih kosong) */
   const nikF = flds.find(f => f.nikfill), nikEl = nikF && $('#f_' + nikF.k, frm);
   if (nikEl && !nikEl.readOnly) nikEl.addEventListener('input', async () => {
@@ -3840,6 +3842,66 @@ async function kkGabung(frm, v, say) {
     say(`✓ Masuk keluarga <b>${esc(k.kepala || '')}</b> (${esc(ds)} RT ${esc(k.rt || '')}/${esc(k.rw || '')}). Halaman keluarga dibuka setelah simpan.`);
   };
 }
+/* ---- Nama Ayah / Ibu → cocokkan dengan Data Penduduk (silsilah lintas KK) ---- */
+const pendInfo = p => [p.nik && p.nik.indexOf('•') < 0 ? 'NIK ' + p.nik : '', String(p.dusun || '').replace(/^DUSUN /, '') + (p.rt ? ' RT ' + p.rt + '/' + (p.rw || '') : ''), p.tgl_lahir ? umur(p.tgl_lahir) + ' th' : '', p.status && p.status !== 'Aktif' ? p.status : ''].filter(Boolean).join(' · ');
+async function cariPend(q, jk, selfId) {
+  const r = (await call('list', { entity: 'penduduk', q, limit: 12 })).rows || [];
+  return r.filter(p => p.id !== selfId).sort((a, b) => (String(b.jk || '').toUpperCase() === jk) - (String(a.jk || '').toUpperCase() === jk));
+}
+function ortuHooks(frm, p) {
+  [['ayah', 'LAKI-LAKI'], ['ibu', 'PEREMPUAN']].forEach(([k, jk]) => {
+    const nm = $('#f_' + k, frm), pid = $('#f_' + k + '_id', frm); if (!nm || nm.readOnly || !pid || !canRead('penduduk')) return;
+    const box = nm.closest('.f'); box.classList.add('pmbox', 'ortu');
+    const wrap = document.createElement('div'); wrap.className = 'ortuin'; nm.parentNode.insertBefore(wrap, nm); wrap.appendChild(nm);
+    const bt = document.createElement('button'); bt.type = 'button'; bt.className = 'btn sm ortupick'; bt.innerHTML = ic('search') + 'Pilih'; wrap.appendChild(bt);
+    const dd = document.createElement('div'); dd.className = 'pmdd'; dd.hidden = true; box.appendChild(dd);
+    const note = document.createElement('span'); note.className = 'pmok'; box.appendChild(note);
+    let hasil = [], tm, info = null;
+    const tandai = () => { note.innerHTML = pid.value ? '✓ Terhubung ke Data Penduduk' + (info ? ': ' + esc(pendInfo(info)) : '') : ''; };
+    if (pid.value) call('get', { entity: 'penduduk', id: pid.value }).then(x => { info = x; tandai(); }).catch(() => { }); tandai();
+    const pakai = o => { nm.value = o.nama; pid.value = o.id; info = o; dd.hidden = true; tandai(); };
+    const tampil = rows => {
+      hasil = rows;
+      dd.innerHTML = rows.length ? `<div class="pmhd">Cocok di Data Penduduk — ketuk untuk menghubungkan</div>` + rows.map((o, i) => `<button type="button" data-i="${i}"><b>${esc(o.nama)}</b>${String(o.jk || '').toUpperCase() !== jk ? ' <small>(' + esc(o.jk || '?') + ')</small>' : ''}<br><small>${esc(pendInfo(o))}</small></button>`).join('') : '';
+      dd.hidden = !rows.length;
+    };
+    nm.addEventListener('input', () => {
+      pid.value = ''; info = null; tandai(); clearTimeout(tm);
+      const q = nm.value.trim(); if (q.length < 3) { dd.hidden = true; return; }
+      tm = setTimeout(async () => { try { const r = await cariPend(q, jk, p.id); if (nm.value.trim() === q) tampil(r); } catch (x) { } }, 300);
+    });
+    dd.addEventListener('pointerdown', ev => ev.preventDefault());
+    dd.addEventListener('click', ev => { const b = ev.target.closest('[data-i]'); if (b) pakai(hasil[Number(b.dataset.i)]); });
+    document.addEventListener('click', ev => { if (!box.contains(ev.target)) dd.hidden = true; });
+    bt.onclick = () => {
+      const m = modal('Pilih ' + (k === 'ayah' ? 'Ayah' : 'Ibu') + ' dari Data Penduduk', `<div class="stack"><input id="opQ" placeholder="Ketik nama (min. 3 huruf) atau NIK" value="${esc(nm.value)}" autocomplete="off"><div id="opR" class="list oplist"></div></div>`);
+      const qi = $('#opQ', m.el), rr = $('#opR', m.el); let rows = [], t2;
+      const cari = async () => {
+        const q = qi.value.trim(); if (q.length < 3) { rr.innerHTML = '<div class="meta">Ketik minimal 3 huruf.</div>'; return; }
+        rr.innerHTML = '<div class="meta">Mencari…</div>';
+        try { rows = await cariPend(q, jk, p.id); } catch (x) { rows = []; }
+        if (qi.value.trim() !== q) return;
+        rr.innerHTML = rows.length ? rows.map((o, i) => `<button type="button" class="row" data-i="${i}"><span class="av">${esc(initials(o.nama))}</span><span class="main"><span class="t">${esc(o.nama)}</span><span class="s">${esc(pendInfo(o))}</span></span></button>`).join('') : '<div class="meta">Tidak ditemukan. Nama tetap bisa diketik manual.</div>';
+      };
+      qi.addEventListener('input', () => { clearTimeout(t2); t2 = setTimeout(cari, 300); });
+      rr.addEventListener('click', ev => { const b = ev.target.closest('[data-i]'); if (!b) return; pakai(rows[Number(b.dataset.i)]); m.close(); });
+      setTimeout(() => qi.focus(), 50); cari();
+    };
+  });
+}
+async function silsilahHtml(x) {
+  if (!canRead('penduduk')) return '';
+  const [ay, ib, a1, a2] = await Promise.all([
+    x.ayah_id ? call('get', { entity: 'penduduk', id: x.ayah_id }).catch(() => null) : null,
+    x.ibu_id ? call('get', { entity: 'penduduk', id: x.ibu_id }).catch(() => null) : null,
+    call('list', { entity: 'penduduk', filters: { ayah_id: x.id }, limit: 50 }).then(r => r.rows || []).catch(() => []),
+    call('list', { entity: 'penduduk', filters: { ibu_id: x.id }, limit: 50 }).then(r => r.rows || []).catch(() => [])
+  ]);
+  const m = {}; a1.concat(a2).forEach(r => { m[r.id] = r; }); const anak = Object.values(m).sort((a, b) => String(a.tgl_lahir || '').localeCompare(String(b.tgl_lahir || '')));
+  const ortu = (lbl, o, nama) => o ? `<button class="row" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'penduduk', id: o.id }]))}'><span class="av">${esc(initials(o.nama))}</span><span class="main"><span class="t">${esc(o.nama)} <small class="muted">· ${lbl}</small></span><span class="s">${esc(pendInfo(o))}</span></span></button>` : nama ? `<div class="row"><span class="av">?</span><span class="main"><span class="t">${esc(nama)} <small class="muted">· ${lbl}</small></span><span class="s">Belum dihubungkan ke Data Penduduk (pilih lewat Ubah)</span></span></div>` : '';
+  const isi = ortu('Ayah', ay, x.ayah) + ortu('Ibu', ib, x.ibu) + anak.map(a => ortu(String(a.jk || '').toUpperCase() === 'PEREMPUAN' ? 'Anak (P)' : 'Anak (L)', a)).join('');
+  return `<div class="sec-h"><h2>${ic('users')} Silsilah (orang tua & anak)</h2></div>` + (isi ? `<div class="list">${isi}</div>` : '<div class="meta">Belum ada data orang tua atau anak yang terhubung.</div>');
+}
 /* ---- Detail penduduk: tanah yang dimiliki & riwayat surat keterangan ---- */
 async function extraPendudukLink(x, el) {
   const nikOk = /^\d{16}$/.test(String(x.nik || ''));
@@ -3851,6 +3913,7 @@ async function extraPendudukLink(x, el) {
   let h = '';
   if (tn) { const T = uniq(tn); h += `<div class="sec-h"><h2>${ic('map')} Tanah yang dimiliki (${T.length})</h2></div>` + (T.length ? `<div class="list">${T.map(r => rowHtml('tanah_desa', r)).join('')}</div>${T.some(r => r.bidang) ? `<div class="btns"><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['tanah', { fokus: T.find(r => r.bidang).id }]))}'>${ic('map')}Lihat di peta</button></div>` : ''}` : '<div class="meta">Belum tercatat sebagai pemilik tanah.</div>'); }
   if (sr) { const R2 = uniq(sr).sort((a, b) => String(b.tgl_surat || '').localeCompare(String(a.tgl_surat || ''))); h += `<div class="sec-h"><h2>${ic('file')} Riwayat surat keterangan (${R2.length})</h2></div>` + (R2.length ? `<div class="list">${R2.map(r => rowHtml('register_surat', r)).join('')}</div>` : '<div class="meta">Belum pernah mengurus surat keterangan.</div>'); }
+  try { h = (await silsilahHtml(x)) + h; } catch (x2) { }
   if (h) el.insertAdjacentHTML('beforeend', `<div class="stack">${h}</div>`);
 }
 /* ---- Orang (Tanah: pemilik, NTCR: suami/istri/orang tua, Rentan: warga) dari Data Penduduk atau baru (luar desa) ---- */
@@ -6019,7 +6082,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '93', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '94', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
