@@ -720,7 +720,9 @@ input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-sof
   .sheet.dock .sh-h{margin-bottom:6px}.sheet.dock .sh-h h3{font-size:14px;color:var(--pri-ink)}.sheet.dock .sh-h .iconbtn{width:28px;height:28px;color:var(--pri-ink)}
   .sheet.dock .mc-ic{background:color-mix(in srgb,var(--pri-ink) 15%,transparent)!important;color:var(--pri-ink)!important}
   .sheet.dock .sh-items{gap:5px}.sheet.dock .sh-it{min-height:36px;padding:5px 6px;font-size:10.5px;font-weight:700;line-height:1.2;gap:6px;letter-spacing:-.01em}.sheet.dock .sh-it small{font-weight:500;font-size:9.5px}.sheet.dock .sh-it .ti{width:24px;height:24px}.sheet.dock .sh-it .ti svg{width:13px;height:13px}
-  .sheet.dock .sh-it:hover{background:color-mix(in srgb,var(--pri-ink) 16%,transparent)}
+  .sheet.dock .sh-it{background:var(--pri)!important;border-color:transparent!important;color:var(--pri-ink);box-shadow:0 1px 3px rgba(0,0,0,.18)}
+  .sheet.dock .sh-it:hover{background:var(--pri-2)!important}
+  .sheet.dock .sh-it .ti{background:color-mix(in srgb,var(--pri-ink) 16%,transparent)!important;color:var(--pri-ink)!important}
   .sheet.dock p{font-size:13px}
   .sheet.dock .sh-st{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin-bottom:6px}.sheet.dock .sh-st>div{padding:5px 8px}.sheet.dock .sh-st b{font-size:15px}.sheet.dock .sh-st small{font-size:10px}
   .sheet.dock .btn:not(.danger){background:color-mix(in srgb,var(--pri-ink) 14%,transparent);border-color:transparent;color:var(--pri-ink)}
@@ -6203,7 +6205,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '108', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '109', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
