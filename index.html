@@ -757,6 +757,21 @@ input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-sof
 .sn-n b{font-size:10.5px;line-height:1.2;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:2px 5px;margin-top:3px;max-width:84px;overflow-wrap:anywhere}
 .sn-n small{font-size:9px;color:var(--muted);line-height:1.2}
 .sn-leg{display:flex;flex-wrap:wrap;gap:10px;font-size:11px}.sn-leg .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}.sn-leg .dot.l{background:#0e7490}.sn-leg .dot.p{background:#ea580c}.sn-k{display:inline-block;width:9px;height:9px;border-radius:50%;border:1.5px dashed var(--muted);margin-right:4px;vertical-align:-1px}
+.st-vp{position:relative;overflow:hidden;height:calc(100dvh - 215px);min-height:320px;border:1px solid var(--line);border-radius:12px;background:var(--surface);touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+.st-in{position:absolute;left:0;top:0;transform-origin:0 0}
+.st-svg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}.st-svg path{fill:none;stroke-width:2}.st-svg path.k{stroke:var(--muted);opacity:.6}.st-svg path.c{stroke:#e11d48;opacity:.55;stroke-width:2.5}
+.st-n{position:absolute;width:112px;height:92px;display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;color:var(--ink);cursor:pointer;padding:0;font:inherit;text-align:center}
+.st-n .sn-a{width:52px;height:52px;flex:none}
+.st-n.l{--c:#0e7490}.st-n.p{--c:#ea580c}.st-n.mati .sn-a{filter:grayscale(.7);opacity:.8}
+.st-n.me .sn-a{box-shadow:0 0 0 2px var(--c),0 0 0 8px color-mix(in srgb,var(--c) 25%,transparent)}
+.st-n.kosong .sn-a,.st-n.luar .sn-a{background:var(--surface);color:var(--c);border:2px dashed var(--c);box-shadow:none}
+.st-n.me.luar .sn-a,.st-n.me.kosong .sn-a{box-shadow:0 0 0 8px color-mix(in srgb,var(--c) 25%,transparent)}
+.st-n b{font-size:10.5px;line-height:1.2;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:2px 5px;max-width:110px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:anywhere}
+.st-n small{font-size:9px;color:var(--muted);line-height:1.2;max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-vp.kecil .st-n small{visibility:hidden}
+.st-zoom{position:absolute;right:8px;bottom:8px;display:flex;gap:5px;z-index:2}.st-zoom .btn{min-width:38px;justify-content:center;font-weight:800;box-shadow:0 2px 6px rgba(0,0,0,.18)}
+.sil-b .btn{flex:1 1 45%;justify-content:center}
+.sheet.dock .f input,.sheet.dock .f select{width:100%;padding:8px 10px;border:1px solid;border-radius:9px;font:inherit;font-size:13px}
 .pl-map{position:relative;height:min(62vh,460px);border-radius:10px;overflow:hidden;border:1px solid var(--line)}.pl-map #plMap{position:absolute;inset:0}.pl-pin{position:absolute;left:50%;top:50%;transform:translate(-50%,-100%);z-index:500;color:#dc2626;pointer-events:none}.pl-pin .ic{width:34px;height:34px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))}
 </style>
 </head>
@@ -4142,82 +4157,262 @@ function wilHook(frm, e, rec, isNew) {
 }
 const HUB_URUT = ['KEPALA KELUARGA', 'SUAMI', 'ISTRI', 'ANAK', 'MENANTU', 'CUCU', 'ORANG TUA', 'MERTUA', 'FAMILI LAIN', 'PEMBANTU', 'LAINNYA'];
 const urutKK = rows => rows.slice().sort((a, b) => { const ia = HUB_URUT.indexOf(String(a.hubungan || '').toUpperCase()), ib = HUB_URUT.indexOf(String(b.hubungan || '').toUpperCase()); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || String(a.tgl_lahir || '9999').localeCompare(String(b.tgl_lahir || '9999')); });
-/* ---- Diagram silsilah (halaman sendiri) ---- */
+/* ---- Diagram silsilah (halaman sendiri; geser, cubit/zoom, semua hubungan) ---- */
+const SIL_W = 112, SIL_H = 92, SIL_GX = 22, SIL_GC = 12, SIL_RY = 150, SIL_PAD = 40;
+const silL = o => String(o && o.jk || '').toUpperCase().indexOf('LAKI') === 0;
 VIEWS.silsilah = async (p, main, alive) => {
   setTop('Silsilah', '');
   main.innerHTML = '<div class="card skel" style="height:320px"></div>';
-  const me = await pGet(p.id); if (!alive()) return;
+  let r; try { r = await call('silsilah', { id: p.id }); } catch (er) { if (alive()) main.innerHTML = `<div class="err">${esc(er.message)}</div>`; return; }
+  if (!alive()) return;
+  const M = {}; (r.nodes || []).forEach(n => { M[n.id] = Object.assign({}, n); });
+  const me = M[p.id];
   if (!me) { main.innerHTML = '<div class="card empty">Data tidak ditemukan.</div>'; return; }
   setTop('Silsilah', me.nama);
-  const [ay, ib] = await Promise.all([pGet(me.ayah_id), pGet(me.ibu_id)]);
-  const [kAy, nAy, kIb, nIb] = await Promise.all([pGet(ay && ay.ayah_id), pGet(ay && ay.ibu_id), pGet(ib && ib.ayah_id), pGet(ib && ib.ibu_id)]);
-  const [sd1, sd2, a1, a2] = await Promise.all([me.ayah_id ? pList({ ayah_id: me.ayah_id }) : [], me.ibu_id ? pList({ ibu_id: me.ibu_id }) : [], pList({ ayah_id: me.id }), pList({ ibu_id: me.id })]);
-  if (!alive()) return;
-  const uq = (a, ex) => { const m = {}; a.forEach(r => { if (r && r.id && ex.indexOf(r.id) < 0) m[r.id] = r; }); return Object.values(m).sort((x, y) => String(x.tgl_lahir || '9').localeCompare(String(y.tgl_lahir || '9'))); };
-  const anak = uq(a1.concat(a2), [me.id]);
-  const isL = r => String(r.jk || '').toUpperCase().indexOf('LAKI') === 0;
-  /* pasangan: orang tua lain dari anak-anak */
-  const pasId = Array.from(new Set(anak.map(c => isL(me) ? c.ibu_id : c.ayah_id).filter(Boolean)));
-  const pas = (await Promise.all(pasId.map(pGet))).filter(Boolean);
-  const sdr = uq(sd1.concat(sd2), [me.id]);
-  const cucu = anak.length ? uq((await Promise.all(anak.slice(0, 12).map(c => Promise.all([pList({ ayah_id: c.id }), pList({ ibu_id: c.id })])))).flat(2), []) : [];
-  if (!alive()) return;
   const w = canWrite('penduduk');
+  /* orang tua yang belum terhubung -> simpul semu (digabung bila nama & pasangannya sama) */
+  const semu = {};
+  Object.values(M).forEach(n => {
+    ['ayah', 'ibu'].forEach(k => {
+      const id = n[k + '_id'];
+      if (id && M[id]) { n['_' + k] = id; return; }
+      const nm = String(n[k] || '').trim().toUpperCase(), ket = n[k + '_ket'] || '';
+      if (!nm && !ket && n !== me) return;
+      const lain = k === 'ayah' ? 'ibu' : 'ayah', lid = n[lain + '_id'] && M[n[lain + '_id']] ? n[lain + '_id'] : String(n[lain] || '').trim().toUpperCase();
+      const key = nm ? k + '|' + nm + '|' + lid : 'x|' + n.id + '|' + k;
+      if (!semu[key]) semu[key] = M['v:' + key] = { id: 'v:' + key, virt: 1, k, nama: nm, ket, jk: k === 'ayah' ? 'LAKI-LAKI' : 'PEREMPUAN', own: [] };
+      semu[key].own.push(n.id); n['_' + k] = semu[key].id;
+    });
+  });
+  const kids = {}, pas = {}, fams = {};
+  Object.values(M).forEach(n => {
+    if (!n._ayah && !n._ibu) return;
+    ['_ayah', '_ibu'].forEach(k => { if (n[k]) (kids[n[k]] = kids[n[k]] || []).push(n.id); });
+    const fk = (n._ayah || '') + '|' + (n._ibu || '');
+    (fams[fk] = fams[fk] || { a: n._ayah, i: n._ibu, kids: [] }).kids.push(n.id);
+    if (n._ayah && n._ibu) { (pas[n._ayah] = pas[n._ayah] || new Set()).add(n._ibu); (pas[n._ibu] = pas[n._ibu] || new Set()).add(n._ayah); }
+  });
+  /* generasi: telusuri dari orang ini */
+  const gen = { [me.id]: 0 }, urut = [me.id], q = [me.id];
+  while (q.length) {
+    const id = q.shift(), n = M[id], g = gen[id];
+    const nb = [...(pas[id] || [])].map(s => [s, g]).concat([[n._ayah, g - 1], [n._ibu, g - 1]], (kids[id] || []).map(c => [c, g + 1]));
+    nb.forEach(([x, gg]) => { if (x && M[x] && gen[x] == null) { gen[x] = gg; urut.push(x); q.push(x); } });
+  }
+  const rows = {}; urut.forEach(id => (rows[gen[id]] = rows[gen[id]] || []).push(id));
+  const gs = Object.keys(rows).map(Number).sort((a, b) => a - b);
+  /* unit = orang + pasangannya pada baris yang sama */
+  const unitOf = {}, units = {};
+  gs.forEach(g => {
+    units[g] = [];
+    rows[g].forEach(id => {
+      if (unitOf[id]) return;
+      const u = { ids: [] }, st = [id];
+      while (st.length) { const x = st.pop(); if (unitOf[x] || gen[x] !== g) continue; unitOf[x] = u; u.ids.push(x); [...(pas[x] || [])].forEach(s => st.push(s)); }
+      const L = u.ids.filter(x => silL(M[x])), P = u.ids.filter(x => !silL(M[x]));
+      u.ids = L.length === 1 && P.length >= 2 ? [P[0], L[0], ...P.slice(1)] : P.length === 1 && L.length >= 2 ? [L[0], P[0], ...L.slice(1)] : L.concat(P);
+      u.w = u.ids.length * SIL_W + (u.ids.length - 1) * SIL_GC; units[g].push(u);
+    });
+  });
+  const cx = id => { const u = unitOf[id]; return u.x + u.ids.indexOf(id) * (SIL_W + SIL_GC) + SIL_W / 2; };
+  const tahun = id => String(M[id].tgl_lahir || '9999');
+  const avg = a => a.length ? a.reduce((s, v) => s + v, 0) / a.length : null;
+  const dariOrtu = u => avg(u.ids.flatMap(id => [M[id]._ayah, M[id]._ibu].filter(x => x && unitOf[x] && gen[x] < gen[id]).map(cx)));
+  const dariAnak = u => avg(u.ids.flatMap(id => (kids[id] || []).filter(c => unitOf[c] && gen[c] > gen[id]).map(cx)));
+  const tempatkan = (g, fn) => {
+    const us = units[g];
+    us.forEach((u, i) => { const v = fn(u); u.k = v == null ? u.x + u.w / 2 : v; u.t = u.ids.map(tahun).sort()[0]; });
+    us.sort((a, b) => a.k - b.k || (a.t < b.t ? -1 : a.t > b.t ? 1 : 0));
+    let end = -Infinity; us.forEach(u => { u.x = Math.max(end + SIL_GX, u.k - u.w / 2); end = u.x + u.w; });
+    const off = avg(us.map(u => u.x + u.w / 2 - u.k)); if (off) us.forEach(u => { u.x -= off / 2; });
+  };
+  gs.forEach(g => { let x = 0; units[g].forEach(u => { u.x = x; x += u.w + SIL_GX; }); });
+  for (let it = 0; it < 4; it++) { gs.forEach(g => tempatkan(g, dariOrtu)); gs.slice().reverse().forEach(g => tempatkan(g, dariAnak)); }
+  gs.forEach(g => tempatkan(g, u => { const a = dariOrtu(u); return a != null ? a : dariAnak(u); }));
+  let mnx = Infinity, mxx = -Infinity;
+  gs.forEach(g => units[g].forEach(u => { mnx = Math.min(mnx, u.x); mxx = Math.max(mxx, u.x + u.w); }));
+  gs.forEach(g => units[g].forEach(u => { u.x += SIL_PAD - mnx; }));
+  const Wt = mxx - mnx + SIL_PAD * 2, Ht = (gs[gs.length - 1] - gs[0]) * SIL_RY + SIL_H + SIL_PAD * 2;
+  const Y = id => SIL_PAD + (gen[id] - gs[0]) * SIL_RY, AY = id => Y(id) + 30;
   const th = d => d ? String(d).slice(0, 4) : '';
-  /* simpul: o = data penduduk; atau slot { nm, own, k, ket } */
-  const N = (o, slot, cls) => {
-    if (o) { const mati = /meninggal/i.test(o.status || ''), u = o.tgl_lahir ? umur(o.tgl_lahir) : ''; return `<button class="sn-n ${isL(o) ? 'l' : 'p'} ${cls || ''}${mati ? ' mati' : ''}" data-act="silNode" data-id="${esc(o.id)}"><span class="sn-a">${esc(initials(o.nama))}</span><b>${esc(judulKata(o.nama))}</b><small>${th(o.tgl_lahir)}${u !== '' ? ' (' + (mati ? 'alm.' : 'usia ' + u) + ')' : mati ? ' (alm.)' : ''}</small></button>`; }
-    const jk = slot.k === 'ayah' ? 'l' : 'p';
-    return `<button class="sn-n ${jk} kosong ${cls || ''}" data-act="silSlot" data-own="${esc(slot.own)}" data-k="${slot.k}" data-nm="${esc(slot.nm || '')}" data-ket="${esc(slot.ket || '')}"><span class="sn-a">${slot.nm ? esc(initials(slot.nm)) : '+'}</span><b>${slot.nm ? esc(judulKata(slot.nm)) : (slot.k === 'ayah' ? 'Ayah' : 'Ibu')}</b><small>${slot.ket ? esc(slot.ket) : slot.nm ? 'belum terhubung' : w ? 'ketuk untuk mengisi' : 'tidak tercatat'}</small></button>`;
+  const nodeH = id => {
+    const o = M[id]; let sub, cls = silL(o) ? 'l' : 'p';
+    if (o.virt) { cls += ' kosong'; sub = o.ket ? judulKata(o.ket) : o.nama ? 'belum terhubung' : w ? 'ketuk untuk mengisi' : 'tidak tercatat'; }
+    else if (o.src === 'k') { cls += ' luar' + (/meninggal/i.test(o.ket || '') ? ' mati' : ''); sub = [th(o.tgl_lahir), o.ket ? judulKata(o.ket) : 'bukan penduduk'].filter(Boolean).join(' · '); }
+    else {
+      const mati = /meninggal/i.test(o.status || ''), u = o.tgl_lahir && !mati ? umur(o.tgl_lahir) : '';
+      if (mati) cls += ' mati';
+      sub = th(o.tgl_lahir) + (mati ? ' (alm.)' : u !== '' ? ' · ' + u + ' th' : '') + (/pindah/i.test(o.status || '') ? ' · pindah' : '');
+    }
+    if (id === me.id) cls += ' me';
+    const nm = o.nama ? judulKata(o.nama) : (o.k === 'ayah' ? 'Ayah' : 'Ibu');
+    return `<button class="st-n ${cls}" data-act="silTap" data-id="${esc(id)}" style="left:${cx(id) - SIL_W / 2}px;top:${Y(id)}px"><span class="sn-a">${o.nama ? esc(initials(o.nama)) : '+'}</span><b>${esc(nm)}</b><small>${esc(sub)}</small></button>`;
   };
-  const ortu = (o, r, k, nmTeks, ketTeks) => r ? N(r) : o ? N(null, { own: o.id, k, nm: nmTeks, ket: ketTeks }) : '';
-  const pasangan = (a, b, lbl) => (a || b) ? `<div class="sn-cp" data-cp="${lbl}">${a || ''}${a && b ? '<i class="sn-hub"></i>' : ''}${b || ''}</div>` : '';
-  const g2 = [pasangan(ortu(ay, kAy, 'ayah', ay && ay.ayah, ay && ay.ayah_ket), ortu(ay, nAy, 'ibu', ay && ay.ibu, ay && ay.ibu_ket), 'ga'), pasangan(ortu(ib, kIb, 'ayah', ib && ib.ayah, ib && ib.ayah_ket), ortu(ib, nIb, 'ibu', ib && ib.ibu, ib && ib.ibu_ket), 'gi')].join('');
-  const g1 = pasangan(ortu(me, ay, 'ayah', me.ayah, me.ayah_ket), ortu(me, ib, 'ibu', me.ibu, me.ibu_ket), 'p');
-  const sdrL = sdr.filter(r => String(r.tgl_lahir || '9') < String(me.tgl_lahir || '9')), sdrM = sdr.filter(r => sdrL.indexOf(r) < 0);
-  const g0 = `${sdrL.map(r => N(r, null, 'sdr')).join('')}<div class="sn-cp" data-cp="me">${N(me, null, 'me')}${pas.map(x => '<i class="sn-hub"></i>' + N(x, null, 'pas')).join('')}</div>${sdrM.map(r => N(r, null, 'sdr')).join('')}`;
-  const gA = anak.map(r => N(r, null, 'anak')).join(''), gC = cucu.map(r => N(r, null, 'cucu')).join('');
-  main.innerHTML = `<div class="stack"><div class="sn-wrap" id="snWrap"><svg class="sn-svg" id="snSvg"></svg><div class="sn-in" id="snIn">
-      ${g2 ? `<div class="sn-row">${g2}</div>` : ''}<div class="sn-row">${g1}</div><div class="sn-row">${g0}</div>${gA ? `<div class="sn-row">${gA}</div>` : ''}${gC ? `<div class="sn-row">${gC}</div>` : ''}
-    </div></div>
-    <div class="meta sn-leg"><span><i class="dot l"></i>Laki-laki</span><span><i class="dot p"></i>Perempuan</span><span><i class="sn-k"></i>Belum terhubung</span><span>Ketuk nama untuk pilihan.</span></div></div>`;
-  const svg = $('#snSvg'), wrap = $('#snWrap'), inn = $('#snIn');
-  const garis = () => {
-    const R = inn.getBoundingClientRect(), W = inn.scrollWidth, H = inn.scrollHeight; svg.setAttribute('width', W); svg.setAttribute('height', H); svg.style.width = W + 'px'; svg.style.height = H + 'px';
-    const pos = el => { const b = el.querySelector('.sn-a').getBoundingClientRect(); return { x: b.left - R.left + b.width / 2, t: b.top - R.top, b: b.bottom - R.top, y: b.top - R.top + b.height / 2 }; };
-    let d = '';
-    const turun = (dari, ke) => { /* dari: {x,y}, ke: [el] */ if (!ke.length) return; const ps = ke.map(pos), yb = Math.min(...ps.map(q => q.t)) - 14; d += `M${dari.x} ${dari.y}V${yb}`; const xs = ps.map(q => q.x).concat(dari.x); d += `M${Math.min(...xs)} ${yb}H${Math.max(...xs)}`; ps.forEach(q => { d += `M${q.x} ${yb}V${q.t}`; }); };
-    const titikCp = cp => { if (!cp) return null; const ns = [...cp.querySelectorAll(':scope > .sn-n')]; if (!ns.length) return null; const ps = ns.map(pos); if (ps.length > 1) d += `M${ps[0].x} ${ps[0].y}H${ps[ps.length - 1].x}`; return { x: ps.length > 1 ? (ps[0].x + ps[1].x) / 2 : ps[0].x, y: ps.length > 1 ? ps[0].y : ps[0].b }; };
-    const ga = titikCp(inn.querySelector('[data-cp="ga"]')), gi = titikCp(inn.querySelector('[data-cp="gi"]')), pp = titikCp(inn.querySelector('[data-cp="p"]')), mm = titikCp(inn.querySelector('[data-cp="me"]'));
-    const nAyah = inn.querySelector('[data-cp="p"] > .sn-n:first-child'), nIbu = inn.querySelector('[data-cp="p"] > .sn-n:last-child');
-    if (ga && nAyah) turun(ga, [nAyah]); if (gi && nIbu && nIbu !== nAyah) turun(gi, [nIbu]);
-    if (pp) turun(pp, [...inn.querySelectorAll('.sn-n.sdr, .sn-n.me')]);
-    if (mm) turun(mm, [...inn.querySelectorAll('.sn-n.anak')]);
-    const cs = [...inn.querySelectorAll('.sn-n.cucu')];
-    if (cs.length) { const ax = [...inn.querySelectorAll('.sn-n.anak')]; cs.forEach(c => { const o = cucu.find(z => z.id === c.dataset.id); const par = ax.find(a => o && (a.dataset.id === o.ayah_id || a.dataset.id === o.ibu_id)); if (par) { const q = pos(par); turun({ x: q.x, y: q.b }, [c]); } }); }
-    svg.innerHTML = `<path d="${d}" />`;
+  let dK = '', dC = '';
+  Object.values(fams).forEach(f => {
+    const ks = f.kids.filter(c => unitOf[c]), ps = [f.a, f.i].filter(x => x && unitOf[x]);
+    if (!ks.length || !ps.length) return;
+    const ax = ps.length === 2 ? (cx(ps[0]) + cx(ps[1])) / 2 : cx(ps[0]), ay = ps.length === 2 ? Math.max(AY(ps[0]), AY(ps[1])) : Y(ps[0]) + SIL_H - 2;
+    const yb = Math.min(...ks.map(Y)) - 20, xs = ks.map(cx).concat(ax);
+    dK += `M${ax} ${ay}V${yb}M${Math.min(...xs)} ${yb}H${Math.max(...xs)}`; ks.forEach(c => { dK += `M${cx(c)} ${yb}V${Y(c)}`; });
+  });
+  const sdh = new Set();
+  Object.keys(pas).forEach(a => pas[a].forEach(b => {
+    const kk = [a, b].sort().join('|'); if (sdh.has(kk) || !unitOf[a] || !unitOf[b]) return; sdh.add(kk);
+    const x1 = Math.min(cx(a), cx(b)), x2 = Math.max(cx(a), cx(b)); dC += `M${x1 + 30} ${AY(a)}H${x2 - 30}`;
+  }));
+  S.sil = { M, me, pas, kids };
+  const jml = urut.filter(id => !M[id].virt).length;
+  main.innerHTML = `<div class="stack"><div class="st-vp" id="stVp"><div class="st-in" id="stIn" style="width:${Wt}px;height:${Ht}px"><svg class="st-svg" width="${Wt}" height="${Ht}" viewBox="0 0 ${Wt} ${Ht}"><path class="k" d="${dK}"/><path class="c" d="${dC}"/></svg>${urut.map(nodeH).join('')}</div>
+      <div class="st-zoom"><button type="button" class="btn sm" data-z="in" aria-label="Perbesar">+</button><button type="button" class="btn sm" data-z="out" aria-label="Perkecil">−</button><button type="button" class="btn sm" data-z="fit">Semua</button><button type="button" class="btn sm" data-z="me">Pusat</button></div></div>
+    <div class="meta sn-leg"><span><b>${jml}</b> orang${r.penuh ? ' (dibatasi)' : ''}</span><span><i class="dot l"></i>Laki-laki</span><span><i class="dot p"></i>Perempuan</span><span><i class="sn-k"></i>Belum terhubung / bukan penduduk</span><span>Geser untuk menjelajah, cubit atau tombol +/− untuk zoom, ketuk nama untuk pilihan.</span></div></div>`;
+  const vp = $('#stVp'), inn = $('#stIn');
+  let s = 1, tx = 0, ty = 0;
+  const pakai = () => { inn.style.transform = `translate(${tx}px,${ty}px) scale(${s})`; vp.classList.toggle('kecil', s < .45); };
+  const zoomDi = (ns, px, py) => { ns = Math.min(2.5, Math.max(.05, ns)); tx = px - (px - tx) * ns / s; ty = py - (py - ty) * ns / s; s = ns; pakai(); };
+  const pusat = () => { s = Math.max(s, .8); tx = vp.clientWidth / 2 - cx(me.id) * s; ty = vp.clientHeight / 2 - (Y(me.id) + SIL_H / 2) * s; pakai(); };
+  const semua = () => { s = Math.min(1, (vp.clientWidth - 10) / Wt, (vp.clientHeight - 50) / Ht); tx = (vp.clientWidth - Wt * s) / 2; ty = (vp.clientHeight - Ht * s) / 2; pakai(); };
+  requestAnimationFrame(() => { if (Math.min((vp.clientWidth - 10) / Wt, (vp.clientHeight - 50) / Ht) >= .6) semua(); else { s = 1; pusat(); } });
+  const pt = new Map(); let geser = 0;
+  vp.addEventListener('pointerdown', ev => { if (ev.target.closest('.st-zoom')) return; pt.set(ev.pointerId, { x: ev.clientX, y: ev.clientY }); if (pt.size === 1) geser = 0; });
+  const lepas = () => { window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up); window.removeEventListener('pointercancel', up); };
+  const mv = ev => {
+    if (!document.body.contains(vp)) return lepas();
+    if (!pt.has(ev.pointerId)) return;
+    const a0 = [...pt.values()], nw = { x: ev.clientX, y: ev.clientY }, old = pt.get(ev.pointerId);
+    pt.set(ev.pointerId, nw);
+    if (pt.size === 1) { tx += nw.x - old.x; ty += nw.y - old.y; geser += Math.abs(nw.x - old.x) + Math.abs(nw.y - old.y); pakai(); return; }
+    if (pt.size === 2) {
+      const a1 = [...pt.values()], R = vp.getBoundingClientRect();
+      const d0 = Math.hypot(a0[0].x - a0[1].x, a0[0].y - a0[1].y), d1 = Math.hypot(a1[0].x - a1[1].x, a1[0].y - a1[1].y);
+      const m0x = (a0[0].x + a0[1].x) / 2 - R.left, m0y = (a0[0].y + a0[1].y) / 2 - R.top, m1x = (a1[0].x + a1[1].x) / 2 - R.left, m1y = (a1[0].y + a1[1].y) / 2 - R.top;
+      tx += m1x - m0x; ty += m1y - m0y; if (d0 > 0) zoomDi(s * d1 / d0, m1x, m1y); else pakai(); geser += 99;
+    }
   };
-  requestAnimationFrame(() => { garis(); const meEl = inn.querySelector('.sn-n.me'); if (meEl) wrap.scrollLeft = Math.max(0, meEl.offsetLeft - wrap.clientWidth / 2 + meEl.offsetWidth / 2); });
-  S.vh.silResize = garis; window.addEventListener('resize', garis, { once: true });
-  S.silNow = me.id;
+  const up = ev => { pt.delete(ev.pointerId); };
+  window.addEventListener('pointermove', mv); window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up);
+  vp.addEventListener('click', ev => { if (geser > 8 && !ev.target.closest('.st-zoom')) { ev.stopPropagation(); ev.preventDefault(); } }, true);
+  vp.addEventListener('wheel', ev => { ev.preventDefault(); const R = vp.getBoundingClientRect(); zoomDi(s * (ev.deltaY < 0 ? 1.15 : 1 / 1.15), ev.clientX - R.left, ev.clientY - R.top); }, { passive: false });
+  $('.st-zoom', main).onclick = ev => {
+    const b = ev.target.closest('[data-z]'); if (!b) return;
+    const z = b.dataset.z, mx = vp.clientWidth / 2, my = vp.clientHeight / 2;
+    if (z === 'in') zoomDi(s * 1.3, mx, my); else if (z === 'out') zoomDi(s / 1.3, mx, my); else if (z === 'fit') semua(); else pusat();
+  };
 };
-ACT.silNode = t => {
-  const id = t.dataset.id, nm = t.querySelector('b').textContent;
-  const m = sheet(nm, `<div class="stack">${t.querySelector('small').textContent ? `<div class="meta">${esc(t.querySelector('small').textContent)}</div>` : ''}<div class="btns"><button class="btn pri" id="snS">${ic('users')}Lihat silsilahnya</button><button class="btn" id="snD">${ic('file')}Buka data</button></div></div>`, { ikon: 'users' });
-  $('#snS', m.el).onclick = () => { m.close(); go('silsilah', { id }); };
-  $('#snD', m.el).onclick = () => { m.close(); go('detail', { e: 'penduduk', id }); };
+const silUlang = () => { if (S.cur && S.cur.name === 'silsilah') refresh(); };
+const silEnt = id => S.sil && S.sil.M[id] && S.sil.M[id].src === 'k' ? 'kerabat' : 'penduduk';
+const silLink = (own, k, id, nama) => call('save', { entity: silEnt(own), record: { id: own, [k + '_id']: id, [k]: nama, [k + '_ket']: '' } });
+/* form orang bukan penduduk (meninggal / luar desa) */
+const silForm = (o, onSave) => {
+  const ketOpt = ['MENINGGAL', 'LUAR DESA', ''];
+  const m = sheet(o.judul, `<form class="stack" id="sfF">${o.info ? `<div class="meta">${o.info}</div>` : ''}${o.pilih ? `<button type="button" class="btn" id="sfP">${ic('search')}Pilih dari Data Penduduk</button><div class="meta" style="text-align:center">atau catat orang yang bukan penduduk:</div>` : ''}
+    <div class="f"><label>Nama</label><input id="sfN" value="${esc(o.nama || '')}" required autocomplete="off" style="text-transform:uppercase"></div>
+    ${o.jk ? '' : `<div class="f"><label>Jenis kelamin</label><select id="sfJ"><option value="LAKI-LAKI"${o.jkAwal === 'LAKI-LAKI' ? ' selected' : ''}>LAKI-LAKI</option><option value="PEREMPUAN"${o.jkAwal === 'PEREMPUAN' ? ' selected' : ''}>PEREMPUAN</option></select></div>`}
+    <div class="f"><label>Keterangan</label><select id="sfK">${ketOpt.map(k => `<option value="${k}"${String(o.ket || '').toUpperCase() === k ? ' selected' : ''}>${k ? judulKata(k) : '—'}</option>`).join('')}</select></div>
+    <div class="f"><label>Tahun lahir (bila tahu)</label><input id="sfT" inputmode="numeric" maxlength="4" value="${esc(String(o.thn || '').slice(0, 4))}" placeholder="mis. 1950"></div>
+    ${o.extra || ''}
+    <div class="btns"><button class="btn pri" type="submit">${ic('check')}Simpan</button></div></form>`, { ikon: 'users' });
+  if (o.pilih) $('#sfP', m.el).onclick = () => { m.close(); o.pilih(); };
+  $('#sfF', m.el).onsubmit = async ev => {
+    ev.preventDefault();
+    const nama = $('#sfN', m.el).value.trim().toUpperCase().replace(/\s+/g, ' '), t = $('#sfT', m.el).value.trim();
+    if (!nama) return toast('Nama wajib diisi.', 1);
+    if (t && !/^\d{4}$/.test(t)) return toast('Tahun lahir harus 4 angka.', 1);
+    const rec = { nama, jk: o.jk || $('#sfJ', m.el).value, ket: $('#sfK', m.el).value, tgl_lahir: t };
+    const b = ev.submitter || $('button[type=submit]', m.el); b.disabled = true;
+    try { await onSave(rec, m.el); m.close(); silUlang(); } catch (er) { b.disabled = false; toast(er.message, 1); }
+  };
 };
-ACT.silSlot = t => {
-  if (!canWrite('penduduk')) return toast('Anda tidak punya hak mengubah Data Penduduk.', 1);
-  const own = t.dataset.own, k = t.dataset.k, nm = t.dataset.nm, ket = t.dataset.ket, judul = (k === 'ayah' ? 'Ayah' : 'Ibu') + (nm ? ': ' + nm : '');
-  const ulang = () => { if (S.cur && S.cur.name === 'silsilah') refresh(); };
-  const hub = () => pilihPendModal('Hubungkan ' + judul, k === 'ayah' ? 'LAKI-LAKI' : 'PEREMPUAN', own, nm, async o => {
-    try { await call('save', { entity: 'penduduk', record: { id: own, [k + '_id']: o.id, [k]: o.nama, [k + '_ket']: '' } }); toast('Terhubung dengan ' + o.nama + '.'); ulang(); } catch (er) { toast(er.message, 1); }
-  }, async kt => { try { await call('save', { entity: 'penduduk', record: Object.assign({ id: own, [k + '_ket']: kt }, nm ? {} : {}) }); toast('Ditandai: ' + kt + '.'); ulang(); } catch (er) { toast(er.message, 1); } });
-  if (!ket) return hub();
-  const m = sheet(judul, `<div class="stack"><p style="margin:0">Ditandai <b>${esc(ket)}</b>. Ubah keterangan ini?</p><div class="btns"><button class="btn danger solid" id="skYa">Ya, ubah</button><button class="btn" id="skNo">Batal</button></div></div>`, { ikon: 'users' });
+/* orang tua belum ada / belum terhubung */
+const silOrtu = (own, k, nm, ket) => {
+  const judul = (k === 'ayah' ? 'Ayah' : 'Ibu') + (nm ? ': ' + judulKata(nm) : '');
+  const jk = k === 'ayah' ? 'LAKI-LAKI' : 'PEREMPUAN';
+  const pilih = () => pilihPendModal('Hubungkan ' + judul, jk, own[0], nm, async x => {
+    try { for (const id of own) await silLink(id, k, x.id, x.nama); toast('Terhubung dengan ' + x.nama + '.'); silUlang(); } catch (er) { toast(er.message, 1); }
+  }, null);
+  const buka = () => silForm({ judul: 'Tambah ' + (k === 'ayah' ? 'ayah' : 'ibu'), jk, nama: nm, ket: ket || 'MENINGGAL', pilih }, async rec => {
+    const x = await call('save', { entity: 'kerabat', record: rec });
+    for (const id of own) await silLink(id, k, x.id, rec.nama);
+    toast(judulKata(rec.nama) + ' ditambahkan.');
+  });
+  if (!ket) return buka();
+  const m = sheet(judul, `<div class="stack"><p style="margin:0">Ditandai <b>${esc(judulKata(ket))}</b>. Ubah atau lengkapi data ini?</p><div class="btns"><button class="btn danger solid" id="skYa">Ya, ubah</button><button class="btn" id="skNo">Batal</button></div></div>`, { ikon: 'users' });
   $('#skNo', m.el).onclick = () => m.close();
-  $('#skYa', m.el).onclick = async () => { m.close(); try { await call('save', { entity: 'penduduk', record: { id: own, [k + '_ket']: '' } }); ulang(); setTimeout(hub, 400); } catch (er) { toast(er.message, 1); } };
+  $('#skYa', m.el).onclick = () => { m.close(); setTimeout(buka, 300); };
+};
+/* pastikan orang tua X berupa data (penduduk/kerabat), bukan sekadar nama */
+const silSiapOrtu = async o => {
+  const G = S.sil, res = {};
+  for (const k of ['ayah', 'ibu']) {
+    const pid = o['_' + k]; if (!pid) continue;
+    let P = G.M[pid];
+    if (P.virt) {
+      if (!P.nama) continue;
+      const x = await call('save', { entity: 'kerabat', record: { nama: P.nama, jk: P.jk, ket: P.ket ? String(P.ket).toUpperCase() : '' } });
+      for (const id of P.own) await silLink(id, k, x.id, P.nama);
+      P = { id: x.id, nama: P.nama };
+    }
+    res[k + '_id'] = P.id; res[k] = P.nama; res[k + '_ket'] = '';
+  }
+  return res;
+};
+ACT.silTap = t => {
+  const G = S.sil; if (!G) return;
+  const o = G.M[t.dataset.id]; if (!o) return;
+  const w = canWrite('penduduk');
+  if (o.virt) { if (!w) return toast(o.nama ? judulKata(o.nama) + ' belum terhubung ke Data Penduduk.' : 'Belum tercatat.'); return silOrtu(o.own, o.k, o.nama, o.ket); }
+  const nm = judulKata(o.nama || ''), L = silL(o);
+  const ortuAda = ['ayah', 'ibu'].some(k => { const x = G.M[o['_' + k]]; return x && (!x.virt || x.nama); });
+  const b = [];
+  if (o.id !== G.me.id) b.push(['fok', 'users', 'Pusatkan silsilah di sini', 'pri']);
+  if (o.src === 'p') b.push(['dat', 'file', 'Buka data']);
+  if (w) {
+    b.push(['sdr', 'plus', 'Tambah saudara'], ['ank', 'plus', 'Tambah anak']);
+    if (!o._ayah) b.push(['ay', 'plus', 'Tambah ayah']);
+    if (!o._ibu) b.push(['ib', 'plus', 'Tambah ibu']);
+    if (o.src === 'k') b.push(['ubh', 'edit', 'Ubah', 'pri'], ['hps', 'trash', 'Hapus', 'danger']);
+  }
+  const m = sheet(nm, `<div class="stack"><div class="meta">${esc(t.querySelector('small').textContent)}${o.src === 'k' ? ' · bukan penduduk' : ''}</div><div class="btns sil-b">${b.map(x => `<button type="button" class="btn ${x[3] || ''}" data-k="${x[0]}">${ic(x[1])}${x[2]}</button>`).join('')}</div></div>`, { ikon: 'users' });
+  m.el.addEventListener('click', ev => {
+    const bt = ev.target.closest('[data-k]'); if (!bt) return; const k = bt.dataset.k; m.close();
+    if (k === 'fok') return go('silsilah', { id: o.id });
+    if (k === 'dat') return go('detail', { e: 'penduduk', id: o.id });
+    if (k === 'ay' || k === 'ib') return setTimeout(() => silOrtu([o.id], k === 'ay' ? 'ayah' : 'ibu', '', ''), 250);
+    if (k === 'sdr') {
+      if (!ortuAda) return toast('Tambahkan dulu ayah atau ibunya (ketuk kotak Ayah/Ibu di atasnya).', 1);
+      const adaSemu = ['ayah', 'ibu'].some(x => G.M[o['_' + x]] && G.M[o['_' + x]].virt);
+      return setTimeout(() => silForm({ judul: 'Tambah saudara ' + nm, ket: 'LUAR DESA', info: adaSemu ? 'Ayah/ibu yang belum terhubung ke Data Penduduk akan dicatat sebagai orang bukan penduduk. Bila mereka warga desa, hubungkan dulu.' : '',
+        pilih: () => pilihPendModal('Pilih saudara ' + nm, '', o.id, '', async x => { try { const ortu = await silSiapOrtu(o); await call('save', { entity: 'penduduk', record: Object.assign({ id: x.id }, ortu) }); toast(x.nama + ' dihubungkan sebagai saudara.'); silUlang(); } catch (er) { toast(er.message, 1); } }, null)
+      }, async rec => { const ortu = await silSiapOrtu(o); await call('save', { entity: 'kerabat', record: Object.assign(rec, ortu) }); toast(judulKata(rec.nama) + ' ditambahkan.'); }), 250);
+    }
+    if (k === 'ank') {
+      const kk = L ? 'ayah' : 'ibu', ln = L ? 'ibu' : 'ayah';
+      const sp = [...(G.pas[o.id] || [])].filter(x => G.M[x] && !G.M[x].virt);
+      const extra = sp.length ? `<div class="f"><label>${L ? 'Ibunya' : 'Ayahnya'}</label><select id="sfS">${sp.map(x => `<option value="${esc(x)}">${esc(judulKata(G.M[x].nama))}</option>`).join('')}<option value="">— tidak diketahui —</option></select></div>` : '';
+      const ortu = el => { const r2 = { [kk + '_id']: o.id, [kk]: o.nama, [kk + '_ket']: '' }; const sv = el && $('#sfS', el) ? $('#sfS', el).value : sp.length === 1 ? sp[0] : ''; if (sv) Object.assign(r2, { [ln + '_id']: sv, [ln]: G.M[sv].nama, [ln + '_ket']: '' }); return r2; };
+      return setTimeout(() => silForm({ judul: 'Tambah anak ' + nm, ket: 'LUAR DESA', extra,
+        pilih: () => pilihPendModal('Pilih anak ' + nm, '', o.id, '', async x => { try { await call('save', { entity: 'penduduk', record: Object.assign({ id: x.id }, ortu(null)) }); toast(x.nama + ' dihubungkan sebagai anak.'); silUlang(); } catch (er) { toast(er.message, 1); } }, null)
+      }, async (rec, el) => { await call('save', { entity: 'kerabat', record: Object.assign(rec, ortu(el)) }); toast(judulKata(rec.nama) + ' ditambahkan.'); }), 250);
+    }
+    if (k === 'ubh') return setTimeout(() => silForm({ judul: 'Ubah ' + nm, nama: o.nama, jkAwal: o.jk, ket: o.ket, thn: o.tgl_lahir }, async rec => {
+      await call('save', { entity: 'kerabat', record: Object.assign({ id: o.id }, rec) });
+      if (rec.nama !== o.nama) { const kp = L ? 'ayah' : 'ibu'; for (const c of (G.kids[o.id] || [])) if (G.M[c] && !G.M[c].virt) await call('save', { entity: silEnt(c), record: { id: c, [kp]: rec.nama } }); }
+      toast('Tersimpan.');
+    }), 250);
+    if (k === 'hps') return setTimeout(() => {
+      const h = sheet('Hapus ' + nm, `<div class="stack"><p style="margin:0">Hapus <b>${esc(nm)}</b> dari silsilah? Nama ${L ? 'ayah' : 'ibu'} pada anak-anaknya tetap tertulis, hanya hubungannya yang dilepas.</p><div class="btns"><button class="btn danger solid" id="hpY">Ya, hapus</button><button class="btn" id="hpN">Batal</button></div></div>`, { ikon: 'trash' });
+      $('#hpN', h.el).onclick = () => h.close();
+      $('#hpY', h.el).onclick = async () => {
+        h.close();
+        try {
+          const kp = L ? 'ayah' : 'ibu';
+          for (const c of (G.kids[o.id] || [])) if (G.M[c] && !G.M[c].virt) await call('save', { entity: silEnt(c), record: { id: c, [kp + '_id']: '', [kp]: o.nama, [kp + '_ket']: o.ket || '' } });
+          await call('remove', { entity: 'kerabat', id: o.id });
+          toast('Dihapus.'); if (o.id === G.me.id) history.back(); else silUlang();
+        } catch (er) { toast(er.message, 1); }
+      };
+    }, 250);
+  });
 };
 /* ---- Pilih lokasi rumah (KK) di peta ---- */
 ACT.kkLokasi = async t => {
@@ -6518,7 +6713,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '120', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '121', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
