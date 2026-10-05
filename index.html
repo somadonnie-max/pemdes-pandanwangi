@@ -696,7 +696,7 @@ input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-sof
 :root[data-accent="cokelat"]{--pri:#8a5a2b;--pri-2:#734a22;--pri-ink:#fff;--pri-soft:#f1e6d9;--bg:#f6f3ef;--surface:#ffffff;--surface2:#f0e9e0;--line:#e6ddd2;--ink:#241c13;--muted:#6f6456}
 @media (prefers-color-scheme:dark){:root[data-accent="cokelat"]:not([data-theme="light"]){--pri:#d9a66f;--pri-2:#c48d55;--pri-ink:#2a1a08;--pri-soft:#3a2a17;--bg:#15100b;--surface:#1e1811;--surface2:#282017;--line:#392e22;--ink:#efe8df;--muted:#ab9e8e}}
 :root[data-accent="cokelat"][data-theme="dark"]{--pri:#d9a66f;--pri-2:#c48d55;--pri-ink:#2a1a08;--pri-soft:#3a2a17;--bg:#15100b;--surface:#1e1811;--surface2:#282017;--line:#392e22;--ink:#efe8df;--muted:#ab9e8e}
-.trow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.trow>.lbl{margin:0;order:2}.accs{display:flex;gap:12px;align-items:center;min-height:32px}.acc{width:22px;height:22px;border-radius:50%;background:var(--c);border:0;padding:0;cursor:pointer;transition:width .15s,height .15s;flex:none}.acc.on{width:30px;height:30px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.trow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.trow>.lbl{margin:0;order:2}.accs{display:flex;gap:12px;align-items:center;min-height:32px}.accdot{width:22px;height:22px;border-radius:50%;background:var(--c);border:0;padding:0;cursor:pointer;transition:width .15s,height .15s;flex:none}.accdot.on{width:30px;height:30px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 
 @media (max-width:899px){
   .sheet.dock{z-index:65;--bg0:var(--bg);--ink0:var(--ink);--muted0:var(--muted);--line0:var(--line);--pri0:var(--pri)}
@@ -6148,7 +6148,7 @@ VIEWS.akun = async (p, main) => {
     <form class="stack" id="pinf" hidden style="margin-top:8px"><div class="form"><div class="f"><label for="pl">Kata sandi lama</label><input id="pl" type="password" autocomplete="current-password"></div><div class="f"><label for="pb">Kata sandi baru (min. 6 karakter)</label><input id="pb" type="password" autocomplete="new-password"></div><div class="f"><label for="pb2">Ulangi kata sandi baru</label><input id="pb2" type="password" autocomplete="new-password"></div></div><div id="perr2" class="err" hidden></div><div><button class="btn pri" type="submit">${ic('key')}Simpan kata sandi</button></div></form></div>
     ${pkAkunHtml()}
     <div class="card stack"><div class="trow"><div class="lbl">Tampilan</div><div class="chips">${[['', 'Ikuti perangkat'], ['light', 'Terang'], ['dark', 'Gelap']].map(t => `<button class="chip ${th === t[0] ? 'on' : ''}" data-act="theme" data-v="${t[0]}">${t[1]}</button>`).join('')}</div></div>
-      <div class="trow"><div class="lbl">Warna tema</div><div class="accs">${[['', 'Hijau', '#0f5a46'], ['biru', 'Biru', '#1d4ed8'], ['merah', 'Merah', '#b91c1c'], ['ungu', 'Ungu', '#6d28d9'], ['cokelat', 'Cokelat', '#8a5a2b']].map(a => `<button class="acc ${(store.get('accent') || '') === a[0] ? 'on' : ''}" data-act="accent" data-v="${a[0]}" style="--c:${a[2]}" title="${a[1]}" aria-label="Warna ${a[1]}"></button>`).join('')}</div></div></div>
+      <div class="trow"><div class="lbl">Warna tema</div><div class="accs">${[['', 'Hijau', '#0f5a46'], ['biru', 'Biru', '#1d4ed8'], ['merah', 'Merah', '#b91c1c'], ['ungu', 'Ungu', '#6d28d9'], ['cokelat', 'Cokelat', '#8a5a2b']].map(a => `<button class="accdot ${(store.get('accent') || '') === a[0] ? 'on' : ''}" data-act="accent" data-v="${a[0]}" style="--c:${a[2]}" title="${a[1]}" aria-label="Warna ${a[1]}"></button>`).join('')}</div></div></div>
     ${isStandalone() ? '' : `<button class="btn" data-act="install">${ic('plus')}Pasang aplikasi di HP / komputer</button>`}
     ${tentangHtml()}
     <button class="btn danger" data-act="logout">${ic('out')}Keluar</button>
@@ -6204,7 +6204,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '110', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '111', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
