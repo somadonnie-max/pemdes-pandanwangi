@@ -743,6 +743,7 @@ input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-sof
 }
 .pill .ic{width:11px;height:11px;vertical-align:-1px;margin-right:3px}
 .rk-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}.rk-r{display:grid;grid-template-columns:minmax(90px,38%) 1fr auto;gap:8px;align-items:center;font-size:12px}.rk-r i{display:block;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--c) var(--w),var(--surface2) var(--w))}.rk-r b{min-width:28px;text-align:right}
+.kunci{background:var(--surface2)!important;color:var(--muted)!important}.kknote{display:flex;gap:6px;align-items:flex-start;margin-top:6px;padding:6px 9px;border-radius:8px;background:color-mix(in srgb,var(--pri) 10%,var(--surface));color:var(--ink);font-size:11.5px;font-weight:500}.kknote .ic{width:14px;height:14px;flex:none;margin-top:1px;color:var(--pri)}
 </style>
 </head>
 <body>
@@ -1196,7 +1197,10 @@ const UI = {
   keluarga: {
     t: 'Data Keluarga (KK)', ic: 'house', perm: 'penduduk', folder: 'Penduduk/KK', file: 'foto_kk_id',
     views: [['Aktif', () => ({ _kel: 'aktif' })], ['Tidak aktif / luar desa', () => ({ _kel: 'nonaktif,luar' })], ['Semua', () => ({})]],
-    fields: [F('kk', 'Nomor KK', 'text', { req: 1, mono: 1, len: 16, sens: 1 }), F('kepala', 'Nama Kepala Keluarga', 'text', { req: 1, up: 1 }), F('dusun', 'Alamat (Dusun)', 'text', { up: 1, req: 1, dd: [], hint: 'Warga desa: pilih dari 6 dusun baku' }),
+    fields: [F('kk', 'Nomor KK', 'text', { req: 1, mono: 1, len: 16, sens: 1 }), F('kepala', 'Nama Kepala Keluarga', 'text', { req: 1, up: 1 }),
+      F('_h_al', 'Alamat KK', 'head', { hint: 'Mulai dari provinsi. Alamat semua anggota keluarga otomatis mengikuti alamat KK ini.' }),
+      F('w_prov', 'Provinsi', 'text', { up: 1, dd: [] }), F('w_kab', 'Kabupaten/Kota', 'text', { up: 1, dd: [] }), F('w_kec', 'Kecamatan', 'text', { up: 1, dd: [] }), F('w_desa', 'Desa/Kelurahan', 'text', { up: 1, dd: [] }),
+      F('dusun', 'Dusun', 'text', { up: 1, req: 1, dd: [], hint: 'Warga desa: pilih dari 6 dusun baku' }),
       F('rw', 'RW', 'text', { pad: 3, dd: [] }), F('rt', 'RT', 'text', { pad: 3, dd: [] }), F('alamat', 'Alamat sesuai KK', 'text', { up: 1, hint: 'Tulis persis seperti di KK. Dipakai saat mencetak; bila kosong memakai Dusun.' }), F('tgl_kk', 'Tanggal KK', 'date'), F('lokasi', 'Koordinat Rumah', 'geo', { hint: 'lat, lng' }), F('foto_kk_id', 'Foto KK', 'file', { img: 1, priv: 1, wide: 1 })],
     chips: { k: 'dusun', opt: OPT.dusun, lbl: s => s.replace('DUSUN ', '') }, sort: 'kepala', excel: 1,
     row: r => ({ t: r.kepala, s: `<span class="mono">${esc(r.kk)}</span> · ${esc(String(r.dusun || '').replace('DUSUN ', ''))} RT ${esc(r.rt)}/${esc(r.rw)}`, raw: 1, s2: [r.alamat, r.tgl_kk && 'KK ' + fDate(r.tgl_kk, 1)].filter(Boolean).join(' · '), av: ic('house'), geo: parseLL(r.lokasi) })
@@ -3915,17 +3919,17 @@ async function kkGabung(frm, v, say) {
   const r = await call('list', { entity: 'keluarga', filters: { kk: v }, limit: 2 });
   const el = $('#f_kk', frm); if (!el || el.value.trim() !== v) return;
   const k = (r.rows || [])[0];
-  if (!k) { frm._kel = null; return say('No. KK ini belum ada di Data Keluarga. Setelah simpan, tambahkan juga di menu Data Keluarga.'); }
+  if (!k) { frm._kel = null; frm._kkLock && frm._kkLock(null); return say('No. KK ini belum ada di Data Keluarga. Isi alamat di bawah; setelah simpan, tambahkan juga di menu Data Keluarga.'); }
   if (frm._kel && frm._kel.id === k.id) return;
   const ds = String(k.dusun || '').replace(/^DUSUN /, '');
   const m = modal('Masukkan ke keluarga ini?', `<div class="stack"><div class="kkbox"><div class="mono">${esc(k.kk && k.kk.indexOf('•') < 0 ? k.kk : v)}</div><b>${esc(k.kepala || '')}</b><div class="meta">${esc(ds)}${k.rt ? ' RT ' + esc(k.rt) + '/' + esc(k.rw || '') : ''}${k.alamat ? ' · ' + esc(k.alamat) : ''}</div></div>
-    <div class="meta">No. KK ini sudah terdaftar. Bila dimasukkan, dusun, RT dan RW terisi otomatis dari data keluarga. Setelah simpan, halaman keluarga ini akan dibuka agar hubungan anggota lain bisa diperiksa.</div>
+    <div class="meta">No. KK ini sudah terdaftar. Bila dimasukkan, seluruh alamat (provinsi s.d. RT dan Alamat sesuai KK) mengikuti KK ini dan tidak bisa diubah dari sini. Setelah simpan, halaman keluarga ini akan dibuka agar hubungan anggota lain bisa diperiksa.</div>
     <div class="btns"><button class="btn pri" id="kkYa">${ic('check')}Ya, masukkan</button><button class="btn" id="kkTidak">Tidak</button></div></div>`);
-  $('#kkTidak', m.el).onclick = () => { frm._kel = null; m.close(); say('No. KK terdaftar atas nama ' + esc(k.kepala || '') + ', tidak digabungkan.'); };
+  $('#kkTidak', m.el).onclick = () => { frm._kel = null; m.close(); el.value = ''; frm._kkLock && frm._kkLock(null); say('Nomor KK dikosongkan (tidak dimasukkan ke keluarga ' + esc(k.kepala || '') + ').'); };
   $('#kkYa', m.el).onclick = () => {
     frm._kel = k; m.close();
     const set = (key, val) => { const x = $('#f_' + key, frm); if (!x || !val) return; if (x.tagName === 'SELECT' && !Array.from(x.options).some(o => o.value === val)) return; x.value = val; x.dispatchEvent(new Event('change', { bubbles: true })); };
-    ['dusun', 'rt', 'rw', 'alamat', 'lokasi'].forEach(key => set(key, k[key]));
+    if (frm._kkLock) frm._kkLock(k); else ['dusun', 'rt', 'rw', 'alamat', 'lokasi'].forEach(key => set(key, k[key]));
     say(`✓ Masuk keluarga <b>${esc(k.kepala || '')}</b> (${esc(ds)} RT ${esc(k.rt || '')}/${esc(k.rw || '')}). Halaman keluarga dibuka setelah simpan.`);
   };
 }
@@ -3986,19 +3990,19 @@ async function silsilahHtml(x) {
   if (!canRead('penduduk')) return '';
   const w = canWrite('penduduk'), out = [];
   const LV = { 1: ['Ayah', 'Ibu'], 2: ['Kakek', 'Nenek'], 3: ['Buyut (L)', 'Buyut (P)'] };
-  async function naik(o, lv, dari) {
-    if (!o || lv > 3) return;
+  async function naik(o, lv, dari, path) {
+    path = path || ''; if (!o || lv > 3) return;
     const [ay, ib] = await Promise.all([pGet(o.ayah_id), pGet(o.ibu_id)]);
     const sisi = dari ? ' · dari ' + dari : '';
     [[ay, o.ayah, 'ayah', 0], [ib, o.ibu, 'ibu', 1]].forEach(([r, nm, k, i]) => {
-      if (r) out.push({ lbl: LV[lv][i] + sisi, o: r, lv });
-      else if (nm) out.push({ lbl: LV[lv][i] + sisi, nm, own: o.id, k, lv, ket: o[k + '_ket'] || '' });
+      if (r) out.push({ lbl: LV[lv][i] + sisi, o: r, lv, path: path + 'ai'[i] });
+      else if (nm) out.push({ lbl: LV[lv][i] + sisi, nm, own: o.id, k, lv, ket: o[k + '_ket'] || '', path: path + 'ai'[i] });
     });
-    await Promise.all([naik(ay, lv + 1, lv === 1 ? 'ayah' : dari), naik(ib, lv + 1, lv === 1 ? 'ibu' : dari)]);
+    await Promise.all([naik(ay, lv + 1, lv === 1 ? 'ayah' : dari, path + 'a'), naik(ib, lv + 1, lv === 1 ? 'ibu' : dari, path + 'i')]);
   }
   const [, sd1, sd2, a1, a2] = await Promise.all([naik(x, 1, ''), x.ayah_id ? pList({ ayah_id: x.ayah_id }) : [], x.ibu_id ? pList({ ibu_id: x.ibu_id }) : [], pList({ ayah_id: x.id }), pList({ ibu_id: x.id })]);
   const uq = a => { const m = {}; a.forEach(r => { if (r.id !== x.id) m[r.id] = r; }); return Object.values(m).sort((p, q) => String(p.tgl_lahir || '').localeCompare(String(q.tgl_lahir || ''))); };
-  out.sort((p, q) => q.lv - p.lv);
+  out.sort((p, q) => p.lv - q.lv || String(p.path).localeCompare(String(q.path)));
   const sdr = uq(sd1.concat(sd2)), anak = uq(a1.concat(a2));
   const cucu = anak.length ? uq((await Promise.all(anak.slice(0, 12).map(a => Promise.all([pList({ ayah_id: a.id }), pList({ ibu_id: a.id })])))).flat(2)) : [];
   const jkL = r => String(r.jk || '').toUpperCase() === 'PEREMPUAN' ? 'P' : 'L';
@@ -4032,7 +4036,12 @@ async function silKetSimpan(own, k, ket, self) {
     if (box && x) box.outerHTML = await silsilahHtml(x);
   } catch (er) { toast(er.message, 1); }
 }
-ACT.silKetX = t => silKetSimpan(t.dataset.own, t.dataset.k, '', t.dataset.self);
+ACT.silKetX = t => {
+  const nm = (t.closest('.srow') && t.closest('.srow').querySelector('.sn')) ? t.closest('.srow').querySelector('.sn').firstChild.textContent.trim() : '';
+  const m = sheet('Ubah keterangan?', `<div class="stack"><p style="margin:0">Keterangan pada <b>${esc(nm)}</b> akan dihapus dan tombol Hubungkan muncul lagi.</p><div class="btns"><button class="btn danger solid" id="skYa">Ya, ubah</button><button class="btn" id="skNo">Batal</button></div></div>`, { ikon: 'users' });
+  $('#skNo', m.el).onclick = () => m.close();
+  $('#skYa', m.el).onclick = () => { m.close(); silKetSimpan(t.dataset.own, t.dataset.k, '', t.dataset.self); };
+};
 /* ---- Wilayah baku (Kemendagri) & RT/RW baku Desa Pandanwangi ---- */
 const RTRW_BAKU = {"DUSUN KRAJAN 1":{"001":["001","002","003","004","005"],"002":["001","002","003","004","005","006"]},"DUSUN KRAJAN 2":{"003":["001","002","003","004","005","006"],"004":["001","002","003","004","005"]},"DUSUN KRAJAN 3":{"005":["001","002","003"],"006":["001","002","003","004","005","006"],"007":["001","002"],"008":["001","002"]},"DUSUN PEMUKIMAN":{"013":["001","002","003","004","005"],"014":["001","002","003","004","005"]},"DUSUN TIMUR SAWAH":{"009":["001","002","003"],"010":["004","005","006","007","008"]},"DUSUN TUNJUNGAN":{"011":["001","002","003","004"],"012":["001","002","003","004"]}};
 const DESA_KODE = '35.08.05.2001', DESA_JALUR = ['JAWA TIMUR', 'KAB. LUMAJANG', 'TEMPEH', 'PANDANWANGI'];
@@ -4084,8 +4093,20 @@ function wilHook(frm, e, rec, isNew) {
   }
   ['dusun', 'rw'].forEach(k => el(k) && el(k).addEventListener('change', rtrw));
   turun();
+  const ALM = ['w_prov', 'w_kab', 'w_kec', 'w_desa', 'dusun', 'rw', 'rt', 'alamat_kk'];
+  frm._kkLock = k => {
+    let note = $('#kkAlmNote', frm);
+    if (!k) { frm._kkKunci = null; ALM.forEach(f => { const x = el(f); if (x) { x.readOnly = false; x.classList.remove('kunci'); } }); if (note) note.remove(); turun(); return; }
+    frm._kkKunci = k;
+    const map = { w_prov: k.w_prov, w_kab: k.w_kab, w_kec: k.w_kec, w_desa: k.w_desa, dusun: k.dusun, rw: k.rw, rt: k.rt, alamat_kk: k.alamat };
+    ALM.forEach(f => { const x = el(f); if (!x) return; if (map[f]) x.value = map[f]; x.readOnly = true; x.classList.add('kunci'); });
+    if (!note) { const h = $('#f__h_al', frm) || (el('w_prov') || el('dusun')).closest('.f'); h.insertAdjacentHTML('beforeend', '<div class="kknote" id="kkAlmNote"></div>'); note = $('#kkAlmNote', frm); }
+    note.innerHTML = `${ic('house')}<span>Alamat mengikuti KK <b>${esc(k.kepala || '')}</b>. Untuk mengubah, ubah alamat di Data Keluarga — semua anggota ikut berubah.</span>`;
+  };
+  if (e === 'penduduk' && /^\d{16}$/.test(String(rec.kk || '')) && canRead('keluarga')) call('list', { entity: 'keluarga', filters: { kk: rec.kk }, limit: 1 }).then(r => { const k = (r.rows || [])[0]; if (k && k.dusun && el('kk') && el('kk').value === rec.kk) frm._kkLock(k); }).catch(() => { });
   frm._wilCek = () => {
     const v = k => String((el(k) || {}).value || '').trim().toUpperCase();
+    if (frm._kkKunci) { const tl0 = el('tempat_lahir'); return tl0 && tl0.value.trim() && WIL.tl && !WIL.tl.some(x => wilSama(x, tl0.value)) ? 'Tempat Lahir harus dipilih dari daftar kabupaten/kota.' : ''; }
     const tl = el('tempat_lahir');
     if (tl && tl.value.trim() && WIL.tl && !WIL.tl.some(x => wilSama(x, tl.value))) return 'Tempat Lahir harus dipilih dari daftar kabupaten/kota.';
     if (el('w_prov') && WIL.induk) {
@@ -6387,7 +6408,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '116', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '117', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
