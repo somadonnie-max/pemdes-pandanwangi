@@ -83,13 +83,12 @@ main{flex:1;width:100%;max-width:1100px;margin:0 auto;padding:10px 10px 84px}
   .tabs button.on{background:color-mix(in srgb,var(--pri-ink) 20%,transparent);color:var(--pri-ink)}
   :root{--navc:color-mix(in srgb,var(--pri) 78%,#000)}
   .tabs{background:var(--pri);height:46px;align-items:center;box-shadow:0 6px 14px rgba(0,0,0,.42),0 2px 4px rgba(0,0,0,.3)}
-  body .btn.fab{left:50%;right:auto;bottom:calc(65px + env(safe-area-inset-bottom,0px));z-index:31;background:var(--navc);border:0;color:var(--pri-ink);border-radius:14px 14px 0 0;min-height:36px;padding:0 18px 2px;font-size:13.5px;box-shadow:0 -3px 8px rgba(0,0,0,.18);animation:fabIn .36s cubic-bezier(.2,.8,.2,1) both;transform-origin:50% 100%}
+  body .btn.fab{left:auto;right:calc((100vw - min(372px, calc(100vw - 20px))) / 2 + 26px);bottom:calc(47px + env(safe-area-inset-bottom,0px));z-index:29;background:var(--navc);border:0;color:var(--pri-ink);border-radius:13px 13px 0 0;min-height:0;padding:5px 5px 23px;box-shadow:0 -3px 10px rgba(0,0,0,.22);animation:fabIn .34s cubic-bezier(.2,.8,.2,1) both;transform:none}
   body .btn.fab:hover{background:var(--navc)}
-  body .fab::before,body .fab::after{content:"";position:absolute;bottom:0;width:12px;height:12px;pointer-events:none}
-  body .fab::before{left:-12px;background:radial-gradient(circle at 0 0,transparent 11.5px,var(--navc) 12px)}
-  body .fab::after{right:-12px;background:radial-gradient(circle at 100% 0,transparent 11.5px,var(--navc) 12px)}
-  @keyframes fabIn{from{opacity:0;transform:translateX(-50%) scaleY(.2)}to{opacity:1;transform:translateX(-50%) scaleY(1)}}
-  body .fab{transform:translateX(-50%)}
+  body .btn.fab .fabin{display:inline-flex;align-items:center;gap:4px;background:var(--pri);color:var(--pri-ink);border-radius:9px;padding:5px 10px;font-size:11.5px;font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  body .btn.fab .fabin .ic{width:14px;height:14px}
+  body .btn.fab:active .fabin{background:var(--pri-2)}
+  @keyframes fabIn{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:none}}
   main{padding-bottom:88px}
   .dl-pop{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 }
@@ -3058,7 +3057,7 @@ VIEWS.list = async (p, main, alive) => {
     <div id="rows"><div class="skel"></div></div>
     <div id="more"></div>
   </div>
-  ${canWrite(e) && !u.noAdd ? `<button class="btn pri fab" data-act="add">${ic('plus')}Tambah</button>` : ''}`;
+  ${canWrite(e) && !u.noAdd ? `<button class="btn pri fab" data-act="add"><span class="fabin">${ic('plus')}Tambah</span></button>` : ''}`;
   const filters = () => {
     const f = {};
     if (u.rkp) f.tahun_rkp = S.rkpYear;
@@ -6205,7 +6204,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '109', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '110', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -6248,7 +6247,7 @@ VIEWS.users = async (p, main, alive) => {
     <div class="meta">Setiap orang masuk dengan email + kata sandi (atau Google). Atur tiap menu per orang: <b>Tidak</b> (menu tidak tampil), <b>Lihat</b>, atau <b>Lihat & ubah</b>. Presensi (Absen Hari Ini & Riwayat) selalu bisa dipakai semua akun. NIK/KK tetap tersamar tanpa hak "Lihat NIK/KK". Admin bisa semuanya. Perangkat yang emailnya ada di data Aparat otomatis dibuatkan akun saat pertama masuk dengan kata sandi 123456.</div>
     <div class="btns"><button class="btn sm" data-act="fromAp">${ic('badge')}Buat akun dari data Aparat</button></div>
     <div class="list">${us.map(u => `<button class="row" data-act="u" data-id="${esc(u.id)}"><span class="av">${esc(initials(u.nama))}</span><span class="main"><span class="t">${esc(u.nama)}</span><span class="s">${esc(u.jabatan)} · ${esc(u.email || 'tanpa email')}</span><span class="s2">${u.admin ? 'Admin (semua menu)' : ringkasAkses(u.akses)}</span></span><span class="r">${u.wajah ? '' : '<span class="pill">Wajah belum</span>'}${u.gantiSandi ? '<span class="pill warn">Sandi awal</span>' : ''}${u.aktif ? '' : '<span class="pill bad">Nonaktif</span>'}</span></button>`).join('')}</div>
-  </div><button class="btn pri fab" data-act="u" data-id="">${ic('plus')}Pengguna</button>`;
+  </div><button class="btn pri fab" data-act="u" data-id=""><span class="fabin">${ic('plus')}Pengguna</span></button>`;
   S.vh.u = t => userForm(us.find(x => x.id === t.dataset.id));
   S.vh.fromAp = async t => {
     t.disabled = true;
