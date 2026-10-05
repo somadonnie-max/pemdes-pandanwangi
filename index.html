@@ -3200,7 +3200,7 @@ async function renderDetail(e, x, el, full) {
   const shown = u.fields.filter(f => !(e === 'aparat' && f.k === 'jabatan_tambahan') && f.t !== 'file' && f.t !== 'geo' && f.t !== 'fotos' && f.t !== 'rows' && f.t !== 'hidden' && f.t !== 'head' && x[f.k] !== '' && x[f.k] != null);
   const rws = u.fields.filter(f => f.t === 'rows' && x[f.k]).map(f => { let a = []; try { a = JSON.parse(x[f.k]); } catch (er) { } return a.length ? `<div class="lbl">${esc(f.l)}</div><div class="tbl-wrap"><table class="tbl"><thead><tr>${f.cols.map(c => `<th>${esc(c[1])}</th>`).join('')}</tr></thead><tbody>${a.map(r => '<tr>' + f.cols.map(([k, , t]) => `<td${t === 'money' ? ' style="text-align:right"' : ''}>${esc(t === 'money' ? rp(r[k]) : r[k] || '')}</td>`).join('') + '</tr>').join('')}</tbody><tfoot><tr><td colspan="${f.cols.length - 1}"><b>Jumlah</b></td><td style="text-align:right"><b>${rp(a.reduce((t, r) => t + Number(r.jumlah || 0), 0))}</b></td></tr></tfoot></table></div>` : ''; }).join('');
   const galeri = u.fields.filter(f => f.t === 'fotos' && x[f.k]).map(f => { let a = []; try { a = JSON.parse(x[f.k]); } catch (er) { } return a.length ? `<div class="lbl">${esc(f.l)} (${a.length})</div><div class="pgrid">${a.map(fo => `<div class="pslot has"><button type="button" class="pimg" data-act="file" data-id="${esc(fo.id)}" data-name="${esc(fo.ket || f.l)}"><img src="${esc(thumb(fo.id, 240))}" alt="" loading="lazy"></button>${fo.ket ? `<span class="plbl">${esc(fo.ket)}</span>` : ''}</div>`).join('')}</div>` : ''; }).join('');
-  const geoF = u.fields.find(f => f.t === 'geo' && x[f.k]);
+  const geoF = e === 'penduduk' ? null : u.fields.find(f => f.t === 'geo' && x[f.k]);
   const geo = geoF ? x[geoF.k] : u.geo ? u.geo(x) : '';
   const w = canWrite(e) && !(e === 'kegiatan' && x.sumber_mus);
   el.innerHTML = `
@@ -6517,7 +6517,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '118', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '119', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
