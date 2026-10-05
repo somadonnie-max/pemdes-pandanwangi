@@ -2972,8 +2972,9 @@ function xlVal(f, v) {
   return s;
 }
 const xlKey = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const xlFields = u => u.fields.filter(f => f.t !== 'file' && f.t !== 'head' && f.t !== 'hidden' && String(f.l || '').trim());
 async function excelExport(e, rows, judul) {
-  const u = UI[e], fs = u.fields.filter(f => f.t !== 'file');
+  const u = UI[e], fs = xlFields(u);
   const data = [['ID'].concat(fs.map(f => f.l))].concat(rows.map(r => [r.id].concat(fs.map(f => r[f.k] == null ? '' : r[f.k]))));
   const pet = [['Petunjuk impor ' + u.t], [''],
     ['1. Jangan mengubah baris judul (baris 1) dan kolom ID.'],
@@ -2990,11 +2991,11 @@ async function excelExport(e, rows, judul) {
   ]), judul + '.xlsx');
 }
 async function excelImport(e, file, done) {
-  const u = UI[e], fs = u.fields.filter(f => f.t !== 'file');
+  const u = UI[e], fs = xlFields(u);
   const rows = await XL.read(file);
   if (rows.length < 2) throw new Error('Berkas tidak berisi data.');
   const head = rows[0].map(xlKey), idCol = head.indexOf('id');
-  const map = head.map(h => fs.find(f => xlKey(f.l) === h || xlKey(f.k) === h) || null);
+  const map = head.map(h => h ? fs.find(f => xlKey(f.l) === h || xlKey(f.k) === h) || null : null);
   if (!map.some(Boolean)) throw new Error('Judul kolom tidak dikenali. Gunakan berkas hasil Ekspor Excel.');
   const recs = [], bad = [];
   rows.slice(1).forEach((r, i) => {
@@ -6307,7 +6308,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '114', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '115', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
