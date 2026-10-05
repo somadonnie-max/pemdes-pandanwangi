@@ -3197,7 +3197,8 @@ async function renderDetail(e, x, el, full) {
   el.classList.add('dview');
   const u = UI[e];
   const files = u.fields.filter(f => f.t === 'file' && x[f.k]);
-  const shown = u.fields.filter(f => !(e === 'aparat' && f.k === 'jabatan_tambahan') && f.t !== 'file' && f.t !== 'geo' && f.t !== 'fotos' && f.t !== 'rows' && f.t !== 'hidden' && f.t !== 'head' && x[f.k] !== '' && x[f.k] != null);
+  const diKK = e === 'penduduk' && !!el.closest('.kkang'), KK_SEMBUNYI = ['kk', 'w_prov', 'w_kab', 'w_kec', 'w_desa', 'dusun', 'rw', 'rt', 'alamat', 'alamat_kk', 'lokasi'];
+  const shown = u.fields.filter(f => !(diKK && KK_SEMBUNYI.includes(f.k)) && !(e === 'aparat' && f.k === 'jabatan_tambahan') && f.t !== 'file' && f.t !== 'geo' && f.t !== 'fotos' && f.t !== 'rows' && f.t !== 'hidden' && f.t !== 'head' && x[f.k] !== '' && x[f.k] != null);
   const rws = u.fields.filter(f => f.t === 'rows' && x[f.k]).map(f => { let a = []; try { a = JSON.parse(x[f.k]); } catch (er) { } return a.length ? `<div class="lbl">${esc(f.l)}</div><div class="tbl-wrap"><table class="tbl"><thead><tr>${f.cols.map(c => `<th>${esc(c[1])}</th>`).join('')}</tr></thead><tbody>${a.map(r => '<tr>' + f.cols.map(([k, , t]) => `<td${t === 'money' ? ' style="text-align:right"' : ''}>${esc(t === 'money' ? rp(r[k]) : r[k] || '')}</td>`).join('') + '</tr>').join('')}</tbody><tfoot><tr><td colspan="${f.cols.length - 1}"><b>Jumlah</b></td><td style="text-align:right"><b>${rp(a.reduce((t, r) => t + Number(r.jumlah || 0), 0))}</b></td></tr></tfoot></table></div>` : ''; }).join('');
   const galeri = u.fields.filter(f => f.t === 'fotos' && x[f.k]).map(f => { let a = []; try { a = JSON.parse(x[f.k]); } catch (er) { } return a.length ? `<div class="lbl">${esc(f.l)} (${a.length})</div><div class="pgrid">${a.map(fo => `<div class="pslot has"><button type="button" class="pimg" data-act="file" data-id="${esc(fo.id)}" data-name="${esc(fo.ket || f.l)}"><img src="${esc(thumb(fo.id, 240))}" alt="" loading="lazy"></button>${fo.ket ? `<span class="plbl">${esc(fo.ket)}</span>` : ''}</div>`).join('')}</div>` : ''; }).join('');
   const geoF = e === 'penduduk' ? null : u.fields.find(f => f.t === 'geo' && x[f.k]);
@@ -3213,7 +3214,7 @@ async function renderDetail(e, x, el, full) {
     <div class="xx"></div>
     <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button>${/^tanah_/.test(e) && !S.user.admin ? '' : `<button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>`}` : ''}${e === 'penduduk' && canWrite('register_surat') ? `<button class="btn sm" data-act="regSurat" data-id="${esc(x.id)}">${ic('file')}Buat surat keterangan</button>` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak surat (Word)</button>` : ''}${e === 'keu_spp' ? `<button class="btn sm" data-act="sppWord" data-id="${esc(x.id)}">${ic('file')}SPP + SPTJM (Word)</button><button class="btn sm" data-act="kuitansi" data-id="${esc(x.id)}">${ic('print')}Cetak kuitansi</button>` : ''}${e === 'keu_spp' && w && x.status !== 'Dicairkan' ? `<button class="btn sm pri" data-act="keuCair" data-id="${esc(x.id)}">${ic('check')}Cairkan</button>` : ''}${e === 'keu_spp' && w && x.status === 'Dicairkan' ? `<button class="btn sm danger" data-act="keuBatal" data-id="${esc(x.id)}">${ic('x')}Batalkan pencairan</button>` : ''}${e === 'keu_trans' && w && x.jenis === 'Pajak Dipungut' ? `<button class="btn sm" data-act="setorPajak" data-id="${esc(x.id)}">${ic('send')}Setor pajak</button>` : ''}${NASKAH[e] && w ? `<button class="btn sm" data-act="cetakNaskah" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('print')}Buat dokumen (Word)</button>` : ''}${e === 'kegiatan' && w && kgBisaSelesai(x) ? `<button class="btn sm pri" data-act="kgSelesai" data-id="${esc(x.id)}">${ic('check')}Selesai</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>`;
   const xk = $('.xk', el), xx = $('.xx', el);
-  if (e === 'penduduk') {
+  if (e === 'penduduk' && !diKK) {
     try {
       const k = await call('keluargaOf', { penduduk_id: x.id });
       xk.innerHTML = k ? `<div class="card" style="padding:6px 9px;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center">${ic('house')}<span>No. KK <button class="linkbtn mono" data-act="kk" data-id="${esc(k.id)}">${esc(k.kk)}</button></span><span class="muted">Kepala: ${esc(k.kepala)} · ${k.jml_anggota} anggota</span><button class="btn sm" data-act="kk" data-id="${esc(k.id)}" style="margin-left:auto">${ic('users')}Lihat anggota KK</button></div>${mapHtml(k.lokasi, 'Rumah ' + k.kepala)}`
@@ -3476,7 +3477,7 @@ async function extraKeluarga(k, el, full) {
   const rows = urutKK(await call('anggota', { keluarga_id: k.id }));
   const w = canWrite('penduduk');
   el.innerHTML = `<div class="sec-h"><h2>Anggota keluarga (${rows.length})</h2><span class="btns">${canWrite('keluarga') ? `<button class="btn sm" data-act="kkLokasi" data-id="${esc(k.id)}" data-ll="${esc(k.lokasi || '')}">${ic('pin')}Pilih Lokasi</button>` : ''}${can('lihat_nik') ? `<button class="btn sm" data-act="draftKK" data-id="${esc(k.id)}">${ic('print')}Draf KK</button>` : ''}${w ? `<button class="btn sm" data-act="addAng" data-k='${esc(JSON.stringify({ kk: String(k.kk).indexOf('•') < 0 ? k.kk : '', dusun: k.dusun, rt: k.rt, rw: k.rw }))}'>${ic('plus')}Anggota</button>` : ''}</span></div>` +
-    (rows.length ? `<div class="list">${rows.map(r => rowHtml('penduduk', r)).join('')}</div>` : '<div class="card empty">Belum ada anggota yang tercatat dengan nomor KK ini.</div>');
+    (rows.length ? `<div class="list kkang">${rows.map(r => rowHtml('penduduk', r)).join('')}</div>` : '<div class="card empty">Belum ada anggota yang tercatat dengan nomor KK ini.</div>');
 }
 ACT.addAng = t => go('form', { e: 'penduduk', preset: JSON.parse(t.dataset.k) });
 ACT.draftKK = async t => {
@@ -6517,7 +6518,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '119', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '120', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
