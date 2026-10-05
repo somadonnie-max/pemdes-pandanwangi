@@ -742,6 +742,7 @@ input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-sof
   .dview .meta{font-size:11px}
 }
 .pill .ic{width:11px;height:11px;vertical-align:-1px;margin-right:3px}
+.rk-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}.rk-r{display:grid;grid-template-columns:minmax(90px,38%) 1fr auto;gap:8px;align-items:center;font-size:12px}.rk-r i{display:block;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--c) var(--w),var(--surface2) var(--w))}.rk-r b{min-width:28px;text-align:right}
 </style>
 </head>
 <body>
@@ -1591,7 +1592,7 @@ function MODS() {
       ['Inventarisasi Fisik', 'check', ['list', { e: 'aset_cek' }], 'aset_cek'], ['Laporan Format SIPADES', 'print', ['sipadeslap'], null, 'r:aset'], ['Cetak Laporan Aset (format awal)', 'print', ['asetcetak'], null, 'r:aset'], ['Cetak Register Label', 'crop', ['asetlabel'], null, 'r:aset'],
       ['Data Ruangan', 'house', ['list', { e: 'aset_ruang' }], 'aset_ruang'], ['Perangkat & Tim Inventarisasi', 'users', ['list', { e: 'aset_tim' }], 'aset_tim'], ['Kode Rekening Aset', 'list', ['list', { e: 'ref_kode_barang' }], 'ref_kode_barang'], ['SOP, Template BA/SK & Pedoman', 'book', ['asetsop'], null, 'r:aset']] },
     { k: 'pemerintahan', l: 'Pemerintahan', ic: 'landmark', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, 'r:penduduk'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga'], ['Tanah di Desa', 'map', ['tanah'], 'tanah_desa']] },
-    { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Buku NTCR', 'users', ['list', { e: 'ntcr' }], 'ntcr'], ['Rentan / Sosial', 'heart', ['list', { e: 'rentan' }], 'rentan'], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
+    { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Buku NTCR', 'users', ['list', { e: 'ntcr' }], 'ntcr'], ['Rentan / Sosial', 'heart', ['list', { e: 'rentan' }], 'rentan'], ['Usulan Bansos & DTSEN', 'send', ['list', { e: 'usulan_bansos' }], 'usulan_bansos'], ['Musdes/Muskel Bansos', 'users', ['list', { e: 'musdes_bansos' }], 'musdes_bansos'], ['Penyaluran Bansos', 'check', ['list', { e: 'penyaluran_bansos' }], 'penyaluran_bansos'], ['Rekap Sosial', 'chart', ['sosrekap'], ''], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
     { k: 'kesejahteraan', l: 'Kesejahteraan', ic: 'heart', items: [['Lembaga / Yayasan', 'landmark', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru Ngaji', 'book', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
     { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RPJM Desa', 'book', ['rpjm', {}], null, 'r:rkp'], ['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['RAB & Gambar', 'hammer', ['rab', {}], null, 'r:rab'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Progres Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
     { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['SPJ', 'check', ['spj', {}], null, 'r:spj'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Rekap Pajak', 'coin', ['keupajak'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek'], ['Impor PDF Siskeudes', 'down', ['skimpor'], null, 'w:keu_anggaran']] },
@@ -1856,7 +1857,7 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) cekI
 /* =====================================================================
    PELINDUNG MENU PRIVAT (selain admin): watermark, kabur saat ditinggal, tanpa cetak/salin
    ===================================================================== */
-const PRIV_E = ['penduduk', 'keluarga', 'rentan', 'ntcr'];
+const PRIV_E = ['penduduk', 'keluarga', 'rentan', 'ntcr', 'usulan_bansos', 'penyaluran_bansos'];
 function privAktif() {
   if (!S.user || S.user.admin || !S.cur) return false;
   const p = S.cur.params || {};
@@ -3046,7 +3047,7 @@ VIEWS.list = async (p, main, alive) => {
   if (st.per === '' && u.month) st.per = isoToday().slice(0, 7);
   setTop(p.title || (GRUP_OF[e] ? GRUP[GRUP_OF[e]].t : u.t), u.rkp ? 'RKP Desa ' + rkpLbl(S.rkpYear) : u.rpjm && S.rpjmDokPer && S.rpjmDokPer.id === S.rpjmPid ? S.rpjmDokPer.nama : '');
   const pers = u.year ? [String(yearNow), String(yearNow - 1), String(yearNow - 2), 'Semua'] : null;
-  main.innerHTML = `<div class="stack">${e === 'tanah_desa' ? tanahTabs('list') : ''}${e === 'rentan' ? rentanTabs('list') : ''}
+  main.innerHTML = `<div class="stack">${e === 'tanah_desa' ? tanahTabs('list') : ''}${SOS_TAB_E[e] ? rentanTabs(SOS_TAB_E[e]) : ''}
     <div class="toolbar"><label class="search">${ic('search')}<input id="q" placeholder="Cari…" value="${esc(st.q)}" autocomplete="off"></label>
       ${u.month ? `<input type="month" class="inp" id="per" value="${esc(st.per)}" style="max-width:180px">` : ''}
       ${e === 'rkp_rutin' && canWrite(e) ? `<button class="btn sm" data-act="rkpRutinIsi">${ic('down')}Salin dari APBDes ${esc(keuTh())}</button>` : ''}${NASKAH[e] && canWrite(e) ? `<button class="btn sm pri" data-act="go" data-go='${esc(JSON.stringify(['form', { e, buat: 1 }]))}' title="${esc(NASKAH[e].buat)}">${ic('next')}Buat</button>` : ''}${u.print ? `<button class="btn sm" data-act="cetak" title="Cetak buku register">${ic('print')}Cetak</button>` : ''}${u.excel ? `<button class="btn sm" data-act="xlsOut">${ic('down')}Ekspor Excel</button>${canWrite(e) ? `<label class="btn sm">${ic('plus')}Impor Excel<input type="file" id="xlsIn" accept=".xlsx,.csv" hidden></label>` : ''}` : ''}${u.print2 ? `<button class="btn sm" data-act="cetak2">${ic('print')}${esc(u.print2.label)}</button>` : ''}</div>
@@ -3212,6 +3213,8 @@ async function renderDetail(e, x, el, full) {
   if (e === 'penduduk') xx.insertAdjacentHTML('afterbegin', mutasiHtml(x));
   if (e === 'penduduk') await extraPendudukLink(x, xx);
   if (e === 'penduduk') await extraPendudukSosial(x, xx);
+  if (e === 'penduduk') await extraSosialUsulan(x, xx);
+  if (e === 'musdes_bansos') await extraMusdes(x, xx);
   if (e === 'ntcr') ntcrExtra(x, xx);
   if (e === 'penduduk') S.pendCache = Object.assign(S.pendCache || {}, { [x.id]: x });
 }
@@ -4146,7 +4149,106 @@ async function ntcrNomor(val) {
   if (val.jenis !== 'Nikah') val.tahap = '';
 }
 /* ---- Rentan: tab daftar & lansia/balita otomatis ---- */
-function rentanTabs(cur) { return `<div class="gtabs">${[['list', 'heart', 'Data rentan', '["list",{"e":"rentan"}]'], ['lansia', 'users', 'Lansia 60+', '["rentanauto",{"j":"lansia"}]'], ['balita', 'users', 'Balita', '["rentanauto",{"j":"balita"}]']].map(([k, i, t, g]) => `<button class="${cur === k ? 'on' : ''}" data-act="go" data-go='${g}'>${ic(i)} ${t}</button>`).join('')}</div>`; }
+/* ---- Sosial: alur mengikuti SIKS-NG (Usulan, Musdes/Muskel, Penyaluran, Rekap) — data diisi desa sendiri ---- */
+const SK_JENIS = ['Usulan Bansos', 'Usulan Pembaruan DTSEN', 'Mundur Bansos', 'Pindah Domisili', 'Klarifikasi / Sanggahan Bansos', 'Perbaikan Data Anomali', 'Verifikasi Temuan DTSEN', 'PBI JK – Pengusulan Data Baru', 'PBI JK – Pendaftaran Bayi Baru Lahir', 'PBI JK – Penghapusan', 'PBI JK – Reaktivasi'];
+const SK_PROG = ['PKH', 'Sembako / BPNT', 'PBI JK', 'YAPI', 'BLT Dana Desa', 'ATENSI', 'Lainnya'];
+const SK_DESIL = ['Desil 1', 'Desil 2', 'Desil 3', 'Desil 4', 'Desil 5', 'Desil 6–10', 'Belum pemeringkatan', 'Nonaktif'];
+const SK_ST = ['Draf', 'Diusulkan di SIKS-NG', 'Disetujui', 'Ditolak'];
+const SK_STC = s => s === 'Disetujui' || s === 'Sudah salur' ? 'ok' : s === 'Ditolak' || s === 'Gagal salur' || s === 'Dikembalikan' ? 'bad' : s === 'Draf' || s === 'Belum salur' ? '' : 'warn';
+const skPeriode = () => { const d = new Date(); return ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'][d.getMonth()] + ' ' + d.getFullYear(); };
+const orangMini = (pre, judul) => [F(pre + '_h', judul, 'head', { hint: 'Ketik nama lalu pilih dari Data Penduduk (data terisi otomatis), atau isi manual.' }),
+  F(pre + 'nama', 'Nama', 'text', { up: 1, wide: 1, opick: 1, req: 1 }), F(pre + 'penduduk_id', '', 'hidden'),
+  F(pre + 'nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1 }), F(pre + 'kk', 'Nomor KK', 'text', { mono: 1, len: 16, sens: 1 }),
+  F(pre + 'alamat', 'Alamat / Dusun', 'text', { up: 1 }), F(pre + 'rt', 'RT', 'text', { pad: 3 }), F(pre + 'rw', 'RW', 'text', { pad: 3 })];
+const skWarga = (r, p) => [String(r[p + 'alamat'] || '').replace(/^DUSUN /, ''), r[p + 'rt'] ? 'RT ' + r[p + 'rt'] + '/' + (r[p + 'rw'] || '') : ''].filter(Boolean).join(' ');
+Object.assign(UI, {
+  usulan_bansos: {
+    t: 'Usulan Bansos & DTSEN', ic: 'send', sort: 'tgl_usul', folder: 'Sosial/Usulan', excel: 1,
+    fields: [F('jenis', 'Jenis usulan', 'select', { opt: SK_JENIS, req: 1, wide: 1, hint: 'Sama dengan menu di SIKS-NG, supaya mudah diinput ulang di sana.' }),
+      ...orangMini('u_', 'Warga yang diusulkan'),
+      F('_h_us', 'Rincian usulan', 'head'),
+      F('bansos', 'Bansos diusulkan', 'checks', { opt: SK_PROG, wide: 1, when: { k: 'jenis', v: ['Usulan Bansos', 'Usulan Pembaruan DTSEN', 'Mundur Bansos', 'Klarifikasi / Sanggahan Bansos'] } }),
+      F('desil', 'Desil DTSEN saat ini', 'select', { opt: SK_DESIL }),
+      F('tujuan', 'Daerah tujuan / asal', 'text', { up: 1, wide: 1, when: { k: 'jenis', v: 'Pindah Domisili' } }),
+      F('arah', 'Arah', 'select', { opt: ['Keluar wilayah', 'Masuk wilayah'], when: { k: 'jenis', v: 'Pindah Domisili' } }),
+      F('temuan', 'Jenis temuan / anomali', 'text', { wide: 1, when: { k: 'jenis', v: ['Verifikasi Temuan DTSEN', 'Perbaikan Data Anomali'] } }),
+      F('periode', 'Periode', 'text', { def: skPeriode }), F('tgl_usul', 'Tanggal diusulkan', 'date', { def: isoToday }),
+      F('alasan', 'Alasan / keterangan usulan', 'textarea', { wide: 1 }),
+      F('musdes_ba', 'Nomor BA Musdes/Muskel', 'text', { listFrom: { e: 'musdes_bansos', k: 'nomor_ba' }, hint: 'Usulan bansos baru wajib melalui Musdes/Muskel' }),
+      F('_h_st', 'Status di SIKS-NG', 'head'),
+      F('status', 'Status', 'select', { opt: SK_ST, def: 'Draf', req: 1 }), F('tgl_status', 'Tanggal status', 'date'),
+      F('alasan_tolak', 'Alasan penolakan', 'text', { wide: 1, when: { k: 'status', v: 'Ditolak' } }),
+      F('dok_id', 'Dokumen pendukung', 'file'), F('ket', 'Catatan', 'textarea', { wide: 1 })],
+    views: [['Belum diproses', () => ({ status: 'Draf' })], ['Diusulkan', () => ({ status: 'Diusulkan di SIKS-NG' })], ['Disetujui', () => ({ status: 'Disetujui' })], ['Ditolak', () => ({ status: 'Ditolak' })], ['Semua', () => ({})]],
+    chips: { k: 'jenis', opt: SK_JENIS, lbl: s => s.replace('PBI JK – ', 'PBI: ').replace(' / Sanggahan Bansos', '').replace('Usulan Pembaruan DTSEN', 'Pembaruan DTSEN') },
+    row: r => ({ t: r.u_nama || '–', s: [r.jenis, String(r.bansos || '').replace(/,/g, ', ')].filter(Boolean).join(' · '), s2: [skWarga(r, 'u_'), r.periode, r.tgl_usul ? fDate(r.tgl_usul) : ''].filter(Boolean).join(' · '), av: initials(r.u_nama || '?'), pill: `<span class="pill ${SK_STC(r.status)}">${esc(r.status || 'Draf')}</span>`, file: r.dok_id }),
+    print: { title: 'DAFTAR USULAN BANSOS / DTSEN', land: 1, cols: [['Nama', 'u_nama'], ['NIK', 'u_nik'], ['No KK', 'u_kk'], ['Alamat', r => esc(skWarga(r, 'u_'))], ['Jenis', 'jenis'], ['Bansos', 'bansos'], ['Desil', 'desil'], ['Periode', 'periode'], ['Status', 'status'], ['Alasan', 'alasan']] }
+  },
+  musdes_bansos: {
+    t: 'Musdes / Muskel Bansos', ic: 'users', sort: 'tanggal', folder: 'Sosial/Musdes',
+    fields: [F('jenis', 'Jenis', 'select', { opt: ['Musdes', 'Muskel'], def: 'Musdes', req: 1 }), F('tanggal', 'Tanggal musyawarah', 'date', { req: 1, def: isoToday }),
+      F('tempat', 'Tempat', 'text', { def: () => 'Balai Desa ' + ND() }), F('periode', 'Periode', 'text', { def: skPeriode }),
+      F('nomor_ba', 'Nomor BA Musdes/Muskel', 'text', { mono: 1, req: 1 }), F('nomor_sptjm', 'Nomor SPTJM', 'text', { mono: 1 }),
+      F('jml_usulan', 'Jumlah usulan dibahas', 'number'), F('peserta', 'Jumlah peserta', 'number'),
+      F('status', 'Status di SIKS-NG', 'select', { opt: ['Draf', 'Diunggah ke SIKS-NG', 'Disetujui', 'Ditolak'], def: 'Draf' }),
+      F('alasan_tolak', 'Alasan penolakan', 'text', { wide: 1, when: { k: 'status', v: 'Ditolak' } }),
+      F('dok_ba', 'Dokumen BA Musdes/Muskel (scan)', 'file'), F('dok_sptjm', 'Surat Pertanggungjawaban Mutlak (SPTJM)', 'file'),
+      F('foto', 'Foto kegiatan', 'fotos', { max: 5 }), F('ket', 'Hasil / catatan', 'textarea', { wide: 1 })],
+    views: [['Semua', () => ({})], ['Draf', () => ({ status: 'Draf' })], ['Diunggah', () => ({ status: 'Diunggah ke SIKS-NG' })], ['Disetujui', () => ({ status: 'Disetujui' })], ['Ditolak', () => ({ status: 'Ditolak' })]],
+    row: r => ({ t: (r.jenis || 'Musdes') + ' ' + fDate(r.tanggal), s: ['BA ' + (r.nomor_ba || '–'), r.nomor_sptjm ? 'SPTJM ' + r.nomor_sptjm : '', r.periode].filter(Boolean).join(' · '), s2: [r.tempat, r.jml_usulan ? r.jml_usulan + ' usulan' : ''].filter(Boolean).join(' · '), av: ic('users'), pill: `<span class="pill ${SK_STC(r.status)}">${esc(r.status || 'Draf')}</span>`, file: r.dok_ba })
+  },
+  penyaluran_bansos: {
+    t: 'Monitor Penyaluran Bansos', ic: 'check', sort: 'tgl_salur', folder: 'Sosial/Penyaluran', excel: 1,
+    fields: [...orangMini('p_', 'Penerima'),
+      F('_h_sl', 'Penyaluran', 'head'),
+      F('program', 'Program bansos', 'select', { opt: SK_PROG, req: 1 }), F('periode', 'Periode / tahap', 'text', { def: skPeriode, req: 1 }),
+      F('penyalur', 'Penyalur', 'select', { opt: ['Bank Himbara (BRI/BNI/Mandiri/BSI)', 'PT Pos Indonesia', 'Desa (tunai)', 'Lainnya'] }),
+      F('nominal', 'Nominal (Rp)', 'money'), F('status', 'Status', 'select', { opt: ['Belum salur', 'Sudah salur', 'Gagal salur', 'Dikembalikan'], def: 'Belum salur', req: 1 }),
+      F('tgl_salur', 'Tanggal salur', 'date'), F('dok_id', 'Bukti / foto penyaluran', 'file', { img: 1 }), F('ket', 'Keterangan', 'textarea', { wide: 1 })],
+    views: [['Semua', () => ({})], ['Belum salur', () => ({ status: 'Belum salur' })], ['Sudah salur', () => ({ status: 'Sudah salur' })], ['Gagal / kembali', () => ({ status: 'Gagal salur' })]],
+    chips: { k: 'program', opt: SK_PROG },
+    row: r => ({ t: r.p_nama || '–', s: [r.program, r.periode, r.penyalur].filter(Boolean).join(' · '), s2: [skWarga(r, 'p_'), r.nominal ? 'Rp ' + Number(r.nominal).toLocaleString('id-ID') : '', r.tgl_salur ? fDate(r.tgl_salur) : ''].filter(Boolean).join(' · '), av: initials(r.p_nama || '?'), pill: `<span class="pill ${SK_STC(r.status)}">${esc(r.status || '')}</span>`, file: r.dok_id }),
+    print: { title: 'MONITOR PENYALURAN BANSOS', land: 1, cols: [['Nama', 'p_nama'], ['NIK', 'p_nik'], ['Alamat', r => esc(skWarga(r, 'p_'))], ['Program', 'program'], ['Periode', 'periode'], ['Penyalur', 'penyalur'], ['Nominal', r => r.nominal ? Number(r.nominal).toLocaleString('id-ID') : ''], ['Status', 'status'], ['Tgl salur', r => fDate(r.tgl_salur)]] }
+  }
+});
+const SOS_TAB_E = { rentan: 'list', usulan_bansos: 'usulan', musdes_bansos: 'musdes', penyaluran_bansos: 'salur' };
+/* Rekap sosial: seperti Rekap DTSEN, dihitung dari data desa */
+VIEWS.sosrekap = async (p, main, alive) => {
+  setTop('Rekap Sosial', ND());
+  main.innerHTML = rentanTabs('rekap') + '<div class="card skel" style="height:200px"></div>';
+  const ls = e => canRead('rentan') ? call('list', { entity: e, limit: 5000 }).then(r => r.rows || []).catch(() => []) : [];
+  const [rn, us, sl] = await Promise.all([ls('rentan'), ls('usulan_bansos'), ls('penyaluran_bansos')]);
+  if (!alive()) return;
+  const akt = rn.filter(r => r.status !== 'Tidak lagi');
+  const cnt = (arr, f) => { const m = {}; arr.forEach(r => [].concat(f(r) || []).forEach(k => { if (k) m[k] = (m[k] || 0) + 1; })); return m; };
+  const tb = (judul, m, urut, warna) => { const ks = urut ? urut.filter(k => m[k]) .concat(Object.keys(m).filter(k => urut.indexOf(k) < 0)) : Object.keys(m).sort((a, b) => m[b] - m[a]); const mx = Math.max(1, ...ks.map(k => m[k])); return `<div class="card stack"><div class="lbl">${esc(judul)}</div>${ks.length ? ks.map(k => `<div class="rk-r"><span>${esc(k)}</span><i style="--w:${m[k] / mx * 100}%;--c:${warna}"></i><b>${nfD(m[k])}</b></div>`).join('') : '<div class="meta">Belum ada data.</div>'}</div>`; };
+  const progOf = r => { let a = []; try { a = JSON.parse(r.bantuan || '[]'); } catch (x) { } return a.filter(b => b && b.program).map(b => b.program); };
+  main.innerHTML = `<div class="stack">` + rentanTabs('rekap') + `<div class="stack">
+    <div class="dks">${dK(nfD(akt.length), 'Warga rentan aktif')}${dK(nfD(akt.filter(r => progOf(r).length).length), 'Menerima bantuan')}${dK(nfD(us.filter(r => r.status === 'Draf' || r.status === 'Diusulkan di SIKS-NG').length), 'Usulan diproses')}${dK(nfD(sl.filter(r => r.status === 'Sudah salur').length), 'Sudah salur')}</div>
+    <div class="rk-g">
+      ${tb('Per desil DTSEN', cnt(akt.filter(r => r.desil), r => r.desil), ['Desil 1', 'Desil 2', 'Desil 3', 'Desil 4', 'Desil 5', 'Desil 6–10', 'Belum terdata'], '#2563eb')}
+      ${tb('Per kategori', cnt(akt, r => String(r.kategori || '').split(',').map(s => s.trim())), RENTAN_KT, '#db2777')}
+      ${tb('Per dusun', cnt(akt, r => String(r.r_alamat || '').replace(/^DUSUN /, '') || '(tanpa dusun)'), null, '#059669')}
+      ${tb('Bantuan yang diterima', cnt(akt, progOf), null, '#d97706')}
+      ${tb('Status usulan', cnt(us, r => r.status || 'Draf'), SK_ST, '#7c3aed')}
+      ${tb('Jenis usulan', cnt(us, r => r.jenis), SK_JENIS, '#0891b2')}
+      ${tb('Penyaluran per program', cnt(sl.filter(r => r.status === 'Sudah salur'), r => r.program), SK_PROG, '#16a34a')}
+    </div></div></div>`;
+};
+async function extraSosialUsulan(x, el) {
+  if (!canRead('rentan')) return;
+  const [us, sl] = await Promise.all(['usulan_bansos', 'penyaluran_bansos'].map((e, i) => call('list', { entity: e, filters: { [(i ? 'p_' : 'u_') + 'penduduk_id']: x.id }, limit: 50 }).then(r => r.rows || []).catch(() => [])));
+  let h = '';
+  if (us.length) h += `<div class="sec-h"><h2>${ic('send')} Usulan bansos / DTSEN (${us.length})</h2></div><div class="list">${us.map(r => rowHtml('usulan_bansos', r)).join('')}</div>`;
+  if (sl.length) h += `<div class="sec-h"><h2>${ic('check')} Penyaluran bansos (${sl.length})</h2></div><div class="list">${sl.map(r => rowHtml('penyaluran_bansos', r)).join('')}</div>`;
+  if (h) el.insertAdjacentHTML('beforeend', `<div class="stack">${h}</div>`);
+}
+async function extraMusdes(x, el) {
+  if (!x.nomor_ba) return;
+  const us = await call('list', { entity: 'usulan_bansos', filters: { musdes_ba: x.nomor_ba }, limit: 500 }).then(r => r.rows || []).catch(() => []);
+  el.insertAdjacentHTML('beforeend', `<div class="stack"><div class="sec-h"><h2>${ic('send')} Usulan dalam BA ini (${us.length})</h2>${canWrite('rentan') ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['form', { e: 'usulan_bansos', preset: { musdes_ba: x.nomor_ba, periode: x.periode || '' } }]))}'>${ic('plus')}Tambah usulan</button>` : ''}</div>${us.length ? `<div class="list">${us.map(r => rowHtml('usulan_bansos', r)).join('')}</div>` : '<div class="meta">Belum ada usulan yang mencantumkan nomor BA ini.</div>'}</div>`);
+}
+function rentanTabs(cur) { return `<div class="gtabs">${[['list', 'heart', 'Data rentan', '["list",{"e":"rentan"}]'], ['usulan', 'send', 'Usulan', '["list",{"e":"usulan_bansos"}]'], ['musdes', 'users', 'Musdes/Muskel', '["list",{"e":"musdes_bansos"}]'], ['salur', 'check', 'Penyaluran', '["list",{"e":"penyaluran_bansos"}]'], ['rekap', 'chart', 'Rekap', '["sosrekap"]'], ['lansia', 'users', 'Lansia 60+', '["rentanauto",{"j":"lansia"}]'], ['balita', 'users', 'Balita', '["rentanauto",{"j":"balita"}]']].map(([k, i, t, g]) => `<button class="${cur === k ? 'on' : ''}" data-act="go" data-go='${g}'>${ic(i)} ${t}</button>`).join('')}</div>`; }
 VIEWS.rentanauto = async (p, main) => {
   const j = p.j === 'balita' ? 'balita' : 'lansia';
   setTop(j === 'lansia' ? 'Lansia (60 tahun ke atas)' : 'Balita (di bawah 5 tahun)', 'Otomatis dari Data Penduduk aktif');
@@ -6205,7 +6307,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '113', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '114', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
