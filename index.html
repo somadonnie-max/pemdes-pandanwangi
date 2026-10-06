@@ -778,6 +778,7 @@ input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-sof
 .sec-h.kkh h2{white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}.sec-h.kkh .btns{flex-wrap:nowrap;gap:4px}.sec-h.kkh .btn{padding-inline:8px}
 .tn-bh{display:inline-flex;align-items:center;gap:4px;font-weight:700;cursor:pointer}.tn-bh input{margin:0}#tnBhLeg{display:inline-flex;flex-wrap:wrap;gap:6px}.tn-bhinfo{border-left:4px solid;padding:4px 8px;margin:4px 0;border-radius:6px;background:color-mix(in srgb,var(--surface) 85%,#000 0%);display:flex;flex-wrap:wrap;gap:2px 6px;align-items:baseline}.tn-bhinfo small{width:100%;color:var(--muted);font-size:10px}
 option,optgroup{background-color:var(--surface)!important;color:var(--ink)!important}
+.pmdd.selpick{position:fixed!important;z-index:95!important;margin:0!important;max-height:60vh;overflow:auto;background:var(--surface)!important;color:var(--ink)!important;border:1px solid var(--line)!important}.pmdd.selpick button{display:block;width:100%;text-align:left;background:none;color:var(--ink)!important;border-bottom:1px solid var(--line)!important}.pmdd.selpick button.on{background:var(--pri-soft)!important;font-weight:700}.pmdd.selpick button:hover{background:var(--surface2,var(--pri-soft))!important}
 .tn-lk{display:flex;align-items:center;gap:6px}.tn-lk .main{flex:1;min-width:0}.tn-wp .btns{margin-top:4px}
 .pl-map{position:relative;height:min(62vh,460px);border-radius:10px;overflow:hidden;border:1px solid var(--line)}.pl-map #plMap{position:absolute;inset:0}.pl-pin{position:absolute;left:50%;top:50%;transform:translate(-50%,-100%);z-index:500;color:#dc2626;pointer-events:none}.pl-pin .ic{width:34px;height:34px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))}
 </style>
@@ -1787,8 +1788,9 @@ window.addEventListener('popstate', ev => {
   const d = (ev.state && ev.state.pw === 'app' && ev.state.d) || 0;
   const keep = () => { if (!d) history.pushState({ pw: 'app', d: 1 }, ''); };
   const md = $$('#layer .modal');
+  if (S.pickEl) { pickClose(); keep(); return; }
   if (md.length) { const x = $('[data-x]', md[md.length - 1]); if (x) x.click(); else md[md.length - 1].remove(); keep(); return; }
-  const sh = $$('#layer .sheet'); if (sh.length) { const x = $('[data-x]', sh[sh.length - 1]); if (x) x.click(); else sh[sh.length - 1].remove(); keep(); return; }
+  const sh = $$('#layer .sheet.on'); if (sh.length) { const x = $('[data-x]', sh[sh.length - 1]); if (x) x.click(); else sh[sh.length - 1].remove(); keep(); return; }
   if (S.stack.length) { navBack(); keep(); return; }
   if (S.cur && S.cur.name !== 'home') { S.cur = { name: 'home', params: {} }; show(); keep(); return; }
   exitAsk(d);
@@ -4529,13 +4531,19 @@ function ddAttach(el, opsi) {
   el.addEventListener('blur', () => setTimeout(() => { dd.hidden = true; }, 150));
 }
 /* ---- Semua pilihan (select & isian ber-saran) memakai daftar di bawah kotak, warna kebalikan tema ---- */
-function pickClose() { if (S.pickEl) { S.pickEl.remove(); S.pickEl = null; } }
+function pickClose() { if (S.pickEl) { S.pickEl.remove(); S.pickEl = null; S.pickSel = null; } }
 function pickOpen(sel) {
   pickClose();
   const dd = document.createElement('div'); dd.className = 'pmdd selpick';
   dd.innerHTML = Array.from(sel.options).map((o, i) => `<button type="button" data-i="${i}" class="${i === sel.selectedIndex ? 'on' : ''}${o.disabled ? ' dis' : ''}">${esc(o.text)}</button>`).join('') || '<div class="meta" style="padding:6px 9px">Tidak ada pilihan.</div>';
-  sel.parentNode.appendChild(dd); S.pickEl = dd;
-  const r = dd.getBoundingClientRect(); if (r.bottom > innerHeight - 70 && r.height < sel.getBoundingClientRect().top - 60) dd.classList.add('up');
+  document.body.appendChild(dd); S.pickEl = dd; S.pickSel = sel;
+  /* daftar mengambang di atas semua lapisan (termasuk popup), di bawah atau di atas isian sesuai ruang */
+  const sr = sel.getBoundingClientRect(), tb = $('.tabs'), bawahBatas = (tb && getComputedStyle(tb).display !== 'none' ? tb.getBoundingClientRect().top : innerHeight) - 8;
+  const ruangB = bawahBatas - sr.bottom - 4, ruangA = sr.top - 8, tinggi = dd.scrollHeight;
+  dd.style.right = 'auto'; dd.style.top = 'auto'; dd.style.bottom = 'auto';
+  dd.style.left = Math.max(6, sr.left) + 'px'; dd.style.width = Math.min(sr.width, innerWidth - 12) + 'px';
+  if (tinggi <= ruangB || ruangB >= ruangA) { dd.style.top = (sr.bottom + 3) + 'px'; dd.style.maxHeight = Math.max(120, ruangB) + 'px'; }
+  else { dd.style.bottom = (innerHeight - sr.top + 3) + 'px'; dd.style.maxHeight = Math.max(120, ruangA) + 'px'; }
   const on = dd.querySelector('.on'); if (on) on.scrollIntoView({ block: 'nearest' });
   dd.addEventListener('pointerdown', ev => ev.preventDefault());
   dd.addEventListener('click', ev => {
@@ -4551,7 +4559,7 @@ function enhanceForm(root) {
     const w = document.createElement('span'); w.className = 'selwrap' + (sel.closest('.f') || sel.closest('td') ? ' blk' : '');
     sel.parentNode.insertBefore(w, sel); w.appendChild(sel);
     const h = document.createElement('span'); h.className = 'selhit'; w.appendChild(h);
-    h.addEventListener('click', ev => { ev.preventDefault(); ev.stopPropagation(); if (sel.disabled) return; if (S.pickEl && S.pickEl.parentNode === w) return pickClose(); sel.focus({ preventScroll: true }); pickOpen(sel); });
+    h.addEventListener('click', ev => { ev.preventDefault(); ev.stopPropagation(); if (sel.disabled) return; if (S.pickEl && S.pickSel === sel) return pickClose(); sel.focus({ preventScroll: true }); pickOpen(sel); });
   });
   $$('input[list]:not([data-dl])', root).forEach(inp => {
     const dl = document.getElementById(inp.getAttribute('list')); inp.dataset.dl = '1'; if (!dl) return;
@@ -4559,7 +4567,9 @@ function enhanceForm(root) {
     if (opts.length && !inp.readOnly) ddAttach(inp, opts);
   });
 }
-document.addEventListener('click', e => { if (S.pickEl && !e.target.closest('.selwrap')) pickClose(); });
+document.addEventListener('click', e => { if (S.pickEl && !e.target.closest('.selwrap') && !e.target.closest('.selpick')) pickClose(); });
+window.addEventListener('scroll', e => { if (S.pickEl && !(e.target && e.target.closest && e.target.closest('.selpick'))) pickClose(); }, true);
+window.addEventListener('resize', () => pickClose());
 document.addEventListener('keydown', e => { if (e.key === 'Escape') pickClose(); });
 new MutationObserver(() => { clearTimeout(S.encT); S.encT = setTimeout(() => enhanceForm(document.body), 30); }).observe(document.body, { childList: true, subtree: true });
 function orangHooks(frm, flds) { flds.filter(f => f.opick).forEach(f => orangHook(frm, f.k.slice(0, -4), f)); }
@@ -4732,8 +4742,8 @@ VIEWS.rentanauto = async (p, main) => {
   S.raQ = S.raQ || '';
   const isi = () => { const q = S.raQ.toLowerCase(); const a = q ? rows.filter(x => (x.nama + ' ' + x.dusun).toLowerCase().indexOf(q) >= 0) : rows; return a.length ? `<div class="list">${a.slice(0, 400).map(x => rowHtml('penduduk', x)).join('')}</div>${a.length > 400 ? `<div class="meta">Menampilkan 400 dari ${a.length}. Gunakan pencarian.</div>` : ''}` : '<div class="card meta">Tidak ada data.</div>'; };
   main.innerHTML = `<div class="stack">${rentanTabs(j)}
-    <div class="stats"><div class="stat"><b>${N(rows.length)}</b><span>Jumlah ${j}</span></div>${Object.keys(grp).sort().map(k => `<div class="stat"><b>${N(grp[k])}</b><span>${esc(k)}</span></div>`).join('')}</div>
-    <div class="chips">${Object.keys(perD).sort().map(k => `<span class="chip">${esc(k)} <b>${N(perD[k])}</b></span>`).join('')}</div>
+    <div class="stats"><div class="stat"><b>${nfD(rows.length)}</b><span>Jumlah ${j}</span></div>${Object.keys(grp).sort().map(k => `<div class="stat"><b>${nfD(grp[k])}</b><span>${esc(k)}</span></div>`).join('')}</div>
+    <div class="chips">${Object.keys(perD).sort().map(k => `<span class="chip">${esc(k)} <b>${nfD(perD[k])}</b></span>`).join('')}</div>
     <div class="meta">Dihitung dari tanggal lahir penduduk aktif (6 dusun). Kondisi khusus (terlantar, sakit, butuh pendamping, penerima bantuan) catat di tab <b>Data rentan</b> lewat rincian penduduk → <b>Catat data rentan</b>.</div>
     <input type="search" id="raQ" placeholder="Cari nama / dusun" value="${esc(S.raQ)}"><div id="raL">${isi()}</div></div>`;
   $('#raQ').addEventListener('input', ev => { S.raQ = ev.target.value; $('#raL').innerHTML = isi(); });
@@ -6779,7 +6789,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '124', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '125', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -6789,8 +6799,8 @@ function tentangHtml() {
     <div class="ab-h">Pembuat & pengelola</div>
     <div><b>${esc(APP_INFO.nama)}</b> — ${esc(APP_INFO.jab)}</div>
     <div>Kantor: ${esc(kantor)}</div>
-    <div>Rumah: ${esc(APP_INFO.rumah)}${kec ? ', Kec. ' + esc(kec) : ''}${kab ? ', Kab. ' + esc(kab) : ''}</div>
-    <div>WhatsApp: <a href="${esc(waLink(APP_INFO.wa))}" target="_blank" rel="noopener">${esc(waTampil(APP_INFO.wa))}</a> · Email: <a href="mailto:${esc(APP_INFO.email)}?subject=${encodeURIComponent('Aplikasi Pemdes ' + ND())}">${esc(APP_INFO.email)}</a>${st.email_desa ? ` · Email desa: <a href="mailto:${esc(st.email_desa)}">${esc(st.email_desa)}</a>` : ''}</div>
+    ${st.dev_rumah ? `<div>Rumah: ${esc(st.dev_rumah)}${kec ? ', Kec. ' + esc(kec) : ''}${kab ? ', Kab. ' + esc(kab) : ''}</div>` : ''}
+    <div>WhatsApp: <a href="${esc(waLink((st.dev_wa || '')))}" target="_blank" rel="noopener">${esc(waTampil((st.dev_wa || '')))}</a> · Email: <a href="mailto:${esc((st.dev_email || ''))}?subject=${encodeURIComponent('Aplikasi Pemdes ' + ND())}">${esc((st.dev_email || ''))}</a>${st.email_desa ? ` · Email desa: <a href="mailto:${esc(st.email_desa)}">${esc(st.email_desa)}</a>` : ''}</div>
     <details><summary>Privasi & kebijakan penggunaan</summary>
       <ol>
         <li>Aplikasi ini khusus untuk perangkat desa dan petugas yang diberi akun. Akun bersifat pribadi; jangan meminjamkan kata sandi.</li>
@@ -8771,7 +8781,7 @@ function sipLaporan(nama, D, opt) {
       (a, i) => [T(i + 1, 'c'), T(sipJenis(a)), T(kodeFmt(a.kode_barang), 'c'), T(sipReg(a), 'c'), T(yr(a.tgl_perolehan), 'c'), T([a.judul, a.pencipta, a.ukuran, a.bahan].filter(Boolean).join(' / '), 'c'), T(sipRp(a.nilai), 'r'), T(a.ket)], 6, 14); }
   }
   /* ----- KIR & kondisi ----- */
-  const headKir = (harga) => spHead([[['NO', 1, 2], ['JENIS BARANG /<br>NAMA BARANG', 1, 2], ['N O M O R', 2], ['TAHUN<br>PEROLEHAN', 1, 2], ['I D E N T I T A S', 2], ['ASAL-USUL<br>BARANG', 1, 2], [harga, 1, 2], ['KETERANGAN', 1, 2]], [['KODE BARANG'], ['REG'], ['KONSTRUKSI/LUAS/MERK/TYPE/WARNA/JUDUL/PENCIPTA'], ['NO. POL']], { n: 1, c: [['1'], ['2'], ['3', 2], ['4'], ['5'], ['6', 2], ['7'], ['8'], ['9']].map((x, i) => i === 3 ? ['5'] : i === 4 ? ['6', 2] : i > 4 ? [String(Number(x[0]) + 0)] : x).slice(0, 0).concat([['1'], ['2'], ['3', 2], ['5'], ['6', 2], ['7'], ['8'], ['9']]) }]);
+  const headKir = (harga) => spHead([[['NO', 1, 2], ['JENIS BARANG /<br>NAMA BARANG', 1, 2], ['N O M O R', 2], ['TAHUN<br>PEROLEHAN', 1, 2], ['I D E N T I T A S', 2], ['ASAL-USUL<br>BARANG', 1, 2], [harga, 1, 2], ['KETERANGAN', 1, 2]], [['KODE BARANG'], ['REG'], ['KONSTRUKSI/LUAS/MERK/TYPE/WARNA/JUDUL/PENCIPTA'], ['NO. POL']], { n: 1, c: [['1'], ['2'], ['3', 2], ['5'], ['6', 2], ['7'], ['8'], ['9']] }]);
   const rowKir = (a, i) => [T(i + 1, 'c'), T(sipJenis(a)), T(kodeFmt(a.kode_barang), 'c'), T(sipReg(a), 'c'), T(yr(a.tgl_perolehan), 'c'), T([kibHuruf(a) === 'D' ? a.bahan : '', '', [a.merk, a.tipe, a.judul, a.pencipta].filter(Boolean).join(' ')].join(' / ').replace(/^ \/ {2}\/ /, ' / / '), 'c'), T(a.no_polisi, 'c'), T(a.asal, 'c'), T(sipRp(a.nilai), 'r'), T(a.ket)];
   const rowKond = (a, i) => [T(i + 1, 'c'), T(sipJenis(a)), T(kodeFmt(a.kode_barang), 'c'), T(sipReg(a), 'c'), T(yr(a.tgl_perolehan), 'c'), T([kibHuruf(a) === 'D' ? a.bahan : '', '', (asetNum(a.luas)).toFixed(2), '', [a.merk, a.tipe].filter(Boolean).join(' ')].join(' / '), 'c'), T(a.no_polisi, 'c'), T(a.asal, 'c'), T(sipRp(a.nilai), 'r'), T(a.ket)];
   if (nama === 'Laporan Kartu Inventaris Ruangan (KIR)') {
