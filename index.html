@@ -777,6 +777,7 @@ input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-sof
 .btns.trio{flex-wrap:nowrap}.btns.trio>.btn{flex:1 1 0;justify-content:center;min-width:0}
 .sec-h.kkh h2{white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}.sec-h.kkh .btns{flex-wrap:nowrap;gap:4px}.sec-h.kkh .btn{padding-inline:8px}
 .tn-bh{display:inline-flex;align-items:center;gap:4px;font-weight:700;cursor:pointer}.tn-bh input{margin:0}#tnBhLeg{display:inline-flex;flex-wrap:wrap;gap:6px}.tn-bhinfo{border-left:4px solid;padding:4px 8px;margin:4px 0;border-radius:6px;background:color-mix(in srgb,var(--surface) 85%,#000 0%);display:flex;flex-wrap:wrap;gap:2px 6px;align-items:baseline}.tn-bhinfo small{width:100%;color:var(--muted);font-size:10px}
+option,optgroup{background-color:var(--surface)!important;color:var(--ink)!important}
 .tn-lk{display:flex;align-items:center;gap:6px}.tn-lk .main{flex:1;min-width:0}.tn-wp .btns{margin-top:4px}
 .pl-map{position:relative;height:min(62vh,460px);border-radius:10px;overflow:hidden;border:1px solid var(--line)}.pl-map #plMap{position:absolute;inset:0}.pl-pin{position:absolute;left:50%;top:50%;transform:translate(-50%,-100%);z-index:500;color:#dc2626;pointer-events:none}.pl-pin .ic{width:34px;height:34px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))}
 </style>
@@ -984,6 +985,7 @@ function hitungPajak(o) {
   return h;
 }
 
+const HAK_TANAH = ['Hak Milik', 'Hak Guna Usaha', 'Hak Guna Bangunan', 'Hak Pakai', 'Hak Pengelolaan', 'Hak Milik atas Satuan Rumah Susun', 'Hak Wakaf'];
 const OPT = {
   dusun: ['DUSUN KRAJAN 1', 'DUSUN KRAJAN 2', 'DUSUN KRAJAN 3', 'DUSUN TIMUR SAWAH', 'DUSUN TUNJUNGAN', 'DUSUN PEMUKIMAN'],
   jk: ['LAKI-LAKI', 'PEREMPUAN'],
@@ -1192,7 +1194,7 @@ const UI = {
     fields: [F('nama', 'Nama Wajib Pajak / Pemilik', 'text', { req: 1, wide: 1 }), F('nop', 'NOP', 'text', { mono: 1 }), F('tahun_sppt', 'Tahun SPPT', 'number'),
       F('alamat_op', 'Letak Objek Pajak', 'text', { wide: 1 }), F('alamat_wp', 'Alamat Wajib Pajak', 'text', { wide: 1 }), F('blok', 'Blok'), F('persil', 'Persil'), F('dusun', 'Dusun', 'select', { opt: OPT.dusun }),
       F('luas', 'Luas Bumi (m²)', 'number'), F('luas_bangunan', 'Luas Bangunan (m²)', 'number'), F('pbb', 'PBB Terutang', 'money'), F('status_bayar', 'Status Bayar', 'select', { opt: ['Lunas', 'Belum Bayar'] }), F('tgl_bayar', 'Tanggal Bayar', 'date'),
-      F('status_hak', 'Status Hak Tanah', 'select', { opt: ['Hak Milik', 'Hak Guna Bangunan', 'Hak Pakai', 'Hak Guna Usaha', 'Hak Pengelolaan', 'Tanah Negara', 'Letter C/Girik'] }),
+      F('status_hak', 'Status Hak Tanah', 'select', { opt: HAK_TANAH.concat(['Tanah Negara', 'Letter C/Girik/Petok D (belum sertifikat)']) }),
       F('luas_sertifikat', 'Luas Bersertifikat (m²)', 'number'), F('luas_belum', 'Luas Belum Bersertifikat (m²)', 'number'), F('penggunaan', 'Penggunaan Tanah', 'select', { opt: ['Perumahan', 'Perdagangan dan Jasa', 'Perkantoran', 'Industri', 'Fasilitas Umum', 'Sawah', 'Tegalan', 'Perkebunan', 'Peternakan/Perikanan', 'Hutan', 'Lainnya'] }),
       F('bidang', 'Nomor bidang di peta', 'text', { noform: 1 }), F('ket', 'Keterangan', 'text', { wide: 1 }),
       F('sert_ids', '', 'hidden'),
@@ -1213,7 +1215,7 @@ const UI = {
     row: r => ({ t: 'Bidang #' + r.no + (r.nama_wp ? ' — ' + r.nama_wp : ''), s: [r.status, r.dusun, r.luas_m2 ? Number(r.luas_m2).toLocaleString('id-ID') + ' m²' : ''].filter(Boolean).join(' · '), av: ic('map') })
   },  tanah_sert: {
     t: 'Sertifikat Tanah', ic: 'file', perm: 'tu_tanah', m: 'tanah_desa', sort: 'no_sert', asc: 1, folder: 'TU/Sertifikat', file: 'dok_id',
-    fields: [F('no_sert', 'Nomor Sertifikat', 'text', { req: 1, mono: 1 }), F('jenis_hak', 'Jenis Hak', 'select', { opt: ['Hak Milik', 'Hak Guna Bangunan', 'Hak Pakai', 'Hak Guna Usaha', 'Hak Pengelolaan', 'Hak Wakaf', 'Letter C/Girik'] }),
+    fields: [F('no_sert', 'Nomor Sertifikat', 'text', { req: 1, mono: 1 }), F('jenis_hak', 'Jenis Hak', 'select', { opt: HAK_TANAH }),
       F('atas_nama', 'Atas Nama', 'text', { up: 1, wide: 1 }), F('luas', 'Luas (m²)', 'number'), F('nib', 'NIB'), F('tgl_terbit', 'Tanggal Terbit', 'date'), F('ket', 'Keterangan', 'text', { wide: 1 }),
       F('bidang', 'Nomor bidang di peta', 'text', { noform: 1 }), F('tanah_ids', '', 'hidden'), F('dok_id', 'Scan Sertifikat', 'file', { img: 1 })],
     row: r => ({ t: (r.no_sert || '') + (r.atas_nama ? ' · ' + r.atas_nama : ''), s: [r.jenis_hak, r.luas ? Number(r.luas).toLocaleString('id-ID') + ' m²' : '', r.nib ? 'NIB ' + r.nib : ''].filter(Boolean).join(' · '), r: r.bidang ? '#' + r.bidang : '', av: ic('file'), pill: (r.bidang ? '<span class="pill ok">Terpetakan</span>' : '') + (tnL(r.tanah_ids).length ? `<span class="pill">${tnL(r.tanah_ids).length} SPPT</span>` : '') })
@@ -6777,7 +6779,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '123', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
+const APP_INFO = { ver: '124', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', wa: '081233568696', email: 'soma.donnie@gmail.com', rumah: 'Dusun Krajan 1 RT 003/RW 001, Desa Pandanwangi' };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -10152,8 +10154,9 @@ VIEWS.paketdesa = async (p, main) => {
    ===================================================================== */
 const TB_ST = ['Belum dicocokkan', 'Sudah dicocokkan', 'Bukan objek pajak'];
 const TB_WARNA = { 'Belum dicocokkan': '#f59e0b', 'Sudah dicocokkan': '#22c55e', 'Bukan objek pajak': '#94a3b8' };
-const BH_HAK = ['HM', 'HGB', 'HP', 'HGU', 'HPL', 'Wakaf', 'Lainnya'];
-const BH_WARNA = { HM: '#dc2626', HGB: '#7c3aed', HP: '#0891b2', HGU: '#65a30d', HPL: '#db2777', Wakaf: '#0f766e', Lainnya: '#475569' };
+const BH_HAK = ['HM', 'HGU', 'HGB', 'HP', 'HPL', 'HMSRS', 'Wakaf'];
+const BH_NAMA = { HM: 'Hak Milik', HGU: 'Hak Guna Usaha', HGB: 'Hak Guna Bangunan', HP: 'Hak Pakai', HPL: 'Hak Pengelolaan', HMSRS: 'Hak Milik atas Satuan Rumah Susun', Wakaf: 'Hak Wakaf', Lainnya: 'Lainnya' };
+const BH_WARNA = { HM: '#dc2626', HGB: '#7c3aed', HP: '#0891b2', HGU: '#65a30d', HPL: '#db2777', HMSRS: '#ea580c', Wakaf: '#0f766e', Lainnya: '#475569' };
 const bhumiUrl = b => { const c = tbPusat(b), d = .0012; return 'https://bhumi.atrbpn.go.id/peta?bbox=' + [c[0] - d * 2, c[1] - d, c[0] + d * 2, c[1] + d].map(v => v.toFixed(6)).join('%2C') + '&height=855&width=1920&x=960&y=427&latitude=' + c[1].toFixed(7) + '&longitude=' + c[0].toFixed(7); };
 const TB_BUKAN = ['Jalan', 'Sungai / Saluran', 'Fasilitas umum', 'Makam', 'Tanah Kas Desa', 'Area TNI', 'Lainnya'];
 let LEAF = null;
@@ -10201,7 +10204,7 @@ async function tnLinkBW(b, x, on, wpById) {
   await tnSimpan('tanah_bidang', b, d);
   await tnSimpan('tanah_desa', x, Object.assign({ bidang: tnTgl(x.bidang, b.no, on) }, on && !x.dusun && b.dusun ? { dusun: b.dusun } : {}));
 }
-const TN_HAK = ['Hak Milik', 'Hak Guna Bangunan', 'Hak Pakai', 'Hak Guna Usaha', 'Hak Pengelolaan', 'Hak Wakaf', 'Letter C/Girik'];
+const TN_HAK = HAK_TANAH;
 /* pilih sertifikat yang ada atau buat baru */
 async function tnPilihSert(judul, onPick) {
   let S2 = []; try { S2 = await ambilSemua('tanah_sert'); } catch (x) { }
@@ -10362,7 +10365,7 @@ VIEWS.tanah = async (p, main, alive) => {
       <div class="btns"><a class="btn sm" href="${esc(bhumiUrl(b))}" target="_blank" rel="noopener">${ic('map')}Buka di Bhumi</a>${w ? `<button class="btn sm" data-act="tnBhIsi">${ic('edit')}${b.bhumi_hak ? 'Ubah' : 'Isi'} data Bhumi</button>` : ''}</div>`;
     S.vh.tnBhIsi = () => {
       const m = sheet('Data Bhumi — bidang #' + b.no, `<form class="stack" id="bhF"><div class="meta">Buka Bhumi, ketuk bidang yang sama, lalu salin Tipe Hak, NIB, dan Luas di sini. Pilih "Kosong" bila Bhumi menulis tipe hak kosong (belum bersertifikat).</div>
-        <div class="f"><label>Tipe hak</label><select id="bhH"><option value="">Kosong / belum bersertifikat</option>${BH_HAK.map(h => `<option${b.bhumi_hak === h ? ' selected' : ''}>${h}</option>`).join('')}</select></div>
+        <div class="f"><label>Tipe hak</label><select id="bhH"><option value="">Kosong / belum bersertifikat</option>${BH_HAK.map(h => `<option value="${h}"${b.bhumi_hak === h ? ' selected' : ''}>${h} — ${BH_NAMA[h]}</option>`).join('')}</select></div>
         <div class="f"><label>NIB</label><input id="bhN" value="${esc(b.bhumi_nib || '')}" inputmode="numeric" autocomplete="off"></div>
         <div class="f"><label>Luas (m²)</label><input id="bhL" value="${esc(b.bhumi_luas || '')}" inputmode="numeric" autocomplete="off"></div>
         <div class="btns"><button class="btn pri" type="submit">${ic('check')}Simpan</button></div></form>`, { ikon: 'map' });
