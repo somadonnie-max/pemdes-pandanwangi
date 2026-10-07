@@ -2728,7 +2728,7 @@ function hadirHtml(d) {
 function agendaHtml(rows, berita) {
   const t = isoToday(), bs = new Date(Date.now() + 864e5), besok = bs.getFullYear() + '-' + String(bs.getMonth() + 1).padStart(2, '0') + '-' + String(bs.getDate()).padStart(2, '0');
   const lbl = d => d === t ? 'Hari ini' : d === besok ? 'Besok' : fDay(d).split(',')[0];
-  const tb = `<button class="linkbtn ag-all" data-act="modOpen" data-k="kegiatan">Lihat semua ${ic('next')}</button>`;
+  const tb = `<button class="linkbtn ag-all" data-act="go" data-go='${esc(JSON.stringify(['list', { e: 'kegiatan', v: 0, title: 'Agenda' }]))}'>Lihat semua ${ic('next')}</button>`;
   const tiga = (rows.map(r => ['a', r]).concat((berita || []).map(r => ['b', r]))).slice(0, 3);
   const aS = new Set(tiga.filter(x => x[0] === 'a').map(x => x[1])), bS = new Set(tiga.filter(x => x[0] === 'b').map(x => x[1]));
   rows = rows.filter(r => aS.has(r)); berita = (berita || []).filter(r => bS.has(r));
@@ -7312,7 +7312,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '136', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '137', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
