@@ -1689,7 +1689,8 @@ function call(action, p, bearer) {
 }
 /* Foto KTP/KK: disimpan di proyek Supabase "pemdes-berkas" lewat penjaga (Edge Function) "berkas" */
 const BERKAS_URL = SB_URL + '/functions/v1/berkas';
-const isSbFile = id => /^sb[12]:/.test(String(id || ''));
+const isR2 = id => /^r2:/.test(String(id || ''));
+const isSbFile = id => /^(sb[12]|r2):/.test(String(id || ''));   /* berkas milik penjaga "berkas": Supabase (KTP/KK lama) atau Cloudflare R2 */
 function callBerkas(action, p) {
   return fetch(BERKAS_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ action, token: S.token }, p || {})) })
     .then(r => r.json()).catch(() => { throw new Error('Tidak ada koneksi ke server berkas. Periksa internet Anda.'); })
@@ -2175,8 +2176,15 @@ setInterval(() => {   /* cadangan bila siaran terputus + perbarui "x mnt lalu" *
    BERKAS
    ===================================================================== */
 const THUMB = {}, thumbTried = new Set();
+const SIGNED = {};   /* tautan lihat sementara (R2) untuk cetakan beresolusi tinggi */
+async function signedFor(ids) {
+  await Promise.all(Array.from(new Set(ids)).filter(x => isR2(x) && !SIGNED[x]).map(async x => {
+    try { SIGNED[x] = (await callBerkas('get', { id: x })).url; setTimeout(() => { delete SIGNED[x]; }, 240000); } catch (e) { }
+  }));
+}
 function thumb(id, sz) {
   if (!id || id === '•') return '';
+  if (isR2(id) && sz > 400 && SIGNED[id]) return SIGNED[id];
   if (THUMB[id]) return THUMB[id];
   return `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w${sz || 400}`;
 }
@@ -2206,14 +2214,14 @@ async function makeThumb(file) {
 function driveUrl(id) { return `https://drive.google.com/file/d/${encodeURIComponent(id)}/view`; }
 async function viewFile(id, priv, name) {
   if (!id || id === '•') return toast('Anda tidak punya izin melihat dokumen ini.', 1);
-  if (!priv) { window.open(driveUrl(id), '_blank', 'noopener'); return; }
+  if (!priv && !isSbFile(id)) { window.open(driveUrl(id), '_blank', 'noopener'); return; }
   const m = modal(name || 'Dokumen', '<div class="skel" style="height:240px"></div>', { big: 1 });
   if (isSbFile(id)) {
     try {
       const r = await callBerkas('get', { id });
-      m.body.innerHTML = /\.pdf$/i.test(id)
-        ? `<a class="btn pri" href="${esc(r.url)}" target="_blank" rel="noopener">${ic('eye')}Buka berkas PDF</a>`
-        : `<img src="${esc(r.url)}" alt="" style="width:100%;border-radius:12px"><div class="btns" style="margin-top:8px"><a class="btn sm" href="${esc(r.url)}" target="_blank" rel="noopener">${ic('eye')}Buka ukuran penuh</a></div>`;
+      m.body.innerHTML = /\.(jpe?g|png|webp|gif)$/i.test(id)
+        ? `<img src="${esc(r.url)}" alt="" style="width:100%;border-radius:12px"><div class="btns" style="margin-top:8px"><a class="btn sm" href="${esc(r.url)}" target="_blank" rel="noopener">${ic('eye')}Buka ukuran penuh</a></div>`
+        : `<a class="btn pri" href="${esc(r.url)}" target="_blank" rel="noopener">${ic('eye')}${/\.pdf$/i.test(id) ? 'Buka berkas PDF' : 'Buka / unduh berkas'}</a>`;
     } catch (e) { m.body.innerHTML = `<div class="err">${esc(e.message)}</div>`; }
     return;
   }
@@ -2281,10 +2289,25 @@ async function uploadKependudukan(file, folder) {
   if (!up || !up.ok) throw new Error('Gagal mengunggah foto' + (up ? ' (' + up.status + ')' : '') + '. Coba lagi.');
   return { id: r.id, size: blob.size };
 }
+/** Unggah dokumen/foto umum ke Cloudflare R2 (privat, lewat tautan unggah sementara). */
+async function uploadR2(file, folder) {
+  let blob = file, mime = file.type || 'application/octet-stream', name = file.name || 'berkas';
+  const gambar = /^image\//.test(mime) && !/gif|svg/.test(mime);
+  if (gambar) { blob = await shrinkBlob(file, 2000, 900e3); mime = 'image/jpeg'; name = name.replace(/\.\w+$/, '') + '.jpg'; }
+  if (blob.size > 25 * 1024 * 1024) throw new Error('Ukuran berkas maksimal 25 MB.');
+  const r = await callBerkas('r2up', { folder, name, mime, size: blob.size });
+  const up = await fetch(r.url, { method: 'PUT', headers: { 'Content-Type': r.mime || mime }, body: blob }).catch(() => null);
+  if (!up || !up.ok) throw new Error('Gagal mengunggah berkas' + (up ? ' (' + up.status + ')' : '') + '. Coba lagi.');
+  if (gambar) { try { const t = await makeThumb(file); THUMB[r.id] = t; await call('thumbSave', { id: r.id, data: t }); } catch (e) { } }
+  return { id: r.id, size: blob.size, name };
+}
 async function uploadFile(file, folder) {
   if (String(folder || '').split('/')[0] === 'Penduduk') {
     try { return await uploadKependudukan(file, folder); }
     catch (e) { if (!/belum dipasang/.test(e.message)) throw e; }   /* penyimpanan baru belum siap: pakai Drive */
+  } else {
+    try { return await uploadR2(file, folder); }
+    catch (e) { if (!/belum dipasang/.test(e.message)) throw e; }   /* R2 belum dipasang: pakai Drive */
   }
   if (file.size > 25 * 1024 * 1024) throw new Error('Ukuran berkas maksimal 25 MB.');
   let data, mime = file.type || 'application/octet-stream', name = file.name;
@@ -6804,7 +6827,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '129', tgl: '2026-10-07', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '130', tgl: '2026-10-07', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -10201,7 +10224,7 @@ VIEWS.spjsusun = async (p, main, alive) => {
   S.vh.sjUxT = () => saveBlob(XL.write([{ name: 'Upah', rows: [['Nama', 'Peran', 'NIK/NPWP', 'Alamat', 'Hari kerja', 'Upah per hari']].concat(D.upah.map(u => [u.nama, u.peran, u.npwp, u.alamat, spjN(u.hari), spjN(u.upah)])), head: true, widths: [28, 16, 20, 28, 12, 14] }]), 'Format daftar upah.xlsx');
   S.vh.sjDariRab = async () => { try { const M = await rabMaster(), Hh = rabDariSimpan(proyek, M), SD = rabSumberDaya(Hh.items).filter(r => !/upah/i.test(r.jenis)); D.barang = D.barang.concat(SD.map(r => ({ uraian: r.uraian, vol: String(r.qty), sat: r.satuan, harga: String(r.harga), jenis: JENIS_BELANJA[0], pkp: 'Tidak' }))); await simpan(); toast(SD.length + ' baris dari RAB. Sesuaikan dengan nota yang sebenarnya.'); draw(); } catch (x) { toast(x.message, 1); } };
   S.vh.sjLengkap = async () => { const H = hit(); if (Math.abs(H.selisih) >= 1) return toast('Total SPJ belum sama dengan nilai SPP.', 1); try { await simpan({ status: 'Lengkap' }); toast('SPJ ditandai lengkap.'); draw(); } catch (x) { toast(x.message, 1); } };
-  S.vh.sjCetak = async t => { try { await simpan(); const H = hit(); const fotoPb = titik.map(x => OPT.progres.filter(p => x['foto_' + p]).map(p => ({ id: x['foto_' + p], ket: (x.nama_titik || '') + ' — progres ' + p + '%' }))).flat(); const all = spjDokumen(spp, D, H, fotoPb, pajakTr); printDocs('SPJ ' + (spp.no || ''), t.dataset.v === 'semua' ? Object.values(all).flat() : all[t.dataset.v], 'spj'); } catch (x) { toast(x.message, 1); } };
+  S.vh.sjCetak = async t => { try { await simpan(); const H = hit(); const fotoPb = titik.map(x => OPT.progres.filter(p => x['foto_' + p]).map(p => ({ id: x['foto_' + p], ket: (x.nama_titik || '') + ' — progres ' + p + '%' }))).flat(); await signedFor(fotoPb.map(f => f.id)); const all = spjDokumen(spp, D, H, fotoPb, pajakTr); printDocs('SPJ ' + (spp.no || ''), t.dataset.v === 'semua' ? Object.values(all).flat() : all[t.dataset.v], 'spj'); } catch (x) { toast(x.message, 1); } };
   draw();
 };
 /* ---------- template dokumen SPJ (siap cetak) ---------- */
@@ -11490,7 +11513,7 @@ VIEWS.skimpor = async (p, main) => {
 applyTheme();
 /* dipakai oleh atribut onclick di HTML */
 window.refresh = refresh; window.loginScreen = loginScreen; window.boot = boot;
-window.__pwTest = { go, root, logoutLocal, store, NX, S, dataSayaHtml, tentangHtml, homeCards, modBuka, aktItem, unduhSelesai, loginScreen, sheet };
+window.__pwTest = { uploadFile, viewFile, thumb, signedFor, isSbFile, isR2, go, root, logoutLocal, store, NX, S, dataSayaHtml, tentangHtml, homeCards, modBuka, aktItem, unduhSelesai, loginScreen, sheet };
 boot();
 })();
 </script>
