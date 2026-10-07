@@ -1445,6 +1445,14 @@ const UI = {
     chips: { k: 'akun', opt: ['4', '5', '6'], lbl: v => ({ 4: 'Pendapatan', 5: 'Belanja', 6: 'Pembiayaan' })[v] || v },
     row: r => ({ t: r.uraian, s: `<span class="mono">${esc(r.kode)}</span>`, raw: 1, av: r.akun || String(r.kode || '').slice(0, 1) })
   },
+  keu_paket: {
+    t: 'Paket Kegiatan Dana Desa', ic: 'box', perm: 'keu_anggaran', sort: 'no', asc: 1, year: 'tahun',
+    fields: [F('tahun', 'Tahun Anggaran', 'number', { req: 1 }), F('no', 'No.', 'number'), F('kode_kegiatan', 'Kode Kegiatan', 'text', { mono: 1 }), F('kode_output', 'Kode Output', 'text', { mono: 1 }), F('nama', 'Nama Paket Kegiatan', 'text', { req: 1, wide: 1 }),
+      F('cara', 'Cara Pengadaan', 'select', { opt: ['Swakelola', 'Penyedia', 'Pihak Ketiga'] }), F('volume', 'Volume Output', 'number'), F('satuan', 'Satuan'), F('nilai', 'Nilai Kegiatan', 'money'),
+      F('real1', 'Realisasi Tahap I', 'money'), F('real2', 'Realisasi s.d. Tahap II', 'money'), F('real3', 'Realisasi s.d. Tahap III', 'money'), F('f1', 'Realisasi Output F1', 'number'), F('f2', 'Realisasi Output F2', 'number'), F('f3', 'Realisasi Output F3', 'number'),
+      F('lokasi', 'Lokasi / Dusun', 'text', { wide: 1 }), F('ket', 'Keterangan', 'text', { wide: 1 }), F('paket_id', '', 'hidden')],
+    row: r => { const real = Math.max(Number(r.real1) || 0, Number(r.real2) || 0, Number(r.real3) || 0), n = Number(r.nilai) || 0; return { t: r.nama, s: [r.kode_kegiatan, [r.volume, r.satuan].filter(Boolean).join(' '), r.cara].filter(Boolean).join(' · '), s2: 'Nilai ' + rp(n) + ' · realisasi ' + (n ? Math.round(real / n * 100) : 0) + '%', r: '#' + (r.no || ''), av: ic('box') }; }
+  },
   keu_anggaran: {
     t: 'APBDes', ic: 'wallet', perm: 'keu_anggaran', sort: 'rek', excel: 1, year: 'tahun',
     fields: [F('tahun', 'Tahun Anggaran', 'number', { req: 1, def: () => new Date().getFullYear() }), F('rek', 'Kode Rekening', 'text', { req: 1, wide: 1, listFrom: { e: 'keu_rek', k: x => x.kode + ' ' + x.uraian }, hint: 'Pilih dari daftar Kode Rekening' }),
@@ -1652,7 +1660,7 @@ function MODS() {
     { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Buku NTCR', 'users', ['list', { e: 'ntcr' }], 'ntcr'], ['Rentan / Sosial', 'heart', ['list', { e: 'rentan' }], 'rentan'], ['Usulan Bansos & DTSEN', 'send', ['list', { e: 'usulan_bansos' }], 'usulan_bansos'], ['Musdes/Muskel Bansos', 'users', ['list', { e: 'musdes_bansos' }], 'musdes_bansos'], ['Penyaluran Bansos', 'check', ['list', { e: 'penyaluran_bansos' }], 'penyaluran_bansos'], ['Rekap Sosial', 'chart', ['sosrekap'], ''], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
     { k: 'kesejahteraan', l: 'Kesejahteraan', ic: 'heart', items: [['Lembaga / Yayasan', 'landmark', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru Ngaji', 'book', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
     { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RPJM Desa', 'book', ['rpjm', {}], null, 'r:rkp'], ['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['RAB & Gambar', 'hammer', ['rab', {}], null, 'r:rab'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Progres Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
-    { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['SPJ', 'check', ['spj', {}], null, 'r:spj'], ['Pengajuan ADD (Siltap & Dana Dusun)', 'send', ['addaju'], null, 'r:keu_penatausahaan'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Rekap Pajak', 'coin', ['keupajak'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek'], ['Impor PDF Siskeudes', 'down', ['skimpor'], null, 'w:keu_anggaran']] },
+    { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Paket Kegiatan Dana Desa', 'box', ['list', { e: 'keu_paket' }], 'keu_paket'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['SPJ', 'check', ['spj', {}], null, 'r:spj'], ['Pengajuan ADD (Siltap & Dana Dusun)', 'send', ['addaju'], null, 'r:keu_penatausahaan'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Rekap Pajak', 'coin', ['keupajak'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek'], ['Impor PDF Siskeudes', 'down', ['skimpor'], null, 'w:keu_anggaran']] },
     { k: 'soon', l: 'Segera Hadir', ic: 'sprout', items: Object.keys(SOON).map(k => [SOON[k].t, SOON[k].ic, ['soon', { k }], null, '*', 1]) }
   ];
 }
@@ -3268,6 +3276,8 @@ async function renderDetail(e, x, el, full) {
     } catch (er) { xk.innerHTML = `<div class="err">${esc(er.message)}</div>`; }
   }
   if (e === 'keluarga') await extraKeluarga(x, xx, full);
+  if (e === 'keu_paket') await extraPaket(x, xx);
+  if (e === 'aset' && x.paket_id) xx.insertAdjacentHTML('afterbegin', `<div class="btns"><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'keu_paket', id: x.paket_id }]))}'>${ic('box')}Paket kegiatan asal</button></div>`);
   if (e === 'rkp_musyawarah') await extraMusyawarah(x, xx);
   if (e === 'aset') await extraAset(x, xx);
   if (e === 'aset_trx') { const dv = document.createElement('div'); dv.className = 'btns'; dv.innerHTML = `<button class="btn sm" data-act="trxDok">${ic('file')}Buat Berita Acara / SK</button>`; xx.appendChild(dv); S.vh.trxDok = () => asetDokTrx(x); }
@@ -6794,7 +6804,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '128', tgl: '2026-10-07', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '129', tgl: '2026-10-07', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -11039,6 +11049,44 @@ VIEWS.frc = async (p, main, alive) => {
     $('#flF', m.el).onsubmit = async ev => { ev.preventDefault(); try { await call('save', { entity: 'frc_lapor', record: { tahun: String(th), ind: k, tgl: $('#flT', m.el).value, persen: $('#flP', m.el).value.trim(), verif: $('#flV', m.el).value.trim(), ket: $('#flK', m.el).value.trim() } }); m.close(); toast('Tersimpan.'); refresh(); } catch (er) { toast(er.message, 1); } };
   };
 };
+
+/* ---- Paket Kegiatan Dana Desa (Siskeudes) ↔ APBDes, RKP, RPJM, Pembangunan, Aset ---- */
+const pkReal = x => Math.max(mNum(x.real1), mNum(x.real2), mNum(x.real3));
+const pkKibDariRek = rek => { const m = String(rek || '').match(/^5\.3\.(\d)/); if (!m) return ''; return { 1: 'A', 2: 'B', 3: 'B', 4: 'C', 5: 'D', 6: 'D', 7: 'D', 8: 'D', 9: 'E' }[m[1]] || ''; };
+const pkKibDariKode = k => { const n = String(k || '').split('.').map(x => parseInt(x, 10)).join('.'); if (/^2\.3\.1[5-9]/.test(n) || /^2\.3\.(1|2|3|4)$/.test(n)) return 'C'; if (/^2\.(3|6)\./.test(n)) return 'D'; return ''; };
+const pkKibOpt = h => KIB_OPT.find(k => k.charAt(0) === h) || '';
+async function extraPaket(x, el) {
+  let R; try { R = await call('paketRelasi', { id: x.id }); } catch (er) { el.insertAdjacentHTML('afterbegin', `<div class="err">${esc(er.message)}</div>`); return; }
+  if (!R) return;
+  const modal5 = R.apbdes.filter(a => /^5\.3/.test(a.rek || '')), kib = (() => { const t = {}; modal5.forEach(a => { const h = pkKibDariRek(a.rek); if (h) t[h] = (t[h] || 0) + (Number(a.pagu) || 0); }); return Object.keys(t).sort((a, b) => t[b] - t[a])[0] || pkKibDariKode(x.kode_kegiatan); })();
+  const fisik = !!kib, real = pkReal(x), pagu = R.apbdes.reduce((t, a) => t + (Number(a.pagu) || 0), 0);
+  const w = canWrite('keu_paket'), wa = canWrite('aset'), wp = canWrite('pembangunan');
+  const kegNama = (R.apbdes[0] && R.apbdes[0].kegiatan) || '';
+  const sec = (judul, isi, tombol) => `<div class="sec-h"><h2>${judul}</h2>${tombol || ''}</div>${isi}`;
+  el.insertAdjacentHTML('afterbegin', `<div class="stack">
+    <div class="card"><dl class="dl"><div><dt>Nilai paket</dt><dd>${rp(mNum(x.nilai))}</dd></div><div><dt>Realisasi</dt><dd>${rp(real)} (${mNum(x.nilai) ? Math.round(real / mNum(x.nilai) * 100) : 0}%)</dd></div><div><dt>Output</dt><dd>${esc(x.volume)} ${esc(x.satuan || '')} · real. ${esc(Math.max(mNum(x.f1), mNum(x.f2), mNum(x.f3)))}</dd></div></dl></div>
+    ${sec(`${ic('wallet')} APBDes ${esc(x.tahun)} · kegiatan ${esc(x.kode_kegiatan)}`, R.apbdes.length ? `<div class="meta">${esc(kegNama)} — ${R.apbdes.length} rincian, pagu ${rp(pagu)} (semua sumber dana dalam kegiatan ini)</div>` : '<div class="meta">Belum ada rincian APBDes dengan kode kegiatan ini.</div>', `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['list', { e: 'keu_anggaran' }]))}'>${ic('next')}APBDes</button>`)}
+    ${sec(`${ic('sprout')} RKP Desa ${esc(x.tahun)}`, R.rkp.length ? `<div class="list">${R.rkp.map(r => `<div class="it"><button class="row" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'rkp_usulan', id: r.id }]))}'><span class="main"><span class="t">${esc(r.kegiatan || '')}</span><span class="s">${esc([r.lokasi, r.volume ? r.volume + ' ' + (r.satuan || '') : '', r.total ? rp(mNum(r.total)) : '', r.sumber].filter(Boolean).join(' · '))}</span></span></button></div>`).join('')}</div>` : '<div class="meta">Tidak ada usulan RKP dengan kode kegiatan ini pada tahun tersebut.</div>')}
+    ${sec(`${ic('book')} RPJM Desa`, R.rpjm.length ? `<div class="list">${R.rpjm.map(r => `<div class="row" style="cursor:default"><span class="main"><span class="t">${esc(r.nama || '')}</span><span class="s">${esc([r.lokasi, r.volume, r.biaya ? 'biaya ' + x.tahun + ' ' + rp(Number(r.biaya)) : ''].filter(Boolean).join(' · '))}</span></span></div>`).join('')}</div>` : '<div class="meta">Belum ditemukan di RPJM untuk tahun ini.</div>', `<button class="btn sm" data-act="go" data-go='["rpjm",{}]'>${ic('next')}RPJM</button>`)}
+    ${fisik ? sec(`${ic('target')} Pembangunan`, R.pembangunan.length ? `<div class="list">${R.pembangunan.map(r => `<div class="it"><button class="row" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'pembangunan', id: r.id }]))}'><span class="main"><span class="t">${esc(r.nama)}</span><span class="s">${esc(r.tahapan || '')}</span></span></button></div>`).join('')}</div>` : '<div class="meta">Belum dicatat di menu Pembangunan (progres, foto, titik lokasi).</div>', wp && !R.pembangunan.length ? `<button class="btn sm" data-act="pkBangun">${ic('plus')}Catat pembangunan</button>` : '') : ''}
+    ${fisik ? sec(`${ic('box')} Aset hasil kegiatan`, R.aset.length ? `<div class="list">${R.aset.map(r => `<div class="it"><button class="row" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'aset', id: r.id }]))}'><span class="main"><span class="t">${esc(r.nama)}</span><span class="s">${esc([r.kib, r.nilai ? rp(mNum(r.nilai)) : '', r.status].filter(Boolean).join(' · '))}</span></span></button></div>`).join('')}</div>` : `<div class="err" style="background:none">Belum tercatat sebagai aset. Hasil pembangunan fisik ini harus masuk buku inventaris (Gol. ${esc(kib)} · ${esc(kibNama ? kibNama(kib) : '')}).</div>`, wa ? `<span class="btns"><button class="btn sm pri" data-act="pkAsetBaru">${ic('plus')}Jadikan aset</button><button class="btn sm" data-act="pkAsetHub">${ic('target')}Hubungkan aset lama</button></span>` : '') : ''}
+  </div>`);
+  const ref = [x.tahun, String(x.kode_kegiatan || '').split('.').map(v => parseInt(v, 10)).join('.'), kegNama].join(' | ');
+  S.vh.pkAsetBaru = () => go('form', { e: 'aset', preset: { kib: pkKibOpt(kib), nama: x.nama, perolehan: 'Pengadaan', asal: 'APBDesa', sumber_dana: 'Dana Desa (Dropping APBN)', tgl_perolehan: x.tahun + '-12-31', nilai: String(real || mNum(x.nilai)), kondisi: 'Baik', status: 'Aktif', ket: [x.volume, x.satuan].filter(Boolean).join(' ') + ' · Paket DD ' + x.tahun + ' no. ' + x.no, apbdes_ref: ref, paket_id: x.id } });
+  S.vh.pkAsetHub = async () => {
+    let L = []; try { L = await asetSemua({}); } catch (er) { return toast(er.message, 1); }
+    const m = sheet('Hubungkan aset untuk ' + x.nama, `<div class="stack"><input id="paQ" placeholder="Cari nama aset…" autocomplete="off"><div id="paL" class="list oplist"></div></div>`, { ikon: 'box' });
+    const kata = String(x.nama).toLowerCase().split(/\s+/).filter(k => k.length > 3);
+    const tulis = () => {
+      const q = $('#paQ', m.el).value.trim().toLowerCase();
+      const H = L.filter(a => !a.paket_id && (q ? String(a.nama || '').toLowerCase().indexOf(q) >= 0 : kibHuruf(a) === kib)).map(a => ({ a, s: kata.filter(k => String(a.nama || '').toLowerCase().indexOf(k) >= 0).length })).sort((p, q2) => q2.s - p.s).slice(0, 40);
+      $('#paL', m.el).innerHTML = H.map(({ a }) => `<button type="button" class="row" data-id="${esc(a.id)}"><span class="main"><span class="t">${esc(a.nama || '')}</span><span class="s">${esc([a.kib, a.tahun || tahunOf(a.tgl_perolehan), a.nilai ? rp(asetNum(a.nilai)) : '', a.letak].filter(Boolean).join(' · '))}</span></span></button>`).join('') || '<div class="meta">Tidak ada aset yang cocok.</div>';
+    };
+    tulis(); $('#paQ', m.el).oninput = tulis;
+    $('#paL', m.el).onclick = ev => { const b = ev.target.closest('[data-id]'); if (!b) return; m.close(); tnKonfirm('Hubungkan aset ini dengan paket ' + x.nama + ' (' + x.tahun + ')?', async () => { await call('save', { entity: 'aset', record: { id: b.dataset.id, paket_id: x.id, apbdes_ref: ref } }); toast('Terhubung.'); refresh(); }, 'Ya, hubungkan'); };
+  };
+  S.vh.pkBangun = async () => { try { const r = await call('save', { entity: 'pembangunan', record: { nama: x.nama, kode: x.kode_kegiatan, sumber_dana: 'Dana Desa', tahun_anggaran: x.tahun, pagu: String(mNum(x.nilai)), pelaksana: x.cara === 'Swakelola' ? 'TPK Desa ' + (S.set.nama_desa || '') : x.cara, ket: [x.volume, x.satuan].filter(Boolean).join(' ') + ' · Paket DD no. ' + x.no, paket_id: x.id } }); toast('Tercatat di Pembangunan.'); go('detail', { e: 'pembangunan', id: r.id }); } catch (er) { toast(er.message, 1); } };
+}
 
 function tanahTabs(cur) { return `<div class="gtabs"><button class="${cur === 'peta' ? 'on' : ''}" data-act="go" data-go='["tanah"]'>${ic('map')} Peta bidang</button><button class="${cur === 'list' ? 'on' : ''}" data-act="go" data-go='["list",{"e":"tanah_desa"}]'>${ic('list')} SPPT</button><button class="${cur === 'sert' ? 'on' : ''}" data-act="go" data-go='["list",{"e":"tanah_sert"}]'>${ic('file')} Sertifikat</button></div>`; }
 /* ---- hubungan banyak-ke-banyak: bidang (poligon) <-> SPPT <-> sertifikat ---- */
