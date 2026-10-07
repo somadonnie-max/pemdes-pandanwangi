@@ -3301,6 +3301,7 @@ async function renderDetail(e, x, el, full) {
   }
   if (e === 'keluarga') { await extraKeluarga(x, xx, full); try { await extraKelDtsen(x, xx); } catch (er) { } }
   if (e === 'keu_paket') await extraPaket(x, xx);
+  if (e === 'dtsen') await extraDtsen(x, xx);
   if (e === 'aset' && x.paket_id) xx.insertAdjacentHTML('afterbegin', `<div class="btns"><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'keu_paket', id: x.paket_id }]))}'>${ic('box')}Paket kegiatan asal</button></div>`);
   if (e === 'rkp_musyawarah') await extraMusyawarah(x, xx);
   if (e === 'aset') await extraAset(x, xx);
@@ -4835,6 +4836,31 @@ async function extraKelDtsen(k, el) {
     tulis(Object.keys(prog).sort()[0]);
     $('#dtRwTab', box).onclick = ev => { const b = ev.target.closest('[data-p]'); if (!b) return; $$('#dtRwTab button', box).forEach(x => x.classList.toggle('on', x === b)); tulis(b.dataset.p); };
   }
+}
+
+/** detail DTSEN: hubungkan ke Data Keluarga (untuk baris yang belum cocok) */
+async function extraDtsen(x, el) {
+  const w = canWrite('rentan');
+  if (x.keluarga_id) { el.insertAdjacentHTML('afterbegin', `<div class="btns"><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'keluarga', id: x.keluarga_id }]))}'>${ic('house')}Buka Data Keluarga</button></div>`); return; }
+  el.insertAdjacentHTML('afterbegin', `<div class="card stack" style="border:1px solid #e8a400"><div>${ic('mega')} Belum terhubung ke Data Keluarga desa. ${esc(x.ket || '')}</div>${w ? `<button class="btn sm pri" data-act="dtHub" style="align-self:flex-start">${ic('link')}Hubungkan ke Data Keluarga</button>` : ''}</div>`);
+  S.vh.dtHub = () => {
+    const m = sheet('Hubungkan ' + (x.kepala || ''), `<div class="stack"><input id="dhQ" placeholder="Cari nama kepala keluarga…" autocomplete="off" value="${esc(String(x.kepala || '').replace(/^\(.*\)$/, ''))}"><div id="dhL" class="list oplist"></div></div>`, { ikon: 'house' });
+    let tm = null;
+    const cari = async () => {
+      const q = $('#dhQ', m.el).value.trim(); if (q.length < 2) { $('#dhL', m.el).innerHTML = '<div class="meta">Ketik minimal 2 huruf.</div>'; return; }
+      let L = []; try { L = (await call('list', { entity: 'keluarga', q, limit: 30 })).rows || []; } catch (er) { $('#dhL', m.el).innerHTML = `<div class="err">${esc(er.message)}</div>`; return; }
+      $('#dhL', m.el).innerHTML = L.map(k => `<button type="button" class="row" data-id="${esc(k.id)}" data-kk="${esc(k.kk || '')}" data-nm="${esc(k.kepala || '')}"><span class="main"><span class="t">${esc(k.kepala || '')}</span><span class="s">${esc([String(k.dusun || '').replace(/^DUSUN /, ''), k.rt ? 'RT ' + Number(k.rt) + '/' + Number(k.rw || 0) : '', k.kk ? 'KK ' + k.kk : ''].filter(Boolean).join(' · '))}</span></span></button>`).join('') || '<div class="meta">Tidak ditemukan.</div>';
+    };
+    $('#dhQ', m.el).oninput = () => { clearTimeout(tm); tm = setTimeout(cari, 300); }; cari();
+    $('#dhL', m.el).onclick = ev => { const b = ev.target.closest('[data-id]'); if (!b) return; m.close();
+      tnKonfirm('Hubungkan data DTSEN ' + (x.kepala || '') + ' dengan keluarga ' + b.dataset.nm + '?', async () => {
+        const rec = { id: x.id, keluarga_id: b.dataset.id, ket: (String(x.ket || '').replace(/RAGU:[^]*$/, '').trim() + ' Dihubungkan manual ke KK ' + b.dataset.nm + ' (' + isoToday() + ').').trim() };
+        if (b.dataset.kk && b.dataset.kk.indexOf('•') < 0) rec.kk = b.dataset.kk;
+        const sv = await call('save', { entity: 'dtsen', record: rec });
+        let msg = 'Terhubung.'; try { if (await dtsenKeRentan(Object.assign({}, x, rec, sv || {}))) msg += ' Masuk Data Rentan sebagai keluarga miskin.'; } catch (er) { }
+        toast(msg); refresh();
+      }, 'Ya, hubungkan'); };
+  };
 }
 /** desil 1 -> Data Rentan "Keluarga miskin" (sekali per keluarga) */
 const DT_KE_RENTAN = { 'PKH': 'PKH', 'Sembako / BPNT': 'BPNT / Sembako', 'PBI JK': 'PBI JK (BPJS Kesehatan)', 'ATENSI': 'ATENSI (Kemensos)', 'BLT Dana Desa': 'BLT Dana Desa' };
@@ -6954,7 +6980,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '132', tgl: '2026-10-07', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '133', tgl: '2026-10-07', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
