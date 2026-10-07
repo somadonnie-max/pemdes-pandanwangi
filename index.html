@@ -923,6 +923,45 @@ img.bf-pg{width:auto;max-width:100%;max-height:70vh;object-fit:contain}
 .add-sil td.jn input[data-k="nama"]{font-weight:600;min-width:0}
 .add-sil td.jn small{display:block;font-size:10.5px;font-weight:700;color:var(--pri)}.add-sil td.jn b{display:block}
 .add-sil input[data-k="nik"]{min-width:118px!important;font-size:10.5px!important}
+/* ---- v139: dasbor 3D & animasi ---- */
+.kd-k,.kd-c,.stat,.dk,.dr,.dm,.pcard,.sh-st>div,.dttot,.ad-hero,.dg{position:relative;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -2px 0 rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.06),0 6px 16px -6px rgba(0,0,0,.16)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) :is(.kd-k,.kd-c,.stat,.dk,.dr,.dm,.pcard,.sh-st>div,.dg){box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 1px 2px rgba(0,0,0,.4),0 8px 18px -6px rgba(0,0,0,.55)}}
+:root[data-theme="dark"] :is(.kd-k,.kd-c,.stat,.dk,.dr,.dm,.pcard,.sh-st>div,.dg){box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 1px 2px rgba(0,0,0,.4),0 8px 18px -6px rgba(0,0,0,.55)}
+.kd-k,.stat,.dk,.dr{background-image:linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,0) 60%)}
+:is(.kd-k,.stat,.dr,.dm,.pcard,.kd-c){transition:transform .2s ease,box-shadow .2s ease}
+:is(.kd-k,.stat,.dr):hover{transform:translateY(-2px)}
+.kd-k .v,.stat b,.dk b,.dr b{font-variant-numeric:tabular-nums}
+.kd>*,.dash>*,.dring>.dr,.dgauge>.dg,.dgrid>.dm,.stats>.stat,.pgrid2>*,.dks>.dk,.kd-grid>*{animation:naik .55s cubic-bezier(.2,.8,.2,1) both}
+:is(.kd,.dash,.dring,.dgauge,.dgrid,.stats,.pgrid2,.dks)>*:nth-child(2){animation-delay:.05s}
+:is(.kd,.dash,.dring,.dgauge,.dgrid,.stats,.pgrid2,.dks)>*:nth-child(3){animation-delay:.1s}
+:is(.kd,.dash,.dring,.dgauge,.dgrid,.stats,.pgrid2,.dks)>*:nth-child(4){animation-delay:.15s}
+:is(.kd,.dash,.dring,.dgauge,.dgrid,.stats,.pgrid2,.dks)>*:nth-child(5){animation-delay:.2s}
+:is(.kd,.dash,.dring,.dgauge,.dgrid,.stats,.pgrid2,.dks)>*:nth-child(6){animation-delay:.25s}
+:is(.kd,.dash,.dring,.dgauge,.dgrid,.stats,.pgrid2,.dks)>*:nth-child(n+7){animation-delay:.3s}
+@keyframes naik{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+.dr .mc-ic,.dm .mc-ic,.kd-k .l svg{filter:drop-shadow(0 2px 3px color-mix(in srgb,var(--mc,var(--pri)) 35%,transparent))}
+/* cincin indikator */
+@property --pv{syntax:'<number>';inherits:false;initial-value:0}
+.dgauge{display:grid;grid-template-columns:repeat(auto-fill,minmax(102px,1fr));gap:8px;margin:2px 0 4px}
+.dg{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px 8px;border-radius:14px;border:1px solid color-mix(in srgb,var(--mc) 22%,var(--line));background:linear-gradient(160deg,color-mix(in srgb,var(--mc) 10%,var(--surface)),var(--surface))}
+.dg-r{--pv:var(--p);width:66px;height:66px;border-radius:50%;display:grid;place-items:center;position:relative;background:conic-gradient(from -90deg,var(--mc) calc(var(--pv) * 1%),color-mix(in srgb,var(--mc) 14%,var(--surface2)) 0);box-shadow:0 4px 10px -3px color-mix(in srgb,var(--mc) 55%,transparent),inset 0 -2px 4px rgba(0,0,0,.15);animation:dgIsi 1.4s cubic-bezier(.2,.8,.2,1) both .15s}
+.dg-r::before{content:"";position:absolute;inset:8px;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--surface),var(--surface2));box-shadow:inset 0 2px 4px rgba(0,0,0,.18),0 1px 0 rgba(255,255,255,.5)}
+.dg-r b{position:relative;font-size:14px;font-weight:800;color:var(--mc)}
+.dg small{font-size:10.5px;font-weight:600;color:var(--muted);text-align:center;line-height:1.25}
+@keyframes dgIsi{from{--pv:0}}
+/* ---- v139: animasi loading dokumen ---- */
+.muat{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:120;display:flex;align-items:center;gap:10px;padding:8px 14px 8px 9px;border-radius:999px;background:color-mix(in srgb,var(--surface) 88%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid color-mix(in srgb,var(--pri) 25%,var(--line));box-shadow:0 10px 28px -8px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.4);transform:translate(-50%,20px) scale(.9);opacity:0;pointer-events:none;transition:opacity .2s,transform .25s cubic-bezier(.2,.8,.2,1);overflow:hidden}
+.muat.on{opacity:1;transform:translate(-50%,0) scale(1)}
+.muat-ik{position:relative;width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--pri-2),var(--pri));display:grid;place-items:center;box-shadow:0 3px 8px -2px color-mix(in srgb,var(--pri) 60%,transparent);flex:none}
+.muat-doc{width:13px;height:16px;border-radius:2px;background:#fff;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:0 2.5px;animation:docGoyang 1.2s ease-in-out infinite}
+.muat-doc i{display:block;height:1.6px;border-radius:1px;background:var(--pri);animation:docBaris 1.2s ease-in-out infinite}.muat-doc i:nth-child(2){width:70%;animation-delay:.15s}.muat-doc i:nth-child(3){width:85%;animation-delay:.3s}
+.muat-arrow{position:absolute;right:-3px;bottom:-3px;width:15px;height:15px;border-radius:50%;background:var(--surface);color:var(--pri);display:grid;place-items:center;box-shadow:0 1px 3px rgba(0,0,0,.25);animation:panahTurun 1s ease-in-out infinite}.muat-arrow .ic{width:10px;height:10px;stroke-width:3}
+.muat-t{font-size:12px;font-weight:700;color:var(--ink);white-space:nowrap}
+.muat-bar{position:absolute;left:0;right:0;bottom:0;height:2px;overflow:hidden}.muat-bar i{position:absolute;inset:0;width:40%;background:linear-gradient(90deg,transparent,var(--pri),transparent);animation:muatJalan 1.1s linear infinite}
+@keyframes docGoyang{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-2px) rotate(4deg)}}
+@keyframes docBaris{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes panahTurun{0%,100%{transform:translateY(-1px)}50%{transform:translateY(2px)}}
+@keyframes muatJalan{from{transform:translateX(-100%)}to{transform:translateX(260%)}}
 </style>
 </head>
 <body>
@@ -1794,11 +1833,11 @@ function MODS() {
       ['Pengadaan', 'plus', ['list', { e: 'aset_trx', chip: 'Pengadaan' }], 'aset_trx'], ['Penggunaan, Pemanfaatan & Penghapusan', 'list', ['list', { e: 'aset_trx' }], 'aset_trx'], ['Persediaan', 'box', ['list', { e: 'persediaan' }], 'persediaan'],
       ['Inventarisasi Fisik', 'check', ['list', { e: 'aset_cek' }], 'aset_cek'], ['Laporan Format SIPADES', 'print', ['sipadeslap'], null, 'r:aset'], ['Cetak Laporan Aset (format awal)', 'print', ['asetcetak'], null, 'r:aset'], ['Cetak Register Label', 'crop', ['asetlabel'], null, 'r:aset'],
       ['Data Ruangan', 'house', ['list', { e: 'aset_ruang' }], 'aset_ruang'], ['Perangkat & Tim Inventarisasi', 'users', ['list', { e: 'aset_tim' }], 'aset_tim'], ['Kode Rekening Aset', 'list', ['list', { e: 'ref_kode_barang' }], 'ref_kode_barang'], ['SOP, Template BA/SK & Pedoman', 'book', ['asetsop'], null, 'r:aset']] },
-    { k: 'pemerintahan', l: 'Pemerintahan', ic: 'landmark', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, 'r:penduduk'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga'], ['Tanah di Desa', 'map', ['tanah'], 'tanah_desa'], ['FRC Desa (Desa Anti Korupsi)', 'check', ['frc'], null, 'r:aparat']] },
-    { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Buku NTCR', 'users', ['list', { e: 'ntcr' }], 'ntcr'], ['Rentan / Sosial', 'heart', ['list', { e: 'rentan' }], 'rentan'], ['DTSEN Keluarga (SIKS-NG)', 'house', ['list', { e: 'dtsen' }], 'rentan'], ['Usulan Bansos & DTSEN', 'send', ['list', { e: 'usulan_bansos' }], 'usulan_bansos'], ['Musdes/Muskel Bansos', 'users', ['list', { e: 'musdes_bansos' }], 'musdes_bansos'], ['Penyaluran Bansos', 'check', ['list', { e: 'penyaluran_bansos' }], 'penyaluran_bansos'], ['Rekap Sosial', 'chart', ['sosrekap'], ''], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
-    { k: 'kesejahteraan', l: 'Kesejahteraan', ic: 'heart', items: [['Lembaga / Yayasan', 'landmark', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru Ngaji', 'book', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
+    { k: 'pemerintahan', l: 'Pemerintahan', ic: 'landmark', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, 'r:penduduk'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga'], ['Tanah di Desa', 'map', ['tanah'], 'tanah_desa'], ['FRC Desa (Desa Anti Korupsi)', 'check', ['frc'], null, 'r:frc']] },
+    { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Buku NTCR', 'users', ['list', { e: 'ntcr' }], 'ntcr'], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
+    { k: 'kesejahteraan', l: 'Kesejahteraan', ic: 'heart', items: [['Rekap Sosial', 'chart', ['sosrekap'], null, 'r:rentan'], ['Rentan / Sosial', 'heart', ['list', { e: 'rentan' }], 'rentan'], ['DTSEN Keluarga (SIKS-NG)', 'house', ['list', { e: 'dtsen' }], 'dtsen'], ['Usulan Bansos & DTSEN', 'send', ['list', { e: 'usulan_bansos' }], 'usulan_bansos'], ['Musdes/Muskel Bansos', 'users', ['list', { e: 'musdes_bansos' }], 'musdes_bansos'], ['Penyaluran Bansos', 'check', ['list', { e: 'penyaluran_bansos' }], 'penyaluran_bansos'], ['Lembaga / Yayasan', 'landmark', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru Ngaji', 'book', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
     { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RPJM Desa', 'book', ['rpjm', {}], null, 'r:rkp'], ['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['RAB & Gambar', 'hammer', ['rab', {}], null, 'r:rab'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Progres Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
-    { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Paket Kegiatan Dana Desa', 'box', ['list', { e: 'keu_paket' }], 'keu_paket'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['SPJ', 'check', ['spj', {}], null, 'r:spj'], ['Pengajuan ADD (Siltap & Dana Dusun)', 'send', ['addaju'], null, 'r:keu_penatausahaan'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Rekap Pajak', 'coin', ['keupajak'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek'], ['Impor PDF Siskeudes', 'down', ['skimpor'], null, 'w:keu_anggaran']] },
+    { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Paket Kegiatan Dana Desa', 'box', ['list', { e: 'keu_paket' }], 'keu_paket'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['SPJ', 'check', ['spj', {}], null, 'r:spj'], ['Pengajuan ADD (Siltap & Dana Dusun)', 'send', ['addaju'], null, 'r:add'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Rekap Pajak', 'coin', ['keupajak'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek'], ['Impor PDF Siskeudes', 'down', ['skimpor'], null, 'w:keu_anggaran']] },
     { k: 'soon', l: 'Segera Hadir', ic: 'sprout', items: Object.keys(SOON).map(k => [SOON[k].t, SOON[k].ic, ['soon', { k }], null, '*', 1]) }
   ];
 }
@@ -1842,7 +1881,7 @@ function callBerkas(action, p) {
 }
 const can = p => !p || p === '*' || (S.user && (S.user.admin || (p !== 'admin' && S.user.akses.indexOf(p) >= 0)));
 /* Hak per menu: 'r:<menu>' melihat, 'w:<menu>' melihat & mengubah (daftar menu dari server) */
-const menuOf = e => UI[e] && UI[e].m || (/^(rkp_|ref_|rpjm_)/.test(e) ? 'rkp' : { kegiatan_berkas: 'kegiatan', pembangunan_titik: 'pembangunan', petugas_jabatan: 'petugas', keu_rek: 'keu_anggaran', keu_spp: 'keu_penatausahaan', keu_trans: 'keu_penatausahaan' }[e] || e);
+const menuOf = e => UI[e] && UI[e].m || (/^(rkp_|ref_|rpjm_)/.test(e) ? 'rkp' : { kegiatan_berkas: 'kegiatan', pembangunan_titik: 'pembangunan', petugas_jabatan: 'petugas', keu_rek: 'keu_anggaran', keu_spp: 'keu_penatausahaan', keu_trans: 'keu_penatausahaan', add_pagu: 'add', add_pengajuan: 'add', frc_bukti: 'frc', frc_lapor: 'frc' }[e] || e);
 const isMenu = m => (S.perms || []).some(p => p.menu && p.k === m);
 const canRead = e => isMenu(menuOf(e)) ? can('r:' + menuOf(e)) : can(UI[e].read || '*');
 const canWrite = e => (UI[e] && UI[e].rkp && S.rkpKunci && S.rkpBuka !== S.rkpYear) ? false : isMenu(menuOf(e)) ? can('w:' + menuOf(e)) : can(UI[e].write || UI[e].perm);
@@ -2214,6 +2253,7 @@ ACT.modOpen = t => modBuka(t.dataset.k);
 const nfD = n => Number(n || 0).toLocaleString('id-ID');
 const rpRingkas = n => { n = Number(n || 0); return n >= 1e9 ? 'Rp' + (n / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' M' : n >= 1e6 ? 'Rp' + (n / 1e6).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' jt' : 'Rp' + nfD(n); };
 const pctD = (a, b) => b ? Math.min(100, Math.round(a / b * 100)) : 0;
+const dGauge = (p, l, c) => { p = Math.max(0, Math.min(100, Math.round(Number(p) || 0))); return `<div class="dg" style="--p:${p};--mc:${c}"><div class="dg-r"><b>${p}%</b></div><small>${esc(l)}</small></div>`; };
 const dK = (v, l, sub) => `<div class="dk"><b>${v}</b><small>${esc(l)}</small>${sub ? `<i>${sub}</i>` : ''}</div>`;
 const dBar = (parts, lbl) => `<div class="dbar"><div class="dbar-t">${parts.map(p => `<i style="width:${p[0]}%;background:${p[1]}" title="${esc(p[2] || '')}"></i>`).join('')}</div>${lbl ? `<div class="dbar-l">${lbl}</div>` : ''}</div>`;
 const dPro = (l, a, b, w) => { const p = pctD(a, b); return `<div class="dpro"><div class="dpro-h"><span>${esc(l)}</span><b>${p}%</b></div><div class="dbar-t"><i style="width:${p}%;background:${w}"></i></div><small>${rpRingkas(a)} dari ${rpRingkas(b)}</small></div>`; };
@@ -2233,10 +2273,14 @@ function dashInfo(k, D, H) {
   }
   if (k === 'pelayanan') {
     const n = g.ntcr || {};
-    return `<div class="dks">${g.srt_th != null ? dK(nfD(g.srt_th), 'Surat ket. ' + new Date().getFullYear(), g.srt_bln ? '+' + g.srt_bln + ' bln ini' : '') : ''}${g.ntcr !== undefined || Object.keys(n).length ? dK(nfD((n.Nikah || 0)), 'Nikah', [n.Cerai || n.Talak ? 'cerai ' + ((n.Cerai || 0) + (n.Talak || 0)) : '', n.Rujuk ? 'rujuk ' + n.Rujuk : ''].filter(Boolean).join(' · ')) : ''}${g.rentan != null ? dK(nfD(g.rentan), 'Warga rentan', g.bansos ? g.bansos + ' terima bansos' : '') : ''}${g.lansia != null ? dK(nfD(g.lansia), 'Lansia 60+') : ''}${g.balita != null ? dK(nfD(g.balita), 'Balita') : ''}</div>`
+    return `<div class="dks">${g.srt_th != null ? dK(nfD(g.srt_th), 'Surat ket. ' + new Date().getFullYear(), g.srt_bln ? '+' + g.srt_bln + ' bln ini' : '') : ''}${g.ntcr !== undefined || Object.keys(n).length ? dK(nfD((n.Nikah || 0)), 'Nikah', [n.Cerai || n.Talak ? 'cerai ' + ((n.Cerai || 0) + (n.Talak || 0)) : '', n.Rujuk ? 'rujuk ' + n.Rujuk : ''].filter(Boolean).join(' · ')) : ''}</div>`
       + (g.srt_top && g.srt_top.length ? `<div class="dtop">${g.srt_top.map(x => `<span>${esc(String(x[0]).replace(/^Surat Keterangan /, ''))} <b>${nfD(x[1])}</b></span>`).join('')}</div>` : '');
   }
-  if (k === 'kesejahteraan') return `<div class="dks">${g.lembaga != null ? dK(nfD(g.lembaga), 'Lembaga / yayasan') : ''}${g.guru != null ? dK(nfD(g.guru), 'Guru ngaji') : ''}</div>`;
+  if (k === 'kesejahteraan') {
+    const so = D.pelayanan || {};
+    return `<div class="dks">${so.rentan != null ? dK(nfD(so.rentan), 'Warga rentan') : ''}${so.bansos != null ? dK(nfD(so.bansos), 'Terima bansos') : ''}${so.lansia != null ? dK(nfD(so.lansia), 'Lansia 60+') : ''}${so.balita != null ? dK(nfD(so.balita), 'Balita') : ''}${g.lembaga != null ? dK(nfD(g.lembaga), 'Lembaga / yayasan') : ''}${g.guru != null ? dK(nfD(g.guru), 'Guru ngaji') : ''}</div>`
+      + (so.rentan ? dBar([[pctD(so.bansos, so.rentan), 'var(--ok)', 'Terima bansos']], `Warga rentan yang menerima bansos: <b>${pctD(so.bansos, so.rentan)}%</b>`) : '');
+  }
   if (k === 'rkp') { const r = D.rkp || {}, b = D.bangun; return `<div class="dks">${r.tahun ? dK(nfD(r.usulan), 'Usulan RKP ' + r.tahun) : ''}${r.rpjm != null ? dK(nfD(r.rpjm), 'Kegiatan RPJM') : ''}${r.gagasan != null ? dK(nfD(r.gagasan), 'Gagasan') : ''}${b ? dK(nfD(b.n), 'Pembangunan', b.selesai ? b.selesai + ' selesai' : '') : ''}</div>${b && b.n ? dBar([[b.progres, 'var(--ok)']], 'Rata-rata progres pembangunan ' + b.progres + '%') : ''}`; }
   if (k === 'keuangan') return `<div class="dpros">${dPro('Pendapatan ' + (g.tahun || ''), g.real_pend, g.pagu_pend, 'var(--ok)')}${dPro('Belanja ' + (g.tahun || ''), g.real_bel, g.pagu_bel, '#2563eb')}</div><div class="dks">${dK(rpRingkas((g.real_pend || 0) - (g.real_bel || 0)), 'Selisih kas')}${dK(nfD(g.spp), 'SPP tahun ini')}</div>`;
   if (k === 'admin') return `<div class="dks">${dK(nfD(g.pengguna), 'Pengguna aktif')}${dK(nfD(g.passkey), 'Perangkat sidik jari')}${dK(nfD(g.aktivitas), 'Aktivitas 24 jam')}</div>`;
@@ -2249,6 +2293,12 @@ async function menuDash(p, main, alive) {
   const c = H.counts || {}, pm = D.pemerintahan, ps = D.pelayanan || {}, ku = D.keuangan, as = D.aset, h = H.hariIni;
   const ring = [pm && [nfD(pm.pend), 'Penduduk', 'users', '#15803d'], pm && [nfD(pm.kk), 'KK', 'house', '#0f766e'], ps.srt_th != null && [nfD(ps.srt_th), 'Surat ket. thn ini', 'file', '#db2777'],
     as && [rpRingkas(as.nilai), 'Nilai aset', 'box', '#0369a1'], ku && [pctD(ku.real_bel, ku.pagu_bel) + '%', 'Realisasi belanja', 'wallet', '#ca8a04'], h && [h.hadir + '/' + h.total, 'Hadir hari ini', 'clock', '#7c3aed']].filter(Boolean);
+  /* indikator persentase (cincin beranimasi) */
+  const tn = D.tanah, bg = D.bangun;
+  const gauge = [h && h.total && [pctD(h.hadir, h.total), 'Kehadiran hari ini', '#7c3aed'], ku && ku.pagu_pend && [pctD(ku.real_pend, ku.pagu_pend), 'Realisasi pendapatan', '#16a34a'],
+    ku && ku.pagu_bel && [pctD(ku.real_bel, ku.pagu_bel), 'Realisasi belanja', '#2563eb'], as && as.n && [pctD(as.baik, as.n), 'Aset kondisi baik', '#0891b2'],
+    tn && tn.wp && [pctD(tn.lunas, tn.wp), 'PBB lunas', '#ca8a04'], bg && bg.n && [Math.round(Number(bg.progres) || 0), 'Progres pembangunan', '#ea580c'],
+    ps.rentan && [pctD(ps.bansos, ps.rentan), 'Rentan terima bansos', '#db2777']].filter(Boolean);
   const kartu = modDaftar().map(m => {
     const w = MOD_WARNA[m.k] || 'var(--pri)';
     const items = m.list.map(it => `<button class="dm-it${it[5] ? ' soon' : ''}" data-act="go" data-go='${esc(JSON.stringify(it[2]))}'>${ic(it[1])}<span>${esc(it[0])}</span>${it[3] && c[it[3]] != null ? `<em>${nfD(c[it[3]])}</em>` : ''}</button>`).join('');
@@ -2256,6 +2306,7 @@ async function menuDash(p, main, alive) {
   }).join('');
   main.innerHTML = `<div class="dash">
     ${ring.length ? `<div class="dring">${ring.map(r => `<div class="dr" style="--mc:${r[3]}"><span class="mc-ic">${ic(r[2])}</span><span><b>${esc(r[0])}</b><small>${esc(r[1])}</small></span></div>`).join('')}</div>` : ''}
+    ${gauge.length ? `<div class="dgauge">${gauge.map(g => dGauge(g[0], g[1], g[2])).join('')}</div>` : ''}
     <label class="search dsearch">${ic('search')}<input id="dq" placeholder="Cari menu…" autocomplete="off"></label>
     <div class="dgrid" id="dgrid">${kartu}</div></div>`;
   $('#dq').oninput = ev => {
@@ -4028,7 +4079,7 @@ VIEWS.form = async (p, main, alive) => {
   if (u.rkp) { await rkpMuatVer(); if (!canWrite(e)) throw new Error('RKP ' + rkpLbl(S.rkpYear) + ' hanya bisa dilihat karena sudah digantikan versi perubahan. Pilih versi terbaru di Dashboard RKP.'); }
   setTop(p.buat && NASKAH[e] ? NASKAH[e].buat : (p.id ? 'Ubah ' : 'Tambah ') + u.t);
   let rec = {};
-  let flds = u.fields.filter(f => !(f.virt && p.id) && !f.noform && !(f.dtv && !canWrite('rentan')));
+  let flds = u.fields.filter(f => !(f.virt && p.id) && !f.noform && !(f.dtv && !canWrite('dtsen')));
   if (p.id) {
     rec = await call('get', { entity: e, id: p.id });
     if (e === 'kegiatan' && rec.sumber_mus) throw new Error('Agenda ini terusan dari Musyawarah RKP/RPJM, jadi tidak bisa diubah di sini. Ubah lewat Perencanaan → RKP Desa atau RPJM Desa → Musyawarah.');
@@ -4049,7 +4100,7 @@ VIEWS.form = async (p, main, alive) => {
       } catch (x) { }
     }
   }
-  if (e === 'keluarga' && p.id && canWrite('rentan')) { try { await kelDtMuat(rec); } catch (x) { } }
+  if (e === 'keluarga' && p.id && canWrite('dtsen')) { try { await kelDtMuat(rec); } catch (x) { } }
   if (e === 'penduduk' && !rec.desil && rec.kk) { try { const d = await pendDtDesil(rec.kk); if (d && d.desil) rec.desil = d.desil; } catch (x) { } }
   if (e === 'register_surat') await muatJenisSurat();
   if (flds.some(f => f.gen) && !(p.buat || NASKAH[e] && NASKAH[e].ada(rec))) flds = flds.filter(f => !f.gen);
@@ -4124,6 +4175,7 @@ VIEWS.form = async (p, main, alive) => {
   idHooks(frm, e, flds, p, rec);
   if (e === 'penduduk' || e === 'keluarga') wilHook(frm, e, rec, !p.id);
   if (e === 'penduduk') ortuHooks(frm, p);
+  if (e === 'register_surat') suketNamaHook(frm);
   /* NIK -> isi otomatis dari Data Penduduk (hanya kolom yang masih kosong) */
   const nikF = flds.find(f => f.nikfill), nikEl = nikF && $('#f_' + nikF.k, frm);
   if (nikEl && !nikEl.readOnly) nikEl.addEventListener('input', async () => {
@@ -4292,8 +4344,11 @@ async function kkGabung(frm, v, say) {
 }
 /* ---- Nama Ayah / Ibu → cocokkan dengan Data Penduduk (silsilah lintas KK) ---- */
 const pendInfo = p => [p.nik && p.nik.indexOf('•') < 0 ? 'NIK ' + p.nik : '', String(p.dusun || '').replace(/^DUSUN /, '') + (p.rt ? ' RT ' + p.rt + '/' + (p.rw || '') : ''), p.tgl_lahir ? umur(p.tgl_lahir) + ' th' : '', p.status && p.status !== 'Aktif' ? p.status : ''].filter(Boolean).join(' · ');
+/* cari / ambil warga untuk form: tanpa akses menu Data Penduduk tetap bisa (identitas saja, lewat server) */
+const wargaCari = (q, limit) => canRead('penduduk') ? call('list', { entity: 'penduduk', q, limit: limit || 12 }).then(r => r.rows || []) : call('cariWarga', { q, limit: limit || 12 });
+const wargaAmbil = id => canRead('penduduk') ? call('get', { entity: 'penduduk', id }) : call('wargaGet', { id });
 async function cariPend(q, jk, selfId) {
-  const r = (await call('list', { entity: 'penduduk', q, limit: 12 })).rows || [];
+  const r = await wargaCari(q, 12);
   return r.filter(p => p.id !== selfId).sort((a, b) => (String(b.jk || '').toUpperCase() === jk) - (String(a.jk || '').toUpperCase() === jk));
 }
 function ortuHooks(frm, p) {
@@ -4306,7 +4361,7 @@ function ortuHooks(frm, p) {
     const note = document.createElement('span'); note.className = 'pmok'; box.appendChild(note);
     let hasil = [], tm, info = null;
     const tandai = () => { note.innerHTML = pid.value ? '✓ Terhubung ke Data Penduduk' + (info ? ': ' + esc(pendInfo(info)) : '') : ''; };
-    if (pid.value) call('get', { entity: 'penduduk', id: pid.value }).then(x => { info = x; tandai(); }).catch(() => { }); tandai();
+    if (pid.value) wargaAmbil(pid.value).then(x => { info = x; tandai(); }).catch(() => { }); tandai();
     const pakai = o => { nm.value = o.nama; pid.value = o.id; info = o; dd.hidden = true; tandai(); };
     const tampil = rows => {
       hasil = rows;
@@ -4867,6 +4922,31 @@ window.addEventListener('scroll', e => { if (S.pickEl && !(e.target && e.target.
 window.addEventListener('resize', () => pickClose());
 document.addEventListener('keydown', e => { if (e.key === 'Escape') pickClose(); });
 new MutationObserver(() => { clearTimeout(S.encT); S.encT = setTimeout(() => enhanceForm(document.body), 30); }).observe(document.body, { childList: true, subtree: true });
+/* Suket: ketik nama -> pilih warga -> NIK diisi, lalu kolom lain terisi otomatis lewat pencocokan NIK.
+   Bisa dipakai walau pengguna tidak punya akses menu Data Penduduk. */
+function suketNamaHook(frm) {
+  const nm = $('#f_nama', frm), nik = $('#f_nik', frm); if (!nm || !nik || nm.readOnly) return;
+  const box = nm.closest('.f'); if (!box) return; box.classList.add('pmbox');
+  const dd = document.createElement('div'); dd.className = 'pmdd'; dd.hidden = true; box.appendChild(dd);
+  let tm, hasil = [];
+  const perorangan = () => { const p = $('#f_pemohon', frm); return !p || p.value !== 'Lembaga / Instansi'; };
+  nm.addEventListener('input', () => {
+    clearTimeout(tm); const q = nm.value.trim();
+    if (q.length < 3 || !perorangan()) { dd.hidden = true; return; }
+    tm = setTimeout(async () => {
+      try { hasil = await wargaCari(q, 8); } catch (x) { hasil = []; }
+      if (nm.value.trim() !== q) return;
+      dd.innerHTML = hasil.length ? hasil.map((p, i) => `<button type="button" data-i="${i}"><b>${esc(p.nama)}</b> <small>${esc(String(p.dusun || '').replace(/^DUSUN /, ''))}${p.rt ? ' RT ' + esc(p.rt) + '/' + esc(p.rw || '') : ''}${p.tgl_lahir ? ' · lahir ' + esc(fDate(p.tgl_lahir)) : ''}</small></button>`).join('') : '<div class="meta" style="padding:6px 9px">Tidak ditemukan di Data Penduduk. Isi data secara manual.</div>';
+      dd.hidden = false;
+    }, 300);
+  });
+  dd.addEventListener('click', ev => {
+    const b = ev.target.closest('[data-i]'); if (!b) return; const p = hasil[Number(b.dataset.i)]; if (!p) return;
+    nm.value = p.nama || nm.value; dd.hidden = true;
+    if (p.nik && /^\d{16}$/.test(p.nik)) { nik.value = p.nik; nik.dispatchEvent(new Event('input', { bubbles: true })); }
+  });
+  document.addEventListener('click', ev => { if (!box.contains(ev.target)) dd.hidden = true; });
+}
 function orangHooks(frm, flds) { flds.filter(f => f.opick).forEach(f => orangHook(frm, f.k.slice(0, -4), f)); }
 function orangHook(frm, pre, f) {
   const nm = $('#f_' + pre + 'nama', frm); if (!nm || nm.readOnly) return;
@@ -4880,9 +4960,9 @@ function orangHook(frm, pre, f) {
   nm.addEventListener('input', () => {
     if (pid && pid.value) pid.value = '';
     tandai(); clearTimeout(tm); const q = nm.value.trim();
-    if (q.length < 3 || !canRead('penduduk')) { dd.hidden = true; return; }
+    if (q.length < 3) { dd.hidden = true; return; }
     tm = setTimeout(async () => {
-      try { hasil = (await call('list', { entity: 'penduduk', q, limit: 8 })).rows || []; } catch (x) { hasil = []; }
+      try { hasil = await wargaCari(q, 8); } catch (x) { hasil = []; }
       dd.innerHTML = hasil.map((p, i) => `<button type="button" data-i="${i}"><b>${esc(p.nama)}</b> <small>${esc(String(p.dusun || '').replace(/^DUSUN /, ''))}${p.rt ? ' RT ' + esc(p.rt) + '/' + esc(p.rw || '') : ''}${p.tgl_lahir ? ' · lahir ' + esc(fDate(p.tgl_lahir)) : ''}${p.status && p.status !== 'Aktif' ? ' · ' + esc(p.status) : ''}</small></button>`).join('') || '<div class="meta" style="padding:6px 9px">Tidak ada di Data Penduduk — isi manual di bawah.</div>';
       dd.hidden = false;
     }, 300);
@@ -5023,7 +5103,7 @@ const dtF = ([k, l, t]) => Array.isArray(t) ? F(k, l, 'select', { opt: t }) : t 
 const dtPill = d => { const n = parseInt(String(d || '').replace(/^\D+/, ''), 10); return d ? `<span class="pill ${n <= 2 ? 'bad' : n <= 4 ? 'warn' : n ? 'info' : ''}">${n ? 'Desil ' + n : esc(d)}</span>` : ''; };
 Object.assign(UI, {
   dtsen: {
-    t: 'DTSEN Keluarga (SIKS-NG)', ic: 'heart', m: 'rentan', sort: 'tgl_cek', excel: 1,
+    t: 'DTSEN Keluarga (SIKS-NG)', ic: 'heart', sort: 'tgl_cek', excel: 1,
     fields: [F('_h_k', 'Keluarga', 'head', { hint: 'Desil, status, tanggal cek dan alamat juga bisa diisi langsung di form Data Keluarga. Isi persis seperti tampilan SIKS-NG.' }),
       F('keluarga_id', '', 'hidden'), F('kk', 'Nomor KK', 'text', { mono: 1, len: 16, sens: 1 }), F('kepala', 'Kepala keluarga', 'text', { up: 1, req: 1 }),
       F('alamat_dtsen', 'Alamat (seperti di SIKS-NG)', 'text', { up: 1, wide: 1 }),
@@ -5053,7 +5133,7 @@ UI.keluarga.fields.push(
 })();
 /** muat DTSEN terbaru keluarga -> x.dt_* (untuk form & detail keluarga) */
 async function kelDtMuat(x) {
-  if (!x || !x.id || !canRead('rentan')) return null;
+  if (!x || !x.id || !canRead('dtsen')) return null;
   const L = await call('list', { entity: 'dtsen', filters: { keluarga_id: x.id }, limit: 20 }).then(r => r.rows || []).catch(() => []);
   L.sort((a, b) => String(b.tgl_cek || '').localeCompare(String(a.tgl_cek || '')));
   x._dtAll = L; x._dt = L[0] || null;
@@ -5079,7 +5159,7 @@ async function kelDtSimpan(k, v, lama) {
 }
 /** desil penduduk masih kosong -> ambil dari DTSEN keluarganya (No. KK sama) */
 async function pendDtDesil(kk) {
-  if (!/^\d{16}$/.test(String(kk || '')) || !canRead('rentan')) return null;
+  if (!/^\d{16}$/.test(String(kk || '')) || !canRead('dtsen')) return null;
   const kl = await call('list', { entity: 'keluarga', filters: { kk }, limit: 1 }).then(r => (r.rows || [])[0]).catch(() => null);
   return kl ? kelDtMuat(Object.assign({}, kl)) : null;
 }
@@ -5106,9 +5186,9 @@ function dtTotalHtml(sl) {
 }
 /** bagian "Bansos" di detail keluarga (isian DTSEN sudah tampil di data keluarga) */
 async function extraKelDtsen(k, el) {
-  if (!canRead('rentan')) return;
+  if (!canRead('penyaluran_bansos') && !canRead('dtsen')) return;
   const sl = await call('list', { entity: 'penyaluran_bansos', filters: { keluarga_id: k.id }, limit: 500 }).then(r => r.rows || []).catch(() => []);
-  const d = k._dt || null, w = canWrite('rentan');
+  const d = k._dt || null, w = canWrite('penyaluran_bansos');
   const kkAsli = String(k.kk || '').indexOf('•') < 0 ? k.kk : '';
   const preDt = { keluarga_id: k.id, kk: kkAsli, kepala: k.kepala, alamat_dtsen: [k.alamat || String(k.dusun || '').replace(/^DUSUN /, ''), k.rt ? 'RT ' + Number(k.rt) + ' RW ' + Number(k.rw || 0) : ''].filter(Boolean).join(' ') };
   const preSl = { keluarga_id: k.id, p_kk: kkAsli, p_alamat: k.dusun || '', p_rt: k.rt || '', p_rw: k.rw || '' };
@@ -5138,7 +5218,7 @@ async function extraKelDtsen(k, el) {
 }
 /** detail DTSEN: hubungkan ke Data Keluarga (untuk baris yang belum cocok) */
 async function extraDtsen(x, el) {
-  const w = canWrite('rentan');
+  const w = canWrite('dtsen');
   if (x.keluarga_id) { el.insertAdjacentHTML('afterbegin', `<div class="btns"><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'keluarga', id: x.keluarga_id }]))}'>${ic('house')}Buka Data Keluarga</button></div>`); return; }
   el.insertAdjacentHTML('afterbegin', `<div class="card stack" style="border:1px solid #e8a400"><div>${ic('mega')} Belum terhubung ke Data Keluarga desa. ${esc(x.ket || '')}</div>${w ? `<button class="btn sm pri" data-act="dtHub" style="align-self:flex-start">${ic('link')}Hubungkan ke Data Keluarga</button>` : ''}</div>`);
   S.vh.dtHub = () => {
@@ -5233,7 +5313,7 @@ const SOS_TAB_E = { rentan: 'list', dtsen: 'dtsen', usulan_bansos: 'usulan', mus
 VIEWS.sosrekap = async (p, main, alive) => {
   setTop('Rekap Sosial', ND());
   main.innerHTML = rentanTabs('rekap') + '<div class="card skel" style="height:200px"></div>';
-  const ls = e => canRead('rentan') ? call('list', { entity: e, limit: 5000 }).then(r => r.rows || []).catch(() => []) : [];
+  const ls = e => canRead(e) ? call('list', { entity: e, limit: 5000 }).then(r => r.rows || []).catch(() => []) : [];
   const [rn, us, sl] = await Promise.all([ls('rentan'), ls('usulan_bansos'), ls('penyaluran_bansos')]);
   if (!alive()) return;
   const akt = rn.filter(r => r.status !== 'Tidak lagi');
@@ -5253,7 +5333,7 @@ VIEWS.sosrekap = async (p, main, alive) => {
     </div></div></div>`;
 };
 async function extraSosialUsulan(x, el) {
-  if (!canRead('rentan')) return;
+  if (!canRead('usulan_bansos')) return;
   const [us, sl] = await Promise.all(['usulan_bansos', 'penyaluran_bansos'].map((e, i) => call('list', { entity: e, filters: { [(i ? 'p_' : 'u_') + 'penduduk_id']: x.id }, limit: 200 }).then(r => r.rows || []).catch(() => [])));
   /* desil kosong -> tampilkan desil keluarganya */
   if (!x.desil && x.kk) { try { const d = await pendDtDesil(x.kk); const dl = el.parentElement && el.parentElement.querySelector(':scope > dl.dl'); if (d && d.desil && dl) dl.insertAdjacentHTML('beforeend', `<div><dt>Desil (dari DTSEN KK)</dt><dd>${dtPill(d.desil)}</dd></div>`); } catch (er) { } }
@@ -5268,7 +5348,7 @@ async function extraSosialUsulan(x, el) {
 async function extraMusdes(x, el) {
   if (!x.nomor_ba) return;
   const us = await call('list', { entity: 'usulan_bansos', filters: { musdes_ba: x.nomor_ba }, limit: 500 }).then(r => r.rows || []).catch(() => []);
-  el.insertAdjacentHTML('beforeend', `<div class="stack"><div class="sec-h"><h2>${ic('send')} Usulan dalam BA ini (${us.length})</h2>${canWrite('rentan') ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['form', { e: 'usulan_bansos', preset: { musdes_ba: x.nomor_ba, periode: x.periode || '' } }]))}'>${ic('plus')}Tambah usulan</button>` : ''}</div>${us.length ? `<div class="list">${us.map(r => rowHtml('usulan_bansos', r)).join('')}</div>` : '<div class="meta">Belum ada usulan yang mencantumkan nomor BA ini.</div>'}</div>`);
+  el.insertAdjacentHTML('beforeend', `<div class="stack"><div class="sec-h"><h2>${ic('send')} Usulan dalam BA ini (${us.length})</h2>${canWrite('usulan_bansos') ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['form', { e: 'usulan_bansos', preset: { musdes_ba: x.nomor_ba, periode: x.periode || '' } }]))}'>${ic('plus')}Tambah usulan</button>` : ''}</div>${us.length ? `<div class="list">${us.map(r => rowHtml('usulan_bansos', r)).join('')}</div>` : '<div class="meta">Belum ada usulan yang mencantumkan nomor BA ini.</div>'}</div>`);
 }
 function rentanTabs(cur) { return `<div class="gtabs">${[['list', 'heart', 'Data rentan', '["list",{"e":"rentan"}]'], ['dtsen', 'house', 'DTSEN Keluarga', '["list",{"e":"dtsen"}]'], ['usulan', 'send', 'Usulan', '["list",{"e":"usulan_bansos"}]'], ['musdes', 'users', 'Musdes/Muskel', '["list",{"e":"musdes_bansos"}]'], ['salur', 'check', 'Penyaluran', '["list",{"e":"penyaluran_bansos"}]'], ['rekap', 'chart', 'Rekap', '["sosrekap"]'], ['lansia', 'users', 'Lansia 60+', '["rentanauto",{"j":"lansia"}]'], ['balita', 'users', 'Balita', '["rentanauto",{"j":"balita"}]']].map(([k, i, t, g]) => `<button class="${cur === k ? 'on' : ''}" data-act="go" data-go='${g}'>${ic(i)} ${t}</button>`).join('')}</div>`; }
 VIEWS.rentanauto = async (p, main) => {
@@ -7340,7 +7420,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '138', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '139', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -8540,7 +8620,7 @@ async function namaKades() {
 async function petaSurat(reg) {
   let p = {};
   try {
-    if (reg.penduduk_id) p = await call('get', { entity: 'penduduk', id: reg.penduduk_id });
+    if (reg.penduduk_id) p = (await wargaAmbil(reg.penduduk_id)) || {};
     else if (/^\d{16}$/.test(String(reg.nik || ''))) p = (await call('pendudukByNik', { nik: reg.nik })) || {};
   } catch (x) { p = {}; }
   const v = k => reg[k] || p[k] || '';
@@ -11527,7 +11607,7 @@ const addLabel = x => x.jenis === 'SILTAP' ? 'Siltap ' + (BULAN[(Number(x.bulan)
 VIEWS.addaju = async (p, main, alive) => {
   setTop('Pengajuan ADD', 'Siltap & Dana Dusun');
   if (!canRead('keu_spp')) throw new Error('Anda tidak punya akses ke menu ini.');
-  const w = canWrite('keu_spp'), th = Number(p.tahun || S.addTh || new Date().getFullYear()); S.addTh = th;
+  const w = canWrite('add_pengajuan'), th = Number(p.tahun || S.addTh || new Date().getFullYear()); S.addTh = th;
   const [pg, riw] = await Promise.all([addPagu(th), addRiwayat(th)]); if (!alive()) return;
   const sil = riw.filter(x => x.jenis === 'SILTAP'), dus = riw.filter(x => x.jenis === 'DUSUN');
   const tSil = sil.reduce((t, x) => t + mNum(x.nominal), 0) + mNum(pg && pg.awal_siltap), tDus = dus.reduce((t, x) => t + mNum(x.nominal), 0) + mNum(pg && pg.awal_dusun);
@@ -11584,7 +11664,7 @@ VIEWS.addaju = async (p, main, alive) => {
 };
 
 VIEWS.addajued = async (p, main, alive) => {
-  const th = Number(p.tahun), w = canWrite('keu_spp');
+  const th = Number(p.tahun), w = canWrite('add_pengajuan');
   const [pg, riw] = await Promise.all([addPagu(th), addRiwayat(th)]); if (!alive()) return;
   let x = p.id ? riw.find(z => z.id === p.id) : null;
   const jenis = x ? x.jenis : p.jenis;
@@ -11779,7 +11859,7 @@ async function frcCek(th) {
 VIEWS.frc = async (p, main, alive) => {
   setTop('FRC Desa', 'Desa Anti Korupsi · SIMWAS');
   const th = Number(p.tahun || S.frcTh || new Date().getFullYear()); S.frcTh = th;
-  const w = can('w:aparat');
+  const w = can('w:frc');
   const [bk, lp] = await Promise.all([ambilSemua('frc_bukti', { tahun: String(th) }).catch(() => []), ambilSemua('frc_lapor', { tahun: String(th) }).catch(() => [])]);
   if (!alive()) return;
   const B = {}; bk.forEach(b => { B[b.ind + '|' + b.item] = b; });
@@ -12423,6 +12503,56 @@ const DP = (() => {
   pindai(document.body);
   return { pasang, pindai };
 })();
+/* =====================================================================
+   ANIMASI DASBOR: angka menghitung naik dari 0 (semua dasbor & ringkasan)
+   ===================================================================== */
+const HITUNG = (() => {
+  const SEL = '.kd-k .v, .stat b, .dk b, .dr b, .sh-st b, .dttot b, .ad-hero b, .dg-r b, .pstats .stat b';
+  const kurang = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function jalan(el) {
+    if (el.dataset.hit) return; el.dataset.hit = '1';
+    if (el.children.length) return;
+    const t = el.textContent, m = /(\d{1,3}(?:\.\d{3})+|\d+)(,\d+)?/.exec(t);
+    if (!m || kurang()) return;
+    const des = m[2] ? m[2].length - 1 : 0, nil = Number(m[1].replace(/\./g, '') + (m[2] ? '.' + m[2].slice(1) : ''));
+    if (!nil || !isFinite(nil)) return;
+    const depan = t.slice(0, m.index), belakang = t.slice(m.index + m[0].length), titik = m[1].indexOf('.') >= 0 || nil >= 1000;
+    const fmt = v => titik ? v.toLocaleString('id-ID', { minimumFractionDigits: des, maximumFractionDigits: des }) : (des ? v.toFixed(des).replace('.', ',') : String(Math.round(v)));
+    const lama = Math.min(1400, 600 + Math.log10(nil + 1) * 180), t0 = performance.now();
+    const step = now => { if (!el.isConnected) return; const k = Math.min(1, (now - t0) / lama), e = 1 - Math.pow(1 - k, 3); el.textContent = depan + fmt(des ? nil * e : Math.round(nil * e)) + belakang; if (k < 1) requestAnimationFrame(step); else el.textContent = t; };
+    el.textContent = depan + fmt(0) + belakang; requestAnimationFrame(step);
+  }
+  let tm = null;
+  const pindai = () => { tm = null; const mn = document.getElementById('main'); if (mn) mn.querySelectorAll(SEL).forEach(jalan); document.querySelectorAll('#layer ' + SEL.split(',').join(',#layer ')).forEach(jalan); };
+  new MutationObserver(() => { if (!tm) tm = setTimeout(pindai, 30); }).observe(document.body, { childList: true, subtree: true });
+  return { pindai };
+})();
+/* =====================================================================
+   ANIMASI LOADING saat menyiapkan / mengunduh / membuka dokumen
+   ===================================================================== */
+const MUAT = (() => {
+  let n = 0, el = null, tmTampil = null;
+  function pasang() {
+    if (el) return el;
+    el = document.createElement('div'); el.className = 'muat'; el.setAttribute('role', 'status');
+    el.innerHTML = `<span class="muat-ik"><span class="muat-doc"><i></i><i></i><i></i></span><span class="muat-arrow">${ic('down')}</span></span><span class="muat-t"></span><span class="muat-bar"><i></i></span>`;
+    document.body.appendChild(el); return el;
+  }
+  function mulai(teks) {
+    n++; const e = pasang(); $('.muat-t', e).textContent = teks || 'Menyiapkan dokumen…';
+    clearTimeout(tmTampil); tmTampil = setTimeout(() => e.classList.add('on'), 120);
+    let sudah = false;
+    return () => { if (sudah) return; sudah = true; n = Math.max(0, n - 1); if (!n) { clearTimeout(tmTampil); e.classList.remove('on'); } };
+  }
+  const bungkus = (fn, teks) => async function (...a) { const s = mulai(typeof teks === 'function' ? teks(...a) : teks); try { return await fn.apply(this, a); } finally { s(); } };
+  return { mulai, bungkus };
+})();
+buatDokumen = MUAT.bungkus(buatDokumen, 'Menyiapkan dokumen…');
+jadiPdf = MUAT.bungkus(jadiPdf, 'Membuat PDF…');
+cetakDocx = MUAT.bungkus(cetakDocx, 'Menyiapkan Word…');
+tampilBerkas = MUAT.bungkus(tampilBerkas, 'Membuka dokumen…');
+viewFile = MUAT.bungkus(viewFile, 'Membuka dokumen…');
+H2D.keXlsx = MUAT.bungkus(H2D.keXlsx, 'Menyiapkan Excel…');
 window.__pwTest = { jadiPdf, pdfDariHalaman, kuotaPeringatan, uploadFile, viewFile, thumb, signedFor, isSbFile, isR2, go, root, logoutLocal, store, NX, S, dataSayaHtml, tentangHtml, homeCards, modBuka, aktItem, unduhSelesai, loginScreen, sheet };
 boot();
 })();
