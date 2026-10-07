@@ -2012,7 +2012,7 @@ function modItems(m) {
 }
 function modDaftar() {
   const a = MODS().filter(m => m.k !== 'soon').map(m => Object.assign({}, m, { list: modItems(m) })).filter(m => m.list.length);
-  if (S.user.admin) a.push({ k: 'admin', l: 'Admin', ic: 'cog', list: [['Pengguna & Hak Akses', 'key', ['users']], ['Pengaturan', 'cog', ['settings']], ['Template Dokumen', 'file', ['template']], ['Paket Desa Baru', 'box', ['paketdesa']]] });
+  if (S.user.admin) a.push({ k: 'admin', l: 'Admin', ic: 'cog', list: [['Pengguna & Hak Akses', 'key', ['users']], ['Pengaturan', 'cog', ['settings']], ['Penyimpanan & Cadangan', 'folder', ['penyimpanan']], ['Template Dokumen', 'file', ['template']], ['Paket Desa Baru', 'box', ['paketdesa']]] });
   return a;
 }
 function modSub(m, d) {
@@ -2546,6 +2546,7 @@ VIEWS.home = async (p, main, alive) => {
   const d = await call('home');
   S.homeData = d;
   if (!alive()) return;
+  setTimeout(() => { if (alive()) berandaPeringatan(main); }, 400);
   const sum = presSummary(d.presensi);
   const hour = new Date().getHours();
   const salam = hour < 11 ? 'Selamat pagi' : hour < 15 ? 'Selamat siang' : hour < 18 ? 'Selamat sore' : 'Selamat malam';
@@ -3575,12 +3576,8 @@ ACT.draftKK = async t => {
       hasilDokumen(m, r, adaG ? { gambar: await gambarKK(M) } : { pdf: 1 });
       t.disabled = false; t.innerHTML = old; return;
     }
-    const r = await call('makeKK', { keluarga_id: t.dataset.id });
-    const bin = atob(r.data), arr = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-    const url = URL.createObjectURL(new Blob([arr], { type: 'application/pdf' }));
-    const a = document.createElement('a'); a.href = url; a.download = r.name || 'Draf_KK.pdf'; document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 60000);
-    toast('Draf KK diunduh.');
+    /* tanpa Apps Script: Draf KK hanya dari template Word / gambar latar di Template Dokumen */
+    toast('Template Draf KK belum ada. Admin: unggah kk/draf_kk.docx atau gambar latar KK di Admin → Template Dokumen.', 1);
   } catch (x) { toast(x.message, 1); }
   t.disabled = false; t.innerHTML = old;
 };
@@ -6827,7 +6824,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '130', tgl: '2026-10-07', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '131', tgl: '2026-10-07', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -6935,7 +6932,7 @@ VIEWS.settings = async (p, main) => {
     <div id="serr" class="err" hidden></div>
     <div><button class="btn pri" type="submit">${ic('check')}Simpan pengaturan</button></div>
     ${S.user && S.user.admin ? `<div class="card stack"><div class="lbl">Desa lain ingin memakai aplikasi ini?</div><p class="meta" style="margin:0">Buat berkas database kosong (tanpa data ${esc(ND())}) untuk dipasang di akun Supabase desa lain.</p><button class="btn sm" type="button" data-act="go" data-go='["paketdesa"]' style="align-self:flex-start">${ic('down')}Paket desa baru</button></div>` : ''}
-    <div class="card stack"><div class="lbl">Penyimpanan foto KTP/KK</div><p class="meta" style="margin:0">Foto KTP/KK baru disimpan di penyimpanan khusus yang lebih cepat. Foto lama yang masih di Google Drive bisa dipindahkan (salinan di Drive tidak dihapus).</p><button class="btn sm" type="button" data-act="go" data-go='["template"]' style="align-self:flex-start">${ic('file')}Template dokumen (Word)</button><button class="btn sm" type="button" data-act="go" data-go='["pindahberkas"]' style="align-self:flex-start">${ic('users')}Pindahkan foto KTP/KK lama</button></div></form>`;
+    <div class="card stack"><div class="lbl">Penyimpanan berkas</div><p class="meta" style="margin:0">Dokumen, foto, dan template disimpan di Cloudflare R2; foto KTP/KK di Supabase lalu R2. Tiap malam semuanya dicadangkan ke Google Drive pribadi.</p><button class="btn sm" type="button" data-act="go" data-go='["penyimpanan"]' style="align-self:flex-start">${ic('folder')}Penyimpanan & Cadangan</button><button class="btn sm" type="button" data-act="go" data-go='["template"]' style="align-self:flex-start">${ic('file')}Template dokumen (Word)</button></div></form>`;
   /* logo aplikasi (ikon kecil, webp) dan logo dokumen (PNG agar bisa masuk Word) */
   $$('[data-logo]').forEach(inp => inp.onchange = () => {
     const f = inp.files[0], k = inp.dataset.logo; if (!f) return;
@@ -6965,6 +6962,271 @@ VIEWS.settings = async (p, main) => {
     try { S.set = await call('settingsSave', { values: v }); S.setAsli = Object.assign({}, S.set); terapBrand(); S.rkpYear = S.set.tahun_rkp || S.rkpYear; toast('Pengaturan disimpan.'); }
     catch (x) { $('#serr').textContent = x.message; $('#serr').hidden = false; }
   };
+};
+
+/* =====================================================================
+   PENYIMPANAN & CADANGAN (admin): kuota Supabase/R2, cadangan malam ke Google Drive,
+   pindah KTP/KK Supabase -> R2, pindah berkas lama Google Drive -> R2
+   ===================================================================== */
+const GAS_CADANGAN = String.raw`/**
+ * ============================================================
+ *  CADANGAN MALAM — Pemdes Pandanwangi
+ *  Dipasang di akun Google PRIBADI pemilik (bukan akun desa).
+ *  Tiap malam (± pukul 01.00 WIB):
+ *    1. ekspor seluruh database aplikasi (JSON terkompres .json.gz), simpan 30 hari terakhir;
+ *    2. salin semua berkas baru (dokumen, foto, PDF, template, foto KTP/KK) dari R2/Supabase.
+ *  Semua disimpan di folder "Cadangan Pemdes Pandanwangi" yang TIDAK dibagikan.
+ *
+ *  Cara pasang (sekali):
+ *    a. Project Settings (ikon roda) -> Script properties -> Add: BK_KUNCI = kunci dari aplikasi
+ *       (Admin -> Penyimpanan & Cadangan -> Buat kunci cadangan).
+ *    b. Pilih fungsi "pasang" lalu tekan Run, izinkan akses (Drive & koneksi luar).
+ * ============================================================
+ */
+const URL_BERKAS = 'https://niaqgsqfsztcsgdyzavt.supabase.co/functions/v1/berkas';
+const INDUK = 'Cadangan Pemdes Pandanwangi';
+const SIMPAN_DB_HARI = 30;
+const BATAS_WAKTU = 4.5 * 60 * 1000;   // Apps Script berhenti di 6 menit; sisakan ruang
+
+/** Jalankan sekali: membuat pemicu harian lalu langsung mencadangkan. */
+function pasang() {
+  ScriptApp.getProjectTriggers().forEach(function (t) { if (t.getHandlerFunction() === 'cadangkan') ScriptApp.deleteTrigger(t); });
+  ScriptApp.newTrigger('cadangkan').timeBased().atHour(1).everyDays(1).inTimezone('Asia/Jakarta').create();
+  PropertiesService.getScriptProperties().deleteProperty('LANJUT_ID');
+  cadangkan();
+}
+
+/** Dijalankan pemicu harian (dan lanjutan bila antrean belum habis). */
+function cadangkan() {
+  const mulai = Date.now();
+  const P = PropertiesService.getScriptProperties();
+  const kunci = String(P.getProperty('BK_KUNCI') || '').trim();
+  if (!kunci) throw new Error('Isi BK_KUNCI di Project Settings -> Script properties.');
+  hapusLanjutan_(P);
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(1000)) return;   // masih ada proses lain
+  try {
+    const hari = Utilities.formatDate(new Date(), 'Asia/Jakarta', 'yyyy-MM-dd');
+    if (P.getProperty('DB_TERAKHIR') !== hari) { eksporDb_(kunci, hari); P.setProperty('DB_TERAKHIR', hari); }
+    const cache = {};
+    let total = 0;
+    while (Date.now() - mulai < BATAS_WAKTU) {
+      const L = panggil_({ action: 'bkList', key: kunci, n: 20 });
+      if (!L.length) { console.log('Selesai. Berkas disalin: ' + total); return; }
+      const ok = [], gagal = [];
+      L.forEach(function (f) {
+        if (Date.now() - mulai > BATAS_WAKTU + 45000) return;
+        try {
+          const fo = folder_(cache, [INDUK].concat(String(f.folder || 'Lainnya').split('/').filter(String)));
+          const ada = fo.getFilesByName(f.name);
+          if (ada.hasNext() && !f.ganti) { ok.push(f.id); return; }   // sudah pernah disalin
+          const r = UrlFetchApp.fetch(f.url, { muteHttpExceptions: true });
+          if (r.getResponseCode() !== 200) throw new Error('unduh ' + r.getResponseCode());
+          if (f.ganti) while (ada.hasNext()) ada.next().setTrashed(true);   // template versi lama -> sampah
+          fo.createFile(r.getBlob().setName(f.name));
+          ok.push(f.id); total++;
+        } catch (e) { console.warn(f.id + ': ' + e.message); gagal.push(f.id); }
+      });
+      panggil_({ action: 'bkDone', key: kunci, ok: ok, gagal: gagal });
+    }
+    // waktu habis tapi antrean masih ada: lanjut 1 menit lagi
+    const t = ScriptApp.newTrigger('cadangkan').timeBased().after(60 * 1000).create();
+    P.setProperty('LANJUT_ID', t.getUniqueId());
+    console.log('Dilanjutkan sebentar lagi. Berkas disalin sejauh ini: ' + total);
+  } finally { lock.releaseLock(); }
+}
+
+function eksporDb_(kunci, hari) {
+  const r = UrlFetchApp.fetch(URL_BERKAS, {
+    method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+    payload: JSON.stringify({ action: 'bkDb', key: kunci }),
+  });
+  const ct = String(r.getHeaders()['Content-Type'] || r.getHeaders()['content-type'] || '');
+  if (r.getResponseCode() !== 200 || !/gzip/.test(ct)) throw new Error('Ekspor database gagal: ' + r.getContentText().slice(0, 200));
+  const fo = folder_({}, [INDUK, 'Database']);
+  fo.createFile(r.getBlob().setName('pemdes-db-' + hari + '.json.gz'));
+  // simpan hanya SIMPAN_DB_HARI ekspor terbaru
+  const semua = []; const it = fo.getFiles();
+  while (it.hasNext()) { const f = it.next(); if (/^pemdes-db-.*\.json\.gz$/.test(f.getName())) semua.push(f); }
+  semua.sort(function (a, b) { return b.getName() < a.getName() ? -1 : 1; });
+  semua.slice(SIMPAN_DB_HARI).forEach(function (f) { f.setTrashed(true); });
+}
+
+function panggil_(req) {
+  const r = UrlFetchApp.fetch(URL_BERKAS, { method: 'post', contentType: 'application/json', muteHttpExceptions: true, payload: JSON.stringify(req) });
+  let j; try { j = JSON.parse(r.getContentText()); } catch (e) { throw new Error('Server tidak menjawab (' + r.getResponseCode() + ').'); }
+  if (!j.ok) throw new Error(j.error || 'Gagal.');
+  return j.data;
+}
+
+function folder_(cache, jalur) {
+  const k = jalur.join('/');
+  if (cache[k]) return cache[k];
+  let f;
+  if (jalur.length === 1) {
+    const it = DriveApp.getRootFolder().getFoldersByName(jalur[0]);
+    f = it.hasNext() ? it.next() : DriveApp.getRootFolder().createFolder(jalur[0]);
+  } else {
+    const induk = folder_(cache, jalur.slice(0, -1)), nama = jalur[jalur.length - 1];
+    const it = induk.getFoldersByName(nama);
+    f = it.hasNext() ? it.next() : induk.createFolder(nama);
+  }
+  cache[k] = f;
+  return f;
+}
+
+function hapusLanjutan_(P) {
+  const id = P.getProperty('LANJUT_ID');
+  if (!id) return;
+  ScriptApp.getProjectTriggers().forEach(function (t) { if (t.getUniqueId() === id) ScriptApp.deleteTrigger(t); });
+  P.deleteProperty('LANJUT_ID');
+}
+`;
+const fmtB = n => { n = Number(n) || 0; return n >= 1073741824 ? (n / 1073741824).toFixed(2).replace('.', ',') + ' GB' : n >= 1048576 ? (n / 1048576).toFixed(1).replace('.', ',') + ' MB' : Math.max(0, Math.round(n / 1024)) + ' KB'; };
+const waktuTgl = iso => { if (!iso) return 'belum pernah'; const d = new Date(iso); return isNaN(d) ? iso : d.toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); };
+const r2Pakai = k => Math.max(k.r2 || 0, (k.r2nyata && k.r2nyata.size) || 0);
+/** daftar peringatan penyimpanan; tingkat: 2 = merah, 1 = kuning */
+function kuotaPeringatan(k) {
+  const W = [];
+  const cek = (pakai, batas, teks) => { const p = pakai / batas; if (p >= .95) W.push({ t: 2, teks: teks + ' hampir penuh (' + fmtB(pakai) + ' dari ' + fmtB(batas) + ').' }); else if (p >= .8) W.push({ t: 1, teks: teks + ' sudah ' + Math.round(p * 100) + '% (' + fmtB(pakai) + ' dari ' + fmtB(batas) + ').' }); };
+  cek(r2Pakai(k), k.batasR2, 'Cloudflare R2 (dokumen & foto)');
+  cek(k.p1, k.batasSb, 'Penyimpanan KTP/KK Supabase');
+  cek(k.db, k.batasDb, 'Database Supabase');
+  if (!k.bkKunci) W.push({ t: 1, teks: 'Cadangan malam ke Google Drive belum dipasang.' });
+  else if (!k.bkTerakhir || Date.now() - new Date(k.bkTerakhir) > 2.2 * 864e5) W.push({ t: 2, teks: 'Cadangan malam tidak berjalan sejak ' + waktuTgl(k.bkTerakhir) + '.' });
+  if (k.bkgagal) W.push({ t: 1, teks: k.bkgagal + ' berkas gagal dicadangkan 5 kali.' });
+  return W;
+}
+async function kuotaAmbil(paksa) {
+  if (!paksa && S.kuota && Date.now() - S.kuota.at < 600000) return S.kuota.k;
+  const k = await callBerkas('kuota');
+  S.kuota = { k, at: Date.now() };
+  return k;
+}
+/** kartu peringatan di beranda (admin saja) */
+async function berandaPeringatan(main) {
+  if (!S.user || !S.user.admin) return;
+  let k; try { k = await kuotaAmbil(); } catch (x) { return; }
+  const W = kuotaPeringatan(k);
+  if (!W.length || !main.isConnected || $('#kqWarn', main)) return;
+  const merah = W.some(w => w.t === 2);
+  const el = document.createElement('div');
+  el.id = 'kqWarn'; el.className = 'card stack';
+  el.style.cssText = 'border:1px solid ' + (merah ? '#d93025' : '#e8a400') + ';background:' + (merah ? 'rgba(217,48,37,.08)' : 'rgba(232,164,0,.10)');
+  el.innerHTML = `<div style="display:flex;gap:8px;align-items:flex-start">${ic('mega')}<div style="flex:1"><b>Penyimpanan perlu perhatian</b>${W.map(w => `<div class="meta" style="margin-top:2px">${esc(w.teks)}</div>`).join('')}</div></div><button class="btn sm" data-act="go" data-go='["penyimpanan"]' style="align-self:flex-start">${ic('next')}Penyimpanan & Cadangan</button>`;
+  const home = $('.home2', main) || main;
+  home.insertBefore(el, home.children[1] || null);
+}
+function kuotaBar(lbl, pakai, batas, ket) {
+  const p = Math.min(100, batas ? pakai / batas * 100 : 0), w = p >= 95 ? '#d93025' : p >= 80 ? '#e8a400' : 'var(--acc, #1a73e8)';
+  return `<div class="stack" style="gap:4px"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><b>${esc(lbl)}</b><span class="meta">${fmtB(pakai)} / ${fmtB(batas)} · ${p < 10 ? p.toFixed(1).replace('.', ',') : Math.round(p)}%</span></div>
+    <div style="height:10px;border-radius:6px;background:rgba(127,127,127,.2);overflow:hidden"><i style="display:block;height:100%;width:${Math.max(p, .6)}%;background:${w}"></i></div>${ket ? `<div class="meta">${ket}</div>` : ''}</div>`;
+}
+
+VIEWS.penyimpanan = async (p, main, alive) => {
+  setTop('Penyimpanan & Cadangan');
+  if (!S.user.admin) { main.innerHTML = '<div class="err">Khusus admin.</div>'; return; }
+  main.innerHTML = '<div class="skel" style="height:200px"></div>';
+  let k; try { k = await kuotaAmbil(true); } catch (x) { main.innerHTML = `<div class="err">${esc(x.message)}</div>`; return; }
+  if (!alive()) return;
+  const W = kuotaPeringatan(k), dr = k.drive || {};
+  main.innerHTML = `<div class="stack">
+    ${W.length ? `<div class="card stack" style="border:1px solid ${W.some(w => w.t === 2) ? '#d93025' : '#e8a400'}">${W.map(w => `<div>${ic('mega')} ${esc(w.teks)}</div>`).join('')}</div>` : `<div class="ok-box">${ic('check')} Semua penyimpanan aman.</div>`}
+    <div class="card stack"><div class="lbl">Kuota</div>
+      ${kuotaBar('Cloudflare R2 — dokumen, foto, template', r2Pakai(k), k.batasR2, `${k.r2n} berkas tercatat${k.r2nyata ? ` · dihitung langsung dari R2: ${fmtB(k.r2nyata.size)} (${k.r2nyata.n} berkas, ${esc(waktuTgl(k.r2nyata.waktu))})` : ''}. Gratis sampai 10 GB; lebih dari itu ditagih ke kartu di akun Cloudflare.`)}
+      ${kuotaBar('Foto KTP/KK — Supabase pemdes-berkas', k.p1, k.batasSb, `${k.sbn} berkas. Bila hampir penuh, foto baru otomatis masuk R2.`)}
+      ${k.p2 ? kuotaBar('Foto KTP/KK — Supabase cadangan (eko)', k.p2, k.batasSb, 'Tidak dipakai untuk foto baru.') : ''}
+      ${kuotaBar('Database Supabase', k.db, k.batasDb, 'Batas paket gratis 500 MB.')}
+      <div class="btns"><button class="btn sm" id="kqHitung">${ic('chart')}Hitung ulang dari R2</button></div></div>
+
+    <div class="card stack"><div class="lbl">Cadangan malam ke Google Drive pribadi</div>
+      <dl class="dl"><div><dt>Berkas terakhir disalin</dt><dd>${esc(waktuTgl(k.bkTerakhir))}</dd></div><div><dt>Ekspor database terakhir</dt><dd>${esc(waktuTgl(k.bkDbTerakhir))}</dd></div><div><dt>Menunggu disalin</dt><dd>${k.antri} berkas${k.bkgagal ? ` · ${k.bkgagal} gagal` : ''}</dd></div><div><dt>Kunci cadangan</dt><dd>${k.bkKunci ? 'sudah dibuat' : 'belum ada'}</dd></div></dl>
+      <p class="meta" style="margin:0">Tiap malam ± pukul 01.00 Apps Script di akun Google pribadi Anda mengekspor seluruh database (30 hari terakhir disimpan) dan menyalin semua berkas baru — termasuk foto KTP/KK — ke folder <b>Cadangan Pemdes Pandanwangi</b> yang tidak dibagikan.</p>
+      <div class="btns"><button class="btn sm" id="bkKunciBtn">${ic('key')}${k.bkKunci ? 'Buat kunci baru' : 'Buat kunci cadangan'}</button><button class="btn sm" id="bkKode">${ic('file')}Salin kode Apps Script</button></div>
+      <div id="bkKunciBox"></div>
+      <details><summary class="meta" style="cursor:pointer">Cara memasang (sekali saja)</summary><ol class="meta" style="margin:6px 0 0;padding-left:18px">
+        <li>Buka <b>script.google.com</b> dengan akun Google pribadi Anda → <b>New project</b>, beri nama "Cadangan Pemdes".</li>
+        <li>Tekan <b>Salin kode Apps Script</b> di atas, lalu tempel menggantikan seluruh isi <i>Code.gs</i>. Simpan.</li>
+        <li>Tekan <b>Buat kunci cadangan</b>, salin kuncinya. Di Apps Script buka <b>Project Settings</b> (ikon roda) → <b>Script properties</b> → <b>Add script property</b>: nama <code>BK_KUNCI</code>, isi kunci tadi. Simpan.</li>
+        <li>Kembali ke <b>Editor</b>, pilih fungsi <b>pasang</b>, tekan <b>Run</b>, lalu izinkan akses (Drive dan koneksi luar). Proses pertama bisa berlanjut beberapa kali sampai semua berkas tersalin.</li></ol></details></div>
+
+    <div class="card stack"><div class="lbl">Pindahkan foto KTP/KK ke R2</div>
+      <p class="meta" style="margin:0">Memindahkan foto KTP/KK dari Supabase ke R2 untuk mengosongkan kuota Supabase. Data penduduk tidak berubah; foto tetap bisa dibuka seperti biasa. Salinan di Supabase dihapus setelah salinan R2 dipastikan utuh.</p>
+      <div>Masih di Supabase: <b id="ktpSisa">${k.sbn}</b> berkas</div>
+      <div class="btns"><button class="btn sm pri" id="ktpGo" ${k.sbn && k.r2ok ? '' : 'disabled'}>${ic('next')}Pindahkan ke R2</button><button class="btn sm" id="ktpStop" hidden>Berhenti</button></div>
+      <div class="meta" id="ktpLog"></div></div>
+
+    <div class="card stack"><div class="lbl">Pindahkan dokumen & foto lama dari Google Drive ke R2</div>
+      <p class="meta" style="margin:0">Berkas lama (unggahan sebelum R2) disalin ke R2 dan semua data yang merujuknya diperbarui otomatis. Berkas asli di Google Drive tidak dihapus. Biarkan halaman ini terbuka sampai selesai; bila terputus, tekan lagi untuk melanjutkan.</p>
+      <dl class="dl"><div><dt>Menunggu</dt><dd id="drAntri">${dr.antri || 0}</dd></div><div><dt>Selesai</dt><dd id="drSelesai">${dr.selesai || 0}</dd></div><div><dt>Gagal</dt><dd id="drGagal">${dr.gagal || 0}</dd></div></dl>
+      <div class="btns"><button class="btn sm pri" id="drGo" ${k.r2ok ? '' : 'disabled'}>${ic('next')}Mulai pindahkan</button><button class="btn sm" id="drUlang">Ulangi yang gagal</button><button class="btn sm" id="drPindai">${ic('search')}Pindai ulang data</button><button class="btn sm" id="drStop" hidden>Berhenti</button></div>
+      <div class="meta" id="drLog"></div></div>
+  </div>`;
+
+  $('#kqHitung').onclick = async ev => { ev.target.disabled = true; ev.target.textContent = 'Menghitung…'; try { S.kuota = { k: await callBerkas('kuota', { hitung: 1 }), at: Date.now() }; refresh(); } catch (x) { toast(x.message, 1); ev.target.disabled = false; } };
+  $('#bkKode').onclick = async () => { try { await navigator.clipboard.writeText(GAS_CADANGAN); toast('Kode Apps Script disalin. Tempel di script.google.com.'); } catch (x) { const b = $('#bkKunciBox'); b.innerHTML = `<textarea readonly rows="8" style="width:100%;font:12px monospace">${esc(GAS_CADANGAN)}</textarea><div class="meta">Salin manual kode di atas.</div>`; } };
+  $('#bkKunciBtn').onclick = () => tnKonfirm(k.bkKunci ? 'Buat kunci baru? Kunci lama tidak berlaku lagi, jadi BK_KUNCI di Apps Script juga harus diganti.' : 'Buat kunci cadangan untuk Apps Script di akun Google pribadi Anda?', async () => {
+    const r = await callBerkas('bkKunci');
+    $('#bkKunciBox').innerHTML = `<div class="stack" style="gap:6px"><div class="meta">Kunci ini hanya ditampilkan sekali. Tempel sebagai <code>BK_KUNCI</code> di Script properties, jangan dibagikan.</div><div style="display:flex;gap:6px"><input readonly id="bkKunciIn" value="${esc(r.kunci)}" style="flex:1;font-family:monospace"><button class="btn sm" id="bkSalin">${ic('check')}Salin</button></div></div>`;
+    $('#bkSalin').onclick = async () => { try { await navigator.clipboard.writeText(r.kunci); toast('Kunci disalin.'); } catch (x) { $('#bkKunciIn').select(); toast('Salin manual dari kotak.', 1); } };
+    S.kuota = null;
+  }, 'Ya, buat kunci');
+
+  /* KTP/KK Supabase -> R2 */
+  let ktpStop = false;
+  $('#ktpStop').onclick = () => { ktpStop = true; $('#ktpStop').disabled = true; };
+  $('#ktpGo').onclick = () => tnKonfirm('Pindahkan semua foto KTP/KK dari Supabase ke R2? Proses berjalan bertahap; biarkan halaman terbuka.', async () => {
+    const go = $('#ktpGo'), log = $('#ktpLog'); go.disabled = true; $('#ktpStop').hidden = false; ktpStop = false;
+    let total = 0, gagal = [];
+    while (!ktpStop) {
+      let r; try { r = await callBerkas('pindahKtp', { n: 8 }); } catch (x) { log.innerHTML = `<span class="err">${esc(x.message)}</span>`; break; }
+      total += r.pindah; gagal = gagal.concat(r.gagal || []);
+      $('#ktpSisa').textContent = r.sisa;
+      log.textContent = `Dipindah: ${total}${gagal.length ? ` · gagal: ${gagal.length}` : ''}`;
+      if (!r.sisa || (!r.pindah && r.gagal.length)) break;
+    }
+    if (gagal.length) log.innerHTML += `<br><span class="err">${esc(gagal.slice(0, 5).join('; '))}</span>`;
+    else if (!ktpStop) log.innerHTML += ' · selesai.';
+    $('#ktpStop').hidden = true; go.disabled = false; S.kuota = null;
+  }, 'Ya, pindahkan');
+
+  /* berkas lama Google Drive -> R2 */
+  let drStop = false;
+  const drAngka = async () => { try { const kk = await callBerkas('kuota'); const d = kk.drive || {}; $('#drAntri').textContent = d.antri || 0; $('#drSelesai').textContent = d.selesai || 0; $('#drGagal').textContent = d.gagal || 0; } catch (x) { } };
+  $('#drStop').onclick = () => { drStop = true; $('#drStop').disabled = true; };
+  $('#drPindai').onclick = async ev => { ev.target.disabled = true; try { const r = await callBerkas('drivePindai'); toast(r.baru ? r.baru + ' berkas lama baru ditemukan.' : 'Tidak ada berkas lama baru.'); await drAngka(); } catch (x) { toast(x.message, 1); } ev.target.disabled = false; };
+  const pindahSatu = async x => {
+    try {
+      const f = await call('fileData', { id: x.id });
+      if (!f || !f.data) throw new Error('isi berkas kosong');
+      const blob = b64Blob(f.data, f.mime || 'application/octet-stream');
+      const u = await callBerkas('driveUp', { lama: x.id, mime: blob.type, size: blob.size });
+      const put = await fetch(u.url, { method: 'PUT', headers: { 'Content-Type': u.mime }, body: blob }).catch(() => null);
+      if (!put || !put.ok) throw new Error('unggah ke R2 gagal' + (put ? ' (' + put.status + ')' : ''));
+      const s = await callBerkas('driveSelesai', { lama: x.id });
+      if (/^image\//.test(blob.type) && !/gif|svg/.test(blob.type)) { try { const t = await makeThumb(blob); THUMB[s.id] = t; await call('thumbSave', { id: s.id, data: t }); } catch (e) { } }
+      return true;
+    } catch (e) {
+      try { await callBerkas('driveGagal', { lama: x.id, pesan: e.message }); } catch (e2) { }
+      return e.message;
+    }
+  };
+  const drJalan = async ulang => {
+    const log = $('#drLog'); $('#drGo').disabled = $('#drUlang').disabled = true; $('#drStop').hidden = false; $('#drStop').disabled = false; drStop = false;
+    let ok = 0, gg = 0, akhir = '';
+    while (!drStop) {
+      let L; try { L = await callBerkas('driveAntri', { n: 10, ulang: ulang ? 1 : 0 }); } catch (x) { akhir = x.message; break; }
+      if (!L.length) { akhir = 'selesai'; break; }
+      const q = L.slice();
+      await Promise.all([0, 1].map(async () => { while (q.length && !drStop) { const r = await pindahSatu(q.shift()); if (r === true) ok++; else { gg++; akhir = r; } log.textContent = `Dipindah: ${ok} · gagal: ${gg}${akhir && akhir !== 'selesai' ? ' (terakhir: ' + akhir + ')' : ''}`; } }));
+      await drAngka();
+      if (ulang) ulang = false;   /* ulangi yang gagal hanya sekali per tekan */
+    }
+    log.textContent = `Dipindah: ${ok} · gagal: ${gg}` + (akhir === 'selesai' ? ' · selesai.' : akhir ? ' · ' + akhir : '');
+    $('#drGo').disabled = $('#drUlang').disabled = false; $('#drStop').hidden = true; S.kuota = null;
+  };
+  $('#drGo').onclick = () => drJalan(false);
+  $('#drUlang').onclick = () => drJalan(true);
 };
 
 VIEWS.pindahberkas = async (p, main) => {
@@ -7552,8 +7814,10 @@ async function cetakNaskah(e, rec) {
 }
 ACT.cetakNaskah = async t => { try { cetakNaskah(t.dataset.e, await call('get', { entity: t.dataset.e, id: t.dataset.id })); } catch (x) { toast(x.message, 1); } };
 async function tplSimpan(path, blob) {
-  const r = await callBerkas('tplUp', { path });
-  const up = await fetch(r.url, { method: 'PUT', headers: { 'Content-Type': blob.type || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'x-upsert': 'true' }, body: blob }).catch(() => null);
+  const r = await callBerkas('tplUp', { path, size: blob.size });
+  const h = { 'Content-Type': blob.type || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' };
+  if (r.lama) h['x-upsert'] = 'true';   /* penyimpanan lama (Supabase) */
+  const up = await fetch(r.url, { method: 'PUT', headers: h, body: blob }).catch(() => null);
   if (!up || !up.ok) throw new Error('Gagal mengunggah template' + (up ? ' (' + up.status + ')' : '') + '.');
   S.tplStore = null;
 }
@@ -7679,12 +7943,66 @@ function muatPdfJs() {
     .catch(e => { PDFJS = null; throw e; });
   return PDFJS;
 }
+let H2C = null;
+function muatH2c() {
+  if (window.html2canvas) return Promise.resolve();
+  if (H2C) return H2C;
+  H2C = new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'; sc.onload = res; sc.onerror = () => { H2C = null; rej(new Error('pustaka PDF gagal dimuat, periksa internet')); }; document.head.appendChild(sc); });
+  return H2C;
+}
+const kanvasJpg = (c, q) => new Promise((res, rej) => c.toBlob(b => b ? b.arrayBuffer().then(a => res(new Uint8Array(a))) : rej(new Error('Gagal membuat gambar halaman.')), 'image/jpeg', q || .9));
+/** Word -> PDF di aplikasi (tanpa Apps Script): tampilkan Word per halaman, potret tiap halaman, susun jadi PDF. */
 async function jadiPdf(r) {
   if (r.pdfBlob) return r.pdfBlob;
-  const kecil = await DOCX.ringan(r.blob, r.jenis === 'kk').catch(() => r.blob);
-  const p = await call('toPdf', { name: r.nama, data: await blobB64(kecil), jenis: r.jenis, simpan: false });
-  r.pdfBlob = b64Blob(p.data, 'application/pdf');
-  return r.pdfBlob;
+  await Promise.all([muatPratinjau(), muatH2c()]);
+  const box = document.createElement('div');
+  box.style.cssText = 'position:absolute;left:-12000px;top:0;background:#fff;pointer-events:none';
+  document.body.appendChild(box);
+  try {
+    const bl = await rapikanSeksi(r.blob);
+    await window.docx.renderAsync(bl, box, null, { inWrapper: true, ignoreLastRenderedPageBreak: false, breakPages: true });
+    const w = box.querySelector('.docx-wrapper'); if (w) w.style.cssText += ';background:#fff;padding:0;display:block';
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    await new Promise(x => setTimeout(x, 60));
+    const secs = Array.from(box.querySelectorAll('section.docx'));
+    if (!secs.length) throw new Error('isi dokumen tidak terbaca');
+    const hal = [];
+    for (const sec of secs) {
+      sec.style.boxShadow = 'none'; sec.style.margin = '0';
+      const wPt = parseFloat(sec.style.width) || 595.3, hPt = parseFloat(sec.style.minHeight) || 841.9;
+      const c = await window.html2canvas(sec, { scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false });
+      const tinggi = Math.round(c.width * hPt / wPt);
+      for (let y = 0; y === 0 || c.height - y > tinggi * .03; y += tinggi) {
+        const h = Math.min(tinggi, c.height - y), pc = document.createElement('canvas');
+        pc.width = c.width; pc.height = tinggi;
+        const g = pc.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, pc.width, pc.height); g.drawImage(c, 0, y, c.width, h, 0, 0, c.width, h);
+        hal.push({ jpg: await kanvasJpg(pc, .88), w: pc.width, h: pc.height, wPt, hPt });
+      }
+    }
+    r.pdfBlob = pdfDariHalaman(hal);
+    return r.pdfBlob;
+  } finally { box.remove(); }
+}
+/** susun beberapa halaman JPEG menjadi satu PDF (ukuran halaman dalam pt) */
+function pdfDariHalaman(hal) {
+  const enc = new TextEncoder(), parts = [], offs = []; let n = 0;
+  const add = x => { const b = typeof x === 'string' ? enc.encode(x) : x; parts.push(b); n += b.length; };
+  const N = hal.length, tot = 3 + N * 3;
+  add('%PDF-1.4\n');
+  offs[1] = n; add('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
+  offs[2] = n; add(`2 0 obj\n<< /Type /Pages /Kids [${hal.map((_, i) => (3 + i * 3) + ' 0 R').join(' ')}] /Count ${N} >>\nendobj\n`);
+  hal.forEach((p, i) => {
+    const pg = 3 + i * 3, im = pg + 1, ct = pg + 2, W = +p.wPt.toFixed(2), H = +p.hPt.toFixed(2);
+    offs[pg] = n; add(`${pg} 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /XObject << /Im${i} ${im} 0 R >> >> /Contents ${ct} 0 R >>\nendobj\n`);
+    offs[im] = n; add(`${im} 0 obj\n<< /Type /XObject /Subtype /Image /Width ${p.w} /Height ${p.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${p.jpg.length} >>\nstream\n`); add(p.jpg); add('\nendstream\nendobj\n');
+    const isi = `q ${W} 0 0 ${H} 0 0 cm /Im${i} Do Q`;
+    offs[ct] = n; add(`${ct} 0 obj\n<< /Length ${isi.length} >>\nstream\n${isi}\nendstream\nendobj\n`);
+  });
+  const xref = n;
+  let x = `xref\n0 ${tot}\n0000000000 65535 f \n`;
+  for (let i = 1; i < tot; i++) x += String(offs[i]).padStart(10, '0') + ' 00000 n \n';
+  add(x); add(`trailer\n<< /Size ${tot} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);
+  return new Blob(parts, { type: 'application/pdf' });
 }
 /** tampilkan dokumen: pratinjau Word (cepat) atau, bila opt.pdf, pratinjau PDF (persis template) */
 function hasilDokumen(m, r, opt) {
@@ -7735,7 +8053,7 @@ function hasilDokumen(m, r, opt) {
   $('#dlW', m.el).onclick = () => { saveBlob(r.blob, r.nama); st.innerHTML = ic('check') + ' Word diunduh.'; };
   const bp = $('#dlP', m.el);
   bp.onclick = async () => {
-    bp.disabled = true; bp.textContent = 'Membuat PDF…'; if (!r.pdfBlob) st.textContent = 'Biasanya 5–20 detik.';
+    bp.disabled = true; bp.textContent = 'Membuat PDF…'; if (!r.pdfBlob) st.textContent = 'Dibuat di perangkat ini, biasanya 3–15 detik.';
     try { saveBlob(await jadiPdf(r), r.nama.replace(/\.docx$/i, '.pdf')); st.innerHTML = ic('check') + ' PDF diunduh.'; }
     catch (x) { st.innerHTML = `<span class="err">PDF gagal dibuat: ${esc(x.message)}. Tekan Unduh PDF untuk mencoba lagi.</span>`; }
     bp.disabled = false; bp.innerHTML = ic('file') + 'Unduh PDF';
@@ -11513,7 +11831,7 @@ VIEWS.skimpor = async (p, main) => {
 applyTheme();
 /* dipakai oleh atribut onclick di HTML */
 window.refresh = refresh; window.loginScreen = loginScreen; window.boot = boot;
-window.__pwTest = { uploadFile, viewFile, thumb, signedFor, isSbFile, isR2, go, root, logoutLocal, store, NX, S, dataSayaHtml, tentangHtml, homeCards, modBuka, aktItem, unduhSelesai, loginScreen, sheet };
+window.__pwTest = { jadiPdf, pdfDariHalaman, kuotaPeringatan, uploadFile, viewFile, thumb, signedFor, isSbFile, isR2, go, root, logoutLocal, store, NX, S, dataSayaHtml, tentangHtml, homeCards, modBuka, aktItem, unduhSelesai, loginScreen, sheet };
 boot();
 })();
 </script>
