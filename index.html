@@ -841,6 +841,60 @@ option,optgroup{background-color:var(--surface)!important;color:var(--ink)!impor
   .sheet.dock .sh-it small{color:color-mix(in srgb,var(--pri-ink) 82%,transparent)}
   .sheet.dock .sh-st>div,.sheet.dock .sh-q{box-shadow:0 1px 3px rgba(0,0,0,.08)}
 }
+/* ---- v136: penampil berkas (seperti pratinjau Draf KK) ---- */
+.bf-prev{background:#e9ecef;border-radius:12px;padding:8px;overflow:auto;max-height:74vh;display:flex;flex-direction:column;gap:10px;align-items:center}
+.bf-pg{display:block;width:100%;height:auto;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25);border-radius:4px}
+img.bf-pg{width:auto;max-width:100%;max-height:70vh;object-fit:contain}
+/* ---- v136: tabel bertema (bantuan, rincian) ---- */
+.ttema th{background:var(--pri-soft)!important;color:var(--pri)!important}
+.tbl-wrap.ttw{border-color:color-mix(in srgb,var(--pri) 25%,var(--line))}
+/* ---- v136: data rentan ringkas di detail penduduk ---- */
+.rnk{display:flex;flex-direction:column;gap:6px;padding:8px 10px}.rnk.off{opacity:.65}
+.rnk-h{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.rnk-k{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:5px;align-items:center}.rnk-h>.btns{flex:none}
+.rnk-p{background:var(--pri-soft);color:var(--pri);font-weight:700;font-size:12px;padding:3px 10px}
+/* ---- v136: desil selalu berbentuk lencana ---- */
+.dl dd .pill{display:inline-block}
+/* ---- v136: filter 3 isian per baris, sisa melebar ---- */
+.flt-g{display:flex!important;flex-wrap:wrap;gap:8px}
+.flt-g .f{flex:1 1 calc((100% - 16px) / 3);min-width:0}
+.flt-g .f.w{flex-basis:100%}
+.flt-g .f label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:420px){.flt-g .f select,.flt-g .f input,.flt-g .dpb{font-size:11.5px;padding:6px 7px}}
+/* ---- v136: pemilih tanggal & jam ---- */
+.dp-src{position:absolute!important;opacity:0!important;pointer-events:none!important;width:1px!important;height:1px!important;min-height:0!important;padding:0!important;margin:0!important;border:0!important;overflow:hidden}
+.dpb{display:inline-flex;align-items:center;gap:7px;width:100%;min-height:32px;padding:5px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;font-size:12.5px;text-align:left;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.dpb .ic{width:15px;height:15px;color:var(--pri);flex:none}.dpb .dpb-t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dpb.kosong .dpb-t{color:var(--muted)}.dpb:hover,.dpb:focus-visible{border-color:var(--pri);box-shadow:0 0 0 2px var(--pri-soft)}.dpb[disabled]{opacity:.6;cursor:not-allowed}
+.rng .dpb{min-width:0}
+.dp-sheet .sh-box{max-width:380px}
+.dp{display:flex;flex-direction:column;gap:8px;user-select:none}
+.dp-top{background:linear-gradient(135deg,var(--pri-2),var(--pri));color:var(--pri-ink);border-radius:12px;padding:10px 14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 3px 8px rgba(0,0,0,.15)}
+.dp-top small{display:block;font-size:11px;opacity:.85;font-weight:600}.dp-top b{font-size:20px;line-height:1.2}
+.dp-nav{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.dp-ar{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--pri);font-size:20px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.dp-ar:hover{background:var(--pri-soft)}
+.dp-my{border:0;background:none;font:inherit;font-weight:800;font-size:14.5px;color:var(--ink);cursor:pointer;padding:6px 10px;border-radius:9px}button.dp-my:hover{background:var(--pri-soft);color:var(--pri)}
+.dp-wk,.dp-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}
+.dp-wk span{font-size:10.5px;font-weight:700;color:var(--muted);padding:2px 0}.dp-wk .mg{color:var(--bad)}
+.dp-d{aspect-ratio:1;border:0;border-radius:50%;background:none;font:inherit;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;transition:background .12s,transform .1s}
+.dp-d.mg{color:var(--bad)}.dp-d:hover:not([disabled]){background:var(--pri-soft)}.dp-d:active{transform:scale(.92)}
+.dp-d.now{box-shadow:inset 0 0 0 1.5px var(--pri);color:var(--pri)}
+.dp-d.on{background:var(--pri);color:var(--pri-ink);box-shadow:0 3px 8px color-mix(in srgb,var(--pri) 45%,transparent)}
+.dp-d[disabled]{opacity:.3;cursor:not-allowed}
+.dp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.dp-c{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:12px 4px;font:inherit;font-weight:700;font-size:13px;color:var(--ink);cursor:pointer}
+.dp-c:hover{border-color:var(--pri);background:var(--pri-soft)}.dp-c.now{border-color:var(--pri);color:var(--pri)}.dp-c.on{background:var(--pri);border-color:var(--pri);color:var(--pri-ink)}
+.dp-body{min-height:228px}
+.dp-time{display:flex;align-items:center;justify-content:center;gap:8px}
+.dp-col{position:relative;height:196px;overflow-y:auto;scroll-snap-type:y mandatory;display:flex;flex-direction:column;gap:3px;padding:4px;border:1px solid var(--line);border-radius:12px;background:var(--surface2);width:84px;scrollbar-width:none}
+.dp-col::-webkit-scrollbar{display:none}
+.dp-col button{scroll-snap-align:center;border:0;border-radius:9px;background:none;font:inherit;font-size:18px;font-weight:700;color:var(--muted);padding:6px 0;cursor:pointer;flex:none}
+.dp-col button.on{background:var(--pri);color:var(--pri-ink);box-shadow:0 3px 8px color-mix(in srgb,var(--pri) 40%,transparent)}
+.dp-sep{font-size:26px;font-weight:800;color:var(--pri)}
+.dp-quick{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+.dp-ft{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:8px}
+.dp-ft .btn{flex:1 1 auto}
 </style>
 </head>
 <body>
@@ -2271,26 +2325,65 @@ function driveUrl(id) { return `https://drive.google.com/file/d/${encodeURICompo
 async function viewFile(id, priv, name) {
   if (!id || id === '•') return toast('Anda tidak punya izin melihat dokumen ini.', 1);
   if (!priv && !isSbFile(id)) { window.open(driveUrl(id), '_blank', 'noopener'); return; }
-  const m = modal(name || 'Dokumen', '<div class="skel" style="height:240px"></div>', { big: 1 });
-  if (isSbFile(id)) {
-    try {
-      const r = await callBerkas('get', { id });
-      m.body.innerHTML = /\.(jpe?g|png|webp|gif)$/i.test(id)
-        ? `<img src="${esc(r.url)}" alt="" style="width:100%;border-radius:12px"><div class="btns" style="margin-top:8px"><a class="btn sm" href="${esc(r.url)}" target="_blank" rel="noopener">${ic('eye')}Buka ukuran penuh</a></div>`
-        : `<a class="btn pri" href="${esc(r.url)}" target="_blank" rel="noopener">${ic('eye')}${/\.pdf$/i.test(id) ? 'Buka berkas PDF' : 'Buka / unduh berkas'}</a>`;
-    } catch (e) { m.body.innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+  const gbr = /\.(jpe?g|png|webp|gif)$/i, pdf = /\.pdf$/i;
+  /* berkas selain foto/PDF (Word, Excel, …): langsung dibuka di tab baru, sekali ketuk */
+  if (isSbFile(id) && !gbr.test(id) && !pdf.test(id)) {
+    const w = window.open('', '_blank');
+    try { const r = await callBerkas('get', { id }); if (w) w.location.href = r.url; else location.href = r.url; }
+    catch (e) { if (w) w.close(); toast(e.message, 1); }
     return;
   }
+  const m = modal(name || 'Dokumen', '<div class="skel" style="height:240px"></div>', { big: 1 });
   try {
+    if (isSbFile(id)) {
+      const r = await callBerkas('get', { id });
+      const ext = (id.match(/\.(\w+)$/) || [])[1] || '';
+      return tampilBerkas(m, { url: r.url, mime: gbr.test(id) ? 'image/' + ext.replace('jpg', 'jpeg') : 'application/pdf', nama: name || 'Dokumen', ext });
+    }
     const f = await call('fileData', { id });
     if (!f) throw new Error('Berkas tidak ditemukan.');
-    const bin = atob(f.data), arr = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-    const url = URL.createObjectURL(new Blob([arr], { type: f.mime }));
-    m.body.innerHTML = /^image/.test(f.mime)
-      ? `<img src="${url}" alt="" style="width:100%;border-radius:12px">`
-      : `<p>Berkas ${esc(f.mime)}.</p><a class="btn pri" href="${url}" target="_blank" rel="noopener">${ic('eye')}Buka berkas</a>`;
+    const blob = b64Blob(f.data, f.mime || 'application/octet-stream');
+    if (!/^image\/|pdf/.test(blob.type)) { const u = URL.createObjectURL(blob); m.body.innerHTML = `<p>Berkas ${esc(f.mime)}.</p><a class="btn pri" href="${u}" target="_blank" rel="noopener">${ic('eye')}Buka berkas</a>`; return; }
+    tampilBerkas(m, { blob, mime: blob.type, nama: name || 'Dokumen', ext: (blob.type.split('/')[1] || '').replace('jpeg', 'jpg') });
   } catch (e) { m.body.innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+}
+/* penampil foto/PDF bergaya pratinjau Draf KK: langsung tampil + Unduh / Cetak / Buka di tab baru */
+async function tampilBerkas(m, o) {
+  m.el.classList.add('big');
+  const nmF = namaFile(o.nama) + (o.ext ? '.' + o.ext : '');
+  m.body.innerHTML = `<div class="stack"><div class="btns"><button class="btn pri" id="bfDl">${ic('down')}Unduh</button><button class="btn" id="bfPr">${ic('print')}Cetak</button><button class="btn" id="bfTab">${ic('eye')}Buka di tab baru</button></div><div class="meta" id="bfSt"></div><div class="bf-prev" id="bfBox"><div class="skel" style="height:300px"></div></div></div>`;
+  const box = $('#bfBox', m.el), st = $('#bfSt', m.el), hal = [];
+  let blob = o.blob || null, url = o.url || (blob && URL.createObjectURL(blob));
+  const ambil = async () => { if (blob) return blob; const r = await fetch(o.url); if (!r.ok) throw new Error('Berkas gagal diunduh (' + r.status + ').'); blob = await r.blob(); return blob; };
+  $('#bfTab', m.el).onclick = () => window.open(url, '_blank', 'noopener');
+  $('#bfDl', m.el).onclick = async () => { try { saveBlob(await ambil(), nmF); st.innerHTML = ic('check') + ' Diunduh.'; } catch (x) { window.open(url, '_blank', 'noopener'); } };
+  $('#bfPr', m.el).onclick = () => {
+    if (!hal.length) return toast('Tunggu pratinjau selesai dimuat.', 1);
+    const f = document.createElement('iframe'); f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0'; document.body.appendChild(f);
+    const d = f.contentDocument;
+    d.open(); d.write(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(o.nama)}</title><style>@page{margin:8mm}body{margin:0}img{max-width:100%;max-height:100vh;display:block;margin:0 auto;page-break-after:always;break-after:page;object-fit:contain}</style></head><body>${hal.map(h => `<img src="${h}">`).join('')}</body></html>`); d.close();
+    const go = () => { f.contentWindow.focus(); f.contentWindow.print(); setTimeout(() => f.remove(), 60000); };
+    if (d.readyState === 'complete') setTimeout(go, 400); else f.onload = () => setTimeout(go, 400);
+  };
+  if (/^image\//.test(o.mime)) {
+    const im = new Image(); im.alt = ''; im.className = 'bf-pg';
+    im.onload = () => { box.innerHTML = ''; box.appendChild(im); hal.push(url); };
+    im.onerror = () => { box.innerHTML = '<div class="meta" style="padding:10px">Foto tidak dapat ditampilkan. Tekan "Buka di tab baru".</div>'; };
+    im.src = url; return;
+  }
+  try {
+    const [lib, b] = await Promise.all([muatPdfJs(), ambil()]);
+    const doc = await lib.getDocument({ data: new Uint8Array(await b.arrayBuffer()) }).promise;
+    box.innerHTML = '';
+    const lebar = Math.max(box.clientWidth - 16, 300), dpr = Math.min(2, window.devicePixelRatio || 1);
+    for (let i = 1; i <= doc.numPages; i++) {
+      const pg = await doc.getPage(i), v1 = pg.getViewport({ scale: 1 }), vp = pg.getViewport({ scale: Math.max(lebar, 900) / v1.width * dpr });
+      const c = document.createElement('canvas'); c.width = vp.width; c.height = vp.height; c.className = 'bf-pg';
+      await pg.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+      box.appendChild(c); hal.push(c.toDataURL('image/jpeg', .9));
+      if (!m.el.isConnected) return;
+    }
+  } catch (x) { box.innerHTML = `<div class="meta" style="padding:10px">Pratinjau tidak dapat ditampilkan (${esc(x.message)}). Tekan "Buka di tab baru" atau "Unduh".</div>`; }
 }
 function readB64(file) {
   return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = () => rej(new Error('Gagal membaca berkas.')); r.readAsDataURL(file); });
@@ -3385,6 +3478,7 @@ ACT.maptype = t => {
 /* ---------------- Detail ---------------- */
 function valHtml(f, v) {
   if (v == null || v === '') return '';
+  if (/desil/i.test(f.k)) return dtPill(v);
   if (f.t === 'date') return fDate(v);
   if (f.t === 'money') return esc(fMoney(v));
   if (f.t === 'sdgs') return esc(String(v).split(',').filter(Boolean).map(n => 'SDGs ' + n).join(', '));
@@ -3407,7 +3501,7 @@ async function renderDetail(e, x, el, full) {
   const files = u.fields.filter(f => f.t === 'file' && x[f.k]);
   const diKK = e === 'penduduk' && !!el.closest('.kkang'), KK_SEMBUNYI = ['kk', 'w_prov', 'w_kab', 'w_kec', 'w_desa', 'dusun', 'rw', 'rt', 'alamat', 'alamat_kk', 'lokasi'];
   const shown = u.fields.filter(f => !(diKK && KK_SEMBUNYI.includes(f.k)) && !(e === 'aparat' && f.k === 'jabatan_tambahan') && f.t !== 'file' && f.t !== 'geo' && f.t !== 'fotos' && f.t !== 'rows' && f.t !== 'hidden' && f.t !== 'head' && x[f.k] !== '' && x[f.k] != null);
-  const rws = u.fields.filter(f => f.t === 'rows' && x[f.k]).map(f => { let a = []; try { a = JSON.parse(x[f.k]); } catch (er) { } return a.length ? `<div class="lbl">${esc(f.l)}</div><div class="tbl-wrap"><table class="tbl"><thead><tr>${f.cols.map(c => `<th>${esc(c[1])}</th>`).join('')}</tr></thead><tbody>${a.map(r => '<tr>' + f.cols.map(([k, , t]) => `<td${t === 'money' ? ' style="text-align:right"' : ''}>${esc(t === 'money' ? rp(r[k]) : r[k] || '')}</td>`).join('') + '</tr>').join('')}</tbody><tfoot><tr><td colspan="${f.cols.length - 1}"><b>Jumlah</b></td><td style="text-align:right"><b>${rp(a.reduce((t, r) => t + Number(r.jumlah || 0), 0))}</b></td></tr></tfoot></table></div>` : ''; }).join('');
+  const rws = u.fields.filter(f => f.t === 'rows' && x[f.k]).map(f => { let a = []; try { a = JSON.parse(x[f.k]); } catch (er) { } return a.length ? `<div class="lbl">${esc(f.l)}</div><div class="tbl-wrap ttw"><table class="tbl dtt ttema"><thead><tr>${f.cols.map(c => `<th>${esc(c[1])}</th>`).join('')}</tr></thead><tbody>${a.map(r => '<tr>' + f.cols.map(([k, , t]) => `<td${t === 'money' ? ' style="text-align:right"' : ''}>${esc(t === 'money' ? rp(r[k]) : r[k] || '')}</td>`).join('') + '</tr>').join('')}</tbody>${f.cols.some(c => c[0] === 'jumlah') ? `<tfoot><tr><td colspan="${f.cols.length - 1}"><b>Jumlah</b></td><td style="text-align:right"><b>${rp(a.reduce((t, r) => t + Number(r.jumlah || 0), 0))}</b></td></tr></tfoot>` : ''}</table></div>` : ''; }).join('');
   const galeri = u.fields.filter(f => f.t === 'fotos' && x[f.k]).map(f => { let a = []; try { a = JSON.parse(x[f.k]); } catch (er) { } return a.length ? `<div class="lbl">${esc(f.l)} (${a.length})</div><div class="pgrid">${a.map(fo => `<div class="pslot has"><button type="button" class="pimg" data-act="file" data-id="${esc(fo.id)}" data-name="${esc(fo.ket || f.l)}"><img src="${esc(thumb(fo.id, 240))}" alt="" loading="lazy"></button>${fo.ket ? `<span class="plbl">${esc(fo.ket)}</span>` : ''}</div>`).join('')}</div>` : ''; }).join('');
   const geoF = e === 'penduduk' ? null : u.fields.find(f => f.t === 'geo' && x[f.k]);
   const geo = geoF ? x[geoF.k] : u.geo ? u.geo(x) : '';
@@ -4898,7 +4992,7 @@ const DT_ASET = [
   ['a_telepon', 'Telepon rumah (PSTN)', DT_YT], ['a_tv', 'Televisi layar datar (min. 30 inci)', DT_YT], ['a_emas', 'Emas/perhiasan (min. 10 gram)', DT_YT], ['a_komputer', 'Komputer/laptop/tablet', DT_YT],
   ['a_motor', 'Sepeda motor', DT_YT], ['a_sepeda', 'Sepeda', DT_YT], ['a_mobil', 'Mobil', DT_YT], ['a_perahu', 'Perahu', DT_YT], ['a_kapal', 'Kapal/perahu motor', DT_YT], ['a_hp', 'Smartphone', DT_YT]];
 const dtF = ([k, l, t]) => Array.isArray(t) ? F(k, l, 'select', { opt: t }) : t === 'number' ? F(k, l, 'number') : F(k, l, 'text', { mono: t === 'mono' });
-const dtPill = d => { const n = parseInt(d, 10); return d ? `<span class="pill ${n <= 2 ? 'bad' : n <= 4 ? 'warn' : n ? 'info' : ''}">${n ? 'Desil ' + n : esc(d)}</span>` : ''; };
+const dtPill = d => { const n = parseInt(String(d || '').replace(/^\D+/, ''), 10); return d ? `<span class="pill ${n <= 2 ? 'bad' : n <= 4 ? 'warn' : n ? 'info' : ''}">${n ? 'Desil ' + n : esc(d)}</span>` : ''; };
 Object.assign(UI, {
   dtsen: {
     t: 'DTSEN Keluarga (SIKS-NG)', ic: 'heart', m: 'rentan', sort: 'tgl_cek', excel: 1,
@@ -4995,14 +5089,13 @@ async function extraKelDtsen(k, el) {
   const aktif = Object.keys(prog).map(p => prog[p][0]).sort((a, b) => dtPerKey(b) - dtPerKey(a));
   const thAktif = Math.max(0, ...aktif.map(dtPerKey));
   let h = `<div class="sec-h"><h2>${ic('heart')} Bansos keluarga</h2>${w ? `<span class="btns"><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['form', { e: 'penyaluran_bansos', preset: preSl }]))}'>${ic('plus')}Catat bansos</button></span>` : ''}</div>`;
-  if ((k._dtAll || []).length > 1) h += `<div class="meta">Riwayat desil: ${k._dtAll.slice().reverse().map(x => esc(fDate(x.tgl_cek, 1) + ': ' + (x.desil || '–'))).join(' → ')}</div>`;
-  h += dtTotalHtml(sl);
+  if ((k._dtAll || []).length > 1) h += `<div class="meta">Riwayat desil: ${k._dtAll.slice().reverse().map(x => esc(fDate(x.tgl_cek, 1)) + ': ' + (x.desil ? dtPill(x.desil) : '–')).join(' → ')}</div>`;
   h += `<details class="card dtlip"><summary>${ic('clock')} Program bansos aktif <span class="meta">(${aktif.length})</span></summary>${aktif.length
     ? dtTabel(['Periode', 'Program', 'Nilai bantuan', 'Status'], aktif.map(r => `<tr data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'penyaluran_bansos', id: r.id }]))}' style="cursor:pointer${Math.floor(dtPerKey(r) / 100) < Math.floor(thAktif / 100) ? ';opacity:.6' : ''}"><td>${esc(r.periode || '')}</td><td><b>${esc(r.program || '')}</b></td><td class="r">${dtRp(r.nominal)}</td><td>${dtPillSt(r.status)}</td></tr>`), [2])
     : '<div class="meta">Belum ada bansos tercatat.</div>'}</details>`;
   if (sl.length) {
     const P = Object.keys(prog).sort();
-    h += `<details class="card dtlip"><summary>${ic('list')} Riwayat bansos <span class="meta">(${sl.length})</span></summary><div class="gtabs" id="dtRwTab">${P.map((p, i) => `<button type="button" class="${i ? '' : 'on'}" data-p="${esc(p)}">${esc(p)} (${prog[p].length})</button>`).join('')}</div><div id="dtRw" style="margin-top:6px"></div></details>`;
+    h += `<details class="card dtlip"><summary>${ic('list')} Riwayat bansos <span class="meta">(${sl.length})</span></summary>${dtTotalHtml(sl)}<div class="gtabs" id="dtRwTab" style="margin-top:8px">${P.map((p, i) => `<button type="button" class="${i ? '' : 'on'}" data-p="${esc(p)}">${esc(p)} (${prog[p].length})</button>`).join('')}</div><div id="dtRw" style="margin-top:6px"></div></details>`;
   }
   const isi = L => d ? L.filter(([kk]) => d[kk] !== undefined && d[kk] !== '').map(([kk, l]) => `<div><dt>${esc(l)}</dt><dd>${esc(d[kk])}</dd></div>`).join('') : '';
   const hn = isi(DT_HUNI), as = isi(DT_ASET);
@@ -5212,6 +5305,17 @@ async function cetakNtcr(r, n, siapa) {
   } catch (x) { m.body.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
 }
 /* ---- Detail penduduk: riwayat perkawinan (NTCR) & data sosial ---- */
+/* data rentan di detail penduduk: cukup kriteria (+ desil) dan tabel bantuan; identitas sudah ada di atas */
+function rentanRingkas(r) {
+  const kt = String(r.kategori || '').split(/\s*,\s*/).filter(Boolean);
+  let bs = []; try { bs = JSON.parse(r.bantuan || '[]').filter(b => b && b.program); } catch (er) { }
+  const w = canWrite('rentan');
+  return `<div class="card rnk${r.status === 'Tidak lagi' ? ' off' : ''}"><div class="rnk-h"><div class="rnk-k">${kt.map(k => `<span class="pill rnk-p">${esc(k)}</span>`).join('')}${r.desil ? dtPill(r.desil) : ''}${r.status === 'Tidak lagi' ? '<span class="pill">tidak lagi</span>' : ''}</div>`
+    + `<span class="btns">${r.dok_id ? `<button class="btn sm" data-act="file" data-id="${esc(r.dok_id)}" data-name="Dokumen rentan">${ic('file')}</button>` : ''}${w ? `<button class="btn sm" data-act="xedit" data-e="rentan" data-id="${esc(r.id)}" title="Ubah data rentan">${ic('edit')}Ubah</button>` : ''}</span></div>`
+    + (r.ket ? `<div class="meta">${esc(r.ket)}</div>` : '')
+    + (bs.length ? `<div class="tbl-wrap ttw"><table class="tbl dtt ttema"><thead><tr><th>Program / jenis</th><th>Sumber</th><th>Tahun</th><th>Keterangan</th></tr></thead><tbody>${bs.map(b => `<tr><td><b>${esc(b.program)}</b></td><td>${esc(b.sumber || '')}</td><td>${esc(b.tahun || '')}</td><td>${esc(b.ket || '')}</td></tr>`).join('')}</tbody></table></div>` : '')
+    + '</div>';
+}
 async function extraPendudukSosial(x, el) {
   const id = x.id, uniq = a => { const m = {}; (a || []).forEach(r => { m[r.id] = r; }); return Object.values(m); };
   const [nt, rn] = await Promise.all([
@@ -5230,7 +5334,7 @@ async function extraPendudukSosial(x, el) {
   }
   if (rn) {
     h += `<div class="sec-h"><h2>${ic('heart')} Data rentan / sosial${tag.length ? ' <span class="pill info">' + esc(tag.join(', ')) + '</span>' : ''}</h2>${canWrite('rentan') ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['form', { e: 'rentan', preset: { r_nama: x.nama || '', r_penduduk_id: x.id, r_nik: x.nik || '', r_kk: x.kk || '', r_jk: x.jk || '', r_tempat_lahir: x.tempat_lahir || '', r_tgl_lahir: x.tgl_lahir || '', r_agama: x.agama || '', r_pekerjaan: x.pekerjaan || '', r_wn: x.warga_negara || 'WNI', r_alamat: x.dusun || '', r_rt: x.rt || '', r_rw: x.rw || '', r_desa: /luar/i.test(x.status || '') ? '' : (S.set.nama_desa || '').toUpperCase(), r_kec: /luar/i.test(x.status || '') ? '' : (S.set.kecamatan || '').toUpperCase(), r_kab: /luar/i.test(x.status || '') ? '' : (S.set.kabupaten || '').toUpperCase() } }]))}'>${ic('plus')}Catat data rentan</button>` : ''}</div>`
-      + (rn.length ? `<div class="list">${rn.map(r => rowHtml('rentan', r)).join('')}</div>` : '<div class="meta">Belum tercatat sebagai penduduk rentan/penerima bantuan.</div>');
+      + (rn.length ? rn.map(rentanRingkas).join('') : '<div class="meta">Belum tercatat sebagai penduduk rentan/penerima bantuan.</div>');
   }
   if (h) el.insertAdjacentHTML('beforeend', `<div class="stack">${h}</div>`);
 }
@@ -7208,7 +7312,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '135', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '136', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -12135,6 +12239,157 @@ VIEWS.skimpor = async (p, main) => {
 applyTheme();
 /* dipakai oleh atribut onclick di HTML */
 window.refresh = refresh; window.loginScreen = loginScreen; window.boot = boot;
+/* =====================================================================
+   PEMILIH TANGGAL / JAM / BULAN buatan sendiri (menggantikan bawaan HP).
+   Input asli (type=date/time/month) tetap ada & menyimpan nilai ISO, hanya disembunyikan;
+   tombol di sebelahnya menampilkan nilai yang mudah dibaca dan membuka pemilih.
+   ===================================================================== */
+const DP = (() => {
+  const VAL = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+  const BLN3 = BULAN.map(b => b.slice(0, 3)), HR = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+  const iso = (y, m, d) => y + '-' + pad2(m + 1) + '-' + pad2(d);
+  const today = () => isoToday();
+  const jenis = inp => inp.dataset.dpType || inp.type;
+  function teks(inp) {
+    const v = VAL.get.call(inp), t = jenis(inp);
+    if (!v) return '';
+    if (t === 'date') { const d = parseD(v); return d ? HARI[d.getDay()].slice(0, 3) + ', ' + d.getDate() + ' ' + BULAN[d.getMonth()] + ' ' + d.getFullYear() : v; }
+    if (t === 'month') { const m = /^(\d{4})-(\d{2})/.exec(v); return m ? BULAN[Number(m[2]) - 1] + ' ' + m[1] : v; }
+    return String(v).slice(0, 5);
+  }
+  const PH = { date: 'Pilih tanggal', time: 'Pilih jam', month: 'Pilih bulan' }, IKON = { date: 'cal', time: 'clock', month: 'cal' };
+  function label(inp) {
+    const b = inp._dpb; if (!b) return;
+    const t = teks(inp);
+    b.querySelector('.dpb-t').textContent = t || inp.placeholder || PH[jenis(inp)];
+    b.classList.toggle('kosong', !t);
+  }
+  function salinStatus(inp) {
+    const b = inp._dpb; if (!b) return;
+    b.hidden = inp.hidden || inp.style.display === 'none';
+    b.disabled = inp.disabled || inp.readOnly;
+  }
+  function pasang(inp) {
+    if (inp.dataset.dp || inp.closest('.h2d-box,#printArea,.dp-off')) return;
+    const t = inp.type; if (!/^(date|time|month)$/.test(t)) return;
+    inp.dataset.dp = '1'; inp.dataset.dpType = t;
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'dpb ' + inp.className.replace(/\bdp-src\b/, ''); b.style.cssText = inp.getAttribute('style') || '';
+    b.innerHTML = `${ic(IKON[t])}<span class="dpb-t"></span>`;
+    if (inp.title) b.title = inp.title;
+    inp.after(b); inp.classList.add('dp-src'); inp.tabIndex = -1; inp.setAttribute('aria-hidden', 'true');
+    inp._dpb = b;
+    Object.defineProperty(inp, 'value', { configurable: true, get() { return VAL.get.call(this); }, set(v) { VAL.set.call(this, v); label(this); } });
+    b.addEventListener('click', ev => { ev.preventDefault(); ev.stopPropagation(); if (!b.disabled) buka(inp); });
+    new MutationObserver(() => salinStatus(inp)).observe(inp, { attributes: true, attributeFilter: ['hidden', 'disabled', 'readonly', 'style'] });
+    label(inp); salinStatus(inp);
+  }
+  function setel(inp, v) {
+    inp.value = v;
+    inp.dispatchEvent(new Event('input', { bubbles: true }));
+    inp.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+  function buka(inp) {
+    const t = jenis(inp), judul = (inp.closest('.f') && inp.closest('.f').querySelector('label') ? inp.closest('.f').querySelector('label').textContent.trim() : '') || PH[t];
+    const m = sheet(judul.slice(0, 60), '<div class="dp"></div>', { ikon: IKON[t], dock: false });
+    m.el.classList.add('dp-sheet');
+    const box = $('.dp', m.el);
+    const selesai = v => { setel(inp, v); m.close(); };
+    if (t === 'time') return jam(box, inp, selesai);
+    if (t === 'month') return bulan(box, inp, selesai);
+    return tanggal(box, inp, selesai);
+  }
+  const kaki = (isi) => `<div class="dp-ft">${isi}</div>`;
+  /* ---- tanggal ---- */
+  function tanggal(box, inp, selesai) {
+    const v = VAL.get.call(inp), d0 = parseD(v) || new Date(), min = inp.min || '', max = inp.max || '';
+    let y = d0.getFullYear(), mo = d0.getMonth(), mode = 'hari', yb = y - (y % 12);
+    const boleh = s => (!min || s >= min) && (!max || s <= max);
+    const gambar = () => {
+      const pilih = v ? (parseD(v) || null) : null, sel = pilih ? iso(pilih.getFullYear(), pilih.getMonth(), pilih.getDate()) : '';
+      const top = `<div class="dp-top"><small>${pilih ? pilih.getFullYear() : 'Belum dipilih'}</small><b>${pilih ? HARI[pilih.getDay()] + ', ' + pilih.getDate() + ' ' + BULAN[pilih.getMonth()] : '–'}</b></div>`;
+      let nav, isi;
+      if (mode === 'hari') {
+        nav = `<div class="dp-nav"><button type="button" class="dp-ar" data-n="-1" aria-label="Bulan sebelumnya">‹</button><button type="button" class="dp-my" data-mode="bulan">${BULAN[mo]} ${y} ▾</button><button type="button" class="dp-ar" data-n="1" aria-label="Bulan berikutnya">›</button></div>`;
+        const awal = (new Date(y, mo, 1).getDay() + 6) % 7, jml = new Date(y, mo + 1, 0).getDate(), tdy = today();
+        let c = '';
+        for (let i = 0; i < awal; i++) c += '<span></span>';
+        for (let d = 1; d <= jml; d++) { const s = iso(y, mo, d), wk = (awal + d - 1) % 7; c += `<button type="button" class="dp-d${s === sel ? ' on' : ''}${s === tdy ? ' now' : ''}${wk === 6 ? ' mg' : ''}" data-d="${s}" ${boleh(s) ? '' : 'disabled'}>${d}</button>`; }
+        isi = `<div class="dp-wk">${HR.map((h, i) => `<span${i === 6 ? ' class="mg"' : ''}>${h}</span>`).join('')}</div><div class="dp-days">${c}</div>`;
+      } else if (mode === 'bulan') {
+        nav = `<div class="dp-nav"><button type="button" class="dp-ar" data-y="-1">‹</button><button type="button" class="dp-my" data-mode="tahun">${y} ▾</button><button type="button" class="dp-ar" data-y="1">›</button></div>`;
+        isi = `<div class="dp-grid">${BLN3.map((b, i) => `<button type="button" class="dp-c${i === mo ? ' on' : ''}" data-m="${i}">${b}</button>`).join('')}</div>`;
+      } else {
+        nav = `<div class="dp-nav"><button type="button" class="dp-ar" data-yb="-12">‹</button><span class="dp-my">${yb} – ${yb + 11}</span><button type="button" class="dp-ar" data-yb="12">›</button></div>`;
+        isi = `<div class="dp-grid">${Array.from({ length: 12 }, (_, i) => yb + i).map(t => `<button type="button" class="dp-c${t === y ? ' on' : ''}${t === new Date().getFullYear() ? ' now' : ''}" data-yy="${t}">${t}</button>`).join('')}</div>`;
+      }
+      box.innerHTML = top + nav + `<div class="dp-body">${isi}</div>` + kaki(`<button type="button" class="btn" data-x="hapus">Hapus</button><button type="button" class="btn" data-x="kini">Hari ini</button>`);
+    };
+    box.onclick = ev => {
+      const b = ev.target.closest('button'); if (!b || b.disabled) return;
+      if (b.dataset.n) { mo += Number(b.dataset.n); if (mo < 0) { mo = 11; y--; } if (mo > 11) { mo = 0; y++; } }
+      else if (b.dataset.y) y += Number(b.dataset.y);
+      else if (b.dataset.yb) yb += Number(b.dataset.yb);
+      else if (b.dataset.mode) { mode = b.dataset.mode; yb = y - (y % 12); }
+      else if (b.dataset.m) { mo = Number(b.dataset.m); mode = 'hari'; }
+      else if (b.dataset.yy) { y = Number(b.dataset.yy); mode = 'bulan'; }
+      else if (b.dataset.d) return selesai(b.dataset.d);
+      else if (b.dataset.x === 'hapus') return selesai('');
+      else if (b.dataset.x === 'kini') { const t = today(); if (boleh(t)) return selesai(t); const d = new Date(); y = d.getFullYear(); mo = d.getMonth(); mode = 'hari'; }
+      gambar();
+    };
+    gambar();
+  }
+  /* ---- bulan (input type=month) ---- */
+  function bulan(box, inp, selesai) {
+    const v = VAL.get.call(inp), m0 = /^(\d{4})-(\d{2})/.exec(v || '') || [0, String(new Date().getFullYear()), pad2(new Date().getMonth() + 1)];
+    let y = Number(m0[1]);
+    const gambar = () => {
+      box.innerHTML = `<div class="dp-top"><small>Bulan</small><b>${v ? teks(inp) : '–'}</b></div><div class="dp-nav"><button type="button" class="dp-ar" data-y="-1">‹</button><span class="dp-my">${y}</span><button type="button" class="dp-ar" data-y="1">›</button></div><div class="dp-body"><div class="dp-grid">${BULAN.map((b, i) => { const s = y + '-' + pad2(i + 1); return `<button type="button" class="dp-c${s === String(v).slice(0, 7) ? ' on' : ''}${s === today().slice(0, 7) ? ' now' : ''}" data-s="${s}">${b}</button>`; }).join('')}</div></div>` + kaki(`<button type="button" class="btn" data-x="hapus">Hapus</button><button type="button" class="btn" data-x="kini">Bulan ini</button>`);
+    };
+    box.onclick = ev => {
+      const b = ev.target.closest('button'); if (!b) return;
+      if (b.dataset.y) { y += Number(b.dataset.y); return gambar(); }
+      if (b.dataset.s) return selesai(b.dataset.s);
+      if (b.dataset.x === 'hapus') return selesai('');
+      if (b.dataset.x === 'kini') return selesai(today().slice(0, 7));
+    };
+    gambar();
+  }
+  /* ---- jam ---- */
+  function jam(box, inp, selesai) {
+    const v = String(VAL.get.call(inp) || ''), m = /^(\d{1,2}):(\d{2})/.exec(v), now = new Date();
+    const step = Math.max(1, Math.round((Number(inp.step) || 60) / 60));
+    let h = m ? Number(m[1]) : now.getHours(), mi = m ? Number(m[2]) : Math.floor(now.getMinutes() / step) * step;
+    const MN = []; for (let i = 0; i < 60; i += step) MN.push(i); if (MN.indexOf(mi) < 0) MN.push(mi), MN.sort((a, b) => a - b);
+    box.innerHTML = `<div class="dp-top"><small>Jam</small><b class="dp-jt"></b></div>
+      <div class="dp-time"><div class="dp-col" data-k="h">${Array.from({ length: 24 }, (_, i) => `<button type="button" data-v="${i}">${pad2(i)}</button>`).join('')}</div><span class="dp-sep">:</span><div class="dp-col" data-k="m">${MN.map(i => `<button type="button" data-v="${i}">${pad2(i)}</button>`).join('')}</div></div>
+      <div class="dp-quick">${['07:00', '08:00', '09:00', '13:00', '15:00', '19:00'].map(q => `<button type="button" class="chip" data-q="${q}">${q}</button>`).join('')}</div>`
+      + kaki(`<button type="button" class="btn" data-x="hapus">Hapus</button><button type="button" class="btn" data-x="kini">Sekarang</button><button type="button" class="btn pri" data-x="ok">${ic('check')}Pilih</button>`);
+    const tandai = (gulir) => {
+      $('.dp-jt', box).textContent = pad2(h) + ':' + pad2(mi);
+      $$('.dp-col', box).forEach(c => { const val = c.dataset.k === 'h' ? h : mi; $$('button', c).forEach(b => { const on = Number(b.dataset.v) === val; b.classList.toggle('on', on); if (on && gulir) c.scrollTop = b.offsetTop - c.clientHeight / 2 + b.offsetHeight / 2; }); });
+    };
+    box.onclick = ev => {
+      const b = ev.target.closest('button'); if (!b) return;
+      const col = b.closest('.dp-col');
+      if (col) { if (col.dataset.k === 'h') h = Number(b.dataset.v); else mi = Number(b.dataset.v); return tandai(false); }
+      if (b.dataset.q) { const [a, c] = b.dataset.q.split(':').map(Number); h = a; mi = c; return selesai(pad2(h) + ':' + pad2(mi)); }
+      if (b.dataset.x === 'hapus') return selesai('');
+      if (b.dataset.x === 'kini') { const d = new Date(); return selesai(pad2(d.getHours()) + ':' + pad2(d.getMinutes())); }
+      if (b.dataset.x === 'ok') return selesai(pad2(h) + ':' + pad2(mi));
+    };
+    requestAnimationFrame(() => tandai(true));
+  }
+  function pindai(root) {
+    if (!root || !root.querySelectorAll) return;
+    if (root.matches && root.matches('input[type=date],input[type=time],input[type=month]')) pasang(root);
+    root.querySelectorAll('input[type=date],input[type=time],input[type=month]').forEach(pasang);
+  }
+  new MutationObserver(ms => ms.forEach(mu => mu.addedNodes.forEach(n => { if (n.nodeType === 1) pindai(n); }))).observe(document.body, { childList: true, subtree: true });
+  pindai(document.body);
+  return { pasang, pindai };
+})();
 window.__pwTest = { jadiPdf, pdfDariHalaman, kuotaPeringatan, uploadFile, viewFile, thumb, signedFor, isSbFile, isR2, go, root, logoutLocal, store, NX, S, dataSayaHtml, tentangHtml, homeCards, modBuka, aktItem, unduhSelesai, loginScreen, sheet };
 boot();
 })();
