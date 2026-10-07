@@ -2872,7 +2872,7 @@ VIEWS.rekap = async (p, main, alive) => {
   </div>`;
   $('#mon').onchange = e => { if (e.target.value) go('rekap', { bulan: e.target.value }, true); };
   S.vh.mon = t => go('rekap', { bulan: t.dataset.m }, true);
-  S.vh.cetak = () => printDocs('Rekap Presensi', [docRekap(d)]);
+  S.vh.cetak = () => printDocs('Rekap Presensi', [docRekap(d)], 'presensi');
 };
 
 function rekapCompute(r) {
@@ -3166,7 +3166,7 @@ VIEWS.list = async (p, main, alive) => {
     const r = await fetchList(Object.assign(params(0), { limit: 5000 }));
     let rows = r.rows; if (cfg.filter) rows = rows.filter(cfg.filter);
     const perLbl = st.per && st.per !== 'all' ? (u.year ? 'Tahun ' + st.per : BULAN[Number(st.per.slice(5)) - 1] + ' ' + st.per.slice(0, 4)) : (u.rkp ? 'RKP Desa Tahun ' + S.rkpYear : '');
-    printDocs(cfg.title, [docRegister(cfg, rows, perLbl)]);
+    printDocs(cfg.title, [docRegister(cfg, rows, perLbl)], cfg === u.print2 ? 'reg_' + e + '_2' : 'reg_' + e);
   };
   S.vh.cetak = () => doPrint(u.print).catch(x => toast(x.message, 1));
   S.vh.xlsOut = async t => {
@@ -5226,7 +5226,7 @@ async function cetakKuitansi(id) {
       <tr><td colspan="2"><b>Jumlah diterima (netto)</b></td><td style="text-align:right"><b>${mFmt(netto)}</b></td></tr></tbody></table>
     ${x.penerima || x.npwp ? `<div style="margin-top:6px;font-size:10.5pt">Penerima: ${esc(x.penerima || '-')}${x.npwp ? ' · NPWP/NIK ' + esc(x.npwp) : ''}${x.jenis_belanja ? ' · ' + esc(x.jenis_belanja) : ''}</div>` : ''}
     <div style="text-align:right;margin-top:16px">${esc(s.nama_desa || '')}, ${fDate(x.tgl_cair || x.tanggal || isoToday())}</div>
-    <div class="ttd" style="gap:10px">${kol('Mengetahui,<br>Kepala Desa', s.nama_kades)}${kol('Pelaksana Kegiatan<br>Anggaran', '')}${kol('Lunas dibayar,<br>Bendahara Desa', bend)}${kol('Yang menerima,<br>&nbsp;', x.penerima)}</div></div>`]);
+    <div class="ttd" style="gap:10px">${kol('Mengetahui,<br>Kepala Desa', s.nama_kades)}${kol('Pelaksana Kegiatan<br>Anggaran', '')}${kol('Lunas dibayar,<br>Bendahara Desa', bend)}${kol('Yang menerima,<br>&nbsp;', x.penerima)}</div></div>`], 'kuitansi');
   if (note) toast(note);
 }
 ACT.kuitansi = t => cetakKuitansi(t.dataset.id).catch(x => toast(x.message, 1));
@@ -5451,7 +5451,7 @@ VIEWS.keulap = async (p, main, alive) => {
   S.vh.lpM = t => { st.mode = t.dataset.v; refresh(); };
   if ($('#lpS')) $('#lpS').onchange = e => { st.sampai = e.target.value; refresh(); };
   $('#lpR').onchange = e => { st.rinci = e.target.checked; refresh(); };
-  S.vh.lpPrint = () => printDocs('Laporan Realisasi', [`<div class="paper">${kop()}<h2>${judul}</h2><h3>PEMERINTAH DESA ${esc(String(S.set.nama_desa || '').toUpperCase())} TAHUN ANGGARAN ${esc(th)}${st.mode === 'tgl' && st.sampai ? ' — SAMPAI ' + esc(fDate(st.sampai).toUpperCase()) : ''}</h3>${isi(1)}${ttdKades(sd && sd < isoToday() ? sd : isoToday())}</div>`]);
+  S.vh.lpPrint = () => printDocs('Laporan Realisasi', [`<div class="paper">${kop()}<h2>${judul}</h2><h3>PEMERINTAH DESA ${esc(String(S.set.nama_desa || '').toUpperCase())} TAHUN ANGGARAN ${esc(th)}${st.mode === 'tgl' && st.sampai ? ' — SAMPAI ' + esc(fDate(st.sampai).toUpperCase()) : ''}</h3>${isi(1)}${ttdKades(sd && sd < isoToday() ? sd : isoToday())}</div>`], 'keu_realisasi');
   S.vh.lpXls = () => keuXls(judul.replace('LAPORAN REALISASI PELAKSANAAN', 'Laporan Realisasi') + ' ' + th, [{ name: 'Realisasi', widths: [12, 60, 18, 18, 18, 8],
     judul: [judul, 'PEMERINTAH DESA ' + String(S.set.nama_desa || '').toUpperCase(), 'TAHUN ANGGARAN ' + th + (sd ? ' (s.d. ' + fDate(sd) + ')' : '')],
     kepala: ['Kode Rekening', 'Uraian', 'Anggaran (Rp)', kolR + ' (Rp)', 'Lebih/(Kurang) (Rp)', '%'],
@@ -5481,7 +5481,7 @@ VIEWS.keupajak = async (p, main, alive) => {
     <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Tanggal</th><th>Jenis</th><th>Uraian</th><th>NTPN / Bukti</th><th style="text-align:right">Jumlah</th></tr></thead><tbody>${rinc.map(r => `<tr><td>${esc(fDate(r.tanggal))}</td><td>${esc(r.pajak)}</td><td style="white-space:normal">${esc(r.uraian || '')}</td><td class="mono">${esc(r.ntpn || r.no_bukti || '')}</td><td style="text-align:right">${rp(r.jumlah)}</td></tr>`).join('') || '<tr><td colspan="5" class="meta">Belum ada setoran.</td></tr>'}</tbody></table></div>
     <div class="meta">Dipungut = potongan saat SPP dicairkan / transaksi Pajak Dipungut. Disetor = transaksi Pajak Disetor (isi NTPN agar mudah dicocokkan saat lapor SPT Masa).</div></div>`;
   S.vh.pjTh = t => { S.keuTh = t.dataset.v; refresh(); };
-  S.vh.pjPrint = () => printDocs('Rekap Pajak', [`<div class="paper land">${kop()}<h2>REKAPITULASI PAJAK PER BULAN</h2><h3>TAHUN ANGGARAN ${esc(th)}</h3>${isi(1)}${ttdKades(isoToday())}</div>`]);
+  S.vh.pjPrint = () => printDocs('Rekap Pajak', [`<div class="paper land">${kop()}<h2>REKAPITULASI PAJAK PER BULAN</h2><h3>TAHUN ANGGARAN ${esc(th)}</h3>${isi(1)}${ttdKades(isoToday())}</div>`], 'keu_pajak');
   S.vh.pjXls = () => {
     const kep = ['Bulan'].concat(...J.map(j => [j + ' dipungut', j + ' disetor']), ['Jumlah dipungut', 'Jumlah disetor']);
     const baris = bulan.map((b, i) => [BULAN[i]].concat(...J.map(j => [sel(b, j, 'dipungut'), sel(b, j, 'disetor')]), [sel(b, null, 'dipungut'), sel(b, null, 'disetor')]));
@@ -5554,7 +5554,7 @@ VIEWS.keubuku = async (p, main, alive) => {
   S.vh.bkB = t => { st.buku = t.dataset.v; refresh(); };
   $('#bkM').onchange = e => { st.bulan = e.target.value; refresh(); };
   S.vh.bkXls = () => bukuXls(d, st);
-  S.vh.bkPrint = () => printDocs('Buku', [`<div class="paper land">${kop()}<h2>${esc({ BKU: 'BUKU KAS UMUM', Bank: 'BUKU BANK DESA', Tunai: 'BUKU KAS TUNAI', Pajak: 'BUKU KAS PEMBANTU PAJAK' }[st.buku])}</h2><h3>TAHUN ANGGARAN ${esc(keuTh())}${st.bulan ? ' — BULAN ' + BULAN[Number(st.bulan) - 1].toUpperCase() : ''}</h3>${tbl(1)}${ttdKades(isoToday())}</div>`]);
+  S.vh.bkPrint = () => printDocs('Buku', [`<div class="paper land">${kop()}<h2>${esc({ BKU: 'BUKU KAS UMUM', Bank: 'BUKU BANK DESA', Tunai: 'BUKU KAS TUNAI', Pajak: 'BUKU KAS PEMBANTU PAJAK' }[st.buku])}</h2><h3>TAHUN ANGGARAN ${esc(keuTh())}${st.bulan ? ' — BULAN ' + BULAN[Number(st.bulan) - 1].toUpperCase() : ''}</h3>${tbl(1)}${ttdKades(isoToday())}</div>`], 'keu_buku');
 };
 ACT.keuCair = async t => {
   const box = t.closest('.xacts'); t.disabled = true;
@@ -6794,7 +6794,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '127', tgl: '2026-10-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '128', tgl: '2026-10-07', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -8215,15 +8215,16 @@ VIEWS.template = async (p, main) => {
   /* satu baris template: status + tombol ikon */
   const item = o => {
     const x = cari(o.path), docx = /\.docx$/i.test(o.path), bawaan = o.bawaan || (docx && kitN.indexOf(o.path.split('/').pop().replace(/\.docx$/, '')) >= 0);
-    const st = x || bawaan || o.umum ? '' : '<span class="pill warn">Belum ada</span>';
+    const st = x || bawaan || o.umum || o.cetak ? '' : '<span class="pill warn">Belum ada</span>';
     const B = (act, icn, txt, cls, extra) => `<button class="ibtn ${cls || ''}" data-act="${act}" data-p="${esc(o.path)}" ${extra || ''} title="${esc(txt)}">${ic(icn)}<span>${esc(txt)}</span></button>`;
     const bt = [];
     if (x) bt.push(B('tplDl', 'file', 'Unduh')); else if (bawaan) bt.push(B('tplDlN', 'file', 'Unduh')); else if (o.umum) bt.push(B('tplDlAs', 'file', 'Unduh'));
+    else if (o.cetak) bt.push(B('tplDlC', 'file', 'Unduh', '', `data-l="${esc(o.label)}" data-land="${o.cetak > 1 ? 1 : ''}"`));
     if (x && docx) bt.push(B('tplTags', 'list', 'Tanda'));
     if (o.edit) bt.push(`<button class="ibtn" data-act="xedit" data-e="jenis_surat" data-id="${esc(o.edit)}" title="Ubah isian jenis surat">${ic('edit')}<span>Isian</span></button>`);
     bt.push(B('tplUpBtn', 'plus', x ? 'Ganti' : 'Unggah', 'pri'));
     if (x && (bawaan || o.umum || o.hapus)) bt.push(B('tplDelBtn', 'trash', 'Hapus', 'danger'));
-    const mt = [st, o.sub, x ? kb(x) + ' · ' + esc(String(x.waktu || '').slice(0, 10)) : ''].filter(Boolean).join(' · ');
+    const mt = [st, o.cetak && !x ? 'memakai tampilan bawaan aplikasi' : o.cetak ? 'memakai template unggahan' : '', o.sub, x ? kb(x) + ' · ' + esc(String(x.waktu || '').slice(0, 10)) : ''].filter(Boolean).join(' · ');
     return `<div class="tpl-it"><div class="tpl-hd"><span class="tpl-ic">${ic(o.ic || 'file')}</span><div class="tpl-mid"><b>${esc(o.label)}</b>${mt ? `<span class="meta">${mt}</span>` : ''}</div></div><div class="tpl-bt">${bt.join('')}</div></div>`;
   };
   const tags = (judul, arr, catatan) => `<details class="tpl-tags"><summary>${ic('list')} ${esc(judul)} <span class="meta">— ketuk tanda untuk menyalin</span></summary>${catatan ? `<div class="meta">${catatan}</div>` : ''}<div class="tpl-chips">${arr.map(k => `<button type="button" class="chip mono" data-act="tagCopy" data-t="${esc(k)}">{{${esc(k)}}}</button>`).join('')}</div></details>`;
@@ -8248,6 +8249,10 @@ VIEWS.template = async (p, main) => {
     ['rpjm', 'RPJM Desa', () => sek('RPJM Desa (21 dokumen & lampiran)', `<button class="btn sm pri" data-act="tplUpBtn" data-p="rpjm/">${ic('plus')}Unggah banyak</button>`,
       Object.keys(RPJMD_CAT).map(k => { const x = list.find(y => y.path.indexOf('rpjm/') === 0 && !/_cadangan/.test(y.path) && y.path.split('/').pop().indexOf(k + '.') === 0); return item({ path: x ? x.path : 'rpjm/' + RPJMD_CAT[k].f, label: k + ' — ' + (RPJMD_NAMA[k] || RPJMD_EXTRA[k] || ''), ic: 'target', hapus: 1 }); }).join(''))
       + '<div class="meta">Nama file diawali kode, mis. <i>R01._BA_Musyawarah….docx</i>. Template lama otomatis dicadangkan.</div>'],
+    ['cetak', 'Cetakan Lain', () => sek('Laporan, buku keuangan, aset & berita acara', '', CETAK_JENIS.map(([k, l, land]) => item({ path: cetakPath(k), label: l, ic: 'print', cetak: land ? 2 : 1, hapus: 1 })).join(''))
+      + sek('Buku administrasi & register', '', cetakRegister().map(([k, l, land]) => item({ path: cetakPath(k), label: l, ic: 'book', cetak: land ? 2 : 1, hapus: 1 })).join(''))
+      + '<div class="meta">Tanpa template unggahan, cetakan memakai tampilan bawaan aplikasi. Setelah template diunggah, hasil cetak, unduhan Word dan PDF mengikuti template tersebut. Unduhan Excel tetap berisi judul dan tabel.</div>'
+      + tags('Daftar tanda Cetakan Lain', ['Kop', 'Judul', 'Subjudul', 'Isi', 'Tanda Tangan', 'Judul Dokumen', 'Desa', 'Kecamatan', 'Kabupaten', 'Provinsi', 'Alamat Desa', 'Kode Pos', 'Email', 'Kode Desa', 'Kepala Desa', 'Sekretaris Desa', 'Tanggal', 'Tahun'], '<b>{{Kop}}</b>, <b>{{Isi}}</b> dan <b>{{Tanda Tangan}}</b> ditulis sendirian dalam satu paragraf: diganti kop, isi (tabel/teks) dan blok tanda tangan dari aplikasi. <b>{{Judul}}</b>/<b>{{Subjudul}}</b> = judul dokumen. Hapus {{Kop}} atau {{Tanda Tangan}} bila ingin mengetik sendiri. Dokumen beberapa halaman: template diulang per halaman.')],
     ['lain', 'Lainnya', () => sek('Progres Pembangunan', '', item({ path: PB_TPL, label: 'Laporan Progres Pembangunan (F4)', ic: 'hammer' }))
       + tags('Daftar tanda Progres Pembangunan', ['Nama Pekerjaan', 'Lokasi', 'Sumber Dana', 'Tahun Anggaran', 'Pagu', 'Pelaksana', 'Tgl Mulai', 'Tgl Selesai', 'Progres', 'Foto Progres'])
       + sek('Draf KK', '', item({ path: 'kk/draf_kk.docx', label: 'Draf Formulir KK (Word)', ic: 'house' }) + item({ path: KK_LATAR, label: 'Gambar latar Draf KK', sub: 'JPG A4 melintang 300 dpi — untuk pratinjau, PDF & cetak', ic: 'cam' }))]
@@ -8302,6 +8307,7 @@ VIEWS.template = async (p, main) => {
     try { let blob; if (list.some(y => y.path === pth)) blob = new Blob([await tplAmbil(pth)]); else blob = await naskahBawaan(nm.replace(/\.docx$/, '')); saveBlob(blob, nm); } catch (x) { toast(x.message, 1); }
   };
   S.vh.tplDlAs = async t => { try { const b = await tplAmbil('surat/_umum.docx'); saveBlob(new Blob([b]), t.dataset.p.split('/').pop()); toast('Ubah file ini di Word, lalu tekan "Unggah template sendiri".'); } catch (x) { toast(x.message, 1); } };
+  S.vh.tplDlC = async t => { try { saveBlob(await H2D.templateBawaan(t.dataset.l, !!t.dataset.land), t.dataset.p.split('/').pop()); toast('Ubah file ini di Word, lalu tekan "Unggah".'); } catch (x) { toast(x.message, 1); } };
   S.vh.tplDl = async t => { try { const b = await tplAmbil(t.dataset.p); saveBlob(new Blob([b]), t.dataset.p.split('/').pop()); } catch (x) { toast(x.message, 1); } };
   S.vh.tplTags = async t => { try { const tg = await DOCX.tags(await tplAmbil(t.dataset.p)); modal('Tanda di template', tg.length ? `<div class="meta" style="line-height:1.8">${tg.map(k => `<span class="mono">{{${esc(k)}}}</span>`).join(' · ')}</div>` : '<div class="meta">Tidak ada tanda {{…}}.</div>'); } catch (x) { toast(x.message, 1); } };
   S.vh.tplDelBtn = t => confirmDel(t.parentNode, async () => { await callBerkas('tplDel', { path: t.dataset.p }); S.tplStore = null; toast('Template dihapus.'); refresh(); });
@@ -8356,9 +8362,9 @@ function docRekap(d) {
 async function rkpDoc(kind, mu) {
   const y = S.rkpYear;
   const listAll = (entity, extra) => call('list', Object.assign({ entity, limit: 5000, filters: { tahun_rkp: y } }, extra || {})).then(r => r.rows);
-  if (kind === 'rktl') return printDocs('Form 03', [docRktl(await listAll('rkp_jadwal', { sort: 'tanggal', desc: false }))]);
-  if (kind === 'f4') return printDocs('Form 04', [docRegister(UI.rkp_usulan.print, await listAll('rkp_usulan', { sort: 'kode_kegiatan', desc: false }), 'RKP Desa Tahun ' + y)]);
-  if (kind === 'f5') return printDocs('Form 05', [docRegister(UI.rkp_pembiayaan.print, await listAll('rkp_pembiayaan', { sort: 'kode_bidang', desc: false }), 'RKP Desa Tahun ' + y)]);
+  if (kind === 'rktl') return printDocs('Form 03', [docRktl(await listAll('rkp_jadwal', { sort: 'tanggal', desc: false }))], 'rkp_f03');
+  if (kind === 'f4') return printDocs('Form 04', [docRegister(UI.rkp_usulan.print, await listAll('rkp_usulan', { sort: 'kode_kegiatan', desc: false }), 'RKP Desa Tahun ' + y)], 'rkp_f04');
+  if (kind === 'f5') return printDocs('Form 05', [docRegister(UI.rkp_pembiayaan.print, await listAll('rkp_pembiayaan', { sort: 'kode_bidang', desc: false }), 'RKP Desa Tahun ' + y)], 'rkp_f05');
   if (!mu) {
     const ms = (await listAll('rkp_musyawarah')).filter(x => /Pembentukan/i.test(x.musyawarah));
     if (!ms.length) throw new Error('Belum ada data "Musdes Pembentukan Tim RKP Desa" untuk tahun ' + y + '. Isi dulu di Form 01–02.');
@@ -8369,9 +8375,9 @@ async function rkpDoc(kind, mu) {
     call('list', { entity: 'rkp_narasumber', filters: { ref: mu.id }, limit: 100 }).then(r => r.rows),
     call('list', { entity: 'ref_hukum', limit: 200, sort: 'no', desc: false }).then(r => r.rows.filter(x => x.status !== 'Tidak Aktif'))
   ]);
-  if (kind === 'ba') return printDocs('Berita Acara', [docBA(mu, tim, nara)]);
-  if (kind === 'skp') return printDocs('SK Tim Penyusun', docSK(mu, tim.filter(x => x.jenis_tim === 'Tim Penyusun'), hk, 'penyusun'));
-  if (kind === 'skv') return printDocs('SK Tim Verifikasi', docSK(mu, tim.filter(x => x.jenis_tim === 'Tim Verifikasi'), hk, 'verifikasi'));
+  if (kind === 'ba') return printDocs('Berita Acara', [docBA(mu, tim, nara)], 'rkp_ba');
+  if (kind === 'skp') return printDocs('SK Tim Penyusun', docSK(mu, tim.filter(x => x.jenis_tim === 'Tim Penyusun'), hk, 'penyusun'), 'rkp_skp');
+  if (kind === 'skv') return printDocs('SK Tim Verifikasi', docSK(mu, tim.filter(x => x.jenis_tim === 'Tim Verifikasi'), hk, 'verifikasi'), 'rkp_skv');
 }
 function docBA(mu, tim, nara) {
   const d = parseD(mu.tanggal) || new Date();
@@ -8421,18 +8427,505 @@ function docRktl(rows) {
   <table class="pt"><thead><tr><th>No</th><th>Hari, Tanggal</th><th>Pukul</th><th>Tempat</th><th>Uraian Kegiatan</th><th>Keterangan</th><th>Keluaran</th></tr></thead>
   <tbody>${rows.map(r => `<tr><td>${esc(r.no)}</td><td>${fDay(r.tanggal)}</td><td>${esc(String(r.jam || '').slice(0, 5))}${r.sampai ? ' s/d ' + esc(r.sampai) : ''}</td><td>${esc(r.tempat)}</td><td style="white-space:pre-wrap">${esc(r.uraian)}</td><td style="white-space:pre-wrap">${esc(r.keterangan)}</td><td style="white-space:pre-wrap">${esc(r.keluaran)}</td></tr>`).join('') || '<tr><td colspan="7" style="text-align:center">Belum ada jadwal</td></tr>'}</tbody></table>${ttdKades(isoToday(), 'KEPALA DESA ' + esc(String(S.set.nama_desa || '').toUpperCase()) + '<br>selaku Pembina Tim Penyusun')}</div>`;
 }
-function printDocs(title, pages) {
-  const html = pages.join('');
-  const m = modal(title, `<div class="stack"><div class="btns"><button class="btn pri" id="doPrint">${ic('print')}Cetak / simpan PDF</button></div><div class="meta">Pilih "Simpan sebagai PDF" di jendela cetak untuk menyimpan berkas.</div><div class="doc-prev">${html}</div></div>`, { big: 1 });
+/* ---------------- Cetakan HTML -> Word / Excel + template manual ----------------
+   Semua dokumen yang dicetak lewat printDocs bisa diunduh sebagai Word, PDF (dibuat server dari Word) dan Excel (bila memuat tabel).
+   Admin dapat mengunggah template Word per jenis cetakan (Admin → Template Dokumen → Cetakan Lain), disimpan sebagai surat/cetak_<kunci>.docx.
+   Tanda blok (ditulis sendirian dalam satu paragraf): {{Kop}}, {{Isi}}, {{Tanda Tangan}}. Tanda teks: {{Judul}}, {{Subjudul}}, data desa, {{Tanggal}}, dst. */
+const CETAK_JENIS = [
+  ['presensi', 'Rekap Presensi Perangkat Desa', 1], ['kuitansi', 'Kuitansi'],
+  ['keu_buku', 'Buku Kas Umum / Bank / Tunai / Pajak', 1], ['keu_realisasi', 'Laporan Realisasi APBDes'], ['keu_pajak', 'Rekapitulasi Pajak per Bulan', 1],
+  ['rkp_f03', 'RKP Form 03 – Rencana Kerja & Tindak Lanjut', 1], ['rkp_f04', 'RKP Form 04 – Usulan Kegiatan', 1], ['rkp_f05', 'RKP Form 05 – Pembiayaan', 1],
+  ['rkp_ba', 'RKP – Berita Acara Musdes Pembentukan Tim'], ['rkp_skp', 'RKP – SK Tim Penyusun'], ['rkp_skv', 'RKP – SK Tim Verifikasi'],
+  ['aset_lap', 'Aset – Laporan / Buku Inventaris', 1], ['aset_kib', 'Aset – KIB A–G', 1], ['aset_sipades', 'Aset – Laporan SIPADES', 1], ['aset_kiblhi', 'Aset – KIB & LHI', 1],
+  ['aset_label', 'Aset – Label Barang'], ['aset_dok', 'Aset – SOP, Template & Pedoman'],
+  ['rab_bundel', 'Bundel RAB Kegiatan'], ['bast', 'Berita Acara Serah Terima (BAST)'], ['spj', 'SPJ Kegiatan'],
+  ['pkd', 'Pengkajian Keadaan Desa', 1], ['add', 'Berkas Pengajuan ADD (Siltap & Dana Dusun)']
+];
+const cetakPath = key => 'surat/cetak_' + String(key || 'umum').replace(/[^\w\-]+/g, '_') + '.docx';
+/* daftar cetakan register/buku administrasi (UI[e].print / print2) */
+function cetakRegister() {
+  const out = [];
+  Object.keys(UI).forEach(e => ['print', 'print2'].forEach((pk, i) => { const c = UI[e][pk]; if (c && c.title) out.push(['reg_' + e + (i ? '_2' : ''), judulKata(c.title), c.land ? 1 : 0]); }));
+  return out.sort((a, b) => a[1].localeCompare(b[1]));
+}
+
+const H2D = (() => {
+  const NS_W = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"';
+  const NS_WP = 'http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing', NS_A = 'http://schemas.openxmlformats.org/drawingml/2006/main', NS_PIC = 'http://schemas.openxmlformats.org/drawingml/2006/picture', NS_R = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+  const x = s => String(s == null ? '' : s).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const TW = px => Math.max(0, Math.round(px * 15));           // 1px (96 dpi) = 15 twip
+  const CS = el => getComputedStyle(el);
+  const SKIP = /^(STYLE|SCRIPT|TEMPLATE|NOSCRIPT|INPUT|BUTTON|SELECT|TEXTAREA)$/;
+  const BLOCK = /^(block|flex|grid|table|list-item|flow-root)$/;
+  const hidden = (el, cs) => cs.display === 'none' || cs.visibility === 'hidden';
+  const hex = c => { const m = /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/.exec(c || ''); if (!m || (m[4] != null && Number(m[4]) < .1)) return ''; return [m[1], m[2], m[3]].map(v => Number(v).toString(16).padStart(2, '0')).join('').toUpperCase(); };
+  const font = f => { const n = String(f || '').split(',')[0].replace(/["']/g, '').trim(); return !n || /^serif$/i.test(n) ? 'Times New Roman' : /sans|system|segoe|roboto|helvetica|inter/i.test(n) ? 'Arial' : /mono/i.test(n) ? 'Courier New' : n; };
+  const isBlock = (el, cs) => BLOCK.test(cs.display) || /^(TABLE|P|DIV|H[1-6]|UL|OL|LI|SECTION|ARTICLE|HEADER|FOOTER|BLOCKQUOTE|PRE|HR|DL|DT|DD|FIGURE)$/.test(el.tagName) && !/^inline/.test(cs.display);
+
+  /* gambar (img/canvas/svg) -> png/jpeg bytes, disiapkan sebelum konversi */
+  async function siapGambar(root) {
+    const map = new Map();
+    const keCanvas = async (src) => {
+      const im = new Image(); im.crossOrigin = 'anonymous';
+      await new Promise((res, rej) => { im.onload = res; im.onerror = rej; im.src = src; });
+      const c = document.createElement('canvas'); c.width = im.naturalWidth || 200; c.height = im.naturalHeight || 200; c.getContext('2d').drawImage(im, 0, 0);
+      return c;
+    };
+    const dariCanvas = c => new Promise(res => c.toBlob(b => res(b), 'image/png'));
+    for (const el of Array.from(root.querySelectorAll('img,canvas,svg'))) {
+      if (el.closest('svg') && el.tagName.toLowerCase() !== 'svg') continue;
+      try {
+        let blob = null;
+        if (el.tagName === 'CANVAS') blob = await dariCanvas(el);
+        else if (el.tagName.toLowerCase() === 'svg') {
+          const s = new XMLSerializer().serializeToString(el), r = el.getBoundingClientRect();
+          const c = await keCanvas('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(/xmlns=/.test(s) ? s : s.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"')));
+          if (r.width && !el.getAttribute('width')) { const k = document.createElement('canvas'); k.width = Math.round(r.width * 2); k.height = Math.round(r.height * 2); k.getContext('2d').drawImage(c, 0, 0, k.width, k.height); blob = await dariCanvas(k); } else blob = await dariCanvas(c);
+        } else if (el.src) {
+          const res = await fetch(el.src).catch(() => null);
+          if (res && res.ok) blob = await res.blob();
+          if (!blob || !/^image\/(png|jpeg|gif)$/.test(blob.type)) blob = await dariCanvas(await keCanvas(blob ? URL.createObjectURL(blob) : el.src));
+        }
+        if (blob) map.set(el, { data: new Uint8Array(await blob.arrayBuffer()), ext: blob.type === 'image/jpeg' ? 'jpeg' : blob.type === 'image/gif' ? 'gif' : 'png' });
+      } catch (e) { /* gambar lintas domain tanpa izin: dilewati */ }
+    }
+    return map;
+  }
+
+  function Konv(ctx) {
+    /* ctx: {img: Map, media: [], rid: n} */
+    const runPr = (el, txtCs) => {
+      const cs = txtCs || CS(el); let u = false;
+      for (let a = el; a && a.nodeType === 1; a = a.parentElement) { const c = a === el ? cs : CS(a); if (a.tagName === 'U' || /underline/.test(c.textDecorationLine)) { u = true; break; } if (isBlock(a, c)) break; }
+      const sz = Math.round(parseFloat(cs.fontSize) * 1.5), col = hex(cs.color), fn = font(cs.fontFamily);
+      return `<w:rPr><w:rFonts w:ascii="${x(fn)}" w:hAnsi="${x(fn)}" w:cs="${x(fn)}"/>${Number(cs.fontWeight) >= 600 || cs.fontWeight === 'bold' ? '<w:b/>' : ''}${/italic|oblique/.test(cs.fontStyle) ? '<w:i/>' : ''}${u ? '<w:u w:val="single"/>' : ''}${col && !/^(000000|111111|222222)$/.test(col) ? `<w:color w:val="${col}"/>` : ''}${sz ? `<w:sz w:val="${sz}"/><w:szCs w:val="${sz}"/>` : ''}${cs.verticalAlign === 'super' ? '<w:vertAlign w:val="superscript"/>' : cs.verticalAlign === 'sub' ? '<w:vertAlign w:val="subscript"/>' : ''}</w:rPr>`;
+    };
+    const imgRun = el => {
+      const g = ctx.img.get(el); if (!g) return '';
+      const r = el.getBoundingClientRect(); let w = r.width || el.width || 100, h = r.height || el.height || 100;
+      if (w > 680) { h = h * 680 / w; w = 680; }
+      const n = ++ctx.rid, id = 'rIdH2D' + n, nm = 'cetak_' + n + '.' + g.ext;
+      ctx.media.push({ id, name: nm, data: g.data, ext: g.ext });
+      const cx = Math.round(w * 9525), cy = Math.round(h * 9525);
+      return `<w:r><w:drawing><wp:inline xmlns:wp="${NS_WP}" distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${cx}" cy="${cy}"/><wp:docPr id="${7000 + n}" name="Gambar ${n}"/><a:graphic xmlns:a="${NS_A}"><a:graphicData uri="${NS_PIC}"><pic:pic xmlns:pic="${NS_PIC}"><pic:nvPicPr><pic:cNvPr id="${7000 + n}" name="${nm}"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip xmlns:r="${NS_R}" r:embed="${id}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>`;
+    };
+    /* lebar tabel tidak melebihi lebar isi halaman (ctx.maxW, twip) */
+    const muat = cols => { const t = cols.reduce((a, b) => a + b, 0), m = ctx.maxW || 0; return m && t > m ? cols.map(c => Math.max(100, Math.floor(c * m / t))) : cols; };
+    const jc = a => ({ center: 'center', right: 'right', end: 'right', justify: 'both', '-webkit-center': 'center' }[a] || 'left');
+    /* paragraf: runs = [{t, rp} | {xml}] */
+    function para(el, runs, o) {
+      o = o || {};
+      while (runs.length && runs[0].t != null && !runs[0].t.trim()) runs.shift();
+      while (runs.length && runs[runs.length - 1].t != null && !runs[runs.length - 1].t.trim()) runs.pop();
+      if (runs.length && runs[0].t != null) runs[0] = { t: runs[0].t.replace(/^\s+/, ''), rp: runs[0].rp };
+      const L = runs.length - 1; if (L >= 0 && runs[L].t != null) runs[L] = { t: runs[L].t.replace(/\s+$/, ''), rp: runs[L].rp };
+      if (!runs.length && !o.kosong) return '';
+      const cs = CS(el), fs = parseFloat(cs.fontSize) || 16, lh = parseFloat(cs.lineHeight);
+      const line = lh ? Math.min(400, Math.max(240, Math.round(lh / fs / 1.15 * 240))) : 252;
+      const sp = o.sel ? `<w:spacing w:before="0" w:after="0" w:line="${Math.min(line, 264)}" w:lineRule="auto"/>` : `<w:spacing w:before="${o.first ? Math.min(600, TW(parseFloat(cs.marginTop) || 0)) : 0}" w:after="${o.last ? Math.min(600, TW(parseFloat(cs.marginBottom) || 0)) : 0}" w:line="${line}" w:lineRule="auto"/>`;
+      const ind = o.ind ? `<w:ind w:left="${o.ind}"${o.hang ? ` w:hanging="${o.hang}"` : ''}/>` : '';
+      const body = runs.map(r => r.xml != null ? r.xml : `<w:r>${r.rp}<w:t xml:space="preserve">${x(r.t)}</w:t></w:r>`).join('');
+      return `<w:p><w:pPr>${o.keep ? '<w:keepNext/>' : ''}${sp}${ind}<w:jc w:val="${jc(cs.textAlign)}"/>${body ? '' : `<w:rPr><w:sz w:val="${Math.round(fs * 1.5)}"/></w:rPr>`}</w:pPr>${body}</w:p>`;
+    }
+    const spacer = px => `<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="${TW(px)}" w:lineRule="exact"/></w:pPr></w:p>`;
+    const garisBawah = cs => { const w = parseFloat(cs.borderBottomWidth) || 0; if (!w || cs.borderBottomStyle === 'none') return ''; return `<w:p><w:pPr><w:pBdr><w:bottom w:val="${cs.borderBottomStyle === 'double' ? 'thickThinSmallGap' : 'single'}" w:sz="${Math.min(24, Math.max(4, Math.round(w * 6)))}" w:space="1" w:color="000000"/></w:pBdr><w:spacing w:before="0" w:after="${TW(parseFloat(cs.paddingBottom) || 0) + TW(parseFloat(cs.marginBottom) || 0)}" w:line="120" w:lineRule="exact"/></w:pPr></w:p>`; };
+
+    /* isi elemen sebagai rangkaian blok (paragraf/tabel) */
+    function blocks(root, o) {
+      o = o || {};
+      const out = []; let runs = [], prefix = o.prefix || null, nPara = 0;
+      const flush = () => {
+        if (prefix) { runs.unshift({ xml: prefix }); prefix = null; }
+        if (runs.length) { const p = para(root, runs, { sel: o.sel, ind: o.ind, hang: o.hang, first: !nPara, last: true }); if (p) { out.push(p); nPara++; } }
+        runs = [];
+      };
+      const walk = node => {
+        for (const n of Array.from(node.childNodes)) {
+          if (n.nodeType === 3) {
+            const pe = n.parentElement, cs = CS(pe); let t = n.nodeValue;
+            if (/^(pre|pre-wrap|pre-line|break-spaces)$/.test(cs.whiteSpace)) {
+              if (cs.whiteSpace === 'pre-line') t = t.replace(/[ \t]+/g, ' ');
+              const rp = runPr(pe, cs);
+              t.split(/\r?\n/).forEach((ln, i) => { if (i) runs.push({ xml: '<w:r><w:br/></w:r>' }); if (ln) runs.push({ t: ln, rp }); });
+              continue;
+            }
+            t = t.replace(/\s+/g, ' '); if (!t) continue;
+            if (t === ' ' && (!runs.length || (runs[runs.length - 1].t || ' ').slice(-1) === ' ')) continue;
+            if (cs.textTransform === 'uppercase') t = t.toUpperCase(); else if (cs.textTransform === 'lowercase') t = t.toLowerCase(); else if (cs.textTransform === 'capitalize') t = t.replace(/(^|\s)(\S)/g, (m, a, b) => a + b.toUpperCase());
+            runs.push({ t, rp: runPr(pe, cs) });
+            continue;
+          }
+          if (n.nodeType !== 1 || SKIP.test(n.tagName)) continue;
+          const cs = CS(n); if (hidden(n, cs)) continue;
+          if (n.tagName === 'BR') { runs.push({ xml: '<w:r><w:br/></w:r>' }); continue; }
+          if (/^(IMG|CANVAS)$/.test(n.tagName) || n.tagName.toLowerCase() === 'svg') { if (isBlock(n, cs)) { flush(); const r = imgRun(n); if (r) out.push(`<w:p><w:pPr><w:spacing w:before="0" w:after="0"/><w:jc w:val="${jc(CS(root).textAlign)}"/></w:pPr>${r}</w:p>`); } else runs.push({ xml: imgRun(n) }); continue; }
+          if (isBlock(n, cs)) { flush(); out.push(...blok(n, cs, o)); } else walk(n);
+        }
+      };
+      walk(root); flush();
+      return out;
+    }
+    /* satu elemen blok */
+    function blok(el, cs, o) {
+      o = o || {};
+      if (el.tagName === 'TABLE' || cs.display === 'table') return [tabel(el)];
+      if (/^(IMG|CANVAS)$/.test(el.tagName) || el.tagName.toLowerCase() === 'svg') { const r = imgRun(el); return r ? [`<w:p><w:pPr><w:spacing w:before="0" w:after="0"/><w:jc w:val="${jc(CS(el.parentElement || el).textAlign)}"/></w:pPr>${r}</w:p>`] : []; }
+      if (el.tagName === 'HR') return [`<w:p><w:pPr><w:pBdr><w:bottom w:val="single" w:sz="6" w:space="1" w:color="000000"/></w:pBdr><w:spacing w:before="0" w:after="60"/></w:pPr></w:p>`];
+      if (el.tagName === 'UL' || el.tagName === 'OL') {
+        const lis = Array.from(el.children).filter(li => !hidden(li, CS(li)));
+        let no = Number(el.getAttribute('start')) || 1; const out = [];
+        lis.forEach(li => { const tanda = el.tagName === 'OL' ? (no++) + '.' : '•'; out.push(...blocks(li, { sel: o.sel, ind: 400 + (o.ind || 0), hang: 400, prefix: `<w:r>${runPr(li)}<w:t xml:space="preserve">${tanda}</w:t></w:r><w:r><w:tab/></w:r>` })); });
+        return out;
+      }
+      /* flex/grid berjajar (kop, tanda tangan, kolom-kolom) -> tabel tanpa garis */
+      if (/flex|grid/.test(cs.display) && !/column/.test(cs.flexDirection)) {
+        const kids = Array.from(el.children).filter(k => !SKIP.test(k.tagName) && !hidden(k, CS(k)));
+        if (kids.length > 1) {
+          const rects = kids.map(k => k.getBoundingClientRect());
+          if (rects.some((r, i) => i && r.left > rects[i - 1].left + 1)) return [tataLetak(el, cs, kids, rects), garisBawah(cs)].filter(Boolean);
+        }
+      }
+      const isi = blocks(el, o);
+      if (!isi.length) { const h = el.getBoundingClientRect().height; if (h > 6) isi.push(spacer(Math.min(h, 400))); }
+      const gb = garisBawah(cs); if (gb) isi.push(gb);
+      return isi;
+    }
+    const tcPr = (w, cs, span, vm, noBorder) => {
+      const b = s => { const wd = parseFloat(cs['border' + s + 'Width']) || 0, st = cs['border' + s + 'Style']; return !noBorder && wd && st !== 'none' && st !== 'hidden' ? `<w:${s.toLowerCase()} w:val="${st === 'double' ? 'double' : st === 'dashed' ? 'dashed' : st === 'dotted' ? 'dotted' : 'single'}" w:sz="${Math.min(24, Math.max(2, Math.round(wd * 6)))}" w:space="0" w:color="${hex(cs['border' + s + 'Color']) || '000000'}"/>` : `<w:${s.toLowerCase()} w:val="nil"/>`; };
+      const bg = hex(cs.backgroundColor), va = cs.verticalAlign === 'middle' ? 'center' : cs.verticalAlign === 'bottom' ? 'bottom' : 'top';
+      return `<w:tcPr><w:tcW w:w="${w}" w:type="dxa"/>${span > 1 ? `<w:gridSpan w:val="${span}"/>` : ''}${vm ? `<w:vMerge${vm === 'restart' ? ' w:val="restart"' : ''}/>` : ''}<w:tcBorders>${['Top', 'Left', 'Bottom', 'Right'].map(b).join('')}</w:tcBorders>${bg && bg !== 'FFFFFF' ? `<w:shd w:val="clear" w:color="auto" w:fill="${bg}"/>` : ''}<w:vAlign w:val="${va}"/></w:tcPr>`;
+    };
+    const isiSel = el => { const b = /^T[DH]$/.test(el.tagName) ? blocks(el, { sel: 1 }) : blok(el, CS(el), { sel: 1 }); if (!b.length || /<\/w:tbl>$/.test(b[b.length - 1])) b.push(para(el, [], { sel: 1, kosong: 1 })); return b.join(''); };
+    const tblPr = (w, ind) => `<w:tblPr><w:tblW w:w="${w}" w:type="dxa"/>${ind ? `<w:tblInd w:w="${ind}" w:type="dxa"/>` : ''}<w:tblLayout w:type="fixed"/><w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="60" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="60" w:type="dxa"/></w:tblCellMar></w:tblPr>`;
+    function tataLetak(el, cs, kids, rects) {
+      const er = el.getBoundingClientRect(), rows = [];
+      kids.forEach((k, i) => { if (!rows.length || rects[i].left <= rects[i - 1].left + 1) rows.push([]); rows[rows.length - 1].push(i); });
+      const pola = rows.reduce((a, r) => r.length > a.length ? r : a, rows[0]);
+      const bts = pola.map(i => rects[i].left - er.left).concat([er.width]);
+      const cols = muat(pola.map((_, c) => Math.max(200, TW(bts[c + 1] - bts[c]))));
+      const tot = cols.reduce((a, b) => a + b, 0), va = cs.alignItems === 'center' ? 'middle' : cs.alignItems === 'flex-end' || cs.alignItems === 'end' ? 'bottom' : 'top';
+      const xml = rows.map(r => '<w:tr>' + r.map((i, c) => { const span = c === r.length - 1 ? cols.length - c : 1, w = cols.slice(c, c + span).reduce((a, b) => a + b, 0); return `<w:tc>${tcPr(w, { verticalAlign: va }, span, null, 1)}${isiSel(kids[i])}</w:tc>`; }).join('') + '</w:tr>').join('');
+      const mt = TW(parseFloat(cs.marginTop) || 0);
+      return (mt > 30 ? spacer(Math.min(parseFloat(cs.marginTop), 60)) : '') + `<w:tbl>${tblPr(tot)}<w:tblGrid>${cols.map(c => `<w:gridCol w:w="${c}"/>`).join('')}</w:tblGrid>${xml}</w:tbl>`;
+    }
+    function tabel(t) {
+      const G = grid(t), cs = CS(t), tr0 = t.getBoundingClientRect();
+      const cols = muat(G.w.map(w => Math.max(120, TW(w)))), tot = cols.reduce((a, b) => a + b, 0);
+      const pr = t.parentElement ? t.parentElement.getBoundingClientRect() : tr0, ind = Math.max(0, TW(tr0.left - pr.left - (parseFloat(CS(t.parentElement || t).paddingLeft) || 0)));
+      const xml = G.rows.map((row, ri) => {
+        let s = `<w:tr>${row.head ? '<w:trPr><w:tblHeader/><w:cantSplit/></w:trPr>' : '<w:trPr><w:cantSplit/></w:trPr>'}`;
+        for (let c = 0; c < G.n;) {
+          const a = G.at[ri][c];
+          if (!a) { s += `<w:tc>${tcPr(cols[c], {}, 1, null, 1)}<w:p/></w:tc>`; c++; continue; }
+          const w = cols.slice(c, c + a.cs).reduce((p, q) => p + q, 0), ccs = CS(a.el);
+          if (a.r0 === ri) s += `<w:tc>${tcPr(w, ccs, a.cs, a.rs > 1 ? 'restart' : null)}${isiSel(a.el)}</w:tc>`;
+          else s += `<w:tc>${tcPr(w, ccs, a.cs, 'cont')}<w:p/></w:tc>`;
+          c += a.cs;
+        }
+        return s + '</w:tr>';
+      }).join('');
+      return `<w:tbl>${tblPr(tot, ind && ind < 3000 ? ind : 0)}<w:tblGrid>${cols.map(c => `<w:gridCol w:w="${c}"/>`).join('')}</w:tblGrid>${xml}</w:tbl>` + spacer(Math.max(2, Math.min(20, parseFloat(cs.marginBottom) || 0)));
+    }
+    return { blocks, blok };
+  }
+
+  /* tata letak tabel logis (colspan/rowspan) + lebar kolom (px) dari hasil render */
+  function grid(t) {
+    const trs = Array.from(t.rows).filter(r => !hidden(r, CS(r)));
+    const at = trs.map(() => []), rows = [], lebar = []; let n = 0;
+    trs.forEach((tr, ri) => {
+      rows.push({ tr, head: tr.parentElement && tr.parentElement.tagName === 'THEAD' });
+      let c = 0;
+      Array.from(tr.cells).forEach(td => {
+        if (hidden(td, CS(td))) return;
+        while (at[ri][c]) c++;
+        const cs = Math.max(1, td.colSpan || 1), rs = Math.max(1, Math.min(td.rowSpan || 1, trs.length - ri)), a = { el: td, cs, rs, r0: ri, c0: c };
+        for (let i = 0; i < rs; i++) for (let j = 0; j < cs; j++) at[ri + i][c + j] = a;
+        const w = td.getBoundingClientRect().width;
+        if (cs === 1) lebar[c] = Math.max(lebar[c] || 0, w);
+        c += cs; n = Math.max(n, c);
+      });
+    });
+    /* kolom tanpa sel tunggal: bagi rata dari sel gabungan */
+    const w = []; for (let c = 0; c < n; c++) w[c] = lebar[c] || 0;
+    at.forEach(r => r.forEach(a => { if (a && a.cs > 1) { const ada = w.slice(a.c0, a.c0 + a.cs), kosong = ada.filter(v => !v).length; if (kosong) { const sisa = Math.max(0, a.el.getBoundingClientRect().width - ada.reduce((p, q) => p + q, 0)); for (let j = a.c0; j < a.c0 + a.cs; j++) if (!w[j]) w[j] = Math.max(20, sisa / kosong); } } }));
+    for (let c = 0; c < n; c++) if (!w[c]) w[c] = 40;
+    return { rows, at, n, w };
+  }
+
+  /* render halaman di luar layar agar ukuran & gaya terbaca */
+  async function render(pages, fn) {
+    const box = document.createElement('div');
+    box.className = 'h2d-box';
+    box.style.cssText = 'position:fixed;left:-20000px;top:0;width:340mm;background:#fff;pointer-events:none;z-index:-1';
+    box.innerHTML = pages.join('');
+    document.body.appendChild(box);
+    try {
+      const imgs = Array.from(box.querySelectorAll('img'));
+      await Promise.all(imgs.map(im => im.complete ? 0 : new Promise(r => { im.onload = im.onerror = r; setTimeout(r, 4000); })));
+      const papers = Array.from(box.children).filter(e => e.nodeType === 1 && e.tagName !== 'STYLE');
+      return await fn(box, papers.length ? papers : [box]);
+    } finally { box.remove(); }
+  }
+  /* bagian halaman untuk template: kop, judul (h2 pertama), subjudul (h3 sesudahnya), tanda tangan (.ttd terakhir), sisanya isi */
+  function bagian(pg) {
+    const kop = pg.querySelector('.kop'), h2 = pg.querySelector('h2');
+    const h3 = h2 && h2.nextElementSibling && h2.nextElementSibling.tagName === 'H3' ? h2.nextElementSibling : null;
+    const ttds = pg.querySelectorAll('.ttd'), ttd = ttds.length ? ttds[ttds.length - 1] : null;
+    return { kop, h2, h3, ttd };
+  }
+  const sect = (pg, land) => {
+    const cs = CS(pg), m = s => Math.min(2880, Math.max(284, TW(parseFloat(cs['padding' + s]) || 68)));
+    return `<w:sectPr><w:pgSz w:w="${land ? 16838 : 11906}" w:h="${land ? 11906 : 16838}"${land ? ' w:orient="landscape"' : ''}/><w:pgMar w:top="${m('Top')}" w:right="${m('Right')}" w:bottom="${m('Bottom')}" w:left="${m('Left')}" w:header="567" w:footer="567" w:gutter="0"/></w:sectPr>`;
+  };
+  const isLand = pg => pg.classList.contains('land') || pg.getBoundingClientRect().width > 1000;
+  const CT = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n';
+  const STYLES = CT + `<w:styles ${NS_W}><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman" w:eastAsia="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="id-ID"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/></w:style><w:style w:type="table" w:default="1" w:styleId="TableNormal"><w:name w:val="Normal Table"/><w:tblPr><w:tblInd w:w="0" w:type="dxa"/><w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="108" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="108" w:type="dxa"/></w:tblCellMar></w:tblPr></w:style></w:styles>`;
+  const enc = new TextEncoder();
+  async function paket(bodyXml, media) {
+    const exts = Array.from(new Set(media.map(m => m.ext)));
+    const files = [
+      { name: '[Content_Types].xml', data: enc.encode(CT + `<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>${exts.map(e => `<Default Extension="${e}" ContentType="image/${e}"/>`).join('')}<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>`) },
+      { name: '_rels/.rels', data: enc.encode(CT + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>') },
+      { name: 'word/_rels/document.xml.rels', data: enc.encode(CT + `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdSt" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>${media.map(m => `<Relationship Id="${m.id}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${m.name}"/>`).join('')}</Relationships>`) },
+      { name: 'word/styles.xml', data: enc.encode(STYLES) },
+      { name: 'word/document.xml', data: enc.encode(CT + `<w:document ${NS_W}><w:body>${bodyXml}</w:body></w:document>`) }
+    ].concat(media.map(m => ({ name: 'word/media/' + m.name, data: m.data })));
+    return DOCX.zip(files, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+  }
+  /* tanpa template: seluruh halaman apa adanya, satu bagian (section) per halaman */
+  async function keDocx(pages) {
+    return render(pages, async (box, papers) => {
+      const ctx = { img: await siapGambar(box), media: [], rid: 0 }, K = Konv(ctx);
+      const body = papers.map((pg, i) => {
+        const s = sect(pg, isLand(pg)), lb = (isLand(pg) ? 16838 : 11906) - Number(/w:right="(\d+)"/.exec(s)[1]) - Number(/w:left="(\d+)"/.exec(s)[1]);
+        ctx.maxW = lb;
+        const isi = K.blocks(pg).join('') || '<w:p/>';
+        return i < papers.length - 1 ? isi + `<w:p><w:pPr>${s}</w:pPr></w:p>` : isi + s;
+      }).join('');
+      return paket(body, ctx.media);
+    });
+  }
+  /* template default yang bisa diunduh admin lalu diubah di Word */
+  function templateBawaan(judul, land) {
+    const P = (t, o = {}) => `<w:p><w:pPr><w:spacing w:before="${o.b || 0}" w:after="${o.a || 0}"/><w:jc w:val="${o.c ? 'center' : 'left'}"/></w:pPr><w:r><w:rPr>${o.bold ? '<w:b/>' : ''}${o.i ? '<w:i/>' : ''}<w:sz w:val="${o.sz || 24}"/></w:rPr><w:t xml:space="preserve">${x(t)}</w:t></w:r></w:p>`;
+    const body = [P('{{Kop}}'), P('{{Judul}}', { c: 1, bold: 1, b: 120 }), P('{{Subjudul}}', { c: 1, bold: 1, a: 200 }), P('{{Isi}}'), P('{{Tanda Tangan}}'),
+      P('Template "' + judul + '" — hapus baris petunjuk ini. Tanda Kop, Isi dan Tanda Tangan (di dalam kurung kurawal ganda) harus sendirian dalam satu paragraf. Kop dan Tanda Tangan boleh dihapus lalu diganti ketikan sendiri memakai tanda Desa_U, Kepala Desa, Tanggal, dst. (daftar tanda ada di menu Template Dokumen).', { i: 1, sz: 18, b: 240 })].join('')
+      + `<w:sectPr><w:pgSz w:w="${land ? 16838 : 11906}" w:h="${land ? 11906 : 16838}"${land ? ' w:orient="landscape"' : ''}/><w:pgMar w:top="1020" w:right="1020" w:bottom="1134" w:left="1020" w:header="567" w:footer="567" w:gutter="0"/></w:sectPr>`;
+    return paket(body, []);
+  }
+  /* dengan template unggahan: tiap halaman mengisi template; tanda blok diganti hasil konversi */
+  async function denganTemplate(buf, pages, M0) {
+    return render(pages, async (box, papers) => {
+      const ctx = { img: await siapGambar(box), media: [], rid: 0 }, K = Konv(ctx);
+      let first = null, bodies = [], missing = [];
+      /* lebar isi halaman template */
+      try {
+        const dx = new TextDecoder().decode((await DOCX.unzip(buf.slice(0))).find(f => f.name === 'word/document.xml').data), si = dx.lastIndexOf('<w:sectPr'), sp = si >= 0 ? dx.slice(si) : '';
+        const at = (tag, a) => { const m = new RegExp('<w:' + tag + '\\b[^>]*\\bw:' + a + '="(\\d+)"').exec(sp); return m ? Number(m[1]) : 0; };
+        ctx.maxW = (at('pgSz', 'w') || 11906) - (at('pgMar', 'left') || 1440) - (at('pgMar', 'right') || 1440);
+      } catch (e) { ctx.maxW = 9000; }
+      for (const pg of papers) {
+        const b = bagian(pg), blk = {};
+        const ambil = el => { if (!el) return ''; const cs = CS(el); const r = K.blok(el, cs).join(''); el.setAttribute('data-h2d', '1'); return r; };
+        blk.KOP = ambil(b.kop); blk.TTD = ambil(b.ttd);
+        const judul = b.h2 ? b.h2.innerText.replace(/\s+/g, ' ').trim() : '', sub = b.h3 ? b.h3.innerText.replace(/\s+/g, ' ').trim() : '';
+        [b.h2, b.h3].forEach(e => e && e.setAttribute('data-h2d', '1'));
+        /* isi: semua bagian halaman selain kop, judul, subjudul & tanda tangan */
+        const tandai = Array.from(pg.querySelectorAll('[data-h2d]'));
+        tandai.forEach(e => { e.dataset.h2dDisp = e.style.display; e.style.display = 'none'; });
+        blk.ISI = K.blocks(pg).join('');
+        tandai.forEach(e => { e.style.display = e.dataset.h2dDisp || ''; e.removeAttribute('data-h2d'); });
+        const M = Object.assign({}, M0, { Judul: judul, Subjudul: sub, Kop: '⟦KOP⟧', Isi: '⟦ISI⟧', 'Tanda Tangan': '⟦TTD⟧', TTD: '⟦TTD⟧' });
+        const r = await DOCX.fill(buf, tambahU(M), []);
+        (r.missing || []).forEach(k => { if (missing.indexOf(k) < 0) missing.push(k); });
+        const files = await DOCX.unzip(await r.blob.arrayBuffer());
+        let xml = new TextDecoder().decode(files.find(f => f.name === 'word/document.xml').data);
+        ['KOP', 'ISI', 'TTD'].forEach(k => {
+          const re = new RegExp('<w:p(?=[\\s>])(?:(?!<w:p[\\s>])[\\s\\S])*?⟦' + k + '⟧[\\s\\S]*?</w:p>', 'g');
+          xml = xml.replace(re, mp => {
+            const mk = '\u27e6' + k + '\u27e7';
+            if (mp.replace(/<[^>]+>/g, '').trim() !== mk) return mp.split(mk).join('');
+            const v = blk[k]; return v ? (/<\/w:tbl>$/.test(v) ? v + '<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="120" w:lineRule="exact"/></w:pPr></w:p>' : v) : '<w:p/>'; });
+        });
+        if (!first) first = { files, xml };
+        const bi = xml.indexOf('<w:body>') + 8, si = xml.lastIndexOf('<w:sectPr'), be = xml.lastIndexOf('</w:body>');
+        bodies.push({ isi: xml.slice(bi, si > bi ? si : be), sect: si > bi ? xml.slice(si, be) : '' });
+      }
+      const x0 = first.xml, bi = x0.indexOf('<w:body>') + 8, be = x0.lastIndexOf('</w:body>');
+      const sect = bodies[0].sect || '';
+      const isi = bodies.map((b, i) => i < bodies.length - 1 ? b.isi + '<w:p><w:r><w:br w:type="page"/></w:r></w:p>' : b.isi).join('') + sect;
+      const files = first.files;
+      files.find(f => f.name === 'word/document.xml').data = enc.encode(x0.slice(0, bi) + isi + x0.slice(be));
+      if (ctx.media.length) {
+        const dec = new TextDecoder();
+        const rel = files.find(f => f.name === 'word/_rels/document.xml.rels');
+        const addRel = ctx.media.map(m => `<Relationship Id="${m.id}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${m.name}"/>`).join('');
+        if (rel) rel.data = enc.encode(dec.decode(rel.data).replace('</Relationships>', addRel + '</Relationships>'));
+        else files.push({ name: 'word/_rels/document.xml.rels', data: enc.encode(CT + `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${addRel}</Relationships>`) });
+        const ct = files.find(f => f.name === '[Content_Types].xml');
+        let t = dec.decode(ct.data);
+        Array.from(new Set(ctx.media.map(m => m.ext))).forEach(e => { if (!new RegExp('Extension="' + e + '"', 'i').test(t)) t = t.replace('<Default ', `<Default Extension="${e}" ContentType="image/${e}"/><Default `); });
+        ct.data = enc.encode(t);
+        ctx.media.forEach(m => files.push({ name: 'word/media/' + m.name, data: m.data }));
+      }
+      return { blob: await DOCX.zip(files, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'), missing };
+    });
+  }
+
+  /* ---------- Excel: judul + semua tabel (sel gabungan dipertahankan) + tanda tangan ---------- */
+  const angka = s => {
+    let t = String(s || '').replace(/ /g, ' ').trim(), neg = false;
+    if (/^\(.*\)$/.test(t)) { neg = true; t = t.slice(1, -1).trim(); }
+    t = t.replace(/^Rp\.?\s*/i, '').replace(/,-$/, '').trim();
+    if (/^-/.test(t)) { neg = !neg; t = t.slice(1).trim(); }
+    if (!/^(\d{1,3}(\.\d{3})+|\d{1,12})(,\d+)?$/.test(t) || (/^0\d/.test(t))) return null;
+    const v = Number(t.replace(/\./g, '').replace(',', '.'));
+    return isFinite(v) ? { v: neg ? -v : v, d: /,\d/.test(t) } : null;
+  };
+  const xx = s => String(s == null ? '' : s).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const colA = i => { let s = ''; i++; while (i) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; };
+  const teks = el => String(el.innerText || el.textContent || '').replace(/ /g, ' ').replace(/[ \t]+/g, ' ').replace(/\n{2,}/g, '\n').trim();
+  function lembar(pg) {
+    /* sel: {v, s} — s: 1 teks bergaris, 2 angka, 3 angka desimal, 4 judul kolom, 5 judul, 6 teks biasa, 7 teks tebal bergaris, 8 angka tebal */
+    const rows = [], merges = [], widths = []; let maxC = 1;
+    const garis = (bagianTxt, gaya) => bagianTxt.split('\n').map(l => l.trim()).filter(Boolean).forEach(l => rows.push([{ v: l, s: gaya }]));
+    const walk = el => {
+      for (const n of Array.from(el.children)) {
+        if (SKIP.test(n.tagName)) continue;
+        const cs = CS(n); if (hidden(n, cs)) continue;
+        if (n.tagName === 'TABLE') { tabelX(n); continue; }
+        if (n.classList.contains('kop')) continue;
+        if (n.querySelector('table')) { walk(n); continue; }
+        const t = teks(n); if (!t) continue;
+        garis(t, /^H[1-3]$/.test(n.tagName) ? 5 : 6);
+      }
+    };
+    const tabelX = t => {
+      const G = grid(t), r0 = rows.length;
+      G.w.forEach((w, c) => { widths[c] = Math.max(widths[c] || 0, Math.min(60, Math.max(5, w / 7))); });
+      maxC = Math.max(maxC, G.n);
+      G.rows.forEach((row, ri) => {
+        const r = [];
+        for (let c = 0; c < G.n; c++) {
+          const a = G.at[ri][c];
+          if (!a) { r.push({ v: '', s: 1 }); continue; }
+          if (a.r0 !== ri || a.c0 !== c) { r.push({ v: '', s: 1 }); continue; }
+          const th = a.el.tagName === 'TH' || row.head, tx = teks(a.el), bb = a.el.querySelector('b,strong');
+          const tebal = Number(CS(a.el).fontWeight) >= 600 || (!!bb && teks(bb) === tx), n = th ? null : angka(tx);
+          r.push(n ? { v: n.v, s: tebal ? 8 : n.d ? 3 : 2 } : { v: tx, s: th ? 4 : tebal ? 7 : 1 });
+          if (a.cs > 1 || a.rs > 1) merges.push(colA(c) + (r0 + ri + 1) + ':' + colA(c + a.cs - 1) + (r0 + ri + a.rs));
+        }
+        rows.push(r);
+      });
+      rows.push([]);
+    };
+    walk(pg);
+    /* baris judul/teks direntang selebar tabel */
+    rows.forEach((r, i) => { if (r.length === 1 && (r[0].s === 5 || r[0].s === 6) && maxC > 1) merges.push('A' + (i + 1) + ':' + colA(maxC - 1) + (i + 1)); });
+    for (let c = 0; c < maxC; c++) if (!widths[c]) widths[c] = 14;
+    return { rows, merges, widths };
+  }
+  function sheetXml(L) {
+    const cel = (v, c, r) => {
+      const ref = colA(c) + (r + 1);
+      if (typeof v.v === 'number') return `<c r="${ref}" s="${v.s}"><v>${v.v}</v></c>`;
+      return `<c r="${ref}" t="inlineStr" s="${v.s}"><is><t xml:space="preserve">${xx(v.v)}</t></is></c>`;
+    };
+    return CT + `<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><cols>${L.widths.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${w.toFixed(1)}" customWidth="1"/>`).join('')}</cols><sheetData>${L.rows.map((r, ri) => `<row r="${ri + 1}">${r.map((v, ci) => cel(v, ci, ri)).join('')}</row>`).join('')}</sheetData>${L.merges.length ? `<mergeCells count="${L.merges.length}">${L.merges.map(m => `<mergeCell ref="${m}"/>`).join('')}</mergeCells>` : ''}<pageMargins left="0.5" right="0.5" top="0.6" bottom="0.6" header="0.3" footer="0.3"/><pageSetup paperSize="9" orientation="${L.land ? 'landscape' : 'portrait'}" fitToWidth="1" fitToHeight="0"/></worksheet>`;
+  }
+  const XSTY = CT + '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="2"><numFmt numFmtId="164" formatCode="#,##0;(#,##0);\\-"/><numFmt numFmtId="165" formatCode="#,##0.00;(#,##0.00);\\-"/></numFmts><fonts count="3"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="13"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFEDEDED"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color auto="1"/></left><right style="thin"><color auto="1"/></right><top style="thin"><color auto="1"/></top><bottom style="thin"><color auto="1"/></bottom><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="9">'
+    + '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
+    + '<xf numFmtId="49" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyNumberFormat="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'
+    + '<xf numFmtId="164" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyNumberFormat="1" applyAlignment="1"><alignment vertical="top"/></xf>'
+    + '<xf numFmtId="165" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyNumberFormat="1" applyAlignment="1"><alignment vertical="top"/></xf>'
+    + '<xf numFmtId="49" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>'
+    + '<xf numFmtId="49" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="center"/></xf>'
+    + '<xf numFmtId="49" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>'
+    + '<xf numFmtId="49" fontId="1" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyNumberFormat="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'
+    + '<xf numFmtId="164" fontId="1" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyNumberFormat="1" applyAlignment="1"><alignment vertical="top"/></xf>'
+    + '</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+  async function keXlsx(pages) {
+    return render(pages, async (box, papers) => {
+      const used = {};
+      const S2 = papers.map((pg, i) => {
+        const L = lembar(pg); L.land = isLand(pg);
+        const h = pg.querySelector('h2'); let nm = (h ? teks(h) : '') || 'Halaman ' + (i + 1);
+        nm = nm.replace(/[\\\/?*\[\]:]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 28) || 'Halaman ' + (i + 1);
+        let u = nm, k = 2; while (used[u.toLowerCase()]) u = nm.slice(0, 26) + ' ' + k++; used[u.toLowerCase()] = 1;
+        return Object.assign(L, { name: u, id: i + 1 });
+      }).filter(L => L.rows.length);
+      if (!S2.length) throw new Error('Dokumen ini tidak berisi tabel.');
+      const files = [
+        { name: '[Content_Types].xml', data: CT + `<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${S2.map((s, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>` },
+        { name: '_rels/.rels', data: CT + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>' },
+        { name: 'xl/workbook.xml', data: CT + `<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${S2.map((s, i) => `<sheet name="${xx(s.name)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join('')}</sheets></workbook>` },
+        { name: 'xl/_rels/workbook.xml.rels', data: CT + `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${S2.map((s, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join('')}<Relationship Id="rId${S2.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>` },
+        { name: 'xl/styles.xml', data: XSTY }
+      ].concat(S2.map((s, i) => ({ name: `xl/worksheets/sheet${i + 1}.xml`, data: sheetXml(s) })));
+      return DOCX.zip(files.map(f => ({ name: f.name, data: enc.encode(f.data) })), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    });
+  }
+  return { keDocx, denganTemplate, templateBawaan, keXlsx };
+})();
+
+/* peta tanda umum untuk template cetakan */
+function petaCetak(judul) {
+  const s = S.set || {}, t = isoToday();
+  return Object.assign(petaDesa(), { 'Kepala Desa': s.nama_kades || '', 'Sekretaris Desa': s.nama_sekdes || '', Tanggal: dPanjang(t), 'Tanggal Surat': dPanjang(t), Tahun: String(new Date().getFullYear()), 'Judul Dokumen': judul || '' });
+}
+async function cetakTplAda(key) {
+  if (!key) return false;
+  try { const L = await tplDaftar(); return L.some(x => x.path === cetakPath(key)); } catch (x) { return false; }
+}
+/* dokumen Word untuk cetakan: template unggahan bila ada, selain itu hasil konversi tampilan */
+async function cetakDocx(title, pages, key) {
+  const nama = namaFile(title) + '.docx';
+  if (await cetakTplAda(key)) {
+    const r = await H2D.denganTemplate(await tplAmbil(cetakPath(key)), pages, petaCetak(title));
+    return { blob: r.blob, missing: r.missing, nama, jenis: 'surat', tpl: 1 };
+  }
+  return { blob: await H2D.keDocx(pages), nama, jenis: 'surat' };
+}
+function printDocs(title, pages, key) {
+  const html = pages.join(''), adaTabel = /<table[\s>]/i.test(html);
+  const m = modal(title, `<div class="stack"><div class="btns"><button class="btn pri" id="doPrint">${ic('print')}Cetak</button><button class="btn" id="dlWord">${ic('file')}Unduh Word</button><button class="btn" id="dlPdf">${ic('file')}Unduh PDF</button>${adaTabel ? `<button class="btn" id="dlXls">${ic('list')}Unduh Excel</button>` : ''}</div><div class="meta" id="cetakSt">Cetak langsung: pilih "Simpan sebagai PDF" di jendela cetak untuk menyimpan berkas.</div><div class="doc-prev">${html}</div></div>`, { big: 1 });
   const fit = () => { const box = $('.doc-prev', m.el); if (!box) return; $$('.paper', box).forEach(pp => { pp.style.zoom = 1; const w = pp.getBoundingClientRect().width; const avail = box.clientWidth - 24; pp.style.zoom = w > avail ? (avail / w).toFixed(3) : 1; }); };
   requestAnimationFrame(fit);
-  $('#doPrint', m.el).onclick = () => {
+  const st = $('#cetakSt', m.el);
+  let docP = null;
+  const doc = () => { if (!docP) docP = cetakDocx(title, pages, key).catch(e => { docP = null; throw e; }); return docP; };
+  const tombol = (id, label, kerja) => {
+    const b = $(id, m.el); if (!b) return;
+    b.onclick = async () => {
+      const asli = b.innerHTML; b.disabled = true; b.textContent = label;
+      try { await kerja(); } catch (x) { st.innerHTML = `<span class="err">${esc(x.message)}</span>`; }
+      b.disabled = false; b.innerHTML = asli;
+    };
+  };
+  tombol('#dlWord', 'Menyiapkan Word…', async () => { const r = await doc(); saveBlob(r.blob, r.nama); st.innerHTML = ic('check') + ' Word diunduh' + (r.tpl ? ' (memakai template unggahan).' : '.') + (r.missing && r.missing.length ? ' Tanda tanpa data: ' + esc(r.missing.slice(0, 10).join(', ')) : ''); });
+  tombol('#dlPdf', 'Membuat PDF…', async () => { st.textContent = 'PDF dibuat dari dokumen Word di server, biasanya 5–20 detik.'; const r = await doc(); saveBlob(await jadiPdf(r), r.nama.replace(/\.docx$/i, '.pdf')); st.innerHTML = ic('check') + ' PDF diunduh.'; });
+  tombol('#dlXls', 'Menyiapkan Excel…', async () => { saveBlob(await H2D.keXlsx(pages), namaFile(title) + '.xlsx'); st.innerHTML = ic('check') + ' Excel diunduh.'; });
+  const cetakHtml = () => {
     $('#printArea').innerHTML = html;
     const land = pages.some(p => /paper land/.test(p));
-    let st = $('#pgsz'); if (!st) { st = document.createElement('style'); st.id = 'pgsz'; document.head.appendChild(st); }
-    st.textContent = '@media print{@page{size:A4 ' + (land ? 'landscape' : 'portrait') + ';margin:0}}';
+    let sz = $('#pgsz'); if (!sz) { sz = document.createElement('style'); sz.id = 'pgsz'; document.head.appendChild(sz); }
+    sz.textContent = '@media print{@page{size:A4 ' + (land ? 'landscape' : 'portrait') + ';margin:0}}';
     setTimeout(() => window.print(), 50);
   };
+  $('#doPrint', m.el).onclick = cetakHtml;
+  /* template unggahan untuk jenis ini: tampilkan & cetak sesuai template */
+  cetakTplAda(key).then(ada => {
+    if (!ada || !m.el.isConnected) return;
+    st.innerHTML = ic('file') + ' Jenis cetakan ini memakai template Word unggahan admin. Menyiapkan dokumen…';
+    doc().then(r => {
+      if (!m.el.isConnected) return;
+      hasilDokumen(m, r);
+      const bt = $('.btns', m.el);
+      if (bt && adaTabel) { const b = document.createElement('button'); b.className = 'btn'; b.innerHTML = ic('list') + 'Unduh Excel'; b.onclick = async () => { b.disabled = true; try { saveBlob(await H2D.keXlsx(pages), namaFile(title) + '.xlsx'); } catch (x) { toast(x.message, 1); } b.disabled = false; }; bt.appendChild(b); }
+      if (bt) { const b = document.createElement('button'); b.className = 'btn'; b.innerHTML = ic('print') + 'Tampilan bawaan'; b.title = 'Cetak tanpa template unggahan'; b.onclick = cetakHtml; bt.appendChild(b); }
+    }).catch(x => { st.innerHTML = `<span class="err">Template tidak dapat dipakai (${esc(x.message)}). Tampilan bawaan ditampilkan.</span>`; });
+  });
 }
 
 /* =====================================================================
@@ -8871,8 +9364,8 @@ VIEWS.sipadeslap = async (p, main, alive) => {
   prev(); $$('#slA,#slB,#slT,#slL,#slN', main).forEach(i => i.onchange = prev);
   $('#slSel').onchange = ev => { st.nama = ev.target.value; $$('.sipl-tree .row', main).forEach(b => b.classList.toggle('on', b.dataset.v === st.nama)); prev(); };
   S.vh.slPilih = t => { st.nama = t.dataset.v; $$('.sipl-tree .row', main).forEach(b => b.classList.toggle('on', b.dataset.v === st.nama)); prev(); };
-  S.vh.slCetak = () => printDocs(st.nama, [SIP_CSS + sipLaporan(st.nama, D, ambil())]);
-  S.vh.slSemua = () => { const o = ambil(); printDocs('KIB & LHI', [SIP_CSS].concat(SIP_LAP['Inventarisasi dan Penatausahaan'].map(n => sipLaporan(n, D, o)))); };
+  S.vh.slCetak = () => printDocs(st.nama, [SIP_CSS + sipLaporan(st.nama, D, ambil())], 'aset_sipades');
+  S.vh.slSemua = () => { const o = ambil(); printDocs('KIB & LHI', [SIP_CSS].concat(SIP_LAP['Inventarisasi dan Penatausahaan'].map(n => sipLaporan(n, D, o))), 'aset_kiblhi'); };
   S.vh.slXls = () => asetXlsSipades(D.aset);
 };
 /* Excel per golongan dengan kolom persis isian SIPADES */
@@ -8895,7 +9388,7 @@ VIEWS.asetlabel = async (p, main, alive) => {
   const draw = () => { $('#lbPrev').innerHTML = `<div class="paper" style="padding:10mm">${css}<div class="lbs">${pilih().slice(0, 24).map(lbl).join('')}</div></div>`; fitPapers($('#lbPrev')); };
   draw(); $('#lbQ').oninput = ev => { st.q = ev.target.value; draw(); };
   S.vh.lbK = t => { st.kib = t.dataset.v; refresh(); };
-  S.vh.lbCetak = () => { const R = pilih(), pg = []; for (let i = 0; i < R.length; i += 24) pg.push(`<div class="paper" style="padding:10mm">${css}<div class="lbs">${R.slice(i, i + 24).map(lbl).join('')}</div></div>`); printDocs('Label aset', pg.length ? pg : ['<div class="paper">Tidak ada aset.</div>']); };
+  S.vh.lbCetak = () => { const R = pilih(), pg = []; for (let i = 0; i < R.length; i += 24) pg.push(`<div class="paper" style="padding:10mm">${css}<div class="lbs">${R.slice(i, i + 24).map(lbl).join('')}</div></div>`); printDocs('Label aset', pg.length ? pg : ['<div class="paper">Tidak ada aset.</div>'], 'aset_label'); };
 };
 /* baca SOP */
 /* isi otomatis template BA/SK SIPADES dari transaksi aset */
@@ -8946,7 +9439,7 @@ function asetTplIsi(html, t, L) {
 function asetDokModal(judul, html) {
   const m = modal(judul, `<div class="stack"><div class="meta">Dokumen bisa diketik/diubah langsung di bawah sebelum dicetak. Titik-titik yang tersisa silakan dilengkapi.</div><div class="btns"><button class="btn pri" id="adkPrint">${ic('print')}Cetak / PDF</button></div><div class="doc-prev fitp" id="adkBox"><div class="paper sopdoc" id="adkDoc" contenteditable="true" style="outline:none">${html}</div></div></div>`, { big: 1 });
   fitPapers($('#adkBox', m.el));
-  $('#adkPrint', m.el).onclick = () => { const h = $('#adkDoc', m.el).innerHTML; m.close(); printDocs(judul, [`<div class="paper sopdoc">${h}</div>`]); };
+  $('#adkPrint', m.el).onclick = () => { const h = $('#adkDoc', m.el).innerHTML; m.close(); printDocs(judul, [`<div class="paper sopdoc">${h}</div>`], 'aset_dok'); };
 }
 async function asetDokTrx(t) {
   const [D, L] = await Promise.all([call('list', { entity: 'aset_sop', filters: { untuk: t.jenis }, limit: 50 }).then(r => r.rows || []), asetSemua({})]);
@@ -8966,7 +9459,7 @@ VIEWS.asetsop = async (p, main) => {
   fitPapers($('#sopPrev'));
   S.vh.sopJ = t => { st.j = t.dataset.v; st.id = ''; refresh(); };
   S.vh.sopP = t => { st.id = t.dataset.v; refresh(); };
-  S.vh.sopCetak = () => isTpl ? asetDokModal(cur.judul, tampil) : printDocs(cur.judul, [`<div class="paper sopdoc">${tampil}</div>`]);
+  S.vh.sopCetak = () => isTpl ? asetDokModal(cur.judul, tampil) : printDocs(cur.judul, [`<div class="paper sopdoc">${tampil}</div>`], 'aset_dok');
 };
 
 /* ---------- format laporan awal (Buku Inventaris/KIB/Kondisi/Semester) & editor kop ---------- */
@@ -9045,8 +9538,8 @@ VIEWS.asetcetak = async (p, main) => {
   const prev = () => { st.tahun = $('#acT').value; st.semester = $('#acS').value; const r = asetLaporan(st.j, L, opt()); $('#acPrev').innerHTML = r.html; fitPapers($('#acPrev')); };
   prev(); $('#acT').onchange = prev; $('#acS').onchange = prev;
   S.vh.acJ = t => { st.j = t.dataset.v; refresh(); };
-  S.vh.acCetak = () => printDocs(st.j, [asetLaporan(st.j, L, opt()).html]);
-  S.vh.acAll = () => printDocs('KIB A–G', ['KIB A', 'KIB B', 'KIB C', 'KIB D', 'KIB E', 'KIB F', 'KIB G'].map(j => asetLaporan(j, L, opt()).html));
+  S.vh.acCetak = () => printDocs(st.j, [asetLaporan(st.j, L, opt()).html], 'aset_lap');
+  S.vh.acAll = () => printDocs('KIB A–G', ['KIB A', 'KIB B', 'KIB C', 'KIB D', 'KIB E', 'KIB F', 'KIB G'].map(j => asetLaporan(j, L, opt()).html), 'aset_kib');
   S.vh.acXls = () => {
     const strip = h => String(h == null ? '' : h).replace(/<br\s*\/?>/g, ' ').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").trim();
     const jj = st.j === 'Buku Inventaris' ? ASET_LAP.slice(0, 8) : [st.j];
@@ -9409,7 +9902,7 @@ VIEWS.rabproyek = async (p, main, alive) => {
   const simpan = async (extra) => { const o = gambar(); const rec = { id: pr.id, nama: o.nama, lokasi: o.lokasi, dusun: o.dusun, tahun: o.tahun, pola: o.pola, sumber_dana: o.sumber_dana, ketua_tpk: o.ketua_tpk, pka: o.pka, bu_persen: o.bu_persen, keu_kegiatan: o.keu_kegiatan || '', keu_kode: o.keu_kode || '', keu_pagu: o.keu_pagu || '', total: String(H.total) }; if (!kunci) rec.params = JSON.stringify(o._p); await call('save', { entity: 'rab_proyek', record: Object.assign(rec, extra || {}) }); Object.assign(pr, rec, extra || {}); kotor = false; return o; };
   if (!kunci && w && String(H.total) !== String(pr.total || '')) simpan().catch(() => { });
   $$('input,select', main).forEach(el => { el.addEventListener('input', () => { gambar(); kotor = true; clearTimeout(tm); tm = setTimeout(() => simpan().catch(x => toast(x.message, 1)), 1200); }); el.addEventListener('change', () => { gambar(); clearTimeout(tm); simpan().catch(x => toast(x.message, 1)); }); });
-  S.vh.rbBundel = async () => { try { const o = await simpan(); printDocs('Bundel RAB ' + o.nama, rabBundel(Object.assign({}, pr, o), H, M)); } catch (x) { toast(x.message, 1); } };
+  S.vh.rbBundel = async () => { try { const o = await simpan(); printDocs('Bundel RAB ' + o.nama, rabBundel(Object.assign({}, pr, o), H, M), 'rab_bundel'); } catch (x) { toast(x.message, 1); } };
   S.vh.rbXls = async () => { try { const o = await simpan(); rabXls(Object.assign({}, pr, o), H); } catch (x) { toast(x.message, 1); } };
   S.vh.rbSahkan = async t => {
     const o = gambar(); if (!o.keu_kegiatan && !confirm2(t, 'Kegiatan APBDes belum dipilih. Sahkan tetap?')) return;
@@ -9422,7 +9915,7 @@ VIEWS.rabproyek = async (p, main, alive) => {
   S.vh.rbPb = async () => { try { const o = await simpan(); const x = await call('save', { entity: 'pembangunan', record: { nama: o.nama, kode: o.keu_kode || '', sumber_dana: o.sumber_dana || '', tahun_anggaran: o.tahun, pagu: String(H.total), pelaksana: o.pola === 'Penyedia' ? 'Penyedia' : 'TPK Desa ' + (S.set.nama_desa || ''), lokasi: [o.lokasi, o.dusun].filter(Boolean).join(', '), ket: 'Dari RAB & Gambar' } }); await call('save', { entity: 'rab_proyek', record: { id: pr.id, pembangunan_id: x.id } }); toast('Data Progres Pembangunan dibuat. Unggah foto 0–100% di sana.'); refresh(); } catch (x) { toast(x.message, 1); } };
   S.vh.rbBast = t => rabBastForm(pr, H, kg, progres, bs);
   S.vh.rbKibF = async () => { try { const n = await rabKeAset(pr, H, null, kg, 'F'); toast(n ? 'Dicatat sebagai KIB F (draf) di Menu Aset.' : 'Sudah tercatat.'); refresh(); } catch (x) { toast(x.message, 1); } };
-  S.vh.rbBastCetak = async t => { try { const b = await call('get', { entity: 'bast', id: t.dataset.id }); printDocs('BAST ' + pr.nama, rabBastDok(pr, b)); } catch (x) { toast(x.message, 1); } };
+  S.vh.rbBastCetak = async t => { try { const b = await call('get', { entity: 'bast', id: t.dataset.id }); printDocs('BAST ' + pr.nama, rabBastDok(pr, b), 'bast'); } catch (x) { toast(x.message, 1); } };
 };
 function confirm2(t, msg) { if (t.dataset.ok === '1') { t.dataset.ok = ''; return true; } t.dataset.ok = '1'; const old = t.innerHTML; t.innerHTML = ic('check') + 'Tekan lagi untuk lanjut'; toast(msg); setTimeout(() => { if (t.dataset.ok === '1') { t.dataset.ok = ''; t.innerHTML = old; } }, 6000); return false; }
 async function peopleList() { try { const r = await call('list', { entity: 'aparat', limit: 200 }); return r.rows || []; } catch (x) { return []; } }
@@ -9512,7 +10005,7 @@ function rabBastForm(pr, H, kg, progres, bs) {
       const bast = await call('save', { entity: 'bast', record: rec });
       await rabKeAset(pr, H, Object.assign({ id: bast.id }, rec), kg);
       await call('save', { entity: 'rab_proyek', record: { id: pr.id, status: 'Selesai', bast_id: bast.id } });
-      m.close(); toast('BAST disahkan. Aset masuk Menu Aset Desa sebagai draf.'); printDocs('BAST ' + pr.nama, rabBastDok(pr, Object.assign({ id: bast.id }, rec))); refresh();
+      m.close(); toast('BAST disahkan. Aset masuk Menu Aset Desa sebagai draf.'); printDocs('BAST ' + pr.nama, rabBastDok(pr, Object.assign({ id: bast.id }, rec)), 'bast'); refresh();
     } catch (x) { const e = $('.err', m.el); e.textContent = x.message; e.hidden = false; b.disabled = false; }
   };
 }
@@ -9566,7 +10059,7 @@ Object.assign(UI, {
 async function extraBast(b, el) {
   el.innerHTML = `<div class="btns"><button class="btn sm pri" data-act="bsCetak" data-id="${esc(b.id)}">${ic('print')}Cetak BAST</button><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['rabproyek', { id: b.proyek_id }]))}'>${ic('hammer')}Buka RAB & gambar</button></div>`;
 }
-ACT.bsCetak = async t => { try { const b = await call('get', { entity: 'bast', id: t.dataset.id }), pr = await call('get', { entity: 'rab_proyek', id: b.proyek_id }); printDocs('BAST', rabBastDok(pr, b)); } catch (x) { toast(x.message, 1); } };
+ACT.bsCetak = async t => { try { const b = await call('get', { entity: 'bast', id: t.dataset.id }), pr = await call('get', { entity: 'rab_proyek', id: b.proyek_id }); printDocs('BAST', rabBastDok(pr, b), 'bast'); } catch (x) { toast(x.message, 1); } };
 
 /* =====================================================================
    SPJ — Surat Pertanggungjawaban per SPP (Permendagri 20/2018, Perlem LKPP 12/2019)
@@ -9698,7 +10191,7 @@ VIEWS.spjsusun = async (p, main, alive) => {
   S.vh.sjUxT = () => saveBlob(XL.write([{ name: 'Upah', rows: [['Nama', 'Peran', 'NIK/NPWP', 'Alamat', 'Hari kerja', 'Upah per hari']].concat(D.upah.map(u => [u.nama, u.peran, u.npwp, u.alamat, spjN(u.hari), spjN(u.upah)])), head: true, widths: [28, 16, 20, 28, 12, 14] }]), 'Format daftar upah.xlsx');
   S.vh.sjDariRab = async () => { try { const M = await rabMaster(), Hh = rabDariSimpan(proyek, M), SD = rabSumberDaya(Hh.items).filter(r => !/upah/i.test(r.jenis)); D.barang = D.barang.concat(SD.map(r => ({ uraian: r.uraian, vol: String(r.qty), sat: r.satuan, harga: String(r.harga), jenis: JENIS_BELANJA[0], pkp: 'Tidak' }))); await simpan(); toast(SD.length + ' baris dari RAB. Sesuaikan dengan nota yang sebenarnya.'); draw(); } catch (x) { toast(x.message, 1); } };
   S.vh.sjLengkap = async () => { const H = hit(); if (Math.abs(H.selisih) >= 1) return toast('Total SPJ belum sama dengan nilai SPP.', 1); try { await simpan({ status: 'Lengkap' }); toast('SPJ ditandai lengkap.'); draw(); } catch (x) { toast(x.message, 1); } };
-  S.vh.sjCetak = async t => { try { await simpan(); const H = hit(); const fotoPb = titik.map(x => OPT.progres.filter(p => x['foto_' + p]).map(p => ({ id: x['foto_' + p], ket: (x.nama_titik || '') + ' — progres ' + p + '%' }))).flat(); const all = spjDokumen(spp, D, H, fotoPb, pajakTr); printDocs('SPJ ' + (spp.no || ''), t.dataset.v === 'semua' ? Object.values(all).flat() : all[t.dataset.v]); } catch (x) { toast(x.message, 1); } };
+  S.vh.sjCetak = async t => { try { await simpan(); const H = hit(); const fotoPb = titik.map(x => OPT.progres.filter(p => x['foto_' + p]).map(p => ({ id: x['foto_' + p], ket: (x.nama_titik || '') + ' — progres ' + p + '%' }))).flat(); const all = spjDokumen(spp, D, H, fotoPb, pajakTr); printDocs('SPJ ' + (spp.no || ''), t.dataset.v === 'semua' ? Object.values(all).flat() : all[t.dataset.v], 'spj'); } catch (x) { toast(x.message, 1); } };
   draw();
 };
 /* ---------- template dokumen SPJ (siap cetak) ---------- */
@@ -9807,8 +10300,8 @@ VIEWS.rpjmpkd = async (p, main, alive) => {
   S.vh.pkdB = t => { st.b = t.dataset.v; rf(); };
   S.vh.pkdAdd = () => go('form', { e: 'rpjm_pkd', preset: Object.assign({ jenis: st.j, periode_id: per.id, urut: String(n(st.j) + 1) }, st.b ? { bidang: st.b } : {}) });
   S.vh.pkdEd = t => go('form', { e: 'rpjm_pkd', id: t.dataset.id });
-  S.vh.pkdCetak = () => printDocs(d.j + ' ' + per.nama, [pkdHalaman(d, rows.filter(r => r.jenis === d.j), per)]);
-  S.vh.pkdCetakAll = () => printDocs('Pengkajian Keadaan Desa ' + per.nama, PKD_J.filter(x => n(x.j)).map(x => pkdHalaman(x, rows.filter(r => r.jenis === x.j), per)));
+  S.vh.pkdCetak = () => printDocs(d.j + ' ' + per.nama, [pkdHalaman(d, rows.filter(r => r.jenis === d.j), per)], 'pkd');
+  S.vh.pkdCetakAll = () => printDocs('Pengkajian Keadaan Desa ' + per.nama, PKD_J.filter(x => n(x.j)).map(x => pkdHalaman(x, rows.filter(r => r.jenis === x.j), per)), 'pkd');
   S.vh.pkdXls = async () => { try { await excelExport('rpjm_pkd', rows.filter(r => r.jenis === st.j), 'Pengkajian ' + st.j + ' ' + per.nama); } catch (x) { toast(x.message, 1); } };
   if ($('#pkdIn')) $('#pkdIn').onchange = async ev => { const f = ev.target.files[0]; ev.target.value = ''; if (!f) return; try { await excelImport('rpjm_pkd', f, rf); } catch (x) { toast(x.message, 1); } };
   S.vh.pkdRank = async t => {
@@ -10407,7 +10900,7 @@ function addCetak(x, rows, pg, lalu, laluPer) {
       <table style="${T};margin-top:10px;font-size:9.5pt"><thead><tr><th style="${td}">Desa</th><th style="${td}">Pagu ADD</th><th style="${td}">Pagu Dana Dusun</th><th style="${td}">Penyaluran s.d. Bulan Lalu</th><th style="${td}">Penyaluran Saat Ini</th><th style="${td}">No. Rekening</th><th style="${td}">Sisa Pagu</th></tr></thead>
       <tbody><tr><td style="${td}">${esc(desa)}</td><td style="${tdr}">${addRp(P.pagu_add)}</td><td style="${tdr}">${addRp(P.pagu_dusun)}</td><td style="${tdr}">${addRp(lalu)}</td><td style="${tdr}">${addRp(tot)}</td><td style="${td}">${esc(P.rekening || '')}</td><td style="${tdr}">${addRp(mNum(P.pagu_dusun) - lalu - tot)}</td></tr></tbody></table>${ttd()}`, 1));
   }
-  printDocs('Berkas ' + addLabel(x), pages);
+  printDocs('Berkas ' + addLabel(x), pages, 'add');
 }
 
 /* =====================================================================
