@@ -895,6 +895,34 @@ img.bf-pg{width:auto;max-width:100%;max-height:70vh;object-fit:contain}
 .dp-quick{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
 .dp-ft{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:8px}
 .dp-ft .btn{flex:1 1 auto}
+/* ---- v138: progress bar 3D + animasi dari 0 ---- */
+.bar,.dbar-t,.kd-track,.kd-stack,.tn-bar{box-shadow:inset 0 2px 3px rgba(0,0,0,.22),inset 0 -1px 0 rgba(255,255,255,.25),0 1px 0 rgba(255,255,255,.3)}
+.bar{height:9px}.dbar-t{height:8px;border-radius:99px}.kd-track{border-radius:99px}
+.bar>i,.dbar-t>i,.kd-track>i,.kd-stack>i,.tn-bar>i,.pbar>i,.pp>i,.ht>i{background-image:linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,.12) 45%,rgba(0,0,0,.14))!important;box-shadow:inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.18);border-radius:99px;transform-origin:left center;animation:barIn 1.1s cubic-bezier(.2,.8,.2,1) both}
+.dbar-t>i+i,.kd-stack>i+i,.pbar>i+i{animation-delay:.12s}
+.pl>i{transform-origin:right center}
+@keyframes barIn{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+/* ---- v138: tabel Pengajuan ADD ringkas & melengkung ---- */
+.add-wrap{border-radius:14px;overflow:auto}
+.add-tbl.ttema{font-size:12px}
+.add-tbl.ttema th{font-size:10px;padding:7px 6px}
+.add-tbl.ttema td{padding:4px 5px;vertical-align:middle;border-bottom:1px solid color-mix(in srgb,var(--pri) 12%,var(--line))}
+.add-tbl.ttema tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--pri) 4%,transparent)}
+.add-tbl.ttema tbody tr:hover td{background:color-mix(in srgb,var(--pri) 8%,transparent)}
+.add-tbl.ttema td:first-child{color:var(--muted);font-weight:700;text-align:center;width:28px}
+.add-tbl.ttema input,.add-tbl.ttema textarea{border:1px solid transparent;border-radius:7px;background:color-mix(in srgb,var(--ink) 5%,transparent);color:var(--ink);padding:5px 7px;min-width:70px;transition:border-color .15s,background .15s}
+.add-tbl.ttema input:focus,.add-tbl.ttema textarea:focus{outline:0;border-color:var(--pri);background:var(--surface)}
+.add-sil input[data-k="jabatan"]{min-width:110px}.add-sil input[data-k="nama"]{min-width:130px}.add-sil input[data-k="nik"]{min-width:128px;font-family:var(--mono);font-size:11px}
+.add-sil input[data-k="siltap"]{min-width:92px;text-align:right;font-weight:700}.add-sil input[data-k="ket"]{min-width:80px}
+.add-tbl.ttema td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.add-sil td.r:not(:has(input)){color:var(--pri);font-weight:700}
+.trash3d{width:30px;height:30px;min-height:30px;padding:0!important;border-radius:9px;display:inline-grid;place-items:center;background-color:var(--bad)!important;border-color:var(--bad)!important;color:#fff!important}
+.trash3d .ic{width:15px;height:15px}
+.add-sil td.jn{min-width:150px}.add-sil td.jn input{display:block;width:100%}
+.add-sil td.jn input[data-k="jabatan"]{font-size:10.5px;font-weight:700;color:var(--pri);background:transparent;padding:2px 7px;min-width:0}
+.add-sil td.jn input[data-k="nama"]{font-weight:600;min-width:0}
+.add-sil td.jn small{display:block;font-size:10.5px;font-weight:700;color:var(--pri)}.add-sil td.jn b{display:block}
+.add-sil input[data-k="nik"]{min-width:118px!important;font-size:10.5px!important}
 </style>
 </head>
 <body>
@@ -7312,7 +7340,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '137', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '138', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -11465,7 +11493,7 @@ const addTb = n => { const t = terbilang(Math.round(Number(n) || 0)).replace(/^\
 const addJ = s => { try { const a = JSON.parse(s || '[]'); return Array.isArray(a) ? a : []; } catch (x) { return []; } };
 const addUrutJab = j => { const s = String(j || '').toLowerCase(); return /kepala desa/.test(s) ? 0 : /sekretaris/.test(s) ? 1 : /kaur/.test(s) ? 2 : /kasi/.test(s) ? 3 : /kasun|kepala dusun/.test(s) ? 4 : 5; };
 const addSiltapAwal = j => /kepala desa/i.test(j) ? 3500000 : /sekretaris/i.test(j) ? 2402400 : 2184000;
-const addBpjsAwal = (j, s) => /kepala desa/i.test(j) ? Math.round(s * 0.01) : 25783;
+const addBpjsAwal = (j, s) => Math.round((Number(s) || 0) / 100);   /* potongan BPJS = 1% siltap */
 async function addPagu(th) {
   const r = await call('list', { entity: 'add_pagu', filters: { tahun: String(th) }, limit: 1 });
   return (r.rows || [])[0] || null;
@@ -11542,7 +11570,7 @@ VIEWS.addaju = async (p, main, alive) => {
     const m = modal('Rencana Penggunaan Dana Dusun ' + th, '<div id="rnB"></div>', { big: 1 });
     const tulis = () => {
       $('#rnB', m.el).innerHTML = `<div class="stack"><div class="meta">Daftar peruntukan dana dusun setahun. Dipakai untuk rincian setiap pengajuan.</div>
-        <div class="tbl-wrap"><table class="tbl add-tbl"><thead><tr><th>Uraian peruntukan</th><th>Pagu (Rp)</th><th>Jumlah/Satuan</th><th>Lokasi / SK Kepala Desa</th><th></th></tr></thead><tbody>${rows.map((r, i) => `<tr data-i="${i}"><td><textarea data-k="uraian" rows="2">${esc(r.uraian || '')}</textarea></td><td><input data-k="pagu" inputmode="numeric" value="${esc(addRp(r.pagu))}"></td><td><input data-k="satuan" value="${esc(r.satuan || '')}"></td><td><textarea data-k="lokasi" rows="2">${esc(r.lokasi || '')}</textarea></td><td><button class="iconbtn" data-del="${i}" aria-label="Hapus">${ic('x')}</button></td></tr>`).join('')}</tbody>
+        <div class="tbl-wrap"><table class="tbl add-tbl"><thead><tr><th>Uraian peruntukan</th><th>Pagu (Rp)</th><th>Jumlah/Satuan</th><th>Lokasi / SK Kepala Desa</th><th></th></tr></thead><tbody>${rows.map((r, i) => `<tr data-i="${i}"><td><textarea data-k="uraian" rows="2">${esc(r.uraian || '')}</textarea></td><td><input data-k="pagu" inputmode="numeric" value="${esc(addRp(r.pagu))}"></td><td><input data-k="satuan" value="${esc(r.satuan || '')}"></td><td><textarea data-k="lokasi" rows="2">${esc(r.lokasi || '')}</textarea></td><td><button class="btn sm danger trash3d" data-del="${i}" aria-label="Hapus baris" title="Hapus baris">${ic('trash')}</button></td></tr>`).join('')}</tbody>
         <tfoot><tr><td><b>Total</b></td><td><b>${addRp(rows.reduce((t, r) => t + mNum(r.pagu), 0))}</b></td><td colspan="3"></td></tr></tfoot></table></div>
         <div class="btns"><button class="btn sm" id="rnT">${ic('plus')}Baris</button><button class="btn sm" id="rnA">${ic('down')}Ambil dari APBDes (kegiatan ADD)</button><button class="btn pri" id="rnS">${ic('check')}Simpan</button></div></div>`;
       const baca = () => { $$('tr[data-i]', m.el).forEach(tr => { const r = rows[Number(tr.dataset.i)]; $$('[data-k]', tr).forEach(el => { r[el.dataset.k] = el.dataset.k === 'pagu' ? mNum(el.value) : el.value; }); }); };
@@ -11571,23 +11599,28 @@ VIEWS.addajued = async (p, main, alive) => {
   const lalu = sebelum.reduce((t, z) => t + mNum(z.nominal), 0) + mNum(pg && (jenis === 'SILTAP' ? pg.awal_siltap : pg.awal_dusun));
   const laluPer = {}; if (jenis === 'DUSUN') sebelum.forEach(z => addJ(z.rows).forEach(r => { laluPer[r.uraian] = (laluPer[r.uraian] || 0) + (Number(r.diajukan) || 0); }));
   const kol = jenis === 'SILTAP'
-    ? [['jabatan', 'Jabatan'], ['nama', 'Nama'], ['nik', 'NIK'], ['siltap', 'Siltap', 1], ['bpjs', 'Pot. BPJS', 1], ['hp', 'No. HP'], ['ket', 'Ket.']]
+    ? [['_jn', 'Jabatan / Nama'], ['nik', 'NIK'], ['siltap', 'Siltap', 1], ['bpjs', 'BPJS 1%', 1, 1], ['ket', 'Ket.']]
     : [['uraian', 'Uraian peruntukan'], ['pagu', 'Pagu', 1], ['diajukan', 'Diajukan', 1], ['lokasi', 'Lokasi / SK']];
+  /* potongan BPJS = 1% dari siltap (otomatis) */
+  const bpjsOtomatis = () => { if (jenis === 'SILTAP') rows.forEach(r => { r.bpjs = String(r.nama || '').trim() ? Math.round((Number(r.siltap) || 0) / 100) : 0; }); };
+  bpjsOtomatis();
+  let gambarUlang = false;
   const tulis = () => {
+    bpjsOtomatis();
     const tot = addTotal(jenis, rows), bp = rows.reduce((t, r) => t + (Number(r.bpjs) || 0), 0);
     main.innerHTML = `<div class="stack"><div class="card stack">
       <div class="form two"><div class="f"><label>Tanggal surat</label><input type="date" id="adT" value="${esc(x.tanggal || '')}"></div><div class="f"><label>Nomor surat</label><input id="adN" value="${esc(x.nomor || '')}" placeholder="400.10.2.4/…/427.85.01/${th}"></div>
       ${jenis === 'DUSUN' ? `<div class="f"><label>Periode (bulan)</label><input id="adP" value="${esc(x.periode || '')}" placeholder="mis. Juni - Juli"></div><div class="f"><label>Tahap ke</label><input id="adU" inputmode="numeric" value="${esc(x.urut || '')}"></div>` : ''}
       <div class="f"><label>Status</label><select id="adS">${['Draf', 'Diajukan', 'Cair'].map(s => `<option${(x.status || 'Draf') === s ? ' selected' : ''}>${s}</option>`).join('')}</select></div></div></div>
-      <div class="tbl-wrap"><table class="tbl add-tbl"><thead><tr><th>No</th>${kol.map(k => `<th>${k[1]}</th>`).join('')}${jenis === 'DUSUN' ? '<th>S.d. lalu</th><th>Sisa</th>' : ''}${w ? '<th></th>' : ''}</tr></thead><tbody>
-      ${rows.map((r, i) => `<tr data-i="${i}"><td>${i + 1}</td>${kol.map(k => `<td>${w ? (k[0] === 'uraian' || k[0] === 'lokasi' ? `<textarea data-k="${k[0]}" rows="2">${esc(r[k[0]] || '')}</textarea>` : `<input data-k="${k[0]}" ${k[2] ? 'inputmode="numeric"' : ''} value="${esc(k[2] ? addRp(r[k[0]]) : r[k[0]] || '')}">`) : esc(k[2] ? addRp(r[k[0]]) : r[k[0]] || '')}</td>`).join('')}${jenis === 'DUSUN' ? `<td class="r">${addRp(laluPer[r.uraian] || 0)}</td><td class="r">${addRp((Number(r.pagu) || 0) - (laluPer[r.uraian] || 0) - (Number(r.diajukan) || 0))}</td>` : ''}${w ? `<td><button class="iconbtn" data-del="${i}" aria-label="Hapus">${ic('x')}</button></td>` : ''}</tr>`).join('')}</tbody></table></div>
+      <div class="tbl-wrap ttw add-wrap"><table class="tbl add-tbl ttema${jenis === 'SILTAP' ? ' add-sil' : ''}"><thead><tr><th>No</th>${kol.map(k => `<th${k[2] ? ' class="r"' : ''}>${k[1]}</th>`).join('')}${jenis === 'DUSUN' ? '<th>S.d. lalu</th><th>Sisa</th>' : ''}${w ? '<th></th>' : ''}</tr></thead><tbody>
+      ${rows.map((r, i) => `<tr data-i="${i}"><td>${i + 1}</td>${kol.map(k => k[0] === '_jn' ? `<td class="jn">${w ? `<input data-k="jabatan" value="${esc(r.jabatan || '')}" placeholder="Jabatan"><input data-k="nama" value="${esc(r.nama || '')}" placeholder="Nama">` : `<small>${esc(r.jabatan || '')}</small><b>${esc(r.nama || '–')}</b>`}</td>` : `<td${k[2] ? ' class="r"' : ''}>${w && !k[3] ? (k[0] === 'uraian' || k[0] === 'lokasi' ? `<textarea data-k="${k[0]}" rows="2">${esc(r[k[0]] || '')}</textarea>` : `<input data-k="${k[0]}" ${k[2] ? 'inputmode="numeric"' : ''} value="${esc(k[2] ? addRp(r[k[0]]) : r[k[0]] || '')}">`) : esc(k[2] ? addRp(r[k[0]]) : r[k[0]] || '')}</td>`).join('')}${jenis === 'DUSUN' ? `<td class="r">${addRp(laluPer[r.uraian] || 0)}</td><td class="r">${addRp((Number(r.pagu) || 0) - (laluPer[r.uraian] || 0) - (Number(r.diajukan) || 0))}</td>` : ''}${w ? `<td><button class="btn sm danger trash3d" data-del="${i}" aria-label="Hapus baris" title="Hapus baris">${ic('trash')}</button></td>` : ''}</tr>`).join('')}</tbody></table></div>
       <div class="card"><dl class="dl">${jenis === 'SILTAP' ? `<div><dt>Jumlah Siltap</dt><dd><b>Rp ${addRp(tot)}</b></dd></div><div><dt>Potongan BPJS</dt><dd>Rp ${addRp(bp)}</dd></div><div><dt>Ditransfer</dt><dd>Rp ${addRp(tot - bp)}</dd></div>` : `<div><dt>Diajukan</dt><dd><b>Rp ${addRp(tot)}</b></dd></div>`}<div><dt>Penyaluran s.d. lalu</dt><dd>Rp ${addRp(lalu)}</dd></div><div><dt>Sisa pagu</dt><dd>Rp ${addRp(mNum(jenis === 'SILTAP' ? pg && pg.pagu_siltap : pg && pg.pagu_dusun) - lalu - tot)}</dd></div><div class="w"><dt>Terbilang</dt><dd>${esc(addTb(tot))}</dd></div></dl></div>
       ${pg ? '' : '<div class="err">Pagu ADD tahun ini belum diisi. Isi dulu di halaman Pengajuan ADD agar rekap dan surat lengkap.</div>'}
       <div class="btns">${w ? `<button class="btn sm" id="adBaris">${ic('plus')}Baris</button><button class="btn pri" id="adSimpan">${ic('check')}Simpan</button>` : ''}<button class="btn" id="adCetak">${ic('print')}Cetak berkas</button>${w && x.id ? `<button class="btn danger" id="adHapus">${ic('trash')}Hapus</button>` : ''}</div></div>`;
     const baca = () => { $$('tr[data-i]', main).forEach(tr => { const r = rows[Number(tr.dataset.i)]; $$('[data-k]', tr).forEach(el => { const k = kol.find(z => z[0] === el.dataset.k); r[el.dataset.k] = k && k[2] ? mNum(el.value) : el.value.trim(); }); }); ['T:tanggal', 'N:nomor', 'P:periode', 'U:urut', 'S:status'].forEach(s => { const [a, k] = s.split(':'); const el = $('#ad' + a, main); if (el) x[k] = el.value.trim(); }); };
-    main.querySelector('.add-tbl').addEventListener('change', () => { baca(); tulis(); });
+    main.querySelector('.add-tbl').addEventListener('change', () => { if (gambarUlang) return; gambarUlang = true; try { baca(); tulis(); } finally { gambarUlang = false; } });
     $$('[data-del]', main).forEach(b => b.onclick = () => { baca(); rows.splice(Number(b.dataset.del), 1); tulis(); });
-    if ($('#adBaris', main)) $('#adBaris', main).onclick = () => { baca(); rows.push(jenis === 'SILTAP' ? { jabatan: '', nama: '', nik: '', siltap: 0, bpjs: 0, hp: '', ket: '' } : { uraian: '', pagu: 0, diajukan: 0, lokasi: '' }); tulis(); };
+    if ($('#adBaris', main)) $('#adBaris', main).onclick = () => { baca(); rows.push(jenis === 'SILTAP' ? { jabatan: '', nama: '', nik: '', siltap: 0, bpjs: 0, ket: '' } : { uraian: '', pagu: 0, diajukan: 0, lokasi: '' }); tulis(); };
     const simpan = async () => {
       baca(); if (jenis === 'DUSUN' && !x.periode) throw new Error('Isi periode bulan dana dusun.');
       const rec = { jenis, tahun: x.tahun, bulan: x.bulan || '', urut: x.urut || '', periode: x.periode || '', tanggal: x.tanggal, nomor: x.nomor || '', status: x.status || 'Draf', nominal: String(addTotal(jenis, rows)), rows: JSON.stringify(rows) };
