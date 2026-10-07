@@ -481,10 +481,10 @@ table.rpj tfoot td.c0,table.rpj tfoot td.c1{z-index:4}
 .dtlip>summary .ic{width:15px;height:15px;vertical-align:-3px}
 .dtlip[open]>summary{margin-bottom:8px}
 table.dtt{font-size:11px}
-.dttot{background:linear-gradient(135deg,#1e4fd6,#2f6bf0);color:#fff;border-radius:var(--r);padding:10px 14px;box-shadow:var(--shadow)}
+.dttot{background:linear-gradient(135deg,var(--pri-2),var(--pri));color:var(--pri-ink);border-radius:var(--r);padding:10px 14px;box-shadow:var(--shadow)}
 .dttot-l{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;opacity:.92;display:flex;align-items:center;gap:6px}
 .dttot b{display:block;font-size:22px;margin:2px 0 6px}
-.dttot-r{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:12px;font-weight:600;border-top:1px solid rgba(255,255,255,.28);padding-top:6px}
+.dttot-r{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:12px;font-weight:600;border-top:1px solid color-mix(in srgb,var(--pri-ink) 28%,transparent);padding-top:6px}
 .dttot-r i{display:block;font-style:normal;font-weight:500;font-size:10px;opacity:.85;text-transform:uppercase}
 .k{display:inline-block;min-width:20px;padding:1px 3px;border-radius:5px;font-weight:700;font-size:10px}
 .k-H,.k-HD,.k-P{background:var(--ok-soft);color:var(--ok)} .k-T,.k-IT,.k-TD,.k-ITD{background:var(--warn-soft);color:var(--warn)} .k-D,.k-DL{background:var(--info-soft);color:var(--info)}
@@ -704,6 +704,9 @@ input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-sof
 :root[data-accent="ungu"]{--pri:#6d28d9;--pri-2:#5b21b6;--pri-ink:#fff;--pri-soft:#ebe2fb;--bg:#f5f3f8;--surface:#ffffff;--surface2:#ede8f5;--line:#e2dcec;--ink:#1d1629;--muted:#685f79}
 @media (prefers-color-scheme:dark){:root[data-accent="ungu"]:not([data-theme="light"]){--pri:#b39dfa;--pri-2:#9a7ef2;--pri-ink:#1c0a3d;--pri-soft:#2c1f4a;--bg:#110d19;--surface:#191324;--surface2:#221a30;--line:#322745;--ink:#ebe5f3;--muted:#a59cb5}}
 :root[data-accent="ungu"][data-theme="dark"]{--pri:#b39dfa;--pri-2:#9a7ef2;--pri-ink:#1c0a3d;--pri-soft:#2c1f4a;--bg:#110d19;--surface:#191324;--surface2:#221a30;--line:#322745;--ink:#ebe5f3;--muted:#a59cb5}
+:root[data-accent="oranye"]{--pri:#c2410c;--pri-2:#9a3412;--pri-ink:#fff;--pri-soft:#fde6d6;--bg:#f8f4f0;--surface:#ffffff;--surface2:#f6ebe2;--line:#ecdccf;--ink:#2a1a10;--muted:#7a6455}
+@media (prefers-color-scheme:dark){:root[data-accent="oranye"]:not([data-theme="light"]){--pri:#fb923c;--pri-2:#f97316;--pri-ink:#2a1003;--pri-soft:#432313;--bg:#160f0a;--surface:#1f1610;--surface2:#2a1e15;--line:#3d2c20;--ink:#f3e8df;--muted:#b49f8f}}
+:root[data-accent="oranye"][data-theme="dark"]{--pri:#fb923c;--pri-2:#f97316;--pri-ink:#2a1003;--pri-soft:#432313;--bg:#160f0a;--surface:#1f1610;--surface2:#2a1e15;--line:#3d2c20;--ink:#f3e8df;--muted:#b49f8f}
 :root[data-accent="cokelat"]{--pri:#8a5a2b;--pri-2:#734a22;--pri-ink:#fff;--pri-soft:#f1e6d9;--bg:#f6f3ef;--surface:#ffffff;--surface2:#f0e9e0;--line:#e6ddd2;--ink:#241c13;--muted:#6f6456}
 @media (prefers-color-scheme:dark){:root[data-accent="cokelat"]:not([data-theme="light"]){--pri:#d9a66f;--pri-2:#c48d55;--pri-ink:#2a1a08;--pri-soft:#3a2a17;--bg:#15100b;--surface:#1e1811;--surface2:#282017;--line:#392e22;--ink:#efe8df;--muted:#ab9e8e}}
 :root[data-accent="cokelat"][data-theme="dark"]{--pri:#d9a66f;--pri-2:#c48d55;--pri-ink:#2a1a08;--pri-soft:#3a2a17;--bg:#15100b;--surface:#1e1811;--surface2:#282017;--line:#392e22;--ink:#efe8df;--muted:#ab9e8e}
@@ -796,6 +799,48 @@ option,optgroup{background-color:var(--surface)!important;color:var(--ink)!impor
 .frc-st{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}.frc-st button{border:0;background:none;padding:4px 8px;font:inherit;font-size:11.5px;color:var(--muted);cursor:pointer}.frc-st button.on.belum{background:#fee2e2;color:#b91c1c}.frc-st button.on.sebagian{background:#fef3c7;color:#b45309}.frc-st button.on.ada{background:#dcfce7;color:#15803d}.frc-c{width:100%;font:inherit;font-size:12px;padding:5px 7px}
 .tn-lk{display:flex;align-items:center;gap:6px}.tn-lk .main{flex:1;min-width:0}.tn-wp .btns{margin-top:4px}
 .pl-map{position:relative;height:min(62vh,460px);border-radius:10px;overflow:hidden;border:1px solid var(--line)}.pl-map #plMap{position:absolute;inset:0}.pl-pin{position:absolute;left:50%;top:50%;transform:translate(-50%,-100%);z-index:500;color:#dc2626;pointer-events:none}.pl-pin .ic{width:34px;height:34px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))}
+/* ---- v135: tombol 3D ---- */
+.btn,.ibtn,.sh-it,.tile,.add-b,.sheet.dock .sh-it{background-image:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 52%,rgba(0,0,0,.07))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.38),inset 0 -2px 0 rgba(0,0,0,.13),0 2px 4px rgba(0,0,0,.13),0 1px 1px rgba(0,0,0,.08);transition:transform .12s ease,box-shadow .12s ease,background-color .15s,border-color .15s,filter .15s}
+.btn:hover:not([disabled]),.ibtn:hover,.sh-it:hover,.tile:hover,.sheet.dock .sh-it:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.42),inset 0 -2px 0 rgba(0,0,0,.13),0 4px 9px rgba(0,0,0,.16),0 1px 2px rgba(0,0,0,.1)}
+.btn:active:not([disabled]),.ibtn:active,.sh-it:active,.tile:active,.add-b:active,.sheet.dock .sh-it:active{transform:translateY(1px);box-shadow:inset 0 2px 5px rgba(0,0,0,.24),0 0 1px rgba(0,0,0,.1);filter:brightness(.97)}
+.btn[disabled]{box-shadow:none}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn,:root:not([data-theme="light"]) .ibtn,:root:not([data-theme="light"]) .sh-it,:root:not([data-theme="light"]) .tile{box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 -2px 0 rgba(0,0,0,.3),0 2px 5px rgba(0,0,0,.4)}}
+:root[data-theme="dark"] .btn,:root[data-theme="dark"] .ibtn,:root[data-theme="dark"] .sh-it,:root[data-theme="dark"] .tile{box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 -2px 0 rgba(0,0,0,.3),0 2px 5px rgba(0,0,0,.4)}
+/* ---- v135: jarak baris tombol di detail ---- */
+.dview .btns+.btns,.btns.trio+.btns.trio,.dview .btns.trio{margin-top:10px}
+.dview .btns{row-gap:8px}
+/* ---- v135: detail muncul halus dari dalam daftar ---- */
+.xp.xp-in>*{animation:xpIn .4s cubic-bezier(.2,.8,.2,1) both}
+.xp.xp-in>*:nth-child(2){animation-delay:.04s}.xp.xp-in>*:nth-child(3){animation-delay:.08s}.xp.xp-in>*:nth-child(n+4){animation-delay:.12s}
+@keyframes xpIn{from{opacity:0;transform:translateY(-12px) scale(.97);transform-origin:50% 0}to{opacity:1;transform:none}}
+.it{transition:background-color .25s ease}.it>.row{transition:background-color .25s ease}
+/* ---- v135: bansos keluarga mengikuti warna tema ---- */
+.bsk .sec-h h2 .ic,.bsk .dtlip>summary .ic{color:var(--pri)}
+.bsk .dtlip{border-color:color-mix(in srgb,var(--pri) 30%,var(--line))}
+.bsk .dtlip>summary{color:var(--pri)}
+.bsk .dtt th{background:var(--pri-soft);color:var(--pri)}
+.bsk .gtabs{background:var(--pri-soft);border-color:color-mix(in srgb,var(--pri) 25%,var(--line))}
+.bsk .gtabs button{color:var(--pri)}
+.bsk .gtabs button.on{background:var(--pri);color:var(--pri-ink)}
+/* ---- v135: filter daftar ---- */
+.btn .fcnt{background:var(--pri);color:var(--pri-ink);border-radius:999px;font-size:10px;min-width:16px;height:16px;display:inline-grid;place-items:center;padding:0 4px}
+.btn .fcnt:empty{display:none}.btn.pri .fcnt{background:var(--pri-ink);color:var(--pri)}
+.fltbar{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.fltbar .chip{display:inline-flex;align-items:center;gap:4px}.fltbar .chip .ic{width:12px;height:12px}
+.flt-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:8px 10px}.flt-g .f.w{grid-column:1/-1}
+.flt-g .f label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:2px}
+.flt-g .f select,.flt-g .f input{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;font-size:12.5px}
+.flt-g .rng{display:flex;gap:4px}.flt-g .rng input{min-width:0}
+/* ---- v135: popup menu bawah transparan (kaca) ---- */
+@media (max-width:899px){
+  .sheet.dock .sh-box{background:rgba(255,255,255,.6);background:color-mix(in srgb,var(--bg0) 58%,transparent);-webkit-backdrop-filter:blur(20px) saturate(1.6);backdrop-filter:blur(20px) saturate(1.6);border:1px solid color-mix(in srgb,#fff 40%,transparent);border-bottom:0;color:var(--ink0);box-shadow:0 -8px 24px rgba(0,0,0,.22);
+    --ink:var(--ink0);--muted:var(--muted0);--surface:color-mix(in srgb,var(--bg0) 75%,transparent);--surface2:color-mix(in srgb,var(--bg0) 88%,transparent);--line:color-mix(in srgb,var(--ink0) 14%,transparent);--mc:var(--pri0)!important}
+  .sheet.dock .sh-h h3,.sheet.dock .sh-h .iconbtn{color:var(--ink0)}
+  .sheet.dock .mc-ic{background:var(--pri0)!important;color:var(--pri-ink)!important}
+  .sheet.dock .btn:not(.danger){background-color:var(--pri0);border-color:transparent;color:var(--pri-ink)}
+  .sheet.dock .sh-it small{color:color-mix(in srgb,var(--pri-ink) 82%,transparent)}
+  .sheet.dock .sh-st>div,.sheet.dock .sh-q{box-shadow:0 1px 3px rgba(0,0,0,.08)}
+}
 </style>
 </head>
 <body>
@@ -898,6 +943,7 @@ const IC = {
   out: '<path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4"/><path d="M10 17l-5-5 5-5M5 12h11"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+  filter: '<path d="M4 5h16l-6 7.5V19l-4 2v-8.5z"/>',
   search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
   back: '<path d="M15 5l-7 7 7 7"/>',
   menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
@@ -3141,6 +3187,8 @@ VIEWS.list = async (p, main, alive) => {
   if (u.rkp) await rkpMuatVer();
   if (u.rpjm && !S.rpjmPid) { try { await rpjmPerAktif(); S.rpjmPid = S.rpjmDokPer && S.rpjmDokPer.id; } catch (x) { } }
   const st = S.listState = (S.listState && S.listState.e === e && S.listState.ctx === JSON.stringify(p)) ? S.listState : { e, ctx: JSON.stringify(p), q: '', chip: p.chip || '', per: '', view: p.v || 0, rows: [], total: 0 };
+  st.flt = st.flt || {};
+  const fltF = fltFields(e), fltN = Object.keys(st.flt).length;
   let chipOpt = u.chips ? u.chips.opt.slice() : null, chipN = {};
   if (u.chips && u.chips.dyn) {
     try {
@@ -3156,13 +3204,14 @@ VIEWS.list = async (p, main, alive) => {
   setTop(p.title || (GRUP_OF[e] ? GRUP[GRUP_OF[e]].t : u.t), u.rkp ? 'RKP Desa ' + rkpLbl(S.rkpYear) : u.rpjm && S.rpjmDokPer && S.rpjmDokPer.id === S.rpjmPid ? S.rpjmDokPer.nama : '');
   const pers = u.year ? [String(yearNow), String(yearNow - 1), String(yearNow - 2), 'Semua'] : null;
   main.innerHTML = `<div class="stack">${e === 'tanah_desa' ? tanahTabs('list') : e === 'tanah_sert' ? tanahTabs('sert') : ''}${SOS_TAB_E[e] ? rentanTabs(SOS_TAB_E[e]) : ''}
-    <div class="toolbar"><label class="search">${ic('search')}<input id="q" placeholder="Cari…" value="${esc(st.q)}" autocomplete="off"></label>
+    <div class="toolbar"><label class="search">${ic('search')}<input id="q" placeholder="Cari…" value="${esc(st.q)}" autocomplete="off"></label>${fltF.length ? `<button class="btn sm${fltN ? ' pri' : ''}" data-act="flt" title="Cari berdasarkan kriteria">${ic('filter')}Filter<span class="fcnt">${fltN || ''}</span></button>` : ''}
       ${u.month ? `<input type="month" class="inp" id="per" value="${esc(st.per)}" style="max-width:180px">` : ''}
       ${e === 'rkp_rutin' && canWrite(e) ? `<button class="btn sm" data-act="rkpRutinIsi">${ic('down')}Salin dari APBDes ${esc(keuTh())}</button>` : ''}${NASKAH[e] && canWrite(e) ? `<button class="btn sm pri" data-act="go" data-go='${esc(JSON.stringify(['form', { e, buat: 1 }]))}' title="${esc(NASKAH[e].buat)}">${ic('next')}Buat</button>` : ''}${u.print ? `<button class="btn sm" data-act="cetak" title="Cetak buku register">${ic('print')}Cetak</button>` : ''}${u.excel ? `<button class="btn sm" data-act="xlsOut">${ic('down')}Ekspor Excel</button>${canWrite(e) ? `<label class="btn sm">${ic('plus')}Impor Excel<input type="file" id="xlsIn" accept=".xlsx,.csv" hidden></label>` : ''}` : ''}${u.print2 ? `<button class="btn sm" data-act="cetak2">${ic('print')}${esc(u.print2.label)}</button>` : ''}</div>
     ${GRUP_OF[e] ? `<div class="gtabs" role="tablist">${grpEs(GRUP_OF[e]).map(([k, l]) => `<button role="tab" class="${k === e ? 'on' : ''}" data-act="grpTab" data-v="${k}">${esc(l)}</button>`).join('')}</div>` : ''}
     ${pers ? `<div class="chips">${pers.map(y => `<button class="chip ${st.per === y || (y === 'Semua' && st.per === 'all') ? 'on' : ''}" data-act="per" data-v="${y === 'Semua' ? 'all' : y}">${y}</button>`).join('')}</div>` : ''}
     ${u.views ? `<div class="chips">${u.views.map((v, i) => `<button class="chip ${st.view === i ? 'on' : ''}" data-act="view" data-v="${i}">${esc(v[0])}</button>`).join('')}</div>` : ''}
     ${u.chips ? `<div class="chips${u.chips.dyn ? ' wrap' : ''}"><button class="chip ${!st.chip ? 'on' : ''}" data-act="chip" data-v="">Semua</button>${chipOpt.map(o => `<button class="chip ${st.chip === o ? 'on' : ''}" data-act="chip" data-v="${esc(o)}">${esc(u.chips.lbl ? u.chips.lbl(o) : o)}${chipN[o] ? ` <small class="num">${chipN[o]}</small>` : ''}</button>`).join('')}</div>` : ''}
+    ${fltN ? `<div class="fltbar">${Object.keys(st.flt).map(k => `<button class="chip on" data-act="fltX" data-k="${esc(k)}" title="Hapus kriteria">${esc(fltLabel(e, k, st.flt[k]))}${ic('x')}</button>`).join('')}<button class="chip" data-act="fltX" data-k="">Hapus semua</button></div>` : ''}
     <div class="meta" id="cnt"></div>
     <div id="rows"><div class="skel"></div></div>
     <div id="more"></div>
@@ -3175,6 +3224,7 @@ VIEWS.list = async (p, main, alive) => {
     if (u.chips && st.chip) f[u.chips.k] = st.chip;
     if ((u.year || u.month) && st.per && st.per !== 'all') f[(u.year || u.month) + '__pre'] = st.per;
     if (u.views) Object.assign(f, u.views[st.view][1]());
+    Object.assign(f, fltServer(st.flt));
     return f;
   };
   const asc = u.views ? !!u.views[st.view][2] : u.asc;
@@ -3198,6 +3248,8 @@ VIEWS.list = async (p, main, alive) => {
   $('#q').oninput = ev => { clearTimeout(tm); tm = setTimeout(() => { st.q = ev.target.value.trim(); load(0); }, 300); };
   if ($('#per')) $('#per').onchange = ev => { st.per = ev.target.value; load(0); };
   S.vh.more = () => load(st.rows.length);
+  S.vh.flt = () => fltBuka(e, st);
+  S.vh.fltX = t => { if (t.dataset.k) delete st.flt[t.dataset.k]; else st.flt = {}; refresh(); };
   S.vh.chip = t => { st.chip = t.dataset.v; refresh(); };
   S.vh.view = t => { st.view = Number(t.dataset.v); refresh(); };
   S.vh.per = t => { st.per = t.dataset.v; refresh(); };
@@ -3232,6 +3284,53 @@ function rowHtml(e, x, act) {
   const av = img ? `<span class="av"><img src="${esc(img)}" alt="" loading="lazy"></span>` : d.av != null ? `<span class="av">${/^</.test(d.av) ? d.av : esc(d.av)}</span>` : '';
   return `<div class="it" data-e="${esc(e)}" data-id="${esc(x.id)}"><div class="row" role="button" tabindex="0" aria-expanded="false" data-act="${act || 'row'}">${av}<span class="main"><span class="t">${esc(d.t)}${d.pill ? ' ' + d.pill : ''}</span><span class="s ${d.mono ? 'mono' : ''}">${d.raw ? d.s : esc(d.s)}</span>${d.s2 ? `<span class="s2">${d.raw2 ? d.s2 : esc(d.s2)}</span>` : ''}</span><span class="r">${d.date ? `<span class="num">${fDate(d.date, 1)}</span>` : ''}${d.r ? `<span class="num">${esc(d.r)}</span>` : ''}${d.file ? ic('file') : ''}${d.geo ? ic('pin') : ''}</span>${ic('down', 'chev')}</div><div class="xp" hidden></div></div>`;
 }
+/* ---------------- Filter daftar: cari berdasarkan kriteria (pilihan, rentang tanggal, umur) ---------------- */
+function fltFields(e) {
+  return (UI[e].fields || []).filter(f => f.l && !f.sens && !f.noform && !/^_/.test(f.k) && (f.t === 'select' || f.t === 'date' || (f.t === 'text' && (f.dd || f.list) && !f.wide)));
+}
+const fltVal = o => Array.isArray(o) ? o[0] : o && typeof o === 'object' ? o.v : o;
+const tglGeser = (iso, n) => { const d = new Date(iso + 'T00:00:00Z'); if (isNaN(d)) return iso; d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const tglMundur = th => { const t = isoToday(); return String(Number(t.slice(0, 4)) - th).padStart(4, '0') + t.slice(4); };
+/* nilai isian filter -> filter server (sama dengan / __gte / __lt) */
+function fltServer(F) {
+  const f = {};
+  Object.keys(F || {}).forEach(k => {
+    const v = F[k]; if (v === '' || v == null) return; let m;
+    if ((m = /^(.+)__dari$/.exec(k))) f[m[1] + '__gte'] = v;
+    else if ((m = /^(.+)__sampai$/.exec(k))) f[m[1] + '__lt'] = tglGeser(v, 1);
+    else if (k === '_umur_min') f.tgl_lahir__lt = tglGeser(tglMundur(Number(v)), 1);
+    else if (k === '_umur_max') f.tgl_lahir__gte = tglGeser(tglMundur(Number(v) + 1), 1);
+    else f[k] = v;
+  });
+  return f;
+}
+function fltLabel(e, k, v) {
+  if (k === '_umur_min') return 'Umur ≥ ' + v;
+  if (k === '_umur_max') return 'Umur ≤ ' + v;
+  const m = /^(.+)__(dari|sampai)$/.exec(k), f = (UI[e].fields || []).find(x => x.k === (m ? m[1] : k));
+  return (f ? f.l : k) + (m ? (m[2] === 'dari' ? ' dari ' : ' s.d. ') + fDate(v) : ': ' + v);
+}
+async function fltBuka(e, st) {
+  const u = UI[e], F = fltFields(e), cur = st.flt || {};
+  const m = sheet('Filter ' + u.t, '<div class="skel"></div>', { ikon: 'filter', dock: false });
+  /* isian teks berdaftar (dusun, RT, RW, …): pilihan dari data yang ada */
+  const dist = {};
+  await Promise.all(F.filter(f => f.t === 'text' || (f.t === 'select' && !(f.opt || f.list))).map(f => call('distinct', { entity: e, field: f.k }).then(r => { dist[f.k] = r.filter(x => x.v).sort((a, b) => String(a.v).localeCompare(String(b.v), 'id', { numeric: true })); }).catch(() => { dist[f.k] = []; })));
+  const opsi = (k, L) => `<option value="">Semua</option>` + L.map(([v, l]) => `<option value="${esc(v)}" ${String(cur[k] || '') === String(v) ? 'selected' : ''}>${esc(l)}</option>`).join('');
+  const isi = F.map(f => {
+    if (f.t === 'date') return `<div class="f w"><label>${esc(f.l)}</label><div class="rng"><input type="date" data-k="${esc(f.k)}__dari" value="${esc(cur[f.k + '__dari'] || '')}" title="dari"><input type="date" data-k="${esc(f.k)}__sampai" value="${esc(cur[f.k + '__sampai'] || '')}" title="sampai"></div></div>`;
+    const L = dist[f.k] ? dist[f.k].map(x => [x.v, x.v + ' (' + Number(x.n).toLocaleString('id-ID') + ')']) : (f.opt || f.list || []).map(o => [fltVal(o), fltVal(o)]);
+    if (!L.length) return '';
+    return `<div class="f"><label>${esc(f.l)}</label><select data-k="${esc(f.k)}">${opsi(f.k, L)}</select></div>`;
+  }).join('') + (F.some(f => f.k === 'tgl_lahir') ? `<div class="f w"><label>Umur (tahun)</label><div class="rng"><input type="number" min="0" max="130" inputmode="numeric" data-k="_umur_min" placeholder="dari" value="${esc(cur._umur_min || '')}"><input type="number" min="0" max="130" inputmode="numeric" data-k="_umur_max" placeholder="sampai" value="${esc(cur._umur_max || '')}"></div></div>` : '');
+  m.body.innerHTML = `<div class="stack"><div class="meta">Pilih satu atau beberapa kriteria. Bisa digabung dengan kotak Cari.</div><div class="flt-g">${isi}</div>
+    <div class="btns"><button class="btn pri" id="fltOk">${ic('check')}Terapkan</button><button class="btn" id="fltReset">Kosongkan</button></div></div>`;
+  $('#fltReset', m.el).onclick = () => $$('[data-k]', m.el).forEach(i => { i.value = ''; });
+  $('#fltOk', m.el).onclick = () => {
+    const n = {}; $$('[data-k]', m.el).forEach(i => { const v = i.value.trim(); if (v) n[i.dataset.k] = v; });
+    st.flt = n; m.close(); refresh();
+  };
+}
 /* Klik baris: detail lengkap muncul di bawahnya (tetap di halaman daftar) */
 ACT.row = async t => {
   const it = t.closest('.it'), xp = it.querySelector(':scope>.xp'), e = it.dataset.e, id = it.dataset.id;
@@ -3239,11 +3338,31 @@ ACT.row = async t => {
     t.setAttribute('aria-expanded', 'true');
     [...it.parentElement.children].forEach(o => { if (o === it || !o.classList.contains('it') || !o.classList.contains('open')) return; o.classList.remove('open'); const r0 = o.querySelector(':scope>.row'), x0 = o.querySelector(':scope>.xp'); if (r0) r0.setAttribute('aria-expanded', 'false'); if (x0) { x0.hidden = true; x0.innerHTML = ''; } });
     if (!S.rowNoScroll) requestAnimationFrame(() => { const hd = $('header.top'), hb = hd ? Math.max(0, hd.getBoundingClientRect().bottom) : 0; window.scrollTo({ top: Math.max(0, it.getBoundingClientRect().top + window.scrollY - hb - 6), behavior: 'smooth' }); });
-    xp.hidden = false; xp.innerHTML = '<div class="skel"></div>';
-    try { const x = await call('get', { entity: e, id }); if (it.classList.contains('open')) await renderDetail(e, x, xp); }
+    xp.hidden = false; xp.innerHTML = '<div class="skel"></div>'; geserTinggi(xp, 0);
+    try {
+      const x = await call('get', { entity: e, id });
+      if (it.classList.contains('open')) { const h0 = xp.getBoundingClientRect().height; await renderDetail(e, x, xp); xp.classList.remove('xp-in'); void xp.offsetWidth; xp.classList.add('xp-in'); geserTinggi(xp, h0); }
+    }
     catch (er) { xp.innerHTML = `<div class="err">${esc(er.message)}</div>`; }
-  } else { t.setAttribute('aria-expanded', 'false'); xp.hidden = true; xp.innerHTML = ''; }
+  } else { t.setAttribute('aria-expanded', 'false'); geserTinggi(xp, null, () => { if (it.classList.contains('open')) return; xp.hidden = true; xp.innerHTML = ''; xp.classList.remove('xp-in'); }); }
 };
+/* animasi tinggi detail di daftar: h0 = tinggi awal (px) -> tinggi isi; h0 null = menutup ke 0 */
+function geserTinggi(el, h0, selesai) {
+  const tutup = h0 == null, kurang = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (el._gt) { el._gt(); el._gt = null; }
+  const awal = tutup ? el.getBoundingClientRect().height : h0, akhir = tutup ? 0 : el.scrollHeight;
+  if (kurang || Math.abs(akhir - awal) < 2) { if (selesai) selesai(); return; }
+  el.style.overflow = 'hidden'; el.style.height = awal + 'px'; if (tutup) el.style.opacity = '1';
+  void el.offsetHeight;
+  el.style.transition = 'height .34s cubic-bezier(.2,.8,.2,1),opacity .25s ease';
+  el.style.height = akhir + 'px'; if (tutup) el.style.opacity = '0';
+  let tm;
+  const beres = () => { clearTimeout(tm); el.removeEventListener('transitionend', te); el.style.height = el.style.overflow = el.style.transition = el.style.opacity = ''; el._gt = null; };
+  const te = ev => { if (ev.target === el && ev.propertyName === 'height') { beres(); if (selesai) selesai(); } };
+  el.addEventListener('transitionend', te);
+  tm = setTimeout(() => { beres(); if (selesai) selesai(); }, 500);
+  el._gt = beres;
+}
 document.addEventListener('keydown', ev => { if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.matches && ev.target.matches('.row[role=button]')) { ev.preventDefault(); ev.target.click(); } });
 ACT.xedit = t => go('form', { e: t.dataset.e, id: t.dataset.id });
 ACT.xdel = t => {
@@ -4888,7 +5007,7 @@ async function extraKelDtsen(k, el) {
   const isi = L => d ? L.filter(([kk]) => d[kk] !== undefined && d[kk] !== '').map(([kk, l]) => `<div><dt>${esc(l)}</dt><dd>${esc(d[kk])}</dd></div>`).join('') : '';
   const hn = isi(DT_HUNI), as = isi(DT_ASET);
   if (hn || as || w) h += `<details class="card dtlip"><summary>${ic('house')} Detail kondisi hunian & aset</summary>${hn ? `<div class="lbl" style="margin-top:4px">Kondisi perumahan keluarga</div><dl class="dl">${hn}</dl>` : ''}${as ? `<div class="lbl" style="margin-top:8px">Aset bergerak & tidak bergerak</div><dl class="dl">${as}</dl>` : ''}${!hn && !as ? '<div class="meta">Belum diisi.</div>' : ''}${w ? `<div class="btns" style="margin-top:8px"><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(d ? ['form', { e: 'dtsen', id: d.id }] : ['form', { e: 'dtsen', preset: preDt }]))}'>${ic('edit')}Isi / ubah hunian & aset</button></div>` : ''}</details>`;
-  const box = document.createElement('div'); box.className = 'stack'; box.style.marginTop = '12px'; box.innerHTML = h; el.appendChild(box);
+  const box = document.createElement('div'); box.className = 'stack bsk'; box.style.marginTop = '12px'; box.innerHTML = h; el.appendChild(box);
   const rw = $('#dtRw', box);
   const tulis = p => { rw.innerHTML = dtTabel(['No. Kartu', 'Periode', 'Penyalur', 'No. Rekening', 'Atas nama', 'Nominal', 'Status'], prog[p].map(r => `<tr data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'penyaluran_bansos', id: r.id }]))}' style="cursor:pointer"><td class="mono">${esc(r.no_kartu || '-')}</td><td>${esc(r.periode || '')}</td><td>${esc(r.penyalur || '')}</td><td class="mono">${esc(r.no_rekening || '-')}</td><td>${esc(r.atas_nama || r.p_nama || '')}</td><td class="r">${dtRp(r.nominal)}</td><td>${dtPillSt(r.status)}</td></tr>`), [5]); };
   if (rw) {
@@ -7033,7 +7152,7 @@ VIEWS.akun = async (p, main) => {
     <form class="stack" id="pinf" hidden style="margin-top:8px"><div class="form"><div class="f"><label for="pl">Kata sandi lama</label><input id="pl" type="password" autocomplete="current-password"></div><div class="f"><label for="pb">Kata sandi baru (min. 6 karakter)</label><input id="pb" type="password" autocomplete="new-password"></div><div class="f"><label for="pb2">Ulangi kata sandi baru</label><input id="pb2" type="password" autocomplete="new-password"></div></div><div id="perr2" class="err" hidden></div><div><button class="btn pri" type="submit">${ic('key')}Simpan kata sandi</button></div></form></div>
     ${pkAkunHtml()}
     <div class="card stack"><div class="trow"><div class="lbl">Tampilan</div><div class="chips">${[['', 'Ikuti perangkat'], ['light', 'Terang'], ['dark', 'Gelap']].map(t => `<button class="chip ${th === t[0] ? 'on' : ''}" data-act="theme" data-v="${t[0]}">${t[1]}</button>`).join('')}</div></div>
-      <div class="trow"><div class="lbl">Warna tema</div><div class="accs">${[['', 'Hijau', '#0f5a46'], ['biru', 'Biru', '#1d4ed8'], ['merah', 'Merah', '#b91c1c'], ['ungu', 'Ungu', '#6d28d9'], ['cokelat', 'Cokelat', '#8a5a2b']].map(a => `<button class="accdot ${(store.get('accent') || '') === a[0] ? 'on' : ''}" data-act="accent" data-v="${a[0]}" style="--c:${a[2]}" title="${a[1]}" aria-label="Warna ${a[1]}"></button>`).join('')}</div></div></div>
+      <div class="trow"><div class="lbl">Warna tema</div><div class="accs">${[['', 'Hijau', '#0f5a46'], ['biru', 'Biru', '#1d4ed8'], ['merah', 'Merah', '#b91c1c'], ['ungu', 'Ungu', '#6d28d9'], ['cokelat', 'Cokelat', '#8a5a2b'], ['oranye', 'Oranye', '#c2410c']].map(a => `<button class="accdot ${(store.get('accent') || '') === a[0] ? 'on' : ''}" data-act="accent" data-v="${a[0]}" style="--c:${a[2]}" title="${a[1]}" aria-label="Warna ${a[1]}"></button>`).join('')}</div></div></div>
     ${isStandalone() ? '' : `<button class="btn" data-act="install">${ic('plus')}Pasang aplikasi di HP / komputer</button>`}
     ${tentangHtml()}
     <button class="btn danger" data-act="logout">${ic('out')}Keluar</button>
@@ -7089,7 +7208,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '134', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '135', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -7231,7 +7350,7 @@ VIEWS.settings = async (p, main) => {
 
 /* =====================================================================
    PENYIMPANAN & CADANGAN (admin): kuota Supabase/R2, cadangan malam ke Google Drive,
-   pindah KTP/KK Supabase -> R2, pindah berkas lama Google Drive -> R2
+   pindah KTP/KK Supabase -> R2
    ===================================================================== */
 const GAS_CADANGAN = String.raw`/**
  * ============================================================
@@ -7394,7 +7513,7 @@ VIEWS.penyimpanan = async (p, main, alive) => {
   main.innerHTML = '<div class="skel" style="height:200px"></div>';
   let k; try { k = await kuotaAmbil(true); } catch (x) { main.innerHTML = `<div class="err">${esc(x.message)}</div>`; return; }
   if (!alive()) return;
-  const W = kuotaPeringatan(k), dr = k.drive || {};
+  const W = kuotaPeringatan(k);
   main.innerHTML = `<div class="stack">
     ${W.length ? `<div class="card stack" style="border:1px solid ${W.some(w => w.t === 2) ? '#d93025' : '#e8a400'}">${W.map(w => `<div>${ic('mega')} ${esc(w.teks)}</div>`).join('')}</div>` : `<div class="ok-box">${ic('check')} Semua penyimpanan aman.</div>`}
     <div class="card stack"><div class="lbl">Kuota</div>
@@ -7421,11 +7540,6 @@ VIEWS.penyimpanan = async (p, main, alive) => {
       <div class="btns"><button class="btn sm pri" id="ktpGo" ${k.sbn && k.r2ok ? '' : 'disabled'}>${ic('next')}Pindahkan ke R2</button><button class="btn sm" id="ktpStop" hidden>Berhenti</button></div>
       <div class="meta" id="ktpLog"></div></div>
 
-    <div class="card stack"><div class="lbl">Pindahkan dokumen & foto lama dari Google Drive ke R2</div>
-      <p class="meta" style="margin:0">Berkas lama (unggahan sebelum R2) disalin ke R2 dan semua data yang merujuknya diperbarui otomatis. Berkas asli di Google Drive tidak dihapus. Biarkan halaman ini terbuka sampai selesai; bila terputus, tekan lagi untuk melanjutkan.</p>
-      <dl class="dl"><div><dt>Menunggu</dt><dd id="drAntri">${dr.antri || 0}</dd></div><div><dt>Selesai</dt><dd id="drSelesai">${dr.selesai || 0}</dd></div><div><dt>Gagal</dt><dd id="drGagal">${dr.gagal || 0}</dd></div></dl>
-      <div class="btns"><button class="btn sm pri" id="drGo" ${k.r2ok ? '' : 'disabled'}>${ic('next')}Mulai pindahkan</button><button class="btn sm" id="drUlang">Ulangi yang gagal</button><button class="btn sm" id="drPindai">${ic('search')}Pindai ulang data</button><button class="btn sm" id="drStop" hidden>Berhenti</button></div>
-      <div class="meta" id="drLog"></div></div>
   </div>`;
 
   $('#kqHitung').onclick = async ev => { ev.target.disabled = true; ev.target.textContent = 'Menghitung…'; try { S.kuota = { k: await callBerkas('kuota', { hitung: 1 }), at: Date.now() }; refresh(); } catch (x) { toast(x.message, 1); ev.target.disabled = false; } };
@@ -7455,87 +7569,6 @@ VIEWS.penyimpanan = async (p, main, alive) => {
     $('#ktpStop').hidden = true; go.disabled = false; S.kuota = null;
   }, 'Ya, pindahkan');
 
-  /* berkas lama Google Drive -> R2 */
-  let drStop = false;
-  const drAngka = async () => { try { const kk = await callBerkas('kuota'); const d = kk.drive || {}; $('#drAntri').textContent = d.antri || 0; $('#drSelesai').textContent = d.selesai || 0; $('#drGagal').textContent = d.gagal || 0; } catch (x) { } };
-  $('#drStop').onclick = () => { drStop = true; $('#drStop').disabled = true; };
-  $('#drPindai').onclick = async ev => { ev.target.disabled = true; try { const r = await callBerkas('drivePindai'); toast(r.baru ? r.baru + ' berkas lama baru ditemukan.' : 'Tidak ada berkas lama baru.'); await drAngka(); } catch (x) { toast(x.message, 1); } ev.target.disabled = false; };
-  const pindahSatu = async x => {
-    try {
-      const f = await call('fileData', { id: x.id });
-      if (!f || !f.data) throw new Error('isi berkas kosong');
-      const blob = b64Blob(f.data, f.mime || 'application/octet-stream');
-      const u = await callBerkas('driveUp', { lama: x.id, mime: blob.type, size: blob.size });
-      const put = await fetch(u.url, { method: 'PUT', headers: { 'Content-Type': u.mime }, body: blob }).catch(() => null);
-      if (!put || !put.ok) throw new Error('unggah ke R2 gagal' + (put ? ' (' + put.status + ')' : ''));
-      const s = await callBerkas('driveSelesai', { lama: x.id });
-      if (/^image\//.test(blob.type) && !/gif|svg/.test(blob.type)) { try { const t = await makeThumb(blob); THUMB[s.id] = t; await call('thumbSave', { id: s.id, data: t }); } catch (e) { } }
-      return true;
-    } catch (e) {
-      try { await callBerkas('driveGagal', { lama: x.id, pesan: e.message }); } catch (e2) { }
-      return e.message;
-    }
-  };
-  const drJalan = async ulang => {
-    const log = $('#drLog'); $('#drGo').disabled = $('#drUlang').disabled = true; $('#drStop').hidden = false; $('#drStop').disabled = false; drStop = false;
-    let ok = 0, gg = 0, akhir = '';
-    while (!drStop) {
-      let L; try { L = await callBerkas('driveAntri', { n: 10, ulang: ulang ? 1 : 0 }); } catch (x) { akhir = x.message; break; }
-      if (!L.length) { akhir = 'selesai'; break; }
-      const q = L.slice();
-      await Promise.all([0, 1].map(async () => { while (q.length && !drStop) { const r = await pindahSatu(q.shift()); if (r === true) ok++; else { gg++; akhir = r; } log.textContent = `Dipindah: ${ok} · gagal: ${gg}${akhir && akhir !== 'selesai' ? ' (terakhir: ' + akhir + ')' : ''}`; } }));
-      await drAngka();
-      if (ulang) ulang = false;   /* ulangi yang gagal hanya sekali per tekan */
-    }
-    log.textContent = `Dipindah: ${ok} · gagal: ${gg}` + (akhir === 'selesai' ? ' · selesai.' : akhir ? ' · ' + akhir : '');
-    $('#drGo').disabled = $('#drUlang').disabled = false; $('#drStop').hidden = true; S.kuota = null;
-  };
-  $('#drGo').onclick = () => drJalan(false);
-  $('#drUlang').onclick = () => drJalan(true);
-};
-
-VIEWS.pindahberkas = async (p, main) => {
-  setTop('Pindahkan foto KTP/KK');
-  if (!S.user.admin) { main.innerHTML = '<div class="err">Khusus admin.</div>'; return; }
-  main.innerHTML = '<div class="skel" style="height:120px"></div>';
-  const J = [['penduduk', 'foto_ktp_id', 'Penduduk/KTP', 'KTP', 'nama'], ['keluarga', 'foto_kk_id', 'Penduduk/KK', 'KK', 'kepala']];
-  let todo = [], sudah = 0;
-  try {
-    for (const [e, k, folder, lbl, nm] of J) {
-      const r = await call('list', { entity: e, limit: 5000 });
-      r.rows.forEach(x => { const v = x[k]; if (!v || v === '•') return; if (isSbFile(v)) sudah++; else todo.push({ e, k, folder, lbl, id: x.id, fid: v, nama: x[nm] || '' }); });
-    }
-  } catch (x) { main.innerHTML = `<div class="err">${esc(x.message)}</div>`; return; }
-  main.innerHTML = `<div class="card stack"><p style="margin:0">Sudah di penyimpanan baru: <b>${sudah}</b> · Masih di Google Drive: <b id="pbSisa">${todo.length}</b></p>
-    <p class="meta" style="margin:0">Biarkan halaman ini terbuka sampai selesai. Salinan di Google Drive tidak dihapus.</p>
-    <div class="btns"><button class="btn pri" id="pbGo" ${todo.length ? '' : 'disabled'}>${ic('check')}Mulai pindahkan</button><button class="btn" id="pbStop" hidden>Berhenti</button></div>
-    <div class="meta" id="pbLog"></div></div>`;
-  let stop = false, ok = 0, gagal = [];
-  const log = $('#pbLog'), sisa = $('#pbSisa');
-  $('#pbStop').onclick = () => { stop = true; $('#pbStop').disabled = true; };
-  $('#pbGo').onclick = async () => {
-    $('#pbGo').disabled = true; $('#pbStop').hidden = false;
-    const q = todo.slice();
-    const kerja = async () => {
-      while (q.length && !stop) {
-        const t = q.shift();
-        try {
-          const f = await call('fileData', { id: t.fid });
-          if (!f || !f.data) throw new Error('berkas Drive tidak ditemukan');
-          const bin = atob(f.data), arr = new Uint8Array(bin.length);
-          for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-          const up = await uploadKependudukan(new File([arr], 'x', { type: f.mime || 'image/jpeg' }), t.folder);
-          await call('save', { entity: t.e, record: { id: t.id, [t.k]: up.id } });
-          ok++;
-        } catch (x) { gagal.push(t.lbl + ' ' + t.nama + ': ' + x.message); }
-        sisa.textContent = todo.length - ok;
-        log.innerHTML = `Berhasil ${ok} · Gagal ${gagal.length}${gagal.length ? '<br>' + gagal.slice(-8).map(esc).join('<br>') : ''}`;
-      }
-    };
-    await Promise.all([kerja(), kerja(), kerja()]);
-    $('#pbStop').hidden = true;
-    toast(stop ? 'Dihentikan. Berhasil ' + ok + '.' : 'Selesai. Berhasil ' + ok + ', gagal ' + gagal.length + '.', gagal.length > 0);
-  };
 };
 
 /* =====================================================================
@@ -8715,6 +8748,12 @@ ACT.dokStatus = async t => { try { await rkpSimpanDok(t.dataset.k, { status: t.v
 
 /* ---------------- Draf KK ---------------- */
 const URUT_HUB = ['KEPALA KELUARGA', 'SUAMI', 'ISTRI', 'ANAK', 'MENANTU', 'CUCU', 'ORANG TUA', 'MERTUA', 'FAMILI LAIN', 'PEMBANTU', 'LAINNYA'];
+/* tanggal perkawinan/perceraian di KK: kawin tercatat -> tgl kawin, cerai tercatat -> tgl cerai */
+function tglKawinKK(x) {
+  const st = String(x.status_kawin || '').toUpperCase();
+  const v = /CERAI/.test(st) ? x.tgl_cerai : /^KAWIN/.test(st) ? x.tgl_kawin : '';
+  return v ? dDmy(v, '-') : '';
+}
 function petaKK(d) {
   const k = d.keluarga || {}, s = d.setting || {};
   const pr = x => { const i = URUT_HUB.indexOf(String(x.hubungan || '').toUpperCase()); return i < 0 ? 99 : i; };
@@ -8728,7 +8767,7 @@ function petaKK(d) {
     const x = ag[i - 1] || {};
     put('Nama' + i, x.nama); put('NIK' + i, x.nik); put('JK' + i, x.jk); put('TML' + i, x.tempat_lahir); put('TL' + i, x.tgl_lahir ? dDmy(x.tgl_lahir, '-') : '');
     put('AG' + i, x.agama); put('PENDIDIKAN' + i, x.pendidikan); put('PEKERJAAN' + i, x.pekerjaan); put('GD' + i, x.gol_darah);
-    put('STKW' + i, x.status_kawin); put('TGKW' + i, ''); put('SHDK' + i, x.hubungan); put('KWRG' + i, x.warga_negara);
+    put('STKW' + i, x.status_kawin); put('TGKW' + i, tglKawinKK(x)); put('SHDK' + i, x.hubungan); put('KWRG' + i, x.warga_negara);
     put('NOPS' + i, x.no_paspor); put('NOKT' + i, x.no_kitap); put('AYAH' + i, x.ayah); put('IBU' + i, x.ibu);
   }
   return M;
