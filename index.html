@@ -476,6 +476,16 @@ table.rpj tfoot td.c0,table.rpj tfoot td.c1{z-index:4}
 .rpj-ol{margin:0;padding-left:20px;display:grid;gap:3px}
 @media (max-width:640px){table.rpj .c1{min-width:160px;max-width:180px}.rpj-wrap{max-height:calc(100vh - 170px)}}
 .tbl td.c,.tbl th.c{text-align:center;padding:4px 3px;min-width:24px}
+.dtlip{padding:8px 12px}
+.dtlip>summary{cursor:pointer;font-weight:600;font-size:13px}
+.dtlip>summary .ic{width:15px;height:15px;vertical-align:-3px}
+.dtlip[open]>summary{margin-bottom:8px}
+table.dtt{font-size:11px}
+.dttot{background:linear-gradient(135deg,#1e4fd6,#2f6bf0);color:#fff;border-radius:var(--r);padding:10px 14px;box-shadow:var(--shadow)}
+.dttot-l{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;opacity:.92;display:flex;align-items:center;gap:6px}
+.dttot b{display:block;font-size:22px;margin:2px 0 6px}
+.dttot-r{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:12px;font-weight:600;border-top:1px solid rgba(255,255,255,.28);padding-top:6px}
+.dttot-r i{display:block;font-style:normal;font-weight:500;font-size:10px;opacity:.85;text-transform:uppercase}
 .k{display:inline-block;min-width:20px;padding:1px 3px;border-radius:5px;font-weight:700;font-size:10px}
 .k-H,.k-HD,.k-P{background:var(--ok-soft);color:var(--ok)} .k-T,.k-IT,.k-TD,.k-ITD{background:var(--warn-soft);color:var(--warn)} .k-D,.k-DL{background:var(--info-soft);color:var(--info)}
 .k-I,.k-S,.k-TI,.k-TS{background:var(--gold-soft);color:var(--gold)} .k-A,.k-PA{background:var(--bad-soft);color:var(--bad)}
@@ -1680,7 +1690,7 @@ function call(action, p, bearer) {
   return fetch(berkas ? FILE_URL : SB_URL + '/rest/v1/rpc/api', { method: 'POST', headers: h, body: JSON.stringify(berkas ? req : { req }) })
     .then(r => r.json()).catch(() => { throw new Error('Tidak ada koneksi ke server. Periksa internet Anda.'); })
     .then(r => {
-      if (r && r.ok) return r.data;
+      if (r && r.ok) { if (action === 'save' && p && (p.entity === 'penduduk' || p.entity === 'keluarga')) { try { sosSinkronAntre(p.entity, r.data); } catch (x) { } } return r.data; }
       const e = new Error((r && (r.error || r.message || r.msg)) || 'Terjadi kesalahan.');
       e.code = r && r.code; e.detail = r && r.detail;
       if (e.code === 'AUTH' && action !== 'login') { logoutLocal(); toast(e.message, 1); }
@@ -3069,7 +3079,7 @@ function xlVal(f, v) {
   return s;
 }
 const xlKey = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-const xlFields = u => u.fields.filter(f => f.t !== 'file' && f.t !== 'head' && f.t !== 'hidden' && String(f.l || '').trim());
+const xlFields = u => u.fields.filter(f => f.t !== 'file' && f.t !== 'head' && f.t !== 'hidden' && !f.dtv && String(f.l || '').trim());
 async function excelExport(e, rows, judul) {
   const u = UI[e], fs = xlFields(u);
   const data = [['ID'].concat(fs.map(f => f.l))].concat(rows.map(r => [r.id].concat(fs.map(f => r[f.k] == null ? '' : r[f.k]))));
@@ -3273,6 +3283,7 @@ function mapHtml(v, title) {
 /* Isi detail satu data. Dipakai di daftar (lipat-buka) dan di halaman detail. */
 async function renderDetail(e, x, el, full) {
   el.classList.add('dview');
+  if (e === 'keluarga') { try { await kelDtMuat(x); if (/^\d+$/.test(x.dt_desil || '')) x.dt_desil = 'Desil ' + x.dt_desil; } catch (er) { } }
   const u = UI[e];
   const files = u.fields.filter(f => f.t === 'file' && x[f.k]);
   const diKK = e === 'penduduk' && !!el.closest('.kkang'), KK_SEMBUNYI = ['kk', 'w_prov', 'w_kab', 'w_kec', 'w_desa', 'dusun', 'rw', 'rt', 'alamat', 'alamat_kk', 'lokasi'];
@@ -3776,10 +3787,11 @@ VIEWS.form = async (p, main, alive) => {
   if (u.rkp) { await rkpMuatVer(); if (!canWrite(e)) throw new Error('RKP ' + rkpLbl(S.rkpYear) + ' hanya bisa dilihat karena sudah digantikan versi perubahan. Pilih versi terbaru di Dashboard RKP.'); }
   setTop(p.buat && NASKAH[e] ? NASKAH[e].buat : (p.id ? 'Ubah ' : 'Tambah ') + u.t);
   let rec = {};
-  let flds = u.fields.filter(f => !(f.virt && p.id) && !f.noform);
-  if (p.id) rec = await call('get', { entity: e, id: p.id });
-  if (e === 'kegiatan' && rec.sumber_mus) throw new Error('Agenda ini terusan dari Musyawarah RKP/RPJM, jadi tidak bisa diubah di sini. Ubah lewat Perencanaan → RKP Desa atau RPJM Desa → Musyawarah.');
-  else {
+  let flds = u.fields.filter(f => !(f.virt && p.id) && !f.noform && !(f.dtv && !canWrite('rentan')));
+  if (p.id) {
+    rec = await call('get', { entity: e, id: p.id });
+    if (e === 'kegiatan' && rec.sumber_mus) throw new Error('Agenda ini terusan dari Musyawarah RKP/RPJM, jadi tidak bisa diubah di sini. Ubah lewat Perencanaan → RKP Desa atau RPJM Desa → Musyawarah.');
+  } else {
     u.fields.forEach(f => { if (f.def != null) rec[f.k] = typeof f.def === 'function' ? f.def() : f.def; });
     Object.assign(rec, p.preset || {});
     if (u.rkp) rec.tahun_rkp = S.rkpYear;
@@ -3796,6 +3808,8 @@ VIEWS.form = async (p, main, alive) => {
       } catch (x) { }
     }
   }
+  if (e === 'keluarga' && p.id && canWrite('rentan')) { try { await kelDtMuat(rec); } catch (x) { } }
+  if (e === 'penduduk' && !rec.desil && rec.kk) { try { const d = await pendDtDesil(rec.kk); if (d && d.desil) rec.desil = d.desil; } catch (x) { } }
   if (e === 'register_surat') await muatJenisSurat();
   if (flds.some(f => f.gen) && !(p.buat || NASKAH[e] && NASKAH[e].ada(rec))) flds = flds.filter(f => !f.gen);
   if (p.buat && NASKAH[e]) flds = flds.filter(f => f.t !== 'file'); /* tombol Buat = menyusun naskah; unggah scan (berkas bertanda tangan) lewat Tambah/Ubah */
@@ -3965,13 +3979,15 @@ VIEWS.form = async (p, main, alive) => {
       if (e === 'rentan') rentanFlags(val);
       if (e === 'penyaluran_bansos' && !val.keluarga_id && val.p_penduduk_id) { try { const kl = await call('keluargaOf', { penduduk_id: val.p_penduduk_id }); if (kl) val.keluarga_id = kl.id; } catch (er) { } }
       if (e === 'ntcr') await ntcrNomor(val);
+      const dtVal = e === 'keluarga' ? kelDtAmbil(val) : null;
       const saved = await call('save', { entity: e, record: val });
+      if (dtVal && saved) { try { const m = await kelDtSimpan(Object.assign({}, rec, val, saved), dtVal, rec._dt); if (m) setTimeout(() => toast('Tersimpan. ' + m), 400); } catch (er) { toast('Data keluarga tersimpan, tetapi isian DTSEN gagal: ' + er.message, 1); } }
       if (e === 'surat_masuk' && frm._fwdSave) { const n = await frm._fwdSave(saved); if (n) toast('Tersimpan. Diteruskan ke ' + n + '.'); }
       if (e === 'petugas' && !p.id && (virt.kelompok || virt.jabatan)) await call('save', { entity: 'petugas_jabatan', record: Object.assign({ ref: saved.id }, virt) });
       if (/^(aparat|petugas)/.test(e)) S.people = null;
       if (e === 'aparat') { S.jabCache = null; S.kades = null; muatPejabat(true).catch(() => { }); }
       toast('Tersimpan.');
-      if (e === 'dtsen' && saved) { try { if (await dtsenKeRentan(saved)) toast('Tersimpan. Desil 1: otomatis masuk Data Rentan sebagai keluarga miskin.'); } catch (er) { toast('Tersimpan, tetapi gagal membuat data rentan: ' + er.message, 1); } }
+      if (e === 'dtsen' && saved) { try { if (await dtsenKeRentan(saved)) toast('Tersimpan. Desil ' + saved.desil + ': otomatis masuk Data Rentan sebagai keluarga miskin.'); } catch (er) { toast('Tersimpan, tetapi gagal membuat data rentan: ' + er.message, 1); } }
       if (e === 'aset' && saved && saved.id) await asetSetelahSimpan(saved.id);
       if (e === 'aset_cek' && saved && saved.id) await asetCekSetelahSimpan(saved.id);
       if ((e === 'rkp_musyawarah' || e === 'rpjm_musyawarah') && saved && saved.id && val.tanggal && val.jam) { const ag = await syncAgendaMus(saved.id, e); if (ag) toast('Tersimpan. Masuk juga ke Kegiatan → Agenda.'); }
@@ -4737,7 +4753,8 @@ Object.assign(UI, {
    desil, anggota (pekerjaan utama & status), kondisi hunian & aset.
    Desil 1 otomatis masuk Data Rentan sebagai "Keluarga miskin".
    ===================================================================== */
-const DT_DESIL = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Belum pemeringkatan'];
+const DT_DESIL = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Belum ditentukan'];
+const DT_MISKIN = ['1', '2'];   /* desil yang otomatis masuk Data Rentan "Keluarga miskin" */
 const DT_YT = ['Ya', 'Tidak', 'Belum ditentukan'];
 const DT_KERJA = ['Pertanian tanaman padi & palawija', 'Hortikultura', 'Perkebunan', 'Perikanan', 'Peternakan', 'Kehutanan & pertanian lainnya', 'Pertambangan/penggalian', 'Industri pengolahan', 'Listrik, gas & air', 'Konstruksi/bangunan', 'Perdagangan', 'Hotel & rumah makan', 'Transportasi & pergudangan', 'Informasi & komunikasi', 'Keuangan & asuransi', 'Jasa pendidikan', 'Jasa kesehatan', 'Jasa kemasyarakatan, pemerintahan & perorangan', 'Pemulung', 'Lainnya', 'Tidak bekerja', 'Belum ditentukan'];
 const DT_HUNI = [
@@ -4766,13 +4783,11 @@ const dtPill = d => { const n = parseInt(d, 10); return d ? `<span class="pill $
 Object.assign(UI, {
   dtsen: {
     t: 'DTSEN Keluarga (SIKS-NG)', ic: 'heart', m: 'rentan', sort: 'tgl_cek', excel: 1,
-    fields: [F('_h_k', 'Keluarga', 'head', { hint: 'Paling mudah dibuka dari Data Keluarga → DTSEN & Bansos, supaya langsung terhubung. Isi persis seperti tampilan SIKS-NG.' }),
+    fields: [F('_h_k', 'Keluarga', 'head', { hint: 'Desil, status, tanggal cek dan alamat juga bisa diisi langsung di form Data Keluarga. Isi persis seperti tampilan SIKS-NG.' }),
       F('keluarga_id', '', 'hidden'), F('kk', 'Nomor KK', 'text', { mono: 1, len: 16, sens: 1 }), F('kepala', 'Kepala keluarga', 'text', { up: 1, req: 1 }),
       F('alamat_dtsen', 'Alamat (seperti di SIKS-NG)', 'text', { up: 1, wide: 1 }),
-      F('desil', 'Desil', 'select', { opt: DT_DESIL, req: 1, hint: 'Desil 1 otomatis masuk Data Rentan sebagai keluarga miskin' }),
+      F('desil', 'Desil', 'select', { opt: DT_DESIL, hint: 'Desil 1 dan 2 otomatis masuk Data Rentan sebagai keluarga miskin. Kosongkan bila belum ada.' }),
       F('status', 'Status DTSEN', 'select', { opt: ['Aktif', 'Tidak aktif'], def: 'Aktif' }), F('tgl_cek', 'Tanggal dicek di SIKS-NG', 'date', { def: isoToday }),
-      F('_h_ag', 'Daftar anggota keluarga (SIKS-NG)', 'head', { hint: 'NIK cukup ditulis seperti di SIKS-NG (tersamar).' }),
-      F('anggota', 'Anggota', 'rows', { cols: [['nama', 'Nama lengkap'], ['hubungan', 'Hubungan'], ['nik', 'NIK'], ['pekerjaan', 'Pekerjaan utama', 'list'], ['status', 'Status']], _list: DT_KERJA, wide: 1 }),
       F('_h_hn', 'Kondisi perumahan keluarga', 'head'), ...DT_HUNI.map(dtF),
       F('_h_as', 'Aset bergerak & tidak bergerak keluarga', 'head'), ...DT_ASET.map(dtF),
       F('ket', 'Catatan', 'textarea', { wide: 1 })],
@@ -4782,6 +4797,51 @@ Object.assign(UI, {
     print: { title: 'DATA KELUARGA DTSEN (SIKS-NG)', land: 1, cols: [['Kepala keluarga', 'kepala'], ['No. KK', 'kk'], ['Alamat', 'alamat_dtsen'], ['Desil', 'desil'], ['Status', 'status'], ['Dicek', r => fDate(r.tgl_cek)]] }
   }
 });
+/* ---------- isian DTSEN menyatu dengan form Keluarga & Penduduk ---------- */
+/* Keluarga: disimpan ke data DTSEN keluarga itu (satu sumber), ditampilkan seperti isian keluarga biasa */
+const DT_KEL = [['dt_desil', 'desil'], ['dt_status', 'status'], ['dt_tgl', 'tgl_cek'], ['dt_alamat', 'alamat_dtsen']];
+UI.keluarga.fields.push(
+  F('_h_dt', 'DTSEN (SIKS-NG)', 'head', { dtv: 1, hint: 'Isi seperti di SIKS-NG; yang belum ada dikosongkan saja. Desil 1 dan 2 otomatis masuk Data Rentan sebagai keluarga miskin.' }),
+  F('dt_desil', 'Desil', 'select', { opt: DT_DESIL, dtv: 1 }), F('dt_status', 'Status DTSEN', 'select', { opt: ['Aktif', 'Tidak aktif'], dtv: 1 }),
+  F('dt_tgl', 'Dicek di SIKS-NG', 'date', { dtv: 1 }), F('dt_alamat', 'Alamat di SIKS-NG', 'text', { up: 1, wide: 1, dtv: 1 }));
+/* Penduduk: desil, pekerjaan utama & status menurut DTSEN disimpan di data penduduk */
+(() => {
+  const L = UI.penduduk.fields, i = L.findIndex(f => f.k === '_h_al');
+  L.splice(i < 0 ? L.length : i, 0, F('_h_dt', 'DTSEN (SIKS-NG)', 'head', { hint: 'Isi seperti di SIKS-NG; yang belum ada dikosongkan saja. Desil terisi otomatis dari DTSEN keluarganya bila masih kosong.' }),
+    F('desil', 'Desil', 'select', { opt: DT_DESIL }), F('pekerjaan_utama', 'Pekerjaan utama (DTSEN)', 'text', { list: DT_KERJA }), F('status_dtsen', 'Status (DTSEN)', 'select', { opt: ['Aktif', 'Tidak aktif'] }));
+})();
+/** muat DTSEN terbaru keluarga -> x.dt_* (untuk form & detail keluarga) */
+async function kelDtMuat(x) {
+  if (!x || !x.id || !canRead('rentan')) return null;
+  const L = await call('list', { entity: 'dtsen', filters: { keluarga_id: x.id }, limit: 20 }).then(r => r.rows || []).catch(() => []);
+  L.sort((a, b) => String(b.tgl_cek || '').localeCompare(String(a.tgl_cek || '')));
+  x._dtAll = L; x._dt = L[0] || null;
+  DT_KEL.forEach(([k, dk]) => { x[k] = x._dt ? x._dt[dk] || '' : ''; });
+  return x._dt;
+}
+/** ambil isian dt_* dari form keluarga (tidak ikut tersimpan di data keluarga) */
+function kelDtAmbil(val) {
+  const o = {}; let ada = false;
+  DT_KEL.forEach(([k, dk]) => { if (k in val) { ada = true; o[dk] = val[k]; delete val[k]; } });
+  return ada ? o : null;
+}
+/** simpan isian DTSEN dari form keluarga ke data DTSEN keluarga itu */
+async function kelDtSimpan(k, v, lama) {
+  if (!lama && !Object.values(v).some(Boolean)) return '';
+  if (lama && DT_KEL.every(([, dk]) => String(lama[dk] || '') === String(v[dk] || ''))) return '';
+  const kk = String(k.kk || '').indexOf('•') < 0 ? k.kk || '' : '';
+  const rec = Object.assign(lama ? { id: lama.id } : { keluarga_id: k.id, kepala: k.kepala || '', kk, ket: 'Diisi dari form Data Keluarga.' }, v);
+  if (lama && kk) rec.kk = kk;
+  if (!rec.tgl_cek && (rec.desil || rec.status)) rec.tgl_cek = isoToday();
+  const sv = await call('save', { entity: 'dtsen', record: rec });
+  return await dtsenKeRentan(Object.assign({}, lama || {}, rec, sv || {})) ? 'Desil ' + v.desil + ': otomatis masuk Data Rentan sebagai keluarga miskin.' : '';
+}
+/** desil penduduk masih kosong -> ambil dari DTSEN keluarganya (No. KK sama) */
+async function pendDtDesil(kk) {
+  if (!/^\d{16}$/.test(String(kk || '')) || !canRead('rentan')) return null;
+  const kl = await call('list', { entity: 'keluarga', filters: { kk }, limit: 1 }).then(r => (r.rows || [])[0]).catch(() => null);
+  return kl ? kelDtMuat(Object.assign({}, kl)) : null;
+}
 /* ---------- urutan periode bansos ("PKH JUL - SEPT 2026" -> 202607) ---------- */
 const DT_BLN = { JAN: 1, FEB: 2, MAR: 3, APR: 4, MEI: 5, MAY: 5, JUN: 6, JUL: 7, AGU: 8, AGS: 8, AUG: 8, SEP: 9, OKT: 10, OCT: 10, NOV: 11, DES: 12, DEC: 12 };
 function dtPerKey(r) {
@@ -4791,53 +4851,51 @@ function dtPerKey(r) {
   return Number(String(r.tgl_salur || '').slice(0, 7).replace('-', '')) || 0;
 }
 const dtRp = n => n && Number(n) ? 'Rp ' + Number(n).toLocaleString('id-ID') : '-';
-/** bagian "DTSEN & Bansos" di detail keluarga */
+/** tabel kecil dalam kotak bergaris lengkung */
+const dtTabel = (head, rows, kanan = []) => `<div class="tbl-wrap"><table class="tbl dtt"><thead><tr>${head.map((h, i) => `<th${kanan.includes(i) ? ' class="r"' : ''}>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+const dtPillSt = s => `<span class="pill ${SK_STC(s)}">${esc(s || '-')}</span>`;
+/** bansos dihitung masuk total: bukan gagal/dikembalikan */
+const dtMasuk = r => !/gagal|dikembalikan|belum/i.test(r.status || '') && Number(r.nominal) > 0;
+/** kartu total bantuan tahun berjalan per program (seperti SIKS-NG) */
+function dtTotalHtml(sl) {
+  const th = new Date().getFullYear(), per = {};
+  sl.filter(r => Math.floor(dtPerKey(r) / 100) === th && dtMasuk(r)).forEach(r => { const p = r.program || 'Lainnya'; per[p] = (per[p] || 0) + Number(r.nominal); });
+  const P = Object.keys(per).sort(), tot = P.reduce((a, p) => a + per[p], 0);
+  return `<div class="dttot"><div class="dttot-l">${ic('check')} Total bantuan tahun ${th}</div><b>${tot ? dtRp(tot) : 'Rp 0'}</b>${P.length ? `<div class="dttot-r">${P.map(p => `<span><i>${esc(p)}</i>${dtRp(per[p])}</span>`).join('')}</div>` : '<div class="dttot-r"><span>Belum ada bantuan tercatat tahun ini.</span></div>'}</div>`;
+}
+/** bagian "Bansos" di detail keluarga (isian DTSEN sudah tampil di data keluarga) */
 async function extraKelDtsen(k, el) {
   if (!canRead('rentan')) return;
-  const [dt, sl] = await Promise.all([
-    call('list', { entity: 'dtsen', filters: { keluarga_id: k.id }, limit: 10 }).then(r => r.rows || []).catch(() => []),
-    call('list', { entity: 'penyaluran_bansos', filters: { keluarga_id: k.id }, limit: 500 }).then(r => r.rows || []).catch(() => [])]);
-  const d = dt.slice().sort((a, b) => String(b.tgl_cek || '').localeCompare(String(a.tgl_cek || '')))[0];
-  const w = canWrite('rentan');
+  const sl = await call('list', { entity: 'penyaluran_bansos', filters: { keluarga_id: k.id }, limit: 500 }).then(r => r.rows || []).catch(() => []);
+  const d = k._dt || null, w = canWrite('rentan');
   const kkAsli = String(k.kk || '').indexOf('•') < 0 ? k.kk : '';
   const preDt = { keluarga_id: k.id, kk: kkAsli, kepala: k.kepala, alamat_dtsen: [k.alamat || String(k.dusun || '').replace(/^DUSUN /, ''), k.rt ? 'RT ' + Number(k.rt) + ' RW ' + Number(k.rw || 0) : ''].filter(Boolean).join(' ') };
   const preSl = { keluarga_id: k.id, p_kk: kkAsli, p_alamat: k.dusun || '', p_rt: k.rt || '', p_rw: k.rw || '' };
   const prog = {}; sl.forEach(r => { (prog[r.program || 'Lainnya'] = prog[r.program || 'Lainnya'] || []).push(r); });
   Object.values(prog).forEach(L => L.sort((a, b) => dtPerKey(b) - dtPerKey(a)));
-  const aktif = Object.keys(prog).map(p => prog[p][0]);
+  const aktif = Object.keys(prog).map(p => prog[p][0]).sort((a, b) => dtPerKey(b) - dtPerKey(a));
   const thAktif = Math.max(0, ...aktif.map(dtPerKey));
-  const pillSt = s => `<span class="pill ${SK_STC(s)}">${esc(s || '-')}</span>`;
-  const tabel = (head, rows) => `<div style="overflow:auto"><table class="pt" style="font-size:12.5px;min-width:100%"><thead><tr>${head.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
-  let h = `<div class="sec-h"><h2>${ic('heart')} DTSEN & Bansos</h2></div><span class="btns">${w ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(d ? ['form', { e: 'dtsen', id: d.id }] : ['form', { e: 'dtsen', preset: preDt }]))}'>${ic(d ? 'edit' : 'plus')}${d ? 'Ubah DTSEN' : 'Isi DTSEN'}</button><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['form', { e: 'penyaluran_bansos', preset: preSl }]))}'>${ic('plus')}Catat bansos</button>` : ''}</span></div>`;
-  h += d ? `<div class="card"><dl class="dl"><div><dt>Desil</dt><dd>${dtPill(d.desil)}</dd></div><div><dt>Status DTSEN</dt><dd>${esc(d.status || '-')}</dd></div><div><dt>Dicek di SIKS-NG</dt><dd>${esc(fDate(d.tgl_cek) || '-')}</dd></div><div><dt>Alamat di SIKS-NG</dt><dd>${esc(d.alamat_dtsen || '-')}</dd></div></dl>${dt.length > 1 ? `<div class="meta" style="margin-top:6px">Riwayat desil: ${dt.slice().sort((a, b) => String(a.tgl_cek || '').localeCompare(String(b.tgl_cek || ''))).map(x => esc(fDate(x.tgl_cek, 1) + ': ' + x.desil)).join(' → ')}</div>` : ''}</div>`
-    : '<div class="meta">Belum ada data DTSEN untuk keluarga ini.</div>';
-  /* program bansos aktif (periode terbaru tiap program) */
-  h += `<div class="lbl" style="margin-top:12px">${ic('clock')} Program bansos aktif</div>` + (aktif.length
-    ? tabel(['Periode', 'Program', 'Nilai bantuan', 'Status'], aktif.sort((a, b) => dtPerKey(b) - dtPerKey(a)).map(r => `<tr${Math.floor(dtPerKey(r) / 100) < Math.floor(thAktif / 100) ? ' style="opacity:.6"' : ''}><td>${esc(r.periode || '')}</td><td><b>${esc(r.program || '')}</b></td><td style="text-align:right">${dtRp(r.nominal)}</td><td>${pillSt(r.status)}</td></tr>`))
-    : '<div class="meta">Belum ada bansos tercatat.</div>');
-  /* riwayat per program */
+  let h = `<div class="sec-h"><h2>${ic('heart')} Bansos keluarga</h2>${w ? `<span class="btns"><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['form', { e: 'penyaluran_bansos', preset: preSl }]))}'>${ic('plus')}Catat bansos</button></span>` : ''}</div>`;
+  if ((k._dtAll || []).length > 1) h += `<div class="meta">Riwayat desil: ${k._dtAll.slice().reverse().map(x => esc(fDate(x.tgl_cek, 1) + ': ' + (x.desil || '–'))).join(' → ')}</div>`;
+  h += dtTotalHtml(sl);
+  h += `<details class="card dtlip"><summary>${ic('clock')} Program bansos aktif <span class="meta">(${aktif.length})</span></summary>${aktif.length
+    ? dtTabel(['Periode', 'Program', 'Nilai bantuan', 'Status'], aktif.map(r => `<tr data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'penyaluran_bansos', id: r.id }]))}' style="cursor:pointer${Math.floor(dtPerKey(r) / 100) < Math.floor(thAktif / 100) ? ';opacity:.6' : ''}"><td>${esc(r.periode || '')}</td><td><b>${esc(r.program || '')}</b></td><td class="r">${dtRp(r.nominal)}</td><td>${dtPillSt(r.status)}</td></tr>`), [2])
+    : '<div class="meta">Belum ada bansos tercatat.</div>'}</details>`;
   if (sl.length) {
     const P = Object.keys(prog).sort();
-    h += `<div class="lbl" style="margin-top:12px">${ic('list')} Riwayat bansos</div><div class="gtabs" id="dtRwTab">${P.map((p, i) => `<button type="button" class="${i ? '' : 'on'}" data-p="${esc(p)}">${esc(p)} (${prog[p].length})</button>`).join('')}</div><div id="dtRw"></div>`;
+    h += `<details class="card dtlip"><summary>${ic('list')} Riwayat bansos <span class="meta">(${sl.length})</span></summary><div class="gtabs" id="dtRwTab">${P.map((p, i) => `<button type="button" class="${i ? '' : 'on'}" data-p="${esc(p)}">${esc(p)} (${prog[p].length})</button>`).join('')}</div><div id="dtRw" style="margin-top:6px"></div></details>`;
   }
-  /* anggota menurut DTSEN */
-  const ang = d ? (() => { try { return JSON.parse(d.anggota || '[]'); } catch (x) { return []; } })() : [];
-  if (ang.length) h += `<div class="lbl" style="margin-top:12px">${ic('users')} Anggota keluarga (SIKS-NG)</div>` + tabel(['Nama lengkap', 'Hubungan', 'NIK', 'Pekerjaan utama', 'Status'], ang.map(a => `<tr><td><b>${esc(a.nama || '')}</b></td><td>${esc(a.hubungan || '')}</td><td class="mono">${esc(a.nik || '')}</td><td>${esc(a.pekerjaan || '')}</td><td>${a.status ? `<span class="pill ${/aktif/i.test(a.status) && !/tidak/i.test(a.status) ? 'ok' : ''}">${esc(a.status)}</span>` : ''}</td></tr>`));
-  /* hunian & aset */
-  if (d) {
-    const isi = L => L.filter(([kk]) => d[kk] !== undefined && d[kk] !== '').map(([kk, l]) => `<div><dt>${esc(l)}</dt><dd>${esc(d[kk])}</dd></div>`).join('');
-    const hn = isi(DT_HUNI), as = isi(DT_ASET);
-    if (hn || as) h += `<details class="card" style="margin-top:8px"><summary style="cursor:pointer;font-weight:600">${ic('house')} Detail kondisi hunian & aset</summary>${hn ? `<div class="lbl" style="margin-top:8px">Kondisi perumahan keluarga</div><dl class="dl">${hn}</dl>` : ''}${as ? `<div class="lbl" style="margin-top:8px">Aset bergerak & tidak bergerak</div><dl class="dl">${as}</dl>` : ''}</details>`;
-  }
+  const isi = L => d ? L.filter(([kk]) => d[kk] !== undefined && d[kk] !== '').map(([kk, l]) => `<div><dt>${esc(l)}</dt><dd>${esc(d[kk])}</dd></div>`).join('') : '';
+  const hn = isi(DT_HUNI), as = isi(DT_ASET);
+  if (hn || as || w) h += `<details class="card dtlip"><summary>${ic('house')} Detail kondisi hunian & aset</summary>${hn ? `<div class="lbl" style="margin-top:4px">Kondisi perumahan keluarga</div><dl class="dl">${hn}</dl>` : ''}${as ? `<div class="lbl" style="margin-top:8px">Aset bergerak & tidak bergerak</div><dl class="dl">${as}</dl>` : ''}${!hn && !as ? '<div class="meta">Belum diisi.</div>' : ''}${w ? `<div class="btns" style="margin-top:8px"><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(d ? ['form', { e: 'dtsen', id: d.id }] : ['form', { e: 'dtsen', preset: preDt }]))}'>${ic('edit')}Isi / ubah hunian & aset</button></div>` : ''}</details>`;
   const box = document.createElement('div'); box.className = 'stack'; box.style.marginTop = '12px'; box.innerHTML = h; el.appendChild(box);
   const rw = $('#dtRw', box);
-  const tulis = p => { rw.innerHTML = tabel(['No. Kartu', 'Periode', 'Penyalur', 'No. Rekening', 'Atas nama', 'Nominal', 'Status'], prog[p].map(r => `<tr data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'penyaluran_bansos', id: r.id }]))}' style="cursor:pointer"><td>${esc(r.no_kartu || '-')}</td><td>${esc(r.periode || '')}</td><td>${esc(r.penyalur || '')}</td><td class="mono">${esc(r.no_rekening || '-')}</td><td>${esc(r.atas_nama || r.p_nama || '')}</td><td style="text-align:right">${dtRp(r.nominal)}</td><td>${pillSt(r.status)}</td></tr>`)); };
+  const tulis = p => { rw.innerHTML = dtTabel(['No. Kartu', 'Periode', 'Penyalur', 'No. Rekening', 'Atas nama', 'Nominal', 'Status'], prog[p].map(r => `<tr data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'penyaluran_bansos', id: r.id }]))}' style="cursor:pointer"><td class="mono">${esc(r.no_kartu || '-')}</td><td>${esc(r.periode || '')}</td><td>${esc(r.penyalur || '')}</td><td class="mono">${esc(r.no_rekening || '-')}</td><td>${esc(r.atas_nama || r.p_nama || '')}</td><td class="r">${dtRp(r.nominal)}</td><td>${dtPillSt(r.status)}</td></tr>`), [5]); };
   if (rw) {
     tulis(Object.keys(prog).sort()[0]);
     $('#dtRwTab', box).onclick = ev => { const b = ev.target.closest('[data-p]'); if (!b) return; $$('#dtRwTab button', box).forEach(x => x.classList.toggle('on', x === b)); tulis(b.dataset.p); };
   }
 }
-
 /** detail DTSEN: hubungkan ke Data Keluarga (untuk baris yang belum cocok) */
 async function extraDtsen(x, el) {
   const w = canWrite('rentan');
@@ -4862,12 +4920,18 @@ async function extraDtsen(x, el) {
       }, 'Ya, hubungkan'); };
   };
 }
-/** desil 1 -> Data Rentan "Keluarga miskin" (sekali per keluarga) */
+/** desil 1 & 2 -> Data Rentan "Keluarga miskin" (sekali per keluarga); desil rentan selalu ikut DTSEN */
 const DT_KE_RENTAN = { 'PKH': 'PKH', 'Sembako / BPNT': 'BPNT / Sembako', 'PBI JK': 'PBI JK (BPJS Kesehatan)', 'ATENSI': 'ATENSI (Kemensos)', 'BLT Dana Desa': 'BLT Dana Desa' };
+const dtRnDesil = v => { const n = parseInt(v, 10); return n ? (n <= 5 ? 'Desil ' + n : 'Desil 6–10') : v ? 'Belum terdata' : ''; };
 async function dtsenKeRentan(d) {
-  if (String(d.desil) !== '1' || d.status === 'Tidak aktif' || !d.keluarga_id) return false;
-  const ada = await call('list', { entity: 'rentan', filters: { dtsen_kel: d.keluarga_id }, limit: 1 }).then(r => r.rows || []).catch(() => []);
-  if (ada.length) return false;
+  if (!d || !d.keluarga_id) return false;
+  const ada = await call('list', { entity: 'rentan', filters: { dtsen_kel: d.keluarga_id }, limit: 5 }).then(r => r.rows || []).catch(() => []);
+  if (ada.length) {
+    const ds = dtRnDesil(d.desil);
+    for (const r of ada) if (ds && r.desil !== ds) await call('save', { entity: 'rentan', record: { id: r.id, desil: ds } });
+    return false;
+  }
+  if (DT_MISKIN.indexOf(String(d.desil)) < 0 || d.status === 'Tidak aktif') return false;
   const ang = await call('anggota', { keluarga_id: d.keluarga_id }).catch(() => []);
   const kp = (ang || []).find(a => /kepala/i.test(a.hubungan || '')) || (ang || [])[0] || {};
   const sl = await call('list', { entity: 'penyaluran_bansos', filters: { keluarga_id: d.keluarga_id }, limit: 300 }).then(r => r.rows || []).catch(() => []);
@@ -4876,12 +4940,52 @@ async function dtsenKeRentan(d) {
   const rec = { r_nama: kp.nama || d.kepala, r_penduduk_id: kp.id || '', r_nik: ok(kp.nik), r_kk: ok(d.kk) || ok(kp.kk), r_jk: kp.jk || '', r_tempat_lahir: kp.tempat_lahir || '', r_tgl_lahir: kp.tgl_lahir || '',
     r_agama: kp.agama || '', r_pekerjaan: kp.pekerjaan || '', r_wn: kp.warga_negara || 'WNI', r_alamat: kp.dusun || '', r_rt: kp.rt || '', r_rw: kp.rw || '',
     r_desa: (S.set.nama_desa || '').toUpperCase(), r_kec: (S.set.kecamatan || '').toUpperCase(), r_kab: (S.set.kabupaten || '').toUpperCase(),
-    kategori: 'Keluarga miskin', desil: 'Desil 1', status: 'Aktif', tgl_data: d.tgl_cek || isoToday(), sumber_data: 'DTSEN', dtsen_kel: d.keluarga_id,
+    kategori: 'Keluarga miskin', desil: 'Desil ' + d.desil, status: 'Aktif', tgl_data: d.tgl_cek || isoToday(), sumber_data: 'DTSEN', dtsen_kel: d.keluarga_id,
     bantuan: JSON.stringify(progs.map(p => ({ program: DT_KE_RENTAN[p] || p, sumber: 'Kemensos', tahun: String(new Date().getFullYear()), ket: 'dari Penyaluran Bansos' }))),
-    ket: 'Otomatis dari DTSEN desil 1 (dicek ' + (d.tgl_cek || isoToday()) + ')' };
+    ket: 'Otomatis dari DTSEN desil ' + d.desil + ' (dicek ' + (d.tgl_cek || isoToday()) + ')' };
   rentanFlags(rec);
   await call('save', { entity: 'rentan', record: rec });
   return true;
+}
+/* =====================================================================
+   TERUSAN: Data Rentan / Usulan / Penyaluran / DTSEN mengikuti Data Penduduk & Keluarga.
+   Setiap kali data penduduk atau keluarga disimpan, salinan identitasnya ikut diperbarui.
+   ===================================================================== */
+const SOS_SYNC = { q: new Map(), t: null };
+function sosSinkronAntre(e, rec) {
+  if (!rec || !rec.id || !S.user || !canWrite('rentan')) return;
+  SOS_SYNC.q.set(e + ':' + rec.id, e);
+  clearTimeout(SOS_SYNC.t); SOS_SYNC.t = setTimeout(sosSinkronJalan, 1200);
+}
+async function sosSinkronJalan() {
+  const L = Array.from(SOS_SYNC.q.entries()); SOS_SYNC.q.clear();
+  for (const [key, e] of L) { try { await sosSinkron(e, key.slice(e.length + 1)); } catch (er) { console.warn('sinkron sosial', er); } }
+}
+async function sosSinkron(e, id) {
+  const x = await call('get', { entity: e, id }).catch(() => null); if (!x) return 0;
+  const daftar = (ent, f) => call('list', { entity: ent, filters: f, limit: 200 }).then(r => r.rows || []).catch(() => []);
+  const okV = v => v != null && String(v).indexOf('•') < 0;
+  let n = 0;
+  const tulis = async (ent, r, patch) => {
+    const ch = {}; Object.keys(patch).forEach(k => { const v = patch[k]; if (okV(v) && String(r[k] == null ? '' : r[k]) !== String(v)) ch[k] = v; });
+    if (Object.keys(ch).length) { await call('save', { entity: ent, record: Object.assign({ id: r.id }, ch) }); n++; }
+  };
+  if (e === 'penduduk') {
+    const idn = p => ({ [p + 'nama']: x.nama, [p + 'nik']: x.nik, [p + 'kk']: x.kk, [p + 'alamat']: x.dusun, [p + 'rt']: x.rt, [p + 'rw']: x.rw });
+    const keluar = /meninggal|pindah/i.test(x.status || '');
+    for (const r of await daftar('rentan', { r_penduduk_id: id })) {
+      const pt = Object.assign(idn('r_'), { r_jk: x.jk, r_tempat_lahir: x.tempat_lahir, r_tgl_lahir: x.tgl_lahir, r_agama: x.agama, r_pekerjaan: x.pekerjaan, r_wn: x.warga_negara });
+      if (x.desil && /miskin/i.test(r.kategori || '')) pt.desil = dtRnDesil(x.desil);
+      if (keluar && r.status !== 'Tidak lagi') { pt.status = 'Tidak lagi'; pt.ket = (String(r.ket || '') + ' Otomatis: penduduk ' + String(x.status).toLowerCase() + ' (' + isoToday() + ').').trim(); }
+      await tulis('rentan', r, pt);
+    }
+    for (const [ent, p] of [['usulan_bansos', 'u_'], ['penyaluran_bansos', 'p_']]) for (const r of await daftar(ent, { [p + 'penduduk_id']: id })) await tulis(ent, r, idn(p));
+  } else if (e === 'keluarga') {
+    for (const r of await daftar('dtsen', { keluarga_id: id })) await tulis('dtsen', r, { kk: x.kk });
+    for (const r of await daftar('penyaluran_bansos', { keluarga_id: id })) await tulis('penyaluran_bansos', r, r.p_penduduk_id ? { p_kk: x.kk } : { p_kk: x.kk, p_alamat: x.dusun, p_rt: x.rt, p_rw: x.rw });
+    for (const r of await daftar('rentan', { dtsen_kel: id })) await tulis('rentan', r, r.r_penduduk_id ? { r_kk: x.kk } : { r_nama: x.kepala, r_kk: x.kk, r_alamat: x.dusun, r_rt: x.rt, r_rw: x.rw });
+  }
+  return n;
 }
 
 const SOS_TAB_E = { rentan: 'list', dtsen: 'dtsen', usulan_bansos: 'usulan', musdes_bansos: 'musdes', penyaluran_bansos: 'salur' };
@@ -4910,10 +5014,15 @@ VIEWS.sosrekap = async (p, main, alive) => {
 };
 async function extraSosialUsulan(x, el) {
   if (!canRead('rentan')) return;
-  const [us, sl] = await Promise.all(['usulan_bansos', 'penyaluran_bansos'].map((e, i) => call('list', { entity: e, filters: { [(i ? 'p_' : 'u_') + 'penduduk_id']: x.id }, limit: 50 }).then(r => r.rows || []).catch(() => [])));
+  const [us, sl] = await Promise.all(['usulan_bansos', 'penyaluran_bansos'].map((e, i) => call('list', { entity: e, filters: { [(i ? 'p_' : 'u_') + 'penduduk_id']: x.id }, limit: 200 }).then(r => r.rows || []).catch(() => [])));
+  /* desil kosong -> tampilkan desil keluarganya */
+  if (!x.desil && x.kk) { try { const d = await pendDtDesil(x.kk); const dl = el.parentElement && el.parentElement.querySelector(':scope > dl.dl'); if (d && d.desil && dl) dl.insertAdjacentHTML('beforeend', `<div><dt>Desil (dari DTSEN KK)</dt><dd>${dtPill(d.desil)}</dd></div>`); } catch (er) { } }
   let h = '';
   if (us.length) h += `<div class="sec-h"><h2>${ic('send')} Usulan bansos / DTSEN (${us.length})</h2></div><div class="list">${us.map(r => rowHtml('usulan_bansos', r)).join('')}</div>`;
-  if (sl.length) h += `<div class="sec-h"><h2>${ic('check')} Penyaluran bansos (${sl.length})</h2></div><div class="list">${sl.map(r => rowHtml('penyaluran_bansos', r)).join('')}</div>`;
+  if (sl.length) {
+    sl.sort((a, b) => dtPerKey(b) - dtPerKey(a));
+    h += `<details class="card dtlip"><summary>${ic('check')} Penyaluran bansos <span class="meta">(${sl.length})</span></summary>${dtTotalHtml(sl)}<div style="margin-top:8px"></div>${dtTabel(['Program', 'Periode', 'Penyalur', 'No. Kartu', 'Nominal', 'Status'], sl.map(r => `<tr data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'penyaluran_bansos', id: r.id }]))}' style="cursor:pointer"><td><b>${esc(r.program || '')}</b></td><td>${esc(r.periode || '')}</td><td>${esc(r.penyalur || '')}</td><td class="mono">${esc(r.no_kartu || '-')}</td><td class="r">${dtRp(r.nominal)}</td><td>${dtPillSt(r.status)}</td></tr>`), [4])}</details>`;
+  }
   if (h) el.insertAdjacentHTML('beforeend', `<div class="stack">${h}</div>`);
 }
 async function extraMusdes(x, el) {
@@ -6980,7 +7089,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '133', tgl: '2026-10-07', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '134', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
