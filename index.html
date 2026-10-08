@@ -1060,6 +1060,18 @@ img.bf-pg{width:auto;max-width:100%;max-height:70vh;object-fit:contain}
 .add-tbl .geser .btn[disabled]{opacity:.3}
 .add-tbl tr.pindah td{animation:pindahKilat 1s ease}
 @keyframes pindahKilat{0%{background:color-mix(in srgb,var(--pri) 30%,transparent)}100%{background:transparent}}
+/* Pengajuan ADD: tabel bisa diciutkan + tanda kunci */
+.add-det{border-radius:16px}
+.add-det>summary{list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 14px;border-radius:14px;background:var(--surface);border:1px solid var(--line);box-shadow:0 2px 0 var(--line),0 6px 14px rgba(0,0,0,.06);user-select:none}
+.add-det>summary::-webkit-details-marker{display:none}
+.add-det>summary .meta{margin-left:auto}
+.add-det>summary .add-det-t{width:9px;height:9px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);transition:transform .25s;margin:0 4px 4px}
+.add-det[open]>summary .add-det-t{transform:rotate(-135deg);margin-bottom:-4px}
+.add-det[open]>summary{margin-bottom:10px}
+.add-det[open]>.add-wrap{animation:addBuka .28s ease}
+@keyframes addBuka{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.add-kunci{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--pri) 12%,transparent);font-size:13px}
+.add-kunci svg{flex:none;width:18px;height:18px;color:var(--pri)}
 </style>
 </head>
 <body>
@@ -7628,7 +7640,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '143', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '144', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -8420,7 +8432,61 @@ const NX = (() => {
       [C('Lunas dibayar,'), C('Bendahara Desa,', { after: 1000 }), C('{{Bendahara_U}}', { bold: 1, u: 1 })],
       [C('Yang menerima,'), C(' ', { after: 1000 }), C('{{Penerima_U}}', { bold: 1, u: 1 })]]])
   ];
-  const DOC = body => `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"><w:body>${body}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1000" w:right="1134" w:bottom="1134" w:left="1560" w:header="709" w:footer="709" w:gutter="0"/></w:sectPr></w:body></w:document>`;
+  /* Keuangan: berkas pengajuan ADD (Siltap & Dana Dusun) — halaman tegak/mendatar dipisah dengan pemisah seksi */
+  const WL = 14570, pgS = land => `<w:pgSz w:w="${land ? 16838 : 11906}" w:h="${land ? 11906 : 16838}"${land ? ' w:orient="landscape"' : ''}/><w:pgMar w:top="${land ? 1134 : 1000}" w:right="1134" w:bottom="1134" w:left="${land ? 1134 : 1560}" w:header="709" w:footer="709" w:gutter="0"/>`;
+  const SEC = land => `<w:p><w:pPr><w:sectPr>${pgS(land)}</w:sectPr></w:pPr></w:p>`;
+  const aC = (t, al, o) => [P([r(t, Object.assign({ size: 20 }, o))], { al: al || 'L', after: 0, line: 240 })];
+  const aH = t => aC(t, 'C', { bold: 1 });
+  const aTtd = (w, tempat) => [P('', { after: 60 }), tbl([w - 4680, 4680], [[[], [C((tempat || '{{Desa}}') + ', {{Tanggal Surat}}'), C('KEPALA DESA {{Desa_U}}', { after: 1100 }), C('{{Kepala Desa_U}}', { bold: 1, u: 1 })]]])];
+  const aSurat = (perihal, isi) => [...kop(),
+    tbl([1500, 250, W - 1750], [['Nomor', ':', '{{Nomor}}'], ['Sifat', ':', 'Penting'], ['Lampiran', ':', '1 (satu) bendel'], ['Perihal', ':', [P([r(perihal, { bold: 1 })], { after: 40, al: 'L' })]]]),
+    P('', { after: 60 }), L('Yth. Bupati Lumajang'), L('c.q. Kepala Dinas Pemberdayaan Masyarakat dan Desa (DPMD)'), L('melalui Camat {{Kecamatan}}'), P([r('di '), r('LUMAJANG', { bold: 1 })], { al: 'L', after: 200 }),
+    P(isi, { ind: 1 }), P('Adapun penyaluran tersebut dilaksanakan melalui Rekening Kas Desa:'),
+    kv([['Nama Bendahara', ':', '{{Bendahara}}'], ['Jabatan', ':', 'Bendahara Desa'], ['No. Rekening', ':', '{{Rekening}}'], ['Atas Nama', ':', '{{Atas Nama}}']], 720),
+    P('Demikian untuk menjadikan periksa dan terima kasih.', { before: 120 }), ...aTtd(W), PB,
+    ...kop(), C('SURAT PERNYATAAN', { bold: 1, u: 1, size: 26 }), C('PERTANGGUNGJAWABAN MUTLAK PENGGUNAAN', { bold: 1 }), C('BANTUAN KEUANGAN DESA', { bold: 1, after: 240 }),
+    P('Yang bertanda tangan di bawah ini:'), kv([['Nama', ':', '{{Kepala Desa}}'], ['Jabatan', ':', 'Kepala Desa {{Desa}}'], ['Alamat', ':', '{{Alamat Kepala Desa}}']], 720),
+    P('Dengan ini menyatakan:', { before: 120 }),
+    P([r('1. Bahwa dana yang kami ajukan/mohonkan adalah '), r('{{Jenis Dana}}', { bold: 1 }), r(' senilai {{Nilai}} yang bersumber dari Alokasi Dana Desa (ADD), akan kami gunakan sesuai dengan APB Desa/ketentuan peraturan perundang-undangan yang berlaku serta akan kami laporkan dan pertanggungjawabkan.')], { hang: 360 }),
+    P('2. Bahwa kelalaian dan/atau penyimpangan terhadap segala hal sebagaimana diatur pada angka 1 (satu) sepenuhnya menjadi tanggung jawab mutlak kami selaku Pemegang Kekuasaan Pengelolaan Keuangan Desa (PKPKD).', { hang: 360 }),
+    P('Demikian surat pernyataan ini kami buat dan akan kami laksanakan sebagaimana mestinya.', { before: 120 }), ...aTtd(W, 'Lumajang'), SEC(0)];
+  T.keu_add_siltap = () => [
+    ...aSurat('Permohonan Penyaluran ADD SILTAP Bulan {{Bulan}} Tahun {{Tahun}}', 'Menindaklanjuti Peraturan Bupati tentang tata cara pengalokasian Alokasi Dana Desa, bersama ini kami mengajukan permohonan penyaluran Alokasi Dana Desa Siltap Bulan {{Bulan}} Tahun Anggaran {{Tahun}} senilai {{Nilai}} untuk rincian penggunaan dana sebagaimana rekapitulasi terlampir.'),
+    C('LAMPIRAN PENGAJUAN SILTAP BULAN {{Bulan_U}} {{Tahun}}', { bold: 1 }), C('DESA {{Desa_U}} KECAMATAN {{Kecamatan_U}}', { bold: 1, after: 160 }),
+    tbl([600, 2600, 3000, 1500, 1500, 1800, 2170, 1400], [[aH('No'), aH('Jabatan'), aH('Nama'), aH('Siltap'), aH('Potongan BPJS 1 (%)'), aH('Jumlah ADD yang Ditransfer'), aH('NIK'), aH('Keterangan')],
+      [aC('{{R No}}', 'C'), aC('{{R Jabatan}}'), aC('{{R Nama}}'), aC('{{R Siltap}}', 'R'), aC('{{R BPJS}}', 'R'), aC('{{R Transfer}}', 'R'), aC('{{R NIK}}'), aC('{{R Ket}}')],
+      [aC(''), aC('JUMLAH', 'L', { bold: 1 }), aC(''), aC('{{Jumlah Angka}}', 'R', { bold: 1 }), aC('{{Jumlah BPJS}}', 'R', { bold: 1 }), aC('{{Ditransfer}}', 'R', { bold: 1 }), aC(''), aC('')]], 0, 1),
+    P('', { after: 60 }), tbl([2000, 300, 1800], [[aC('Keterangan', 'L', { i: 1 }), aC(''), aC('')], [aC('Kades'), aC(':'), aC('{{BPJS Kades}}', 'R')], [aC('Perangkat Desa'), aC(':'), aC('{{BPJS Perangkat}}', 'R')], [aC(''), aC(''), aC('{{Jumlah BPJS}}', 'R', { bold: 1 })]]),
+    ...aTtd(WL), PB,
+    C('REKAP PENYALURAN ADD SILTAP', { bold: 1 }), C('DESA {{Desa_U}} KECAMATAN {{Kecamatan_U}}', { bold: 1 }), C('BULAN {{Bulan_U}} TAHUN ANGGARAN {{Tahun}}', { bold: 1, after: 160 }),
+    tbl([1700, 1600, 1600, 1700, 1500, 1400, 1700, 1770, 1600], [[aH('Desa'), aH('Pagu ADD'), aH('Pagu Siltap'), aH('Penyaluran s.d. Bulan Lalu'), aH('Siltap Saat Ini'), aH('Pot. BPJS'), aH('Jumlah Diterima'), aH('No. Rekening'), aH('Sisa Pagu Siltap')],
+      [aC('{{Desa_U}}'), aC('{{Pagu ADD}}', 'R'), aC('{{Pagu Siltap}}', 'R'), aC('{{Lalu}}', 'R'), aC('{{Jumlah Angka}}', 'R'), aC('{{Jumlah BPJS}}', 'R'), aC('{{Ditransfer}}', 'R'), aC('{{No Rekening}}'), aC('{{Sisa}}', 'R')]], 0, 1),
+    ...aTtd(WL), PB,
+    C('LAPORAN REALISASI PENGHASILAN TETAP BULAN {{Bulan_U}}', { bold: 1 }), C('DESA {{Desa_U}} KECAMATAN {{Kecamatan_U}}', { bold: 1 }), C('TAHUN ANGGARAN {{Tahun}}', { bold: 1, after: 160 }),
+    tbl([600, 1900, 1800, 1800, 2000, 1800, 1700, 2970], [[aH('No'), aH('Nama Desa'), aH('Pagu ADD'), aH('Pagu Siltap'), aH('Jumlah yang Ditransfer'), aH('Realisasi'), aH('Kurang/Lebih'), aH('Ket. (jabatan kosong)')],
+      [aC('1', 'C'), aC('{{Desa_U}}'), aC('{{Pagu ADD}}', 'R'), aC('{{Pagu Siltap}}', 'R'), aC('{{Ditransfer}}', 'R'), aC('{{Realisasi}}', 'R'), aC('{{Selisih}}', 'R'), aC('{{Jabatan Kosong}}')]], 0, 1),
+    ...aTtd(WL, 'Lumajang'), SEC(1),
+    C('DAFTAR NAMA KEPALA DESA DAN PERANGKAT DESA', { bold: 1 }), C('DESA {{Desa_U}} PER BULAN {{Bulan_U}} TAHUN {{Tahun}}', { bold: 1, after: 160 }),
+    tbl([700, 4500, 4160], [[aH('No'), aH('Nama'), aH('Jabatan')], [aC('{{R No}}', 'C'), aC('{{R Nama}}'), aC('{{R Jabatan}}')]], 0, 1),
+    ...aTtd(W)];
+  T.keu_add_dusun = () => [
+    ...aSurat('Permohonan Penyaluran ADD Non Siltap untuk Dana Dusun Bagian {{Bulan}} Tahun {{Tahun}}', 'Bersama ini kami kirimkan dengan hormat permohonan penyaluran Alokasi Dana Desa Non Siltap untuk Dana Dusun bagian bulan {{Bulan}} senilai {{Nilai}} dengan rincian sesuai lampiran.'),
+    C('RINCIAN PERMOHONAN PENYALURAN', { bold: 1 }), C('ALOKASI DANA DESA NON SILTAP UNTUK DANA DUSUN', { bold: 1 }), C('BAGIAN BULAN {{Bulan_U}} TAHUN {{Tahun}}', { bold: 1, after: 160 }),
+    tbl([700, 4570, 1860, 1860, 1860, 1860, 1860], [[aH('No'), aH('Uraian'), aH('Pagu'), aH('S.d. Bulan Lalu'), aH('Pengajuan Saat Ini'), aH('Total'), aH('Sisa')],
+      [aC('{{R No}}', 'C'), aC('{{R Uraian}}'), aC('{{R Pagu}}', 'R'), aC('{{R Lalu}}', 'R'), aC('{{R Ajuan}}', 'R'), aC('{{R Total}}', 'R'), aC('{{R Sisa}}', 'R')],
+      [aC(''), aC('JUMLAH', 'L', { bold: 1 }), aC('{{Jumlah Pagu}}', 'R', { bold: 1 }), aC('{{Lalu}}', 'R', { bold: 1 }), aC('{{Jumlah Angka}}', 'R', { bold: 1 }), aC('{{Total}}', 'R', { bold: 1 }), aC('{{Sisa Rincian}}', 'R', { bold: 1 })]], 0, 1),
+    ...aTtd(WL), PB,
+    C('RENCANA PENGGUNAAN', { bold: 1 }), C('ALOKASI DANA DESA NON-SILTAP UNTUK DANA DUSUN', { bold: 1 }), C('TAHUN ANGGARAN {{Tahun}}', { bold: 1 }), C('DESA {{Desa_U}} KECAMATAN {{Kecamatan_U}}', { bold: 1, after: 160 }),
+    tbl([700, 4970, 2300, 2300, 4300], [[aH('No'), aH('Uraian Peruntukan'), aH('Pagu'), aH('Jumlah yang Diajukan'), aH('Satuan/Lokasi/Keputusan Kepala Desa')],
+      [aC('{{R No}}', 'C'), aC('{{R Uraian}}'), aC('{{R Pagu}}', 'R'), aC('{{R Ajuan}}', 'R'), aC('{{R Lokasi}}')],
+      [aC(''), aC('Total', 'L', { bold: 1 }), aC('{{Jumlah Pagu}}', 'R', { bold: 1 }), aC('{{Jumlah Angka}}', 'R', { bold: 1 }), aC('')]], 0, 1),
+    ...aTtd(WL), PB,
+    C('REKAP PENYALURAN ADD NON SILTAP (DANA DUSUN)', { bold: 1 }), C('KECAMATAN {{Kecamatan_U}}', { bold: 1 }), C('TAHUN ANGGARAN {{Tahun}}', { bold: 1, after: 160 }),
+    tbl([1900, 2000, 2000, 2200, 2000, 2470, 2000], [[aH('Desa'), aH('Pagu ADD'), aH('Pagu Dana Dusun'), aH('Penyaluran s.d. Bulan Lalu'), aH('Penyaluran Saat Ini'), aH('No. Rekening'), aH('Sisa Pagu')],
+      [aC('{{Desa_U}}'), aC('{{Pagu ADD}}', 'R'), aC('{{Pagu Dusun}}', 'R'), aC('{{Lalu}}', 'R'), aC('{{Jumlah Angka}}', 'R'), aC('{{No Rekening}}'), aC('{{Sisa}}', 'R')]], 0, 1),
+    ...aTtd(WL)];
+  T.keu_add_dusun.land = 1;
+  const DOC = (body, land) => `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"><w:body>${body}<w:sectPr>${pgS(land)}</w:sectPr></w:body></w:document>`;
   const PKG = {
     '[Content_Types].xml': '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>',
     '_rels/.rels': '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>',
@@ -8480,7 +8546,7 @@ const NX = (() => {
   async function buat(nm, logoBytes) {
     if (!T[nm]) return null;
     const en = new TextEncoder();
-    const files = Object.keys(PKG).map(n => ({ name: n, data: en.encode(PKG[n]) })).concat([{ name: 'word/document.xml', data: en.encode(DOC(T[nm]().join(''))) }, { name: 'word/media/logo.png', data: logoBytes }]);
+    const files = Object.keys(PKG).map(n => ({ name: n, data: en.encode(PKG[n]) })).concat([{ name: 'word/document.xml', data: en.encode(DOC(T[nm]().join(''), T[nm].land)) }, { name: 'word/media/logo.png', data: logoBytes }]);
     return DOCX.zip(files, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
   }
   return { nama, buat };
@@ -9321,6 +9387,7 @@ VIEWS.template = async (p, main) => {
   const sek = (judul, aksi, isi) => `<div class="sec-h"><h2>${judul}</h2>${aksi ? `<span class="btns">${aksi}</span>` : ''}</div><div class="tpl-list">${isi}</div>`;
   const TAG_SURAT = ['Desa', 'Kecamatan', 'Kabupaten', 'Alamat Desa', 'Kode Pos', 'Kode Desa', 'No', 'Tahun', 'Tanggal Surat', 'Kepala Desa', 'Nama', 'NIK', 'No KK', 'TTL', 'Tempat Lahir', 'Tanggal Lahir', 'Umur', 'Jenis Kelamin', 'Agama', 'Pekerjaan', 'Status Perkawinan', 'Kewarganegaraan', 'Pendidikan', 'Alamat', 'Dusun', 'RT', 'RW', 'Keperluan', 'Alamat Domisili', 'Lama Tinggal', 'Nama Usaha', 'Jenis Usaha', 'Alamat Usaha', 'Mulai Usaha', 'Nama Bayi', 'JK Bayi', 'Hari Lahir Bayi', 'Tanggal Lahir Bayi', 'Jam Lahir', 'Tempat Lahir Bayi', 'Anak Ke', 'Nama Ayah', 'Nama Ibu', 'Hari Meninggal', 'Tanggal Meninggal', 'Jam Meninggal', 'Tempat Meninggal', 'Sebab Meninggal', 'Pelapor', 'Alamat Tujuan', 'Alasan Pindah', 'Jumlah Pengikut', 'Penghasilan', 'Penghasilan Terbilang', 'Pemohon', 'Nama Lembaga', 'Jenis Lembaga', 'Bidang Kegiatan', 'No Akta', 'No SK Lembaga', 'SK Kemenkumham', 'Alamat Lembaga', 'Penanggung Jawab', 'Jabatan', 'Jenis Surat', 'Isi Surat', 'Isian Label', 'Isian Nilai', 'Isian Titik2'];
   const TAG_SPP = ['Desa', 'Kecamatan', 'Kabupaten', 'Nomor SPP', 'Tanggal SPP', 'Tanggal Cair', 'Tahun', 'Jenis SPP', 'Bidang', 'Kode Kegiatan', 'Kegiatan', 'Uraian', 'Penerima', 'NPWP', 'Jenis Belanja', 'Jumlah', 'Jumlah Angka', 'Terbilang', 'Potongan', 'Netto', 'Netto Angka', 'Terbilang Netto', 'Kepala Desa', 'Sekretaris Desa', 'Bendahara', 'PKA', 'Jabatan PKA', 'R No', 'R Kode', 'R Uraian', 'R Sumber', 'R Jumlah', 'P Jenis', 'P Jumlah'];
+  const TAG_ADD = ['Desa', 'Kecamatan', 'Kabupaten', 'Alamat Desa', 'Kode Pos', 'Kode Desa', 'Nomor', 'Tanggal Surat', 'Tahun', 'Bulan', 'Periode', 'Tahap', 'Jenis Dana', 'Nilai', 'Jumlah Angka', 'Terbilang', 'Kepala Desa', 'Alamat Kepala Desa', 'Bendahara', 'Bank', 'No Rekening', 'Rekening', 'Atas Nama', 'Pagu ADD', 'Pagu Siltap', 'Pagu Dusun', 'Lalu', 'Sisa', 'Jumlah BPJS', 'Ditransfer', 'BPJS Kades', 'BPJS Perangkat', 'Realisasi', 'Selisih', 'Jabatan Kosong', 'Jumlah Pagu', 'Total', 'Sisa Rincian', 'R No', 'R Jabatan', 'R Nama', 'R Siltap', 'R BPJS', 'R Transfer', 'R NIK', 'R Ket', 'R Uraian', 'R Pagu', 'R Lalu', 'R Ajuan', 'R Total', 'R Sisa', 'R Lokasi'];
   const tambahan = S.jenisSurat.filter(j => !SURAT[j.nama]);
   const TABS = [
     ['surat', 'Surat Keterangan', () => sek('Surat keterangan bawaan', '', Object.keys(SURAT).map(j => item({ path: suratPath(j), label: j.replace(/^Surat /, ''), ic: 'file' })).join(''))
@@ -9333,7 +9400,10 @@ VIEWS.template = async (p, main) => {
       + tags('Daftar tanda Surat Keluar & Produk Hukum', TAG_NASKAH, 'Menimbang, Mengingat, Isi, Isi Surat, Tembusan, Yang Ditugaskan: tulis tanda sendirian dalam satu paragraf, maka setiap baris isian menjadi paragraf baru.')],
     ['ntcr', 'Buku NTCR', () => sek('Formulir nikah (PMA No. 20 Tahun 2019)', '', [['n1', 'N1 Pengantar Nikah'], ['n2', 'N2 Permohonan Kehendak Perkawinan'], ['n4', 'N4 Persetujuan Calon Pengantin'], ['n5', 'N5 Surat Izin Orang Tua']].map(([n, l]) => item({ path: 'ntcr/ntcr_' + n + '.docx', label: l, ic: 'users' })).join(''))
       + tags('Daftar tanda Buku NTCR', TAG_NTCR, 'Tanpa awalan = calon pengantin yang dipilih saat mencetak (N1/N5); <b>Ayah</b>/<b>Ibu</b> = orang tuanya; <b>Pasangan</b> = calon pasangannya. Awalan <b>Suami</b>, <b>Istri</b>, <b>Ayah Suami</b>, <b>Ibu Istri</b>, dst. juga tersedia (Nama, NIK, TTL, Agama, Pekerjaan, Alamat, Kewarganegaraan).')],
-    ['keu', 'Keuangan', () => sek('Keuangan', '', item({ path: 'keu/keu_spp.docx', label: 'SPP + Pernyataan Tanggung Jawab + Rincian + Kuitansi', ic: 'wallet', bawaan: 1 })) + tags('Daftar tanda SPP', TAG_SPP, 'Baris berawalan R diulang per rekening; baris berawalan P diulang per potongan pajak.')],
+    ['keu', 'Keuangan', () => sek('Keuangan', '', item({ path: 'keu/keu_spp.docx', label: 'SPP + Pernyataan Tanggung Jawab + Rincian + Kuitansi', ic: 'wallet', bawaan: 1 })) + tags('Daftar tanda SPP', TAG_SPP, 'Baris berawalan R diulang per rekening; baris berawalan P diulang per potongan pajak.')
+      + sek('Pengajuan ADD', '', item({ path: 'keu/keu_add_siltap.docx', label: 'ADD Siltap — permohonan, pernyataan, lampiran, rekap, realisasi & daftar perangkat', ic: 'users', bawaan: 1 })
+        + item({ path: 'keu/keu_add_dusun.docx', label: 'ADD Dana Dusun — permohonan, pernyataan, rincian, rencana penggunaan & rekap', ic: 'home', bawaan: 1 }))
+      + tags('Daftar tanda Pengajuan ADD', TAG_ADD, 'Unduh template bawaan, ubah tampilannya di Word (kop, huruf, kolom, kalimat), lalu Ganti/Unggah — cetak berkas berikutnya mengikuti template ini. Baris tabel berisi <span class="mono">{{R No}}</span> diulang per perangkat (Siltap) atau per peruntukan (Dana Dusun); tanda R lain di baris yang sama ikut terisi. Huruf besar: tambahkan <b>_U</b>, mis. <span class="mono">{{Bulan_U}}</span>.')],
     ['rkp', 'RKP Desa', () => sek('RKP Desa', `<button class="btn sm" data-act="tplUpBtn" data-p="rkp/">${ic('plus')}Template</button><button class="btn sm" data-act="tplImpor">${ic('folder')}Dari Google Drive</button>`,
       list.filter(x => x.path.indexOf('rkp/') === 0 && !/_cadangan/.test(x.path)).map(x => item({ path: x.path, label: x.path.split('/').pop().replace(/\.docx$/i, '').replace(/_/g, ' '), ic: 'cal', hapus: 1 })).join('') || '<div class="card meta">Belum ada. Tekan "Dari Google Drive" untuk memindahkan template Google Docs lama.</div>')],
     ['rpjm', 'RPJM Desa', () => sek('RPJM Desa (21 dokumen & lampiran)', `<button class="btn sm pri" data-act="tplUpBtn" data-p="rpjm/">${ic('plus')}Unggah banyak</button>`,
@@ -9529,7 +9599,7 @@ const CETAK_JENIS = [
   ['aset_lap', 'Aset – Laporan / Buku Inventaris', 1], ['aset_kib', 'Aset – KIB A–G', 1], ['aset_sipades', 'Aset – Laporan SIPADES', 1], ['aset_kiblhi', 'Aset – KIB & LHI', 1],
   ['aset_label', 'Aset – Label Barang'], ['aset_dok', 'Aset – SOP, Template & Pedoman'],
   ['rab_bundel', 'Bundel RAB Kegiatan'], ['bast', 'Berita Acara Serah Terima (BAST)'], ['spj', 'SPJ Kegiatan'],
-  ['pkd', 'Pengkajian Keadaan Desa', 1], ['add', 'Berkas Pengajuan ADD (Siltap & Dana Dusun)']
+  ['pkd', 'Pengkajian Keadaan Desa', 1]
 ];
 const cetakPath = key => 'surat/cetak_' + String(key || 'umum').replace(/[^\w\-]+/g, '_') + '.docx';
 /* daftar cetakan register/buku administrasi (UI[e].print / print2) */
@@ -11856,6 +11926,13 @@ async function addSiltapBaris(th, riw) {
   });
 }
 const addTotal = (jenis, rows) => jenis === 'SILTAP' ? rows.reduce((t, r) => t + (Number(r.siltap) || 0), 0) : rows.reduce((t, r) => t + (Number(r.diajukan) || 0), 0);
+/* nomor surat otomatis: 400.10.2.4/{no. terakhir + 1}/{kode desa}/{tahun} — no. terakhir dari pengajuan ADD & register surat keluar tahun yang sama */
+async function addNomorBaru(th, riw) {
+  const no = v => { const a = String(v || '').split('/'); return a.length >= 3 ? Number(String(a[1]).replace(/\D/g, '')) || 0 : 0; };
+  let mx = riw.reduce((t, z) => Math.max(t, no(z.nomor)), 0);
+  try { const r = await call('list', { entity: 'surat_keluar', filters: { tgl_surat__pre: String(th) }, limit: 500 }); (r.rows || []).forEach(z => { mx = Math.max(mx, Number(z.no_agenda) || 0, no(z.nomor)); }); } catch (er) { }
+  return ['400.10.2.4', mx + 1, (S.set && S.set.kode_surat) || '427.85.01', th].join('/');
+}
 const addLabel = x => x.jenis === 'SILTAP' ? 'Siltap ' + (BULAN[(Number(x.bulan) || 1) - 1] || '') + ' ' + x.tahun : 'Dana Dusun ' + (x.periode || '') + ' ' + x.tahun;
 
 VIEWS.addaju = async (p, main, alive) => {
@@ -11926,6 +12003,7 @@ VIEWS.addajued = async (p, main, alive) => {
     if (jenis === 'SILTAP') x = { jenis, tahun: String(th), bulan: String(p.bulan), tanggal: isoToday(), status: 'Draf', rows: JSON.stringify(await addSiltapBaris(th, riw)) };
     else { const lalu = riw.filter(z => z.jenis === 'DUSUN'); x = { jenis, tahun: String(th), urut: String(lalu.length + 1), periode: '', tanggal: isoToday(), status: 'Draf', rows: JSON.stringify(addJ(pg && pg.rencana).map(r => ({ uraian: r.uraian, kode: r.kode || '', pagu: mNum(r.pagu), lokasi: [r.satuan, r.lokasi].filter(Boolean).join(' · '), diajukan: 0 }))) }; }
   }
+  if (!String(x.nomor || '').trim() && (x.status || 'Draf') === 'Draf') x.nomor = await addNomorBaru(th, riw);
   if (!alive()) return;
   setTop(addLabel(x), x.id ? (x.status || 'Draf') : 'Baru');
   let rows = addJ(x.rows);
@@ -11946,16 +12024,28 @@ VIEWS.addajued = async (p, main, alive) => {
   let gambarUlang = false;
   const tulis = () => {
     const tot = addTotal(jenis, rows), bp = rows.reduce((t, r) => t + (Number(r.bpjs) || 0), 0);
+    /* status Diajukan/Cair: data dikunci, hanya status yang bisa dikembalikan ke Draf */
+    const kunci = (x.status || 'Draf') !== 'Draf', ed = w && !kunci, dis = kunci ? ' disabled' : '';
     main.innerHTML = `<div class="stack"><div class="card stack">
-      <div class="form two"><div class="f"><label>Tanggal surat</label><input type="date" id="adT" value="${esc(x.tanggal || '')}"></div><div class="f"><label>Nomor surat</label><input id="adN" value="${esc(x.nomor || '')}" placeholder="400.10.2.4/…/427.85.01/${th}"></div>
-      ${jenis === 'DUSUN' ? `<div class="f"><label>Periode (bulan)</label><input id="adP" value="${esc(x.periode || '')}" placeholder="mis. Juni - Juli"></div><div class="f"><label>Tahap ke</label><input id="adU" inputmode="numeric" value="${esc(x.urut || '')}"></div>` : ''}
-      <div class="f"><label>Status</label><select id="adS">${['Draf', 'Diajukan', 'Cair'].map(s => `<option${(x.status || 'Draf') === s ? ' selected' : ''}>${s}</option>`).join('')}</select></div></div></div>
-      <div class="tbl-wrap ttw add-wrap"><table class="tbl add-tbl ttema${jenis === 'SILTAP' ? ' add-sil' : ''}"><thead><tr><th>No</th>${kol.map(k => `<th${k[2] ? ' class="r"' : ''}>${k[1]}</th>`).join('')}${jenis === 'DUSUN' ? '<th>S.d. lalu</th><th>Sisa</th>' : ''}${w ? '<th></th>' : ''}</tr></thead><tbody>
-      ${rows.map((r, i) => `<tr data-i="${i}"><td>${i + 1}</td>${kol.map(k => k[0] === '_tf' ? `<td class="r tf">${addRp((Number(r.siltap) || 0) - (Number(r.bpjs) || 0))}</td>` : k[0] === '_jn' ? `<td class="jn">${w ? `<input data-k="jabatan" value="${esc(r.jabatan || '')}" placeholder="Jabatan"><input data-k="nama" value="${esc(r.nama || '')}" placeholder="Nama">` : `<small>${esc(r.jabatan || '')}</small><b>${esc(r.nama || '–')}</b>`}</td>` : `<td${k[2] ? ' class="r"' : ''}>${w && !k[3] ? (k[0] === 'uraian' || k[0] === 'lokasi' ? `<textarea data-k="${k[0]}" rows="2">${esc(r[k[0]] || '')}</textarea>` : `<input data-k="${k[0]}" ${k[2] ? 'inputmode="numeric"' : ''} value="${esc(k[2] ? addRp(r[k[0]]) : r[k[0]] || '')}">`) : esc(k[2] ? addRp(r[k[0]]) : r[k[0]] || '')}</td>`).join('')}${jenis === 'DUSUN' ? `<td class="r">${addRp(laluPer[r.uraian] || 0)}</td><td class="r">${addRp((Number(r.pagu) || 0) - (laluPer[r.uraian] || 0) - (Number(r.diajukan) || 0))}</td>` : ''}${w ? `<td class="rw-akt"><span class="geser"><button type="button" class="btn sm" data-mv="${i}" data-d="-1" title="Geser ke atas" aria-label="Geser ke atas" ${i ? '' : 'disabled'}>${ic('down')}</button><button type="button" class="btn sm" data-mv="${i}" data-d="1" title="Geser ke bawah" aria-label="Geser ke bawah" ${i < rows.length - 1 ? '' : 'disabled'}>${ic('down')}</button></span><button class="btn sm danger trash3d" data-del="${i}" aria-label="Hapus baris" title="Hapus baris">${ic('trash')}</button></td>` : ''}</tr>`).join('')}</tbody></table></div>
+      <div class="form two"><div class="f"><label>Tanggal surat</label><input type="date" id="adT" value="${esc(x.tanggal || '')}"${dis}></div><div class="f"><label>Nomor surat</label><input id="adN" value="${esc(x.nomor || '')}" placeholder="400.10.2.4/…/${esc((S.set && S.set.kode_surat) || '427.85.01')}/${th}"${dis}></div>
+      ${jenis === 'DUSUN' ? `<div class="f"><label>Periode (bulan)</label><input id="adP" value="${esc(x.periode || '')}" placeholder="mis. Juni - Juli"${dis}></div><div class="f"><label>Tahap ke</label><input id="adU" inputmode="numeric" value="${esc(x.urut || '')}"${dis}></div>` : ''}
+      <div class="f"><label>Status</label><select id="adS"${w ? '' : ' disabled'}>${['Draf', 'Diajukan', 'Cair'].map(s => `<option${(x.status || 'Draf') === s ? ' selected' : ''}>${s}</option>`).join('')}</select></div></div>
+      ${kunci ? `<div class="add-kunci">${ic('lock')}<span>Status <b>${esc(x.status)}</b>: data dikunci dan tidak bisa diubah. Kembalikan status ke <b>Draf</b> untuk mengedit.</span></div>` : ''}</div>
+      <details class="add-det"${S.addTutup ? '' : ' open'}><summary>${ic('list')}<b>Tabel rincian</b><span class="meta">${rows.length} baris · Rp ${addRp(tot)}</span><span class="add-det-t"></span></summary>
+      <div class="tbl-wrap ttw add-wrap"><table class="tbl add-tbl ttema${jenis === 'SILTAP' ? ' add-sil' : ''}"><thead><tr><th>No</th>${kol.map(k => `<th${k[2] ? ' class="r"' : ''}>${k[1]}</th>`).join('')}${jenis === 'DUSUN' ? '<th>S.d. lalu</th><th>Sisa</th>' : ''}${ed ? '<th></th>' : ''}</tr></thead><tbody>
+      ${rows.map((r, i) => `<tr data-i="${i}"><td>${i + 1}</td>${kol.map(k => k[0] === '_tf' ? `<td class="r tf">${addRp((Number(r.siltap) || 0) - (Number(r.bpjs) || 0))}</td>` : k[0] === '_jn' ? `<td class="jn">${ed ? `<input data-k="jabatan" value="${esc(r.jabatan || '')}" placeholder="Jabatan"><input data-k="nama" value="${esc(r.nama || '')}" placeholder="Nama">` : `<small>${esc(r.jabatan || '')}</small><b>${esc(r.nama || '–')}</b>`}</td>` : `<td${k[2] ? ' class="r"' : ''}>${ed && !k[3] ? (k[0] === 'uraian' || k[0] === 'lokasi' ? `<textarea data-k="${k[0]}" rows="2">${esc(r[k[0]] || '')}</textarea>` : `<input data-k="${k[0]}" ${k[2] ? 'inputmode="numeric"' : ''} value="${esc(k[2] ? addRp(r[k[0]]) : r[k[0]] || '')}">`) : esc(k[2] ? addRp(r[k[0]]) : r[k[0]] || '')}</td>`).join('')}${jenis === 'DUSUN' ? `<td class="r">${addRp(laluPer[r.uraian] || 0)}</td><td class="r">${addRp((Number(r.pagu) || 0) - (laluPer[r.uraian] || 0) - (Number(r.diajukan) || 0))}</td>` : ''}${ed ? `<td class="rw-akt"><span class="geser"><button type="button" class="btn sm" data-mv="${i}" data-d="-1" title="Geser ke atas" aria-label="Geser ke atas" ${i ? '' : 'disabled'}>${ic('down')}</button><button type="button" class="btn sm" data-mv="${i}" data-d="1" title="Geser ke bawah" aria-label="Geser ke bawah" ${i < rows.length - 1 ? '' : 'disabled'}>${ic('down')}</button></span><button class="btn sm danger trash3d" data-del="${i}" aria-label="Hapus baris" title="Hapus baris">${ic('trash')}</button></td>` : ''}</tr>`).join('')}</tbody></table></div></details>
       <div class="card"><dl class="dl">${jenis === 'SILTAP' ? `<div><dt>Jumlah Siltap</dt><dd><b>Rp ${addRp(tot)}</b></dd></div><div><dt>Potongan BPJS</dt><dd>Rp ${addRp(bp)}</dd></div><div><dt>Ditransfer</dt><dd>Rp ${addRp(tot - bp)}</dd></div>` : `<div><dt>Diajukan</dt><dd><b>Rp ${addRp(tot)}</b></dd></div>`}<div><dt>Penyaluran s.d. lalu</dt><dd>Rp ${addRp(lalu)}</dd></div><div><dt>Sisa pagu</dt><dd>Rp ${addRp(mNum(jenis === 'SILTAP' ? pg && pg.pagu_siltap : pg && pg.pagu_dusun) - lalu - tot)}</dd></div><div class="w"><dt>Terbilang</dt><dd>${esc(addTb(tot))}</dd></div></dl></div>
       ${pg ? '' : '<div class="err">Pagu ADD tahun ini belum diisi. Isi dulu di halaman Pengajuan ADD agar rekap dan surat lengkap.</div>'}
-      <div class="btns">${w ? `<button class="btn sm" id="adBaris">${ic('plus')}Baris</button><button class="btn pri" id="adSimpan">${ic('check')}Simpan</button>` : ''}<button class="btn" id="adCetak">${ic('print')}Cetak berkas</button>${w && x.id ? `<button class="btn danger" id="adHapus">${ic('trash')}Hapus</button>` : ''}</div></div>`;
+      <div class="btns">${ed ? `<button class="btn sm" id="adBaris">${ic('plus')}Baris</button><button class="btn pri" id="adSimpan">${ic('check')}Simpan</button>` : ''}<button class="btn" id="adCetak">${ic('print')}Cetak berkas</button>${ed && x.id ? `<button class="btn danger" id="adHapus">${ic('trash')}Hapus</button>` : ''}</div></div>`;
     const baca = () => { $$('tr[data-i]', main).forEach(tr => { const r = rows[Number(tr.dataset.i)]; $$('[data-k]', tr).forEach(el => { const k = kol.find(z => z[0] === el.dataset.k); r[el.dataset.k] = k && k[2] ? (Number(String(el.value).replace(/[^\d-]/g, '')) || 0) : el.value.trim(); }); }); ['T:tanggal', 'N:nomor', 'P:periode', 'U:urut', 'S:status'].forEach(s => { const [a, k] = s.split(':'); const el = $('#ad' + a, main); if (el) x[k] = el.value.trim(); }); };
+    const det = main.querySelector('.add-det'); det.addEventListener('toggle', () => { S.addTutup = !det.open; });
+    /* ganti status: langsung disimpan; Diajukan/Cair mengunci isian, Draf membukanya lagi */
+    $('#adS', main).onchange = async ev => {
+      const lama = x.status || 'Draf', baru = ev.target.value;
+      if (!kunci) baca(); x.status = baru;
+      try { await simpan(); toast(baru === 'Draf' ? 'Status Draf — data bisa diedit lagi.' : 'Status ' + baru + ' — data dikunci.'); setTop(addLabel(x), x.status); tulis(); }
+      catch (er) { x.status = lama; ev.target.value = lama; toast(er.message, 1); }
+    };
     main.querySelector('.add-tbl').addEventListener('change', ev => { if (gambarUlang) return; gambarUlang = true; try { baca(); siltapRapi(); tulis(); } finally { gambarUlang = false; } });
     $$('[data-del]', main).forEach(b => b.onclick = () => { baca(); rows.splice(Number(b.dataset.del), 1); tulis(); });
     /* geser baris naik/turun: urutan tersimpan dan dipakai lagi bulan berikutnya */
@@ -11966,78 +12056,42 @@ VIEWS.addajued = async (p, main, alive) => {
     });
     if ($('#adBaris', main)) $('#adBaris', main).onclick = () => { baca(); rows.push(jenis === 'SILTAP' ? { jabatan: '', nama: '', nik: '', siltap: 0, bpjs: 0, ket: '' } : { uraian: '', pagu: 0, diajukan: 0, lokasi: '' }); tulis(); };
     const simpan = async () => {
-      baca(); siltapRapi(); if (jenis === 'DUSUN' && !x.periode) throw new Error('Isi periode bulan dana dusun.');
+      if (!kunci) { baca(); siltapRapi(); } if (jenis === 'DUSUN' && !x.periode) throw new Error('Isi periode bulan dana dusun.');
       const rec = { jenis, tahun: x.tahun, bulan: x.bulan || '', urut: x.urut || '', periode: x.periode || '', tanggal: x.tanggal, nomor: x.nomor || '', status: x.status || 'Draf', nominal: String(addTotal(jenis, rows)), rows: JSON.stringify(rows) };
       const r = await call('save', { entity: 'add_pengajuan', record: x.id ? Object.assign({ id: x.id }, rec) : rec }); Object.assign(x, rec, { id: (r && r.id) || x.id }); return x;
     };
     if ($('#adSimpan', main)) $('#adSimpan', main).onclick = async () => { try { await simpan(); toast('Tersimpan.'); setTop(addLabel(x), x.status); } catch (er) { toast(er.message, 1); } };
-    $('#adCetak', main).onclick = async () => { try { if (w) await simpan(); addCetak(x, rows, pg, lalu, laluPer); } catch (er) { toast(er.message, 1); } };
+    $('#adCetak', main).onclick = async () => { try { if (ed) await simpan(); await addCetak(x, rows, pg, lalu, laluPer); } catch (er) { toast(er.message, 1); } };
     if ($('#adHapus', main)) $('#adHapus', main).onclick = () => tnKonfirm('Hapus pengajuan ' + addLabel(x) + '?', async () => { await call('remove', { entity: 'add_pengajuan', id: x.id }); toast('Dihapus.'); back(); }, 'Ya, hapus');
   };
   tulis();
 };
 
-/* ---- berkas cetak ---- */
-function addCetak(x, rows, pg, lalu, laluPer) {
-  const s = S.set, P = pg || {}, desa = String(s.nama_desa || '').toUpperCase(), kec = String(s.kecamatan || '').toUpperCase(), th = x.tahun;
-  const tot = addTotal(x.jenis, rows), bp = rows.reduce((t, r) => t + (Number(r.bpjs) || 0), 0), bln = BULAN[(Number(x.bulan) || 1) - 1] || '';
-  const tgl = x.tanggal || isoToday(), kd = s.nama_kades || '', bend = (S.pej && S.pej.bendahara && S.pej.bendahara.nama) || s.nama_bendahara || '';
-  const rek = [P.bank, P.rekening].filter(Boolean).join(' '), sil = x.jenis === 'SILTAP';
-  const pageL = (h, land) => `<div class="paper ${land ? 'land' : ''}" style="font-size:11pt">${h}</div>`;
-  const ttd = (tmp) => `<div style="display:flex;justify-content:flex-end;margin-top:18px"><div style="text-align:center;min-width:220px">${esc(tmp || judulKata(desa))}, ${esc(fDate(tgl))}<br>KEPALA DESA ${esc(desa)}<div style="height:62px"></div><b><u>${esc(kd)}</u></b></div></div>`;
-  const T = 'border-collapse:collapse;width:100%', td = 'border:1px solid #000;padding:3px 5px', tdr = td + ';text-align:right', tdc = td + ';text-align:center';
-  const nilaiTeks = `Rp ${addRp(tot)},- ( ${esc(addTb(tot))} )`;
-  const pages = [];
-  /* 1. surat permohonan */
-  pages.push(pageL(`${kop()}<table style="margin:8px 0"><tbody><tr><td>Nomor</td><td>: ${esc(x.nomor || '400.10.2.4/      /427.85.01/' + th)}</td></tr><tr><td>Sifat</td><td>: Penting</td></tr><tr><td>Lampiran</td><td>: 1 (satu) bendel</td></tr><tr><td style="vertical-align:top">Perihal</td><td>: <b>Permohonan Penyaluran ADD ${sil ? 'SILTAP Bulan ' + esc(bln) : 'Non Siltap untuk Dana Dusun Bagian ' + esc(x.periode || '')} Tahun ${esc(th)}</b></td></tr></tbody></table>
-    <p>Yth. Bupati Lumajang<br>c.q. Kepala Dinas Pemberdayaan Masyarakat dan Desa (DPMD)<br>melalui Camat ${esc(judulKata(kec))}<br>di <b>LUMAJANG</b></p>
-    <p style="text-align:justify;text-indent:36px">${sil ? `Menindaklanjuti Peraturan Bupati tentang tata cara pengalokasian Alokasi Dana Desa, bersama ini kami mengajukan permohonan penyaluran Alokasi Dana Desa Siltap Bulan ${esc(bln)} Tahun Anggaran ${esc(th)} senilai ${nilaiTeks} untuk rincian penggunaan dana sebagaimana rekapitulasi terlampir.` : `Bersama ini kami kirimkan dengan hormat permohonan penyaluran Alokasi Dana Desa Non Siltap untuk Dana Dusun bagian bulan ${esc(x.periode || '')} senilai ${nilaiTeks} dengan rincian sesuai lampiran.`}</p>
-    <p>Adapun penyaluran tersebut dilaksanakan melalui Rekening Kas Desa:</p>
-    <table style="margin-left:24px"><tbody><tr><td>Nama Bendahara</td><td>: ${esc(bend)}</td></tr><tr><td>Jabatan</td><td>: Bendahara Desa</td></tr><tr><td>No. Rekening</td><td>: ${esc(rek)}</td></tr><tr><td>Atas Nama</td><td>: ${esc(P.nama_rek || 'Kas Desa ' + judulKata(desa))}</td></tr></tbody></table>
-    <p>Demikian untuk menjadikan periksa dan terima kasih.</p>${ttd()}`));
-  /* 2. pernyataan tanggung jawab mutlak */
-  const kdA = (S.pej && S.pej.kades) || {};
-  pages.push(pageL(`${kop()}<h3 style="text-align:center;margin:10px 0 2px"><u>SURAT PERNYATAAN</u></h3><div style="text-align:center;font-weight:700;margin-bottom:12px">PERTANGGUNGJAWABAN MUTLAK PENGGUNAAN<br>BANTUAN KEUANGAN DESA</div>
-    <p>Yang bertanda tangan di bawah ini:</p><table style="margin-left:24px"><tbody><tr><td style="width:120px">Nama</td><td>: ${esc(kd)}</td></tr><tr><td>Jabatan</td><td>: Kepala Desa ${esc(judulKata(desa))}</td></tr>${kdA.alamat ? `<tr><td>Alamat</td><td>: ${esc(kdA.alamat)}</td></tr>` : ''}</tbody></table>
-    <p>Dengan ini menyatakan:</p><ol style="text-align:justify"><li>Bahwa dana yang kami ajukan/mohonkan adalah <b>ADD ${sil ? 'SILTAP bagian bulan ' + esc(bln) : 'NON SILTAP (Dana Dusun) bagian bulan ' + esc(x.periode || '')}</b> senilai ${nilaiTeks} yang bersumber dari Alokasi Dana Desa (ADD), akan kami gunakan sesuai dengan APB Desa/ketentuan peraturan perundang-undangan yang berlaku serta akan kami laporkan dan pertanggungjawabkan.</li>
-    <li>Bahwa kelalaian dan/atau penyimpangan terhadap segala hal sebagaimana diatur pada angka 1 (satu) sepenuhnya menjadi tanggung jawab mutlak kami selaku Pemegang Kekuasaan Pengelolaan Keuangan Desa (PKPKD).</li></ol>
-    <p>Demikian surat pernyataan ini kami buat dan akan kami laksanakan sebagaimana mestinya.</p>${ttd('Lumajang')}`));
-  if (sil) {
-    /* 3. lampiran siltap */
-    pages.push(pageL(`<div style="text-align:center;font-weight:700">LAMPIRAN PENGAJUAN SILTAP BULAN ${esc(bln.toUpperCase())} ${esc(th)}<br>DESA ${esc(desa)} KECAMATAN ${esc(kec)}</div>
-      <table style="${T};margin-top:8px;font-size:9.5pt"><thead><tr><th style="${td}">No</th><th style="${td}">Jabatan</th><th style="${td}">Nama</th><th style="${td}">Siltap</th><th style="${td}">Potongan BPJS 1 (%)</th><th style="${td}">Jumlah ADD yang Ditransfer</th><th style="${td}">NIK</th><th style="${td}">Keterangan</th></tr></thead>
-      <tbody>${rows.map((r, i) => `<tr><td style="${tdc}">${i + 1}</td><td style="${td}">${esc(fmtJabatan(r.jabatan, 'us'))}</td><td style="${td}">${esc(fmtNama(r.nama, 'u'))}</td><td style="${tdr}">${addRp(r.siltap)}</td><td style="${tdr}">${r.bpjs ? addRp(r.bpjs) : ''}</td><td style="${tdr}">${addRp((Number(r.siltap) || 0) - (Number(r.bpjs) || 0))}</td><td style="${td}">${esc(r.nik || '')}</td><td style="${td}">${esc(r.ket || r.hp || '')}</td></tr>`).join('')}</tbody>
-      <tfoot><tr><td style="${td}" colspan="3"><b>JUMLAH</b></td><td style="${tdr}"><b>${addRp(tot)}</b></td><td style="${tdr}"><b>${addRp(bp)}</b></td><td style="${tdr}"><b>${addRp(tot - bp)}</b></td><td style="${td}" colspan="2"></td></tr></tfoot></table>
-      ${(() => { const kd = rows.filter(r => /^kepala desa$/i.test(String(r.jabatan || '').trim())).reduce((t, r) => t + (Number(r.bpjs) || 0), 0); return `<table style="margin-top:10px;font-size:10pt"><tbody><tr><td colspan="3"><i>Keterangan</i></td></tr><tr><td style="width:120px">Kades</td><td>:</td><td style="text-align:right;width:110px">${addRp(kd)}</td></tr><tr><td>Perangkat Desa</td><td>:</td><td style="text-align:right;border-bottom:1px solid #000">${addRp(bp - kd)}</td></tr><tr><td></td><td></td><td style="text-align:right"><b>${addRp(bp)}</b></td></tr></tbody></table>`; })()}${ttd()}`, 1));
-    /* 4. rekap penyaluran siltap */
-    pages.push(pageL(`<div style="text-align:center;font-weight:700">REKAP PENYALURAN ADD SILTAP<br>DESA ${esc(desa)} KECAMATAN ${esc(kec)}<br>BULAN ${esc(bln.toUpperCase())} TAHUN ANGGARAN ${esc(th)}</div>
-      <table style="${T};margin-top:10px;font-size:9.5pt"><thead><tr><th style="${td}" rowspan="2">Desa</th><th style="${td}" rowspan="2">Pagu ADD</th><th style="${td}" rowspan="2">Pagu Siltap</th><th style="${td}" rowspan="2">Penyaluran s.d. Bulan Lalu</th><th style="${td}" colspan="3">Penyaluran Saat Ini</th><th style="${td}" rowspan="2">No. Rekening</th><th style="${td}" rowspan="2">Sisa Pagu Siltap</th></tr><tr><th style="${td}">Siltap</th><th style="${td}">Pot. BPJS</th><th style="${td}">Jumlah Diterima</th></tr></thead>
-      <tbody><tr><td style="${td}">${esc(desa)}</td><td style="${tdr}">${addRp(P.pagu_add)}</td><td style="${tdr}">${addRp(P.pagu_siltap)}</td><td style="${tdr}">${addRp(lalu)}</td><td style="${tdr}">${addRp(tot)}</td><td style="${tdr}">${addRp(bp)}</td><td style="${tdr}">${addRp(tot - bp)}</td><td style="${td}">${esc(P.rekening || '')}</td><td style="${tdr}">${addRp(mNum(P.pagu_siltap) - lalu - tot)}</td></tr></tbody></table>${ttd()}`, 1));
-    /* 5. laporan realisasi siltap */
+/* ---- berkas cetak (Word, template keu/keu_add_siltap.docx & keu/keu_add_dusun.docx — bisa diganti di Admin › Template Dokumen › Keuangan) ---- */
+async function addCetak(x, rows, pg, lalu, laluPer) {
+  const m = modal('Membuat berkas ' + addLabel(x), `<div class="stack"><div class="skel"></div><div class="meta">Mengisi template surat permohonan, pernyataan & lampiran…</div></div>`);
+  try {
+    const s = S.set || {}, P = pg || {}, th = x.tahun, sil = x.jenis === 'SILTAP';
+    const tot = addTotal(x.jenis, rows), bp = rows.reduce((t, r) => t + (Number(r.bpjs) || 0), 0), bln = sil ? BULAN[(Number(x.bulan) || 1) - 1] || '' : x.periode || '';
+    const kd = s.nama_kades || await namaKades() || TITIK, kdA = (S.pej && S.pej.kades) || {}, bend = (S.pej && S.pej.bendahara && S.pej.bendahara.nama) || s.nama_bendahara || await namaJabatan('bendahara|kaur keuangan') || TITIK;
+    const bpK = rows.filter(r => /^kepala desa$/i.test(String(r.jabatan || '').trim())).reduce((t, r) => t + (Number(r.bpjs) || 0), 0);
     const kosong = rows.filter(r => !r.nama), real = rows.filter(r => r.nama).reduce((t, r) => t + (Number(r.siltap) || 0) - (Number(r.bpjs) || 0), 0);
-    pages.push(pageL(`<div style="text-align:center;font-weight:700">LAPORAN REALISASI PENGHASILAN TETAP BULAN ${esc(bln.toUpperCase())}<br>DESA ${esc(desa)} KECAMATAN ${esc(kec)}<br>TAHUN ANGGARAN ${esc(th)}</div>
-      <table style="${T};margin-top:10px;font-size:9.5pt"><thead><tr><th style="${td}">No</th><th style="${td}">Nama Desa</th><th style="${td}">Pagu ADD</th><th style="${td}">Pagu Siltap</th><th style="${td}">Jumlah yang Ditransfer</th><th style="${td}">Realisasi</th><th style="${td}">Kurang/Lebih</th><th style="${td}">Ket. (jabatan kosong)</th></tr></thead>
-      <tbody><tr><td style="${tdc}">1</td><td style="${td}">${esc(desa)}</td><td style="${tdr}">${addRp(P.pagu_add)}</td><td style="${tdr}">${addRp(P.pagu_siltap)}</td><td style="${tdr}">${addRp(tot - bp)}</td><td style="${tdr}">${addRp(real)}</td><td style="${tdr}">${addRp(tot - bp - real)}</td><td style="${td}">${kosong.length ? kosong.length + ' orang (' + esc(kosong.map(r => r.jabatan).join(', ')) + ')' : '-'}</td></tr></tbody></table>${ttd('Lumajang')}`, 1));
-    /* 6. daftar perangkat (rekonsiliasi BPJS) */
-    pages.push(pageL(`<div style="text-align:center;font-weight:700">DAFTAR NAMA KEPALA DESA DAN PERANGKAT DESA<br>DESA ${esc(desa)} PER BULAN ${esc(bln.toUpperCase())} TAHUN ${esc(th)}</div>
-      <table style="${T};margin-top:10px"><thead><tr><th style="${td}">No</th><th style="${td}">Nama</th><th style="${td}">Jabatan</th></tr></thead><tbody>${rows.map((r, i) => `<tr><td style="${tdc}">${i + 1}</td><td style="${td}">${esc(r.nama || '')}</td><td style="${td}">${esc(String(r.jabatan || '').toUpperCase())}</td></tr>`).join('')}</tbody></table>${ttd()}`));
-  } else {
-    /* 3. rincian permohonan dana dusun */
-    pages.push(pageL(`<div style="text-align:center;font-weight:700">RINCIAN PERMOHONAN PENYALURAN<br>ALOKASI DANA DESA NON SILTAP UNTUK DANA DUSUN<br>BAGIAN BULAN ${esc(String(x.periode || '').toUpperCase())} TAHUN ${esc(th)}</div>
-      <table style="${T};margin-top:10px;font-size:9.5pt"><thead><tr><th style="${td}">No</th><th style="${td}">Uraian</th><th style="${td}">Pagu</th><th style="${td}">S.d. Bulan Lalu</th><th style="${td}">Pengajuan Saat Ini</th><th style="${td}">Total</th><th style="${td}">Sisa</th></tr></thead>
-      <tbody>${rows.map((r, i) => { const l = laluPer[r.uraian] || 0, a = Number(r.diajukan) || 0; return `<tr><td style="${tdc}">${i + 1}</td><td style="${td}">${esc(r.uraian || '')}</td><td style="${tdr}">${addRp(r.pagu)}</td><td style="${tdr}">${addRp(l)}</td><td style="${tdr}">${addRp(a)}</td><td style="${tdr}">${addRp(l + a)}</td><td style="${tdr}">${addRp((Number(r.pagu) || 0) - l - a)}</td></tr>`; }).join('')}</tbody>
-      <tfoot><tr><td style="${td}" colspan="2"><b>JUMLAH</b></td><td style="${tdr}"><b>${addRp(rows.reduce((t, r) => t + (Number(r.pagu) || 0), 0))}</b></td><td style="${tdr}"><b>${addRp(lalu)}</b></td><td style="${tdr}"><b>${addRp(tot)}</b></td><td style="${tdr}"><b>${addRp(lalu + tot)}</b></td><td style="${tdr}"><b>${addRp(rows.reduce((t, r) => t + (Number(r.pagu) || 0), 0) - lalu - tot)}</b></td></tr></tfoot></table>${ttd()}`, 1));
-    /* 4. rencana penggunaan */
-    pages.push(pageL(`<div style="text-align:center;font-weight:700">RENCANA PENGGUNAAN<br>ALOKASI DANA DESA NON-SILTAP UNTUK DANA DUSUN<br>TAHUN ANGGARAN ${esc(th)}<br>DESA ${esc(desa)} KECAMATAN ${esc(kec)}</div>
-      <table style="${T};margin-top:10px;font-size:9.5pt"><thead><tr><th style="${td}">No</th><th style="${td}">Uraian Peruntukan</th><th style="${td}">Pagu</th><th style="${td}">Jumlah yang Diajukan</th><th style="${td}">Satuan/Lokasi/Keputusan Kepala Desa</th></tr></thead>
-      <tbody>${rows.map((r, i) => `<tr><td style="${tdc}">${i + 1}</td><td style="${td}">${esc(r.uraian || '')}</td><td style="${tdr}">${addRp(r.pagu)}</td><td style="${tdr}">${addRp(r.diajukan)}</td><td style="${td}">${esc(r.lokasi || '')}</td></tr>`).join('')}</tbody>
-      <tfoot><tr><td style="${td}" colspan="2"><b>Total</b></td><td style="${tdr}"><b>${addRp(rows.reduce((t, r) => t + (Number(r.pagu) || 0), 0))}</b></td><td style="${tdr}"><b>${addRp(tot)}</b></td><td style="${td}"></td></tr></tfoot></table>${ttd()}`, 1));
-    /* 5. rekap penyaluran non siltap */
-    pages.push(pageL(`<div style="text-align:center;font-weight:700">REKAP PENYALURAN ADD NON SILTAP (DANA DUSUN)<br>KECAMATAN ${esc(kec)}<br>TAHUN ANGGARAN ${esc(th)}</div>
-      <table style="${T};margin-top:10px;font-size:9.5pt"><thead><tr><th style="${td}">Desa</th><th style="${td}">Pagu ADD</th><th style="${td}">Pagu Dana Dusun</th><th style="${td}">Penyaluran s.d. Bulan Lalu</th><th style="${td}">Penyaluran Saat Ini</th><th style="${td}">No. Rekening</th><th style="${td}">Sisa Pagu</th></tr></thead>
-      <tbody><tr><td style="${td}">${esc(desa)}</td><td style="${tdr}">${addRp(P.pagu_add)}</td><td style="${tdr}">${addRp(P.pagu_dusun)}</td><td style="${tdr}">${addRp(lalu)}</td><td style="${tdr}">${addRp(tot)}</td><td style="${td}">${esc(P.rekening || '')}</td><td style="${tdr}">${addRp(mNum(P.pagu_dusun) - lalu - tot)}</td></tr></tbody></table>${ttd()}`, 1));
-  }
-  printDocs('Berkas ' + addLabel(x), pages, 'add');
+    const jmlPagu = rows.reduce((t, r) => t + (Number(r.pagu) || 0), 0);
+    const M = tambahU(Object.assign(petaDesa(), {
+      Nomor: x.nomor || '400.10.2.4/      /' + (s.kode_surat || '427.85.01') + '/' + th, 'Tanggal Surat': dPanjang(x.tanggal || isoToday()), Tahun: th, Bulan: bln, Periode: x.periode || '', Tahap: x.urut || '',
+      'Jenis Dana': sil ? 'ADD SILTAP bagian bulan ' + bln : 'ADD NON SILTAP (Dana Dusun) bagian bulan ' + bln,
+      Nilai: 'Rp ' + addRp(tot) + ',- ( ' + addTb(tot) + ' )', 'Jumlah Angka': addRp(tot), Terbilang: addTb(tot),
+      'Kepala Desa': kd, 'Alamat Kepala Desa': kdA.alamat || '-', Bendahara: bend, Bank: P.bank || '', 'No Rekening': P.rekening || '', Rekening: [P.bank, P.rekening].filter(Boolean).join(' '), 'Atas Nama': P.nama_rek || 'Kas Desa ' + judulKata(s.nama_desa || ''),
+      'Pagu ADD': addRp(P.pagu_add), 'Pagu Siltap': addRp(P.pagu_siltap), 'Pagu Dusun': addRp(P.pagu_dusun), Lalu: addRp(lalu), Sisa: addRp(mNum(sil ? P.pagu_siltap : P.pagu_dusun) - lalu - tot),
+      'Jumlah BPJS': addRp(bp), Ditransfer: addRp(tot - bp), 'BPJS Kades': addRp(bpK), 'BPJS Perangkat': addRp(bp - bpK), Realisasi: addRp(real), Selisih: addRp(tot - bp - real),
+      'Jabatan Kosong': kosong.length ? kosong.length + ' orang (' + kosong.map(r => fmtJabatan(r.jabatan, 'us')).join(', ') + ')' : '-',
+      'Jumlah Pagu': addRp(jmlPagu), Total: addRp(lalu + tot), 'Sisa Rincian': addRp(jmlPagu - lalu - tot)
+    }));
+    const items = sil
+      ? rows.map((r, i) => ({ 'R No': String(i + 1), 'R Jabatan': fmtJabatan(r.jabatan, 'us'), 'R Nama': r.nama ? fmtNama(r.nama, 'u') : '', 'R Siltap': addRp(r.siltap), 'R BPJS': r.bpjs ? addRp(r.bpjs) : '', 'R Transfer': addRp((Number(r.siltap) || 0) - (Number(r.bpjs) || 0)), 'R NIK': r.nik || '', 'R Ket': r.ket || '' }))
+      : rows.map((r, i) => { const l = laluPer[r.uraian] || 0, a = Number(r.diajukan) || 0; return { 'R No': String(i + 1), 'R Uraian': r.uraian || '', 'R Pagu': addRp(r.pagu), 'R Lalu': addRp(l), 'R Ajuan': addRp(a), 'R Total': addRp(l + a), 'R Sisa': addRp((Number(r.pagu) || 0) - l - a), 'R Lokasi': r.lokasi || '' }; });
+    hasilDokumen(m, await buatDokumen({ path: sil ? 'keu/keu_add_siltap.docx' : 'keu/keu_add_dusun.docx', M, rows: [{ key: 'R No', items }], jenis: 'surat', nama: 'Berkas ADD ' + addLabel(x) }));
+  } catch (er) { m.body.innerHTML = `<div class="err">${esc(er.message)}</div>`; }
 }
 
 /* =====================================================================
