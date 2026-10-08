@@ -7640,7 +7640,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '145', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '146', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -9391,7 +9391,7 @@ VIEWS.template = async (p, main) => {
   const sek = (judul, aksi, isi) => `<div class="sec-h"><h2>${judul}</h2>${aksi ? `<span class="btns">${aksi}</span>` : ''}</div><div class="tpl-list">${isi}</div>`;
   const TAG_SURAT = ['Desa', 'Kecamatan', 'Kabupaten', 'Alamat Desa', 'Kode Pos', 'Kode Desa', 'No', 'Tahun', 'Tanggal Surat', 'Kepala Desa', 'Nama', 'NIK', 'No KK', 'TTL', 'Tempat Lahir', 'Tanggal Lahir', 'Umur', 'Jenis Kelamin', 'Agama', 'Pekerjaan', 'Status Perkawinan', 'Kewarganegaraan', 'Pendidikan', 'Alamat', 'Dusun', 'RT', 'RW', 'Keperluan', 'Alamat Domisili', 'Lama Tinggal', 'Nama Usaha', 'Jenis Usaha', 'Alamat Usaha', 'Mulai Usaha', 'Nama Bayi', 'JK Bayi', 'Hari Lahir Bayi', 'Tanggal Lahir Bayi', 'Jam Lahir', 'Tempat Lahir Bayi', 'Anak Ke', 'Nama Ayah', 'Nama Ibu', 'Hari Meninggal', 'Tanggal Meninggal', 'Jam Meninggal', 'Tempat Meninggal', 'Sebab Meninggal', 'Pelapor', 'Alamat Tujuan', 'Alasan Pindah', 'Jumlah Pengikut', 'Penghasilan', 'Penghasilan Terbilang', 'Pemohon', 'Nama Lembaga', 'Jenis Lembaga', 'Bidang Kegiatan', 'No Akta', 'No SK Lembaga', 'SK Kemenkumham', 'Alamat Lembaga', 'Penanggung Jawab', 'Jabatan', 'Jenis Surat', 'Isi Surat', 'Isian Label', 'Isian Nilai', 'Isian Titik2'];
   const TAG_SPP = ['Desa', 'Kecamatan', 'Kabupaten', 'Nomor SPP', 'Tanggal SPP', 'Tanggal Cair', 'Tahun', 'Jenis SPP', 'Bidang', 'Kode Kegiatan', 'Kegiatan', 'Uraian', 'Penerima', 'NPWP', 'Jenis Belanja', 'Jumlah', 'Jumlah Angka', 'Terbilang', 'Potongan', 'Netto', 'Netto Angka', 'Terbilang Netto', 'Kepala Desa', 'Sekretaris Desa', 'Bendahara', 'PKA', 'Jabatan PKA', 'R No', 'R Kode', 'R Uraian', 'R Sumber', 'R Jumlah', 'P Jenis', 'P Jumlah'];
-  const TAG_ADD = ['Desa', 'Kecamatan', 'Kabupaten', 'Alamat Desa', 'Kode Pos', 'Kode Desa', 'Nomor', 'Tanggal Surat', 'Tahun', 'Bulan', 'Periode', 'Tahap', 'Jenis Dana', 'Nilai', 'Jumlah Angka', 'Terbilang', 'Kepala Desa', 'Alamat Kepala Desa', 'Bendahara', 'Bank', 'No Rekening', 'Rekening', 'Atas Nama', 'Pagu ADD', 'Pagu Siltap', 'Pagu Dusun', 'Lalu', 'Sisa', 'Jumlah BPJS', 'Ditransfer', 'BPJS Kades', 'BPJS Perangkat', 'Realisasi', 'Selisih', 'Jabatan Kosong', 'Jumlah Pagu', 'Total', 'Sisa Rincian', 'R No', 'R Jabatan', 'R Nama', 'R Siltap', 'R BPJS', 'R Transfer', 'R NIK', 'R Ket', 'R Uraian', 'R Pagu', 'R Lalu', 'R Ajuan', 'R Total', 'R Sisa', 'R Lokasi'];
+  const TAG_ADD = ['Desa', 'Kecamatan', 'Kabupaten', 'Alamat Desa', 'Kode Pos', 'Kode Desa', 'Nomor', 'Tanggal Surat', 'Tahun', 'Bulan', 'Periode', 'Tahap', 'Jenis Dana', 'Nilai', 'Jumlah Angka', 'Terbilang', 'Kepala Desa', 'Alamat Kepala Desa', 'Dusun_KD', 'No Hp KD', 'Email KD', 'Email', 'Bendahara', 'Bank', 'No Rekening', 'Rekening', 'Atas Nama', 'Pagu ADD', 'Pagu Siltap', 'Pagu Dusun', 'Lalu', 'Sisa', 'Jumlah BPJS', 'Ditransfer', 'BPJS Kades', 'BPJS Perangkat', 'Realisasi', 'Selisih', 'Jabatan Kosong', 'Jumlah Pagu', 'Total', 'Sisa Rincian', 'R No', 'R Jabatan', 'R Nama', 'R Siltap', 'R BPJS', 'R Transfer', 'R NIK', 'R Ket', 'R Uraian', 'R Pagu', 'R Lalu', 'R Ajuan', 'R Total', 'R Sisa', 'R Lokasi'];
   const tambahan = S.jenisSurat.filter(j => !SURAT[j.nama]);
   const TABS = [
     ['surat', 'Surat Keterangan', () => sek('Surat keterangan bawaan', '', Object.keys(SURAT).map(j => item({ path: suratPath(j), label: j.replace(/^Surat /, ''), ic: 'file' })).join(''))
@@ -11945,14 +11945,14 @@ VIEWS.addaju = async (p, main, alive) => {
   const w = canWrite('add_pengajuan'), th = Number(p.tahun || S.addTh || new Date().getFullYear()); S.addTh = th;
   const [pg, riw] = await Promise.all([addPagu(th), addRiwayat(th)]); if (!alive()) return;
   const sil = riw.filter(x => x.jenis === 'SILTAP'), dus = riw.filter(x => x.jenis === 'DUSUN');
-  const tSil = sil.reduce((t, x) => t + mNum(x.nominal), 0) + mNum(pg && pg.awal_siltap), tDus = dus.reduce((t, x) => t + mNum(x.nominal), 0) + mNum(pg && pg.awal_dusun);
+  const tSil = sil.filter(x => x.status === 'Cair').reduce((t, x) => t + mNum(x.nominal), 0) + mNum(pg && pg.awal_siltap), tDus = dus.reduce((t, x) => t + mNum(x.nominal), 0) + mNum(pg && pg.awal_dusun);
   const P = pg || {}, ren = addJ(P.rencana);
   const bar = (a, b) => `<div class="bar" style="margin-top:4px"><i style="width:${b ? Math.min(100, a / b * 100) : 0}%;background:var(--pri)"></i></div>`;
   main.innerHTML = `<div class="stack">
     <div class="chips">${[th - 1, th, th + 1].map(y => `<button class="chip ${y === th ? 'on' : ''}" data-act="go" data-go='${JSON.stringify(['addaju', { tahun: y }])}'>${y}</button>`).join('')}</div>
     <div class="card stack"><div class="sec-h"><h2>${ic('wallet')} Pagu ADD ${th}</h2>${w ? `<button class="btn sm" data-act="addPaguUbah">${ic('edit')}${pg ? 'Ubah' : 'Isi'}</button>` : ''}</div>
       ${pg ? `<dl class="dl"><div><dt>Pagu ADD</dt><dd>Rp ${addRp(P.pagu_add)}</dd></div><div><dt>Pagu Siltap</dt><dd>Rp ${addRp(P.pagu_siltap)}</dd></div><div><dt>Pagu Dana Dusun</dt><dd>Rp ${addRp(P.pagu_dusun)}</dd></div><div><dt>Rekening Kas Desa</dt><dd>${esc([P.bank, P.rekening].filter(Boolean).join(' '))}</dd></div><div class="w"><dt>Atas nama</dt><dd>${esc(P.nama_rek || '')}</dd></div></dl>` : '<div class="meta">Belum diisi. Ketuk Isi: pagu ADD dan Siltap diambil otomatis dari APBDes.</div>'}</div>
-    <div class="card stack"><div class="sec-h"><h2>${ic('users')} Siltap ${th}</h2><span class="meta">Rp ${addRp(tSil)} / ${addRp(P.pagu_siltap)}</span></div>${bar(tSil, mNum(P.pagu_siltap))}
+    <div class="card stack"><div class="sec-h"><h2>${ic('users')} Siltap ${th}</h2><span class="meta" title="Dihitung dari bulan berstatus Cair">Cair Rp ${addRp(tSil)} / ${addRp(P.pagu_siltap)} · ${sil.filter(x => x.status === 'Cair').length} bulan</span></div>${bar(tSil, mNum(P.pagu_siltap))}
       <div class="add-bln">${BULAN.map((b, i) => { const x = sil.find(z => Number(z.bulan) === i + 1); return `<button class="add-b ${x ? 'ada ' + (x.status === 'Cair' ? 'cair' : '') : ''}" data-act="addBuka" data-j="SILTAP" data-b="${i + 1}" data-id="${x ? esc(x.id) : ''}"><b>${b.slice(0, 3)}</b><small>${x ? (x.status === 'Cair' ? 'Cair' : x.status || 'Draf') : '—'}</small></button>`; }).join('')}</div>
       <div class="meta">Ketuk bulan untuk membuat atau membuka pengajuan. Daftar perangkat diambil dari Aparatur Desa dan nominal bulan sebelumnya.</div></div>
     <div class="card stack"><div class="sec-h"><h2>${ic('home')} Dana Dusun ${th}</h2><span class="meta">Rp ${addRp(tDus)} / ${addRp(P.pagu_dusun)}</span></div>${bar(tDus, mNum(P.pagu_dusun))}
@@ -12077,15 +12077,21 @@ async function addCetak(x, rows, pg, lalu, laluPer) {
   try {
     const s = S.set || {}, P = pg || {}, th = x.tahun, sil = x.jenis === 'SILTAP';
     const tot = addTotal(x.jenis, rows), bp = rows.reduce((t, r) => t + (Number(r.bpjs) || 0), 0), bln = sil ? BULAN[(Number(x.bulan) || 1) - 1] || '' : x.periode || '';
-    const kd = s.nama_kades || await namaKades() || TITIK, kdA = (S.pej && S.pej.kades) || {}, bend = (S.pej && S.pej.bendahara && S.pej.bendahara.nama) || s.nama_bendahara || await namaJabatan('bendahara|kaur keuangan') || TITIK;
+    const kd = s.nama_kades || await namaKades() || TITIK, bend = (S.pej && S.pej.bendahara && S.pej.bendahara.nama) || s.nama_bendahara || await namaJabatan('bendahara|kaur keuangan') || TITIK;
     const bpK = rows.filter(r => /^kepala desa$/i.test(String(r.jabatan || '').trim())).reduce((t, r) => t + (Number(r.bpjs) || 0), 0);
+    /* data Kepala Desa dari Aparatur (+ dusun dari Data Penduduk lewat NIK) */
+    let kdR = {}, kdP = {};
+    try { const pj = await muatPejabat(); if (pj && pj.kades && pj.kades.id) kdR = (await call('get', { entity: 'aparat', id: pj.kades.id })) || {}; } catch (er) { }
+    if (/^\d{16}$/.test(String(kdR.nik || ''))) { try { kdP = (await call('pendudukByNik', { nik: kdR.nik })) || {}; } catch (er) { } }
+    const dusKD = judulKata(String(kdP.dusun || '').toLowerCase()), rtrw = [kdR.rt || kdP.rt, kdR.rw || kdP.rw];
+    const alamatKD = kdR.alamat || [dusKD && 'Dusun ' + dusKD, rtrw[0] && 'RT ' + rtrw[0], rtrw[1] && 'RW ' + rtrw[1], 'Desa ' + judulKata(String(s.nama_desa || '').toLowerCase())].filter(Boolean).join(' ');
     const kosong = rows.filter(r => !r.nama), real = rows.filter(r => r.nama).reduce((t, r) => t + (Number(r.siltap) || 0) - (Number(r.bpjs) || 0), 0);
     const jmlPagu = rows.reduce((t, r) => t + (Number(r.pagu) || 0), 0);
     const M = tambahU(Object.assign(petaDesa(), {
       Nomor: x.nomor || '400.10.2.4/      /' + (s.kode_surat || '427.85.01') + '/' + th, 'Tanggal Surat': dPanjang(x.tanggal || isoToday()), Tahun: th, Bulan: bln, Periode: x.periode || '', Tahap: x.urut || '',
       'Jenis Dana': sil ? 'ADD SILTAP bagian bulan ' + bln : 'ADD NON SILTAP (Dana Dusun) bagian bulan ' + bln,
       Nilai: 'Rp ' + addRp(tot) + ',- ( ' + addTb(tot) + ' )', 'Jumlah Angka': addRp(tot), Terbilang: addTb(tot),
-      'Kepala Desa': kd, 'Alamat Kepala Desa': kdA.alamat || '-', Bendahara: bend, Bank: P.bank || '', 'No Rekening': P.rekening || '', Rekening: [P.bank, P.rekening].filter(Boolean).join(' '), 'Atas Nama': P.nama_rek || 'Kas Desa ' + judulKata(s.nama_desa || ''),
+      'Kepala Desa': kd, 'Alamat Kepala Desa': alamatKD || '-', 'Dusun KD': dusKD || kdR.alamat || '', 'No Hp KD': kdR.wa ? waTampil(kdR.wa) : '', 'Email KD': kdR.email || '', Bendahara: bend, Bank: P.bank || '', 'No Rekening': P.rekening || '', Rekening: [P.bank, P.rekening].filter(Boolean).join(' '), 'Atas Nama': P.nama_rek || 'Kas Desa ' + judulKata(s.nama_desa || ''),
       'Pagu ADD': addRp(P.pagu_add), 'Pagu Siltap': addRp(P.pagu_siltap), 'Pagu Dusun': addRp(P.pagu_dusun), Lalu: addRp(lalu), Sisa: addRp(mNum(sil ? P.pagu_siltap : P.pagu_dusun) - lalu - tot),
       'Jumlah BPJS': addRp(bp), Ditransfer: addRp(tot - bp), 'BPJS Kades': addRp(bpK), 'BPJS Perangkat': addRp(bp - bpK), Realisasi: addRp(real), Selisih: addRp(tot - bp - real),
       'Jabatan Kosong': kosong.length ? kosong.length + ' orang (' + kosong.map(r => fmtJabatan(r.jabatan, 'us')).join(', ') + ')' : '-',
