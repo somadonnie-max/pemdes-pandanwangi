@@ -1046,6 +1046,11 @@ img.bf-pg{width:auto;max-width:100%;max-height:70vh;object-fit:contain}
   main{padding:18px 26px 40px;max-width:1240px}
 }
 @media (min-width:900px) and (prefers-color-scheme:dark){:root:not([data-theme="light"]) .sb-theme .ic:first-child{display:none}:root:not([data-theme="light"]) .sb-theme .ic:last-child{display:block}}
+/* ---- v141: tombol model nama ---- */
+.nmfmt{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.nmfmt[hidden]{display:none}
+.nmfmt button{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:2px 9px;font:inherit;font-size:10.5px;font-weight:700;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.nmfmt button:hover{border-color:var(--pri);color:var(--pri)}
+.nmfmt button.on{background:var(--pri);border-color:var(--pri);color:var(--pri-ink);box-shadow:0 2px 6px -2px color-mix(in srgb,var(--pri) 60%,transparent)}
 </style>
 </head>
 <body>
@@ -1377,6 +1382,17 @@ const UI = {
       title: 'BUKU APARAT PEMERINTAH DESA', land: 1, cols: [['Nama', 'nama'], ['NIAP', 'niap'], ['NIP/NRPDes', 'nip'], ['L/P', r => (r.jk || '').slice(0, 1)], ['Tempat & Tgl Lahir', r => (r.tempat_lahir || '') + ', ' + fDate(r.tgl_lahir)], ['Agama', 'agama'], ['Pangkat', 'pangkat'], ['Jabatan', 'jabatan'], ['Pendidikan', 'pendidikan'],
         ['SK Pengangkatan', r => (r.no_sk_angkat || '') + '<br>' + fDate(r.tgl_sk_angkat)], ['SK Pemberhentian', r => (r.no_sk_henti || '') + '<br>' + fDate(r.tgl_sk_henti)], ['Ket', 'ket']]
     }
+  },
+  tokoh_luar: {
+    t: 'Tokoh & Pejabat Luar Desa', ic: 'landmark', perm: 'w:aparat', sort: 'urut', asc: 1, excel: 1, folder: 'TU/Tokoh',
+    chips: { k: 'kelompok', opt: ['Kecamatan', 'Keamanan', 'Keagamaan', 'Kesehatan', 'Pendamping', 'Lainnya'] },
+    fields: [F('urut', 'No. Urut', 'text', { pad: 2 }), F('jabatan', 'Jabatan', 'text', { req: 1, wide: 1, hint: 'mis. Camat Tempeh, Babinsa Desa Pandanwangi' }),
+      F('nama', 'Nama', 'text', { wide: 1, hint: 'Gelar ditulis di belakang koma, mis. "Budi Santoso, S.STP, M.Si". Gelar depan (Drs., H., dr.) boleh di depan nama.' }),
+      F('instansi', 'Instansi / Kantor', 'text', { wide: 1 }), F('kelompok', 'Kelompok', 'select', { opt: ['Kecamatan', 'Keamanan', 'Keagamaan', 'Kesehatan', 'Pendamping', 'Lainnya'] }),
+      F('pangkat', 'Pangkat / Golongan'), F('nip', 'NIP / NRP', 'text', { mono: 1 }), F('hp', 'No. HP / WA', 'tel'), F('alamat', 'Alamat Kantor', 'text', { wide: 1 }),
+      F('mulai', 'Menjabat sejak', 'date'), F('selesai', 'Sampai', 'date'), F('aktif', 'Aktif', 'select', { opt: ['Ya', 'Tidak'], def: 'Ya' }), F('ket', 'Keterangan', 'textarea', { wide: 1 }), F('foto_id', 'Foto', 'file', { img: 1 })],
+    row: r => ({ t: r.nama || '— belum diisi —', s: [r.jabatan, r.instansi].filter(Boolean).join(' · '), s2: [r.pangkat, r.nip ? 'NIP/NRP ' + r.nip : '', r.hp].filter(Boolean).join(' · '), img: r.foto_id, av: r.nama ? initials(r.nama) : ic('landmark'), pill: r.aktif === 'Tidak' ? '<span class="pill">tidak aktif</span>' : !r.nama ? '<span class="pill warn">belum diisi</span>' : '' }),
+    print: { title: 'DAFTAR TOKOH & PEJABAT LUAR DESA', land: 1, cols: [['Jabatan', 'jabatan'], ['Nama', 'nama'], ['Instansi', 'instansi'], ['Pangkat', 'pangkat'], ['NIP/NRP', 'nip'], ['No. HP', 'hp'], ['Ket', 'ket']] }
   },
   petugas: {
     t: 'Petugas & Lembaga Desa', ic: 'users', perm: 'tu_aparat', folder: 'TU/Petugas', file: 'foto_id',
@@ -1912,7 +1928,7 @@ function MODS() {
   return [
     { k: 'presensi', l: 'Presensi', ic: 'clock', items: [['Presensi Hari Ini', 'clock', ['presensi']], ['Riwayat Harian', 'list', ['harian']]] },
     { k: 'kegiatan', l: 'Kegiatan', ic: 'cal', items: [['Agenda', 'cal', ['list', { e: 'kegiatan', v: 0, title: 'Agenda' }], null, 'r:kegiatan'], ['Berita', 'mega', ['list', { e: 'berita' }], 'berita']] },
-    { k: 'arsip', l: 'Arsip', ic: 'folder', items: [grpItem('surat'), grpItem('hukum')].concat(['aparat', 'petugas'].map(e => [UI[e].t, UI[e].ic, ['list', { e }], e])) },
+    { k: 'arsip', l: 'Arsip', ic: 'folder', items: [grpItem('surat'), grpItem('hukum')].concat(['aparat', 'petugas', 'tokoh_luar'].map(e => [UI[e].t, UI[e].ic, ['list', { e }], e])) },
     { k: 'aset', l: 'Aset Desa', ic: 'box', items: [['Dashboard Aset', 'chart', ['asetdash'], null, 'r:aset'], ['Inventarisasi & Penatausahaan (KIB)', 'box', ['list', { e: 'aset' }], 'aset'],
       ['Pengadaan', 'plus', ['list', { e: 'aset_trx', chip: 'Pengadaan' }], 'aset_trx'], ['Penggunaan, Pemanfaatan & Penghapusan', 'list', ['list', { e: 'aset_trx' }], 'aset_trx'], ['Persediaan', 'box', ['list', { e: 'persediaan' }], 'persediaan'],
       ['Inventarisasi Fisik', 'check', ['list', { e: 'aset_cek' }], 'aset_cek'], ['Laporan Format SIPADES', 'print', ['sipadeslap'], null, 'r:aset'], ['Cetak Laporan Aset (format awal)', 'print', ['asetcetak'], null, 'r:aset'], ['Cetak Register Label', 'crop', ['asetlabel'], null, 'r:aset'],
@@ -4194,7 +4210,7 @@ function readForm(u, root) {
     else if (f.t === 'money') v[f.k] = mIn(el);
     else {
       let s = el.value.trim();
-      if (f.up) s = s.toUpperCase();
+      if (f.up && !el.dataset.nf) s = s.toUpperCase();
       if (f.pad && /^\d+$/.test(s)) s = s.padStart(f.pad, '0');
       v[f.k] = s;
     }
@@ -4245,7 +4261,7 @@ VIEWS.form = async (p, main, alive) => {
   </form><button type="button" class="btn pri fab fabL" data-act="fsimpan"><span class="fabin">${ic('check')}Simpan</span></button><button type="button" class="btn pri fab" data-act="cancel"><span class="fabin">${ic('x')}Batal</span></button>`;
   const frm = $('#frm');
   $$('[data-money]', frm).forEach(el => el.addEventListener('input', () => liveMoney(el)));
-  flds.filter(f => f.up).forEach(f => { const el = $('#f_' + f.k, frm); if (el && el.tagName === 'INPUT') el.addEventListener('input', () => { const v = el.value.toUpperCase(); if (v === el.value) return; const ps = el.selectionStart; el.value = v; try { el.setSelectionRange(ps, ps); } catch (x) { } }); });
+  flds.filter(f => f.up).forEach(f => { const el = $('#f_' + f.k, frm); if (el && el.tagName === 'INPUT') el.addEventListener('input', () => { if (el.dataset.nf) return; const v = el.value.toUpperCase(); if (v === el.value) return; const ps = el.selectionStart; el.value = v; try { el.setSelectionRange(ps, ps); } catch (x) { } }); });
   if (u.calc) frm.addEventListener('input', ev => { if (ev.target.id === 'f_total') return; const c = u.calc(readForm(u, frm)); if (c) Object.keys(c).forEach(k => { const el = $('#f_' + k, frm); if (el) el.value = Number(c[k]).toLocaleString('id-ID'); }); });
   S.vh.cancel = back;
   S.vh.fsimpan = () => {
@@ -4304,6 +4320,7 @@ VIEWS.form = async (p, main, alive) => {
   if (e === 'penduduk' || e === 'keluarga') wilHook(frm, e, rec, !p.id);
   if (e === 'penduduk') ortuHooks(frm, p);
   if (e === 'register_surat') suketNamaHook(frm);
+  namaHooks(frm, e, flds);
   /* NIK -> isi otomatis dari Data Penduduk (hanya kolom yang masih kosong) */
   const nikF = flds.find(f => f.nikfill), nikEl = nikF && $('#f_' + nikF.k, frm);
   if (nikEl && !nikEl.readOnly) nikEl.addEventListener('input', async () => {
@@ -5050,6 +5067,56 @@ window.addEventListener('scroll', e => { if (S.pickEl && !(e.target && e.target.
 window.addEventListener('resize', () => pickClose());
 document.addEventListener('keydown', e => { if (e.key === 'Escape') pickClose(); });
 new MutationObserver(() => { clearTimeout(S.encT); S.encT = setTimeout(() => enhanceForm(document.body), 30); }).observe(document.body, { childList: true, subtree: true });
+/* ---- Isian nama orang: popup dari Data Penduduk + Tokoh Luar Desa, lalu pilih model tulisan (4 tombol) ---- */
+const NAMA_E = new Set(['aparat', 'petugas', 'guru_ngaji', 'aset_tim', 'kerabat', 'rkp_tim', 'rkp_narasumber']);
+const NAMA_LBL = /(^nama( lengkap)?$|nama (ketua|pemilik|penerima|pelapor|ayah|ibu|saksi|penanggung|kepala|pengurus|pejabat|petugas|wali|pemohon|calon|narasumber|pimpinan|pelaksana|pengawas|bendahara|sekretaris|kuasa|pihak)|^(ketua|pelapor|penanggung jawab|pejabat|saksi|narasumber|penerima|pemohon|pelaksana|pengawas)\b)/i;
+const NAMA_BUKAN = /lembaga|usaha|instansi|bank|rekening|jabatan|kegiatan|barang|desa|dusun|bayi|ibu kandung bayi|rumah|tempat/i;
+function namaHooks(frm, e, flds) {
+  if (e === 'penduduk' || e === 'keluarga' || e === 'tokoh_luar' || e === 'register_surat') return;
+  flds.forEach(f => {
+    if ((f.t && f.t !== 'text') || f.opick || f.noform || f.k.slice(-4) === '_nik') return;
+    const lbl = String(f.l || '');
+    if (!((f.k === 'nama' && NAMA_E.has(e)) || (NAMA_LBL.test(lbl) && !NAMA_BUKAN.test(lbl)))) return;
+    const el = $('#f_' + f.k, frm); if (el && el.tagName === 'INPUT' && !el.readOnly) namaHook(frm, el, f);
+  });
+}
+function namaHook(frm, el, f) {
+  const box = el.closest('.f'); if (!box || box.dataset.nh) return; box.dataset.nh = '1'; box.classList.add('pmbox');
+  const dd = document.createElement('div'); dd.className = 'pmdd'; dd.hidden = true; box.appendChild(dd);
+  const fm = document.createElement('div'); fm.className = 'nmfmt'; box.appendChild(fm);
+  let tm, hasil = [];
+  const MODEL = [['u', 'NAMA'], ['p', 'Nama'], ['ug', 'NAMA, Gelar'], ['pg', 'Nama, Gelar']];
+  const tombol = () => {
+    const v = el.value.trim(), asli = el.dataset.asli || v, ada = !!pisahGelar(asli).gelar;
+    fm.hidden = !v;
+    fm.innerHTML = v ? MODEL.filter(m => ada || m[0].length === 1).map(([m, l]) => `<button type="button" class="${fmtNama(asli, m) === v ? 'on' : ''}" data-m="${m}" title="${esc(fmtNama(asli, m))}">${esc(l)}</button>`).join('') : '';
+  };
+  el.addEventListener('input', () => {
+    el.dataset.asli = ''; tombol();
+    clearTimeout(tm); const q = el.value.trim();
+    if (q.length < 3) { dd.hidden = true; return; }
+    tm = setTimeout(async () => {
+      const [w, t] = await Promise.all([wargaCari(q, 6).catch(() => []), call('list', { entity: 'tokoh_luar', q, limit: 6 }).then(r => (r.rows || []).filter(x => x.nama)).catch(() => [])]);
+      if (el.value.trim() !== q) return;
+      hasil = t.map(x => ({ nama: x.nama, info: [x.jabatan, x.instansi].filter(Boolean).join(' · '), tokoh: 1 })).concat(w.map(p => ({ nama: p.nama, nik: p.nik, info: [String(p.dusun || '').replace(/^DUSUN /, ''), p.rt ? 'RT ' + p.rt + '/' + (p.rw || '') : '', p.tgl_lahir ? 'lahir ' + fDate(p.tgl_lahir) : ''].filter(Boolean).join(' · ') })));
+      dd.innerHTML = hasil.length ? hasil.map((h, i) => `<button type="button" data-i="${i}"><b>${esc(h.nama)}</b> ${h.tokoh ? '<span class="pill info">luar desa</span> ' : ''}<small>${esc(h.info)}</small></button>`).join('') : '<div class="meta" style="padding:6px 9px">Tidak ada di Data Penduduk / Tokoh Luar Desa. Tulis bebas.</div>';
+      dd.hidden = false;
+    }, 300);
+  });
+  dd.addEventListener('click', ev => {
+    const b = ev.target.closest('[data-i]'); if (!b) return; const h = hasil[Number(b.dataset.i)]; if (!h) return;
+    el.dataset.asli = h.nama; el.dataset.nf = '1'; el.value = h.nama; dd.hidden = true;
+    const nik = $('#f_nik', frm); if (h.nik && nik && !nik.value.trim() && /^\d{16}$/.test(h.nik)) { nik.value = h.nik; nik.dispatchEvent(new Event('input', { bubbles: true })); }
+    el.dispatchEvent(new Event('change', { bubbles: true })); tombol();
+  });
+  fm.addEventListener('click', ev => {
+    const b = ev.target.closest('[data-m]'); if (!b) return;
+    if (!el.dataset.asli) el.dataset.asli = el.value.trim();
+    el.dataset.nf = '1'; el.value = fmtNama(el.dataset.asli, b.dataset.m); el.dispatchEvent(new Event('change', { bubbles: true })); tombol();
+  });
+  document.addEventListener('click', ev => { if (!box.contains(ev.target)) dd.hidden = true; });
+  tombol();
+}
 /* Suket: ketik nama -> pilih warga -> NIK diisi, lalu kolom lain terisi otomatis lewat pencocokan NIK.
    Bisa dipakai walau pengguna tidak punya akses menu Data Penduduk. */
 function suketNamaHook(frm) {
@@ -8182,7 +8249,22 @@ function upNama(v) {
   if (i > 0) { const g = t.slice(i + 1).trim(); if (g && g.length <= 30 && g.split(/\s*,\s*/).every(x => /^[A-Za-z]{1,6}(\.[A-Za-z]{0,6})*\.?$/.test(x.replace(/\s/g, '')))) return t.slice(0, i).toUpperCase() + ', ' + g; }
   return t.toUpperCase();
 }
-function tambahU(M) { Object.keys(M).forEach(k => { if (!/_U$/.test(k)) M[k + '_U'] = upNama(M[k]); }); return M; }
+/* varian tanda: _U UPPER (gelar tetap), _UT UPPER tanpa gelar, _P Proper (gelar tetap), _PT Proper tanpa gelar,
+   _S jabatan disingkat (Kaur/Kasi/Kasun), _US UPPER disingkat */
+const TANDA_VAR = /_(U|UT|P|PT|S|US)$/;
+function tambahU(M) {
+  Object.keys(M).forEach(k => {
+    if (TANDA_VAR.test(k)) return; const v = M[k];
+    if (!(k + '_U' in M)) M[k + '_U'] = upNama(v);
+    if (v == null || typeof v === 'object' || /^\s*[\d.,\s\-\/:]*$/.test(String(v))) return;
+    const t = String(v);
+    if (!(k + '_UT' in M)) M[k + '_UT'] = fmtNama(t, 'u');
+    if (!(k + '_P' in M)) M[k + '_P'] = t.length > 80 ? t : fmtNama(t, 'pg');
+    if (!(k + '_PT' in M)) M[k + '_PT'] = fmtNama(t, 'p');
+    if (/jabatan|kades|sekdes|kaur|kasi|kasun|pejabat/i.test(k) || /^(kepala|sekretaris|kaur|kasi|kasun)\b/i.test(t)) { M[k + '_S'] = fmtJabatan(t, 'ps'); M[k + '_US'] = fmtJabatan(t, 'us'); }
+  });
+  return M;
+}
 function petaDesa() {
   const s = S.set || {};
   return { Desa: s.nama_desa || '', Kecamatan: s.kecamatan || '', Kabupaten: s.kabupaten || '', Provinsi: s.provinsi || '', 'Alamat Desa': s.alamat || '', Alamat: s.alamat || '', 'Kode Pos': s.kode_pos || '', Kodepos: s.kode_pos || '', email: s.email_desa || '', Email: s.email_desa || '', 'Kode Desa': s.kode_surat || '........' };
@@ -9256,7 +9338,7 @@ VIEWS.template = async (p, main) => {
   const tab = TABS.find(t => t[0] === S.tplTab);
   main.innerHTML = `<div class="stack">
     <div class="gtabs" role="tablist">${TABS.map(t => `<button role="tab" class="${t[0] === S.tplTab ? 'on' : ''}" data-act="tplTab" data-v="${t[0]}">${esc(t[1])}</button>`).join('')}</div>
-    <details class="card tpl-help"><summary>${ic('book')} Cara mengubah template</summary><ol class="meta" style="margin:6px 0 0;padding-left:18px;line-height:1.7"><li>Tekan <b>Unduh</b>, buka file di Microsoft Word / WPS.</li><li>Ubah susunan dan kalimat sesukanya. Tulis isian dengan kurung kurawal ganda, mis. <span class="mono">{{Nama}}</span> (lihat daftar tanda di bawah).</li><li>Simpan sebagai .docx, lalu tekan <b>Ganti</b> untuk mengunggah.</li><li>Tekan <b>Hapus</b> untuk membuang template unggahan dan kembali memakai susunan bawaan aplikasi (bila ada).</li></ol></details>
+    <details class="card tpl-help"><summary>${ic('book')} Cara mengubah template</summary><ol class="meta" style="margin:6px 0 0;padding-left:18px;line-height:1.7"><li>Tekan <b>Unduh</b>, buka file di Microsoft Word / WPS.</li><li>Ubah susunan dan kalimat sesukanya. Tulis isian dengan kurung kurawal ganda, mis. <span class="mono">{{Nama}}</span> (lihat daftar tanda di bawah).</li><li><b>Model tulisan nama & jabatan</b> — tambahkan akhiran pada tanda apa pun: <span class="mono">_U</span> HURUF BESAR (gelar tetap, mis. SUGIANTO, S.Pd), <span class="mono">_UT</span> HURUF BESAR tanpa gelar, <span class="mono">_P</span> Huruf Awal Besar (gelar tetap), <span class="mono">_PT</span> Huruf Awal Besar tanpa gelar, <span class="mono">_S</span> jabatan disingkat (Kaur/Kasi/Kasun), <span class="mono">_US</span> jabatan HURUF BESAR disingkat. Contoh: <span class="mono">{{Kepala Desa_UT}}</span>, <span class="mono">{{Jabatan_US}}</span>.</li><li>Simpan sebagai .docx, lalu tekan <b>Ganti</b> untuk mengunggah.</li><li>Tekan <b>Hapus</b> untuk membuang template unggahan dan kembali memakai susunan bawaan aplikasi (bila ada).</li></ol></details>
     ${tab[2]()}
     <input type="file" id="tplFile" accept=".docx,.xlsx,.jpg,.jpeg,.png" multiple hidden></div>`;
   S.vh.tplTab = t => { S.tplTab = t.dataset.v; refresh(); };
