@@ -7640,7 +7640,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '144', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '145', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -8321,10 +8321,13 @@ const NX = (() => {
   const C = (t, o = {}) => P([r(t, o)], Object.assign({ al: 'C', after: 0 }, o));
   const L = (t, o = {}) => P([r(t, o)], Object.assign({ al: 'L', after: 0 }, o));
   const NB = '<w:tblBorders><w:top w:val="nil"/><w:left w:val="nil"/><w:bottom w:val="nil"/><w:right w:val="nil"/><w:insideH w:val="nil"/><w:insideV w:val="nil"/></w:tblBorders>';
-  const GB = '<w:tblBorders><w:top w:val="single" w:sz="4"/><w:left w:val="single" w:sz="4"/><w:bottom w:val="single" w:sz="4"/><w:right w:val="single" w:sz="4"/><w:insideH w:val="single" w:sz="4"/><w:insideV w:val="single" w:sz="4"/></w:tblBorders>';
+  /* garis tabel lengkap (warna & jarak ditulis eksplisit, juga per sel) supaya tampil di Word HP, WPS, Google Docs & pratinjau aplikasi */
+  const bd1 = n => `<w:${n} w:val="single" w:sz="4" w:space="0" w:color="000000"/>`;
+  const GB = '<w:tblBorders>' + ['top', 'left', 'bottom', 'right', 'insideH', 'insideV'].map(bd1).join('') + '</w:tblBorders>';
+  const GC = '<w:tcBorders>' + ['top', 'left', 'bottom', 'right'].map(bd1).join('') + '</w:tcBorders>';
   /* sel: string -> paragraf kiri; array -> isi XML apa adanya */
   const tbl = (cols, rows, indent, garis) => `<w:tbl><w:tblPr><w:tblW w:w="${cols.reduce((a, b) => a + b, 0)}" w:type="dxa"/>${indent ? `<w:tblInd w:w="${indent}" w:type="dxa"/>` : ''}${garis ? GB : NB}<w:tblLayout w:type="fixed"/><w:tblCellMar><w:left w:w="60" w:type="dxa"/><w:right w:w="60" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>${cols.map(c => `<w:gridCol w:w="${c}"/>`).join('')}</w:tblGrid>`
-    + rows.map(rw => '<w:tr>' + rw.map((c, i) => `<w:tc><w:tcPr><w:tcW w:w="${cols[i]}" w:type="dxa"/><w:vAlign w:val="${garis ? 'center' : 'top'}"/></w:tcPr>${Array.isArray(c) ? (/<\/w:p>$/.test(c.join('')) ? c.join('') : c.join('') + P('', { after: 0, line: 240 })) : P(c, { after: 40, al: 'L' })}</w:tc>`).join('') + '</w:tr>').join('') + '</w:tbl>';
+    + rows.map(rw => '<w:tr>' + rw.map((c, i) => `<w:tc><w:tcPr><w:tcW w:w="${cols[i]}" w:type="dxa"/>${garis ? GC : ''}<w:vAlign w:val="${garis ? 'center' : 'top'}"/></w:tcPr>${Array.isArray(c) ? (/<\/w:p>$/.test(c.join('')) ? c.join('') : c.join('') + P('', { after: 0, line: 240 })) : P(c, { after: 40, al: 'L' })}</w:tc>`).join('') + '</w:tr>').join('') + '</w:tbl>';
   const logo = (px, al) => `<w:p><w:pPr><w:spacing w:after="${al ? 120 : 0}"/><w:jc w:val="center"/></w:pPr><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${px * 9525}" cy="${px * 9525}"/><wp:docPr id="1" name="Logo"/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="1" name="logo.png"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rIdLogo"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${px * 9525}" cy="${px * 9525}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>`;
   const garis = '<w:p><w:pPr><w:pBdr><w:bottom w:val="thickThinSmallGap" w:sz="24" w:space="1" w:color="000000"/></w:pBdr><w:spacing w:after="200"/></w:pPr></w:p>';
   const kop = () => [tbl([1500, 7860], [[[logo(88)], [C('PEMERINTAH KABUPATEN {{Kabupaten_U}}', { size: 28, bold: 1 }), C('KECAMATAN {{Kecamatan_U}}', { size: 28, bold: 1 }), C('DESA {{Desa_U}}', { size: 34, bold: 1 }), C('{{Alamat Desa}} Kode Pos {{Kode Pos}}', { size: 20, i: 1 })]]]), garis];
@@ -8843,7 +8846,8 @@ function hasilDokumen(m, r, opt) {
       const inner = document.createElement('div'); pv.innerHTML = ''; pv.appendChild(inner);
       return rapikanSeksi(r.blob).then(bl => window.docx.renderAsync(bl, inner, null, { inWrapper: true, ignoreLastRenderedPageBreak: true, breakPages: true }).then(() => {
         const w = inner.querySelector('.docx-wrapper'); if (w) { w.style.background = 'transparent'; w.style.padding = '0'; }
-        const sec = inner.querySelector('section.docx'); const lebar = sec ? sec.offsetWidth + 16 : 0;
+        /* lebar halaman terlebar (halaman mendatar ikut muat, tidak terpotong) */
+        const lebar = Math.max(0, ...Array.from(inner.querySelectorAll('section.docx')).map(x => x.offsetWidth)) + 16;
         if (lebar && pv.clientWidth < lebar) inner.style.zoom = (pv.clientWidth - 4) / lebar;
         siap = true;
       }));
