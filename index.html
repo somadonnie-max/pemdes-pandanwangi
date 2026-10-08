@@ -1051,6 +1051,15 @@ img.bf-pg{width:auto;max-width:100%;max-height:70vh;object-fit:contain}
 .nmfmt button{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:2px 9px;font:inherit;font-size:10.5px;font-weight:700;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
 .nmfmt button:hover{border-color:var(--pri);color:var(--pri)}
 .nmfmt button.on{background:var(--pri);border-color:var(--pri);color:var(--pri-ink);box-shadow:0 2px 6px -2px color-mix(in srgb,var(--pri) 60%,transparent)}
+/* ---- v143: geser baris tabel pengajuan ---- */
+.add-tbl td.rw-akt{white-space:nowrap}
+.add-tbl .geser{display:inline-flex;flex-direction:column;gap:2px;vertical-align:middle;margin-right:6px}
+.add-tbl .geser .btn{width:26px;min-height:15px;height:15px;padding:0!important;border-radius:5px;display:grid;place-items:center;background-color:var(--surface2)!important;color:var(--pri)}
+.add-tbl .geser .btn .ic{width:12px;height:12px;stroke-width:2.6}
+.add-tbl .geser .btn:first-child .ic{transform:rotate(180deg)}
+.add-tbl .geser .btn[disabled]{opacity:.3}
+.add-tbl tr.pindah td{animation:pindahKilat 1s ease}
+@keyframes pindahKilat{0%{background:color-mix(in srgb,var(--pri) 30%,transparent)}100%{background:transparent}}
 </style>
 </head>
 <body>
@@ -7619,7 +7628,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '142', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '143', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -11832,10 +11841,13 @@ async function addSiltapBaris(th, riw) {
   const ap = ((await call('list', { entity: 'aparat', limit: 500 })).rows || []).filter(x => SILTAP_JAB(x.jabatan));
   const kunci = new Map(), tambah = (k, urut) => { if (k && !kunci.has(k)) kunci.set(k, urut); };
   tambah('KEPALA DESA', 0); tambah('SEKRETARIS DESA', 1);
-  ap.forEach(a => tambah(jabKunci(a.jabatan), Number(a.no_urut) || 50));
+  const kDusun = (OPT.dusun || []).map(d => 'KASUN ' + String(d).replace(/^DUSUN\s+/i, '').toUpperCase());
+  ap.forEach(a => { const k = jabKunci(a.jabatan), di = kDusun.indexOf(k); tambah(k, di >= 0 ? 100 + di : Number(a.no_urut) || 50); });
   lr.filter(r => SILTAP_JAB(r.jabatan)).forEach((r, i) => tambah(jabKunci(r.jabatan), 60 + i));
-  (OPT.dusun || []).forEach((d, i) => tambah('KASUN ' + String(d).replace(/^DUSUN\s+/i, '').toUpperCase(), 80 + i));
-  return Array.from(kunci.entries()).sort((a, b) => addUrutJab(a[0]) - addUrutJab(b[0]) || a[1] - b[1]).map(([k]) => {
+  kDusun.forEach((k, i) => tambah(k, 100 + i));
+  /* urutan bulan lalu (yang sudah diatur pengguna) didahulukan */
+  const posLalu = k => { const i = lr.findIndex(r => jabKunci(r.jabatan) === k); return i < 0 ? 999 : i; };
+  return Array.from(kunci.entries()).sort((a, b) => (lr.length ? posLalu(a[0]) - posLalu(b[0]) : 0) || addUrutJab(a[0]) - addUrutJab(b[0]) || a[1] - b[1]).map(([k]) => {
     const h = ap.find(a => apAktif(a) && jabKunci(a.jabatan) === k), lama = ap.filter(a => !apAktif(a) && jabKunci(a.jabatan) === k).sort((a, b) => String(b.tgl_sk_henti || '').localeCompare(String(a.tgl_sk_henti || '')))[0];
     const prev = lr.find(r => jabKunci(r.jabatan) === k);
     const siltap = (prev && Number(prev.siltap)) || addSiltapAwal(k);
@@ -11939,13 +11951,19 @@ VIEWS.addajued = async (p, main, alive) => {
       ${jenis === 'DUSUN' ? `<div class="f"><label>Periode (bulan)</label><input id="adP" value="${esc(x.periode || '')}" placeholder="mis. Juni - Juli"></div><div class="f"><label>Tahap ke</label><input id="adU" inputmode="numeric" value="${esc(x.urut || '')}"></div>` : ''}
       <div class="f"><label>Status</label><select id="adS">${['Draf', 'Diajukan', 'Cair'].map(s => `<option${(x.status || 'Draf') === s ? ' selected' : ''}>${s}</option>`).join('')}</select></div></div></div>
       <div class="tbl-wrap ttw add-wrap"><table class="tbl add-tbl ttema${jenis === 'SILTAP' ? ' add-sil' : ''}"><thead><tr><th>No</th>${kol.map(k => `<th${k[2] ? ' class="r"' : ''}>${k[1]}</th>`).join('')}${jenis === 'DUSUN' ? '<th>S.d. lalu</th><th>Sisa</th>' : ''}${w ? '<th></th>' : ''}</tr></thead><tbody>
-      ${rows.map((r, i) => `<tr data-i="${i}"><td>${i + 1}</td>${kol.map(k => k[0] === '_tf' ? `<td class="r tf">${addRp((Number(r.siltap) || 0) - (Number(r.bpjs) || 0))}</td>` : k[0] === '_jn' ? `<td class="jn">${w ? `<input data-k="jabatan" value="${esc(r.jabatan || '')}" placeholder="Jabatan"><input data-k="nama" value="${esc(r.nama || '')}" placeholder="Nama">` : `<small>${esc(r.jabatan || '')}</small><b>${esc(r.nama || '–')}</b>`}</td>` : `<td${k[2] ? ' class="r"' : ''}>${w && !k[3] ? (k[0] === 'uraian' || k[0] === 'lokasi' ? `<textarea data-k="${k[0]}" rows="2">${esc(r[k[0]] || '')}</textarea>` : `<input data-k="${k[0]}" ${k[2] ? 'inputmode="numeric"' : ''} value="${esc(k[2] ? addRp(r[k[0]]) : r[k[0]] || '')}">`) : esc(k[2] ? addRp(r[k[0]]) : r[k[0]] || '')}</td>`).join('')}${jenis === 'DUSUN' ? `<td class="r">${addRp(laluPer[r.uraian] || 0)}</td><td class="r">${addRp((Number(r.pagu) || 0) - (laluPer[r.uraian] || 0) - (Number(r.diajukan) || 0))}</td>` : ''}${w ? `<td><button class="btn sm danger trash3d" data-del="${i}" aria-label="Hapus baris" title="Hapus baris">${ic('trash')}</button></td>` : ''}</tr>`).join('')}</tbody></table></div>
+      ${rows.map((r, i) => `<tr data-i="${i}"><td>${i + 1}</td>${kol.map(k => k[0] === '_tf' ? `<td class="r tf">${addRp((Number(r.siltap) || 0) - (Number(r.bpjs) || 0))}</td>` : k[0] === '_jn' ? `<td class="jn">${w ? `<input data-k="jabatan" value="${esc(r.jabatan || '')}" placeholder="Jabatan"><input data-k="nama" value="${esc(r.nama || '')}" placeholder="Nama">` : `<small>${esc(r.jabatan || '')}</small><b>${esc(r.nama || '–')}</b>`}</td>` : `<td${k[2] ? ' class="r"' : ''}>${w && !k[3] ? (k[0] === 'uraian' || k[0] === 'lokasi' ? `<textarea data-k="${k[0]}" rows="2">${esc(r[k[0]] || '')}</textarea>` : `<input data-k="${k[0]}" ${k[2] ? 'inputmode="numeric"' : ''} value="${esc(k[2] ? addRp(r[k[0]]) : r[k[0]] || '')}">`) : esc(k[2] ? addRp(r[k[0]]) : r[k[0]] || '')}</td>`).join('')}${jenis === 'DUSUN' ? `<td class="r">${addRp(laluPer[r.uraian] || 0)}</td><td class="r">${addRp((Number(r.pagu) || 0) - (laluPer[r.uraian] || 0) - (Number(r.diajukan) || 0))}</td>` : ''}${w ? `<td class="rw-akt"><span class="geser"><button type="button" class="btn sm" data-mv="${i}" data-d="-1" title="Geser ke atas" aria-label="Geser ke atas" ${i ? '' : 'disabled'}>${ic('down')}</button><button type="button" class="btn sm" data-mv="${i}" data-d="1" title="Geser ke bawah" aria-label="Geser ke bawah" ${i < rows.length - 1 ? '' : 'disabled'}>${ic('down')}</button></span><button class="btn sm danger trash3d" data-del="${i}" aria-label="Hapus baris" title="Hapus baris">${ic('trash')}</button></td>` : ''}</tr>`).join('')}</tbody></table></div>
       <div class="card"><dl class="dl">${jenis === 'SILTAP' ? `<div><dt>Jumlah Siltap</dt><dd><b>Rp ${addRp(tot)}</b></dd></div><div><dt>Potongan BPJS</dt><dd>Rp ${addRp(bp)}</dd></div><div><dt>Ditransfer</dt><dd>Rp ${addRp(tot - bp)}</dd></div>` : `<div><dt>Diajukan</dt><dd><b>Rp ${addRp(tot)}</b></dd></div>`}<div><dt>Penyaluran s.d. lalu</dt><dd>Rp ${addRp(lalu)}</dd></div><div><dt>Sisa pagu</dt><dd>Rp ${addRp(mNum(jenis === 'SILTAP' ? pg && pg.pagu_siltap : pg && pg.pagu_dusun) - lalu - tot)}</dd></div><div class="w"><dt>Terbilang</dt><dd>${esc(addTb(tot))}</dd></div></dl></div>
       ${pg ? '' : '<div class="err">Pagu ADD tahun ini belum diisi. Isi dulu di halaman Pengajuan ADD agar rekap dan surat lengkap.</div>'}
       <div class="btns">${w ? `<button class="btn sm" id="adBaris">${ic('plus')}Baris</button><button class="btn pri" id="adSimpan">${ic('check')}Simpan</button>` : ''}<button class="btn" id="adCetak">${ic('print')}Cetak berkas</button>${w && x.id ? `<button class="btn danger" id="adHapus">${ic('trash')}Hapus</button>` : ''}</div></div>`;
     const baca = () => { $$('tr[data-i]', main).forEach(tr => { const r = rows[Number(tr.dataset.i)]; $$('[data-k]', tr).forEach(el => { const k = kol.find(z => z[0] === el.dataset.k); r[el.dataset.k] = k && k[2] ? (Number(String(el.value).replace(/[^\d-]/g, '')) || 0) : el.value.trim(); }); }); ['T:tanggal', 'N:nomor', 'P:periode', 'U:urut', 'S:status'].forEach(s => { const [a, k] = s.split(':'); const el = $('#ad' + a, main); if (el) x[k] = el.value.trim(); }); };
     main.querySelector('.add-tbl').addEventListener('change', ev => { if (gambarUlang) return; gambarUlang = true; try { baca(); siltapRapi(); tulis(); } finally { gambarUlang = false; } });
     $$('[data-del]', main).forEach(b => b.onclick = () => { baca(); rows.splice(Number(b.dataset.del), 1); tulis(); });
+    /* geser baris naik/turun: urutan tersimpan dan dipakai lagi bulan berikutnya */
+    $$('[data-mv]', main).forEach(b => b.onclick = () => {
+      baca(); const i = Number(b.dataset.mv), j = i + Number(b.dataset.d); if (j < 0 || j >= rows.length) return;
+      [rows[i], rows[j]] = [rows[j], rows[i]]; tulis();
+      const tr = main.querySelector(`tr[data-i="${j}"]`); if (tr) { tr.classList.add('pindah'); tr.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+    });
     if ($('#adBaris', main)) $('#adBaris', main).onclick = () => { baca(); rows.push(jenis === 'SILTAP' ? { jabatan: '', nama: '', nik: '', siltap: 0, bpjs: 0, ket: '' } : { uraian: '', pagu: 0, diajukan: 0, lokasi: '' }); tulis(); };
     const simpan = async () => {
       baca(); siltapRapi(); if (jenis === 'DUSUN' && !x.periode) throw new Error('Isi periode bulan dana dusun.');
