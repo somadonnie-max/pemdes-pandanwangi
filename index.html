@@ -1374,10 +1374,12 @@ const UI = {
     fields: [F('no_urut', 'No. Urut', 'number'), F('nama', 'Nama Lengkap', 'text', { req: 1 }), F('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1, nikfill: 1, hint: 'Ketik 16 digit: data dari Data Penduduk terisi otomatis' }), F('jabatan', 'Jabatan', 'text', { req: 1, dd: () => jabDaftar(), hint: 'Ketuk untuk memilih. Bila mengisi kekosongan jabatan, pilih yang berawalan "Plt."' }), F('jabatan_tambahan', 'Jabatan Tambahan (satu per baris)', 'textarea', { wide: 1, rows: 2 }), F('niap', 'NIAP'), F('nip', 'NIP / NRPDes', 'text', { mono: 1 }),
       F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk2 }), F('tempat_lahir', 'Tempat Lahir'), F('tgl_lahir', 'Tanggal Lahir', 'date'), F('alamat', 'Alamat', 'text', { wide: 1 }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }), F('agama', 'Agama', 'select', { opt: OPT.agama2 }), F('pangkat', 'Pangkat/Golongan'),
       F('pendidikan', 'Pendidikan Terakhir', 'select', { opt: OPT.pendidikan2 }), F('no_sk_angkat', 'Nomor SK Pengangkatan'), F('tgl_sk_angkat', 'Tanggal SK Pengangkatan', 'date'),
-      F('no_sk_henti', 'Nomor SK Pemberhentian'), F('tgl_sk_henti', 'Tanggal SK Pemberhentian', 'date'), F('email', 'Email', 'email'), F('wa', 'Nomor WhatsApp', 'tel'), F('ket', 'Keterangan'),
+      F('status_jab', 'Status', 'select', { opt: ['Aktif', 'Berhenti', 'Pensiun', 'Meninggal'], def: 'Aktif', hint: 'Perangkat terdahulu tetap disimpan dengan status Berhenti / Pensiun / Meninggal' }),
+      F('no_sk_henti', 'Nomor SK Pemberhentian'), F('tgl_sk_henti', 'Tanggal SK Pemberhentian / Tanggal Wafat', 'date'), F('email', 'Email', 'email'), F('wa', 'Nomor WhatsApp', 'tel'), F('ket', 'Keterangan'),
       F('foto_id', 'Foto', 'file', { img: 1 }), F('dok_sk_id', 'Dokumen SK', 'file')],
     sort: 'no_urut',
-    row: r => ({ t: r.nama, s: [r.jabatan].concat(jabTambah(r)).join(' · '), img: r.foto_id, av: initials(r.nama), r: r.no_urut ? '#' + r.no_urut : '' }),
+    chips: { k: 'status_jab', opt: ['Aktif', 'Berhenti', 'Pensiun', 'Meninggal'] },
+    row: r => ({ t: r.nama, s: [r.jabatan].concat(jabTambah(r)).join(' · '), img: r.foto_id, av: initials(r.nama), r: r.no_urut ? '#' + r.no_urut : '', pill: apAktif(r) ? '' : `<span class="pill">${esc(r.status_jab && r.status_jab !== 'Aktif' ? r.status_jab : 'berhenti')}</span>` }),
     print: {
       title: 'BUKU APARAT PEMERINTAH DESA', land: 1, cols: [['Nama', 'nama'], ['NIAP', 'niap'], ['NIP/NRPDes', 'nip'], ['L/P', r => (r.jk || '').slice(0, 1)], ['Tempat & Tgl Lahir', r => (r.tempat_lahir || '') + ', ' + fDate(r.tgl_lahir)], ['Agama', 'agama'], ['Pangkat', 'pangkat'], ['Jabatan', 'jabatan'], ['Pendidikan', 'pendidikan'],
         ['SK Pengangkatan', r => (r.no_sk_angkat || '') + '<br>' + fDate(r.tgl_sk_angkat)], ['SK Pemberhentian', r => (r.no_sk_henti || '') + '<br>' + fDate(r.tgl_sk_henti)], ['Ket', 'ket']]
@@ -1983,8 +1985,8 @@ const can = p => !p || p === '*' || (S.user && (S.user.admin || (p !== 'admin' &
 /* Hak per menu: 'r:<menu>' melihat, 'w:<menu>' melihat & mengubah (daftar menu dari server) */
 const menuOf = e => UI[e] && UI[e].m || (/^(rkp_|ref_|rpjm_)/.test(e) ? 'rkp' : { kegiatan_berkas: 'kegiatan', pembangunan_titik: 'pembangunan', petugas_jabatan: 'petugas', keu_rek: 'keu_anggaran', keu_spp: 'keu_penatausahaan', keu_trans: 'keu_penatausahaan', add_pagu: 'add', add_pengajuan: 'add', frc_bukti: 'frc', frc_lapor: 'frc' }[e] || e);
 const isMenu = m => (S.perms || []).some(p => p.menu && p.k === m);
-const canRead = e => isMenu(menuOf(e)) ? can('r:' + menuOf(e)) : can(UI[e].read || '*');
-const canWrite = e => (UI[e] && UI[e].rkp && S.rkpKunci && S.rkpBuka !== S.rkpYear) ? false : isMenu(menuOf(e)) ? can('w:' + menuOf(e)) : can(UI[e].write || UI[e].perm);
+const canRead = e => isMenu(menuOf(e)) ? can('r:' + menuOf(e)) : UI[e] ? can(UI[e].read || '*') : can('r:' + menuOf(e));
+const canWrite = e => (UI[e] && UI[e].rkp && S.rkpKunci && S.rkpBuka !== S.rkpYear) ? false : isMenu(menuOf(e)) ? can('w:' + menuOf(e)) : UI[e] ? can(UI[e].write || UI[e].perm) : can('w:' + menuOf(e));
 
 /* =====================================================================
    RANGKA TAMPILAN
@@ -3769,12 +3771,14 @@ async function renderDetail(e, x, el, full) {
   if (e === 'ntcr') ntcrExtra(x, xx);
   if (e === 'penduduk') S.pendCache = Object.assign(S.pendCache || {}, { [x.id]: x });
 }
+/* perangkat masih menjabat: status bukan Berhenti/Pensiun/Meninggal dan belum lewat tanggal SK pemberhentian */
+const apAktif = x => !!x && !/berhenti|pensiun|meninggal/i.test(x.status_jab || '') && !(x.tgl_sk_henti && String(x.tgl_sk_henti) <= isoToday());
 /* ---- Pejabat penandatangan: diambil dari data Aparatur Desa ---- */
 const PEJ_KEY = { kades: ['nama_kades', 'nip_kades'], sekdes: ['nama_sekdes', 'nip_sekdes'], bendahara: ['nama_bendahara', 'nip_bendahara'], pengurus: ['nama_pengurus_aset', 'nip_pengurus_aset'] };
 async function muatPejabat(force) {
   if (S.pej && !force) return S.pej;
   const r = await call('list', { entity: 'aparat', limit: 300 });
-  const L = r.rows.filter(x => !x.tgl_sk_henti || String(x.tgl_sk_henti) > isoToday());
+  const L = r.rows.filter(apAktif);
   const nip = x => { const n = String((x && x.nip) || '').trim(); return /\d{6,}/.test(n.replace(/\s/g, '')) ? n : ''; };
   const tamb = re => L.find(x => jabTambah(x).some(j => re.test(j))), jab = re => L.find(x => re.test(x.jabatan || ''));
   const o = (x, asal) => x ? { nama: x.nama, nip: nip(x), jabatan: x.jabatan || '', asal, id: x.id } : null;
@@ -6031,7 +6035,7 @@ async function cetakKuitansi(id) {
   P.daerah = mNum(x.pajak_daerah);
   const pot = Object.values(P).reduce((s, n) => s + n, 0), netto = bruto - pot;
   let bend = '';
-  try { const ap = (await call('list', { entity: 'aparat', limit: 200 })).rows; bend = (ap.find(r => /bendahara|kaur keuangan/i.test(r.jabatan || '')) || {}).nama || ''; } catch (er) { }
+  try { const ap = (await call('list', { entity: 'aparat', limit: 200 })).rows; bend = (ap.filter(apAktif).find(r => /bendahara|kaur keuangan|kepala urusan keuangan/i.test(r.jabatan || '')) || {}).nama || ''; } catch (er) { }
   const s = S.set, L = [['PPN', P.ppn], ['PPh Pasal 21', P.pph21], ['PPh Pasal 22', P.pph22], ['PPh Pasal 23', P.pph23], ['PPh Final Pasal 4 ayat (2)', P.pph4], ['Pajak Daerah', P.daerah]].filter(r => r[1]);
   const sat = n => terbilang(Math.floor(n)).replace(/^\s+/, '') + ' rupiah' + (Math.round(n % 1 * 100) ? ' ' + terbilang(Math.round(n % 1 * 100)) + ' sen' : '');
   const kol = (j, n) => `<div style="text-align:center;flex:1;min-width:120px">${j}<div class="sp"></div><u>${esc(n || '..............................')}</u></div>`;
@@ -7615,7 +7619,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '141', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '142', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -8500,7 +8504,7 @@ async function nomorOtomatis(e, val) {
 async function namaJabatan(re) {
   S.jabCache = S.jabCache || {};
   if (S.jabCache[re]) return S.jabCache[re];
-  try { const r = await call('list', { entity: 'aparat', limit: 100 }); const k = r.rows.find(x => new RegExp(re, 'i').test(x.jabatan || '')); S.jabCache[re] = k ? k.nama : ''; } catch (x) { S.jabCache[re] = ''; }
+  try { const r = await call('list', { entity: 'aparat', limit: 100 }); const k = r.rows.filter(apAktif).find(x => new RegExp(re, 'i').test(x.jabatan || '')); S.jabCache[re] = k ? k.nama : ''; } catch (x) { S.jabCache[re] = ''; }
   return S.jabCache[re];
 }
 async function petaNaskah(e, r) {
@@ -8823,7 +8827,7 @@ async function suratTemplate(jenis) {
 }
 async function namaKades() {
   if (S.kades != null) return S.kades;
-  try { const r = await call('list', { entity: 'aparat', q: 'kepala desa', limit: 50 }); const k = r.rows.find(x => /^\s*kepala desa\s*$/i.test(x.jabatan || '')); S.kades = k ? k.nama : ''; }
+  try { const r = await call('list', { entity: 'aparat', q: 'kepala desa', limit: 50 }); const k = r.rows.filter(apAktif).find(x => /^\s*kepala desa\s*$/i.test(x.jabatan || '')); S.kades = k ? k.nama : ''; }
   catch (x) { S.kades = ''; }
   return S.kades;
 }
@@ -10995,7 +10999,7 @@ VIEWS.rabproyek = async (p, main, alive) => {
   S.vh.rbBastCetak = async t => { try { const b = await call('get', { entity: 'bast', id: t.dataset.id }); printDocs('BAST ' + pr.nama, rabBastDok(pr, b), 'bast'); } catch (x) { toast(x.message, 1); } };
 };
 function confirm2(t, msg) { if (t.dataset.ok === '1') { t.dataset.ok = ''; return true; } t.dataset.ok = '1'; const old = t.innerHTML; t.innerHTML = ic('check') + 'Tekan lagi untuk lanjut'; toast(msg); setTimeout(() => { if (t.dataset.ok === '1') { t.dataset.ok = ''; t.innerHTML = old; } }, 6000); return false; }
-async function peopleList() { try { const r = await call('list', { entity: 'aparat', limit: 200 }); return r.rows || []; } catch (x) { return []; } }
+async function peopleList() { try { const r = await call('list', { entity: 'aparat', limit: 200 }); return (r.rows || []).filter(apAktif); } catch (x) { return []; } }
 /* RAB yang sudah disahkan dibaca dari salinan tersimpan (harga terkunci) */
 function rabDariSimpan(pr, M) { let items = [], v = {}; try { items = JSON.parse(pr.items || '[]'); v = JSON.parse(pr.vars || '{}'); } catch (x) { } if (!items.length) return rabHitung(pr, M); return { items, total: items.reduce((s, it) => s + rabNum(it.jumlah), 0), v, bu: rabNum(pr.bu_dipakai), tpl: RAB_TPL[pr.jenis_proyek] }; }
 /* ---------- bundel RAB (HTML siap cetak / PDF) ---------- */
@@ -11781,7 +11785,10 @@ const ADD_JNS = { SILTAP: 'ADD Siltap', DUSUN: 'ADD Non Siltap (Dana Dusun)' };
 const addRp = n => Number(Math.round(Number(n) || 0)).toLocaleString('id-ID');
 const addTb = n => { const t = terbilang(Math.round(Number(n) || 0)).replace(/^\s+/, ''); return t ? t.charAt(0).toUpperCase() + t.slice(1) + ' Rupiah' : 'Nol Rupiah'; };
 const addJ = s => { try { const a = JSON.parse(s || '[]'); return Array.isArray(a) ? a : []; } catch (x) { return []; } };
-const addUrutJab = j => { const s = String(j || '').toLowerCase(); return /kepala desa/.test(s) ? 0 : /sekretaris/.test(s) ? 1 : /kaur/.test(s) ? 2 : /kasi/.test(s) ? 3 : /kasun|kepala dusun/.test(s) ? 4 : 5; };
+const addUrutJab = j => { const s = String(j || '').toLowerCase(); return /^kepala desa/.test(s) ? 0 : /sekretaris desa/.test(s) ? 1 : /kaur|kepala urusan/.test(s) ? 2 : /kasi|kepala seksi/.test(s) ? 3 : /kasun|kepala dusun/.test(s) ? 4 : 5; };
+/* yang menerima Siltap: Kepala Desa, Sekretaris Desa, semua Kaur, Kasi & Kasun */
+const SILTAP_JAB = j => addUrutJab(j) < 5;
+const jabKunci = j => fmtJabatan(j, 'us').replace(/\s+/g, ' ').trim();
 const addSiltapAwal = j => /kepala desa/i.test(j) ? 3500000 : /sekretaris/i.test(j) ? 2402400 : 2184000;
 /* ---- format nama & jabatan ----
    nama: 'u' UPPER tanpa gelar, 'p' Proper tanpa gelar, 'ug' UPPER + gelar (gelar tetap seperti isian), 'pg' Proper + gelar
@@ -11796,13 +11803,13 @@ function fmtNama(n, m) {
 }
 const JAB_SINGKAT = [[/\bkepala urusan\b/ig, 'Kaur'], [/\bkepala seksi\b/ig, 'Kasi'], [/\bkepala dusun\b/ig, 'Kasun'], [/\btata usaha\b/ig, 'T.U'], [/\bkesejahteraan( rakyat)?\b/ig, 'Kesra']];
 function fmtJabatan(j, m) {
-  let t = String(j || '').replace(/\s+/g, ' ').trim();
+  let t = String(j || '').replace(/\s*&\s*/g, ' dan ').replace(/\s+/g, ' ').trim();
   if (/s$/.test(m || 'p')) JAB_SINGKAT.forEach(([re, v]) => { t = t.replace(re, v); });
   return /^u/.test(m || 'p') ? t.toUpperCase() : judulKata(t).replace(/\bT\.u\b/g, 'T.U').replace(/\b(Dan|Di|Ke|Dari|Yang)\b/g, w => w.toLowerCase());
 }
 /* potongan BPJS bawaan (bisa diubah di tabel): Kepala Desa 35.000, Sekdes & perangkat 25.783; jabatan kosong 0 */
 const ADD_BPJS_KADES = 35000, ADD_BPJS_PERANGKAT = 25783;
-const addBpjsAwal = (j, s, nama) => nama === '' ? 0 : /kepala desa/i.test(j || '') && !/sekretaris/i.test(j || '') ? ADD_BPJS_KADES : ADD_BPJS_PERANGKAT;
+const addBpjsAwal = (j, s, nama) => !String(nama == null ? 'x' : nama).trim() ? 0 : addUrutJab(j) === 0 ? ADD_BPJS_KADES : ADD_BPJS_PERANGKAT;
 async function addPagu(th) {
   const r = await call('list', { entity: 'add_pagu', filters: { tahun: String(th) }, limit: 1 });
   return (r.rows || [])[0] || null;
@@ -11821,14 +11828,20 @@ async function addDariApbdes(th) {
   return { add, sil, keg: Object.values(keg).filter(k => k.pagu > 0) };
 }
 async function addSiltapBaris(th, riw) {
-  const lalu = riw.filter(x => x.jenis === 'SILTAP').slice(-1)[0];
-  const ap = ((await call('list', { entity: 'aparat', limit: 300 })).rows || []).filter(x => !x.tgl_sk_henti || String(x.tgl_sk_henti) > isoToday());
-  const cocok = j => ap.find(x => String(x.jabatan || '').toLowerCase().replace(/\s+/g, ' ').trim() === String(j || '').toLowerCase().replace(/\s+/g, ' ').trim());
-  if (lalu) return addJ(lalu.rows).map(b => { const a = cocok(b.jabatan); return Object.assign({}, b, a ? { nama: a.nama, nik: a.nik || b.nik, hp: a.wa || b.hp, ket: /kosong|meninggal|berhenti/i.test(b.ket || '') ? '' : b.ket } : {}); });
-  const rows = ap.filter(x => addUrutJab(x.jabatan) < 5).sort((a, b) => addUrutJab(a.jabatan) - addUrutJab(b.jabatan) || (Number(a.no_urut) || 99) - (Number(b.no_urut) || 99))
-    .map(a => { const s = addSiltapAwal(a.jabatan); return { jabatan: a.jabatan, nama: a.nama, nik: a.nik || '', hp: a.wa || '', siltap: s, bpjs: addBpjsAwal(a.jabatan, s, a.nama || ''), ket: '' }; });
-  OPT.dusun.forEach(d => { const j = 'Kasun ' + judulKata(d.replace(/^DUSUN /, '')); if (!rows.some(r => String(r.jabatan).toLowerCase().indexOf(d.replace(/^DUSUN /, '').toLowerCase()) >= 0)) rows.push({ jabatan: j, nama: '', nik: '', hp: '', siltap: 2184000, bpjs: 0, ket: 'KOSONG' }); });
-  return rows;
+  const lalu = riw.filter(x => x.jenis === 'SILTAP').slice(-1)[0], lr = lalu ? addJ(lalu.rows) : [];
+  const ap = ((await call('list', { entity: 'aparat', limit: 500 })).rows || []).filter(x => SILTAP_JAB(x.jabatan));
+  const kunci = new Map(), tambah = (k, urut) => { if (k && !kunci.has(k)) kunci.set(k, urut); };
+  tambah('KEPALA DESA', 0); tambah('SEKRETARIS DESA', 1);
+  ap.forEach(a => tambah(jabKunci(a.jabatan), Number(a.no_urut) || 50));
+  lr.filter(r => SILTAP_JAB(r.jabatan)).forEach((r, i) => tambah(jabKunci(r.jabatan), 60 + i));
+  (OPT.dusun || []).forEach((d, i) => tambah('KASUN ' + String(d).replace(/^DUSUN\s+/i, '').toUpperCase(), 80 + i));
+  return Array.from(kunci.entries()).sort((a, b) => addUrutJab(a[0]) - addUrutJab(b[0]) || a[1] - b[1]).map(([k]) => {
+    const h = ap.find(a => apAktif(a) && jabKunci(a.jabatan) === k), lama = ap.filter(a => !apAktif(a) && jabKunci(a.jabatan) === k).sort((a, b) => String(b.tgl_sk_henti || '').localeCompare(String(a.tgl_sk_henti || '')))[0];
+    const prev = lr.find(r => jabKunci(r.jabatan) === k);
+    const siltap = (prev && Number(prev.siltap)) || addSiltapAwal(k);
+    return { jabatan: k, nama: h ? fmtNama(h.nama, 'u') : '', nik: h && h.nik && h.nik.indexOf('•') < 0 ? h.nik : '', siltap, bpjs: h ? addBpjsAwal(k, siltap, h.nama) : 0,
+      ket: h ? '' : lama && /meninggal|pensiun|berhenti/i.test(lama.status_jab || '') ? String(lama.status_jab).toUpperCase() : 'KOSONG' };
+  });
 }
 const addTotal = (jenis, rows) => jenis === 'SILTAP' ? rows.reduce((t, r) => t + (Number(r.siltap) || 0), 0) : rows.reduce((t, r) => t + (Number(r.diajukan) || 0), 0);
 const addLabel = x => x.jenis === 'SILTAP' ? 'Siltap ' + (BULAN[(Number(x.bulan) || 1) - 1] || '') + ' ' + x.tahun : 'Dana Dusun ' + (x.periode || '') + ' ' + x.tahun;
@@ -11908,15 +11921,16 @@ VIEWS.addajued = async (p, main, alive) => {
   const lalu = sebelum.reduce((t, z) => t + mNum(z.nominal), 0) + mNum(pg && (jenis === 'SILTAP' ? pg.awal_siltap : pg.awal_dusun));
   const laluPer = {}; if (jenis === 'DUSUN') sebelum.forEach(z => addJ(z.rows).forEach(r => { laluPer[r.uraian] = (laluPer[r.uraian] || 0) + (Number(r.diajukan) || 0); }));
   const kol = jenis === 'SILTAP'
-    ? [['_jn', 'Jabatan / Nama'], ['nik', 'NIK'], ['siltap', 'Siltap', 1], ['bpjs', 'Pot. BPJS', 1], ['_tf', 'Ditransfer', 1, 1], ['ket', 'Ket.']]
+    ? [['_jn', 'Jabatan / Nama'], ['nik', 'NIK'], ['siltap', 'Siltap', 1], ['bpjs', 'Pot. BPJS', 1, 1], ['_tf', 'Ditransfer', 1, 1], ['ket', 'Ket.']]
     : [['uraian', 'Uraian peruntukan'], ['pagu', 'Pagu', 1], ['diajukan', 'Diajukan', 1], ['lokasi', 'Lokasi / SK']];
   /* potongan BPJS = 1% dari siltap (otomatis) */
-  /* sisa v138 (BPJS dihitung 1%) dikembalikan ke nilai bawaan; selebihnya angka BPJS bebas diubah */
-  if (jenis === 'SILTAP') rows.forEach(r => {
-    const nm = String(r.nama || '').trim(), sv = Number(r.siltap) || 0, bp = Number(r.bpjs) || 0;
-    if (!nm && /kosong|meninggal|berhenti/i.test(r.ket || '')) return;
-    if (nm && bp && bp === Math.round(sv / 100) && !/^kepala desa$/i.test(String(r.jabatan || '').trim())) r.bpjs = ADD_BPJS_PERANGKAT;
-  });
+  /* Siltap: jabatan UPPER disingkat, nama UPPER tanpa gelar, BPJS otomatis (Kades 35.000, lainnya 25.783, kosong 0) */
+  const siltapRapi = () => { if (jenis === 'SILTAP') rows.forEach(r => {
+    r.jabatan = jabKunci(r.jabatan); r.nama = String(r.nama || '').trim() ? fmtNama(r.nama, 'u') : '';
+    if (!r.nama) { r.nik = ''; if (!(Number(r.siltap) > 0)) r.siltap = addSiltapAwal(r.jabatan); }
+    r.bpjs = addBpjsAwal(r.jabatan, r.siltap, r.nama);
+  }); };
+  siltapRapi();
   let gambarUlang = false;
   const tulis = () => {
     const tot = addTotal(jenis, rows), bp = rows.reduce((t, r) => t + (Number(r.bpjs) || 0), 0);
@@ -11929,12 +11943,12 @@ VIEWS.addajued = async (p, main, alive) => {
       <div class="card"><dl class="dl">${jenis === 'SILTAP' ? `<div><dt>Jumlah Siltap</dt><dd><b>Rp ${addRp(tot)}</b></dd></div><div><dt>Potongan BPJS</dt><dd>Rp ${addRp(bp)}</dd></div><div><dt>Ditransfer</dt><dd>Rp ${addRp(tot - bp)}</dd></div>` : `<div><dt>Diajukan</dt><dd><b>Rp ${addRp(tot)}</b></dd></div>`}<div><dt>Penyaluran s.d. lalu</dt><dd>Rp ${addRp(lalu)}</dd></div><div><dt>Sisa pagu</dt><dd>Rp ${addRp(mNum(jenis === 'SILTAP' ? pg && pg.pagu_siltap : pg && pg.pagu_dusun) - lalu - tot)}</dd></div><div class="w"><dt>Terbilang</dt><dd>${esc(addTb(tot))}</dd></div></dl></div>
       ${pg ? '' : '<div class="err">Pagu ADD tahun ini belum diisi. Isi dulu di halaman Pengajuan ADD agar rekap dan surat lengkap.</div>'}
       <div class="btns">${w ? `<button class="btn sm" id="adBaris">${ic('plus')}Baris</button><button class="btn pri" id="adSimpan">${ic('check')}Simpan</button>` : ''}<button class="btn" id="adCetak">${ic('print')}Cetak berkas</button>${w && x.id ? `<button class="btn danger" id="adHapus">${ic('trash')}Hapus</button>` : ''}</div></div>`;
-    const baca = () => { $$('tr[data-i]', main).forEach(tr => { const r = rows[Number(tr.dataset.i)]; $$('[data-k]', tr).forEach(el => { const k = kol.find(z => z[0] === el.dataset.k); r[el.dataset.k] = k && k[2] ? mNum(el.value) : el.value.trim(); }); }); ['T:tanggal', 'N:nomor', 'P:periode', 'U:urut', 'S:status'].forEach(s => { const [a, k] = s.split(':'); const el = $('#ad' + a, main); if (el) x[k] = el.value.trim(); }); };
-    main.querySelector('.add-tbl').addEventListener('change', ev => { if (gambarUlang) return; gambarUlang = true; try { baca(); if (jenis === 'SILTAP' && ev.target.dataset.k === 'nama') { const r = rows[Number(ev.target.closest('tr').dataset.i)]; if (r) r.bpjs = String(r.nama || '').trim() ? (Number(r.bpjs) || addBpjsAwal(r.jabatan, r.siltap, r.nama)) : 0; } tulis(); } finally { gambarUlang = false; } });
+    const baca = () => { $$('tr[data-i]', main).forEach(tr => { const r = rows[Number(tr.dataset.i)]; $$('[data-k]', tr).forEach(el => { const k = kol.find(z => z[0] === el.dataset.k); r[el.dataset.k] = k && k[2] ? (Number(String(el.value).replace(/[^\d-]/g, '')) || 0) : el.value.trim(); }); }); ['T:tanggal', 'N:nomor', 'P:periode', 'U:urut', 'S:status'].forEach(s => { const [a, k] = s.split(':'); const el = $('#ad' + a, main); if (el) x[k] = el.value.trim(); }); };
+    main.querySelector('.add-tbl').addEventListener('change', ev => { if (gambarUlang) return; gambarUlang = true; try { baca(); siltapRapi(); tulis(); } finally { gambarUlang = false; } });
     $$('[data-del]', main).forEach(b => b.onclick = () => { baca(); rows.splice(Number(b.dataset.del), 1); tulis(); });
     if ($('#adBaris', main)) $('#adBaris', main).onclick = () => { baca(); rows.push(jenis === 'SILTAP' ? { jabatan: '', nama: '', nik: '', siltap: 0, bpjs: 0, ket: '' } : { uraian: '', pagu: 0, diajukan: 0, lokasi: '' }); tulis(); };
     const simpan = async () => {
-      baca(); if (jenis === 'DUSUN' && !x.periode) throw new Error('Isi periode bulan dana dusun.');
+      baca(); siltapRapi(); if (jenis === 'DUSUN' && !x.periode) throw new Error('Isi periode bulan dana dusun.');
       const rec = { jenis, tahun: x.tahun, bulan: x.bulan || '', urut: x.urut || '', periode: x.periode || '', tanggal: x.tanggal, nomor: x.nomor || '', status: x.status || 'Draf', nominal: String(addTotal(jenis, rows)), rows: JSON.stringify(rows) };
       const r = await call('save', { entity: 'add_pengajuan', record: x.id ? Object.assign({ id: x.id }, rec) : rec }); Object.assign(x, rec, { id: (r && r.id) || x.id }); return x;
     };
