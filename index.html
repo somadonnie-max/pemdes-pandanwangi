@@ -7548,7 +7548,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '140', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '141', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -11701,7 +11701,26 @@ const addTb = n => { const t = terbilang(Math.round(Number(n) || 0)).replace(/^\
 const addJ = s => { try { const a = JSON.parse(s || '[]'); return Array.isArray(a) ? a : []; } catch (x) { return []; } };
 const addUrutJab = j => { const s = String(j || '').toLowerCase(); return /kepala desa/.test(s) ? 0 : /sekretaris/.test(s) ? 1 : /kaur/.test(s) ? 2 : /kasi/.test(s) ? 3 : /kasun|kepala dusun/.test(s) ? 4 : 5; };
 const addSiltapAwal = j => /kepala desa/i.test(j) ? 3500000 : /sekretaris/i.test(j) ? 2402400 : 2184000;
-const addBpjsAwal = (j, s) => Math.round((Number(s) || 0) / 100);   /* potongan BPJS = 1% siltap */
+/* ---- format nama & jabatan ----
+   nama: 'u' UPPER tanpa gelar, 'p' Proper tanpa gelar, 'ug' UPPER + gelar (gelar tetap seperti isian), 'pg' Proper + gelar
+   jabatan: 'u' UPPER, 'us' UPPER disingkat (Kaur/Kasi/Kasun), 'p' Proper, 'ps' Proper disingkat */
+function pisahGelar(n) {
+  const t = String(n || '').trim(), i = t.indexOf(',');
+  return i > 0 ? { nama: t.slice(0, i).trim(), gelar: t.slice(i + 1).trim() } : { nama: t, gelar: '' };
+}
+function fmtNama(n, m) {
+  const g = pisahGelar(n), dasar = /^u/.test(m || 'ug') ? g.nama.toUpperCase() : judulKata(g.nama);
+  return /g$/.test(m || 'ug') && g.gelar ? dasar + ', ' + g.gelar : dasar;
+}
+const JAB_SINGKAT = [[/\bkepala urusan\b/ig, 'Kaur'], [/\bkepala seksi\b/ig, 'Kasi'], [/\bkepala dusun\b/ig, 'Kasun'], [/\btata usaha\b/ig, 'T.U'], [/\bkesejahteraan( rakyat)?\b/ig, 'Kesra']];
+function fmtJabatan(j, m) {
+  let t = String(j || '').replace(/\s+/g, ' ').trim();
+  if (/s$/.test(m || 'p')) JAB_SINGKAT.forEach(([re, v]) => { t = t.replace(re, v); });
+  return /^u/.test(m || 'p') ? t.toUpperCase() : judulKata(t).replace(/\bT\.u\b/g, 'T.U').replace(/\b(Dan|Di|Ke|Dari|Yang)\b/g, w => w.toLowerCase());
+}
+/* potongan BPJS bawaan (bisa diubah di tabel): Kepala Desa 35.000, Sekdes & perangkat 25.783; jabatan kosong 0 */
+const ADD_BPJS_KADES = 35000, ADD_BPJS_PERANGKAT = 25783;
+const addBpjsAwal = (j, s, nama) => nama === '' ? 0 : /kepala desa/i.test(j || '') && !/sekretaris/i.test(j || '') ? ADD_BPJS_KADES : ADD_BPJS_PERANGKAT;
 async function addPagu(th) {
   const r = await call('list', { entity: 'add_pagu', filters: { tahun: String(th) }, limit: 1 });
   return (r.rows || [])[0] || null;
@@ -11725,7 +11744,7 @@ async function addSiltapBaris(th, riw) {
   const cocok = j => ap.find(x => String(x.jabatan || '').toLowerCase().replace(/\s+/g, ' ').trim() === String(j || '').toLowerCase().replace(/\s+/g, ' ').trim());
   if (lalu) return addJ(lalu.rows).map(b => { const a = cocok(b.jabatan); return Object.assign({}, b, a ? { nama: a.nama, nik: a.nik || b.nik, hp: a.wa || b.hp, ket: /kosong|meninggal|berhenti/i.test(b.ket || '') ? '' : b.ket } : {}); });
   const rows = ap.filter(x => addUrutJab(x.jabatan) < 5).sort((a, b) => addUrutJab(a.jabatan) - addUrutJab(b.jabatan) || (Number(a.no_urut) || 99) - (Number(b.no_urut) || 99))
-    .map(a => { const s = addSiltapAwal(a.jabatan); return { jabatan: a.jabatan, nama: a.nama, nik: a.nik || '', hp: a.wa || '', siltap: s, bpjs: addBpjsAwal(a.jabatan, s), ket: '' }; });
+    .map(a => { const s = addSiltapAwal(a.jabatan); return { jabatan: a.jabatan, nama: a.nama, nik: a.nik || '', hp: a.wa || '', siltap: s, bpjs: addBpjsAwal(a.jabatan, s, a.nama || ''), ket: '' }; });
   OPT.dusun.forEach(d => { const j = 'Kasun ' + judulKata(d.replace(/^DUSUN /, '')); if (!rows.some(r => String(r.jabatan).toLowerCase().indexOf(d.replace(/^DUSUN /, '').toLowerCase()) >= 0)) rows.push({ jabatan: j, nama: '', nik: '', hp: '', siltap: 2184000, bpjs: 0, ket: 'KOSONG' }); });
   return rows;
 }
@@ -11807,26 +11826,29 @@ VIEWS.addajued = async (p, main, alive) => {
   const lalu = sebelum.reduce((t, z) => t + mNum(z.nominal), 0) + mNum(pg && (jenis === 'SILTAP' ? pg.awal_siltap : pg.awal_dusun));
   const laluPer = {}; if (jenis === 'DUSUN') sebelum.forEach(z => addJ(z.rows).forEach(r => { laluPer[r.uraian] = (laluPer[r.uraian] || 0) + (Number(r.diajukan) || 0); }));
   const kol = jenis === 'SILTAP'
-    ? [['_jn', 'Jabatan / Nama'], ['nik', 'NIK'], ['siltap', 'Siltap', 1], ['bpjs', 'BPJS 1%', 1, 1], ['ket', 'Ket.']]
+    ? [['_jn', 'Jabatan / Nama'], ['nik', 'NIK'], ['siltap', 'Siltap', 1], ['bpjs', 'Pot. BPJS', 1], ['_tf', 'Ditransfer', 1, 1], ['ket', 'Ket.']]
     : [['uraian', 'Uraian peruntukan'], ['pagu', 'Pagu', 1], ['diajukan', 'Diajukan', 1], ['lokasi', 'Lokasi / SK']];
   /* potongan BPJS = 1% dari siltap (otomatis) */
-  const bpjsOtomatis = () => { if (jenis === 'SILTAP') rows.forEach(r => { r.bpjs = String(r.nama || '').trim() ? Math.round((Number(r.siltap) || 0) / 100) : 0; }); };
-  bpjsOtomatis();
+  /* sisa v138 (BPJS dihitung 1%) dikembalikan ke nilai bawaan; selebihnya angka BPJS bebas diubah */
+  if (jenis === 'SILTAP') rows.forEach(r => {
+    const nm = String(r.nama || '').trim(), sv = Number(r.siltap) || 0, bp = Number(r.bpjs) || 0;
+    if (!nm && /kosong|meninggal|berhenti/i.test(r.ket || '')) return;
+    if (nm && bp && bp === Math.round(sv / 100) && !/^kepala desa$/i.test(String(r.jabatan || '').trim())) r.bpjs = ADD_BPJS_PERANGKAT;
+  });
   let gambarUlang = false;
   const tulis = () => {
-    bpjsOtomatis();
     const tot = addTotal(jenis, rows), bp = rows.reduce((t, r) => t + (Number(r.bpjs) || 0), 0);
     main.innerHTML = `<div class="stack"><div class="card stack">
       <div class="form two"><div class="f"><label>Tanggal surat</label><input type="date" id="adT" value="${esc(x.tanggal || '')}"></div><div class="f"><label>Nomor surat</label><input id="adN" value="${esc(x.nomor || '')}" placeholder="400.10.2.4/…/427.85.01/${th}"></div>
       ${jenis === 'DUSUN' ? `<div class="f"><label>Periode (bulan)</label><input id="adP" value="${esc(x.periode || '')}" placeholder="mis. Juni - Juli"></div><div class="f"><label>Tahap ke</label><input id="adU" inputmode="numeric" value="${esc(x.urut || '')}"></div>` : ''}
       <div class="f"><label>Status</label><select id="adS">${['Draf', 'Diajukan', 'Cair'].map(s => `<option${(x.status || 'Draf') === s ? ' selected' : ''}>${s}</option>`).join('')}</select></div></div></div>
       <div class="tbl-wrap ttw add-wrap"><table class="tbl add-tbl ttema${jenis === 'SILTAP' ? ' add-sil' : ''}"><thead><tr><th>No</th>${kol.map(k => `<th${k[2] ? ' class="r"' : ''}>${k[1]}</th>`).join('')}${jenis === 'DUSUN' ? '<th>S.d. lalu</th><th>Sisa</th>' : ''}${w ? '<th></th>' : ''}</tr></thead><tbody>
-      ${rows.map((r, i) => `<tr data-i="${i}"><td>${i + 1}</td>${kol.map(k => k[0] === '_jn' ? `<td class="jn">${w ? `<input data-k="jabatan" value="${esc(r.jabatan || '')}" placeholder="Jabatan"><input data-k="nama" value="${esc(r.nama || '')}" placeholder="Nama">` : `<small>${esc(r.jabatan || '')}</small><b>${esc(r.nama || '–')}</b>`}</td>` : `<td${k[2] ? ' class="r"' : ''}>${w && !k[3] ? (k[0] === 'uraian' || k[0] === 'lokasi' ? `<textarea data-k="${k[0]}" rows="2">${esc(r[k[0]] || '')}</textarea>` : `<input data-k="${k[0]}" ${k[2] ? 'inputmode="numeric"' : ''} value="${esc(k[2] ? addRp(r[k[0]]) : r[k[0]] || '')}">`) : esc(k[2] ? addRp(r[k[0]]) : r[k[0]] || '')}</td>`).join('')}${jenis === 'DUSUN' ? `<td class="r">${addRp(laluPer[r.uraian] || 0)}</td><td class="r">${addRp((Number(r.pagu) || 0) - (laluPer[r.uraian] || 0) - (Number(r.diajukan) || 0))}</td>` : ''}${w ? `<td><button class="btn sm danger trash3d" data-del="${i}" aria-label="Hapus baris" title="Hapus baris">${ic('trash')}</button></td>` : ''}</tr>`).join('')}</tbody></table></div>
+      ${rows.map((r, i) => `<tr data-i="${i}"><td>${i + 1}</td>${kol.map(k => k[0] === '_tf' ? `<td class="r tf">${addRp((Number(r.siltap) || 0) - (Number(r.bpjs) || 0))}</td>` : k[0] === '_jn' ? `<td class="jn">${w ? `<input data-k="jabatan" value="${esc(r.jabatan || '')}" placeholder="Jabatan"><input data-k="nama" value="${esc(r.nama || '')}" placeholder="Nama">` : `<small>${esc(r.jabatan || '')}</small><b>${esc(r.nama || '–')}</b>`}</td>` : `<td${k[2] ? ' class="r"' : ''}>${w && !k[3] ? (k[0] === 'uraian' || k[0] === 'lokasi' ? `<textarea data-k="${k[0]}" rows="2">${esc(r[k[0]] || '')}</textarea>` : `<input data-k="${k[0]}" ${k[2] ? 'inputmode="numeric"' : ''} value="${esc(k[2] ? addRp(r[k[0]]) : r[k[0]] || '')}">`) : esc(k[2] ? addRp(r[k[0]]) : r[k[0]] || '')}</td>`).join('')}${jenis === 'DUSUN' ? `<td class="r">${addRp(laluPer[r.uraian] || 0)}</td><td class="r">${addRp((Number(r.pagu) || 0) - (laluPer[r.uraian] || 0) - (Number(r.diajukan) || 0))}</td>` : ''}${w ? `<td><button class="btn sm danger trash3d" data-del="${i}" aria-label="Hapus baris" title="Hapus baris">${ic('trash')}</button></td>` : ''}</tr>`).join('')}</tbody></table></div>
       <div class="card"><dl class="dl">${jenis === 'SILTAP' ? `<div><dt>Jumlah Siltap</dt><dd><b>Rp ${addRp(tot)}</b></dd></div><div><dt>Potongan BPJS</dt><dd>Rp ${addRp(bp)}</dd></div><div><dt>Ditransfer</dt><dd>Rp ${addRp(tot - bp)}</dd></div>` : `<div><dt>Diajukan</dt><dd><b>Rp ${addRp(tot)}</b></dd></div>`}<div><dt>Penyaluran s.d. lalu</dt><dd>Rp ${addRp(lalu)}</dd></div><div><dt>Sisa pagu</dt><dd>Rp ${addRp(mNum(jenis === 'SILTAP' ? pg && pg.pagu_siltap : pg && pg.pagu_dusun) - lalu - tot)}</dd></div><div class="w"><dt>Terbilang</dt><dd>${esc(addTb(tot))}</dd></div></dl></div>
       ${pg ? '' : '<div class="err">Pagu ADD tahun ini belum diisi. Isi dulu di halaman Pengajuan ADD agar rekap dan surat lengkap.</div>'}
       <div class="btns">${w ? `<button class="btn sm" id="adBaris">${ic('plus')}Baris</button><button class="btn pri" id="adSimpan">${ic('check')}Simpan</button>` : ''}<button class="btn" id="adCetak">${ic('print')}Cetak berkas</button>${w && x.id ? `<button class="btn danger" id="adHapus">${ic('trash')}Hapus</button>` : ''}</div></div>`;
     const baca = () => { $$('tr[data-i]', main).forEach(tr => { const r = rows[Number(tr.dataset.i)]; $$('[data-k]', tr).forEach(el => { const k = kol.find(z => z[0] === el.dataset.k); r[el.dataset.k] = k && k[2] ? mNum(el.value) : el.value.trim(); }); }); ['T:tanggal', 'N:nomor', 'P:periode', 'U:urut', 'S:status'].forEach(s => { const [a, k] = s.split(':'); const el = $('#ad' + a, main); if (el) x[k] = el.value.trim(); }); };
-    main.querySelector('.add-tbl').addEventListener('change', () => { if (gambarUlang) return; gambarUlang = true; try { baca(); tulis(); } finally { gambarUlang = false; } });
+    main.querySelector('.add-tbl').addEventListener('change', ev => { if (gambarUlang) return; gambarUlang = true; try { baca(); if (jenis === 'SILTAP' && ev.target.dataset.k === 'nama') { const r = rows[Number(ev.target.closest('tr').dataset.i)]; if (r) r.bpjs = String(r.nama || '').trim() ? (Number(r.bpjs) || addBpjsAwal(r.jabatan, r.siltap, r.nama)) : 0; } tulis(); } finally { gambarUlang = false; } });
     $$('[data-del]', main).forEach(b => b.onclick = () => { baca(); rows.splice(Number(b.dataset.del), 1); tulis(); });
     if ($('#adBaris', main)) $('#adBaris', main).onclick = () => { baca(); rows.push(jenis === 'SILTAP' ? { jabatan: '', nama: '', nik: '', siltap: 0, bpjs: 0, ket: '' } : { uraian: '', pagu: 0, diajukan: 0, lokasi: '' }); tulis(); };
     const simpan = async () => {
@@ -11869,9 +11891,10 @@ function addCetak(x, rows, pg, lalu, laluPer) {
   if (sil) {
     /* 3. lampiran siltap */
     pages.push(pageL(`<div style="text-align:center;font-weight:700">LAMPIRAN PENGAJUAN SILTAP BULAN ${esc(bln.toUpperCase())} ${esc(th)}<br>DESA ${esc(desa)} KECAMATAN ${esc(kec)}</div>
-      <table style="${T};margin-top:8px;font-size:9.5pt"><thead><tr><th style="${td}">No</th><th style="${td}">Jabatan</th><th style="${td}">Nama</th><th style="${td}">Siltap</th><th style="${td}">Potongan BPJS 1%</th><th style="${td}">Jumlah ADD yang Ditransfer</th><th style="${td}">NIK</th><th style="${td}">Keterangan</th></tr></thead>
-      <tbody>${rows.map((r, i) => `<tr><td style="${tdc}">${i + 1}</td><td style="${td}">${esc(String(r.jabatan || '').toUpperCase())}</td><td style="${td}">${esc(r.nama || '')}</td><td style="${tdr}">${addRp(r.siltap)}</td><td style="${tdr}">${r.bpjs ? addRp(r.bpjs) : ''}</td><td style="${tdr}">${addRp((Number(r.siltap) || 0) - (Number(r.bpjs) || 0))}</td><td style="${td}">${esc(r.nik || '')}</td><td style="${td}">${esc(r.ket || r.hp || '')}</td></tr>`).join('')}</tbody>
-      <tfoot><tr><td style="${td}" colspan="3"><b>JUMLAH</b></td><td style="${tdr}"><b>${addRp(tot)}</b></td><td style="${tdr}"><b>${addRp(bp)}</b></td><td style="${tdr}"><b>${addRp(tot - bp)}</b></td><td style="${td}" colspan="2"></td></tr></tfoot></table>${ttd()}`, 1));
+      <table style="${T};margin-top:8px;font-size:9.5pt"><thead><tr><th style="${td}">No</th><th style="${td}">Jabatan</th><th style="${td}">Nama</th><th style="${td}">Siltap</th><th style="${td}">Potongan BPJS 1 (%)</th><th style="${td}">Jumlah ADD yang Ditransfer</th><th style="${td}">NIK</th><th style="${td}">Keterangan</th></tr></thead>
+      <tbody>${rows.map((r, i) => `<tr><td style="${tdc}">${i + 1}</td><td style="${td}">${esc(fmtJabatan(r.jabatan, 'us'))}</td><td style="${td}">${esc(fmtNama(r.nama, 'u'))}</td><td style="${tdr}">${addRp(r.siltap)}</td><td style="${tdr}">${r.bpjs ? addRp(r.bpjs) : ''}</td><td style="${tdr}">${addRp((Number(r.siltap) || 0) - (Number(r.bpjs) || 0))}</td><td style="${td}">${esc(r.nik || '')}</td><td style="${td}">${esc(r.ket || r.hp || '')}</td></tr>`).join('')}</tbody>
+      <tfoot><tr><td style="${td}" colspan="3"><b>JUMLAH</b></td><td style="${tdr}"><b>${addRp(tot)}</b></td><td style="${tdr}"><b>${addRp(bp)}</b></td><td style="${tdr}"><b>${addRp(tot - bp)}</b></td><td style="${td}" colspan="2"></td></tr></tfoot></table>
+      ${(() => { const kd = rows.filter(r => /^kepala desa$/i.test(String(r.jabatan || '').trim())).reduce((t, r) => t + (Number(r.bpjs) || 0), 0); return `<table style="margin-top:10px;font-size:10pt"><tbody><tr><td colspan="3"><i>Keterangan</i></td></tr><tr><td style="width:120px">Kades</td><td>:</td><td style="text-align:right;width:110px">${addRp(kd)}</td></tr><tr><td>Perangkat Desa</td><td>:</td><td style="text-align:right;border-bottom:1px solid #000">${addRp(bp - kd)}</td></tr><tr><td></td><td></td><td style="text-align:right"><b>${addRp(bp)}</b></td></tr></tbody></table>`; })()}${ttd()}`, 1));
     /* 4. rekap penyaluran siltap */
     pages.push(pageL(`<div style="text-align:center;font-weight:700">REKAP PENYALURAN ADD SILTAP<br>DESA ${esc(desa)} KECAMATAN ${esc(kec)}<br>BULAN ${esc(bln.toUpperCase())} TAHUN ANGGARAN ${esc(th)}</div>
       <table style="${T};margin-top:10px;font-size:9.5pt"><thead><tr><th style="${td}" rowspan="2">Desa</th><th style="${td}" rowspan="2">Pagu ADD</th><th style="${td}" rowspan="2">Pagu Siltap</th><th style="${td}" rowspan="2">Penyaluran s.d. Bulan Lalu</th><th style="${td}" colspan="3">Penyaluran Saat Ini</th><th style="${td}" rowspan="2">No. Rekening</th><th style="${td}" rowspan="2">Sisa Pagu Siltap</th></tr><tr><th style="${td}">Siltap</th><th style="${td}">Pot. BPJS</th><th style="${td}">Jumlah Diterima</th></tr></thead>
