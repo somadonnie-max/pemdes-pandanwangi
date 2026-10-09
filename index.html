@@ -5290,8 +5290,10 @@ const TTD_SEBAGAI = ['Kepala Desa', 'a.n. Kepala Desa', 'Plt. Kepala Desa', 'Plh
 const VF_ST = { menunggu: ['Menunggu tanda tangan', 'warn'], sah: ['Sah', 'ok'], batal: ['Dibatalkan', 'bad'] };
 const vfPill = s => VF_ST[s] ? `<span class="pill ${VF_ST[s][1]}">${esc(VF_ST[s][0])}</span>` : '';
 const VERIF_URL = () => new URL('verifikasi/', location.href.split('#')[0].split('?')[0]).href;
-/** isi {{Kode Verifikasi}}: kode + alamat halaman verifikasi (alamat github.io tidak ditampilkan) */
-const kodeVerif = k => k ? k + (/github\.io$/.test(location.hostname) ? '' : ' / ' + VERIF_URL().replace(/\/$/, '')) : '';
+/** kode cek satu baris: kode + alamat halaman verifikasi (alamat github.io tidak ditampilkan) */
+const kodeCek = k => k ? k + (/github\.io$/.test(location.hostname) ? '' : ' / ' + VERIF_URL().replace(/\/$/, '')) : '';
+/** {{Kode Verifikasi}}: 2 baris (kosong bila cetak tanpa QR) — tulis sendirian di satu paragraf */
+const kodeVerif = k => k ? 'Pindai QR untuk memeriksa keaslian surat\nKode cek: ' + kodeCek(k) : '';
 /** penandatangan surat: bawaan Kepala Desa; bisa a.n./Plt./Plh. */
 function ttdInfo(reg) {
   const desa = judulKata(String((S.set && S.set.nama_desa) || ''));
@@ -5334,9 +5336,14 @@ function muatQR() {
 async function qrPng(url) {
   await muatQR();
   const q = window.qrcode(0, 'M'); q.addData(url); q.make();
-  const n = q.getModuleCount(), px = 8, tepi = 2, c = document.createElement('canvas');
+  /* QR + bingkai melengkung (bingkai ikut gambar, jadi cetak tanpa QR tidak menyisakan kotak) */
+  const n = q.getModuleCount(), px = 8, tepi = 4, c = document.createElement('canvas');
   c.width = c.height = (n + tepi * 2) * px;
-  const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.fillStyle = '#000';
+  const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+  { const lw = px * 0.45, o = lw / 2 + px * 0.5, w = c.width - o * 2, rr = px * 3.2;
+    g.strokeStyle = '#000'; g.lineWidth = lw; g.beginPath();
+    g.moveTo(o + rr, o); g.arcTo(o + w, o, o + w, o + w, rr); g.arcTo(o + w, o + w, o, o + w, rr); g.arcTo(o, o + w, o, o, rr); g.arcTo(o, o, o + w, o, rr); g.closePath(); g.stroke(); }
+  g.fillStyle = '#000';
   for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (q.isDark(y, x)) g.fillRect((x + tepi) * px, (y + tepi) * px, px, px);
   return new Promise((res, rej) => c.toBlob(b => b ? b.arrayBuffer().then(a => res(new Uint8Array(a))) : rej(new Error('Gagal membuat QR.')), 'image/png'));
 }
@@ -5362,7 +5369,7 @@ function docxQR(files, q) {
     if (!rf) { rf = { name: rn, data: enc.encode('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>') }; files.push(rf); }
     rf.data = enc.encode(dec.decode(rf.data).replace('</Relationships>', tag + '</Relationships>'));
   };
-  const cx = Math.round(2.1 * 360000);   // 2,1 cm (1,5 cm terlalu kecil untuk dipindai)
+  const cx = Math.round(2.5 * 360000);   // 2,5 cm termasuk bingkai melengkung (QR-nya sendiri ±2 cm; 1,5 cm terlalu kecil untuk dipindai)
   const P = 'http://schemas.openxmlformats.org/drawingml/2006/picture';
   const run = `<w:r><w:drawing><wp:inline xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${cx}" cy="${cx}"/><wp:docPr id="9901" name="QR Verifikasi"/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="${P}"><pic:pic xmlns:pic="${P}"><pic:nvPicPr><pic:cNvPr id="9901" name="qr_verifikasi.png"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip xmlns:r="${REL}" r:embed="rIdQrVerif"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cx}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>`;
   const relQr = `<Relationship Id="rIdQrVerif" Type="${REL}/image" Target="media/qr_verifikasi.png"/>`;
@@ -5379,7 +5386,7 @@ function docxQR(files, q) {
     /* 2) template tanpa {{QR}}: tempel di footer (footer yang ada, atau buat footer baru) */
     const kecil = t => `<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="200" w:lineRule="auto"/></w:pPr><w:r><w:rPr><w:sz w:val="13"/></w:rPr><w:t xml:space="preserve">${xmlEsc(t)}</w:t></w:r></w:p>`;
     const nb = ['top', 'left', 'bottom', 'right', 'insideH', 'insideV'].map(k => `<w:${k} w:val="nil"/>`).join('');
-    const tbl = `<w:tbl><w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblBorders>${nb}</w:tblBorders><w:tblLayout w:type="fixed"/><w:tblCellMar><w:left w:w="0" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid><w:gridCol w:w="1300"/><w:gridCol w:w="3400"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:w="1300" w:type="dxa"/></w:tcPr><w:p><w:pPr><w:spacing w:before="0" w:after="0"/></w:pPr>${run}</w:p></w:tc><w:tc><w:tcPr><w:tcW w:w="3400" w:type="dxa"/><w:vAlign w:val="bottom"/></w:tcPr>${kecil('Pindai QR untuk memeriksa keaslian surat')}${kecil('Kode cek: ' + kodeVerif(q.kode))}</w:tc></w:tr></w:tbl><w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="20" w:lineRule="exact"/></w:pPr></w:p>`;
+    const tbl = `<w:tbl><w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblBorders>${nb}</w:tblBorders><w:tblLayout w:type="fixed"/><w:tblCellMar><w:left w:w="0" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid><w:gridCol w:w="1300"/><w:gridCol w:w="3400"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:w="1300" w:type="dxa"/></w:tcPr><w:p><w:pPr><w:spacing w:before="0" w:after="0"/></w:pPr>${run}</w:p></w:tc><w:tc><w:tcPr><w:tcW w:w="3400" w:type="dxa"/><w:vAlign w:val="bottom"/></w:tcPr>${kecil('Pindai QR untuk memeriksa keaslian surat')}${kecil('Kode cek: ' + kodeCek(q.kode))}</w:tc></w:tr></w:tbl><w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="20" w:lineRule="exact"/></w:pPr></w:p>`;
     let dx = dec.decode(docF.data); const sm = /<w:sectPr[^>]*>/.exec(dx);
     if (sm) {
       const blok = dx.slice(sm.index, dx.indexOf('</w:sectPr>', sm.index));
@@ -8042,7 +8049,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '161', tgl: '2026-10-09', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '162', tgl: '2026-10-09', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -9906,7 +9913,7 @@ VIEWS.template = async (p, main) => {
       + sek('Jenis tambahan', `<button class="btn sm pri" data-act="go" data-go='["form",{"e":"jenis_surat"}]'>${ic('plus')}Jenis surat</button>`,
         item({ path: 'surat/_umum.docx', label: 'Template umum', sub: 'untuk jenis tambahan tanpa template', ic: 'folder', hapus: 1 })
         + tambahan.map(j => item({ path: slugJenis(j.nama), label: j.nama.replace(/^Surat /, ''), umum: 1, edit: j.id, sub: (j.aktif === 'Tidak' ? 'tidak aktif · ' : '') + (isianJenis(j).length ? 'isian: ' + esc(isianJenis(j).join(', ')) : 'tanpa isian tambahan') })).join(''))
-      + tags('Daftar tanda Surat Keterangan', TAG_SURAT, 'Huruf besar: tambahkan <b>_U</b>, mis. <span class="mono">{{Nama_U}}</span>. Jenis tambahan: setiap isian menjadi tanda dengan nama yang sama. Baris tabel berisi <span class="mono">{{Isian Label}}</span> diulang untuk semua isian.<br><b>QR verifikasi:</b> paling rapi di <b>footer</b>: tulis <span class="mono">{{QR}}</span> sendirian di satu baris footer (Sisipkan → Footer), ukuran QR otomatis 2,1 cm. Tanpa tanda ini, QR kecil ditempel otomatis di footer. {{QR}} juga boleh di badan surat (mis. sel tabel tanda tangan) dan <span class="mono">{{Kode Verifikasi}}</span> di bawahnya dengan huruf kecil. QR hanya muncul pada <b>Cetak dengan QR</b>; pada Cetak (tanpa QR) baris itu kosong. Template tanpa <span class="mono">{{QR}}</span> tetap mendapat QR di bawah isi surat.<br><b>Penandatangan:</b> pakai <span class="mono">{{An TTD}}</span> (terisi "a.n. Kepala Desa …" bila diwakilkan), <span class="mono">{{Jabatan TTD}}</span> dan <span class="mono">{{Nama TTD_U}}</span>. Template lama dengan <span class="mono">{{Kepala Desa}}</span> tetap bisa: nama dan baris jabatannya menyesuaikan otomatis.')],
+      + tags('Daftar tanda Surat Keterangan', TAG_SURAT, 'Huruf besar: tambahkan <b>_U</b>, mis. <span class="mono">{{Nama_U}}</span>. Jenis tambahan: setiap isian menjadi tanda dengan nama yang sama. Baris tabel berisi <span class="mono">{{Isian Label}}</span> diulang untuk semua isian.<br><b>QR verifikasi:</b> paling rapi di <b>footer</b>: tabel 2 kolom 1 baris, semua garis disembunyikan; kolom kiri (±2,8 cm) berisi <span class="mono">{{QR}}</span> saja, kolom kanan berisi <span class="mono">{{Kode Verifikasi}}</span> saja (huruf kecil). Saat <b>Cetak dengan QR</b>, kolom kiri berisi QR berbingkai melengkung 2,5 cm dan kolom kanan dua baris: &ldquo;Pindai QR untuk memeriksa keaslian surat&rdquo; dan &ldquo;Kode cek: PDW-… / alamat verifikasi&rdquo;. Saat cetak tanpa QR keduanya kosong sehingga footer tidak terlihat. Tanpa tanda ini, QR kecil ditempel otomatis di footer. {{QR}} juga boleh di badan surat (mis. sel tabel tanda tangan) dan <span class="mono">{{Kode Verifikasi}}</span> di bawahnya dengan huruf kecil. QR hanya muncul pada <b>Cetak dengan QR</b>; pada Cetak (tanpa QR) baris itu kosong. Template tanpa <span class="mono">{{QR}}</span> tetap mendapat QR di bawah isi surat.<br><b>Penandatangan:</b> pakai <span class="mono">{{An TTD}}</span> (terisi "a.n. Kepala Desa …" bila diwakilkan), <span class="mono">{{Jabatan TTD}}</span> dan <span class="mono">{{Nama TTD_U}}</span>. Template lama dengan <span class="mono">{{Kepala Desa}}</span> tetap bisa: nama dan baris jabatannya menyesuaikan otomatis.')],
     ['ba', 'Berita Acara', () => sek('Berita acara (kertas F4)', `<button class="btn sm" data-act="tplUpBtn" data-p="ba/">${ic('plus')}Jenis berita acara</button>`, baDaftar.map(([path, label]) => item({ path, label, ic: 'stamp', hapus: 1 })).join(''))
       + '<div class="meta">Template per jenis: beri nama file sesuai jenisnya, mis. <i>Berita Acara Pemeriksaan.docx</i>, lalu pilih jenis yang sama saat membuat berita acara. Jenis tanpa template memakai template Umum. Halaman terakhir berisi <span class="mono">{{Foto Dokumentasi}}</span>: diganti foto kegiatan (maks. 7) — tulis sendirian dalam satu paragraf.</div>'
       + tags('Daftar tanda Berita Acara', TAG_BA, 'Dasar, Peserta, Uraian, Hasil: tulis tanda sendirian dalam satu paragraf, maka setiap baris isian menjadi paragraf baru. Huruf besar: tambahkan <b>_U</b>, mis. <span class="mono">{{Pihak 1_U}}</span>. Mengetahui/Jabatan Mengetahui/Nama Mengetahui kosong bila "Mengetahui Kepala Desa" = Tidak.')],
