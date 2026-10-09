@@ -5290,6 +5290,8 @@ const TTD_SEBAGAI = ['Kepala Desa', 'a.n. Kepala Desa', 'Plt. Kepala Desa', 'Plh
 const VF_ST = { menunggu: ['Menunggu tanda tangan', 'warn'], sah: ['Sah', 'ok'], batal: ['Dibatalkan', 'bad'] };
 const vfPill = s => VF_ST[s] ? `<span class="pill ${VF_ST[s][1]}">${esc(VF_ST[s][0])}</span>` : '';
 const VERIF_URL = () => new URL('verifikasi/', location.href.split('#')[0].split('?')[0]).href;
+/** isi {{Kode Verifikasi}}: kode + alamat halaman verifikasi (alamat github.io tidak ditampilkan) */
+const kodeVerif = k => k ? k + (/github\.io$/.test(location.hostname) ? '' : ' / ' + VERIF_URL().replace(/\/$/, '')) : '';
 /** penandatangan surat: bawaan Kepala Desa; bisa a.n./Plt./Plh. */
 function ttdInfo(reg) {
   const desa = judulKata(String((S.set && S.set.nama_desa) || ''));
@@ -5377,7 +5379,7 @@ function docxQR(files, q) {
     /* 2) template tanpa {{QR}}: tempel di footer (footer yang ada, atau buat footer baru) */
     const kecil = t => `<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="200" w:lineRule="auto"/></w:pPr><w:r><w:rPr><w:sz w:val="13"/></w:rPr><w:t xml:space="preserve">${xmlEsc(t)}</w:t></w:r></w:p>`;
     const nb = ['top', 'left', 'bottom', 'right', 'insideH', 'insideV'].map(k => `<w:${k} w:val="nil"/>`).join('');
-    const tbl = `<w:tbl><w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblBorders>${nb}</w:tblBorders><w:tblLayout w:type="fixed"/><w:tblCellMar><w:left w:w="0" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid><w:gridCol w:w="1300"/><w:gridCol w:w="3400"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:w="1300" w:type="dxa"/></w:tcPr><w:p><w:pPr><w:spacing w:before="0" w:after="0"/></w:pPr>${run}</w:p></w:tc><w:tc><w:tcPr><w:tcW w:w="3400" w:type="dxa"/><w:vAlign w:val="bottom"/></w:tcPr>${kecil('Pindai QR untuk memeriksa keaslian surat')}${kecil('Kode cek: ' + q.kode)}${/github\.io$/.test(new URL(q.url).hostname) ? '' : kecil(q.url.replace(/^https?:\/\//, '').replace(/\?.*$/, ''))}</w:tc></w:tr></w:tbl><w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="20" w:lineRule="exact"/></w:pPr></w:p>`;
+    const tbl = `<w:tbl><w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblBorders>${nb}</w:tblBorders><w:tblLayout w:type="fixed"/><w:tblCellMar><w:left w:w="0" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid><w:gridCol w:w="1300"/><w:gridCol w:w="3400"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:w="1300" w:type="dxa"/></w:tcPr><w:p><w:pPr><w:spacing w:before="0" w:after="0"/></w:pPr>${run}</w:p></w:tc><w:tc><w:tcPr><w:tcW w:w="3400" w:type="dxa"/><w:vAlign w:val="bottom"/></w:tcPr>${kecil('Pindai QR untuk memeriksa keaslian surat')}${kecil('Kode cek: ' + kodeVerif(q.kode))}</w:tc></w:tr></w:tbl><w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="20" w:lineRule="exact"/></w:pPr></w:p>`;
     let dx = dec.decode(docF.data); const sm = /<w:sectPr[^>]*>/.exec(dx);
     if (sm) {
       const blok = dx.slice(sm.index, dx.indexOf('</w:sectPr>', sm.index));
@@ -5434,7 +5436,7 @@ async function cetakSuratQR(reg) {
 async function salinanSurat(reg, v, url) {
   const path = await suratTemplate(reg.jenis_surat); if (!path) return;
   const M = await petaSurat(reg), rows = M.rows; delete M.rows;
-  samarkanM(M); M['Kode Verifikasi'] = v.kode;
+  samarkanM(M); M['Kode Verifikasi'] = kodeVerif(v.kode);
   const t = ttdInfo(reg);
   const r = await buatDokumen({ path, M, rows, jenis: 'surat', kka: M['Kode Klasifikasi'], qr: { png: await qrPng(url), kode: v.kode, url }, ttdBaris: t.baris, nama: 'salinan-verifikasi' });
   await Promise.all([muatPratinjau(), muatH2c()]);
@@ -8036,7 +8038,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '158', tgl: '2026-10-09', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '159', tgl: '2026-10-09', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -9453,7 +9455,7 @@ async function cetakSurat(reg, vq) {
   const m = modal('Membuat surat', `<div class="stack"><b>${esc(reg.jenis_surat)}</b><div class="skel"></div><div class="meta">Mengisi template…</div></div>`);
   try {
     const M = await petaSurat(reg), rows = M.rows; delete M.rows;
-    if (vq) M['Kode Verifikasi'] = vq.kode;
+    if (vq) M['Kode Verifikasi'] = kodeVerif(vq.kode);
     const r = await buatDokumen({
       path, M, rows, jenis: 'surat', kka: M['Kode Klasifikasi'], qr: vq && vq.qr, ttdBaris: ttdInfo(reg).baris, nama: reg.jenis_surat.replace(/^Surat (Keterangan )?/, 'SK ') + ' - ' + M.Nama + (reg.no ? ' - No ' + reg.no : '')
     });
