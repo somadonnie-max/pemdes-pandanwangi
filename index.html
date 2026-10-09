@@ -5471,7 +5471,7 @@ async function extraSuratVerif(x, el) {
   h += `</div>`;
   el.insertAdjacentHTML('afterbegin', `<div class="stack">${h}</div>`);
   /* surat sah: tombol Ubah & Hapus disembunyikan */
-  if (st === 'sah') { const root = el.closest('.dview') || el.parentElement; $$('[data-act="xedit"],[data-act="xdel"]', root).forEach(b => b.remove()); }
+  if (st === 'sah') { const root = el.closest('.dview') || el.parentElement; $$(S.user && S.user.admin ? '[data-act="xedit"]' : '[data-act="xedit"],[data-act="xdel"]', root).forEach(b => b.remove()); }
   S.vh.vfCetak = () => cetakSuratQR(x);
   S.vh.vfSah = () => tnKonfirm('Surat ' + (x.vf_kode || '') + ' atas nama ' + (x.nama || '') + ' sudah ditandatangani ' + t.ket + '? Setelah disahkan, isi surat terkunci.', async () => {
     await call('vfSah', { register_id: x.id }); toast('Surat disahkan.'); refresh();
@@ -8006,7 +8006,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '153', tgl: '2026-10-09', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '154', tgl: '2026-10-09', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
