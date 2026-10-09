@@ -5428,7 +5428,7 @@ async function cetakSuratQR(reg) {
     const url = VERIF_URL() + '?id=' + v.id;
     const png = await qrPng(url);
     await cetakSurat(reg, { qr: { png, kode: v.kode, url }, kode: v.kode });
-    if (!v.ada_gambar) salinanSurat(reg, v, url).catch(er => console.warn('salinan verifikasi', er));
+    salinanSurat(reg, v, url).catch(er => console.warn('salinan verifikasi', er));
     if (typeof refresh === 'function') setTimeout(refresh, 1500);
   }, 'Ya, cetak dengan QR');
 }
@@ -5498,6 +5498,7 @@ async function extraSuratVerif(x, el) {
   if (st === 'menunggu' && can('sah_surat')) B.push(`<button class="btn sm pri" data-act="vfSah" style="background:#15803d">${ic('check')}Sudah ditandatangani</button>`);
   if ((st === 'menunggu' || st === 'sah') && can('batal_surat')) B.push(`<button class="btn sm danger" data-act="vfBatal">${ic('x')}Batalkan</button>`);
   if (x.vf_id) B.push(`<a class="btn sm" href="${esc(VERIF_URL() + '?id=' + x.vf_id)}" target="_blank" rel="noopener">${ic('eye')}Halaman verifikasi</a>`);
+  if (S.user && S.user.admin && (st || lama.length)) B.push(`<button class="btn sm danger" data-act="vfLepas">${ic('trash')}Hapus verifikasi (admin)</button>`);
   if (B.length) h += `<div class="btns">${B.join('')}</div>`;
   if (lama.length) h += `<details><summary class="meta" style="cursor:pointer">Kode lama yang dibatalkan (${lama.length})</summary><div class="meta">${lama.map(r => `${esc(r.kode)} · dibatalkan ${esc(r.dibatalkan || '')}${r.alasan ? ' — ' + esc(r.alasan) : ''}`).join('<br>')}</div></details>`;
   h += `</div>`;
@@ -5505,6 +5506,9 @@ async function extraSuratVerif(x, el) {
   /* surat sah: tombol Ubah & Hapus disembunyikan */
   if (st === 'sah') { const root = el.closest('.dview') || el.parentElement; $$(S.user && S.user.admin ? '[data-act="xedit"]' : '[data-act="xedit"],[data-act="xdel"]', root).forEach(b => b.remove()); }
   S.vh.vfCetak = () => cetakSuratQR(x);
+  S.vh.vfLepas = () => tnKonfirm('Hapus semua catatan QR & pengesahan surat ' + (x.nama || '') + '? Surat kembali berstatus "belum dicetak dengan QR". QR yang sudah tercetak akan terbaca "Dibatalkan". Pakai hanya untuk surat percobaan.', async () => {
+    const r = await call('vfLepas', { register_id: x.id }); toast('Verifikasi dihapus (' + ((r && r.dilepas) || 0) + ' kode).'); refresh();
+  }, 'Ya, hapus verifikasi');
   S.vh.vfSah = () => tnKonfirm('Surat ' + (x.vf_kode || '') + ' atas nama ' + (x.nama || '') + ' sudah ditandatangani ' + t.ket + '? Setelah disahkan, isi surat terkunci.', async () => {
     await call('vfSah', { register_id: x.id }); toast('Surat disahkan.'); refresh();
   }, 'Ya, sudah ditandatangani');
@@ -8038,7 +8042,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '159', tgl: '2026-10-09', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '160', tgl: '2026-10-09', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -13391,7 +13395,7 @@ cetakDocx = MUAT.bungkus(cetakDocx, 'Menyiapkan Word…');
 tampilBerkas = MUAT.bungkus(tampilBerkas, 'Membuka dokumen…');
 viewFile = MUAT.bungkus(viewFile, 'Membuka dokumen…');
 H2D.keXlsx = MUAT.bungkus(H2D.keXlsx, 'Menyiapkan Excel…');
-window.__pwTest = { jadiPdf, pdfDariHalaman, kuotaPeringatan, uploadFile, viewFile, thumb, signedFor, isSbFile, isR2, go, root, logoutLocal, store, NX, S, dataSayaHtml, tentangHtml, homeCards, modBuka, aktItem, unduhSelesai, loginScreen, sheet };
+window.__pwTest = { jadiPdf, rapikanSeksi, muatPratinjau, pdfDariHalaman, kuotaPeringatan, uploadFile, viewFile, thumb, signedFor, isSbFile, isR2, go, root, logoutLocal, store, NX, S, dataSayaHtml, tentangHtml, homeCards, modBuka, aktItem, unduhSelesai, loginScreen, sheet };
 boot();
 })();
 </script>
