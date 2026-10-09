@@ -1,6 +1,6 @@
 /* Service worker Pemdes Pandanwangi: halaman selalu diambil dari internet (versi terbaru);
    salinan terakhir hanya dipakai bila sedang tidak ada sinyal. Data tidak disimpan di sini. */
-const CACHE = 'pemdes-v1';
+const CACHE = 'pemdes-v2';
 self.addEventListener('install', e => {
   self.skipWaiting();
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./', './icon-192.png'])).catch(() => { }));
@@ -11,6 +11,7 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const r = e.request;
   if (r.method !== 'GET' || r.mode !== 'navigate') return;
+  if (new URL(r.url).pathname.indexOf('/verifikasi') >= 0) return;   /* halaman verifikasi publik: tidak disimpan sebagai halaman aplikasi */
   e.respondWith(fetch(r).then(res => {
     if (res.ok) { const cp = res.clone(); caches.open(CACHE).then(c => c.put('./', cp)); }
     return res;
