@@ -1072,7 +1072,7 @@ img.bf-pg{width:auto;max-width:100%;max-height:70vh;object-fit:contain}
 @keyframes addBuka{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 .add-kunci{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--pri) 12%,transparent);font-size:13px}
 .add-kunci svg{flex:none;width:18px;height:18px;color:var(--pri)}
-section.docx,section.docx *{-webkit-hyphens:manual!important;hyphens:manual!important}</style>
+section.docx,section.docx *{-webkit-hyphens:manual!important;hyphens:manual!important}section.docx img{vertical-align:top}</style>
 </head>
 <body>
 <div id="app"></div>
@@ -8042,7 +8042,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '160', tgl: '2026-10-09', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '161', tgl: '2026-10-09', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -9191,7 +9191,10 @@ async function rapikanSeksi(blob) {
     /* 2. tabel yang garisnya disembunyikan di Word: lepas gaya "Table Grid" supaya garisnya tidak muncul (isi surat, header & footer) */
     const lepasGrid = xx => xx.replace(/<w:tbl>[\s\S]*?<\/w:tblPr>/g, s => {
       if (!/<w:tblBorders>/.test(s) || /<w:(?:top|left|bottom|right|insideH|insideV)\b[^>]*w:val="(?!none|nil)/.test(s)) return s;
-      const t = s.replace(/<w:tblStyle\b[^>]*\/>/, '').replace(/<w:tblBorders>[\s\S]*?<\/w:tblBorders>/, ''); if (t !== s) ubah = true; return t;
+      let t = s.replace(/<w:tblStyle\b[^>]*\/>/, '').replace(/<w:tblBorders>[\s\S]*?<\/w:tblBorders>/, '');
+      /* jarak kiri-kanan sel bawaan Word (0,19 cm) tetap dipakai walau gayanya dilepas */
+      if (t !== s && !/<w:tblCellMar>/.test(t)) t = t.replace(/<\/w:tblPr>$/, '<w:tblCellMar><w:left w:w="108" w:type="dxa"/><w:right w:w="108" w:type="dxa"/></w:tblCellMar></w:tblPr>');
+      if (t !== s) ubah = true; return t;
     });
     x = lepasGrid(x);
     for (const hf of z.file(/^word\/(header|footer)\d*\.xml$/)) { const hx = await hf.async('string'), hy = lepasGrid(hx); if (hy !== hx) z.file(hf.name, hy); }
@@ -9366,7 +9369,7 @@ function hasilDokumen(m, r, opt) {
     const judul = esc(r.nama.replace(/\.docx$/i, ''));
     const isi = opt.pdf || opt.gambar
       ? `<style>@page{size:${halaman[0] && halaman[0].land ? 'landscape' : 'portrait'};margin:0}body{margin:0}img{width:100%;display:block;page-break-after:always;break-after:page}</style>${halaman.map(h => `<img src="${h.url}">`).join('')}`
-      : `<style>@page{margin:0}body{margin:0}.docx-wrapper{background:#fff!important;padding:0!important;display:block!important}section.docx,section.docx *{-webkit-hyphens:manual!important;hyphens:manual!important}.docx-wrapper>section.docx{box-shadow:none!important;margin:0 auto!important;page-break-after:always;break-after:page}</style>${pv.firstElementChild.innerHTML}`;
+      : `<style>@page{margin:0}body{margin:0}.docx-wrapper{background:#fff!important;padding:0!important;display:block!important}section.docx,section.docx *{-webkit-hyphens:manual!important;hyphens:manual!important}section.docx img{vertical-align:top}.docx-wrapper>section.docx{box-shadow:none!important;margin:0 auto!important;page-break-after:always;break-after:page}</style>${pv.firstElementChild.innerHTML}`;
     const f = document.createElement('iframe'); f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
     document.body.appendChild(f);
     const d = f.contentDocument;
