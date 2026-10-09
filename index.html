@@ -1128,7 +1128,7 @@ function liveMoney(el) { let s = el.value.replace(/[^\d,]/g, ''); const i = s.in
 const mIn = el => mVal(String(el.value || '').replace(/\./g, '').replace(',', '.'));
 function fMoney(v) { return v === '' || v == null || isNaN(mNum(v)) ? '' : 'Rp ' + mFmt(v); }
 function nOnly(v) { return String(v || '').replace(/[^\d]/g, ''); }
-function umur(s) { const d = parseD(s); if (!d) return ''; const t = new Date(); let a = t.getFullYear() - d.getFullYear(); if (t.getMonth() < d.getMonth() || (t.getMonth() === d.getMonth() && t.getDate() < d.getDate())) a--; return a; }
+function umur(s, ref) { const d = parseD(s); if (!d) return ''; const t = (ref && parseD(ref)) || new Date(); let a = t.getFullYear() - d.getFullYear(); if (t.getMonth() < d.getMonth() || (t.getMonth() === d.getMonth() && t.getDate() < d.getDate())) a--; return a; }
 function initials(n) { return String(n || '?').replace(/[,.].*$/, '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase(); }
 function terbilang(n) {
   const a = ['', 'satu', 'dua', 'tiga', 'empat', 'lima', 'enam', 'tujuh', 'delapan', 'sembilan', 'sepuluh', 'sebelas'];
@@ -1828,7 +1828,7 @@ const UI = {
       F('lembaga_alamat', 'Alamat Lembaga', 'text', { wide: 1, when: { k: 'pemohon', v: 'Lembaga / Instansi' } }),
       F('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1, nikfill: 1, hint: 'Ketik 16 digit: data dari Data Penduduk terisi otomatis' }), F('nama', 'Nama', 'text', { req: 1, up: 1, wide: 1, lblW: { k: 'pemohon', v: 'Lembaga / Instansi', l: 'Nama Penanggung Jawab' } }),
       F('pj_jabatan', 'Jabatan dalam Lembaga', 'text', { when: { k: 'pemohon', v: 'Lembaga / Instansi' }, list: ['Ketua', 'Pengasuh', 'Kepala Sekolah', 'Takmir', 'Pimpinan', 'Direktur', 'Sekretaris', 'Bendahara'] }),
-      F('tempat_lahir', 'Tempat Lahir', 'text', { up: 1 }), F('tgl_lahir', 'Tanggal Lahir', 'date'), F('umur', 'Tahun Lahir / Umur'),
+      F('tempat_lahir', 'Tempat Lahir', 'text', { up: 1 }), F('tgl_lahir', 'Tanggal Lahir', 'date'), F('umur', 'Umur', 'text', { umurDari: ['tgl_lahir', 'tgl_surat'], hint: 'Otomatis dari tanggal lahir, dihitung pada tanggal surat' }),
       F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk }), F('agama', 'Agama', 'select', { opt: OPT.agama }), F('pekerjaan', 'Pekerjaan', 'text', { up: 1, dd: OPT.pekerjaan }), F('status_kawin', 'Status Perkawinan', 'text', { up: 1, list: OPT.kawin }),
       F('dusun', 'Dusun', 'select', { opt: OPT.dusun }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }), F('keperluan', 'Keperluan', 'textarea', { wide: 1 }),
       F('alamat_domisili', 'Alamat Domisili (kosongkan bila sama dengan alamat)', 'text', { wide: 1, grp: ['Surat Keterangan Domisili'] }), F('lama_tinggal', 'Tinggal Sejak', 'text', { hint: 'mis. tahun 2015', grp: ['Surat Keterangan Domisili'] }),
@@ -4363,6 +4363,12 @@ VIEWS.form = async (p, main, alive) => {
   if (e === 'register_surat') suketNamaHook(frm);
   namaHooks(frm, e, flds);
   /* NIK -> isi otomatis dari Data Penduduk (hanya kolom yang masih kosong) */
+  /* umur otomatis: dari tanggal lahir, dihitung pada tanggal surat dikeluarkan */
+  const umF = flds.find(f => f.umurDari), hitungUmur = () => {
+    if (!umF) return; const el = $('#f_' + umF.k, frm), tl = $('#f_' + umF.umurDari[0], frm), ts = $('#f_' + umF.umurDari[1], frm);
+    if (!el || !tl || !tl.value) return; const u = umur(tl.value, ts && ts.value); if (u !== '' && u >= 0) el.value = u + ' tahun';
+  };
+  if (umF) { umF.umurDari.forEach(k => { const el = $('#f_' + k, frm); if (el) ['input', 'change'].forEach(ev => el.addEventListener(ev, hitungUmur)); }); hitungUmur(); }
   const nikF = flds.find(f => f.nikfill), nikEl = nikF && $('#f_' + nikF.k, frm);
   if (nikEl && !nikEl.readOnly) nikEl.addEventListener('input', async () => {
     const v = nikEl.value.replace(/\D/g, ''), note = $('#nikNote', frm);
@@ -4384,6 +4390,7 @@ VIEWS.form = async (p, main, alive) => {
         n++;
       });
       note.textContent = n ? 'Cocok dengan Data Penduduk (' + tc(d.nama) + '): ' + n + ' kolom terisi otomatis.' : 'Cocok dengan Data Penduduk (' + tc(d.nama) + ').';
+      hitungUmur();
       if ($('#f_nama', frm)) $('#f_nama', frm).dispatchEvent(new Event('change'));
     } catch (x) { }
   });
@@ -7656,7 +7663,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '150', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '151', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -9011,7 +9018,7 @@ async function petaSurat(reg) {
     No: reg.no || '', 'Nomor Register': reg.no || '', Tahun: String(d.getFullYear()), 'Tanggal Surat': dPanjang(reg.tgl_surat || isoToday()), 'Jenis Surat': reg.jenis_surat || '',
     Nama: judulKata(v('nama')), NIK: String(v('nik')).indexOf('•') >= 0 ? '' : v('nik'), 'No KK': String(p.kk || '').indexOf('•') >= 0 ? '' : (p.kk || ''),
     'Tempat Lahir': judulKata(v('tempat_lahir')), 'Tanggal Lahir': dPanjang(tl), TTL: [judulKata(v('tempat_lahir')), dPanjang(tl)].filter(Boolean).join(', '),
-    Umur: tl ? umur(tl) + ' tahun' : (reg.umur || ''), 'Jenis Kelamin': judulKata(v('jk')), Agama: judulKata(v('agama')), Pekerjaan: judulKata(v('pekerjaan')),
+    Umur: tl ? umur(tl, reg.tgl_surat) + ' tahun' : (reg.umur || ''), 'Jenis Kelamin': judulKata(v('jk')), Agama: judulKata(v('agama')), Pekerjaan: judulKata(v('pekerjaan')),
     'Status Perkawinan': judulKata(v('status_kawin')),
     Pemohon: reg.pemohon || 'Perorangan', 'Nama Lembaga': reg.lembaga_nama || TITIK, 'Jenis Lembaga': reg.lembaga_jenis || TITIK, 'Alamat Lembaga': reg.lembaga_alamat || alamat || TITIK,
     'No SK Lembaga': reg.lembaga_no || TITIK, 'No Akta': reg.lembaga_no || TITIK, 'Bidang Kegiatan': reg.lembaga_bidang || TITIK, 'SK Kemenkumham': reg.lembaga_kemenkumham || '-', Jabatan: reg.pj_jabatan || TITIK, 'Penanggung Jawab': judulKata(v('nama')), Kewarganegaraan: String(p.warga_negara || 'WNI').toUpperCase() === 'WNI' ? 'Indonesia' : (p.warga_negara || ''), Pendidikan: judulKata(p.pendidikan || ''),
