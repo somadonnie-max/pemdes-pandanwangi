@@ -7656,7 +7656,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '149', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '150', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -7772,10 +7772,18 @@ VIEWS.settings = async (p, main) => {
       const mx = k === 'logo_app' ? 192 : 360, z = Math.min(1, mx / Math.max(im.width, im.height)), c = document.createElement('canvas');
       c.width = Math.round(im.width * z); c.height = Math.round(im.height * z); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
       let u = k === 'logo_app' ? c.toDataURL('image/webp', .85) : c.toDataURL('image/png'); if (!/^data:image\/(webp|png)/.test(u)) u = c.toDataURL('image/png');
-      $('#s_' + k).value = u; const pv = $('#s_' + k + '_p'); pv.src = u; pv.hidden = false; URL.revokeObjectURL(im.src); toast('Logo siap. Tekan Simpan pengaturan.');
-    }; im.src = URL.createObjectURL(f);
+      $('#s_' + k).value = u; const pv = $('#s_' + k + '_p'); pv.src = u; pv.hidden = false; URL.revokeObjectURL(im.src);
+      logoSimpan(k, u);
+    };
+    im.onerror = () => toast('Gambar tidak bisa dibaca. Pakai file PNG atau JPG.', 1);
+    im.src = URL.createObjectURL(f);
   });
-  S.vh.logoDel = t => { const k = t.dataset.k; $('#s_' + k).value = ''; const pv = $('#s_' + k + '_p'); if (k === 'logo_url') pv.hidden = true; t.remove(); toast('Logo dihapus. Tekan Simpan pengaturan.'); };
+  /* logo langsung disimpan ke server (tidak perlu menekan Simpan pengaturan) */
+  const logoSimpan = async (k, u) => {
+    try { const r = await call('settingsSave', { values: { [k]: u } }); if (String((r || {})[k] || '') !== u) throw new Error('Logo tidak tersimpan di server.'); S.set = Object.assign(S.set || {}, { [k]: u }); S.setAsli = Object.assign({}, r); terapBrand(); toast(u ? 'Logo tersimpan. Dokumen berikutnya memakai logo ini.' : 'Logo dihapus.'); }
+    catch (x) { toast('Gagal menyimpan logo: ' + x.message, 1); }
+  };
+  S.vh.logoDel = t => { const k = t.dataset.k; $('#s_' + k).value = ''; const pv = $('#s_' + k + '_p'); if (k === 'logo_url') pv.hidden = true; t.remove(); logoSimpan(k, ''); };
   muatPejabat(true).then(P => {
     const bx = $('#pejBox'); if (!bx) return;
     const R2 = [['kades', 'Kepala Desa', 'jabatan "Kepala Desa"'], ['sekdes', 'Sekretaris Desa', 'jabatan "Sekretaris Desa" (atau tambahan "Plt. Sekretaris Desa")'], ['bendahara', 'Bendahara', 'tambahan "Bendahara Desa", bila tidak ada: Kaur Keuangan'], ['pengurus', 'Pengurus Barang / Aset', 'tambahan "Pengurus Barang / Aset", bila tidak ada: Kaur TU & Umum']];
@@ -8225,8 +8233,11 @@ const DOCX = (() => {
     relF.data = enc.encode(rel); ctF.data = enc.encode(ct);
     return new XMLSerializer().serializeToString(doc);
   }
-  async function fill(buf, M, rows, xlsx, o) {
+  async function fill(buf, M, rows, xlsx, o, logo) {
     const files = await unzip(buf), missing = [];
+    /* logo aplikasi yang terlanjur tertanam di template (diunduh sebelum logo dokumen diisi) -> logo dokumen dari Pengaturan */
+    const sama = (a, b) => { if (a.length !== b.length) return false; for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false; return true; };
+    if (logo && !xlsx) files.forEach(f => { if (/^word\/media\//.test(f.name) && sama(f.data, logo.dari)) f.data = logo.ke; });
     const foto = !xlsx && o && o.fotos && o.fotos.length && o.ambil, prog = !xlsx && o && o.grup && o.grup.length && o.ambil;
     for (const f of files) if (PART.test(f.name)) {
       let x = dec.decode(f.data);
@@ -8597,6 +8608,20 @@ const NX = (() => {
   }
   return { nama, buat };
 })();
+/* logo dokumen (Pengaturan) dibuat persegi agar pas di kotak logo bawaan; dipakai mengganti logo aplikasi di template lama */
+async function logoGanti() {
+  const ld = String((S.set || {}).logo_url || ''); if (!/^data:image\/png;base64,/.test(ld)) return null;
+  if (S._logoG && S._logoG.k === ld) return S._logoG.v;
+  try {
+    const dari = new Uint8Array(await (await fetch('icon-512.png')).arrayBuffer());
+    const im = await new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = ld; });
+    const n = Math.max(im.width, im.height), c = document.createElement('canvas'); c.width = c.height = n;
+    c.getContext('2d').drawImage(im, (n - im.width) / 2, (n - im.height) / 2);
+    const ke = Uint8Array.from(atob(c.toDataURL('image/png').split(',')[1]), x => x.charCodeAt(0));
+    S._logoG = { k: ld, v: { dari, ke } };
+  } catch (x) { S._logoG = { k: ld, v: null }; }
+  return S._logoG.v;
+}
 async function naskahBawaan(nm) {
   if (NX.nama.indexOf(nm) < 0) return null;
   const ld = String((S.set || {}).logo_url || ''), m = ld.match(/^data:image\/png;base64,(.+)$/);
@@ -8710,7 +8735,7 @@ async function buatDokumen(o) {
   const buf = await tplAmbil(o.path);
   const xlsx = /\.xlsx$/i.test(o.path);
   let ft = []; try { ft = JSON.parse((o.M && o.M.__foto) || '[]'); } catch (x) { }
-  const { blob, missing } = await DOCX.fill(buf, o.M, o.rows, xlsx, ft.length ? { fotos: ft.slice(0, 7), ambil: fotoCrop } : o.grup ? { grup: o.grup, judul: o.judulPb, ambil: fotoCrop } : null);
+  const { blob, missing } = await DOCX.fill(buf, o.M, o.rows, xlsx, ft.length ? { fotos: ft.slice(0, 7), ambil: fotoCrop } : o.grup ? { grup: o.grup, judul: o.judulPb, ambil: fotoCrop } : null, xlsx ? null : await logoGanti());
   const nama = namaFile(o.nama) + (xlsx ? '.xlsx' : '.docx');
   if (xlsx) saveBlob(blob, nama);
   return { nama, missing, blob, jenis: xlsx ? '' : o.jenis, xlsx };
