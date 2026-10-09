@@ -1213,6 +1213,7 @@ const DESA0 = 'Pandanwangi', KEC0 = 'Tempeh', KAB0 = 'Lumajang';
 const brandCache = () => { try { return JSON.parse(localStorage.getItem('pd_brand') || '{}') || {}; } catch (e) { return {}; } };
 function brand() { const s = (typeof S !== 'undefined' && S.set) || {}, b = brandCache(); return { desa: s.nama_desa || b.desa || CFG.namaDesa || DESA0, kec: s.kecamatan || b.kec || CFG.kecamatan || KEC0, kab: s.kabupaten || b.kab || CFG.kabupaten || KAB0 }; }
 const ND = () => brand().desa;
+const JENIS_BA = ['Berita Acara Musyawarah', 'Berita Acara Rapat', 'Berita Acara Serah Terima', 'Berita Acara Pemeriksaan', 'Berita Acara Penyerahan Bantuan', 'Berita Acara Kesepakatan', 'Berita Acara Klarifikasi'];
 (function () { const b = brandCache(); if (b.logo) { LOGO = b.logo; document.getElementById('favi').href = b.logo; } document.title = 'Pemdes ' + (b.desa || CFG.namaDesa || DESA0); })();
 function terapBrand() {
   const s = S.set || {}, b = brand();
@@ -1438,6 +1439,21 @@ const UI = {
       F('no_urut', 'No. Urut', 'number', { auto: 1, by: 'kelompok', hint: 'Urutan dalam kelompoknya: 1 = paling atas (mis. Ketua)' }), F('unsur', 'Unsur (untuk tim RKP)', 'text', { list: ['BPD', 'LPMD', 'PKK', 'RT RW', 'Karang Taruna', 'BUMDes', 'Tokoh Masyarakat', 'Kader Pemberdayaan Masyarakat', 'Tokoh Agama', 'Perwakilan Perempuan'] }),
       F('no_sk', 'Nomor SK'), F('tgl_sk', 'Tanggal SK', 'date'), F('tgl_akhir_sk', 'Tanggal Berakhir SK', 'date'), F('ket', 'Keterangan', 'text', { wide: 1 })],
     row: r => ({ t: r.jabatan, s: [r.kelompok, r.no_sk && 'SK ' + r.no_sk].filter(Boolean).join(' · '), av: ic('badge'), r: r.no_urut ? '#' + r.no_urut : '' })
+  },
+  berita_acara: {
+    t: 'Berita Acara', ic: 'stamp', perm: 'tu_surat', folder: 'TU/Berita Acara', file: 'dok_id',
+    fields: [F('jenis', 'Jenis Berita Acara', 'text', { req: 1, dd: JENIS_BA, def: 'Berita Acara Musyawarah', hint: 'Ketuk untuk memilih — menentukan template yang dipakai (jenis tanpa template memakai template umum)' }),
+      F('tentang', 'Tentang / Perihal', 'text', { req: 1, wide: 1 }), F('nomor', 'Nomor', 'text', { mono: 1, wide: 1, hint: 'Kosongkan: dibuat otomatis kode klasifikasi/no. urut/kode desa/tahun' }), F('klasifikasi', 'Kode Klasifikasi Arsip', 'text', { list: OPT.kka }),
+      F('tanggal', 'Tanggal', 'date', { req: 1, def: isoToday }), F('jam', 'Jam', 'time', { def: '09:00' }), F('tempat', 'Tempat', 'text', { def: () => 'Balai Desa ' + ND(), wide: 1 }),
+      F('dasar', 'Dasar (satu per baris)', 'textarea', { wide: 1, rows: 2 }), F('peserta', 'Peserta / yang hadir (satu per baris)', 'textarea', { wide: 1, rows: 3 }),
+      F('uraian', 'Uraian kegiatan / barang yang diserahkan (satu per baris)', 'textarea', { wide: 1, rows: 5 }), F('hasil', 'Hasil / kesepakatan (satu per baris)', 'textarea', { wide: 1, rows: 4 }),
+      F('pihak1', 'Pihak Pertama / Penandatangan 1', 'person', { fill: { jabatan1: 'jabatan' } }), F('jabatan1', 'Jabatan Pihak Pertama', 'text'),
+      F('pihak2', 'Pihak Kedua / Penandatangan 2', 'person', { fill: { jabatan2: 'jabatan' } }), F('jabatan2', 'Jabatan Pihak Kedua', 'text'),
+      F('mengetahui', 'Mengetahui Kepala Desa', 'select', { opt: ['Ya', 'Tidak'], def: 'Ya' }),
+      F('foto', 'Foto Dokumentasi Kegiatan', 'fotos', { max: 7 }), F('dok_id', 'Scan berita acara bertanda tangan (PDF/foto)', 'file', { wide: 1 }), F('ket', 'Keterangan', 'text')],
+    year: 'tanggal', sort: 'tanggal',
+    row: r => ({ t: r.tentang, s: [r.jenis, r.nomor].filter(Boolean).join(' · '), date: r.tanggal, file: r.dok_id, av: ic('stamp'), pill: (() => { let a = []; try { a = JSON.parse(r.foto || '[]'); } catch (x) { } return a.length ? `<span class="pill">${ic('cam')} ${a.length}</span>` : ''; })() }),
+    print: { title: 'BUKU REGISTER BERITA ACARA', land: 1, cols: [['Tanggal', r => fDate(r.tanggal)], ['Nomor', 'nomor'], ['Jenis', 'jenis'], ['Tentang', 'tentang'], ['Tempat', 'tempat'], ['Pihak Pertama', r => [r.pihak1, r.jabatan1].filter(Boolean).join(', ')], ['Pihak Kedua', r => [r.pihak2, r.jabatan2].filter(Boolean).join(', ')], ['Ket', 'ket']] }
   },
   surat_masuk: {
     t: 'Surat Masuk', ic: 'inbox', perm: 'tu_surat', folder: 'TU/Surat Masuk', file: 'dok_id',
@@ -1951,7 +1967,7 @@ function MODS() {
   return [
     { k: 'presensi', l: 'Presensi', ic: 'clock', items: [['Presensi Hari Ini', 'clock', ['presensi']], ['Riwayat Harian', 'list', ['harian']]] },
     { k: 'kegiatan', l: 'Kegiatan', ic: 'cal', items: [['Agenda', 'cal', ['list', { e: 'kegiatan', v: 0, title: 'Agenda' }], null, 'r:kegiatan'], ['Berita', 'mega', ['list', { e: 'berita' }], 'berita']] },
-    { k: 'arsip', l: 'Arsip', ic: 'folder', items: [grpItem('surat'), grpItem('hukum')].concat(['aparat', 'petugas', 'tokoh_luar'].map(e => [UI[e].t, UI[e].ic, ['list', { e }], e])) },
+    { k: 'arsip', l: 'Arsip', ic: 'folder', items: [grpItem('surat'), grpItem('hukum')].concat(['berita_acara', 'aparat', 'petugas', 'tokoh_luar'].map(e => [UI[e].t, UI[e].ic, ['list', { e }], e])) },
     { k: 'aset', l: 'Aset Desa', ic: 'box', items: [['Dashboard Aset', 'chart', ['asetdash'], null, 'r:aset'], ['Inventarisasi & Penatausahaan (KIB)', 'box', ['list', { e: 'aset' }], 'aset'],
       ['Pengadaan', 'plus', ['list', { e: 'aset_trx', chip: 'Pengadaan' }], 'aset_trx'], ['Penggunaan, Pemanfaatan & Penghapusan', 'list', ['list', { e: 'aset_trx' }], 'aset_trx'], ['Persediaan', 'box', ['list', { e: 'persediaan' }], 'persediaan'],
       ['Inventarisasi Fisik', 'check', ['list', { e: 'aset_cek' }], 'aset_cek'], ['Laporan Format SIPADES', 'print', ['sipadeslap'], null, 'r:aset'], ['Cetak Laporan Aset (format awal)', 'print', ['asetcetak'], null, 'r:aset'], ['Cetak Register Label', 'crop', ['asetlabel'], null, 'r:aset'],
@@ -7640,7 +7656,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '148', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '149', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -8317,7 +8333,7 @@ const NX = (() => {
   const x = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const W = 9360, AL = { L: 'left', C: 'center', J: 'both', R: 'right' };
   const r = (t, o = {}) => `<w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/>${o.bold ? '<w:b/>' : ''}${o.i ? '<w:i/>' : ''}${o.u ? '<w:u w:val="single"/>' : ''}<w:sz w:val="${o.size || 24}"/></w:rPr><w:t xml:space="preserve">${x(t)}</w:t></w:r>`;
-  const P = (runs, o = {}) => `<w:p><w:pPr><w:spacing w:before="${o.before || 0}" w:after="${o.after == null ? 120 : o.after}" w:line="${o.line || 300}" w:lineRule="auto"/>${o.hang ? `<w:ind w:left="${o.hang}" w:hanging="${o.hangBy || 360}"/>` : o.ind ? '<w:ind w:firstLine="720"/>' : o.left ? `<w:ind w:left="${o.left}"/>` : ''}<w:jc w:val="${AL[o.al || 'J']}"/></w:pPr>${Array.isArray(runs) ? runs.join('') : r(runs, o)}</w:p>`;
+  const P = (runs, o = {}) => `<w:p><w:pPr>${o.keep ? '<w:keepNext/>' : ''}${o.pb ? '<w:pageBreakBefore/>' : ''}<w:spacing w:before="${o.before || 0}" w:after="${o.after == null ? 120 : o.after}" w:line="${o.line || 300}" w:lineRule="auto"/>${o.hang ? `<w:ind w:left="${o.hang}" w:hanging="${o.hangBy || 360}"/>` : o.ind ? '<w:ind w:firstLine="720"/>' : o.left ? `<w:ind w:left="${o.left}"/>` : ''}<w:jc w:val="${AL[o.al || 'J']}"/></w:pPr>${Array.isArray(runs) ? runs.join('') : r(runs, o)}</w:p>`;
   const C = (t, o = {}) => P([r(t, o)], Object.assign({ al: 'C', after: 0 }, o));
   const L = (t, o = {}) => P([r(t, o)], Object.assign({ al: 'L', after: 0 }, o));
   const NB = '<w:tblBorders><w:top w:val="nil"/><w:left w:val="nil"/><w:bottom w:val="nil"/><w:right w:val="nil"/><w:insideH w:val="nil"/><w:insideV w:val="nil"/></w:tblBorders>';
@@ -8436,7 +8452,7 @@ const NX = (() => {
       [C('Yang menerima,'), C(' ', { after: 1000 }), C('{{Penerima_U}}', { bold: 1, u: 1 })]]])
   ];
   /* Keuangan: berkas pengajuan ADD (Siltap & Dana Dusun) — halaman tegak/mendatar dipisah dengan pemisah seksi */
-  const WL = 14570, pgS = land => `<w:pgSz w:w="${land ? 16838 : 11906}" w:h="${land ? 11906 : 16838}"${land ? ' w:orient="landscape"' : ''}/><w:pgMar w:top="${land ? 1134 : 1000}" w:right="1134" w:bottom="1134" w:left="${land ? 1134 : 1560}" w:header="709" w:footer="709" w:gutter="0"/>`;
+  const WL = 14570, pgS = (land, f4) => `<w:pgSz w:w="${land ? 16838 : f4 ? 12189 : 11906}" w:h="${land ? 11906 : f4 ? 18709 : 16838}"${land ? ' w:orient="landscape"' : ''}/><w:pgMar w:top="${land ? 1134 : 1000}" w:right="1134" w:bottom="1134" w:left="${land ? 1134 : 1560}" w:header="709" w:footer="709" w:gutter="0"/>`;
   const SEC = land => `<w:p><w:pPr><w:sectPr>${pgS(land)}</w:sectPr></w:pPr></w:p>`;
   const aC = (t, al, o) => [P([r(t, Object.assign({ size: 20 }, o))], { al: al || 'L', after: 0, line: 240 })];
   const aH = t => aC(t, 'C', { bold: 1 });
@@ -8489,7 +8505,34 @@ const NX = (() => {
       [aC('{{Desa_U}}'), aC('{{Pagu ADD}}', 'R'), aC('{{Pagu Dusun}}', 'R'), aC('{{Lalu}}', 'R'), aC('{{Jumlah Angka}}', 'R'), aC('{{No Rekening}}'), aC('{{Sisa}}', 'R')]], 0, 1),
     ...aTtd(WL)];
   T.keu_add_dusun.land = 1;
-  const DOC = (body, land) => `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"><w:body>${body}<w:sectPr>${pgS(land)}</w:sectPr></w:body></w:document>`;
+
+  /* Berita Acara (kertas F4): naskah + halaman dokumentasi foto (maks. 7). Tanda berisi beberapa baris ditulis sendirian dalam satu paragraf agar diulang per baris. */
+  const bP = (t, o) => P(t, Object.assign({ line: 260, after: 60 }, o));
+  const baJudul = () => [...kop(), C('{{Jenis BA_U}}', { bold: 1, u: 1, size: 26 }), C('TENTANG', { bold: 1 }), C('{{Tentang_U}}', { bold: 1 }), C('Nomor : {{Nomor}}', { after: 240 })];
+  const baTtd = (kiri, kanan) => [bP('{{Desa}}, {{Tanggal}}', { al: 'R', before: 160, after: 120 }),
+    tbl([4680, 4680], [[[C(kiri[0]), C('{{Jabatan Pihak 2}}', { after: 850 }), C('{{Pihak 2_U}}', { bold: 1, u: 1 })], [C(kanan[0]), C('{{Jabatan Pihak 1}}', { after: 850 }), C('{{Pihak 1_U}}', { bold: 1, u: 1 })]]]),
+    bP('', { after: 60, keep: 1 }), C('{{Mengetahui}}', { keep: 1 }), C('{{Jabatan Mengetahui}}', { after: 850, keep: 1 }), C('{{Nama Mengetahui_U}}', { bold: 1, u: 1 })];
+  /* halaman foto: pageBreakBefore (bukan paragraf pemisah) supaya tidak muncul halaman kosong bila halaman naskah penuh */
+  const baFoto = () => [C('{{Judul Dokumentasi}}', { bold: 1, size: 26, pb: 1 }), C('{{Tentang}}', { bold: 1 }), C('{{Hari}}, {{Tanggal}} · {{Tempat}}', { after: 200 }), C('{{Foto Dokumentasi}}')];
+  const baBaris = t => bP(t, { left: 360, after: 40 });
+  T.naskah_berita_acara = () => [...baJudul(),
+    bP('Pada hari ini {{Hari}} tanggal {{Tanggal Terbilang}}, pukul {{Jam}} WIB, bertempat di {{Tempat}}, telah dilaksanakan {{Jenis BA}} tentang {{Tentang}} dengan uraian sebagai berikut:', { ind: 1 }),
+    bP([r('Dasar:', { bold: 1 })], { after: 40 }), baBaris('{{Dasar}}'),
+    bP([r('Peserta / yang hadir:', { bold: 1 })], { before: 80, after: 40 }), baBaris('{{Peserta}}'),
+    bP([r('Uraian kegiatan / pembahasan:', { bold: 1 })], { before: 80, after: 40 }), baBaris('{{Uraian}}'),
+    bP([r('Hasil / kesepakatan:', { bold: 1 })], { before: 80, after: 40 }), baBaris('{{Hasil}}'),
+    bP('Demikian berita acara ini dibuat dengan sebenarnya untuk dipergunakan sebagaimana mestinya.', { ind: 1, before: 160 }),
+    ...baTtd(['Pihak Kedua,'], ['Pihak Pertama,']), ...baFoto()];
+  T.naskah_berita_acara_serah_terima = () => [...baJudul(),
+    bP('Pada hari ini {{Hari}} tanggal {{Tanggal Terbilang}}, pukul {{Jam}} WIB, bertempat di {{Tempat}}, kami yang bertanda tangan di bawah ini:', { ind: 1 }),
+    tbl([450, 2300, 250, W - 3360], [['1.', 'Nama', ':', [bP([r('{{Pihak 1}}', { bold: 1 })], { after: 40, al: 'L' })]], ['', 'Jabatan', ':', '{{Jabatan Pihak 1}}']], 360), bP([r('selanjutnya disebut '), r('PIHAK PERTAMA', { bold: 1 }), r('.')], { left: 810, after: 80 }),
+    tbl([450, 2300, 250, W - 3360], [['2.', 'Nama', ':', [bP([r('{{Pihak 2}}', { bold: 1 })], { after: 40, al: 'L' })]], ['', 'Jabatan', ':', '{{Jabatan Pihak 2}}']], 360), bP([r('selanjutnya disebut '), r('PIHAK KEDUA', { bold: 1 }), r('.')], { left: 810, after: 80 }),
+    bP('Dengan ini PIHAK PERTAMA menyerahkan kepada PIHAK KEDUA, dan PIHAK KEDUA menyatakan telah menerima dari PIHAK PERTAMA, hal-hal sebagai berikut:', { ind: 1, before: 120 }), baBaris('{{Uraian}}'),
+    bP([r('Ketentuan / keterangan:', { bold: 1 })], { before: 80, after: 40 }), baBaris('{{Hasil}}'),
+    bP('Sejak penandatanganan berita acara ini, tanggung jawab atas hal yang diserahkan beralih kepada PIHAK KEDUA. Demikian berita acara serah terima ini dibuat dengan sebenarnya untuk dipergunakan sebagaimana mestinya.', { ind: 1, before: 160 }),
+    ...baTtd(['PIHAK KEDUA,'], ['PIHAK PERTAMA,']), ...baFoto()];
+  T.naskah_berita_acara.f4 = T.naskah_berita_acara_serah_terima.f4 = 1;
+  const DOC = (body, land, f4) => `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"><w:body>${body}<w:sectPr>${pgS(land, f4)}</w:sectPr></w:body></w:document>`;
   const PKG = {
     '[Content_Types].xml': '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>',
     '_rels/.rels': '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>',
@@ -8549,7 +8592,7 @@ const NX = (() => {
   async function buat(nm, logoBytes) {
     if (!T[nm]) return null;
     const en = new TextEncoder();
-    const files = Object.keys(PKG).map(n => ({ name: n, data: en.encode(PKG[n]) })).concat([{ name: 'word/document.xml', data: en.encode(DOC(T[nm]().join(''), T[nm].land)) }, { name: 'word/media/logo.png', data: logoBytes }]);
+    const files = Object.keys(PKG).map(n => ({ name: n, data: en.encode(PKG[n]) })).concat([{ name: 'word/document.xml', data: en.encode(DOC(T[nm]().join(''), T[nm].land, T[nm].f4)) }, { name: 'word/media/logo.png', data: logoBytes }]);
     return DOCX.zip(files, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
   }
   return { nama, buat };
@@ -8563,6 +8606,9 @@ async function naskahBawaan(nm) {
 /* ---------------- Naskah dinas: Surat Keluar & Produk Hukum ---------------- */
 const slugNaskah = j => String(j || '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
 const NASKAH = {
+  /* berita acara: template per jenis (surat/naskah_berita_acara_<jenis>.docx), jenis tanpa template memakai template umum */
+  berita_acara: { buat: 'Buat Berita Acara', ada: r => !!r.jenis, nomor: 1, umum: 'surat/naskah_berita_acara.docx', nama: r => (r.jenis || 'Berita Acara') + ' - ' + String(r.tentang || '').slice(0, 60) + (r.nomor ? ' - ' + r.nomor : ''),
+    path: r => { const sl = slugNaskah(String(r.jenis || '').replace(/^\s*berita acara\s*/i, '')); return 'surat/naskah_berita_acara' + (sl && sl !== 'umum' ? '_' + sl : '') + '.docx'; } },
   surat_keluar: { buat: 'Buat surat keluar', ada: r => !!r.jenis, nama: r => (r.jenis || 'Surat') + ' - ' + (r.kepada || '') + (r.no_agenda ? ' - No ' + r.no_agenda : ''),
     path: r => { const sl = slugNaskah(r.jenis); return 'surat/naskah_surat_keluar' + (sl && sl !== 'surat_biasa' ? '_' + sl : '') + '.docx'; } },
   perdes: { buat: 'Buat Peraturan Desa', ada: r => !!(r.menimbang || r.isi_naskah) },
@@ -8577,6 +8623,7 @@ async function nomorOtomatis(e, val) {
   const u = UI[e], tgl = val[u.year] || isoToday(), th = String(tgl).slice(0, 4), kode = (S.set && S.set.kode_surat) || '';
   if (e === 'surat_keluar') return [val.klasifikasi || '400.10.2.2', val.no_agenda || '', kode, th].join('/');
   const r = await call('list', { entity: e, filters: { [u.year + '__pre']: th }, limit: 1 });
+  if (e === 'berita_acara') return [val.klasifikasi, String(r.total + 1).padStart(2, '0'), kode, th].filter(Boolean).join('/');
   return [val.klasifikasi || '100.3.3', String(r.total + 1).padStart(2, '0'), kode, th].join('/');
 }
 async function namaJabatan(re) {
@@ -8600,17 +8647,31 @@ async function petaNaskah(e, r) {
     'Yang Ditugaskan': v('tugas_nama'), 'Keperluan Tugas': v('tugas_untuk'), 'Tanggal Tugas': v('tugas_tgl'), 'Tempat Tugas': v('tugas_tempat'),
     'Penerima Kuasa': v('kuasa_penerima'), 'Penerima Kuasa Nama': kp, 'Keperluan Kuasa': v('kuasa_untuk'),
     'Desa Mitra': judulKata(v('desa_mitra')), 'Kepala Desa Mitra': v('kades_mitra'), 'Ketua BPD': v('ketua_bpd') || TITIK
-  }));
+  }, e === 'berita_acara' ? await petaBA(r) : {}));
 }
+/* tanda khusus Berita Acara (+ foto dokumentasi maks. 7) */
+const tglTerbilang = v => { const d = parseD(v); return d ? terbilang(d.getDate()).trim() + ' bulan ' + BULAN[d.getMonth()] + ' tahun ' + terbilang(d.getFullYear()).trim() : ''; };
+async function petaBA(r) {
+  const v = k => r[k] == null ? '' : String(r[k]).trim(), tg = r.tanggal || isoToday(), tahu = v('mengetahui') !== 'Tidak';
+  let ft = []; try { ft = JSON.parse(r.foto || '[]'); } catch (x) { }
+  const kd = tahu ? S.set.nama_kades || await namaKades() || TITIK : '';
+  return { 'Jenis BA': v('jenis') || 'Berita Acara', Hari: dHari(tg), Tanggal: dPanjang(tg), 'Tanggal Terbilang': tglTerbilang(tg), Tgl: dPanjang(tg), Jam: v('jam') || TITIK, Tempat: v('tempat') || TITIK,
+    Dasar: v('dasar') || '-', Peserta: v('peserta') || '-', Uraian: v('uraian') || TITIK, Hasil: v('hasil') || '-',
+    'Pihak 1': v('pihak1') || TITIK, 'Jabatan Pihak 1': v('jabatan1'), 'Pihak 2': v('pihak2') || TITIK, 'Jabatan Pihak 2': v('jabatan2'),
+    Mengetahui: tahu ? 'Mengetahui,' : '', 'Jabatan Mengetahui': tahu ? 'KEPALA DESA ' + String(S.set.nama_desa || '').toUpperCase() : '', 'Nama Mengetahui': kd,
+    'Judul Dokumentasi': 'DOKUMENTASI ' + (v('jenis') || 'BERITA ACARA').toUpperCase(), 'Foto Dokumentasi': ft.length ? '' : 'Belum ada foto dokumentasi.', 'Jumlah Foto': String(ft.length), __foto: r.foto || '' };
+}
+const TAG_BA = ['Desa', 'Kecamatan', 'Kabupaten', 'Kode Desa', 'Kepala Desa', 'Nomor', 'Tahun', 'Jenis BA', 'Tentang', 'Hari', 'Tanggal', 'Tanggal Terbilang', 'Jam', 'Tempat', 'Dasar', 'Peserta', 'Uraian', 'Hasil', 'Pihak 1', 'Jabatan Pihak 1', 'Pihak 2', 'Jabatan Pihak 2', 'Mengetahui', 'Jabatan Mengetahui', 'Nama Mengetahui', 'Judul Dokumentasi', 'Foto Dokumentasi', 'Jumlah Foto'];
 const TAG_NASKAH = ['Desa', 'Kecamatan', 'Kabupaten', 'Alamat Desa', 'Kode Pos', 'Kode Desa', 'Kepala Desa', 'Sekretaris Desa', 'Nomor', 'No', 'Tahun', 'Kode Klasifikasi', 'Tanggal Surat', 'Hari Surat', 'Perihal', 'Kepada', 'Di', 'Sifat', 'Lampiran', 'Isi Surat', 'Tembusan', 'Hari Acara', 'Tanggal Acara', 'Waktu Acara', 'Tempat Acara', 'Acara', 'Yang Ditugaskan', 'Keperluan Tugas', 'Tanggal Tugas', 'Tempat Tugas', 'Penerima Kuasa', 'Penerima Kuasa Nama', 'Keperluan Kuasa', 'Tentang', 'Menimbang', 'Mengingat', 'Memperhatikan', 'Isi', 'Tanggal Ditetapkan', 'Tanggal Diundangkan', 'No Lembaran', 'No Berita', 'Desa Mitra', 'Kepala Desa Mitra', 'Ketua BPD'];
 async function cetakNaskah(e, rec) {
   const path = naskahPath(e, rec), label = rec.jenis || UI[e].t;
   const m = modal('Membuat dokumen', `<div class="stack"><b>${esc(label)}</b><div class="skel"></div><div class="meta">Mengisi template…</div></div>`);
   try {
     let pth = path;
-    if (e === 'surat_keluar') { const nm = path.split('/').pop().replace(/\.docx$/, ''); let ada = NX.nama.indexOf(nm) >= 0; if (!ada) { try { ada = (await tplDaftar()).some(x => x.path === path); } catch (x) { } } if (!ada) pth = 'surat/naskah_surat_keluar.docx'; }
+    const umum = e === 'surat_keluar' ? 'surat/naskah_surat_keluar.docx' : NASKAH[e].umum;
+    if (umum && path !== umum) { const nm = path.split('/').pop().replace(/\.docx$/, ''); let ada = NX.nama.indexOf(nm) >= 0; if (!ada) { try { ada = (await tplDaftar()).some(x => x.path === path); } catch (x) { } } if (!ada) pth = umum; }
     const M = await petaNaskah(e, rec);
-    const nama = e === 'surat_keluar' ? NASKAH[e].nama(rec) : UI[e].t + ' ' + (rec.nomor || '') + ' - ' + String(rec.tentang || '').slice(0, 60);
+    const nama = NASKAH[e].nama ? NASKAH[e].nama(rec) : UI[e].t + ' ' + (rec.nomor || '') + ' - ' + String(rec.tentang || '').slice(0, 60);
     hasilDokumen(m, await buatDokumen({ path: pth, M, rows: [], jenis: 'surat', nama }));
   } catch (x) { m.body.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
 }
@@ -9369,7 +9430,9 @@ VIEWS.template = async (p, main) => {
   const ada = new Set(list.map(x => x.path));
   const kitN = NX.nama;
   const lblN = nm => nm === 'naskah_surat_keluar' ? 'Surat Keluar – Surat Biasa (juga dipakai jenis yang belum punya template)' : /^naskah_surat_keluar_/.test(nm) ? 'Surat Keluar – ' + judulKata(nm.replace('naskah_surat_keluar_', '').replace(/_/g, ' ')) : UI[nm.replace('naskah_', '')] ? UI[nm.replace('naskah_', '')].t : nm;
-  const naskahDaftar = Array.from(new Set(kitN.filter(n => /^naskah_/.test(n)).map(n => 'surat/' + n + '.docx').concat(list.filter(x => /^surat\/naskah_/.test(x.path)).map(x => x.path)))).sort().map(pth => [pth, lblN(pth.split('/').pop().replace(/\.docx$/, ''))]);
+  const naskahSemua = Array.from(new Set(kitN.filter(n => /^naskah_/.test(n)).map(n => 'surat/' + n + '.docx').concat(list.filter(x => /^surat\/naskah_/.test(x.path)).map(x => x.path)))).sort().map(pth => [pth, lblN(pth.split('/').pop().replace(/\.docx$/, ''))]);
+  const isBA = pth => /\/naskah_berita_acara/.test(pth), naskahDaftar = naskahSemua.filter(x => !isBA(x[0]));
+  const baDaftar = naskahSemua.filter(x => isBA(x[0])).map(([pth]) => { const nm = pth.split('/').pop().replace(/\.docx$/, '').replace(/^naskah_berita_acara_?/, ''); return [pth, nm ? 'Berita Acara ' + judulKata(nm.replace(/_/g, ' ')) : 'Berita Acara – Umum (juga dipakai jenis yang belum punya template)']; }).sort((a, b) => a[1].indexOf('Umum') >= 0 ? -1 : b[1].indexOf('Umum') >= 0 ? 1 : a[1].localeCompare(b[1]));
   const cari = pth => list.find(y => y.path === pth);
   const kb = x => Math.max(1, Math.round((x.size || 0) / 1024)) + ' KB';
   /* satu baris template: status + tombol ikon */
@@ -9399,6 +9462,9 @@ VIEWS.template = async (p, main) => {
         item({ path: 'surat/_umum.docx', label: 'Template umum', sub: 'untuk jenis tambahan tanpa template', ic: 'folder', hapus: 1 })
         + tambahan.map(j => item({ path: slugJenis(j.nama), label: j.nama.replace(/^Surat /, ''), umum: 1, edit: j.id, sub: (j.aktif === 'Tidak' ? 'tidak aktif · ' : '') + (isianJenis(j).length ? 'isian: ' + esc(isianJenis(j).join(', ')) : 'tanpa isian tambahan') })).join(''))
       + tags('Daftar tanda Surat Keterangan', TAG_SURAT, 'Huruf besar: tambahkan <b>_U</b>, mis. <span class="mono">{{Nama_U}}</span>. Jenis tambahan: setiap isian menjadi tanda dengan nama yang sama. Baris tabel berisi <span class="mono">{{Isian Label}}</span> diulang untuk semua isian.')],
+    ['ba', 'Berita Acara', () => sek('Berita acara (kertas F4)', `<button class="btn sm" data-act="tplUpBtn" data-p="ba/">${ic('plus')}Jenis berita acara</button>`, baDaftar.map(([path, label]) => item({ path, label, ic: 'stamp', hapus: 1 })).join(''))
+      + '<div class="meta">Template per jenis: beri nama file sesuai jenisnya, mis. <i>Berita Acara Pemeriksaan.docx</i>, lalu pilih jenis yang sama saat membuat berita acara. Jenis tanpa template memakai template Umum. Halaman terakhir berisi <span class="mono">{{Foto Dokumentasi}}</span>: diganti foto kegiatan (maks. 7) — tulis sendirian dalam satu paragraf.</div>'
+      + tags('Daftar tanda Berita Acara', TAG_BA, 'Dasar, Peserta, Uraian, Hasil: tulis tanda sendirian dalam satu paragraf, maka setiap baris isian menjadi paragraf baru. Huruf besar: tambahkan <b>_U</b>, mis. <span class="mono">{{Pihak 1_U}}</span>. Mengetahui/Jabatan Mengetahui/Nama Mengetahui kosong bila "Mengetahui Kepala Desa" = Tidak.')],
     ['naskah', 'Surat Keluar & Produk Hukum', () => sek('Surat keluar & produk hukum', `<button class="btn sm" data-act="tplUpBtn" data-p="naskah/">${ic('plus')}Jenis surat keluar</button>`, naskahDaftar.map(([path, label]) => item({ path, label, ic: /perdes|perkades|perbersama|sk_/.test(path) ? 'scale' : 'send' })).join(''))
       + '<div class="meta">Jenis surat keluar baru: beri nama file sesuai jenisnya, mis. <i>Surat Undangan Rapat.docx</i>, lalu ketik jenis yang sama di isian "Jenis Surat".</div>'
       + tags('Daftar tanda Surat Keluar & Produk Hukum', TAG_NASKAH, 'Menimbang, Mengingat, Isi, Isi Surat, Tembusan, Yang Ditugaskan: tulis tanda sendirian dalam satu paragraf, maka setiap baris isian menjadi paragraf baru.')],
@@ -9462,6 +9528,7 @@ VIEWS.template = async (p, main) => {
     if (!/\.(docx|xlsx)$/i.test(f.name)) return toast('Pilih file Word (.docx).', 1);
     if (path === 'rkp/' || path === 'rpjm/') path += f.name.replace(/[^\w\-. ()]+/g, '_');
     if (path === 'naskah/') path = 'surat/naskah_surat_keluar_' + slugNaskah(f.name.replace(/\.docx$/i, '')) + '.docx';
+    if (path === 'ba/') { const sl = slugNaskah(f.name.replace(/\.docx$/i, '').replace(/^\s*berita[\s_]+acara[\s_]*/i, '')); path = 'surat/naskah_berita_acara' + (sl && sl !== 'umum' ? '_' + sl : '') + '.docx'; }
     if (/\.xlsx$/i.test(f.name) !== /\.xlsx$/i.test(path)) return toast('Jenis file harus sama dengan template yang diganti (.docx).', 1);
     try { await DOCX.unzip(await f.arrayBuffer()); await tplSimpan(path, f); toast('Template disimpan.'); refresh(); } catch (x) { toast(x.message, 1); }
   };
