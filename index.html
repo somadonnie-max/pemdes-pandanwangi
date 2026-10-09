@@ -1280,6 +1280,23 @@ function hitungPajak(o) {
 }
 
 const HAK_TANAH = ['Hak Milik', 'Hak Guna Usaha', 'Hak Guna Bangunan', 'Hak Pakai', 'Hak Pengelolaan', 'Hak Milik atas Satuan Rumah Susun', 'Hak Wakaf'];
+const KKA_SK = [
+  ['400.12.2.1', 'Identitas Penduduk'], ['400.12.2.2', 'Pindah Datang Penduduk dalam Wilayah NKRI'], ['400.12.2.4', 'Pendataan Penduduk Rentan'],
+  ['400.12.3.1', 'Kelahiran dan Kematian'], ['400.12.3.2', 'Perkawinan dan Perceraian'],
+  ['400.9.14.1', 'Penanggulangan Kemiskinan: Identifikasi dan Analisis'], ['400.10.5.4', 'Usaha Ekonomi dan Keluarga'],
+  ['400.10.3.1', 'Kelembagaan Masyarakat'], ['300.1.4', 'Perlindungan Masyarakat'],
+  ['500.17.2.2', 'Pembinaan dan Pengendalian Administrasi Pertanahan'], ['400.10.2.2', 'Administrasi Pemerintahan Desa dan Kelurahan']];
+const KKA_ATURAN = [
+  [/yayasan|lembaga/i, '400.10.3.1'],
+  [/lahir|kematian|meninggal|wafat|\bmati\b/i, '400.12.3.1'],
+  [/nikah|kawin|janda|duda|cerai/i, '400.12.3.2'],
+  [/pindah|datang|domisili/i, '400.12.2.2'],
+  [/tidak mampu|sktm|miskin/i, '400.9.14.1'],
+  [/tanah|tkd|batas|kepemilikan|sporadik/i, '500.17.2.2'],
+  [/usaha|\bsku\b/i, '400.10.5.4'],
+  [/skck|kelakuan baik|kehilangan|keramaian|kepolisian/i, '300.1.4'],
+  [/beda nama|identitas|ktp|\bkk\b|kartu keluarga|penduduk|penghasilan|bekerja|waris|wali|kelakuan|ktp/i, '400.12.2.1']];
+const KKA_UMUM = '400.10.2.2';
 const OPT = {
   dusun: ['DUSUN KRAJAN 1', 'DUSUN KRAJAN 2', 'DUSUN KRAJAN 3', 'DUSUN TIMUR SAWAH', 'DUSUN TUNJUNGAN', 'DUSUN PEMUKIMAN'],
   jk: ['LAKI-LAKI', 'PEREMPUAN'],
@@ -1820,13 +1837,14 @@ const UI = {
   register_surat: {
     t: 'Surat Keterangan', ic: 'file', perm: 'pelayanan', excel: 1,
     fields: [F('tgl_surat', 'Tanggal Surat', 'date', { def: isoToday }), F('no', 'No. Register', 'text', { auto: 1 }), F('jenis_surat', 'Surat / Jenis Keterangan', 'text', { req: 1, wide: 1, list: ['Surat Keterangan Domisili', 'Surat Keterangan Tidak Mampu', 'Surat Keterangan Usaha', 'Surat Pengantar SKCK', 'Surat Keterangan Kelahiran', 'Surat Keterangan Kematian', 'Surat Keterangan Pindah', 'Surat Keterangan Belum Menikah', 'Surat Keterangan Penghasilan', 'Surat Keterangan Domisili Yayasan/Lembaga'] }),
+      F('klasifikasi', 'Kode Klasifikasi Arsip', 'text', { mono: 1, list: KKA_SK.map(x => x[0]), hint: 'Terisi otomatis sesuai jenis surat (Permendagri 83/2022). Boleh diubah.' }), F('penduduk_id', '', 'hidden'),
       F('pemohon', 'Pemohon', 'select', { opt: ['Perorangan', 'Lembaga / Instansi'], def: 'Perorangan', hint: 'Lembaga / Instansi: yayasan, masjid, TPQ, sekolah, kelompok, instansi, dll.' }),
       F('lembaga_nama', 'Nama Lembaga / Instansi', 'text', { wide: 1, when: { k: 'pemohon', v: 'Lembaga / Instansi' }, listFrom: { e: 'lembaga', k: 'nama' }, hint: 'Ketik atau pilih dari data Lembaga/Yayasan: data lembaga & penanggung jawab terisi otomatis',
         fill: x => ({ lembaga_jenis: x.jenis, lembaga_alamat: [x.alamat, x.dusun ? 'Dusun ' + judulKata(String(x.dusun).replace(/^DUSUN\s+/i, '')) : '', x.rt ? 'RT ' + x.rt : '', x.rw ? 'RW ' + x.rw : ''].filter(Boolean).join(' '), lembaga_no: x.no_sk, lembaga_bidang: x.bidang, lembaga_kemenkumham: x.no_kemenkumham, pj_jabatan: x.ketua_jabatan || 'Ketua', nik: String(x.ketua_nik || '').indexOf('•') >= 0 ? '' : x.ketua_nik, nama: x.ketua_nama }) }),
       F('lembaga_jenis', 'Jenis Lembaga', 'text', { when: { k: 'pemohon', v: 'Lembaga / Instansi' }, list: OPT.jenisLembaga }), F('lembaga_no', 'No. SK / Akta / Izin', 'text', { when: { k: 'pemohon', v: 'Lembaga / Instansi' } }),
       F('lembaga_bidang', 'Bidang Kegiatan', 'text', { grp: ['Surat Keterangan Domisili Yayasan/Lembaga'], hint: 'mis. Pendidikan anak usia dini, Sosial keagamaan' }), F('lembaga_kemenkumham', 'No. SK Kemenkumham', 'text', { grp: ['Surat Keterangan Domisili Yayasan/Lembaga'], hint: 'Kosongkan bila belum ada' }),
       F('lembaga_alamat', 'Alamat Lembaga', 'text', { wide: 1, when: { k: 'pemohon', v: 'Lembaga / Instansi' } }),
-      F('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1, nikfill: 1, hint: 'Ketik 16 digit: data dari Data Penduduk terisi otomatis' }), F('nama', 'Nama', 'text', { req: 1, up: 1, wide: 1, lblW: { k: 'pemohon', v: 'Lembaga / Instansi', l: 'Nama Penanggung Jawab' } }),
+      F('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1, nikfill: 1, hint: 'Ketik sebagian NIK (atau nama di isian Nama), lalu pilih dari daftar: semua isian terisi otomatis' }), F('nama', 'Nama', 'text', { req: 1, up: 1, wide: 1, lblW: { k: 'pemohon', v: 'Lembaga / Instansi', l: 'Nama Penanggung Jawab' } }),
       F('pj_jabatan', 'Jabatan dalam Lembaga', 'text', { when: { k: 'pemohon', v: 'Lembaga / Instansi' }, list: ['Ketua', 'Pengasuh', 'Kepala Sekolah', 'Takmir', 'Pimpinan', 'Direktur', 'Sekretaris', 'Bendahara'] }),
       F('tempat_lahir', 'Tempat Lahir', 'text', { up: 1 }), F('tgl_lahir', 'Tanggal Lahir', 'date'), F('umur', 'Umur', 'text', { umurDari: ['tgl_lahir', 'tgl_surat'], hint: 'Otomatis dari tanggal lahir, dihitung pada tanggal surat' }),
       F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk }), F('agama', 'Agama', 'select', { opt: OPT.agama }), F('pekerjaan', 'Pekerjaan', 'text', { up: 1, dd: OPT.pekerjaan }), F('status_kawin', 'Status Perkawinan', 'text', { up: 1, list: OPT.kawin }),
@@ -1840,15 +1858,16 @@ const UI = {
       ...[1, 2, 3, 4, 5, 6, 7, 8].map(n => F('isian' + n, 'Isian ' + n, 'text', { dyn: n }))],
     year: 'tgl_surat', grpBy: 'jenis_surat',
     row: r => ({ t: r.pemohon === 'Lembaga / Instansi' && r.lembaga_nama ? r.lembaga_nama + ' (' + r.nama + ')' : r.nama, s: [r.jenis_surat, r.keperluan].filter(Boolean).join(' · '), av: initials(r.lembaga_nama && r.pemohon === 'Lembaga / Instansi' ? r.lembaga_nama : r.nama), date: r.tgl_surat, r: r.no ? 'No. ' + r.no : '' }),
-    print: { title: 'BUKU REGISTER SURAT KETERANGAN', land: 1, cols: [['No', 'no'], ['Tanggal', r => fDate(r.tgl_surat)], ['Nama', 'nama'], ['L/P', r => (r.jk || '').slice(0, 1)], ['Umur', 'umur'], ['Alamat', r => String(r.dusun || '').replace('DUSUN ', '') + (r.rt ? ' RT ' + r.rt : '') + (r.rw ? '/RW ' + r.rw : '')], ['Jenis Surat', 'jenis_surat'], ['Keperluan', 'keperluan']] }
+    print: { title: 'BUKU REGISTER SURAT KETERANGAN', land: 1, cols: [['No', 'no'], ['Kode', r => esc(r.klasifikasi || kkaSurat(r.jenis_surat))], ['Tanggal', r => fDate(r.tgl_surat)], ['Nama', 'nama'], ['L/P', r => (r.jk || '').slice(0, 1)], ['Umur', 'umur'], ['Alamat', r => String(r.dusun || '').replace('DUSUN ', '') + (r.rt ? ' RT ' + r.rt : '') + (r.rw ? '/RW ' + r.rw : '')], ['Jenis Surat', 'jenis_surat'], ['Keperluan', 'keperluan']] }
   },
   jenis_surat: {
     t: 'Jenis Surat Keterangan', ic: 'file', perm: 'admin', read: '*', write: 'admin', sort: 'nama', asc: 1,
     fields: [F('nama', 'Nama Jenis Surat', 'text', { req: 1, wide: 1, hint: 'mis. Surat Keterangan Ahli Waris' }),
       F('isi', 'Kalimat isi surat', 'textarea', { wide: 1, hint: 'Boleh memakai tanda, mis. Orang tersebut di atas benar penduduk Desa {{Desa}} dan ...' }),
       F('isian', 'Isian tambahan (maks. 8)', 'textarea', { wide: 1, hint: 'Tulis nama isian dipisah koma atau baris baru, mis.: Nama Yayasan, Bidang Kegiatan, Nomor Akta. Di template Word tulis sama persis dalam kurung kurawal: {{Nama Yayasan}}. Jangan memakai nama tanda bawaan seperti Nama, Alamat, Nama_U.' }),
+      F('klasifikasi', 'Kode Klasifikasi Arsip', 'text', { mono: 1, list: KKA_SK.map(x => x[0]), hint: 'Kosongkan: dipilih otomatis dari nama jenis surat (Permendagri 83/2022)' }),
       F('aktif', 'Aktif', 'select', { opt: ['Ya', 'Tidak'], def: 'Ya' })],
-    row: r => ({ t: r.nama, s: isianJenis(r).join(', ') || 'Tanpa isian tambahan', av: ic('file'), pill: r.aktif === 'Tidak' ? '<span class="pill">Tidak aktif</span>' : '' })
+    row: r => ({ t: r.nama, s: [r.klasifikasi, isianJenis(r).join(', ') || 'Tanpa isian tambahan'].filter(Boolean).join(' · '), av: ic('file'), pill: r.aktif === 'Tidak' ? '<span class="pill">Tidak aktif</span>' : '' })
   },
   ref_hukum: {
     t: 'Dasar Hukum', ic: 'book', perm: '*', write: 'perencanaan', sort: 'no', asc: 1,
@@ -4360,7 +4379,7 @@ VIEWS.form = async (p, main, alive) => {
   idHooks(frm, e, flds, p, rec);
   if (e === 'penduduk' || e === 'keluarga') wilHook(frm, e, rec, !p.id);
   if (e === 'penduduk') ortuHooks(frm, p);
-  if (e === 'register_surat') suketNamaHook(frm);
+  if (e === 'register_surat') { suketCariHook(frm); kkaHook(frm); }
   namaHooks(frm, e, flds);
   /* NIK -> isi otomatis dari Data Penduduk (hanya kolom yang masih kosong) */
   /* umur otomatis: dari tanggal lahir, dihitung pada tanggal surat dikeluarkan */
@@ -4465,6 +4484,7 @@ VIEWS.form = async (p, main, alive) => {
       if (e === 'rentan') rentanFlags(val);
       if (e === 'penyaluran_bansos' && !val.keluarga_id && val.p_penduduk_id) { try { const kl = await call('keluargaOf', { penduduk_id: val.p_penduduk_id }); if (kl) val.keluarga_id = kl.id; } catch (er) { } }
       if (e === 'ntcr') await ntcrNomor(val);
+      if (e === 'register_surat' && !val.klasifikasi) val.klasifikasi = kkaSurat(val.jenis_surat);
       const dtVal = e === 'keluarga' ? kelDtAmbil(val) : null;
       const saved = await call('save', { entity: e, record: val });
       if (dtVal && saved) { try { const m = await kelDtSimpan(Object.assign({}, rec, val, saved), dtVal, rec._dt); if (m) setTimeout(() => toast('Tersimpan. ' + m), 400); } catch (er) { toast('Data keluarga tersimpan, tetapi isian DTSEN gagal: ' + er.message, 1); } }
@@ -5167,6 +5187,90 @@ function namaHook(frm, el, f) {
 }
 /* Suket: ketik nama -> pilih warga -> NIK diisi, lalu kolom lain terisi otomatis lewat pencocokan NIK.
    Bisa dipakai walau pengguna tidak punya akses menu Data Penduduk. */
+/* =====================================================================
+   KODE KLASIFIKASI ARSIP SURAT KETERANGAN — Permendagri No. 83 Tahun 2022
+   (kode lama 470 berasal dari Permendagri 78/2012 yang lampiran kodenya sudah dicabut)
+   ===================================================================== */
+const kkaNama = k => (KKA_SK.find(x => x[0] === k) || [])[1] || '';
+/** kode klasifikasi untuk satu jenis surat: yang diatur admin di Jenis Surat, lalu aturan kata kunci */
+function kkaSurat(jenis) {
+  const j = String(jenis || '').trim(); if (!j) return '';
+  const def = (S.jenisSurat || []).find(x => x.nama === j);
+  if (def && def.klasifikasi) return def.klasifikasi;
+  const a = KKA_ATURAN.find(([re]) => re.test(j));
+  return a ? a[1] : KKA_UMUM;
+}
+/** form Surat Keterangan: kode klasifikasi ikut jenis surat (selama belum diubah manual) */
+function kkaHook(frm) {
+  const js = $('#f_jenis_surat', frm), kk = $('#f_klasifikasi', frm); if (!js || !kk) return;
+  const box = kk.closest('.f'), nt = document.createElement('span'); nt.className = 'hint'; box.appendChild(nt);
+  let auto = !kk.value || kk.value === kkaSurat(js.value);
+  const tulis = () => { const n = kkaNama(kk.value.trim()); nt.textContent = n ? n + (auto ? ' (otomatis sesuai jenis surat)' : '') : kk.value ? 'Kode diisi manual.' : ''; };
+  const ikut = () => { if (!auto) return; kk.value = kkaSurat(js.value); tulis(); };
+  ['input', 'change'].forEach(ev => js.addEventListener(ev, ikut));
+  kk.addEventListener('input', () => { auto = !kk.value.trim(); if (auto) ikut(); else tulis(); });
+  if (!kk.value) ikut(); else tulis();
+}
+/** template lama: "Nomor : 470/{{No}}/..." -> kode klasifikasi surat ini (teks template tidak perlu diubah) */
+function kkaGanti(x, kode) {
+  if (!kode || /\{\{\s*Kode Klasifikasi\s*\}\}/.test(x)) return x;
+  let sudah = false;
+  return x.replace(/<w:p[ >][\s\S]*?<\/w:p>/g, p => {
+    if (sudah) return p;
+    const teks = (p.match(/<w:t(?: [^>]*)?>[^<]*<\/w:t>/g) || []).map(t => t.replace(/<[^>]+>/g, '')).join('');
+    const m = teks.match(/Nomor\s*:?\s*(\d{3}(?:\.\d{1,2}){0,3})\s*\/\s*(?:\{\{|\.|…|\d|\s)/i);
+    if (!m) return p;
+    const lama = m[1].replace(/\./g, '\\.');
+    const re = new RegExp('(<w:t(?: [^>]*)?>[^<]*?)' + lama + '(?![\\d.]*\\d)');
+    if (!re.test(p)) return p;
+    sudah = true;
+    return p.replace(re, '$1' + kode);
+  });
+}
+
+/* ---- Surat Keterangan: ketik NIK atau Nama -> daftar warga di bawah isian -> pilih -> semua isian terisi ---- */
+const SK_ISI = ['nik', 'nama', 'tempat_lahir', 'tgl_lahir', 'jk', 'agama', 'pekerjaan', 'status_kawin', 'dusun', 'rt', 'rw'];
+function suketCariHook(frm) {
+  const nm = $('#f_nama', frm), nik = $('#f_nik', frm); if (!nm || !nik || nm.readOnly) return;
+  const pid = $('#f_penduduk_id', frm);
+  const set = (k, v) => {
+    const el = $('#f_' + k, frm); if (!el || el.readOnly) return;
+    v = v == null ? '' : String(v);
+    if (el.tagName === 'SELECT') {
+      const lv = v.toLowerCase(), o = Array.from(el.options).find(o => o.value && (o.value.toLowerCase() === lv || lv.indexOf(o.value.toLowerCase() + '/') === 0 || o.value.replace(/\s+/g, '').toLowerCase() === lv.replace(/\s+/g, '')));
+      el.value = o ? o.value : ''; return;
+    }
+    el.value = v;
+  };
+  const pilih = async p => {
+    let d = p; try { d = Object.assign({}, p, (await wargaAmbil(p.id)) || {}); } catch (x) { }
+    SK_ISI.forEach(k => set(k, d[k]));
+    if (pid) pid.value = d.id || '';
+    const note = $('#nikNote', frm); if (note) note.textContent = '✓ Diisi dari Data Penduduk: ' + (d.nama || '') + (d.status && d.status !== 'Aktif' ? ' (status: ' + d.status + ')' : '');
+    ['tgl_lahir', 'nama'].forEach(k => { const el = $('#f_' + k, frm); if (el) el.dispatchEvent(new Event('change', { bubbles: true })); });
+  };
+  const pasang = (inp, ok) => {
+    const box = inp.closest('.f'); if (!box) return; box.classList.add('pmbox');
+    const dd = document.createElement('div'); dd.className = 'pmdd'; dd.hidden = true; box.appendChild(dd);
+    let tm, hasil = [];
+    inp.addEventListener('input', () => {
+      if (pid && inp === nm) pid.value = '';
+      clearTimeout(tm); const q = inp.value.trim();
+      if (!ok(q)) { dd.hidden = true; return; }
+      tm = setTimeout(async () => {
+        try { hasil = await wargaCari(q, 8); } catch (x) { hasil = []; }
+        if (inp.value.trim() !== q) return;
+        dd.innerHTML = hasil.length ? hasil.map((p, i) => `<button type="button" data-i="${i}"><b>${esc(p.nama || '')}</b> <small class="mono">${esc(p.nik || '')}</small><br><small>${esc(String(p.dusun || '').replace(/^DUSUN /, ''))}${p.rt ? ' RT ' + esc(p.rt) + '/' + esc(p.rw || '') : ''}${p.tgl_lahir ? ' · lahir ' + esc(fDate(p.tgl_lahir)) : ''}${p.status && p.status !== 'Aktif' ? ' · ' + esc(p.status) : ''}</small></button>`).join('') : '<div class="meta" style="padding:8px">Tidak ada di Data Penduduk. Isi manual.</div>';
+        dd.hidden = false;
+      }, 280);
+    });
+    dd.addEventListener('click', ev => { const b = ev.target.closest('[data-i]'); if (!b) return; const p = hasil[Number(b.dataset.i)]; dd.hidden = true; if (p) pilih(p); });
+    inp.addEventListener('keydown', ev => { if (ev.key === 'Escape') dd.hidden = true; });
+    document.addEventListener('click', ev => { if (!box.contains(ev.target)) dd.hidden = true; });
+  };
+  pasang(nm, q => q.length >= 3 && !/^\d+$/.test(q));
+  pasang(nik, q => /^\d{4,15}$/.test(q));
+}
 function suketNamaHook(frm) {
   const nm = $('#f_nama', frm), nik = $('#f_nik', frm); if (!nm || !nik || nm.readOnly) return;
   const box = nm.closest('.f'); if (!box) return; box.classList.add('pmbox');
@@ -7663,7 +7767,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '151', tgl: '2026-10-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '152', tgl: '2026-10-09', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -8250,6 +8354,7 @@ const DOCX = (() => {
       let x = dec.decode(f.data);
       if (foto && /word\/document\.xml$/.test(f.name)) x = await sisipFoto(x, files, o);
       if (prog && /word\/document\.xml$/.test(f.name)) x = await sisipProgres(x, files, o);
+      if (!xlsx && o && o.kka && /word\/document\.xml$/.test(f.name)) x = kkaGanti(x, o.kka);
       f.data = enc.encode(fillXml(x, M, /document\.xml$/.test(f.name) ? rows : null, missing));
     }
     return { blob: await zip(files, xlsx ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'), missing };
@@ -8742,7 +8847,9 @@ async function buatDokumen(o) {
   const buf = await tplAmbil(o.path);
   const xlsx = /\.xlsx$/i.test(o.path);
   let ft = []; try { ft = JSON.parse((o.M && o.M.__foto) || '[]'); } catch (x) { }
-  const { blob, missing } = await DOCX.fill(buf, o.M, o.rows, xlsx, ft.length ? { fotos: ft.slice(0, 7), ambil: fotoCrop } : o.grup ? { grup: o.grup, judul: o.judulPb, ambil: fotoCrop } : null, xlsx ? null : await logoGanti());
+  const oo = ft.length ? { fotos: ft.slice(0, 7), ambil: fotoCrop } : o.grup ? { grup: o.grup, judul: o.judulPb, ambil: fotoCrop } : o.kka ? {} : null;
+  if (oo && o.kka) oo.kka = o.kka;
+  const { blob, missing } = await DOCX.fill(buf, o.M, o.rows, xlsx, oo, xlsx ? null : await logoGanti());
   const nama = namaFile(o.nama) + (xlsx ? '.xlsx' : '.docx');
   if (xlsx) saveBlob(blob, nama);
   return { nama, missing, blob, jenis: xlsx ? '' : o.jenis, xlsx };
@@ -9015,7 +9122,8 @@ async function petaSurat(reg) {
   const alamat = [akkT ? (/^(dusun|dsn|jl|jalan|perum|kampung)\b/i.test(akkT) ? akkT : 'Dusun ' + akkT) : dusun ? 'Dusun ' + dusun : '', v('rt') ? 'RT ' + v('rt') : '', v('rw') ? 'RW ' + v('rw') : ''].filter(Boolean).join(' ');   /* tanpa nama desa: sudah ada di kalimat surat */
   const tl = v('tgl_lahir'), d = parseD(reg.tgl_surat) || new Date();
   const M = Object.assign(petaDesa(), {
-    No: reg.no || '', 'Nomor Register': reg.no || '', Tahun: String(d.getFullYear()), 'Tanggal Surat': dPanjang(reg.tgl_surat || isoToday()), 'Jenis Surat': reg.jenis_surat || '',
+    No: reg.no || '', 'Nomor Register': reg.no || '', Tahun: String(d.getFullYear()), 'Kode Klasifikasi': reg.klasifikasi || kkaSurat(reg.jenis_surat),
+    'Nomor Surat': [reg.klasifikasi || kkaSurat(reg.jenis_surat), reg.no || '', (S.set && S.set.kode_surat) || '', String(d.getFullYear())].join('/'), 'Tanggal Surat': dPanjang(reg.tgl_surat || isoToday()), 'Jenis Surat': reg.jenis_surat || '',
     Nama: judulKata(v('nama')), NIK: String(v('nik')).indexOf('•') >= 0 ? '' : v('nik'), 'No KK': String(p.kk || '').indexOf('•') >= 0 ? '' : (p.kk || ''),
     'Tempat Lahir': judulKata(v('tempat_lahir')), 'Tanggal Lahir': dPanjang(tl), TTL: [judulKata(v('tempat_lahir')), dPanjang(tl)].filter(Boolean).join(', '),
     Umur: tl ? umur(tl, reg.tgl_surat) + ' tahun' : (reg.umur || ''), 'Jenis Kelamin': judulKata(v('jk')), Agama: judulKata(v('agama')), Pekerjaan: judulKata(v('pekerjaan')),
@@ -9051,7 +9159,7 @@ async function cetakSurat(reg) {
   try {
     const M = await petaSurat(reg), rows = M.rows; delete M.rows;
     const r = await buatDokumen({
-      path, M, rows, jenis: 'surat', nama: reg.jenis_surat.replace(/^Surat (Keterangan )?/, 'SK ') + ' - ' + M.Nama + (reg.no ? ' - No ' + reg.no : '')
+      path, M, rows, jenis: 'surat', kka: M['Kode Klasifikasi'], nama: reg.jenis_surat.replace(/^Surat (Keterangan )?/, 'SK ') + ' - ' + M.Nama + (reg.no ? ' - No ' + reg.no : '')
     });
     hasilDokumen(m, r);
   } catch (x) { m.body.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
@@ -9484,7 +9592,7 @@ VIEWS.template = async (p, main) => {
   };
   const tags = (judul, arr, catatan) => `<details class="tpl-tags"><summary>${ic('list')} ${esc(judul)} <span class="meta">— ketuk tanda untuk menyalin</span></summary>${catatan ? `<div class="meta">${catatan}</div>` : ''}<div class="tpl-chips">${arr.map(k => `<button type="button" class="chip mono" data-act="tagCopy" data-t="${esc(k)}">{{${esc(k)}}}</button>`).join('')}</div></details>`;
   const sek = (judul, aksi, isi) => `<div class="sec-h"><h2>${judul}</h2>${aksi ? `<span class="btns">${aksi}</span>` : ''}</div><div class="tpl-list">${isi}</div>`;
-  const TAG_SURAT = ['Desa', 'Kecamatan', 'Kabupaten', 'Alamat Desa', 'Kode Pos', 'Kode Desa', 'No', 'Tahun', 'Tanggal Surat', 'Kepala Desa', 'Nama', 'NIK', 'No KK', 'TTL', 'Tempat Lahir', 'Tanggal Lahir', 'Umur', 'Jenis Kelamin', 'Agama', 'Pekerjaan', 'Status Perkawinan', 'Kewarganegaraan', 'Pendidikan', 'Alamat', 'Dusun', 'RT', 'RW', 'Keperluan', 'Alamat Domisili', 'Lama Tinggal', 'Nama Usaha', 'Jenis Usaha', 'Alamat Usaha', 'Mulai Usaha', 'Nama Bayi', 'JK Bayi', 'Hari Lahir Bayi', 'Tanggal Lahir Bayi', 'Jam Lahir', 'Tempat Lahir Bayi', 'Anak Ke', 'Nama Ayah', 'Nama Ibu', 'Hari Meninggal', 'Tanggal Meninggal', 'Jam Meninggal', 'Tempat Meninggal', 'Sebab Meninggal', 'Pelapor', 'Alamat Tujuan', 'Alasan Pindah', 'Jumlah Pengikut', 'Penghasilan', 'Penghasilan Terbilang', 'Pemohon', 'Nama Lembaga', 'Jenis Lembaga', 'Bidang Kegiatan', 'No Akta', 'No SK Lembaga', 'SK Kemenkumham', 'Alamat Lembaga', 'Penanggung Jawab', 'Jabatan', 'Jenis Surat', 'Isi Surat', 'Isian Label', 'Isian Nilai', 'Isian Titik2'];
+  const TAG_SURAT = ['Desa', 'Kecamatan', 'Kabupaten', 'Alamat Desa', 'Kode Pos', 'Kode Desa', 'No', 'Kode Klasifikasi', 'Nomor Surat', 'Tahun', 'Tanggal Surat', 'Kepala Desa', 'Nama', 'NIK', 'No KK', 'TTL', 'Tempat Lahir', 'Tanggal Lahir', 'Umur', 'Jenis Kelamin', 'Agama', 'Pekerjaan', 'Status Perkawinan', 'Kewarganegaraan', 'Pendidikan', 'Alamat', 'Dusun', 'RT', 'RW', 'Keperluan', 'Alamat Domisili', 'Lama Tinggal', 'Nama Usaha', 'Jenis Usaha', 'Alamat Usaha', 'Mulai Usaha', 'Nama Bayi', 'JK Bayi', 'Hari Lahir Bayi', 'Tanggal Lahir Bayi', 'Jam Lahir', 'Tempat Lahir Bayi', 'Anak Ke', 'Nama Ayah', 'Nama Ibu', 'Hari Meninggal', 'Tanggal Meninggal', 'Jam Meninggal', 'Tempat Meninggal', 'Sebab Meninggal', 'Pelapor', 'Alamat Tujuan', 'Alasan Pindah', 'Jumlah Pengikut', 'Penghasilan', 'Penghasilan Terbilang', 'Pemohon', 'Nama Lembaga', 'Jenis Lembaga', 'Bidang Kegiatan', 'No Akta', 'No SK Lembaga', 'SK Kemenkumham', 'Alamat Lembaga', 'Penanggung Jawab', 'Jabatan', 'Jenis Surat', 'Isi Surat', 'Isian Label', 'Isian Nilai', 'Isian Titik2'];
   const TAG_SPP = ['Desa', 'Kecamatan', 'Kabupaten', 'Nomor SPP', 'Tanggal SPP', 'Tanggal Cair', 'Tahun', 'Jenis SPP', 'Bidang', 'Kode Kegiatan', 'Kegiatan', 'Uraian', 'Penerima', 'NPWP', 'Jenis Belanja', 'Jumlah', 'Jumlah Angka', 'Terbilang', 'Potongan', 'Netto', 'Netto Angka', 'Terbilang Netto', 'Kepala Desa', 'Sekretaris Desa', 'Bendahara', 'PKA', 'Jabatan PKA', 'R No', 'R Kode', 'R Uraian', 'R Sumber', 'R Jumlah', 'P Jenis', 'P Jumlah'];
   const TAG_ADD = ['Desa', 'Kecamatan', 'Kabupaten', 'Alamat Desa', 'Kode Pos', 'Kode Desa', 'Nomor', 'Tanggal Surat', 'Tahun', 'Bulan', 'Periode', 'Tahap', 'Jenis Dana', 'Nilai', 'Jumlah Angka', 'Terbilang', 'Kepala Desa', 'Alamat Kepala Desa', 'Dusun_KD', 'No Hp KD', 'Email KD', 'Email', 'Bendahara', 'Bank', 'No Rekening', 'Rekening', 'Atas Nama', 'Pagu ADD', 'Pagu Siltap', 'Pagu Dusun', 'Lalu', 'Sisa', 'Jumlah BPJS', 'Ditransfer', 'BPJS Kades', 'BPJS Perangkat', 'Realisasi', 'Selisih', 'Jabatan Kosong', 'Hari', 'tgl', 'bln', 'Jml KD', 'jml SD', 'Jml KS', 'Jml KU', 'Jml KN', 'jml tot', 'Camat', 'Camat_U', 'NIP Camat', 'Jumlah Pagu', 'Total', 'Sisa Rincian', 'R No', 'R Jabatan', 'R Nama', 'R Siltap', 'R BPJS', 'R Transfer', 'R NIK', 'R Ket', 'R Uraian', 'R Pagu', 'R Lalu', 'R Ajuan', 'R Total', 'R Sisa', 'R Lokasi'];
   const tambahan = S.jenisSurat.filter(j => !SURAT[j.nama]);
