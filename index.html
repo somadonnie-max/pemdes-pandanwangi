@@ -1907,6 +1907,9 @@ const UI = {
 };
 /* ---- blok data orang (dipakai Tanah, NTCR, Rentan): pilih dari Data Penduduk atau isi manual ---- */
 function orangF(pre, judul, o = {}) {
+  if (o.lite) { const w = o.when ? { when: o.when } : {}; const X = (k, l, t, op) => F(pre + k, l, t, Object.assign({}, w, op || {}));
+    return [X('_h', judul, 'head', { hint: 'Ketik nama lalu pilih dari Data Penduduk, atau isi manual.' }), X('nama', 'Nama', 'text', { up: 1, wide: 1, opick: 1 }), F(pre + 'penduduk_id', '', 'hidden'), X('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1 })]
+      .concat(o.kk ? [X('kk', 'Nomor KK', 'text', { mono: 1, len: 16, sens: 1 })] : []).concat([X('wn', 'Kewarganegaraan', 'select', { opt: OPT.wn, def: 'WNI' })]); }
   const w = o.when ? { when: o.when } : {};
   const X = (k, l, t, op) => F(pre + k, l, t, Object.assign({}, w, op || {}));
   return [X('_h', judul, 'head', { hint: o.hint || (o.buat ? 'Ketik nama lalu pilih dari Data Penduduk. Bila tidak ada (mis. warga luar desa), isi manual: saat disimpan otomatis masuk Data Penduduk (luar desa).' : 'Ketik nama lalu pilih dari Data Penduduk, atau isi manual.') }),
@@ -1928,6 +1931,23 @@ const RENTAN_KT = ['Warga miskin', 'Keluarga miskin', 'Yatim', 'Piatu', 'Yatim p
 const RENTAN_GRP = { miskin: ['Warga miskin', 'Keluarga miskin', 'Kelompok marginal lainnya'], anak: ['Yatim', 'Piatu', 'Yatim piatu', 'Anak terlantar'], lansia: ['Lansia'], dis: ['Penyandang disabilitas'], pkk: ['Perempuan kepala keluarga'], ibu: ['Ibu hamil', 'Ibu menyusui'], balita: ['Balita', 'Stunting'] };
 const RENTAN_BANSOS = ['BLT Dana Desa', 'PKH', 'BPNT / Sembako', 'PBI JK (BPJS Kesehatan)', 'PIP / KIP', 'ATENSI (Kemensos)', 'Bantuan Rumah Tidak Layak Huni', 'Alat bantu disabilitas', 'Bantuan pangan (beras)', 'Zakat / BAZNAS', 'Bantuan Pemkab', 'Bantuan Pemprov', 'Lainnya'];
 const RT_WALI = { when: { k: 'kategori', v: ['Yatim', 'Piatu', 'Yatim piatu', 'Anak terlantar', 'Lansia', 'Penyandang disabilitas'] } };
+/* ---- Formulir Adminduk (Permendagri 109/2019) — v164 ---- */
+const F_ADM = [['F-1.01', 'F-1.01 Formulir Biodata Keluarga'], ['F-1.02', 'F-1.02 Pendaftaran Peristiwa Kependudukan (KK, KTP-el, KIA)'], ['F-1.03', 'F-1.03 Pendaftaran Perpindahan Penduduk'],
+  ['F-1.04', 'F-1.04 Surat Pernyataan Tidak Memiliki Dokumen Kependudukan'], ['F-1.06', 'F-1.06 Surat Pernyataan Perubahan Elemen Data Kependudukan'], ['F-2.01', 'F-2.01 Pelaporan Pencatatan Sipil (Kelahiran / Kematian)'],
+  ['F-2.03', 'F-2.03 SPTJM Kebenaran Data Kelahiran'], ['F-2.04', 'F-2.04 SPTJM Kebenaran sebagai Pasangan Suami Istri']];
+const admKode = frm => String((($('#f_formulir', frm) || {}).value) || '').slice(0, 6);
+const AW_ = (...k) => ({ when: { fn: frm => k.indexOf(admKode(frm)) >= 0 } });
+const admLahir = frm => admKode(frm) === 'F-2.03' || (admKode(frm) === 'F-2.01' && (($('#f_lp_jenis', frm) || {}).value || 'Kelahiran') === 'Kelahiran');
+const admMati = frm => admKode(frm) === 'F-2.01' && (($('#f_lp_jenis', frm) || {}).value) === 'Kematian';
+const JP_KK = ['Baru – Membentuk Keluarga Baru', 'Baru – Penggantian Kepala Keluarga', 'Baru – Pisah KK', 'Baru – Pindah Datang', 'Baru – WNI dari LN karena Pindah', 'Baru – Rentan Adminduk',
+  'Perubahan Data – Menumpang dalam KK', 'Perubahan Data – Peristiwa Penting', 'Perubahan Data – Perubahan elemen data yang tercantum dalam KK', 'Hilang/Rusak – Hilang', 'Hilang/Rusak – Rusak'];
+const JP_KTP = ['Baru', 'Pindah Datang', 'Hilang/Rusak – Hilang', 'Hilang/Rusak – Rusak', 'Perpanjangan ITAP', 'Perubahan Status Kewarganegaraan', 'Luar Domisili', 'Transmigrasi'];
+const JP_KIA = ['Baru', 'Hilang/Rusak – Hilang', 'Hilang/Rusak – Rusak', 'Perpanjangan ITAP', 'Lainnya'];
+const JP_SYARAT = ['KK Lama/KK Rusak', 'Buku nikah/kutipan akta perkawinan', 'Kutipan akta perceraian', 'Surat Keterangan Pindah', 'Surat Keterangan Pindah Luar Negeri', 'Surat Keterangan Pindah dari Perwakilan RI',
+  'KTP-el Rusak', 'Dokumen Perjalanan', 'Surat keterangan hilang dari kepolisian', 'Surat keterangan/bukti perubahan Peristiwa Kependudukan dan Peristiwa Penting', 'SPTJM perkawinan/perceraian belum tercatat',
+  'Akta Kematian', 'Surat pernyataan penyebab terjadinya hilang atau rusak', 'Surat pernyataan bersedia menerima sebagai anggota keluarga', 'Surat kuasa pengasuhan anak dari orang tua/wali', 'Kartu izin tinggal tetap'];
+const PD_KLAS = ['Dalam satu desa/kelurahan', 'Antar desa/kelurahan dalam satu kecamatan', 'Antar kecamatan dalam satu kabupaten/kota', 'Antar kabupaten/kota dalam satu provinsi', 'Antar provinsi'];
+const PD_JENIS = ['Kepala Keluarga', 'Kepala Keluarga dan Sebagian Anggota Keluarga', 'Kepala Keluarga dan Seluruh Anggota Keluarga', 'Anggota Keluarga'];
 const UI_NTCR = {
   ntcr: {
     t: 'Buku NTCR', ic: 'users', year: 'tanggal', sort: 'tanggal', excel: 1,
@@ -1951,6 +1971,56 @@ const UI_NTCR = {
       ['Suami', r => `<b>${esc(r.s_nama || '')}</b>${r.sa_nama ? ' bin ' + esc(r.sa_nama) : ''}<br>${esc([r.s_tgl_lahir ? umur(r.s_tgl_lahir) + ' th' : '', r.s_pekerjaan, r.s_alamat].filter(Boolean).join(', '))}${r.s_status_pend ? '<br><i>' + esc(r.s_status_pend) + '</i>' : ''}`],
       ['Istri', r => `<b>${esc(r.i_nama || '')}</b>${r.ia_nama ? ' binti ' + esc(r.ia_nama) : ''}<br>${esc([r.i_tgl_lahir ? umur(r.i_tgl_lahir) + ' th' : '', r.i_pekerjaan, r.i_alamat].filter(Boolean).join(', '))}${r.i_status_pend ? '<br><i>' + esc(r.i_status_pend) + '</i>' : ''}`],
       ['Tgl & Tempat Peristiwa', r => fDate(r.tgl_peristiwa) + (r.tempat_peristiwa ? '<br>' + esc(r.tempat_peristiwa) : '')], ['No. Akta', r => esc(r.no_akta || '') + (r.tgl_akta ? '<br>' + fDate(r.tgl_akta) : '')], ['Ket', 'ket']] }
+  },
+  adminduk: {
+    t: 'Formulir Adminduk', ic: 'file', m: 'register_surat', year: 'tanggal', sort: 'tanggal', excel: 1,
+    fields: [F('tanggal', 'Tanggal', 'date', { req: 1, def: isoToday }), F('formulir', 'Formulir', 'select', { opt: F_ADM.map(x => x[1]), req: 1, wide: 1, hint: 'Blanko resmi Permendagri No. 109 Tahun 2019. Isian di bawah menyesuaikan formulir yang dipilih.' }),
+      ...orangF('p_', 'Pemohon / Pelapor / Yang menyatakan', { kk: 1, hp: 1, req: 1, ortu: ['pay_', 'pib_'], hint: 'Ketik nama lalu pilih dari Data Penduduk: identitas, KK, dan daftar anggota keluarga terisi otomatis.' }),
+      F('pib_nama', 'Nama ibu kandung pemohon', 'text', Object.assign({ up: 1 }, AW_('F-1.04'))), F('pay_nama', '', 'hidden'),
+      /* F-1.01 */
+      F('_h_101', 'Biodata Keluarga', 'head', Object.assign({ hint: 'Data kepala keluarga & seluruh anggota diambil dari Data Penduduk sesuai Nomor KK pemohon saat dicetak.' }, AW_('F-1.01'))),
+      F('kk_jenis', 'Jenis input', 'select', Object.assign({ opt: ['Input Data Kepala Keluarga dan Anggota Keluarga WNI', 'Input Data Kepala Keluarga dan Anggota Keluarga Orang Asing', 'Input Data Kepala Keluarga dan Anggota Keluarga WNI di luar Negeri'], def: 'Input Data Kepala Keluarga dan Anggota Keluarga WNI' }, AW_('F-1.01'))),
+      F('kk_email', 'Email keluarga', 'email', AW_('F-1.01')),
+      /* F-1.02 */
+      F('jp_kk', 'Kartu Keluarga', 'checks', Object.assign({ opt: JP_KK, wide: 1 }, AW_('F-1.02'))), F('jp_ktp', 'KTP-el', 'checks', Object.assign({ opt: JP_KTP, wide: 1 }, AW_('F-1.02'))),
+      F('jp_kia', 'Kartu Identitas Anak', 'checks', Object.assign({ opt: JP_KIA, wide: 1 }, AW_('F-1.02'))), F('jp_ubah', 'Perubahan Data (melampirkan formulir perubahan data & buktinya)', 'checks', Object.assign({ opt: ['KK', 'KTP-el', 'KIA'] }, AW_('F-1.02'))),
+      F('jp_syarat', 'Persyaratan yang dilampirkan', 'checks', Object.assign({ opt: JP_SYARAT, wide: 1 }, AW_('F-1.02'))),
+      /* F-1.03 */
+      F('pd_jenis', 'Jenis permohonan', 'select', Object.assign({ opt: ['Surat Keterangan Pindah', 'Surat Keterangan Pindah Luar Negeri (SKPLN)', 'Surat Keterangan Tempat Tinggal (SKTT)'], def: 'Surat Keterangan Pindah' }, AW_('F-1.03'))),
+      F('pd_klas', 'Klasifikasi kepindahan', 'select', Object.assign({ opt: PD_KLAS }, AW_('F-1.03'))),
+      F('pd_alamat', 'Alamat pindah (tujuan)', 'text', Object.assign({ up: 1, wide: 1 }, AW_('F-1.03'))), F('pd_rt', 'RT tujuan', 'text', Object.assign({ pad: 3 }, AW_('F-1.03'))), F('pd_rw', 'RW tujuan', 'text', Object.assign({ pad: 3 }, AW_('F-1.03'))),
+      F('pd_desa', 'Desa/Kelurahan tujuan', 'text', Object.assign({ up: 1 }, AW_('F-1.03'))), F('pd_kec', 'Kecamatan tujuan', 'text', Object.assign({ up: 1 }, AW_('F-1.03'))), F('pd_kab', 'Kabupaten/Kota tujuan', 'text', Object.assign({ up: 1 }, AW_('F-1.03'))),
+      F('pd_prov', 'Provinsi tujuan', 'text', Object.assign({ up: 1 }, AW_('F-1.03'))), F('pd_kodepos', 'Kode pos tujuan', 'text', AW_('F-1.03')),
+      F('pd_alasan', 'Alasan pindah', 'select', Object.assign({ opt: ['Pekerjaan', 'Pendidikan', 'Keamanan', 'Kesehatan', 'Perumahan', 'Keluarga', 'Lainnya'] }, AW_('F-1.03'))), F('pd_alasan_lain', 'Alasan lainnya', 'text', AW_('F-1.03')),
+      F('pd_jenis_pindah', 'Jenis kepindahan', 'select', Object.assign({ opt: PD_JENIS }, AW_('F-1.03'))),
+      F('pd_tdk', 'Anggota keluarga yang tidak pindah', 'select', Object.assign({ opt: ['Numpang KK', 'Membuat KK Baru', 'Nomor KK Tetap'] }, AW_('F-1.03'))), F('pd_ikut', 'Anggota keluarga yang pindah', 'select', Object.assign({ opt: ['Numpang KK', 'Membuat KK Baru'] }, AW_('F-1.03'))),
+      F('pd_anggota', 'Daftar anggota keluarga yang pindah (satu per baris: NIK; Nama; SHDK)', 'textarea', Object.assign({ wide: 1, rows: 4, hint: 'Terisi otomatis dari KK pemohon. Hapus baris anggota yang tidak ikut pindah.' }, AW_('F-1.03'))),
+      F('pd_tgl', 'Rencana tanggal pindah', 'date', AW_('F-1.03')),
+      /* F-1.06 */
+      F('ub_rincian', 'Perubahan elemen data (satu per baris: Nama; Elemen; Semula; Menjadi; Dasar perubahan)', 'textarea', Object.assign({ wide: 1, rows: 4, hint: 'Elemen: Pendidikan, Pekerjaan, Agama, atau elemen lain (mis. Status Perkawinan, Nama, Tanggal Lahir). Contoh: SITI AMINAH; Pendidikan; SLTP/SEDERAJAT; SLTA/SEDERAJAT; Ijazah SMA' }, AW_('F-1.06'))),
+      /* F-2.01 */
+      F('lp_jenis', 'Jenis pelaporan', 'select', Object.assign({ opt: ['Kelahiran', 'Kematian'], def: 'Kelahiran' }, AW_('F-2.01'))),
+      F('_h_anak', 'Data anak', 'head', { when: { fn: admLahir } }),
+      F('an_nama', 'Nama anak', 'text', { up: 1, wide: 1, when: { fn: admLahir } }), F('an_jk', 'Jenis kelamin', 'select', { opt: OPT.jk, when: { fn: admLahir } }),
+      F('an_tempat_jenis', 'Tempat dilahirkan', 'select', { opt: ['RS/RB', 'Puskesmas', 'Polindes', 'Rumah', 'Lainnya'], when: { fn: admLahir } }), F('an_tempat', 'Tempat kelahiran (kota/kabupaten)', 'text', { up: 1, when: { fn: admLahir } }),
+      F('an_tgl', 'Tanggal lahir', 'date', { when: { fn: admLahir } }), F('an_jam', 'Pukul', 'time', { when: { fn: admLahir } }),
+      F('an_jenis', 'Jenis kelahiran', 'select', { opt: ['Tunggal', 'Kembar 2', 'Kembar 3', 'Kembar 4', 'Lainnya'], def: 'Tunggal', when: { fn: admLahir } }), F('an_ke', 'Kelahiran / anak ke-', 'number', { when: { fn: admLahir } }),
+      F('an_penolong', 'Penolong kelahiran', 'select', { opt: ['Dokter', 'Bidan/Perawat', 'Dukun', 'Lainnya'], when: { fn: admLahir } }), F('an_berat', 'Berat bayi (kg)', 'text', { when: { fn: admLahir } }), F('an_panjang', 'Panjang bayi (cm)', 'text', { when: { fn: admLahir } }),
+      ...orangF('mt_', 'Yang meninggal dunia', { wil: false, kk: 1, when: { fn: admMati } }),
+      F('mt_tgl', 'Tanggal kematian', 'date', { when: { fn: admMati } }), F('mt_jam', 'Pukul', 'time', { when: { fn: admMati } }),
+      F('mt_sebab', 'Sebab kematian', 'select', { opt: ['Sakit biasa / tua', 'Wabah Penyakit', 'Kecelakaan', 'Kriminalitas', 'Bunuh Diri', 'Lainnya'], when: { fn: admMati } }),
+      F('mt_tempat', 'Tempat kematian', 'text', { wide: 1, when: { fn: admMati } }), F('mt_menerangkan', 'Yang menerangkan', 'select', { opt: ['Dokter', 'Tenaga Kesehatan', 'Kepolisian', 'Lainnya'], when: { fn: admMati } }),
+      ...orangF('ay_', 'Ayah', { wil: false, jk: 'LAKI-LAKI', when: AW_('F-2.01').when }), ...orangF('ib_', 'Ibu', { wil: false, jk: 'PEREMPUAN', when: AW_('F-2.01', 'F-2.03').when }),
+      /* F-2.03: penolong kelahiran */
+      F('_h_pn', 'Penolong kelahiran', 'head', AW_('F-2.03')), F('pn_nama', 'Nama penolong', 'text', Object.assign({ up: 1, wide: 1 }, AW_('F-2.03'))), F('pn_nik', 'NIK penolong', 'text', Object.assign({ mono: 1 }, AW_('F-2.03'))),
+      F('pn_pekerjaan', 'Pekerjaan penolong', 'text', Object.assign({ up: 1 }, AW_('F-2.03'))), F('pn_alamat', 'Alamat penolong', 'text', Object.assign({ up: 1, wide: 1 }, AW_('F-2.03'))),
+      /* F-2.04 */
+      ...orangF('su_', 'Menyatakan bahwa (suami/istri)', { wil: false, kk: 1, when: AW_('F-2.04').when }), ...orangF('is_', 'Adalah suami/istri dari', { wil: false, when: AW_('F-2.04').when }),
+      /* saksi */
+      ...orangF('s1_', 'Saksi I', { lite: 1, kk: 1, when: AW_('F-2.01', 'F-2.03', 'F-2.04').when }), ...orangF('s2_', 'Saksi II', { lite: 1, kk: 1, when: AW_('F-2.01', 'F-2.03', 'F-2.04').when }),
+      F('ket', 'Keterangan', 'textarea', { wide: 1 })],
+    row: r => ({ t: (r.p_nama || '–'), s: [r.formulir, r.formulir && /^F-2\.01/.test(r.formulir) ? r.lp_jenis : ''].filter(Boolean).join(' · '), av: String(r.formulir || 'F').slice(0, 6).replace('F-', ''), date: r.tanggal }),
+    print: { title: 'REGISTER FORMULIR ADMINISTRASI KEPENDUDUKAN', land: 1, cols: [['Tanggal', r => fDate(r.tanggal)], ['Formulir', 'formulir'], ['Pemohon / Pelapor', 'p_nama'], ['Alamat', r => esc([r.p_alamat, r.p_rt ? 'RT ' + r.p_rt + '/RW ' + (r.p_rw || '') : ''].filter(Boolean).join(' '))], ['Ket', 'ket']] }
   },
   rentan: {
     t: 'Data Penduduk Rentan / Sosial', ic: 'heart', sort: 'r_nama', asc: 1, excel: 1,
@@ -2023,7 +2093,7 @@ function MODS() {
       ['Inventarisasi Fisik', 'check', ['list', { e: 'aset_cek' }], 'aset_cek'], ['Laporan Format SIPADES', 'print', ['sipadeslap'], null, 'r:aset'], ['Cetak Laporan Aset (format awal)', 'print', ['asetcetak'], null, 'r:aset'], ['Cetak Register Label', 'crop', ['asetlabel'], null, 'r:aset'],
       ['Data Ruangan', 'house', ['list', { e: 'aset_ruang' }], 'aset_ruang'], ['Perangkat & Tim Inventarisasi', 'users', ['list', { e: 'aset_tim' }], 'aset_tim'], ['Kode Rekening Aset', 'list', ['list', { e: 'ref_kode_barang' }], 'ref_kode_barang'], ['SOP, Template BA/SK & Pedoman', 'book', ['asetsop'], null, 'r:aset']] },
     { k: 'pemerintahan', l: 'Pemerintahan', ic: 'landmark', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, 'r:penduduk'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga'], ['Tanah di Desa', 'map', ['tanah'], 'tanah_desa'], ['FRC Desa (Desa Anti Korupsi)', 'check', ['frc'], null, 'r:frc']] },
-    { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Buku NTCR', 'users', ['list', { e: 'ntcr' }], 'ntcr'], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
+    { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Buku NTCR', 'users', ['list', { e: 'ntcr' }], 'ntcr'], ['Formulir Adminduk', 'file', ['list', { e: 'adminduk' }], 'register_surat'], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
     { k: 'kesejahteraan', l: 'Kesejahteraan', ic: 'heart', items: [['Rekap Sosial', 'chart', ['sosrekap'], null, 'r:rentan'], ['Rentan / Sosial', 'heart', ['list', { e: 'rentan' }], 'rentan'], ['DTSEN Keluarga (SIKS-NG)', 'house', ['list', { e: 'dtsen' }], 'dtsen'], ['Usulan Bansos & DTSEN', 'send', ['list', { e: 'usulan_bansos' }], 'usulan_bansos'], ['Musdes/Muskel Bansos', 'users', ['list', { e: 'musdes_bansos' }], 'musdes_bansos'], ['Penyaluran Bansos', 'check', ['list', { e: 'penyaluran_bansos' }], 'penyaluran_bansos'], ['Lembaga / Yayasan', 'landmark', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru Ngaji', 'book', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
     { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RPJM Desa', 'book', ['rpjm', {}], null, 'r:rkp'], ['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['RAB & Gambar', 'hammer', ['rab', {}], null, 'r:rab'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Progres Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
     { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Paket Kegiatan Dana Desa', 'box', ['list', { e: 'keu_paket' }], 'keu_paket'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['SPJ', 'check', ['spj', {}], null, 'r:spj'], ['Pengajuan ADD (Siltap & Dana Dusun)', 'send', ['addaju'], null, 'r:add'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Rekap Pajak', 'coin', ['keupajak'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek'], ['Impor PDF Siskeudes', 'down', ['skimpor'], null, 'w:keu_anggaran']] },
@@ -3857,6 +3927,11 @@ async function renderDetail(e, x, el, full) {
   if (e === 'penduduk') await extraSosialUsulan(x, xx);
   if (e === 'musdes_bansos') await extraMusdes(x, xx);
   if (e === 'ntcr') ntcrExtra(x, xx);
+  if (e === 'adminduk') admExtra(x, xx);
+  if (e === 'register_surat' && /^Surat Keterangan (Kematian|Kelahiran)$/.test(x.jenis_surat || '') && canWrite('adminduk')) {
+    xx.insertAdjacentHTML('beforeend', `<div class="card stack" style="padding:8px 10px"><div class="meta">Untuk akta ${/Kematian/.test(x.jenis_surat) ? 'kematian' : 'kelahiran'} di Disdukcapil, pelapor juga mengisi formulir F-2.01.</div><div class="btns"><button class="btn sm" data-act="admF201">${ic('file')}Buat F-2.01 dari surat ini</button></div></div>`);
+    S.vh.admF201 = () => go('form', { e: 'adminduk', preset: admDariSurat(x) });
+  }
   if (e === 'penduduk') S.pendCache = Object.assign(S.pendCache || {}, { [x.id]: x });
 }
 /* perangkat masih menjabat: status bukan Berhenti/Pensiun/Meninggal dan belum lewat tanggal SK pemberhentian */
@@ -4382,7 +4457,8 @@ VIEWS.form = async (p, main, alive) => {
   if (whenF.length) {
     const sync2 = () => whenF.forEach(f => {
       const el = $('#f_' + f.k, frm), box = el && el.closest('.f'); if (!box) return;
-      if (f.when) { const c = $('#f_' + f.when.k, frm), cv = !c ? [] : c.classList.contains('checks') ? $$('input:checked', c).map(i => i.value) : [c.value]; box.hidden = ![].concat(f.when.v).some(x => cv.indexOf(x) >= 0); }
+      if (f.when && f.when.fn) box.hidden = !f.when.fn(frm);
+      else if (f.when) { const c = $('#f_' + f.when.k, frm), cv = !c ? [] : c.classList.contains('checks') ? $$('input:checked', c).map(i => i.value) : [c.value]; box.hidden = ![].concat(f.when.v).some(x => cv.indexOf(x) >= 0); }
       if (f.lblW) { const c = $('#f_' + f.lblW.k, frm), lb = box.querySelector('label'); if (lb && lb.firstChild) lb.firstChild.textContent = c && c.value === f.lblW.v ? f.lblW.l : f.l; }
       if (f.lblFn) { const c = $('#f_' + f.lblFn.k, frm), lb = box.querySelector('label'); if (lb && lb.firstChild) lb.firstChild.textContent = f.lblFn.fn(c ? c.value : '', frm) || f.l; }
     });
@@ -5641,6 +5717,7 @@ function orangHook(frm, pre, f) {
     const sb = ST_SBLM[pre === 'i_' ? 'P' : 'L'][String(p.status_kawin || '').toUpperCase()]; if (sb) set(pre + 'status_sblm', sb, 1);
     dd.hidden = true; tandai();
     if (pre === 'alm_') ahliWarisIsi(frm);
+    if (typeof admPilih === 'function') admPilih(frm, pre);
   });
   document.addEventListener('click', ev => { if (!box.contains(ev.target)) dd.hidden = true; });
 }
@@ -6063,6 +6140,118 @@ function petaNtcr(r, siapa) {
 const TAG_NTCR = ['Desa', 'Kecamatan', 'Kabupaten', 'Kepala Desa', 'Nomor', 'No', 'Tahun', 'Tanggal Surat', 'Nama', 'NIK', 'Bin', 'Bin Binti', 'Jenis Kelamin', 'TTL', 'Tempat Lahir', 'Tanggal Lahir', 'Umur', 'Kewarganegaraan', 'Agama', 'Pekerjaan', 'Alamat', 'Status Perkawinan', 'Pasangan Terdahulu',
   'Ayah Nama', 'Ayah NIK', 'Ayah TTL', 'Ayah Kewarganegaraan', 'Ayah Agama', 'Ayah Pekerjaan', 'Ayah Alamat', 'Ibu Nama', 'Ibu NIK', 'Ibu TTL', 'Ibu Agama', 'Ibu Pekerjaan', 'Ibu Alamat', 'Pasangan Nama', 'Pasangan Bin', 'Pasangan NIK', 'Pasangan TTL', 'Pasangan Alamat',
   'Suami Nama', 'Suami Bin', 'Suami NIK', 'Suami TTL', 'Suami Status', 'Istri Nama', 'Istri Bin', 'Istri NIK', 'Istri TTL', 'Istri Status', 'Hari Akad', 'Tanggal Akad', 'Jam Akad', 'Tempat Akad', 'Wali', 'Hubungan Wali', 'Mas Kawin', 'No Akta'];
+/* ---- Formulir Adminduk: isi otomatis, cetak — v164 ---- */
+const admPath = kode => 'surat/adm_' + String(kode).toLowerCase().replace(/^f-/, 'f').replace('.', '_') + '.docx';
+async function admAnggota(kk) {
+  if (!kk || String(kk).indexOf('•') >= 0) return [];
+  try { return canRead('penduduk') ? ((await call('list', { entity: 'penduduk', filters: { kk }, limit: 40 })).rows || []) : (await call('cariWarga', { q: kk, limit: 30 })) || []; } catch (x) { return []; }
+}
+const SHDK_URUT = ['KEPALA KELUARGA', 'SUAMI', 'ISTRI', 'ANAK', 'MENANTU', 'CUCU', 'ORANG TUA', 'MERTUA', 'FAMILI LAIN', 'PEMBANTU', 'LAINNYA'];
+const shdkUrut = L => L.slice().sort((a, b) => { const i = x => { const h = String(x.hubungan || '').toUpperCase(); const k = SHDK_URUT.findIndex(s => h.indexOf(s) >= 0); return k < 0 ? 99 : k; }; return i(a) - i(b) || String(a.tgl_lahir || '').localeCompare(String(b.tgl_lahir || '')); });
+/** pemohon dipilih -> daftar anggota pindah terisi dari KK */
+async function admPilih(frm, pre) {
+  if (pre !== 'p_') return;
+  const ta = $('#f_pd_anggota', frm), kk = ($('#f_p_kk', frm) || {}).value;
+  if (ta && !ta.value.trim() && kk) {
+    const L = shdkUrut((await admAnggota(kk)).filter(x => !/meninggal|pindah/i.test(x.status || '')));
+    if (L.length) ta.value = L.map(x => [x.nik && String(x.nik).indexOf('•') < 0 ? x.nik : '', x.nama, judulKata(x.hubungan || '')].join('; ')).join('\n');
+  }
+}
+async function petaAdm(r) {
+  const v = k => r[k] == null ? '' : String(r[k]);
+  const M = petaDesa(), kode = String(r.formulir || '').slice(0, 6), tgl = r.tanggal || isoToday(), CK = '✓';
+  Object.assign(M, { 'Tanggal Surat': dPanjang(tgl), Tahun: String(tgl).slice(0, 4), 'Kepala Desa': S.set.nama_kades || await namaKades() || TITIK, Formulir: kode });
+  const orang = (pre, L) => {
+    const al = [judulKata(v(pre + 'alamat')).replace(/\bRt\b/g, 'RT').replace(/\bRw\b/g, 'RW'), v(pre + 'rt') ? 'RT ' + v(pre + 'rt') + '/RW ' + v(pre + 'rw') : '', v(pre + 'desa') ? 'Desa ' + judulKata(v(pre + 'desa')) : '', v(pre + 'kec') ? 'Kec. ' + judulKata(v(pre + 'kec')) : '', v(pre + 'kab') ? 'Kab. ' + judulKata(v(pre + 'kab')) : ''].filter(Boolean).join(', ');
+    const t = { Nama: v(pre + 'nama'), NIK: v(pre + 'nik').indexOf('•') >= 0 ? '' : v(pre + 'nik'), KK: v(pre + 'kk').indexOf('•') >= 0 ? '' : v(pre + 'kk'), 'Jenis Kelamin': judulKata(v(pre + 'jk')),
+      'Tempat Lahir': judulKata(v(pre + 'tempat_lahir')), 'Tanggal Lahir': dPanjang(v(pre + 'tgl_lahir')), Kewarganegaraan: v(pre + 'wn') === 'WNA' ? 'WNA' : v(pre + 'nama') ? 'WNI' : '',
+      Agama: judulKata(v(pre + 'agama')), Pekerjaan: judulKata(v(pre + 'pekerjaan')), Alamat: al, RT: v(pre + 'rt'), RW: v(pre + 'rw'), HP: v(pre + 'hp') };
+    t.TTL = [t['Tempat Lahir'], t['Tanggal Lahir']].filter(Boolean).join(', ');
+    const d = parseD(v(pre + 'tgl_lahir')); t['Tgl Lahir'] = d ? pad2(d.getDate()) : ''; t['Bln Lahir'] = d ? pad2(d.getMonth() + 1) : ''; t['Thn Lahir'] = d ? String(d.getFullYear()) : '';
+    Object.keys(t).forEach(k => { M[L + ' ' + k] = t[k] || ''; });
+  };
+  [['p_', 'P'], ['ay_', 'Ayah'], ['ib_', 'Ibu'], ['mt_', 'Mati'], ['su_', 'Suami'], ['is_', 'Istri'], ['s1_', 'Saksi1'], ['s2_', 'Saksi2']].forEach(([a, b]) => orang(a, b));
+  M['P Ibu'] = v('pib_nama') || TITIK; M['P Jalan'] = judulKata(v('p_alamat')) || '';
+  /* F-2.04: yang dinyatakan suami/istri */
+  M['Suami Istri'] = /PEREMPUAN/i.test(v('su_jk')) ? 'istri' : 'suami'; M['KK Pasangan'] = M['Suami KK'] || M['P KK'] || TITIK;
+  /* anak / kelahiran */
+  const dA = parseD(v('an_tgl'));
+  Object.assign(M, { 'Anak Nama': v('an_nama'), 'Anak JK': judulKata(v('an_jk')), 'Anak Tempat Jenis': v('an_tempat_jenis'), 'Anak Tempat': judulKata(v('an_tempat')), 'Anak Hari': dHari(v('an_tgl')),
+    'Anak Tgl': dA ? pad2(dA.getDate()) : '', 'Anak Bln': dA ? pad2(dA.getMonth() + 1) : '', 'Anak Thn': dA ? String(dA.getFullYear()) : '', 'Anak Tanggal Lahir': dPanjang(v('an_tgl')),
+    'Anak TTL': [judulKata(v('an_tempat')), dPanjang(v('an_tgl'))].filter(Boolean).join(', '), 'Anak Pukul': v('an_jam') ? dJam(v('an_jam')) : '', 'Anak Jenis Kelahiran': v('an_jenis'), 'Anak Ke': v('an_ke'),
+    'Anak Penolong': v('an_penolong'), 'Anak Berat': v('an_berat'), 'Anak Panjang': v('an_panjang'),
+    'Penolong Nama': v('pn_nama'), 'Penolong NIK': v('pn_nik'), 'Penolong Pekerjaan': judulKata(v('pn_pekerjaan')), 'Penolong Alamat': judulKata(v('pn_alamat')) });
+  const dM = parseD(v('mt_tgl'));
+  Object.assign(M, { 'Mati Tgl': dM ? pad2(dM.getDate()) : '', 'Mati Bln': dM ? pad2(dM.getMonth() + 1) : '', 'Mati Thn': dM ? String(dM.getFullYear()) : '', 'Mati Tanggal': dPanjang(v('mt_tgl')),
+    'Mati Pukul': v('mt_jam') ? dJam(v('mt_jam')) : '', 'Mati Sebab': v('mt_sebab'), 'Mati Tempat': v('mt_tempat'), 'Mati Menerangkan': v('mt_menerangkan') });
+  /* centang pilihan */
+  const ck = (arr, sel, pfx) => arr.forEach((o, i) => { M[pfx + (i + 1)] = String(sel || '').split(/\s*,\s*|\n/).indexOf(o) >= 0 || (Array.isArray(sel) && sel.indexOf(o) >= 0) ? CK : ''; });
+  const arr = k => Array.isArray(r[k]) ? r[k] : String(r[k] || '').split(/\s*[,;\n]\s*/).filter(Boolean);
+  const isi = (list, k, pfx) => list.forEach((o, i) => { M[pfx + (i + 1)] = arr(k).indexOf(o) >= 0 ? CK : ''; });
+  isi(JP_KK, 'jp_kk', 'KK'); isi(JP_KTP, 'jp_ktp', 'KT'); isi(JP_KIA, 'jp_kia', 'KI'); isi(['KK', 'KTP-el', 'KIA'], 'jp_ubah', 'PD'); isi(JP_SYARAT, 'jp_syarat', 'SY');
+  isi(['Surat Keterangan Pindah', 'Surat Keterangan Pindah Luar Negeri (SKPLN)', 'Surat Keterangan Tempat Tinggal (SKTT)'], 'pd_jenis', 'PJ'); isi(PD_KLAS, 'pd_klas', 'PK');
+  isi(['Pekerjaan', 'Pendidikan', 'Keamanan', 'Kesehatan', 'Perumahan', 'Keluarga', 'Lainnya'], 'pd_alasan', 'PA'); isi(PD_JENIS, 'pd_jenis_pindah', 'PJK');
+  isi(['Numpang KK', 'Membuat KK Baru', 'Nomor KK Tetap'], 'pd_tdk', 'PT'); isi(['Numpang KK', 'Membuat KK Baru'], 'pd_ikut', 'PI');
+  isi(['Kelahiran', 'Kematian'], 'lp_jenis', 'LP'); isi(['Input Data Kepala Keluarga dan Anggota Keluarga WNI', 'Input Data Kepala Keluarga dan Anggota Keluarga Orang Asing', 'Input Data Kepala Keluarga dan Anggota Keluarga WNI di luar Negeri'], 'kk_jenis', 'IJ');
+  void ck;
+  isi(['LAKI-LAKI', 'PEREMPUAN'], 'an_jk', 'AK'); isi(['RS/RB', 'Puskesmas', 'Polindes', 'Rumah', 'Lainnya'], 'an_tempat_jenis', 'AT'); isi(['Tunggal', 'Kembar 2', 'Kembar 3', 'Kembar 4', 'Lainnya'], 'an_jenis', 'AJ');
+  isi(['Dokter', 'Bidan/Perawat', 'Dukun', 'Lainnya'], 'an_penolong', 'AP'); isi(['Sakit biasa / tua', 'Wabah Penyakit', 'Kecelakaan', 'Kriminalitas', 'Bunuh Diri', 'Lainnya'], 'mt_sebab', 'MS'); isi(['Dokter', 'Tenaga Kesehatan', 'Kepolisian', 'Lainnya'], 'mt_menerangkan', 'MM');
+  const mati = v('lp_jenis') === 'Kematian';
+  ['Nama', 'NIK', 'KK', 'Kewarganegaraan'].forEach(k => { M['Subjek ' + k] = mati ? M['Mati ' + k] : k === 'Nama' ? v('an_nama') : k === 'KK' ? M['P KK'] : k === 'Kewarganegaraan' ? (v('an_nama') ? 'WNI' : '') : ''; M['Subjek2 ' + k] = ''; });
+  Object.assign(M, { 'Pindah Alamat': v('pd_alamat'), 'Pindah RT': v('pd_rt'), 'Pindah RW': v('pd_rw'), 'Pindah Desa': judulKata(v('pd_desa')), 'Pindah Kec': judulKata(v('pd_kec')), 'Pindah Kab': judulKata(v('pd_kab')),
+    'Pindah Prov': judulKata(v('pd_prov')), 'Pindah Kode Pos': v('pd_kodepos'), 'Alasan Lain': v('pd_alasan_lain'), 'Pindah Tgl': dDmy(v('pd_tgl'), '-'), 'Kode Pos': M['Kode Pos'] || (S.set || {}).kode_pos || '' });
+  /* daftar anggota pindah */
+  const pindah = String(r.pd_anggota || '').split(/\r?\n/).map(l => l.split(/;|\|/).map(x => x.trim())).filter(a => a.join('')).map((a, i) => ({ 'PD No': (i + 1) + '.', 'PD NIK': a[0] || '', 'PD Nama': a[1] || '', 'PD SHDK': a[2] || '' }));
+  /* anggota KK (F-1.01, F-1.06) */
+  const ag = (kode === 'F-1.01' || kode === 'F-1.06') ? shdkUrut(await admAnggota(v('p_kk'))).filter(x => !/meninggal|pindah/i.test(x.status || '')) : [];
+  const kepala = ag.find(x => /KEPALA/i.test(x.hubungan || '')) || ag[0] || {};
+  const nikOf = id => { const x = ag.find(y => y.id === id); return x && x.nik && String(x.nik).indexOf('•') < 0 ? x.nik : ''; };
+  Object.assign(M, { 'KK Kepala': kepala.nama || v('p_nama'), 'KK Nomor': M['P KK'], 'KK Alamat': [kepala.alamat_kk ? judulKata(kepala.alamat_kk) : '', kepala.dusun ? judulKata(String(kepala.dusun)) : M['P Alamat']].filter(Boolean)[0] || M['P Alamat'],
+    'KK RT': kepala.rt || v('p_rt'), 'KK RW': kepala.rw || v('p_rw'), 'KK Jumlah': ag.length ? String(ag.length) : '', 'KK Telepon': v('p_hp'), 'KK Email': v('kk_email'),
+    'Wil Prov': judulKata(M.Provinsi || 'Jawa Timur'), 'Wil Kab': judulKata(M.Kabupaten), 'Wil Kec': judulKata(M.Kecamatan), 'Wil Desa': judulKata(M.Desa), 'Wil Dusun': kepala.dusun ? judulKata(String(kepala.dusun).replace(/^DUSUN\s+/i, '')) : '' });
+  const pad10 = (L, mk) => { const o = L.map(mk); while (o.length < 10) o.push(mk(null, o.length)); return o.slice(0, Math.max(10, o.length)); };
+  const anggota = pad10(ag, (x, i) => { const n = x ? ag.indexOf(x) + 1 + '.' : (i + 1) + '.'; const o = { No: n };
+    if (x) Object.assign(o, { Nama: x.nama || '', JK: judulKata(x.jk || ''), 'Tempat Lahir': judulKata(x.tempat_lahir || ''), 'Tgl Lahir': dDmy(x.tgl_lahir, '-'), WN: /WNA/i.test(x.warga_negara || '') ? 'WNA' : 'WNI',
+      'Gol Darah': x.gol_darah || '', Agama: judulKata(x.agama || ''), 'Status Kawin': judulKata(x.status_kawin || ''), 'Tgl Kawin': dDmy(x.tgl_kawin, '-'), 'Tgl Cerai': dDmy(x.tgl_cerai, '-'), SHDK: judulKata(x.hubungan || ''),
+      Pendidikan: judulKata(x.pendidikan || ''), Pekerjaan: judulKata(x.pekerjaan || ''), 'NIK Ibu': nikOf(x.ibu_id), 'Nama Ibu': x.ibu || '', 'NIK Ayah': nikOf(x.ayah_id), 'Nama Ayah': x.ayah || '', NIK: x.nik && String(x.nik).indexOf('•') < 0 ? x.nik : '' });
+    const out = {}; [1, 2, 3, 4, 5].forEach(t => Object.keys(o).forEach(k => { out['A' + t + ' ' + k] = o[k]; })); ['Nama', 'JK', 'Tempat Lahir', 'Tgl Lahir', 'WN', 'Gol Darah', 'Agama', 'Status Kawin', 'Tgl Kawin', 'Tgl Cerai', 'SHDK', 'Pendidikan', 'Pekerjaan', 'NIK Ibu', 'Nama Ibu', 'NIK Ayah', 'Nama Ayah', 'NIK'].forEach(k => { [1, 2, 3, 4, 5].forEach(t => { if (!(('A' + t + ' ' + k) in out)) out['A' + t + ' ' + k] = ''; }); });
+    return out; });
+  /* F-1.06: rincian KK + perubahan */
+  const ub = String(r.ub_rincian || '').split(/\r?\n/).map(l => l.split(/;|\|/).map(x => x.trim())).filter(a => a[0]).map(a => ({ nama: a[0], el: a[1] || '', se: a[2] || '', jd: a[3] || '', ds: a[4] || '' }));
+  const orangUb = Array.from(new Set(ub.map(x => x.nama.toUpperCase())));
+  const cari = (nm, re) => ub.find(x => x.nama.toUpperCase() === nm && re.test(x.el)) || {};
+  const ubA = orangUb.filter(nm => ub.some(x => x.nama.toUpperCase() === nm && /pendidikan|pekerjaan/i.test(x.el))).map((nm, i) => { const a = cari(nm, /pendidikan/i), b = cari(nm, /pekerjaan/i);
+    return { 'UA No': (i + 1) + '.', 'UA Nama': judulKata(nm), 'UA Pend Semula': a.se || '', 'UA Pend Menjadi': a.jd || '', 'UA Pend Dasar': a.ds || '', 'UA Kerja Semula': b.se || '', 'UA Kerja Menjadi': b.jd || '', 'UA Kerja Dasar': b.ds || '' }; });
+  const ubB = orangUb.filter(nm => ub.some(x => x.nama.toUpperCase() === nm && !/pendidikan|pekerjaan/i.test(x.el))).map((nm, i) => { const a = cari(nm, /agama/i), b = ub.find(x => x.nama.toUpperCase() === nm && !/pendidikan|pekerjaan|agama/i.test(x.el)) || {};
+    return { 'UB No': (i + 1) + '.', 'UB Nama': judulKata(nm), 'UB Agama Semula': a.se || '', 'UB Agama Menjadi': a.jd || '', 'UB Agama Dasar': a.ds || '', 'UB Lain Elemen': b.el || '', 'UB Lain Semula': b.se || '', 'UB Lain Menjadi': b.jd || '', 'UB Lain Dasar': b.ds || '' }; });
+  const rk = ag.map((x, i) => ({ 'RK No': (i + 1) + '.', 'RK Nama': x.nama || '', 'RK NIK': x.nik && String(x.nik).indexOf('•') < 0 ? x.nik : '', 'RK SHDK': judulKata(x.hubungan || ''), 'RK Ket': '' }));
+  const kosong = (L, n, keys) => { const o = L.slice(); while (o.length < n) { const e = {}; keys.forEach(k => { e[k] = k.slice(-2) === 'No' ? (o.length + 1) + '.' : ''; }); o.push(e); } return o; };
+  M.rows = [1, 2, 3, 4, 5].map(t => ({ key: 'A' + t + ' No', items: anggota }))
+    .concat([{ key: 'PD No', items: kosong(pindah, 6, ['PD No', 'PD NIK', 'PD Nama', 'PD SHDK']) },
+      { key: 'RK No', items: kosong(rk, 7, ['RK No', 'RK Nama', 'RK NIK', 'RK SHDK', 'RK Ket']) },
+      { key: 'UA No', items: kosong(ubA, 4, ['UA No', 'UA Nama', 'UA Pend Semula', 'UA Pend Menjadi', 'UA Pend Dasar', 'UA Kerja Semula', 'UA Kerja Menjadi', 'UA Kerja Dasar']) },
+      { key: 'UB No', items: kosong(ubB, 4, ['UB No', 'UB Nama', 'UB Agama Semula', 'UB Agama Menjadi', 'UB Agama Dasar', 'UB Lain Elemen', 'UB Lain Semula', 'UB Lain Menjadi', 'UB Lain Dasar']) }]);
+  return tambahU(M);
+}
+async function cetakAdm(r) {
+  const kode = String(r.formulir || '').slice(0, 6); if (!kode) return toast('Pilih formulirnya dulu.', 1);
+  const m = modal('Membuat formulir', `<div class="stack"><b>${esc(r.formulir)}</b><div class="skel"></div><div class="meta">Mengisi formulir…</div></div>`);
+  try { const M = await petaAdm(r), rows = M.rows; delete M.rows;
+    hasilDokumen(m, await buatDokumen({ path: admPath(kode), M, rows, jenis: 'surat', nama: kode + ' ' + (r.p_nama || '') }));
+  } catch (x) { m.body.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
+}
+function admExtra(x, el) {
+  el.insertAdjacentHTML('afterbegin', `<div class="card stack" style="padding:8px 10px"><div class="lbl">${esc(x.formulir || 'Formulir')}</div><div class="btns"><button class="btn sm pri" data-act="admCetak">${ic('print')}Cetak formulir</button></div><div class="meta">Blanko resmi Permendagri No. 109 Tahun 2019. Ditandatangani pemohon/pelapor${/^F-2\.01/.test(x.formulir || '') ? ' dan diketahui Kepala Desa' : ''}, lalu dibawa ke Disdukcapil.</div></div>`);
+  S.vh.admCetak = () => cetakAdm(x);
+}
+/** dari Surat Keterangan Kelahiran/Kematian -> F-2.01 terisi */
+function admDariSurat(x) {
+  const lbl = F_ADM.find(f => f[0] === 'F-2.01')[1];
+  const pel = { p_nama: x.pelapor || '', p_hp: x.hp || '' };
+  if (x.jenis_surat === 'Surat Keterangan Kematian') return Object.assign({ formulir: lbl, lp_jenis: 'Kematian', mt_nama: x.nama || '', mt_nik: x.nik && String(x.nik).indexOf('•') < 0 ? x.nik : '', mt_penduduk_id: x.penduduk_id || '', mt_jk: x.jk || '',
+    mt_tempat_lahir: x.tempat_lahir || '', mt_tgl_lahir: x.tgl_lahir || '', mt_agama: x.agama || '', mt_pekerjaan: x.pekerjaan || '', mt_tgl: x.mati_tgl || '', mt_jam: x.mati_jam || '', mt_tempat: x.mati_tempat || '', mt_sebab: /tua|sakit/i.test(x.mati_sebab || '') ? 'Sakit biasa / tua' : '' }, pel);
+  return Object.assign({ formulir: lbl, lp_jenis: 'Kelahiran', an_nama: x.bayi_nama || '', an_jk: x.bayi_jk || '', an_tgl: x.bayi_tgl || '', an_jam: x.bayi_jam || '', an_tempat: x.bayi_tempat || '', an_ke: x.anak_ke || '', ay_nama: x.ayah_nama || '', ib_nama: x.ibu_nama || '' }, pel);
+}
 async function cetakNtcr(r, n, siapa) {
   const lbl = { n1: 'N1 Pengantar Nikah', n2: 'N2 Permohonan Kehendak Perkawinan', n4: 'N4 Persetujuan Calon Pengantin', n5: 'N5 Surat Izin Orang Tua' }[n];
   const nm = siapa === 'i' ? r.i_nama : r.s_nama;
@@ -8080,7 +8269,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '163', tgl: '2026-10-09', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '164', tgl: '2026-10-09', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -9032,6 +9221,164 @@ const NX = (() => {
     P('Surat pernyataan ini saya buat untuk keperluan {{Keperluan}}. Apabila di kemudian hari pernyataan ini tidak benar, saya bersedia menerima sanksi sesuai ketentuan peraturan perundang-undangan yang berlaku.', { ind: 1 }),
     tglKanan(),
     ttd2(kol('Mengetahui,\nKepala Desa {{Desa}}', '{{Kepala Desa_U}}'), kol('Yang membuat pernyataan,', '{{Nama_U}}', { materai: 1 }))];
+  /* ---- Formulir Adminduk (lampiran Permendagri No. 109 Tahun 2019) — v164 ---- */
+  const z9 = 18, z8 = 16;
+  const tx = (t, o = {}) => P([r(t, Object.assign({}, o, { size: o.size || z9 }))], Object.assign({ after: 0, line: (o.size || z9) <= 16 ? 200 : 240, al: 'L' }, o, { size: undefined }));
+  const B4 = '<w:tcBorders>' + ['top', 'left', 'bottom', 'right'].map(bd1).join('') + '</w:tcBorders>';
+  const NB4 = '<w:tcBorders>' + ['top', 'left', 'bottom', 'right'].map(n => `<w:${n} w:val="nil"/>`).join('') + '</w:tcBorders>';
+  const tcX = (c, w) => { const o = typeof c === 'string' ? { t: c } : (c || {}); const sp = o.span || 1;
+    const body = o.x || (Array.isArray(o.t) ? o.t.map(t => tx(t, { bold: o.bold, al: o.al || 'L', size: o.sz, i: o.i })).join('') : tx(o.t || '', { bold: o.bold, al: o.al || 'L', size: o.sz, i: o.i }));
+    return `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/>${sp > 1 ? `<w:gridSpan w:val="${sp}"/>` : ''}${o.b ? B4 : NB4}${o.sh ? `<w:shd w:val="clear" w:color="auto" w:fill="${o.sh}"/>` : ''}<w:vAlign w:val="${o.va || 'center'}"/></w:tcPr>${body}</w:tc>`; };
+  const tb = (cols, rows, o = {}) => `<w:tbl><w:tblPr><w:tblW w:w="${cols.reduce((a, b) => a + b, 0)}" w:type="dxa"/>${o.ind ? `<w:tblInd w:w="${o.ind}" w:type="dxa"/>` : ''}${NB}<w:tblLayout w:type="fixed"/><w:tblCellMar><w:left w:w="45" w:type="dxa"/><w:right w:w="45" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>${cols.map(c => `<w:gridCol w:w="${c}"/>`).join('')}</w:tblGrid>`
+    + rows.map((rw, ri) => { let ci = 0; const hh = o.rh ? o.rh[ri] : 0; return '<w:tr>' + (hh ? `<w:trPr><w:trHeight w:val="${hh}" w:hRule="exact"/></w:trPr>` : o.h ? `<w:trPr><w:trHeight w:val="${o.h}"/></w:trPr>` : '') + rw.map(c => { const sp = (c && c.span) || 1; const w = cols.slice(ci, ci + sp).reduce((a, b) => a + b, 0); ci += sp; return tcX(c, w); }).join('') + '</w:tr>'; }).join('') + '</w:tbl>';
+  const bx = (t, o = {}) => Object.assign({ t, b: 1 }, o);
+  const ckc = tag => bx('{{' + tag + '}}', { al: 'C' });
+  const sp6 = (n = 80) => P('', { after: n, line: 200 });
+  const kodeF = (k, lebar) => tb([(lebar || W) - 1500, 1500], [['', bx(k, { al: 'C', bold: 1 })]]);
+  const judulF = (t, k, lebar) => [kodeF(k, lebar), P([r(t, { bold: 1, size: 24 })], { al: 'C', before: 60, after: 120 })];
+  const baris = (cols, list) => tb(cols, list.map(x => [x[0], ':', bx(x[1], { span: x[2] || 1 })].concat(x[3] || [])));
+  const pilih = (opts, pf, kol) => { kol = kol || 2; const rows = []; for (let i = 0; i < opts.length; i += kol) { const rw = []; for (let j = 0; j < kol; j++) { const k = i + j; rw.push(k < opts.length ? ckc(pf + (k + 1)) : ''); rw.push(k < opts.length ? opts[k] : ''); } rows.push(rw); } return rows; };
+  const ttdDua = (kiri, kanan, lebar) => tb([(lebar || W) / 2, (lebar || W) / 2], [[{ x: kiri.join('') }, { x: kanan.join('') }]]);
+  const kolT = (lines, nama, o = {}) => lines.map((t, i) => tx(t, { al: 'C', after: i === lines.length - 1 ? (o.materai ? 0 : 900) : 0 })).concat(o.materai ? [tx('Materai', { al: 'C', size: 14, before: 200 }), tx('10.000', { al: 'C', size: 14, after: 300 })] : []).concat([tx(nama, { al: 'C', bold: 1, u: 1 })]).concat(o.bawah ? [tx(o.bawah, { al: 'C' })] : []);
+  const pernyataanTTD = (lebar) => ttdDua(kolT(['Saksi I,'], '( {{Saksi1 Nama_U}} )', { bawah: 'NIK. {{Saksi1 NIK}}' }).concat([sp6(200)]).concat(kolT(['Saksi II,'], '( {{Saksi2 Nama_U}} )', { bawah: 'NIK. {{Saksi2 NIK}}' })),
+    kolT(['{{Kabupaten}}, {{Tanggal Surat}}', 'Saya yang menyatakan,'], '{{P Nama_U}}', { materai: 1 }), lebar);
+  /* F-1.01 Biodata Keluarga (lanskap) */
+  const thA = (cols, heads, tag, keys) => tb(cols, [heads.map(h => bx(h, { al: 'C', sz: 14, bold: 1, sh: 'EDEDED' })), heads.map((h, i) => bx('(' + keys[i][0] + ')', { al: 'C', sz: 12, sh: 'F5F5F5' })),
+    keys.map(k => bx(k[1] ? '{{' + tag + ' ' + k[1] + '}}' : '', { sz: 14, al: k[2] || 'L' }))], { rh: [0, 190, 230] });
+  T.adm_f1_01 = () => [tb([WL], [[bx('PEMERINTAH KABUPATEN {{Kabupaten_U}}', { al: 'C', bold: 1 })]]), ...judulF('FORMULIR BIODATA KELUARGA', 'F-1.01', WL),
+    tb([WL], [[bx('PERHATIAN : Isilah Formulir ini dengan huruf cetak dan jelas serta mengikuti "TATA CARA PENGISIAN FORMULIR"', { sh: 'D9D9D9', bold: 1, sz: z8 })]]), sp6(40),
+    tx('Pilih salah satu:'), tb([400, 7000, 7170], [[ckc('IJ1'), 'Input Data Kepala Keluarga dan Anggota Keluarga WNI', ''], [ckc('IJ2'), 'Input Data Kepala Keluarga dan Anggota Keluarga Orang Asing', ''], [ckc('IJ3'), 'Input Data Kepala Keluarga dan Anggota Keluarga WNI di luar Negeri', '']]),
+    sp6(60), tx('DATA KEPALA KELUARGA', { bold: 1 }),
+    tb([3600, 200, 2000, 1100, 1000, 1100, 1000, 2870, 1700], [['1. Nama Kepala Keluarga', ':', bx('{{KK Kepala_U}}', { span: 7 })], ['2. Alamat', ':', bx('{{KK Alamat}}', { span: 7 })],
+      ['3. Kode Pos', ':', bx('{{Kode Pos}}'), { t: '4. RT', al: 'R' }, bx('{{KK RT}}'), { t: '5. RW', al: 'R' }, bx('{{KK RW}}'), { t: '6. Jumlah Anggota Keluarga', al: 'R' }, bx('{{KK Jumlah}} Orang')],
+      ['7. Telepon/Handphone', ':', bx('{{KK Telepon}}', { span: 3 }), { t: '', span: 4 }], ['8. Email', ':', bx('{{KK Email}}', { span: 3 }), { t: '', span: 4 }]]),
+    sp6(60), tx('Kode Wilayah diisi oleh Petugas Kependudukan dan Pencatatan Sipil', { size: z8, i: 1 }), tx('DATA WILAYAH', { bold: 1 }),
+    tb([3600, 200, 1200, 9570], [['9. Kode-Nama Provinsi', ':', bx(''), bx('{{Wil Prov}}')], ['10. Kode-Nama Kabupaten/Kota', ':', bx(''), bx('{{Wil Kab}}')], ['11. Kode-Nama Kecamatan', ':', bx(''), bx('{{Wil Kec}}')],
+      ['12. Kode-Nama Kelurahan/Desa', ':', bx(''), bx('{{Wil Desa}}')], ['13. Nama Dusun/Dukuh/Kampung', ':', bx('{{Wil Dusun}}', { span: 2 })]]),
+    sp6(60), tx('Alamat di Luar Negeri (diisi oleh WNI di luar negeri)', { bold: 1 }),
+    tb([3600, 200, 4000, 2600, 4170], [['1. Alamat', ':', bx('', { span: 3 })], ['2. Kota', ':', bx(''), { t: '3. Provinsi/Negara Bagian', al: 'R' }, bx('')], ['4. Negara', ':', bx('', { span: 3 })],
+      ['5. Kode Pos', ':', bx(''), { t: '6. Jumlah Anggota Keluarga', al: 'R' }, bx('')], ['7. Telepon/Handphone', ':', bx(''), '', ''], ['8. Email', ':', bx(''), '', '']]),
+    P('', { pb: 1, after: 0 }), tx('DATA ANGGOTA KELUARGA', { bold: 1 }),
+    tx('Catatan: - Bagi Penduduk WNI mengisi Kolom 2 s.d 6, 10 s.d 31, 38 s.d. 41  - Orang Asing mengisi kolom 2 s.d 13, 15 s.d 41  - WNI di luar wilayah NKRI mengisi nomor 2 s.d 31, 38 s.d 41', { size: z8 }), sp6(40),
+    thA([500, 5170, 1300, 1300, 2000, 1600, 2700], ['No.', 'Nama Lengkap', 'Gelar Depan', 'Gelar Belakang', 'Nomor Paspor', 'Tgl Berakhir Paspor', 'Nama Sponsor'], 'A1', [[1, 'No', 'C'], [2, 'Nama'], [3], [4], [5], [6], [7]]), sp6(60),
+    thA([500, 1400, 3000, 1300, 2100, 1800, 1700, 1500, 1270], ['No.', 'Tipe Sponsor', 'Alamat Sponsor', 'Jenis Kelamin', 'Tempat Lahir', 'Tanggal Lahir', 'Kewarga-negaraan', 'No SK Penetapan WNI', 'Akta Lahir'], 'A2', [[1, 'No', 'C'], [8], [9], [10, 'JK'], [11, 'Tempat Lahir'], [12, 'Tgl Lahir', 'C'], [13, 'WN', 'C'], [14], [15]]), sp6(60),
+    thA([500, 2600, 1000, 1500, 3000, 1500, 1200, 1900, 1370], ['No.', 'Nomor Akta Kelahiran', 'Gol. Darah', 'Agama', 'Nama Organisasi Kepercayaan terhadap Tuhan YME', 'Status Perkawinan', 'Akta Perkawinan', 'Nomor Akta Perkawinan', 'Tanggal Perkawinan'], 'A3', [[1, 'No', 'C'], [16], [17, 'Gol Darah', 'C'], [18, 'Agama'], [19], [20, 'Status Kawin'], [21], [22], [23, 'Tgl Kawin', 'C']]),
+    P('', { pb: 1, after: 0 }),
+    thA([500, 1000, 1800, 1500, 1500, 1200, 1100, 1700, 1700, 1300, 1270], ['No.', 'Akta Cerai', 'Nomor Akta Perceraian', 'Tanggal Perceraian', 'Status Hubungan Dalam Keluarga', 'Kelainan Fisik & Mental', 'Penyandang Cacat', 'Pendidikan Terakhir', 'Jenis Pekerjaan', 'Nomor ITAS/ITAP', 'Tempat Terbit ITAS/ITAP'], 'A4', [[1, 'No', 'C'], [24], [25], [26, 'Tgl Cerai', 'C'], [27, 'SHDK'], [28], [29], [30, 'Pendidikan'], [31, 'Pekerjaan'], [32], [33]]), sp6(60),
+    thA([500, 1300, 1300, 1700, 1500, 2000, 2240, 2000, 2030], ['No.', 'Tanggal Terbit ITAS/ITAP', 'Tanggal Akhir ITAS/ITAP', 'Tempat Datang Pertama', 'Tgl Kedatangan Pertama', 'NIK Ibu', 'Nama Ibu', 'NIK Ayah', 'Nama Ayah'], 'A5', [[1, 'No', 'C'], [34], [35], [36], [37], [38, 'NIK Ibu'], [39, 'Nama Ibu'], [40, 'NIK Ayah'], [41, 'Nama Ayah']]),
+    sp6(120), ttdDua(kolT(['Mengetahui,', 'Kepala Dinas Kependudukan dan Pencatatan Sipil/', 'UPT Dinas Dukcapil'], '( Nama Lengkap )', { bawah: 'NIP.' }), kolT(['{{Desa}}, {{Tanggal Surat}}', 'Kepala Keluarga'], '{{KK Kepala_U}}'), WL),
+    tx('PERNYATAAN', { bold: 1, before: 120 }), tx('Demikian Formulir ini saya/kami isi dengan sesungguhnya. Apabila keterangan tersebut tidak sesuai dengan keadaan sebenarnya, saya bersedia dikenakan sanksi sesuai ketentuan peraturan perundang-undangan yang berlaku.', { size: z8 })];
+  T.adm_f1_01.land = 1;
+  /* F-1.02 Pendaftaran Peristiwa Kependudukan */
+  const g102 = [
+    [['I', 'KARTU KELUARGA', '', 1], ['II', 'KTP-el', '', 1], ['III.', 'KARTU IDENTITAS ANAK', '', 1], ['IV', 'PERUBAHAN DATA', '', 1]],
+    [['A', 'BARU'], ['A.', 'BARU', 'KT1'], ['A', 'BARU', 'KI1'], ['A', 'KK', 'PD1']],
+    [['1.', 'Membentuk Keluarga Baru', 'KK1'], ['B', 'PINDAH DATANG', 'KT2'], ['B', 'HILANG/RUSAK'], ['B', 'KTP-el', 'PD2']],
+    [['2.', 'Penggantian Kepala Keluarga', 'KK2'], ['C', 'HILANG/RUSAK'], ['1.', 'Hilang', 'KI2'], ['C', 'KIA', 'PD3']],
+    [['3.', 'Pisah KK', 'KK3'], ['1.', 'Hilang', 'KT3'], ['2.', 'Rusak', 'KI3'], ['', 'melampirkan:']],
+    [['4.', 'Pindah Datang', 'KK4'], ['2.', 'Rusak', 'KT4'], ['C.', 'Perpanjangan ITAP', 'KI4'], ['', '1) Formulir Perubahan Data; dan']],
+    [['5.', 'WNI dari LN karena Pindah', 'KK5'], ['D', 'PERPANJANGAN ITAP', 'KT5'], ['D', 'Lainnya', 'KI5'], ['', '2) Bukti Perubahan Data']],
+    [['6.', 'Rentan Adminduk', 'KK6'], ['E.', 'PERUBAHAN STATUS KEWARGANEGARAAN', 'KT6'], ['', ''], ['', '']],
+    [['B.', 'PERUBAHAN DATA'], ['F', 'LUAR DOMISILI', 'KT7'], ['', ''], ['', '']],
+    [['1.', 'Menumpang dalam KK', 'KK7'], ['G', 'TRANSMIGRASI', 'KT8'], ['', ''], ['', '']],
+    [['2.', 'Peristiwa Penting', 'KK8'], ['', ''], ['', ''], ['', '']],
+    [['3.', 'Perubahan elemen data yang tercantum dalam KK', 'KK9'], ['', ''], ['', ''], ['', '']],
+    [['C.', 'HILANG/RUSAK'], ['', ''], ['', ''], ['', '']],
+    [['1.', 'Hilang', 'KK10'], ['', ''], ['', ''], ['', '']],
+    [['2.', 'Rusak', 'KK11'], ['', ''], ['', ''], ['', '']]];
+  T.adm_f1_02 = () => [...judulF('FORMULIR PENDAFTARAN PERISTIWA KEPENDUDUKAN', 'F-1.02'),
+    tx('I. DATA PEMOHON:', { bold: 1 }), baris([3000, 200, 6160], [['1. NAMA LENGKAP', '{{P Nama_U}}'], ['2. No. Induk Kependudukan', '{{P NIK}}'], ['3. Nomor Kartu Keluarga', '{{P KK}}']]),
+    sp6(80), tx('II. JENIS PERMOHONAN:', { bold: 1 }),
+    tb([330, 1620, 390, 330, 1620, 390, 330, 1620, 390, 330, 1620, 390], g102.map(rw => rw.flatMap(([a, b, c, hd]) => hd ? [bx(a, { bold: 1, sz: z8 }), bx(b, { bold: 1, sz: z8, span: 2 })] : [bx(a, { sz: z8 }), bx(b, { sz: z8 }), c ? ckc(c) : bx('')]))),
+    sp6(80), tx('III. PERSYARATAN YANG DILAMPIRKAN', { bold: 1 }),
+    tb([380, 4300, 380, 4300], pilih(JP_SYARAT, 'SY', 2).map(rw => rw.map((c, i) => i % 2 ? { t: c, sz: z8 } : c))),
+    sp6(160), ttdDua(kolT(['', 'Petugas,'], '( Nama Lengkap )'), kolT(['{{Desa}}, {{Tanggal Surat}}', 'Pemohon,'], '( {{P Nama_U}} )'))];
+  /* F-1.03 Pendaftaran Perpindahan Penduduk */
+  T.adm_f1_03 = () => [tx('Perhatian: Harap diisi dengan huruf cetak dan menggunakan tinta hitam', { size: z8, i: 1 }), ...judulF('FORMULIR PENDAFTARAN PERPINDAHAN PENDUDUK', 'F-1.03'),
+    baris([3200, 200, 5960], [['1. No KK', '{{P KK}}'], ['2. Nama Lengkap Pemohon', '{{P Nama_U}}'], ['3. NIK', '{{P NIK}}']]),
+    tb([3200, 200, 400, 5560], [['4. Jenis Permohonan', ':', { t: 'D. SURAT KETERANGAN KEPENDUDUKAN', span: 2, bold: 1 }], ['', '', ckc('PJ1'), 'Surat Keterangan Pindah'], ['', '', ckc('PJ2'), 'Surat Keterangan Pindah Luar Negeri (SKPLN)'], ['', '', ckc('PJ3'), 'Surat Keterangan Tempat Tinggal (SKTT)']]),
+    tb([3200, 200, 3360, 600, 600, 600, 600, 200], [['5. Alamat Asal', ':', bx('{{P Jalan}}'), { t: 'RT', al: 'C' }, bx('{{P RT}}'), { t: 'RW', al: 'C' }, bx('{{P RW}}'), '']]),
+    baris([3200, 200, 5960], [['    a. Desa/Kelurahan', '{{Wil Desa}}'], ['    b. Kecamatan', '{{Wil Kec}}'], ['    c. Kabupaten/Kota', '{{Wil Kab}}'], ['    d. Provinsi', '{{Wil Prov}}'], ['    Kode Pos', '{{Kode Pos}}']]),
+    tb([3200, 200, 400, 5560], [['6. Klasifikasi Kepindahan', ':', ckc('PK1'), PD_KLAS[0]]].concat(PD_KLAS.slice(1).map((o, i) => ['', '', ckc('PK' + (i + 2)), o]))),
+    tb([3200, 200, 3360, 600, 600, 600, 600, 200], [['7. Alamat Pindah', ':', bx('{{Pindah Alamat}}'), { t: 'RT', al: 'C' }, bx('{{Pindah RT}}'), { t: 'RW', al: 'C' }, bx('{{Pindah RW}}'), '']]),
+    baris([3200, 200, 5960], [['    a. Desa/Kelurahan', '{{Pindah Desa}}'], ['    b. Kecamatan', '{{Pindah Kec}}'], ['    c. Kabupaten/Kota', '{{Pindah Kab}}'], ['    d. Provinsi', '{{Pindah Prov}}'], ['    Kode Pos', '{{Pindah Kode Pos}}']]),
+    tb([3200, 200, 400, 2580, 400, 2580], [['8. Alasan Pindah', ':', ckc('PA1'), 'Pekerjaan', ckc('PA2'), 'Pendidikan'], ['', '', ckc('PA3'), 'Keamanan', ckc('PA4'), 'Kesehatan'], ['', '', ckc('PA5'), 'Perumahan', ckc('PA6'), 'Keluarga'], ['', '', ckc('PA7'), { t: 'Lainnya (sebutkan): {{Alasan Lain}}', span: 3 }]]),
+    tb([3200, 200, 400, 5560], [['9. Jenis Kepindahan', ':', ckc('PJK1'), PD_JENIS[0]]].concat(PD_JENIS.slice(1).map((o, i) => ['', '', ckc('PJK' + (i + 2)), o]))),
+    tb([3200, 200, 400, 1600, 400, 1600, 400, 1560], [['10. Anggota Keluarga Tidak Pindah', ':', ckc('PT1'), 'Numpang KK', ckc('PT2'), 'Membuat KK Baru', ckc('PT3'), 'Nomor KK Tetap'],
+      ['11. Anggota Keluarga yang Pindah', ':', ckc('PI1'), 'Numpang KK', ckc('PI2'), 'Membuat KK Baru', '', '']]),
+    tx('12. Daftar Anggota Keluarga yang Pindah', { before: 60 }),
+    tb([600, 2900, 4060, 1800], [['NO.', 'NIK', 'NAMA LENGKAP', 'SHDK'].map(h => bx(h, { al: 'C', bold: 1, sz: z8, sh: 'EDEDED' })), [bx('{{PD No}}', { al: 'C' }), bx('{{PD NIK}}'), bx('{{PD Nama}}'), bx('{{PD SHDK}}')]]),
+    tx('Diisi oleh Penduduk (Orang Asing) pemegang ITAS yang Mengajukan SKTT dan OA Pemegang ITAP yang Mengajukan Surat Keterangan Kependudukan Lainnya', { size: z8, i: 1, before: 80 }),
+    baris([3200, 200, 5960], [['13. Nama Sponsor', ''], ['14. Tipe Sponsor', 'Organisasi Internasional / Pemerintah / Perusahaan / Perorangan / Tanpa Sponsor'], ['15. Alamat Sponsor', ''], ['16. Nomor dan Tanggal KITAS & KITAP', '']]),
+    tx('Diisi oleh Penduduk yang Mengajukan Surat Keterangan Pindah Luar Negeri', { size: z8, i: 1, before: 60 }),
+    baris([3200, 200, 5960], [['17. Negara Tujuan', ''], ['18. Alamat Tujuan', ''], ['19. Penanggung Jawab', ''], ['20. Rencana Pindah Tanggal', '{{Pindah Tgl}}']]),
+    sp6(140), ttdDua(kolT(['Mengetahui,', 'Kepala Dinas/UPT Dinas', 'Kependudukan dan Pencatatan Sipil'], '( ............................................ )', { bawah: 'NIP.' }), kolT(['{{Desa}}, {{Tanggal Surat}}', 'Pemohon,'], '( {{P Nama_U}} )'))];
+  /* F-1.04 Pernyataan Tidak Memiliki Dokumen Kependudukan */
+  T.adm_f1_04 = () => [kodeF('F-1.04'), P([r('SURAT PERNYATAAN TIDAK MEMILIKI DOKUMEN KEPENDUDUKAN', { bold: 1 })], { al: 'C', before: 240, after: 240 }),
+    P('Yang bertanda tangan di bawah ini :'), tbl([3000, 250, W - 3970], [['Nama', ':', '{{P Nama_U}}'], ['Alamat', ':', '{{P Alamat}}'], ['Tempat dan Tanggal lahir', ':', '{{P TTL}}'], ['Nama Ibu', ':', '{{P Ibu}}']], 720),
+    P('Dengan ini menyatakan bahwa saya tidak memiliki dokumen kependudukan dan apabila dikemudian hari ternyata pernyataan saya ini tidak benar, maka saya bersedia diproses secara hukum sesuai dengan peraturan perundang-undangan serta dokumen yang diterbitkan dari permohonan ini menjadi tidak sah.', { ind: 1, before: 160 }),
+    P('{{Desa}}, {{Tanggal Surat}}', { al: 'R', before: 240, after: 60 }), tb([4680, 4680], [['', { x: kolT(['Yang menyatakan,'], '{{P Nama_U}}', { materai: 1 }).join('') }]])];
+  /* F-1.06 Pernyataan Perubahan Elemen Data Kependudukan */
+  const hd = (t, o = {}) => bx(t, Object.assign({ al: 'C', bold: 1, sz: z8, sh: 'EDEDED' }, o));
+  T.adm_f1_06 = () => [kodeF('F-1.06'), tx('Materai Cukup', { al: 'R', size: z8, i: 1 }), P([r('SURAT PERNYATAAN PERUBAHAN ELEMEN DATA KEPENDUDUKAN', { bold: 1 })], { al: 'C', before: 120, after: 160 }),
+    tx('Yang bertanda tangan di bawah ini :', { size: 22 }), tb([2600, 200, 6200], [['Nama lengkap', ':', '{{P Nama_U}}'], ['N I K', ':', '{{P NIK}}'], ['Nomor KK', ':', '{{P KK}}'], ['Alamat rumah', ':', '{{P Alamat}}']].map(x => x.map(c => ({ t: c, sz: 22 }))), { ind: 360 }),
+    tx('dengan rincian KK sebagai berikut:', { before: 80, size: 22 }),
+    tb([600, 3400, 2300, 1660, 1400], [['No', 'Nama', 'NIK', 'SHDK', 'Keterangan'].map(h => hd(h)), [bx('{{RK No}}', { al: 'C' }), bx('{{RK Nama}}'), bx('{{RK NIK}}'), bx('{{RK SHDK}}'), bx('{{RK Ket}}')]]),
+    tx('Menyatakan bahwa data elemen data kependudukan saya dan anggota keluarga saya telah berubah, dengan rincian:', { before: 80, size: 22 }),
+    tx('A. Pendidikan dan Pekerjaan:', { bold: 1 }),
+    tb([450, 1650, 1150, 1150, 1150, 1270, 1270, 1270], [[hd('No', {}), hd('Nama'), hd('Pendidikan Terakhir', { span: 3 }), hd('Pekerjaan', { span: 3 })], ['', '', 'Semula', 'Menjadi', 'Dasar Perubahan', 'Semula', 'Menjadi', 'Dasar Perubahan'].map(h => hd(h)),
+      [bx('{{UA No}}', { al: 'C' }), bx('{{UA Nama}}', { sz: z8 }), bx('{{UA Pend Semula}}', { sz: z8 }), bx('{{UA Pend Menjadi}}', { sz: z8 }), bx('{{UA Pend Dasar}}', { sz: z8 }), bx('{{UA Kerja Semula}}', { sz: z8 }), bx('{{UA Kerja Menjadi}}', { sz: z8 }), bx('{{UA Kerja Dasar}}', { sz: z8 })]]),
+    tx('B. Agama dan Perubahan Lainnya', { bold: 1, before: 80 }),
+    tb([450, 1500, 1050, 1050, 1050, 1300, 980, 980, 1000], [[hd('No'), hd('Nama'), hd('Agama', { span: 3 }), hd('Lainnya, yaitu: *)', { span: 4 })], ['', '', 'Semula', 'Menjadi', 'Dasar Perubahan', 'Elemen', 'Semula', 'Menjadi', 'Dasar Perubahan'].map(h => hd(h)),
+      [bx('{{UB No}}', { al: 'C' }), bx('{{UB Nama}}', { sz: z8 }), bx('{{UB Agama Semula}}', { sz: z8 }), bx('{{UB Agama Menjadi}}', { sz: z8 }), bx('{{UB Agama Dasar}}', { sz: z8 }), bx('{{UB Lain Elemen}}', { sz: z8 }), bx('{{UB Lain Semula}}', { sz: z8 }), bx('{{UB Lain Menjadi}}', { sz: z8 }), bx('{{UB Lain Dasar}}', { sz: z8 })]]),
+    tx('Terlampir disampaikan fotokopi berkas-berkas yang terkait dengan perubahan elemen data tersebut.', { before: 80, size: 22 }),
+    tx('Demikian Surat Pernyataan ini saya buat dengan sebenarnya, apabila dalam keterangan yang saya berikan terdapat hal-hal yang tidak berdasarkan keadaan yang sebenarnya, saya bersedia dikenakan sanksi sesuai ketentuan peraturan perundang-undangan yang berlaku.', { size: 22, al: 'J' }),
+    tb([4680, 4680], [['', { x: kolT(['{{Desa}}, {{Tanggal Surat}}', 'Yang membuat pernyataan,'], '{{P Nama_U}}').join('') }]]),
+    tx('Keterangan : *) Perubahan Lainnya ini, juga dapat digunakan untuk merubah data kependudukan yang diakibatkan adanya kesalahan pada waktu pengisian Formulir Biodata maupun kesalahan pada saat peng-entry-an biodata penduduk dimaksud.', { size: 14, i: 1, before: 80 })];
+  /* F-2.01 Pelaporan Pencatatan Sipil di dalam wilayah NKRI (bagian kelahiran & kematian) */
+  const tglBx = pf => [{ t: 'Tgl', al: 'R', sz: z8 }, bx('{{' + pf + ' Tgl Lahir}}', { al: 'C' }), { t: 'Bln', al: 'R', sz: z8 }, bx('{{' + pf + ' Bln Lahir}}', { al: 'C' }), { t: 'Thn', al: 'R', sz: z8 }, bx('{{' + pf + ' Thn Lahir}}', { al: 'C' })];
+  const C201 = [2900, 200, 900, 700, 650, 700, 650, 900, 1760];
+  const r201 = (lbl, val) => [lbl, ':', bx(val, { span: 7 })];
+  const orang201 = (judul, pf) => [[{ t: judul, bold: 1, span: 9 }], r201('Nama', '{{' + pf + ' Nama_U}}'), r201('NIK', '{{' + pf + ' NIK}}'), r201('Nomor Dokumen Perjalanan*', ''), r201('Nomor Kartu Keluarga', '{{' + pf + ' KK}}'), r201('Kewarganegaraan', '{{' + pf + ' Kewarganegaraan}}')];
+  const opsi201 = (lbl, opts, pf) => { const rw = [lbl, ':']; const cells = []; opts.forEach((o, i) => { cells.push(ckc(pf + (i + 1))); cells.push({ t: (i + 1) + '. ' + o, sz: z8 }); });
+    const out = []; for (let i = 0; i < cells.length; i += 6) out.push((i ? ['', ''] : rw).concat(cells.slice(i, i + 6)).concat(cells.slice(i, i + 6).length < 6 ? Array(6 - cells.slice(i, i + 6).length).fill('') : []).concat([''])); return out; };
+  const C201o = [2900, 200, 400, 1500, 400, 1500, 400, 1500, 560];
+  T.adm_f2_01 = () => [tb([2200, 200, 1000, 5960], [['Provinsi', ':', bx(''), bx('{{Wil Prov}}')], ['Kabupaten/Kota', ':', bx(''), bx('{{Wil Kab}}')], ['Kecamatan', ':', bx(''), bx('{{Wil Kec}}')], ['Desa/Kelurahan', ':', bx(''), bx('{{Wil Desa}}')]]),
+    tx('Kode Wilayah diisi petugas', { size: 14, i: 1 }), ...judulF('FORMULIR PELAPORAN PENCATATAN SIPIL DI DALAM WILAYAH NKRI', 'F-2.01'),
+    tx('Jenis Pelaporan Pencatatan Sipil', { bold: 1 }),
+    tb([400, 2700, 400, 2700, 400, 2760], [[ckc('LP1'), 'Kelahiran', bx(''), 'Pengakuan Anak', bx(''), 'Pembatalan Perceraian'], [bx(''), 'Lahir Mati', bx(''), 'Pengesahan Anak', bx(''), 'Pembetulan Akta'], [bx(''), 'Perkawinan', bx(''), 'Perubahan Nama', bx(''), 'Pembatalan Akta'],
+      [bx(''), 'Pembatalan Perkawinan', bx(''), 'Perubahan Status Kewarganegaraan', bx(''), 'Pengangkatan Anak'], [bx(''), 'Perceraian', bx(''), 'Pencatatan Peristiwa Penting Lainnya', bx(''), 'Pelaporan dari Luar Wilayah NKRI'], [ckc('LP2'), 'Kematian', '', '', '', ''] ].map(rw => rw.map((c, i) => i % 2 ? { t: c, sz: z8 } : c))),
+    sp6(60), tb(C201, [].concat(orang201('DATA PELAPOR', 'P'), orang201('DATA SUBJEK AKTA KESATU', 'Subjek'), orang201('DATA SUBJEK AKTA KEDUA (JIKA ADA)', 'Subjek2'), orang201('DATA SAKSI I', 'Saksi1'), orang201('DATA SAKSI II', 'Saksi2'))),
+    sp6(60), tb(C201, [[{ t: 'DATA ORANG TUA** (hanya diisi untuk keperluan pencatatan kelahiran, lahir mati dan kematian)', bold: 1, span: 9 }],
+      r201('Nama Ayah', '{{Ayah Nama_U}}'), r201('NIK Ayah', '{{Ayah NIK}}'), r201('Tempat Lahir Ayah', '{{Ayah Tempat Lahir}}'), ['Tanggal Lahir Ayah', ':'].concat(tglBx('Ayah')).concat([{ t: '', span: 1 }]), r201('Kewarganegaraan', '{{Ayah Kewarganegaraan}}'),
+      r201('Nama Ibu', '{{Ibu Nama_U}}'), r201('NIK Ibu', '{{Ibu NIK}}'), r201('Tempat Lahir Ibu', '{{Ibu Tempat Lahir}}'), ['Tanggal Lahir Ibu', ':'].concat(tglBx('Ibu')).concat([{ t: '', span: 1 }]), r201('Kewarganegaraan', '{{Ibu Kewarganegaraan}}')]),
+    sp6(60), tb(C201o, [[{ t: 'DATA ANAK', bold: 1, span: 9 }], ['1. Nama', ':', bx('{{Anak Nama_U}}', { span: 7 })]].concat(opsi201('2. Jenis kelamin', ['Laki-Laki', 'Perempuan'], 'AK'), opsi201('3. Tempat dilahirkan', ['RS/RB', 'Puskesmas', 'Polindes', 'Rumah', 'Lainnya'], 'AT'),
+      [['4. Tempat kelahiran', ':', bx('{{Anak Tempat}}', { span: 7 })], ['5. Hari dan tanggal lahir', ':', bx('{{Anak Hari}}', { span: 2 }), bx('{{Anak Tanggal Lahir}}', { span: 5 })], ['6. Pukul', ':', bx('{{Anak Pukul}}', { span: 3 }), { t: '', span: 4 }]],
+      opsi201('7. Jenis kelahiran', ['Tunggal', 'Kembar 2', 'Kembar 3', 'Kembar 4', 'Lainnya'], 'AJ'), [['8. Kelahiran ke', ':', bx('{{Anak Ke}}', { span: 3 }), { t: '', span: 4 }]],
+      opsi201('9. Penolong kelahiran', ['Dokter', 'Bidan/Perawat', 'Dukun', 'Lainnya'], 'AP'), [['10. Berat bayi', ':', bx('{{Anak Berat}} Kg', { span: 3 }), { t: '', span: 4 }], ['11. Panjang bayi', ':', bx('{{Anak Panjang}} cm', { span: 3 }), { t: '', span: 4 }]])),
+    sp6(60), tb(C201o, [[{ t: 'KEMATIAN', bold: 1, span: 9 }], ['1. NIK', ':', bx('{{Mati NIK}}', { span: 7 })], ['2. Nama lengkap', ':', bx('{{Mati Nama_U}}', { span: 7 })], ['3. Tanggal kematian', ':', bx('{{Mati Tanggal}}', { span: 7 })], ['4. Pukul', ':', bx('{{Mati Pukul}}', { span: 3 }), { t: '', span: 4 }]]
+      .concat(opsi201('5. Sebab kematian', ['Sakit biasa / tua', 'Wabah Penyakit', 'Kecelakaan', 'Kriminalitas', 'Bunuh Diri', 'Lainnya'], 'MS'), [['6. Tempat kematian', ':', bx('{{Mati Tempat}}', { span: 7 })]], opsi201('7. Yang menerangkan', ['Dokter', 'Tenaga Kesehatan', 'Kepolisian', 'Lainnya'], 'MM'))),
+    tx('* Jika ada.   ** Bagian lahir mati, perkawinan, perceraian, pengangkatan anak, dan lainnya memakai blanko lengkap dari Disdukcapil.', { size: 14, i: 1, before: 60 }),
+    sp6(120), P('{{Desa}}, {{Tanggal Surat}}', { al: 'R', after: 60 }),
+    ttdDua(kolT(['Mengetahui :', 'Kepala Desa {{Desa}}'], '( {{Kepala Desa_U}} )'), kolT(['', 'Pelapor'], '( {{P Nama_U}} )'))];
+  T.adm_f2_01.f4 = 1;
+  /* F-2.03 SPTJM Kebenaran Data Kelahiran */
+  const idS = rows => tb([3000, 250, W - 3970], rows.map(x => [{ t: x[0], sz: 22 }, { t: ':', sz: 22 }, { t: x[1], sz: 22 }]), { ind: 720 });
+  T.adm_f2_03 = () => [kodeF('F-2.03'), P([r('SURAT PERNYATAAN TANGGUNGJAWAB MUTLAK (SPTJM) KEBENARAN DATA KELAHIRAN', { bold: 1 })], { al: 'C', before: 160, after: 200 }),
+    P('Saya yang bertandatangan dibawah ini:', { after: 40 }), idS([['Nama', '{{P Nama_U}}'], ['NIK', '{{P NIK}}'], ['Tempat/tanggal lahir', '{{P TTL}}'], ['Pekerjaan', '{{P Pekerjaan}}'], ['Alamat', '{{P Alamat}}']]),
+    P('menyatakan bahwa:', { after: 40 }), idS([['Nama', '{{Anak Nama_U}}'], ['NIK', '-'], ['Tempat/tanggal lahir', '{{Anak TTL}}'], ['Anak ke *)', '{{Anak Ke}}'], ['Alamat', '{{P Alamat}}']]),
+    P('adalah anak kandung dari:', { after: 40 }), idS([['Nama Ibu', '{{Ibu Nama_U}}'], ['NIK', '{{Ibu NIK}}'], ['Tempat/tanggal lahir', '{{Ibu TTL}}'], ['Pekerjaan', '{{Ibu Pekerjaan}}'], ['Alamat', '{{Ibu Alamat}}']]),
+    P('yang lahir dengan penolong kelahiran:', { after: 40 }), idS([['Nama', '{{Penolong Nama_U}}'], ['NIK', '{{Penolong NIK}}'], ['Pekerjaan', '{{Penolong Pekerjaan}}'], ['Alamat', '{{Penolong Alamat}}']]),
+    P('Demikian surat pernyataan ini saya buat dengan sebenar-benarnya dan apabila dikemudian hari ternyata pernyataan saya ini tidak benar, maka saya bersedia diproses secara hukum sesuai dengan peraturan perundang-undangan dan dokumen yang diterbitkan akibat dari pernyataan ini menjadi tidak sah.', { ind: 1, before: 120 }),
+    pernyataanTTD(), tx('Keterangan: Lampiran ini digunakan dalam hal persyaratan berupa Surat Keterangan Lahir tidak terpenuhi. *) Ditulis urutan kelahiran anak.', { size: z8, before: 120 })];
+  /* F-2.04 SPTJM Kebenaran sebagai Pasangan Suami Isteri */
+  T.adm_f2_04 = () => [kodeF('F-2.04'), P([r('SURAT PERNYATAAN TANGGUNG JAWAB MUTLAK (SPTJM) KEBENARAN SEBAGAI PASANGAN SUAMI ISTERI', { bold: 1 })], { al: 'C', before: 160, after: 200 }),
+    P('Saya yang bertandatangan dibawah ini:', { after: 40 }), idS([['Nama', '{{P Nama_U}}'], ['NIK', '{{P NIK}}'], ['Tempat/tanggal lahir', '{{P TTL}}'], ['Pekerjaan', '{{P Pekerjaan}}'], ['Alamat', '{{P Alamat}}']]),
+    P('menyatakan bahwa:', { after: 40 }), idS([['Nama', '{{Suami Nama_U}}'], ['NIK', '{{Suami NIK}}'], ['Tempat/tanggal lahir', '{{Suami TTL}}'], ['Pekerjaan', '{{Suami Pekerjaan}}'], ['Alamat', '{{Suami Alamat}}']]),
+    P('adalah {{Suami Istri}} dari:', { after: 40 }), idS([['Nama', '{{Istri Nama_U}}'], ['NIK', '{{Istri NIK}}'], ['Tempat/tanggal lahir', '{{Istri TTL}}'], ['Pekerjaan', '{{Istri Pekerjaan}}'], ['Alamat', '{{Istri Alamat}}']]),
+    P('sebagaimana tercantum dalam Kartu Keluarga (KK) Nomor: {{KK Pasangan}}', { before: 80 }),
+    P('Demikian surat pernyataan ini saya buat dengan sebenar-benarnya dan apabila dikemudian hari ternyata pernyataan saya ini tidak benar, maka saya bersedia diproses secara hukum sesuai dengan peraturan perundang-undangan dan dokumen yang diterbitkan akibat dari pernyataan ini menjadi tidak sah.', { ind: 1, before: 80 }),
+    pernyataanTTD()];
   /* Formulir nikah — PMA No. 20 Tahun 2019 (Model N1, N2, N4, N5) */
   const nModel = m => P([r(m, { size: 20 })], { al: 'R', after: 60 });
   const nList = (rows, ind) => tbl([450, 3300, 250, W - 4000 - (ind || 0)], rows.map((x, i) => [(i + 1) + '.', x[0], ':', x[1]]), ind || 0);
@@ -10060,6 +10407,7 @@ VIEWS.template = async (p, main) => {
     ['naskah', 'Surat Keluar & Produk Hukum', () => sek('Surat keluar & produk hukum', `<button class="btn sm" data-act="tplUpBtn" data-p="naskah/">${ic('plus')}Jenis surat keluar</button>`, naskahDaftar.map(([path, label]) => item({ path, label, ic: /perdes|perkades|perbersama|sk_/.test(path) ? 'scale' : 'send' })).join(''))
       + '<div class="meta">Jenis surat keluar baru: beri nama file sesuai jenisnya, mis. <i>Surat Undangan Rapat.docx</i>, lalu ketik jenis yang sama di isian "Jenis Surat".</div>'
       + tags('Daftar tanda Surat Keluar & Produk Hukum', TAG_NASKAH, 'Menimbang, Mengingat, Isi, Isi Surat, Tembusan, Yang Ditugaskan: tulis tanda sendirian dalam satu paragraf, maka setiap baris isian menjadi paragraf baru.')],
+    ['adm', 'Formulir Adminduk', () => sek('Formulir Adminduk (Permendagri No. 109 Tahun 2019)', '', F_ADM.map(([k, l]) => item({ path: admPath(k), label: l, ic: 'file' })).join('')) + '<div class="meta">Template bawaan disusun dari lampiran Permendagri 109/2019. Bila Disdukcapil memakai blanko berbeda, unduh, sesuaikan, lalu unggah kembali.</div>'],
     ['ntcr', 'Buku NTCR', () => sek('Formulir nikah (PMA No. 20 Tahun 2019)', '', [['n1', 'N1 Pengantar Nikah'], ['n2', 'N2 Permohonan Kehendak Perkawinan'], ['n4', 'N4 Persetujuan Calon Pengantin'], ['n5', 'N5 Surat Izin Orang Tua']].map(([n, l]) => item({ path: 'ntcr/ntcr_' + n + '.docx', label: l, ic: 'users' })).join(''))
       + tags('Daftar tanda Buku NTCR', TAG_NTCR, 'Tanpa awalan = calon pengantin yang dipilih saat mencetak (N1/N5); <b>Ayah</b>/<b>Ibu</b> = orang tuanya; <b>Pasangan</b> = calon pasangannya. Awalan <b>Suami</b>, <b>Istri</b>, <b>Ayah Suami</b>, <b>Ibu Istri</b>, dst. juga tersedia (Nama, NIK, TTL, Agama, Pekerjaan, Alamat, Kewarganegaraan).')],
     ['keu', 'Keuangan', () => sek('Keuangan', '', item({ path: 'keu/keu_spp.docx', label: 'SPP + Pernyataan Tanggung Jawab + Rincian + Kuitansi', ic: 'wallet', bawaan: 1 })) + tags('Daftar tanda SPP', TAG_SPP, 'Baris berawalan R diulang per rekening; baris berawalan P diulang per potongan pajak.')
