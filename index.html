@@ -1424,6 +1424,7 @@ const UI = {
     fields: [F('no_urut', 'No. Urut', 'number'), F('nama', 'Nama Lengkap', 'text', { req: 1 }), F('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1, nikfill: 1, hint: 'Ketik 16 digit: data dari Data Penduduk terisi otomatis' }), F('jabatan', 'Jabatan', 'text', { req: 1, dd: () => jabDaftar(), hint: 'Ketuk untuk memilih. Bila mengisi kekosongan jabatan, pilih yang berawalan "Plt."' }), F('jabatan_tambahan', 'Jabatan Tambahan (satu per baris)', 'textarea', { wide: 1, rows: 2 }), F('niap', 'NIAP'), F('nip', 'NRPDesa / NIP', 'text', { mono: 1, lblFn: { k: 'jabatan', fn: v => NO_INDUK(v) }, hint: 'NRPDesa untuk Sekdes, Kaur, Kasi, Kasun; NIP untuk ASN/PPPK; selain itu No. Induk' }),
       F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk2 }), F('tempat_lahir', 'Tempat Lahir'), F('tgl_lahir', 'Tanggal Lahir', 'date'), F('alamat', 'Alamat', 'text', { wide: 1 }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }), F('agama', 'Agama', 'select', { opt: OPT.agama2 }), F('pangkat', 'Pangkat/Golongan'),
       F('pendidikan', 'Pendidikan Terakhir', 'select', { opt: OPT.pendidikan2 }), F('no_sk_angkat', 'Nomor SK Pengangkatan (pertama)'), F('tgl_sk_angkat', 'Tanggal SK Pengangkatan (pertama)', 'date'),
+      F('jabatan_awal', 'Jabatan saat SK pertama', 'text', { dd: () => jabDaftar(), hint: 'Isi bila jabatan pertama berbeda dengan jabatan sekarang (mis. dulu Kasi Pelayanan, sekarang Kasi Kesejahteraan). Kosongkan bila sama. Pergantian jabatan dicatat lewat + SK → Mutasi / Rotasi Jabatan.' }),
       F('akhir_jabatan', 'Akhir masa jabatan', 'date', { hint: 'Otomatis: Kepala Desa 8 tahun sejak pelantikan (UU 3/2024); Sekdes, Kaur, Kasi, Kasun sampai usia 60 tahun. SK pengangkatan kembali dicatat di Riwayat SK pada halaman detail.' }),
       F('status_jab', 'Status', 'select', { opt: ['Aktif', 'Berhenti', 'Mengundurkan Diri', 'Pensiun', 'Meninggal'], def: 'Aktif', hint: 'Perangkat terdahulu tetap disimpan dengan status Berhenti / Pensiun / Meninggal' }),
       F('no_sk_henti', 'Nomor SK Pemberhentian', 'text', { when: { k: 'status_jab', v: ['Berhenti', 'Mengundurkan Diri', 'Pensiun', 'Meninggal'] } }), F('tgl_sk_henti', 'Tanggal SK Pemberhentian', 'date', { when: { k: 'status_jab', v: ['Berhenti', 'Mengundurkan Diri', 'Pensiun', 'Meninggal'] } }), F('dok_henti_id', 'Dokumen SK Pemberhentian', 'file', { when: { k: 'status_jab', v: ['Berhenti', 'Mengundurkan Diri', 'Pensiun', 'Meninggal'] } }),
@@ -4092,7 +4093,7 @@ async function extraAparatSK(x, el, w) {
   const item = (jn, jab, no, tgl, dok, act) => `<div class="it"><div class="row"${act || ''}><span class="av">${ic('stamp')}</span><span class="tx"><b>${esc(jn)} — ${esc(jab || x.jabatan || '')}</b><small>${esc(' - ' + [no, tgl ? fDate(tgl) : ''].filter(Boolean).join(' · '))}</small></span>${dok ? `<button class="btn sm" data-act="file" data-id="${esc(dok)}" data-name="${esc(jn)}">${ic('eye')}SK</button>` : ''}</div></div>`;
   const L = [];
   const adaNo = no => no && sks.some(s => String(s.no_sk || '').trim() === String(no).trim());
-  if (x.no_sk_angkat && !adaNo(x.no_sk_angkat)) L.push({ k: x.tgl_sk_angkat || '0', h: item('Pengangkatan', x.jabatan, x.no_sk_angkat, x.tgl_sk_angkat, x.dok_sk_id) });
+  if (x.no_sk_angkat && !adaNo(x.no_sk_angkat)) L.push({ k: x.tgl_sk_angkat || '0', h: item('Pengangkatan', x.jabatan_awal || x.jabatan, x.no_sk_angkat, x.tgl_sk_angkat, x.dok_sk_id) });
   urut.forEach(r => L.push({ k: kunci(r), h: item(jenisL(r.jenis, /^pemberhentian$/i.test(r.jenis || '') ? mj.status : ''), r.jabatan, r.no_sk, r.tgl_sk || r.tmt, r.dok_id, ` role="button" tabindex="0" title="Buka / ubah SK" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'aparat_sk', id: r.id }]))}'`) }));
   if (!aktif && x.no_sk_henti && !adaNo(x.no_sk_henti)) L.push({ k: x.tgl_sk_henti || '9', h: item(jenisL('Pemberhentian', mj.status), x.jabatan, x.no_sk_henti, x.tgl_sk_henti, x.dok_henti_id) });
   L.sort((a, b) => a.k.localeCompare(b.k));
@@ -4126,8 +4127,14 @@ async function apSkSync(ref) {
   try { const ap = await call('get', { entity: 'aparat', id: ref }); const sks = (await call('list', { entity: 'aparat_sk', filters: { ref }, limit: 50 })).rows || [];
     const mj = masaJabatan(ap, sks); const rec = { id: ref };
     if (mj.akhir && mj.akhir !== ap.akhir_jabatan) rec.akhir_jabatan = mj.akhir;
+    /* mutasi / pengangkatan ke jabatan lain: SK terakhir (bukan pemberhentian) menjadi jabatan sekarang */
+    const akhirSk = sks.filter(x => x.jabatan && !/pemberhentian|pengunduran/i.test(x.jenis || '')).sort((a, b) => String(b.tmt || b.tgl_sk || '').localeCompare(String(a.tmt || a.tgl_sk || '')))[0];
+    if (akhirSk && apAktif(ap) && String(akhirSk.tmt || akhirSk.tgl_sk || '') >= String(ap.tgl_sk_angkat || '') && akhirSk.jabatan.trim() !== String(ap.jabatan || '').trim()) {
+      rec.jabatan = akhirSk.jabatan.trim(); if (!ap.jabatan_awal) rec.jabatan_awal = ap.jabatan || '';
+      S.jabCache = null; S.kades = null; setTimeout(() => toast('Jabatan ' + (ap.nama || '') + ' diperbarui menjadi ' + rec.jabatan + ' sesuai SK terakhir.'), 500);
+    }
     if (mj.henti && apAktif(ap)) { rec.no_sk_henti = mj.sk.no_sk || ap.no_sk_henti || ''; rec.tgl_sk_henti = mj.sk.tmt || mj.sk.tgl_sk || ''; if (mj.sk.dok_id) rec.dok_henti_id = mj.sk.dok_id; }
-    if (Object.keys(rec).length > 1) await call('save', { entity: 'aparat', record: rec });
+    if (Object.keys(rec).length > 1) { await call('save', { entity: 'aparat', record: rec }); if (rec.jabatan) { S.people = null; muatPejabat(true).catch(() => { }); } }
   } catch (er) { }
 }
 
@@ -8374,7 +8381,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '167', tgl: '2026-10-09', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '168', tgl: '2026-10-09', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
