@@ -8581,7 +8581,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '180', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '181', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -13280,10 +13280,10 @@ async function addRealSiskeudes(th) {
   return { sil: jml(sil), dus: jml(dus), nSil: sil.length, nDus: dus.length, akhirSil: sil.map(x => x.tanggal).sort().pop() || '', akhirDus: dus.map(x => x.tanggal).sort().pop() || '' };
 }
 /** garis progres 2 warna: pengajuan (oranye terang, penuh) + realisasi Siskeudes (hijau, garis dalam) */
-function addBar2(aju, real, pagu) {
+function addBar2(aju, real, pagu, diaj) {
   const pc = v => pagu ? Math.max(0, Math.min(100, v / pagu * 100)) : 0;
-  return `<div class="add-bar2" title="Pengajuan ${pc(aju).toFixed(1)}% · Realisasi Siskeudes ${pc(real).toFixed(1)}%"><i class="aju" style="width:${pc(aju)}%"></i><i class="real" style="width:${pc(real)}%"></i></div>
-    <div class="add-leg"><span><i class="aju"></i>Pengajuan Rp ${addRp(aju)} (${pc(aju).toFixed(0)}%)</span><span><i class="real"></i>Realisasi Siskeudes Rp ${addRp(real)} (${pc(real).toFixed(0)}%)</span><span class="meta">Pagu Rp ${addRp(pagu)}</span></div>`;
+  return `<div class="add-bar2" title="Pengajuan cair ${pc(aju).toFixed(1)}% · Realisasi Siskeudes ${pc(real).toFixed(1)}%"><i class="aju" style="width:${pc(aju)}%"></i><i class="real" style="width:${pc(real)}%"></i></div>
+    <div class="add-leg"><span><i class="aju"></i>Pengajuan cair Rp ${addRp(aju)} (${pc(aju).toFixed(0)}%)${diaj ? ` · masih diajukan Rp ${addRp(diaj)}` : ''}</span><span><i class="real"></i>Realisasi Siskeudes Rp ${addRp(real)} (${pc(real).toFixed(0)}%)</span><span class="meta">Pagu Rp ${addRp(pagu)}</span></div>`;
 }
 
 VIEWS.addaju = async (p, main, alive) => {
@@ -13292,19 +13292,19 @@ VIEWS.addaju = async (p, main, alive) => {
   const w = canWrite('add_pengajuan'), th = Number(p.tahun || S.addTh || new Date().getFullYear()); S.addTh = th;
   const [pg, riw, rs] = await Promise.all([addPagu(th), addRiwayat(th), addRealSiskeudes(th).catch(() => ({ sil: 0, dus: 0 }))]); if (!alive()) return;
   const sil = riw.filter(x => x.jenis === 'SILTAP'), dus = riw.filter(x => x.jenis === 'DUSUN');
-  /* pengajuan = saldo awal + pengajuan Diajukan/Cair setelah batas saldo awal (draf tidak dihitung) */
-  const ajuJml = (L, jenis) => { const b = addAwalBatas(pg, jenis), aw = mNum(pg && (jenis === 'SILTAP' ? pg.awal_siltap : pg.awal_dusun)); return aw + L.filter(x => x.status !== 'Draf' && (!aw || !b || (Number(jenis === 'SILTAP' ? x.bulan : x.urut) || 0) > b)).reduce((t, x) => t + mNum(x.nominal), 0); };
-  const tSil = ajuJml(sil, 'SILTAP'), tDus = ajuJml(dus, 'DUSUN');
+  /* garis oranye = pengajuan berstatus Cair yang tercatat di aplikasi ÷ pagu (saldo awal tidak dihitung); Diajukan ditampilkan di keterangan */
+  const jmlSt = (L, st) => L.filter(x => x.status === st).reduce((t, x) => t + mNum(x.nominal), 0);
+  const tSil = jmlSt(sil, 'Cair'), tDus = jmlSt(dus, 'Cair'), dSil = jmlSt(sil, 'Diajukan'), dDus = jmlSt(dus, 'Diajukan');
   const P = pg || {}, ren = addJ(P.rencana);
   const bar = (a, b) => `<div class="bar" style="margin-top:4px"><i style="width:${b ? Math.min(100, a / b * 100) : 0}%;background:var(--pri)"></i></div>`;
   main.innerHTML = `<div class="stack">
     <div class="chips">${[th - 1, th, th + 1].map(y => `<button class="chip ${y === th ? 'on' : ''}" data-act="go" data-go='${JSON.stringify(['addaju', { tahun: y }])}'>${y}</button>`).join('')}</div>
     <div class="card stack"><div class="sec-h"><h2>${ic('wallet')} Pagu ADD ${th}</h2>${w ? `<button class="btn sm" data-act="addPaguUbah">${ic('edit')}${pg ? 'Ubah' : 'Isi'}</button>` : ''}</div>
       ${pg ? `<dl class="dl"><div><dt>Pagu ADD</dt><dd>Rp ${addRp(P.pagu_add)}</dd></div><div><dt>Pagu Siltap</dt><dd>Rp ${addRp(P.pagu_siltap)}</dd></div><div><dt>Pagu Dana Dusun</dt><dd>Rp ${addRp(P.pagu_dusun)}</dd></div><div><dt>Rekening Kas Desa</dt><dd>${esc([P.bank, P.rekening].filter(Boolean).join(' '))}</dd></div><div class="w"><dt>Atas nama</dt><dd>${esc(P.nama_rek || '')}</dd></div></dl>` : '<div class="meta">Belum diisi. Ketuk Isi: pagu ADD dan Siltap diambil otomatis dari APBDes.</div>'}</div>
-    <div class="card stack"><div class="sec-h"><h2>${ic('users')} Siltap ${th}</h2><span class="meta">${sil.filter(x => x.status === 'Cair').length} bulan cair</span></div>${addBar2(tSil, rs.sil, mNum(P.pagu_siltap))}
+    <div class="card stack"><div class="sec-h"><h2>${ic('users')} Siltap ${th}</h2><span class="meta">${sil.filter(x => x.status === 'Cair').length} bulan cair</span></div>${addBar2(tSil, rs.sil, mNum(P.pagu_siltap), dSil)}
       <div class="add-bln">${BULAN.map((b, i) => { const x = sil.find(z => Number(z.bulan) === i + 1); return `<button class="add-b ${x ? 'ada ' + (x.status === 'Cair' ? 'cair' : '') : ''}" data-act="addBuka" data-j="SILTAP" data-b="${i + 1}" data-id="${x ? esc(x.id) : ''}"><b>${b.slice(0, 3)}</b><small>${x ? (x.status === 'Cair' ? 'Cair' : x.status || 'Draf') : '—'}</small></button>`; }).join('')}</div>
       <div class="meta">Ketuk bulan untuk membuat atau membuka pengajuan. Daftar perangkat diambil dari Aparatur Desa dan nominal bulan sebelumnya.</div></div>
-    <div class="card stack"><div class="sec-h"><h2>${ic('home')} Dana Dusun ${th}</h2><span class="meta">${dus.length} tahap</span></div>${addBar2(tDus, rs.dus, mNum(P.pagu_dusun))}
+    <div class="card stack"><div class="sec-h"><h2>${ic('home')} Dana Dusun ${th}</h2><span class="meta">${dus.length} tahap</span></div>${addBar2(tDus, rs.dus, mNum(P.pagu_dusun), dDus)}
       ${dus.length ? `<div class="list">${dus.map(x => `<div class="it"><button class="row" data-act="addBuka" data-j="DUSUN" data-id="${esc(x.id)}"><span class="av">${ic('send')}</span><span class="main"><span class="t">Tahap ${esc(x.urut || '')} · ${esc(x.periode || '')}</span><span class="s">Rp ${addRp(x.nominal)} · ${esc(x.status || 'Draf')}${x.tanggal ? ' · ' + esc(fDate(x.tanggal)) : ''}</span></span></button></div>`).join('')}</div>` : '<div class="meta">Belum ada pengajuan dana dusun.</div>'}
       ${w ? `<div class="btns"><button class="btn sm pri" data-act="addBuka" data-j="DUSUN" data-id="">${ic('plus')}Pengajuan dana dusun</button><button class="btn sm" data-act="addRencana">${ic('list')}Rencana penggunaan (${ren.length})</button></div>` : ''}</div>
   </div>`;
