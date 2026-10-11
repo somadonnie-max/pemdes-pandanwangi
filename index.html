@@ -2154,7 +2154,7 @@ function call(action, p, bearer) {
   return fetch(berkas ? FILE_URL : SB_URL + '/rest/v1/rpc/api', { method: 'POST', headers: h, body: JSON.stringify(berkas ? req : { req }) })
     .then(r => r.json()).catch(() => { throw new Error('Tidak ada koneksi ke server. Periksa internet Anda.'); })
     .then(r => {
-      if (r && r.ok) { if (action === 'save' && p && (p.entity === 'penduduk' || p.entity === 'keluarga')) { try { sosSinkronAntre(p.entity, r.data); } catch (x) { } } return r.data; }
+      if (r && r.ok) { if (action === 'save' && p && (p.entity === 'penduduk' || p.entity === 'keluarga')) { try { sosSinkronAntre(p.entity, r.data); } catch (x) { } } if (/^(save|remove|saveMany|hapus|bulk)/i.test(action)) bersihkanNanti(); return r.data; }
       const e = new Error((r && (r.error || r.message || r.msg)) || 'Terjadi kesalahan.');
       e.code = r && r.code; e.detail = r && r.detail;
       if (e.code === 'AUTH' && action !== 'login') { logoutLocal(); toast(e.message, 1); }
@@ -2165,6 +2165,13 @@ function call(action, p, bearer) {
 const BERKAS_URL = SB_URL + '/functions/v1/berkas';
 const isR2 = id => /^r2:/.test(String(id || ''));
 const isSbFile = id => /^(sb[12]|r2):/.test(String(id || ''));   /* berkas milik penjaga "berkas": Supabase (KTP/KK lama) atau Cloudflare R2 */
+/* berkas R2 yang dilepas dari data (diganti / dihapus) dibersihkan server beberapa detik setelah simpan/hapus (v177).
+   Server memeriksa ulang: berkas yang masih dipakai data lain tidak dihapus; cadangan Google Drive tidak disentuh. */
+let _bersihTm = null;
+function bersihkanNanti() {
+  if (!S.token) return; clearTimeout(_bersihTm);
+  _bersihTm = setTimeout(async () => { for (let i = 0; i < 4; i++) { try { const r = await callBerkas('bersihkan', {}); if (!r || !r.sisa || !r.hapus && !r.dipakai) break; } catch (e) { break; } } }, 3000);
+}
 function callBerkas(action, p) {
   return fetch(BERKAS_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ action, token: S.token }, p || {})) })
     .then(r => r.json()).catch(() => { throw new Error('Tidak ada koneksi ke server berkas. Periksa internet Anda.'); })
@@ -8562,7 +8569,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '176', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '177', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
