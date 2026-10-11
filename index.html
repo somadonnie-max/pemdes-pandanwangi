@@ -1298,6 +1298,9 @@ const KKA_ATURAN = [
   [/skck|kelakuan baik|kehilangan|keramaian|kepolisian/i, '300.1.4'],
   [/beda nama|identitas|ktp|\bkk\b|kartu keluarga|penduduk|penghasilan|bekerja|waris|wali|kelakuan|ktp/i, '400.12.2.1']];
 const KKA_UMUM = '400.10.2.2';
+const AP_ALASAN = ['Meninggal', 'Mengundurkan Diri', 'Pensiun (usia 60 tahun)', 'Berhenti / Diberhentikan'];
+/** alasan / jenis SK pemberhentian -> status aparatur */
+const apStatusDari = (jenis, alasan) => /pengunduran/i.test(jenis || '') || /mundur/i.test(alasan || '') ? 'Mengundurkan Diri' : /meninggal/i.test(alasan || '') ? 'Meninggal' : /pensiun/i.test(alasan || '') ? 'Pensiun' : 'Berhenti';
 const SK_JENIS_AP = ['Pengangkatan', 'Pengangkatan Kembali', 'Penyesuaian Masa Jabatan (usia 60 tahun)', 'Pelantikan Periode Berikutnya', 'Perpanjangan Masa Jabatan', 'Mutasi / Rotasi Jabatan', 'Pemberhentian Sementara', 'Pengunduran Diri', 'Pemberhentian'];
 /* label nomor induk sesuai jabatan: NRPDesa (Sekdes, Kaur, Kasi, Kasun), NIP (ASN/PPPK), NRP (TNI/Polri), selain itu No. Induk */
 const NO_INDUK = (jab, kel) => {
@@ -1421,15 +1424,13 @@ const UI = {
   },
   aparat: {
     t: 'Aparatur Desa', ic: 'badge', perm: 'tu_aparat', folder: 'TU/Aparat', file: 'dok_sk_id',
-    fields: [F('no_urut', 'No. Urut', 'number'), F('nama', 'Nama Lengkap', 'text', { req: 1 }), F('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1, nikfill: 1, hint: 'Ketik 16 digit: data dari Data Penduduk terisi otomatis' }), F('jabatan', 'Jabatan', 'text', { req: 1, dd: () => jabDaftar(), hint: 'Ketuk untuk memilih. Bila mengisi kekosongan jabatan, pilih yang berawalan "Plt."' }), F('jabatan_tambahan', 'Jabatan Tambahan (satu per baris)', 'textarea', { wide: 1, rows: 2 }), F('niap', 'NIAP'), F('nip', 'NRPDesa / NIP', 'text', { mono: 1, lblFn: { k: 'jabatan', fn: v => NO_INDUK(v) }, hint: 'NRPDesa untuk Sekdes, Kaur, Kasi, Kasun; NIP untuk ASN/PPPK; selain itu No. Induk' }),
-      F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk2 }), F('tempat_lahir', 'Tempat Lahir'), F('tgl_lahir', 'Tanggal Lahir', 'date'), F('alamat', 'Alamat', 'text', { wide: 1 }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }), F('agama', 'Agama', 'select', { opt: OPT.agama2 }), F('pangkat', 'Pangkat/Golongan'),
-      F('pendidikan', 'Pendidikan Terakhir', 'select', { opt: OPT.pendidikan2 }), F('no_sk_angkat', 'Nomor SK Pengangkatan (pertama)'), F('tgl_sk_angkat', 'Tanggal SK Pengangkatan (pertama)', 'date'),
-      F('jabatan_awal', 'Jabatan saat SK pertama', 'text', { dd: () => jabDaftar(), hint: 'Isi bila jabatan pertama berbeda dengan jabatan sekarang (mis. dulu Kasi Pelayanan, sekarang Kasi Kesejahteraan). Kosongkan bila sama. Pergantian jabatan dicatat lewat + SK → Mutasi / Rotasi Jabatan.' }),
-      F('akhir_jabatan', 'Akhir masa jabatan', 'date', { hint: 'Otomatis: Kepala Desa 8 tahun sejak pelantikan (UU 3/2024); Sekdes, Kaur, Kasi, Kasun sampai usia 60 tahun. SK pengangkatan kembali dicatat di Riwayat SK pada halaman detail.' }),
-      F('status_jab', 'Status', 'select', { opt: ['Aktif', 'Berhenti', 'Mengundurkan Diri', 'Pensiun', 'Meninggal'], def: 'Aktif', hint: 'Perangkat terdahulu tetap disimpan dengan status Berhenti / Pensiun / Meninggal' }),
+    fields: [F('_h_id', 'Identitas', 'head', { hint: 'Ketik nama atau sebagian NIK, lalu pilih dari Data Penduduk: JK, tempat & tanggal lahir, alamat, RT/RW, agama, pendidikan dan No. WhatsApp terisi otomatis.' }),
+      F('no_urut', 'No. Urut', 'number'), F('nama', 'Nama Lengkap', 'text', { req: 1, hint: 'Ketik minimal 3 huruf lalu pilih dari daftar Data Penduduk' }), F('nik', 'NIK', 'text', { mono: 1, len: 16, sens: 1, nikfill: 1, hint: 'Ketik sebagian NIK lalu pilih dari daftar, atau ketik 16 digit' }), F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk2 }), F('tempat_lahir', 'Tempat Lahir'), F('tgl_lahir', 'Tanggal Lahir', 'date'), F('alamat', 'Alamat', 'text', { wide: 1 }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }), F('agama', 'Agama', 'select', { opt: OPT.agama2 }), F('pendidikan', 'Pendidikan Terakhir', 'select', { opt: OPT.pendidikan2 }),
+      F('_h_jab', 'Jabatan & SK pengangkatan pertama', 'head', { hint: 'SK berikutnya (mutasi, pengangkatan kembali, pemberhentian) dicatat lewat tombol di halaman detail aparatur.' }),
+      F('jabatan', 'Jabatan', 'text', { req: 1, dd: () => jabDaftar(), hint: 'Ketuk untuk memilih. Bila mengisi kekosongan jabatan, pilih yang berawalan "Plt."' }), F('jabatan_awal', 'Jabatan saat SK pertama', 'text', { dd: () => jabDaftar(), when: { fn: frm => !!(($('#f_jabatan_awal', frm) || {}).value) }, hint: 'Terisi otomatis bila jabatan pernah berganti (mutasi). Pergantian jabatan sebaiknya lewat tombol Mutasi Jabatan di halaman detail.' }), F('jabatan_tambahan', 'Jabatan Tambahan (satu per baris)', 'textarea', { wide: 1, rows: 2 }), F('niap', 'NIAP'), F('nip', 'NRPDesa / NIP', 'text', { mono: 1, lblFn: { k: 'jabatan', fn: v => NO_INDUK(v) }, hint: 'NRPDesa untuk Sekdes, Kaur, Kasi, Kasun; NIP untuk ASN/PPPK; selain itu No. Induk' }), F('pangkat', 'Pangkat/Golongan'), F('no_sk_angkat', 'Nomor SK Pengangkatan (pertama)'), F('tgl_sk_angkat', 'Tanggal SK Pengangkatan (pertama)', 'date'), F('dok_sk_id', 'Dokumen SK Pengangkatan (pertama)', 'file'), F('akhir_jabatan', 'Akhir masa jabatan', 'date', { hint: 'Otomatis: Kepala Desa 8 tahun sejak pelantikan (UU 3/2024); Sekdes, Kaur, Kasi, Kasun sampai usia 60 tahun. SK berikutnya dicatat lewat tombol di halaman detail.' }),
+      F('_h_st', 'Status', 'head'), F('status_jab', 'Status', 'select', { opt: ['Aktif', 'Berhenti', 'Mengundurkan Diri', 'Pensiun', 'Meninggal'], def: 'Aktif', hint: 'Perangkat terdahulu tetap disimpan dengan status Berhenti / Pensiun / Meninggal' }),
       F('no_sk_henti', 'Nomor SK Pemberhentian', 'text', { when: { k: 'status_jab', v: ['Berhenti', 'Mengundurkan Diri', 'Pensiun', 'Meninggal'] } }), F('tgl_sk_henti', 'Tanggal SK Pemberhentian', 'date', { when: { k: 'status_jab', v: ['Berhenti', 'Mengundurkan Diri', 'Pensiun', 'Meninggal'] } }), F('dok_henti_id', 'Dokumen SK Pemberhentian', 'file', { when: { k: 'status_jab', v: ['Berhenti', 'Mengundurkan Diri', 'Pensiun', 'Meninggal'] } }),
-      F('bpjs_kes', 'No. BPJS Kesehatan', 'text', { mono: 1, sens: 1 }), F('bpjs_tk', 'No. BPJS Ketenagakerjaan', 'text', { mono: 1, sens: 1 }), F('email', 'Email', 'email'), F('wa', 'Nomor WhatsApp', 'tel'), F('ket', 'Keterangan'),
-      F('foto_id', 'Foto', 'file', { img: 1 }), F('dok_sk_id', 'Dokumen SK Pengangkatan (pertama)', 'file')],
+      F('_h_kt', 'Kontak, BPJS & foto', 'head'), F('wa', 'Nomor WhatsApp', 'tel'), F('email', 'Email', 'email'), F('bpjs_kes', 'No. BPJS Kesehatan', 'text', { mono: 1, sens: 1 }), F('bpjs_tk', 'No. BPJS Ketenagakerjaan', 'text', { mono: 1, sens: 1 }), F('ket', 'Keterangan'), F('foto_id', 'Foto', 'file', { img: 1 })],
     sort: 'no_urut',
     chips: { k: 'status_jab', opt: ['Aktif', 'Berhenti', 'Mengundurkan Diri', 'Pensiun', 'Meninggal'] },
     row: r => ({ t: r.nama, s: [r.jabatan].concat(jabTambah(r)).join(' · '), s2: apAktif(r) && r.akhir_jabatan ? 'Masa jabatan s.d. ' + fDate(r.akhir_jabatan) : '', img: r.foto_id, av: initials(r.nama), r: r.no_urut ? '#' + r.no_urut : '', pill: apAktif(r) ? '' : `<span class="pill">${esc(r.status_jab && r.status_jab !== 'Aktif' ? r.status_jab : 'berhenti')}</span>` }),
@@ -1473,9 +1474,12 @@ const UI = {
   },
   aparat_sk: {
     t: 'Riwayat SK Aparatur', ic: 'stamp', perm: 'tu_aparat', m: 'aparat', sub: 1, folder: 'TU/Aparat', file: 'dok_id', sort: 'tgl_sk',
-    fields: [F('ref', '', 'hidden'), F('jenis', 'Jenis SK', 'select', { opt: SK_JENIS_AP, req: 1, def: 'Pengangkatan' }), F('jabatan', 'Jabatan', 'text', { req: 1, dd: () => jabDaftar() }),
-      F('no_sk', 'Nomor SK', 'text', { wide: 1 }), F('tgl_sk', 'Tanggal SK', 'date'), F('tmt', 'TMT / Tanggal pelantikan', 'date', { hint: 'Terhitung mulai tanggal. Untuk pemberhentian: tanggal berhenti.' }),
-      F('akhir', 'Akhir masa jabatan', 'date', { hint: 'Otomatis: Kepala Desa 8 tahun sejak pelantikan (UU 3/2024); Sekdes, Kaur, Kasi, Kasun sampai usia 60 tahun. Boleh diubah (mis. SK perpanjangan).' }),
+    fields: [F('ref', '', 'hidden'), F('_h_ap', 'Aparatur', 'head'), F('jenis', 'Jenis SK', 'select', { opt: SK_JENIS_AP, req: 1, def: 'Pengangkatan' }),
+      F('alasan', 'Alasan pemberhentian', 'select', { opt: AP_ALASAN, when: { k: 'jenis', v: ['Pemberhentian'] }, hint: 'Status aparatur otomatis berubah sesuai alasan ini saat disimpan.' }),
+      F('jabatan', 'Jabatan', 'text', { req: 1, dd: () => jabDaftar(), lblFn: { k: 'jenis', fn: v => /mutasi/i.test(v) ? 'Jabatan baru' : /pemberhentian|pengunduran/i.test(v) ? 'Jabatan yang ditinggalkan' : 'Jabatan' } }),
+      F('no_sk', 'Nomor SK', 'text', { wide: 1 }), F('tgl_sk', 'Tanggal SK', 'date'),
+      F('tmt', 'TMT / Tanggal pelantikan', 'date', { lblFn: { k: 'jenis', fn: v => /pemberhentian|pengunduran/i.test(v) ? 'Tanggal berhenti (TMT)' : /pelantikan/i.test(v) ? 'Tanggal pelantikan' : 'TMT (terhitung mulai tanggal)' }, hint: 'Otomatis sama dengan Tanggal SK. Ubah bila berbeda.' }),
+      F('akhir', 'Akhir masa jabatan', 'date', { when: { fn: frm => !/pemberhentian$|pengunduran/i.test(($('#f_jenis', frm) || {}).value || '') }, hint: 'Otomatis: Kepala Desa 8 tahun sejak pelantikan (UU 3/2024); Sekdes, Kaur, Kasi, Kasun sampai usia 60 tahun. Boleh diubah (mis. SK perpanjangan).' }),
       F('dasar', 'Dasar hukum', 'text', { wide: 1, list: ['UU No. 3 Tahun 2024 tentang Perubahan Kedua atas UU No. 6 Tahun 2014 tentang Desa', 'Permendagri No. 67 Tahun 2017 tentang Pengangkatan dan Pemberhentian Perangkat Desa', 'Peraturan Bupati Lumajang tentang Perangkat Desa'] }),
       F('dok_id', 'Dokumen SK', 'file', { wide: 1 }), F('ket', 'Keterangan', 'text', { wide: 1 })],
     row: r => ({ t: String(r.jenis || 'SK').replace(/\s*\(.*\)\s*$/, '') + (r.jabatan ? ' — ' + r.jabatan : ''), s: [r.no_sk, r.tgl_sk ? fDate(r.tgl_sk) : ''].filter(Boolean).join(' · '), av: ic('stamp'), file: r.dok_id })
@@ -4097,29 +4101,92 @@ async function extraAparatSK(x, el, w) {
   urut.forEach(r => L.push({ k: kunci(r), h: item(jenisL(r.jenis, /^pemberhentian$/i.test(r.jenis || '') ? mj.status : ''), r.jabatan, r.no_sk, r.tgl_sk || r.tmt, r.dok_id, ` role="button" tabindex="0" title="Buka / ubah SK" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'aparat_sk', id: r.id }]))}'`) }));
   if (!aktif && x.no_sk_henti && !adaNo(x.no_sk_henti)) L.push({ k: x.tgl_sk_henti || '9', h: item(jenisL('Pemberhentian', mj.status), x.jabatan, x.no_sk_henti, x.tgl_sk_henti, x.dok_henti_id) });
   L.sort((a, b) => a.k.localeCompare(b.k));
-  el.insertAdjacentHTML('beforeend', `<div class="stack"><div class="sec-h"><h2>${ic('stamp')} Masa jabatan & riwayat SK</h2>${w ? `<button class="btn sm" data-act="addSub" data-e="aparat_sk" data-p='${esc(JSON.stringify({ ref: x.id, jabatan: x.jabatan || '', jenis: sks.length || x.no_sk_angkat ? 'Pengangkatan Kembali' : 'Pengangkatan' }))}'>${ic('plus')}SK</button>` : ''}</div>
+  el.insertAdjacentHTML('beforeend', `<div class="stack"><div class="sec-h"><h2>${ic('stamp')} Masa jabatan & riwayat SK</h2>${w ? `<button class="btn sm" data-act="addSub" data-e="aparat_sk" title="Jenis SK lainnya" data-p='${esc(JSON.stringify({ ref: x.id, jabatan: x.jabatan || '', jenis: sks.length || x.no_sk_angkat ? 'Pengangkatan Kembali' : 'Pengangkatan' }))}'>${ic('plus')}SK</button>` : ''}</div>
+    ${w && aktif ? `<div class="btns">${[['Mutasi Jabatan', 'next', { jenis: 'Mutasi / Rotasi Jabatan', jabatan: '' }], [jabKades(x.jabatan) ? 'Periode Berikutnya' : 'Angkat Kembali', 'badge', { jenis: jabKades(x.jabatan) ? 'Pelantikan Periode Berikutnya' : 'Pengangkatan Kembali', jabatan: x.jabatan || '' }], ['Berhentikan', 'x', { jenis: 'Pemberhentian', jabatan: x.jabatan || '' }]].map(([l, i, o]) => `<button class="btn sm${l === 'Berhentikan' ? ' danger' : ''}" data-act="addSub" data-e="aparat_sk" data-p='${esc(JSON.stringify(Object.assign({ ref: x.id }, o)))}'>${ic(i)}${esc(l)}</button>`).join('')}</div>` : ''}
     <div class="card stack" style="gap:6px">${mj.akhir || awal ? `<div><b>${esc(judul)}</b>${kurung ? ` <span class="meta">(${esc(kurung)})</span>` : ''}</div>` : '<div class="meta">Akhir masa jabatan belum dapat dihitung.</div>'}${status}${ket ? `<div class="meta">${esc(ket)}</div>` : ''}</div>
     ${L.length ? `<div class="list">${L.map(o => o.h).join('')}</div>` : '<div class="card meta">Belum ada riwayat SK. Tambahkan SK pengangkatan, pengangkatan kembali (mis. penyesuaian usia 60 tahun), atau pelantikan periode berikutnya.</div>'}</div>`);
 }
-/** form riwayat SK: akhir masa jabatan dihitung otomatis */
-function apSkHook(frm) {
-  const g = k => $('#f_' + k, frm); const ak = g('akhir'); if (!ak) return;
-  let lahir = '', manual = !!ak.value;
+/** form riwayat SK: TMT ikut tanggal SK, akhir masa jabatan otomatis, info aparatur di atas */
+function apSkHook(frm, p, rec) {
+  const g = k => $('#f_' + k, frm); const ak = g('akhir'), tmt = g('tmt'), tsk = g('tgl_sk'); if (!ak) return;
+  let lahir = '', manual = !!ak.value, tmtManual = !!(tmt && tmt.value && tmt.value !== (tsk && tsk.value));
   ak.addEventListener('input', () => { manual = !!ak.value; });
-  const hitung = () => { if (manual) return; const v = akhirJabatan({ jenis: g('jenis').value, jabatan: g('jabatan').value, tmt: g('tmt').value, tgl_sk: g('tgl_sk').value, tgl_lahir: lahir }); ak.value = v || ''; };
+  if (tmt) tmt.addEventListener('input', () => { tmtManual = !!tmt.value && tmt.value !== tsk.value; });
+  const hitung = () => {
+    if (tmt && tsk && !tmtManual && tsk.value) tmt.value = tsk.value;
+    if (manual) return; const v = akhirJabatan({ jenis: g('jenis').value, jabatan: g('jabatan').value, tmt: tmt.value, tgl_sk: tsk.value, tgl_lahir: lahir }); ak.value = v || '';
+  };
   ['jenis', 'jabatan', 'tmt', 'tgl_sk'].forEach(k => { const el = g(k); if (el) ['input', 'change'].forEach(ev => el.addEventListener(ev, hitung)); });
-  const ref = (g('ref') || {}).value;
-  if (ref) call('get', { entity: 'aparat', id: ref }).then(a => { lahir = (a && a.tgl_lahir) || ''; hitung(); }).catch(() => { });
+  /* jenis Pengunduran Diri -> alasan tidak perlu; Pemberhentian tanpa alasan -> ingatkan */
+  const ref = (g('ref') || {}).value, hd = g('_h_ap');
+  if (ref) call('get', { entity: 'aparat', id: ref }).then(a => {
+    lahir = (a && a.tgl_lahir) || ''; hitung();
+    if (hd && a) hd.innerHTML = `<b>${esc(a.nama || '')}</b><span class="hint">Jabatan sekarang: ${esc(a.jabatan || '-')}${a.tgl_lahir ? ' · usia ' + umur(a.tgl_lahir) + ' tahun' : ''}${apAktif(a) ? '' : ' · status ' + esc(a.status_jab || 'berhenti')}</span>`;
+  }).catch(() => { });
+  else if (hd) hd.hidden = true;
 }
-/** form aparatur: akhir masa jabatan otomatis dari jabatan, tanggal lahir & SK pertama */
-function apHook(frm) {
+/** form aparatur: akhir masa jabatan otomatis, cari warga lewat sebagian NIK, jabatan lama tersimpan otomatis saat diganti */
+function apHook(frm, p, rec) {
   const g = k => $('#f_' + k, frm); const ak = g('akhir_jabatan'); if (!ak) return;
+  rec = rec || {};
   let manual = !!ak.value;
   ak.addEventListener('input', () => { manual = !!ak.value; });
   const hitung = () => { const st = (g('status_jab') || {}).value || 'Aktif', th = (g('tgl_sk_henti') || {}).value;
     if (!/^aktif$/i.test(st)) { if (th) { ak.value = th; manual = false; } return; }
     if (manual) return; ak.value = akhirJabatan({ jabatan: g('jabatan').value, tmt: g('tgl_sk_angkat').value, tgl_lahir: g('tgl_lahir').value }) || ''; };
   ['jabatan', 'tgl_lahir', 'tgl_sk_angkat', 'status_jab', 'tgl_sk_henti'].forEach(k => { const el = g(k); if (el) ['input', 'change'].forEach(ev => el.addEventListener(ev, hitung)); });
+  /* jabatan diganti pada data lama: jabatan sebelumnya disimpan sebagai "Jabatan saat SK pertama" */
+  const jb = g('jabatan'), ja = g('jabatan_awal'), lama = String(rec.jabatan || '').trim();
+  if (jb && ja && p && p.id && lama) {
+    const nt = document.createElement('span'); nt.className = 'hint'; jb.closest('.f').appendChild(nt);
+    const cek = () => {
+      const v = jb.value.trim(), beda = v && v !== lama;
+      if (!String(rec.jabatan_awal || '').trim()) { const isi = beda ? lama : ''; if (ja.value !== isi) { ja.value = isi; ja.dispatchEvent(new Event('change', { bubbles: true })); } }
+      nt.textContent = beda ? 'Jabatan berubah dari ' + lama + '. Bila ini mutasi, lebih baik dicatat lewat tombol Mutasi Jabatan di halaman detail agar masuk riwayat SK.' : '';
+    };
+    ['input', 'change'].forEach(ev => jb.addEventListener(ev, cek));
+  }
+  /* status jadi tidak aktif: beri tahu bahwa SK pemberhentian ikut dicatat di riwayat */
+  const st = g('status_jab');
+  if (st && p && p.id && apAktif(rec)) {
+    const nt = document.createElement('span'); nt.className = 'hint'; st.closest('.f').appendChild(nt);
+    st.addEventListener('change', () => { nt.textContent = /^aktif$/i.test(st.value) ? '' : 'Saat disimpan, SK pemberhentian ini juga dicatat di Riwayat SK. (Cara lebih cepat: tombol Berhentikan di halaman detail.)'; });
+  }
+  /* NIK: ketik sebagian angka -> daftar warga -> pilih -> 16 digit terisi lalu kolom lain ikut terisi */
+  const nik = g('nik');
+  if (nik && !nik.readOnly) {
+    const box = nik.closest('.f'); box.classList.add('pmbox');
+    const dd = document.createElement('div'); dd.className = 'pmdd'; dd.hidden = true; box.appendChild(dd);
+    let tm, hasil = [];
+    nik.addEventListener('input', () => {
+      clearTimeout(tm); const q = nik.value.trim();
+      if (!/^\d{4,15}$/.test(q)) { dd.hidden = true; return; }
+      tm = setTimeout(async () => {
+        try { hasil = await wargaCari(q, 8); } catch (x) { hasil = []; }
+        if (nik.value.trim() !== q) return;
+        dd.innerHTML = hasil.length ? hasil.map((w, i) => `<button type="button" data-i="${i}"><b>${esc(w.nama || '')}</b> <small class="mono">${esc(w.nik || '')}</small><br><small>${esc(String(w.dusun || '').replace(/^DUSUN /, ''))}${w.rt ? ' RT ' + esc(w.rt) + '/' + esc(w.rw || '') : ''}${w.tgl_lahir ? ' · lahir ' + esc(fDate(w.tgl_lahir)) : ''}</small></button>`).join('') : '<div class="meta" style="padding:8px">Tidak ada di Data Penduduk. Isi manual.</div>';
+        dd.hidden = false;
+      }, 280);
+    });
+    dd.addEventListener('click', ev => {
+      const b = ev.target.closest('[data-i]'); if (!b) return; const w = hasil[Number(b.dataset.i)]; dd.hidden = true; if (!w || !/^\d{16}$/.test(w.nik || '')) return;
+      nik.value = w.nik; const nm = g('nama'); if (nm && !nm.value.trim() && w.nama) nm.value = judulKata(w.nama);
+      nik.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    document.addEventListener('click', ev => { if (!box.contains(ev.target)) dd.hidden = true; });
+  }
+}
+/** data aparat disimpan dengan status tidak aktif + SK pemberhentian: ikut dicatat di riwayat SK (sekali saja) */
+async function apHentiKeRiwayat(id, val, rec) {
+  const st = val.status_jab || rec.status_jab || 'Aktif';
+  if (!id || /^aktif$/i.test(st) || !(val.no_sk_henti || val.tgl_sk_henti)) return;
+  try {
+    const sks = (await call('list', { entity: 'aparat_sk', filters: { ref: id }, limit: 50 })).rows || [];
+    if (sks.some(x => /^(pemberhentian|pengunduran diri)$/i.test(x.jenis || ''))) return;
+    const alasan = { Meninggal: 'Meninggal', 'Mengundurkan Diri': 'Mengundurkan Diri', Pensiun: 'Pensiun (usia 60 tahun)' }[st] || 'Berhenti / Diberhentikan';
+    await call('save', { entity: 'aparat_sk', record: { ref: id, jenis: st === 'Mengundurkan Diri' ? 'Pengunduran Diri' : 'Pemberhentian', alasan, jabatan: val.jabatan || rec.jabatan || '', no_sk: val.no_sk_henti || '', tgl_sk: val.tgl_sk_henti || '', tmt: val.tgl_sk_henti || '' } });
+    setTimeout(() => toast('SK pemberhentian juga dicatat di Riwayat SK.'), 700);
+  } catch (er) { }
 }
 /** setelah riwayat SK disimpan: akhir masa jabatan aparat diperbarui dari SK terakhir */
 async function apSkSync(ref) {
@@ -4133,7 +4200,7 @@ async function apSkSync(ref) {
       rec.jabatan = akhirSk.jabatan.trim(); if (!ap.jabatan_awal) rec.jabatan_awal = ap.jabatan || '';
       S.jabCache = null; S.kades = null; setTimeout(() => toast('Jabatan ' + (ap.nama || '') + ' diperbarui menjadi ' + rec.jabatan + ' sesuai SK terakhir.'), 500);
     }
-    if (mj.henti && apAktif(ap)) { rec.no_sk_henti = mj.sk.no_sk || ap.no_sk_henti || ''; rec.tgl_sk_henti = mj.sk.tmt || mj.sk.tgl_sk || ''; if (mj.sk.dok_id) rec.dok_henti_id = mj.sk.dok_id; }
+    if (mj.henti && apAktif(ap)) { rec.status_jab = apStatusDari(mj.sk.jenis, mj.sk.alasan); rec.no_sk_henti = mj.sk.no_sk || ap.no_sk_henti || ''; rec.tgl_sk_henti = mj.sk.tmt || mj.sk.tgl_sk || ''; rec.akhir_jabatan = rec.tgl_sk_henti || ap.akhir_jabatan || ''; if (mj.sk.dok_id) rec.dok_henti_id = mj.sk.dok_id; setTimeout(() => toast('Status ' + (ap.nama || '') + ' diubah menjadi ' + rec.status_jab + ' sesuai SK.'), 900); }
     if (Object.keys(rec).length > 1) { await call('save', { entity: 'aparat', record: rec }); if (rec.jabatan) { S.people = null; muatPejabat(true).catch(() => { }); } }
   } catch (er) { }
 }
@@ -4599,8 +4666,8 @@ VIEWS.form = async (p, main, alive) => {
   if (e === 'penduduk' || e === 'keluarga') wilHook(frm, e, rec, !p.id);
   if (e === 'penduduk') ortuHooks(frm, p);
   if (e === 'register_surat') { suketCariHook(frm); kkaHook(frm); ttdHook(frm); }
-  if (e === 'aparat_sk') apSkHook(frm);
-  if (e === 'aparat') apHook(frm);
+  if (e === 'aparat_sk') apSkHook(frm, p, rec);
+  if (e === 'aparat') apHook(frm, p, rec);
   namaHooks(frm, e, flds);
   /* NIK -> isi otomatis dari Data Penduduk (hanya kolom yang masih kosong) */
   /* umur otomatis: dari tanggal lahir, dihitung pada tanggal surat dikeluarkan */
@@ -4713,7 +4780,7 @@ VIEWS.form = async (p, main, alive) => {
       if (e === 'surat_masuk' && frm._fwdSave) { const n = await frm._fwdSave(saved); if (n) toast('Tersimpan. Diteruskan ke ' + n + '.'); }
       if (e === 'petugas' && !p.id && (virt.kelompok || virt.jabatan)) await call('save', { entity: 'petugas_jabatan', record: Object.assign({ ref: saved.id }, virt) });
       if (/^(aparat|petugas)/.test(e)) S.people = null;
-      if (e === 'aparat') { S.jabCache = null; S.kades = null; muatPejabat(true).catch(() => { }); }
+      if (e === 'aparat') { S.jabCache = null; S.kades = null; muatPejabat(true).catch(() => { }); if (p.id) await apHentiKeRiwayat(p.id, val, rec); }
       if (e === 'aparat_sk') await apSkSync(val.ref || (saved && saved.ref));
       toast('Tersimpan.');
       if (e === 'dtsen' && saved) { try { if (await dtsenKeRentan(saved)) toast('Tersimpan. Desil ' + saved.desil + ': otomatis masuk Data Rentan sebagai keluarga miskin.'); } catch (er) { toast('Tersimpan, tetapi gagal membuat data rentan: ' + er.message, 1); } }
@@ -8381,7 +8448,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '168', tgl: '2026-10-09', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '169', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
