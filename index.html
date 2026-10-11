@@ -394,8 +394,9 @@ body.privblur #main,body.privblur #layer,body.privblur .tabs{filter:blur(18px);t
 .f input[type=file]{font-size:11.5px}
 .inp:focus,.f input:focus,.f select:focus,.f textarea:focus{border-color:var(--pri);box-shadow:0 0 0 2px var(--pri-soft)}
 .hint{font-size:10.5px;color:var(--muted)}
-details.sertbox>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px}details.sertbox>summary::-webkit-details-marker{display:none}details.sertbox>summary .chev{transition:transform .2s;width:18px;height:18px;color:var(--muted)}details.sertbox[open]>summary .chev{transform:rotate(180deg)}details.sertbox:not([open])>summary{opacity:.95}.smat{color:var(--pri)!important;font-weight:600}
+details.sertbox>summary .btns{flex-wrap:nowrap;flex-shrink:0;align-items:center}details.sertbox>summary h2{min-width:0}details.sertbox>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px}details.sertbox>summary::-webkit-details-marker{display:none}details.sertbox>summary .chev{transition:transform .2s;width:18px;height:18px;color:var(--muted)}details.sertbox[open]>summary .chev{transform:rotate(180deg)}details.sertbox:not([open])>summary{opacity:.95}.smat{color:var(--pri)!important;font-weight:600}
 .sertbox .tx{display:flex;flex-direction:column;gap:1px;min-width:0}.sertbox .tx small{display:block;line-height:1.35}
+.sgrp{padding:8px 10px}.sgh{display:flex;align-items:center;gap:10px}.sgh .tx{flex:1;display:flex;flex-direction:column;min-width:0}.sgh .tx small{color:var(--muted)}.smr{margin-left:42px;padding:6px 0 6px 10px!important;border-left:2px solid var(--pri-soft);gap:8px}.smr .tx{flex:1}.smr .tx b{font-weight:600;font-size:13px}
 .hint.err-t{color:var(--bad,#c0392b)}.hint.err-t:empty{display:none}a.kontak{display:inline-flex;align-items:center;gap:5px;color:var(--pri,#0b6);text-decoration:none;font-weight:600}a.kontak svg{width:14px;height:14px}a.kontak:hover{text-decoration:underline}
 .checks{display:flex;flex-wrap:wrap;gap:4px}
 .checks label{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:7px;padding:3px 8px;font-size:11.5px;font-weight:500;color:var(--ink);cursor:pointer;background:var(--surface)}
@@ -1303,6 +1304,7 @@ const KKA_ATURAN = [
 const KKA_UMUM = '400.10.2.2';
 const SERT_JENIS = ['Pelatihan', 'Bimbingan Teknis (Bimtek)', 'Workshop', 'Seminar / Webinar', 'Sosialisasi', 'Diklat', 'Uji Kompetensi / Sertifikasi', 'Lomba / Penghargaan', 'Lainnya'];
 const sertMateri = r => String((r && r.materi) || '').split(/\n+/).map(x => x.trim()).filter(Boolean);
+const SERT_SALIN = ['nama', 'jenis', 'peran', 'penyelenggara', 'tanggal', 'tgl_selesai', 'metode', 'tempat', 'berlaku'];
 const AP_ALASAN = ['Meninggal', 'Mengundurkan Diri', 'Pensiun (usia 60 tahun)', 'Berhenti / Diberhentikan'];
 /** alasan / jenis SK pemberhentian -> status aparatur */
 const apStatusDari = (jenis, alasan) => /pengunduran/i.test(jenis || '') || /mundur/i.test(alasan || '') ? 'Mengundurkan Diri' : /meninggal/i.test(alasan || '') ? 'Meninggal' : /pensiun/i.test(alasan || '') ? 'Pensiun' : 'Berhenti';
@@ -1494,14 +1496,14 @@ const UI = {
     fields: [F('ref', '', 'hidden'), F('_h_ap', 'Aparatur', 'head'),
       F('dok_id', 'Foto / PDF sertifikat', 'file', { wide: 1, hint: 'Foto (kamera/galeri) atau PDF, maks. 25 MB' }),
       F('nama', 'Kegiatan', 'text', { req: 1, wide: 1, listFrom: { e: 'aparat_sert', k: 'nama' }, fill: x => ({ jenis: x.jenis, penyelenggara: x.penyelenggara, tanggal: x.tanggal, tgl_selesai: x.tgl_selesai, metode: x.metode, tempat: x.tempat, jp: x.jp, berlaku: x.berlaku }), hint: 'mis. Sistem Belajar Mandiri Tata Kelola Desa (Sibermata Desa). Ketik atau pilih kegiatan yang pernah dicatat: penyelenggara, tanggal, tempat & JP ikut terisi' }),
-      F('materi', 'Materi (satu per baris)', 'textarea', { wide: 1, rows: 2, hint: 'Boleh lebih dari satu, tulis satu materi per baris. mis. Pengelolaan Keuangan Desa' }),
+      F('materi', 'Materi', 'text', { wide: 1, listFrom: { e: 'aparat_sert', k: 'materi' }, hint: 'Satu sertifikat = satu materi, mis. Pengelolaan Keuangan Desa. Kegiatan dengan 10 materi dicatat sebagai 10 sertifikat (pakai tombol + Materi di halaman detail).' }),
       F('jenis', 'Jenis', 'select', { opt: SERT_JENIS, def: 'Pelatihan' }), F('peran', 'Sebagai', 'text', { def: 'Peserta', list: ['Peserta', 'Narasumber', 'Panitia', 'Moderator', 'Juara I', 'Juara II', 'Juara III', 'Harapan'] }),
       F('penyelenggara', 'Penyelenggara', 'text', { wide: 1, listFrom: { e: 'aparat_sert', k: 'penyelenggara' }, hint: 'Ketik atau pilih: penyelenggara yang pernah diisi muncul di daftar', list: ['Pemerintah Kabupaten Lumajang', 'DPMD Kabupaten Lumajang', 'Kecamatan Tempeh', 'BPSDM Provinsi Jawa Timur', 'Kementerian Desa PDT', 'Kementerian Dalam Negeri', 'BPS Kabupaten Lumajang'] }),
       F('nomor', 'Nomor sertifikat', 'text', { mono: 1 }), F('tanggal', 'Tanggal kegiatan', 'date'), F('tgl_selesai', 'Sampai tanggal', 'date', { hint: 'Kosongkan bila hanya 1 hari' }),
       F('metode', 'Pelaksanaan', 'select', { opt: ['Luring (tatap muka)', 'Daring (online)', 'Campuran'] }), F('tempat', 'Tempat', 'text', { listFrom: { e: 'aparat_sert', k: 'tempat' } }), F('jp', 'Jumlah JP / jam', 'number', { hint: 'Jam pelajaran yang tertulis di sertifikat' }),
       F('berlaku', 'Berlaku sampai', 'date', { hint: 'Hanya untuk sertifikat yang punya masa berlaku (mis. sertifikat PBJ)' }), F('ket', 'Keterangan', 'text', { wide: 1 })],
-    row: r => ({ t: r.nama, s: [sertMateri(r).join(', '), r.peran, r.penyelenggara, r.tanggal ? fDate(r.tanggal) : ''].filter(Boolean).join(' · '), av: ic('badge'), file: r.dok_id, r: r.jp ? r.jp + ' JP' : '' }),
-    print: { title: 'DAFTAR SERTIFIKAT APARATUR', land: 1, cols: [['Tanggal', r => fDate(r.tanggal)], ['Kegiatan', 'nama'], ['Materi', r => sertMateri(r).map(esc).join('<br>')], ['Jenis', 'jenis'], ['Sebagai', 'peran'], ['Penyelenggara', 'penyelenggara'], ['Nomor', 'nomor'], ['JP', 'jp']] }
+    row: r => ({ t: r.materi ? r.materi : r.nama, s: [r.materi ? r.nama : '', r.peran, r.penyelenggara, r.tanggal ? fDate(r.tanggal) : ''].filter(Boolean).join(' · '), av: ic('badge'), file: r.dok_id, r: r.jp ? r.jp + ' JP' : '' }),
+    print: { title: 'DAFTAR SERTIFIKAT APARATUR', land: 1, cols: [['Tanggal', r => fDate(r.tanggal)], ['Kegiatan', 'nama'], ['Materi', 'materi'], ['Jenis', 'jenis'], ['Sebagai', 'peran'], ['Penyelenggara', 'penyelenggara'], ['Nomor', 'nomor'], ['JP', 'jp']] }
   },
   berita_acara: {
     t: 'Berita Acara', ic: 'stamp', perm: 'tu_surat', folder: 'TU/Berita Acara', file: 'dok_id',
@@ -4158,12 +4160,25 @@ async function extraAparatSert(x, el, w) {
   let rs = []; try { rs = (await call('list', { entity: 'aparat_sert', filters: { ref: x.id }, limit: 200 })).rows || []; } catch (er) { }
   rs.sort((a, b) => String(b.tanggal || '').localeCompare(String(a.tanggal || '')));
   const jp = rs.reduce((n, r) => n + (Number(r.jp) || 0), 0), hari = isoToday();
-  const item = r => { const mt = sertMateri(r); return `<div class="it"><div class="row" role="button" tabindex="0" title="Buka / ubah" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'aparat_sert', id: r.id }]))}'><span class="av">${ic('badge')}</span><span class="tx"><b>${esc(r.nama || '')}</b>${mt.length ? `<small class="smat">Materi: ${mt.map(esc).join(' · ')}</small>` : ''}<small>${esc([r.peran, r.penyelenggara, r.tanggal ? fDate(r.tanggal) + (r.tgl_selesai && r.tgl_selesai !== r.tanggal ? ' s.d. ' + fDate(r.tgl_selesai) : '') : '', r.jp ? r.jp + ' JP' : ''].filter(Boolean).join(' · '))}</small>${r.berlaku ? `<small>${r.berlaku < hari ? '<span class="pill bad">kedaluwarsa</span> ' : ''}Berlaku s.d. ${esc(fDate(r.berlaku))}</small>` : ''}</span>${r.dok_id ? `<button class="btn sm" data-act="file" data-id="${esc(r.dok_id)}" data-name="${esc('Sertifikat ' + (r.nama || ''))}">${ic('eye')}Lihat</button>` : ''}</div></div>`; };
+  /* dikelompokkan per kegiatan (nama + penyelenggara): 1 kegiatan bisa banyak materi = banyak sertifikat */
+  const grp = []; const idx = {};
+  rs.forEach(r => { const k = String(r.nama || '').trim().toLowerCase() + '|' + String(r.penyelenggara || '').trim().toLowerCase(); if (!(k in idx)) { idx[k] = grp.length; grp.push([]); } grp[idx[k]].push(r); });
+  const tglTxt = r => r.tanggal ? fDate(r.tanggal) + (r.tgl_selesai && r.tgl_selesai !== r.tanggal ? ' s.d. ' + fDate(r.tgl_selesai) : '') : '';
+  const lihat = r => r.dok_id ? `<button class="btn sm" data-act="file" data-id="${esc(r.dok_id)}" data-name="${esc('Sertifikat ' + (r.materi || r.nama || ''))}">${ic('eye')}Lihat</button>` : '';
+  const goA = r => ` role="button" tabindex="0" title="Buka / ubah" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'aparat_sert', id: r.id }]))}'`;
+  const kdl = r => r.berlaku ? `<small>${r.berlaku < hari ? '<span class="pill bad">kedaluwarsa</span> ' : ''}Berlaku s.d. ${esc(fDate(r.berlaku))}</small>` : '';
+  const tambah = g => w ? `<button class="btn sm" data-act="addSub" data-e="aparat_sert" title="Tambah materi lain dari kegiatan ini" data-p='${esc(JSON.stringify(Object.assign({ ref: x.id }, Object.fromEntries(SERT_SALIN.filter(k => g[0][k]).map(k => [k, g[0][k]])))))}'>${ic('plus')}Materi</button>` : '';
+  const kelompok = g => {
+    g = g.slice().sort((p, q) => String(p.tanggal || '').localeCompare(String(q.tanggal || '')) || String(p.nomor || '').localeCompare(String(q.nomor || ''), 'id', { numeric: true }) || String(p.materi || '').localeCompare(String(q.materi || ''), 'id', { numeric: true }));
+    const r0 = g[0], jpg = g.reduce((n, r) => n + (Number(r.jp) || 0), 0);
+    if (g.length === 1 && !r0.materi) return `<div class="it"><div class="row"${goA(r0)}><span class="av">${ic('badge')}</span><span class="tx"><b>${esc(r0.nama || '')}</b><small>${esc([r0.peran, r0.penyelenggara, tglTxt(r0), r0.jp ? r0.jp + ' JP' : ''].filter(Boolean).join(' · '))}</small>${kdl(r0)}</span>${lihat(r0)}</div></div>`;
+    return `<div class="it sgrp"><div class="sgh"><span class="av">${ic('badge')}</span><span class="tx"><b>${esc(r0.nama || '')}</b><small>${esc([r0.penyelenggara, g.length + ' materi', jpg ? jpg + ' JP' : ''].filter(Boolean).join(' · '))}</small></span>${tambah(g)}</div>
+      ${g.map(r => `<div class="row smr"${goA(r)}><span class="tx"><b>${esc(r.materi || '(tanpa materi)')}</b><small>${esc([r.nomor, tglTxt(r), r.jp ? r.jp + ' JP' : ''].filter(Boolean).join(' · '))}</small>${kdl(r)}</span>${lihat(r)}</div>`).join('')}</div>`;
+  };
   /* bisa diciutkan; terbuka otomatis bila sertifikat sedikit (≤ 3), pilihan terakhir diingat */
   let buka = rs.length <= 3; try { const v = localStorage.getItem('pw_sertBuka'); if (v !== null && rs.length > 3) buka = v === '1'; } catch (er) { }
-  const nMat = rs.reduce((n, r) => n + sertMateri(r).length, 0);
-  el.insertAdjacentHTML('beforeend', `<details class="stack sertbox"${buka ? ' open' : ''}><summary class="sec-h"><h2>${ic('badge')} Sertifikat & pelatihan${rs.length ? ` <span class="meta">(${rs.length} sertifikat${nMat ? ' · ' + nMat + ' materi' : ''}${jp ? ' · ' + jp + ' JP' : ''})</span>` : ''}</h2><span class="btns">${w ? `<button class="btn sm" data-act="addSub" data-e="aparat_sert" data-p='${esc(JSON.stringify({ ref: x.id }))}'>${ic('plus')}Sertifikat</button>` : ''}${ic('down', 'chev')}</span></summary>
-    ${rs.length ? `<div class="list">${rs.map(item).join('')}</div>` : '<div class="card meta">Belum ada sertifikat. Ketuk + Sertifikat, lalu foto atau unggah PDF sertifikatnya.</div>'}</details>`);
+  el.insertAdjacentHTML('beforeend', `<details class="stack sertbox"${buka ? ' open' : ''}><summary class="sec-h"><h2>${ic('badge')} Sertifikat & pelatihan${rs.length ? ` <span class="meta">(${rs.length} sertifikat${grp.length !== rs.length ? ' · ' + grp.length + ' kegiatan' : ''}${jp ? ' · ' + jp + ' JP' : ''})</span>` : ''}</h2><span class="btns">${w ? `<button class="btn sm" data-act="addSub" data-e="aparat_sert" data-p='${esc(JSON.stringify({ ref: x.id }))}'>${ic('plus')}Sertifikat</button>` : ''}${ic('down', 'chev')}</span></summary>
+    ${rs.length ? `<div class="list">${grp.map(kelompok).join('')}</div>` : '<div class="card meta">Belum ada sertifikat. Ketuk + Sertifikat, lalu foto atau unggah PDF sertifikatnya.</div>'}</details>`);
   const d = el.querySelector('details.sertbox:last-of-type'); if (d) d.addEventListener('toggle', () => { try { localStorage.setItem('pw_sertBuka', d.open ? '1' : '0'); } catch (er) { } });
 }
 /** form sertifikat: nama aparatur di atas */
@@ -8527,7 +8542,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '173', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '174', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
