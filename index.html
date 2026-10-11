@@ -1380,7 +1380,7 @@ const UI = {
     fields: [F('jenis', 'Jenis Peraturan', 'select', { opt: OPT.jenisPerdes, req: 1, def: 'Peraturan Desa' }), F('nomor', 'Nomor', 'text', { req: 1 }), F('tahun', 'Tahun', 'number', { def: () => new Date().getFullYear() }), F('tgl_tetap', 'Tanggal Ditetapkan', 'date'),
       F('tentang', 'Tentang', 'textarea', { req: 1, wide: 1 }), F('uraian', 'Uraian Singkat', 'textarea', { wide: 1 }), ...GEN_HUKUM(), F('tgl_sepakat', 'Tanggal Kesepakatan (BPD)', 'date'),
       F('no_lapor', 'Nomor Dilaporkan'), F('tgl_lapor', 'Tanggal Dilaporkan', 'date'), F('no_lembaran', 'Nomor Lembaran Desa'), F('tgl_lembaran', 'Tanggal Diundangkan (Lembaran)', 'date'),
-      F('no_berita', 'Nomor Berita Desa'), F('tgl_berita', 'Tanggal Diundangkan (Berita)', 'date'), F('ket', 'Keterangan', 'text', { wide: 1 }), F('dok_id', 'Dokumen (PDF/foto)', 'file', { wide: 1 })],
+      F('no_berita', 'Nomor Berita Desa'), F('tgl_berita', 'Tanggal Diundangkan (Berita)', 'date'), F('ket', 'Keterangan', 'text', { wide: 1 }), F('dok_id', 'Dokumen (PDF/foto)', 'file', { wide: 1, maxAdm: 10 })],
     year: 'tgl_tetap',
     row: r => ({ t: r.tentang, s: r.jenis + ' Nomor ' + r.nomor + (r.tahun ? ' Tahun ' + r.tahun : ''), date: r.tgl_tetap, file: r.dok_id }),
     print: {
@@ -2882,22 +2882,26 @@ const MAX_DOK = 2 * 1024 * 1024;
 const HINT_DOK = 'PDF / dokumen maks. 2 MB · foto otomatis diperkecil';
 const fotoKecil = f => /^image\//.test((f && f.type) || '') && !/gif|svg/.test(f.type);
 const fmtMB = n => (n / 1048576).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' MB';
-function dokTerlaluBesar(f) { return f && !fotoKecil(f) && f.size > MAX_DOK; }
-function pesanBesar(f) { return '"' + (f.name || 'Berkas') + '" berukuran ' + fmtMB(f.size) + '. Dokumen maksimal 2 MB. Perkecil dulu (mis. kompres PDF di ilovepdf.com, atau pindai ulang dengan resolusi lebih rendah), atau unggah sebagai foto.'; }
+/** batas berkas: 2 MB; isian ber-maxAdm (mis. Perdes) boleh lebih besar khusus admin */
+const batasDok = maxAdm => maxAdm && S.user && S.user.admin ? maxAdm * 1048576 : MAX_DOK;
+function dokTerlaluBesar(f, maks) { return f && !fotoKecil(f) && f.size > (maks || MAX_DOK); }
+function pesanBesar(f, maks, maxAdm) { maks = maks || MAX_DOK; return '"' + (f.name || 'Berkas') + '" berukuran ' + fmtMB(f.size) + '. Dokumen maksimal ' + fmtMB(maks) + '. ' + (maxAdm && maks === MAX_DOK ? 'Dokumen lebih dari 2 MB (sampai ' + maxAdm + ' MB) hanya bisa diunggah admin. ' : '') + 'Perkecil dulu (mis. kompres PDF di ilovepdf.com, atau pindai ulang dengan resolusi lebih rendah)' + (maks === MAX_DOK ? ', atau unggah sebagai foto.' : '.'); }
 /* pemeriksaan langsung saat berkas dipilih (semua isian unggah dokumen) */
 document.addEventListener('change', ev => {
   const inp = ev.target; if (!inp || inp.type !== 'file' || inp.hasAttribute('data-nolimit')) return;
   const acc = String(inp.accept || '').toLowerCase(); if (acc && !/pdf|image|\.doc|\.xls|\.ppt/.test(acc)) return;
   if (/^\.(docx|xlsx|csv|geojson|json)/.test(acc) && !/pdf/.test(acc)) return;
-  const besar = Array.from(inp.files || []).find(dokTerlaluBesar);
+  const mAdm = Number(inp.dataset.maxadm) || 0, maks = batasDok(mAdm);
+  const besar = Array.from(inp.files || []).find(f => dokTerlaluBesar(f, maks));
   if (!besar) { const b0 = inp.closest('.f, .filebox'), h0 = b0 && b0.querySelector('.hint.err-t'); if (h0) h0.textContent = ''; return; }
   ev.stopImmediatePropagation(); ev.stopPropagation();
-  toast(pesanBesar(besar), 1);
+  toast(pesanBesar(besar, maks, mAdm), 1);
   try { inp.value = ''; } catch (er) { }
-  const box = inp.closest('.f, .filebox'); const h = box && box.querySelector('.hint.err-t'); if (h) h.textContent = pesanBesar(besar);
+  const box = inp.closest('.f, .filebox'); const h = box && box.querySelector('.hint.err-t'); if (h) h.textContent = pesanBesar(besar, maks, mAdm);
 }, true);
-async function uploadFile(file, folder) {
-  if (dokTerlaluBesar(file)) throw new Error(pesanBesar(file));
+async function uploadFile(file, folder, maxAdm) {
+  const maks = batasDok(maxAdm);
+  if (dokTerlaluBesar(file, maks)) throw new Error(pesanBesar(file, maks, maxAdm));
   if (String(folder || '').split('/')[0] === 'Penduduk') {
     try { return await uploadKependudukan(file, folder); }
     catch (e) { if (!/belum dipasang/.test(e.message)) throw e; }   /* penyimpanan baru belum siap: pakai Drive */
@@ -4632,7 +4636,7 @@ function fieldHtml(f, v, rec) {
     case 'file': {
       const locked = v === '•';
       inp = `<div class="filebox">${v ? `<span class="btns fkeep"><button type="button" class="btn sm" data-act="file" data-id="${esc(v)}" data-priv="${f.priv ? 1 : 0}" data-name="${esc(f.l)}">${ic(locked ? 'lock' : 'eye')}Berkas tersimpan</button>${locked ? '' : `<button type="button" class="btn sm danger" data-act="fileDel" data-k="${esc(f.k)}">${ic('trash')}Hapus</button>`}</span><input type="hidden" id="fd_${esc(f.k)}" value="">` : ''}
-        ${locked ? '<span class="hint">Anda tidak punya izin mengganti dokumen kependudukan.</span>' : `<input type="file" id="${id}" accept="${f.img ? IMG_ANY : 'application/pdf,' + IMG_ANY + ',.doc,.docx,.xls,.xlsx'}"><span class="hint">${v ? 'Pilih berkas baru untuk mengganti.' : f.img ? 'Foto akan diperkecil otomatis.' : HINT_DOK + '.'}</span><span class="hint err-t"></span>`}</div>`;
+        ${locked ? '<span class="hint">Anda tidak punya izin mengganti dokumen kependudukan.</span>' : `<input type="file" id="${id}"${f.maxAdm ? ` data-maxadm="${f.maxAdm}"` : ''} accept="${f.img ? IMG_ANY : 'application/pdf,' + IMG_ANY + ',.doc,.docx,.xls,.xlsx'}"><span class="hint">${v ? 'Pilih berkas baru untuk mengganti.' : f.img ? 'Foto akan diperkecil otomatis.' : f.maxAdm ? (S.user && S.user.admin ? 'PDF / dokumen maks. ' + f.maxAdm + ' MB (khusus admin) · foto otomatis diperkecil.' : HINT_DOK + '. Dokumen sampai ' + f.maxAdm + ' MB hanya bisa diunggah admin.') : HINT_DOK + '.'}</span><span class="hint err-t"></span>`}</div>`;
       break;
     }
     case 'checks': { const sel = String(v).split(/\s*,\s*/); inp = `<div class="checks" id="${id}">${f.opt.map(o => `<label><input type="checkbox" value="${esc(o)}" ${sel.indexOf(o) >= 0 ? 'checked' : ''}>${esc(o)}</label>`).join('')}</div>`; break; }
@@ -4866,7 +4870,7 @@ VIEWS.form = async (p, main, alive) => {
         if (del && del.value === '1' && !(el && el.files && el.files[0])) { val[f.k] = ''; continue; }
         if (el && el.files && el.files[0]) {
           btn.textContent = 'Mengunggah ' + f.l.toLowerCase() + '…';
-          const up = await uploadFile(el.files[0], u.folder || 'Lainnya');
+          const up = await uploadFile(el.files[0], u.folder || 'Lainnya', f.maxAdm);
           val[f.k] = up.id;
         }
       }
@@ -8569,7 +8573,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '177', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '178', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
