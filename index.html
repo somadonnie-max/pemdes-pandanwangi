@@ -1299,6 +1299,7 @@ const KKA_ATURAN = [
   [/skck|kelakuan baik|kehilangan|keramaian|kepolisian/i, '300.1.4'],
   [/beda nama|identitas|ktp|\bkk\b|kartu keluarga|penduduk|penghasilan|bekerja|waris|wali|kelakuan|ktp/i, '400.12.2.1']];
 const KKA_UMUM = '400.10.2.2';
+const SERT_JENIS = ['Pelatihan', 'Bimbingan Teknis (Bimtek)', 'Workshop', 'Seminar / Webinar', 'Sosialisasi', 'Diklat', 'Uji Kompetensi / Sertifikasi', 'Lomba / Penghargaan', 'Lainnya'];
 const AP_ALASAN = ['Meninggal', 'Mengundurkan Diri', 'Pensiun (usia 60 tahun)', 'Berhenti / Diberhentikan'];
 /** alasan / jenis SK pemberhentian -> status aparatur */
 const apStatusDari = (jenis, alasan) => /pengunduran/i.test(jenis || '') || /mundur/i.test(alasan || '') ? 'Mengundurkan Diri' : /meninggal/i.test(alasan || '') ? 'Meninggal' : /pensiun/i.test(alasan || '') ? 'Pensiun' : 'Berhenti';
@@ -1484,6 +1485,19 @@ const UI = {
       F('dasar', 'Dasar hukum', 'text', { wide: 1, list: ['UU No. 3 Tahun 2024 tentang Perubahan Kedua atas UU No. 6 Tahun 2014 tentang Desa', 'Permendagri No. 67 Tahun 2017 tentang Pengangkatan dan Pemberhentian Perangkat Desa', 'Peraturan Bupati Lumajang tentang Perangkat Desa'] }),
       F('dok_id', 'Dokumen SK', 'file', { wide: 1 }), F('ket', 'Keterangan', 'text', { wide: 1 })],
     row: r => ({ t: String(r.jenis || 'SK').replace(/\s*\(.*\)\s*$/, '') + (r.jabatan ? ' — ' + r.jabatan : ''), s: [r.no_sk, r.tgl_sk ? fDate(r.tgl_sk) : ''].filter(Boolean).join(' · '), av: ic('stamp'), file: r.dok_id })
+  },
+  aparat_sert: {
+    t: 'Sertifikat Aparatur', ic: 'badge', perm: 'tu_aparat', m: 'aparat', sub: 1, folder: 'TU/Aparat', file: 'dok_id', sort: 'tanggal',
+    fields: [F('ref', '', 'hidden'), F('_h_ap', 'Aparatur', 'head'),
+      F('dok_id', 'Foto / PDF sertifikat', 'file', { wide: 1, hint: 'Foto (kamera/galeri) atau PDF, maks. 25 MB' }),
+      F('nama', 'Nama kegiatan', 'text', { req: 1, wide: 1, hint: 'mis. Pelatihan Perpajakan dalam PBJ Desa' }),
+      F('jenis', 'Jenis', 'select', { opt: SERT_JENIS, def: 'Pelatihan' }), F('peran', 'Sebagai', 'text', { def: 'Peserta', list: ['Peserta', 'Narasumber', 'Panitia', 'Moderator', 'Juara I', 'Juara II', 'Juara III', 'Harapan'] }),
+      F('penyelenggara', 'Penyelenggara', 'text', { wide: 1, list: ['Pemerintah Kabupaten Lumajang', 'DPMD Kabupaten Lumajang', 'Kecamatan Tempeh', 'BPSDM Provinsi Jawa Timur', 'Kementerian Desa PDT', 'Kementerian Dalam Negeri', 'BPS Kabupaten Lumajang'] }),
+      F('nomor', 'Nomor sertifikat', 'text', { mono: 1 }), F('tanggal', 'Tanggal kegiatan', 'date'), F('tgl_selesai', 'Sampai tanggal', 'date', { hint: 'Kosongkan bila hanya 1 hari' }),
+      F('metode', 'Pelaksanaan', 'select', { opt: ['Luring (tatap muka)', 'Daring (online)', 'Campuran'] }), F('tempat', 'Tempat'), F('jp', 'Jumlah JP / jam', 'number', { hint: 'Jam pelajaran yang tertulis di sertifikat' }),
+      F('berlaku', 'Berlaku sampai', 'date', { hint: 'Hanya untuk sertifikat yang punya masa berlaku (mis. sertifikat PBJ)' }), F('ket', 'Keterangan', 'text', { wide: 1 })],
+    row: r => ({ t: r.nama, s: [r.peran, r.penyelenggara, r.tanggal ? fDate(r.tanggal) : ''].filter(Boolean).join(' · '), av: ic('badge'), file: r.dok_id, r: r.jp ? r.jp + ' JP' : '' }),
+    print: { title: 'DAFTAR SERTIFIKAT APARATUR', land: 1, cols: [['Tanggal', r => fDate(r.tanggal)], ['Nama Kegiatan', 'nama'], ['Jenis', 'jenis'], ['Sebagai', 'peran'], ['Penyelenggara', 'penyelenggara'], ['Nomor', 'nomor'], ['JP', 'jp']] }
   },
   berita_acara: {
     t: 'Berita Acara', ic: 'stamp', perm: 'tu_surat', folder: 'TU/Berita Acara', file: 'dok_id',
@@ -3965,7 +3979,7 @@ async function renderDetail(e, x, el, full) {
   if (e === 'rpjm_gagasan' && canWrite(e) && x.status !== 'Masuk RPJM') xx.innerHTML = `<div class="btns"><button class="btn sm pri" data-act="rpjGagKeg" data-id="${esc(x.id)}">${ic('plus')}Jadikan kegiatan RPJM</button></div>`;
   if (e === 'pembangunan') await extraPembangunan(x, xx);
   if (e === 'petugas') await extraPetugas(x, xx);
-  if (e === 'aparat') { extraAparat(x, xx, canWrite(e)); await extraAparatSK(x, xx, canWrite(e)); }
+  if (e === 'aparat') { extraAparat(x, xx, canWrite(e)); await extraAparatSK(x, xx, canWrite(e)); await extraAparatSert(x, xx, canWrite(e)); }
   if (e === 'tanah_desa' || e === 'tanah_sert') await extraTanah(e, x, xx);
   if (e === 'penduduk') xx.insertAdjacentHTML('afterbegin', mutasiHtml(x) + pendTombol(x));
   if (e === 'penduduk') await extraPendudukLink(x, xx);
@@ -4134,6 +4148,21 @@ async function extraAparatSK(x, el, w) {
     ${w && aktif ? `<div class="btns">${[['Mutasi Jabatan', 'next', { jenis: 'Mutasi / Rotasi Jabatan', jabatan: '' }], [jabKades(x.jabatan) ? 'Periode Berikutnya' : 'Angkat Kembali', 'badge', { jenis: jabKades(x.jabatan) ? 'Pelantikan Periode Berikutnya' : 'Pengangkatan Kembali', jabatan: x.jabatan || '' }], ['Berhentikan', 'x', { jenis: 'Pemberhentian', jabatan: x.jabatan || '' }]].map(([l, i, o]) => `<button class="btn sm${l === 'Berhentikan' ? ' danger' : ''}" data-act="addSub" data-e="aparat_sk" data-p='${esc(JSON.stringify(Object.assign({ ref: x.id }, o)))}'>${ic(i)}${esc(l)}</button>`).join('')}</div>` : ''}
     <div class="card stack" style="gap:6px">${mj.akhir || awal ? `<div><b>${esc(judul)}</b>${kurung ? ` <span class="meta">(${esc(kurung)})</span>` : ''}</div>` : '<div class="meta">Akhir masa jabatan belum dapat dihitung.</div>'}${status}${ket ? `<div class="meta">${esc(ket)}</div>` : ''}</div>
     ${L.length ? `<div class="list">${L.map(o => o.h).join('')}</div>` : '<div class="card meta">Belum ada riwayat SK. Tambahkan SK pengangkatan, pengangkatan kembali (mis. penyesuaian usia 60 tahun), atau pelantikan periode berikutnya.</div>'}</div>`);
+}
+/** detail aparatur: daftar sertifikat (banyak per orang), terbaru di atas */
+async function extraAparatSert(x, el, w) {
+  let rs = []; try { rs = (await call('list', { entity: 'aparat_sert', filters: { ref: x.id }, limit: 200 })).rows || []; } catch (er) { }
+  rs.sort((a, b) => String(b.tanggal || '').localeCompare(String(a.tanggal || '')));
+  const jp = rs.reduce((n, r) => n + (Number(r.jp) || 0), 0), hari = isoToday();
+  const item = r => `<div class="it"><div class="row" role="button" tabindex="0" title="Buka / ubah" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'aparat_sert', id: r.id }]))}'><span class="av">${ic('badge')}</span><span class="tx"><b>${esc(r.nama || '')}</b><small>${esc([r.peran, r.penyelenggara, r.tanggal ? fDate(r.tanggal) + (r.tgl_selesai && r.tgl_selesai !== r.tanggal ? ' s.d. ' + fDate(r.tgl_selesai) : '') : '', r.jp ? r.jp + ' JP' : ''].filter(Boolean).join(' · '))}</small>${r.berlaku ? `<small>${r.berlaku < hari ? '<span class="pill bad">kedaluwarsa</span> ' : ''}Berlaku s.d. ${esc(fDate(r.berlaku))}</small>` : ''}</span>${r.dok_id ? `<button class="btn sm" data-act="file" data-id="${esc(r.dok_id)}" data-name="${esc('Sertifikat ' + (r.nama || ''))}">${ic('eye')}Lihat</button>` : ''}</div></div>`;
+  el.insertAdjacentHTML('beforeend', `<div class="stack"><div class="sec-h"><h2>${ic('badge')} Sertifikat & pelatihan${rs.length ? ` <span class="meta">(${rs.length}${jp ? ' · ' + jp + ' JP' : ''})</span>` : ''}</h2>${w ? `<button class="btn sm" data-act="addSub" data-e="aparat_sert" data-p='${esc(JSON.stringify({ ref: x.id }))}'>${ic('plus')}Sertifikat</button>` : ''}</div>
+    ${rs.length ? `<div class="list">${rs.map(item).join('')}</div>` : '<div class="card meta">Belum ada sertifikat. Ketuk + Sertifikat, lalu foto atau unggah PDF sertifikatnya.</div>'}</div>`);
+}
+/** form sertifikat: nama aparatur di atas */
+function apSertHook(frm) {
+  const ref = ($('#f_ref', frm) || {}).value, hd = $('#f__h_ap', frm); if (!hd) return;
+  if (!ref) { hd.hidden = true; return; }
+  call('get', { entity: 'aparat', id: ref }).then(a => { if (a) hd.innerHTML = `<b>${esc(a.nama || '')}</b><span class="hint">${esc(a.jabatan || '')}</span>`; }).catch(() => { });
 }
 /** form riwayat SK: TMT ikut tanggal SK, akhir masa jabatan otomatis, info aparatur di atas */
 function apSkHook(frm, p, rec) {
@@ -4706,6 +4735,7 @@ VIEWS.form = async (p, main, alive) => {
   if (e === 'penduduk') ortuHooks(frm, p);
   if (e === 'register_surat') { suketCariHook(frm); kkaHook(frm); ttdHook(frm); }
   if (e === 'aparat_sk') apSkHook(frm, p, rec);
+  if (e === 'aparat_sert') apSertHook(frm);
   if (e === 'aparat') apHook(frm, p, rec);
   namaHooks(frm, e, flds);
   /* NIK -> isi otomatis dari Data Penduduk (hanya kolom yang masih kosong) */
@@ -8489,7 +8519,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '170', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '171', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
