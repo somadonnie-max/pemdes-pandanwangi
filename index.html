@@ -1494,7 +1494,7 @@ const UI = {
   aparat_sert: {
     t: 'Sertifikat Aparatur', ic: 'badge', perm: 'tu_aparat', m: 'aparat', sub: 1, folder: 'TU/Aparat', file: 'dok_id', sort: 'tanggal',
     fields: [F('ref', '', 'hidden'), F('_h_ap', 'Aparatur', 'head'),
-      F('dok_id', 'Foto / PDF sertifikat', 'file', { wide: 1, hint: 'Foto (kamera/galeri) atau PDF, maks. 25 MB' }),
+      F('dok_id', 'Foto / PDF sertifikat', 'file', { wide: 1, hint: 'Foto langsung dari kamera/galeri, atau PDF' }),
       F('nama', 'Kegiatan', 'text', { req: 1, wide: 1, listFrom: { e: 'aparat_sert', k: 'nama' }, fill: x => ({ jenis: x.jenis, penyelenggara: x.penyelenggara, tanggal: x.tanggal, tgl_selesai: x.tgl_selesai, metode: x.metode, tempat: x.tempat, jp: x.jp, berlaku: x.berlaku }), hint: 'mis. Sistem Belajar Mandiri Tata Kelola Desa (Sibermata Desa). Ketik atau pilih kegiatan yang pernah dicatat: penyelenggara, tanggal, tempat & JP ikut terisi' }),
       F('materi', 'Materi', 'text', { wide: 1, listFrom: { e: 'aparat_sert', k: 'materi' }, hint: 'Satu sertifikat = satu materi, mis. Pengelolaan Keuangan Desa. Kegiatan dengan 10 materi dicatat sebagai 10 sertifikat (pakai tombol + Materi di halaman detail).' }),
       F('jenis', 'Jenis', 'select', { opt: SERT_JENIS, def: 'Pelatihan' }), F('peran', 'Sebagai', 'text', { def: 'Peserta', list: ['Peserta', 'Narasumber', 'Panitia', 'Moderator', 'Juara I', 'Juara II', 'Juara III', 'Harapan'] }),
@@ -2870,7 +2870,27 @@ async function uploadR2(file, folder) {
   if (gambar) { try { const t = await makeThumb(file); THUMB[r.id] = t; await call('thumbSave', { id: r.id, data: t }); } catch (e) { } }
   return { id: r.id, size: blob.size, name };
 }
+/* ---- batas ukuran unggah (v176): dokumen (PDF, Word, Excel, dll.) maks. 2 MB; foto diperkecil otomatis, jadi tidak dibatasi ---- */
+const MAX_DOK = 2 * 1024 * 1024;
+const HINT_DOK = 'PDF / dokumen maks. 2 MB · foto otomatis diperkecil';
+const fotoKecil = f => /^image\//.test((f && f.type) || '') && !/gif|svg/.test(f.type);
+const fmtMB = n => (n / 1048576).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' MB';
+function dokTerlaluBesar(f) { return f && !fotoKecil(f) && f.size > MAX_DOK; }
+function pesanBesar(f) { return '"' + (f.name || 'Berkas') + '" berukuran ' + fmtMB(f.size) + '. Dokumen maksimal 2 MB. Perkecil dulu (mis. kompres PDF di ilovepdf.com, atau pindai ulang dengan resolusi lebih rendah), atau unggah sebagai foto.'; }
+/* pemeriksaan langsung saat berkas dipilih (semua isian unggah dokumen) */
+document.addEventListener('change', ev => {
+  const inp = ev.target; if (!inp || inp.type !== 'file' || inp.hasAttribute('data-nolimit')) return;
+  const acc = String(inp.accept || '').toLowerCase(); if (acc && !/pdf|image|\.doc|\.xls|\.ppt/.test(acc)) return;
+  if (/^\.(docx|xlsx|csv|geojson|json)/.test(acc) && !/pdf/.test(acc)) return;
+  const besar = Array.from(inp.files || []).find(dokTerlaluBesar);
+  if (!besar) { const b0 = inp.closest('.f, .filebox'), h0 = b0 && b0.querySelector('.hint.err-t'); if (h0) h0.textContent = ''; return; }
+  ev.stopImmediatePropagation(); ev.stopPropagation();
+  toast(pesanBesar(besar), 1);
+  try { inp.value = ''; } catch (er) { }
+  const box = inp.closest('.f, .filebox'); const h = box && box.querySelector('.hint.err-t'); if (h) h.textContent = pesanBesar(besar);
+}, true);
 async function uploadFile(file, folder) {
+  if (dokTerlaluBesar(file)) throw new Error(pesanBesar(file));
   if (String(folder || '').split('/')[0] === 'Penduduk') {
     try { return await uploadKependudukan(file, folder); }
     catch (e) { if (!/belum dipasang/.test(e.message)) throw e; }   /* penyimpanan baru belum siap: pakai Drive */
@@ -3221,7 +3241,7 @@ ACT.hDet = async t => {
           <div class="pd-k">${ic('file')} <span class="pd-kt">${r.keterangan ? esc(r.keterangan) : '<i class="muted">Tanpa keterangan</i>'}</span></div>
           <div class="pd-m">${geo ? `<span>${ic('pin')} ${jr ? (jr >= 1000 ? (jr / 1000).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' km' : jr + ' m') + ' dari kantor' : 'Di kantor'}</span><a href="https://www.google.com/maps?q=${encodeURIComponent(geo)}" target="_blank" rel="noopener">Lihat lokasi</a>` : '<span>Tanpa lokasi</span>'}</div>
           ${r.foto_id || L.length ? `<div class="btns">${r.foto_id ? `<button class="btn sm" data-act="file" data-id="${esc(r.foto_id)}" data-name="Foto presensi">${ic('cam')}Foto presensi</button>` : ''}${L.map((f, k) => `<button class="btn sm" data-act="file" data-id="${esc(f.id)}" data-name="${esc(f.nama || 'Lampiran')}">${ic('file')}${esc(f.nama || 'Lampiran ' + (k + 1))}</button>`).join('')}</div>` : ''}
-          ${boleh(r) ? `<div class="pd-act">${`<button class="btn sm" data-pd="ket">${ic('edit')}Ubah keterangan</button>`}${bolehDok(r) && L.length < 5 ? `<label class="btn sm">${ic('plus')}Tambah dokumen/foto<input type="file" data-pd="dok" accept="image/*,application/pdf" hidden></label>` : ''}${S.user.admin ? `<button class="btn sm" data-pd="adm">${ic('cog')}Ubah lengkap (admin)</button>` : ''}</div>
+          ${boleh(r) ? `<div class="pd-act">${`<button class="btn sm" data-pd="ket">${ic('edit')}Ubah keterangan</button>`}${bolehDok(r) && L.length < 5 ? `<label class="btn sm" title="${HINT_DOK}">${ic('plus')}Tambah dokumen/foto<input type="file" data-pd="dok" accept="image/*,application/pdf" hidden></label>` : ''}${S.user.admin ? `<button class="btn sm" data-pd="adm">${ic('cog')}Ubah lengkap (admin)</button>` : ''}</div>
             <div class="pd-ed" hidden><textarea rows="2" maxlength="500">${esc(r.keterangan || '')}</textarea><div class="btns"><button class="btn sm pri" data-pd="simpan">${ic('check')}Simpan</button><button class="btn sm" data-pd="batal">Batal</button></div></div>` : ''}
         </div>`; }).join('') : '<div class="meta">Data presensi tidak ditemukan.</div>'}
       ${rows.some(r => !boleh(r)) || !rows.length ? '' : '<div class="meta" style="font-size:11px">Jam, jenis, dan lokasi presensi tidak bisa diubah. Yang bisa diubah: keterangan, serta tambah dokumen/foto untuk Izin, Sakit, atau Dinas Luar.</div>'}
@@ -4051,7 +4071,7 @@ function extraAparat(x, el, w) {
   S.vh.jabMenu = t => {
     const i = Number(t.dataset.i), j = a[i];
     const m = modal(j, `<div class="stack"><div class="meta">${esc(x.nama)}</div>
-      <div class="btns">${sk[j] ? `<button class="btn sm" data-act="file" data-id="${esc(sk[j])}" data-name="SK ${esc(j)}">${ic('eye')}Lihat SK</button>` : ''}${w ? `<label class="btn sm pri">${ic('plus')}${sk[j] ? 'Ganti' : 'Unggah'} SK ${esc(j)}<input type="file" id="jbSk" accept="application/pdf,${IMG_ANY}" hidden></label>` : ''}</div>
+      <div class="btns">${sk[j] ? `<button class="btn sm" data-act="file" data-id="${esc(sk[j])}" data-name="SK ${esc(j)}">${ic('eye')}Lihat SK</button>` : ''}${w ? `<label class="btn sm pri">${ic('plus')}${sk[j] ? 'Ganti' : 'Unggah'} SK ${esc(j)}<input type="file" id="jbSk" accept="application/pdf,${IMG_ANY}" hidden></label>` : ''}</div>${w ? `<span class="hint">${HINT_DOK}</span>` : ''}
       ${w ? `<div class="btns" id="jbAct">${sk[j] ? `<button class="btn sm" id="jbSkDel">${ic('trash')}Hapus SK</button>` : ''}<button class="btn sm danger" id="jbDel">${ic('trash')}Hapus jabatan</button></div>` : ''}<div id="jbMsg" class="meta"></div></div>`);
     if (!w) return;
     $('#jbSk', m.el).onchange = async ev => { const f = ev.target.files[0]; if (!f) return; $('#jbMsg', m.el).textContent = 'Mengunggah…'; try { const up = await uploadFile(f, UI.aparat.folder || 'TU/Aparat'); await simpan(a, Object.assign({}, sk, { [j]: up.id })); m.close(); } catch (er) { $('#jbMsg', m.el).textContent = er.message; } };
@@ -4061,7 +4081,7 @@ function extraAparat(x, el, w) {
   S.vh.jabAdd = () => {
     const m = modal('Tambah jabatan — ' + x.nama, `<div class="stack"><div class="f"><label for="jbIn">Jabatan / tugas</label><input id="jbIn" placeholder="Ketuk untuk memilih, mis. Plt. Kepala Dusun Krajan 1"></div>
       <div class="chips wrap">${JAB_TAMBAH.filter(j => a.indexOf(j) < 0).slice(0, 8).map(j => `<button type="button" class="chip" data-j="${esc(j)}">${esc(j)}</button>`).join('')}</div>
-      <div class="f"><label for="jbSkN">Dokumen SK (boleh menyusul)</label><input type="file" id="jbSkN" accept="application/pdf,${IMG_ANY}"></div>
+      <div class="f"><label for="jbSkN">Dokumen SK (boleh menyusul)</label><input type="file" id="jbSkN" accept="application/pdf,${IMG_ANY}"><span class="hint">${HINT_DOK}</span></div>
       <div class="btns"><button class="btn pri" id="jbOk">${ic('check')}Simpan</button></div></div>`);
     ddAttach($('#jbIn', m.el), JAB_TAMBAH.concat(jabDaftar().filter(j => /^Plt\./.test(j))).filter(j => a.indexOf(j) < 0));
     $$('[data-j]', m.el).forEach(b => b.onclick = () => { $('#jbIn', m.el).value = b.dataset.j; });
@@ -4387,7 +4407,7 @@ async function extraKegiatan(kg, el) {
   const grp = OPT.jenisBerkas.filter(j => by[j]).map(j => `<div class="sec-h"><h2>${esc(j)} (${by[j].length})</h2></div>` + (j === 'Foto'
     ? `<div class="pgrid">${by[j].map(b => `<div class="pslot has"><button type="button" class="pimg" data-act="file" data-id="${esc(b.file_id)}" data-name="${esc(b.ket || 'Foto kegiatan')}"><img src="${esc(thumb(b.file_id, 240))}" alt="" loading="lazy"></button>${b.ket ? `<span class="plbl">${esc(b.ket)}</span>` : ''}${w ? `<button class="btn sm danger pup" data-act="delBerkas" data-id="${esc(b.id)}" data-ref="${esc(kg.id)}">${ic('trash')}</button>` : ''}</div>`).join('')}</div>`
     : `<div class="list">${by[j].map(b => `<div class="row">${ic('file')}<span class="main"><span class="t">${esc(b.nama_file || j)}</span><span class="s">${esc(b.ket || '')}</span></span><span class="btns"><button class="btn sm" data-act="file" data-id="${esc(b.file_id)}" data-name="${esc(b.nama_file || j)}">${ic('eye')}Buka</button>${w ? `<button class="btn sm danger" data-act="delBerkas" data-id="${esc(b.id)}" data-ref="${esc(kg.id)}">${ic('trash')}</button>` : ''}</span></div>`).join('')}</div>`)).join('');
-  el.innerHTML = `<div class="stack">${w ? `<div class="card stack kgup" data-ref="${esc(kg.id)}"><b>Tambah foto / dokumen kegiatan</b><div class="form"><div class="f"><label>Jenis</label><select class="kgj">${OPT.jenisBerkas.map(j => `<option>${j}</option>`).join('')}</select></div><div class="f"><label>Keterangan (opsional)</label><input class="kgk" placeholder="Mis. Penyerahan simbolis"></div><div class="f wide"><label>Berkas (boleh pilih beberapa)</label><input type="file" class="kgf" multiple accept="application/pdf,${IMG_ANY},.doc,.docx,.xls,.xlsx,.ppt,.pptx"></div></div><div class="btns"><button class="btn sm pri" data-act="kgUp">${ic('plus')}Unggah</button>${!kg.ringkasan ? `<button class="btn sm" data-act="xedit" data-e="kegiatan" data-id="${esc(kg.id)}">${ic('edit')}Tulis ringkasan materi</button>` : ''}</div></div>` : ''}
+  el.innerHTML = `<div class="stack">${w ? `<div class="card stack kgup" data-ref="${esc(kg.id)}"><b>Tambah foto / dokumen kegiatan</b><div class="form"><div class="f"><label>Jenis</label><select class="kgj">${OPT.jenisBerkas.map(j => `<option>${j}</option>`).join('')}</select></div><div class="f"><label>Keterangan (opsional)</label><input class="kgk" placeholder="Mis. Penyerahan simbolis"></div><div class="f wide"><label>Berkas (boleh pilih beberapa)</label><input type="file" class="kgf" multiple accept="application/pdf,${IMG_ANY},.doc,.docx,.xls,.xlsx,.ppt,.pptx"><span class="hint">${HINT_DOK}</span></div></div><div class="btns"><button class="btn sm pri" data-act="kgUp">${ic('plus')}Unggah</button>${!kg.ringkasan ? `<button class="btn sm" data-act="xedit" data-e="kegiatan" data-id="${esc(kg.id)}">${ic('edit')}Tulis ringkasan materi</button>` : ''}</div></div>` : ''}
     ${grp || '<div class="card meta">Belum ada foto atau dokumen kegiatan.</div>'}</div>`;
 }
 ACT.kgUp = async t => {
@@ -4605,7 +4625,7 @@ function fieldHtml(f, v, rec) {
     case 'file': {
       const locked = v === '•';
       inp = `<div class="filebox">${v ? `<span class="btns fkeep"><button type="button" class="btn sm" data-act="file" data-id="${esc(v)}" data-priv="${f.priv ? 1 : 0}" data-name="${esc(f.l)}">${ic(locked ? 'lock' : 'eye')}Berkas tersimpan</button>${locked ? '' : `<button type="button" class="btn sm danger" data-act="fileDel" data-k="${esc(f.k)}">${ic('trash')}Hapus</button>`}</span><input type="hidden" id="fd_${esc(f.k)}" value="">` : ''}
-        ${locked ? '<span class="hint">Anda tidak punya izin mengganti dokumen kependudukan.</span>' : `<input type="file" id="${id}" accept="${f.img ? IMG_ANY : 'application/pdf,' + IMG_ANY + ',.doc,.docx,.xls,.xlsx'}"><span class="hint">${v ? 'Pilih berkas baru untuk mengganti.' : f.img ? 'Foto akan diperkecil otomatis.' : 'PDF atau foto, maks. 25 MB.'}</span>`}</div>`;
+        ${locked ? '<span class="hint">Anda tidak punya izin mengganti dokumen kependudukan.</span>' : `<input type="file" id="${id}" accept="${f.img ? IMG_ANY : 'application/pdf,' + IMG_ANY + ',.doc,.docx,.xls,.xlsx'}"><span class="hint">${v ? 'Pilih berkas baru untuk mengganti.' : f.img ? 'Foto akan diperkecil otomatis.' : HINT_DOK + '.'}</span><span class="hint err-t"></span>`}</div>`;
       break;
     }
     case 'checks': { const sel = String(v).split(/\s*,\s*/); inp = `<div class="checks" id="${id}">${f.opt.map(o => `<label><input type="checkbox" value="${esc(o)}" ${sel.indexOf(o) >= 0 ? 'checked' : ''}>${esc(o)}</label>`).join('')}</div>`; break; }
@@ -5428,7 +5448,7 @@ function pendTombol(x) {
 }
 ACT.ktpUp = t => {
   const id = t.dataset.id;
-  const m = sheet('Unggah Foto KTP', `<div class="stack"><div class="meta">Foto KTP disimpan privat. Foto diperkecil otomatis.</div><input type="file" id="ktpF" accept="image/*,application/pdf"><div class="btns"><button class="btn pri" id="ktpS" disabled>${ic('check')}Unggah</button></div></div>`, { ikon: 'file' });
+  const m = sheet('Unggah Foto KTP', `<div class="stack"><div class="meta">Foto KTP disimpan privat. Foto diperkecil otomatis; PDF maks. 2 MB.</div><input type="file" id="ktpF" accept="image/*,application/pdf"><div class="btns"><button class="btn pri" id="ktpS" disabled>${ic('check')}Unggah</button></div></div>`, { ikon: 'file' });
   const fi = $('#ktpF', m.el), b = $('#ktpS', m.el);
   fi.onchange = () => { b.disabled = !fi.files[0]; };
   b.onclick = async () => {
@@ -6593,14 +6613,14 @@ async function mutasiForm(id, jenis) {
       <div class="f wide"><label>Keterangan tempat (mis. nama rumah sakit)</label><input id="mu_tempat2"></div>
       <div class="f"><label>Nama pelapor</label><input id="mu_pelapor"></div>
       <div class="f"><label>Hubungan pelapor</label><input id="mu_hub" list="mu_hubl"><datalist id="mu_hubl">${['Suami', 'Istri', 'Anak', 'Orang tua', 'Saudara', 'Ketua RT', 'Lainnya'].map(o => `<option value="${o}">`).join('')}</datalist></div>
-      <div class="f wide"><label>Surat kematian / dokumen (foto atau PDF)</label><input type="file" id="mu_dok" accept="application/pdf,${IMG_ANY}"></div>`
+      <div class="f wide"><label>Surat kematian / dokumen (foto atau PDF)</label><input type="file" id="mu_dok" accept="application/pdf,${IMG_ANY}"><span class="hint">${HINT_DOK}</span></div>`
     : `<div class="f"><label>Tanggal pindah <i>*</i></label><input type="date" id="mu_tgl" value="${isoToday()}"></div>
       <div class="f"><label>Jenis kepindahan</label><select id="mu_jenis"><option value="">— pilih —</option>${opt(JENIS_PINDAH)}</select></div>
       <div class="f wide"><label>Alamat tujuan <i>*</i></label><input id="mu_alamat" placeholder="Jalan / dusun / RT RW"></div>
       <div class="f"><label>Desa / kelurahan tujuan</label><input id="mu_desa"></div><div class="f"><label>Kecamatan tujuan</label><input id="mu_kec"></div>
       <div class="f"><label>Kabupaten / kota tujuan</label><input id="mu_kab"></div><div class="f"><label>Provinsi tujuan</label><input id="mu_prov"></div>
       <div class="f"><label>Alasan pindah</label><select id="mu_alasan"><option value="">— pilih —</option>${opt(ALASAN_PINDAH)}</select></div>
-      <div class="f wide"><label>Surat pindah (SKPWNI) / dokumen</label><input type="file" id="mu_dok" accept="application/pdf,${IMG_ANY}"></div>`}
+      <div class="f wide"><label>Surat pindah (SKPWNI) / dokumen</label><input type="file" id="mu_dok" accept="application/pdf,${IMG_ANY}"><span class="hint">${HINT_DOK}</span></div>`}
     <div class="f wide"><label>Keterangan</label><textarea id="mu_ket" rows="2"></textarea></div></div>
     <div class="err" id="mu_err" hidden></div><div class="btns"><button class="btn pri" type="submit">${ic('check')}Simpan</button><button class="btn" type="button" data-x>Batal</button></div></form>`);
   const v = k => { const el = $('#mu_' + k, m.el); return el ? el.value.trim() : ''; };
@@ -8542,7 +8562,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '175', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '176', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -13488,7 +13508,7 @@ VIEWS.frc = async (p, main, alive) => {
       <div class="stack" style="margin-top:8px"><div class="lbl">Yang dinilai</div><ol class="frc-n">${d.n.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
       <div class="lbl">Lampiran / bukti</div><div class="frc-l">${d.l.map((x, i) => { const b = B[d.k + '|' + i] || {}; return `<div class="frc-r" data-i="${i}"><div class="frc-t">${i + 1}. ${esc(x.t)}${x.cek ? `<small class="frc-auto" data-cek="${x.cek}"></small>` : ''}</div>
         <div class="frc-a"><span class="frc-st">${['Belum', 'Sebagian', 'Ada'].map(s => `<button class="${(b.status || 'Belum') === s ? 'on ' + s.toLowerCase() : ''}" data-st="${s}" ${w ? '' : 'disabled'}>${s}</button>`).join('')}</span>
-        ${x.go ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(x.go))}'>${ic('next')}Data</button>` : ''}${b.file_id ? `<button class="btn sm" data-act="file" data-id="${esc(b.file_id)}" data-name="Bukti ${d.k}-${i + 1}">${ic('eye')}Bukti</button>` : ''}${w ? `<label class="btn sm">${ic('plus')}${b.file_id ? 'Ganti' : 'Unggah'}<input type="file" hidden data-up></label>` : ''}</div>
+        ${x.go ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(x.go))}'>${ic('next')}Data</button>` : ''}${b.file_id ? `<button class="btn sm" data-act="file" data-id="${esc(b.file_id)}" data-name="Bukti ${d.k}-${i + 1}">${ic('eye')}Bukti</button>` : ''}${w ? `<label class="btn sm" title="${HINT_DOK}">${ic('plus')}${b.file_id ? 'Ganti' : 'Unggah'}<input type="file" hidden data-up></label>` : ''}</div>
         ${b.catatan || w ? `<input class="frc-c" data-cat placeholder="Catatan (mis. nomor SK, lokasi berkas)" value="${esc(b.catatan || '')}" ${w ? '' : 'readonly'}>` : ''}</div>`; }).join('')}</div>
       <div class="lbl">Laporan ke SIMWAS</div><div class="meta">${last ? `Terakhir: ${esc(fDate(last.tgl))} · klaim ${esc(last.persen || '')}%${last.verif ? ' · verifikasi ' + esc(last.verif) + '%' : ' · menunggu verifikasi'}` : 'Belum dicatat.'}</div>
       ${w ? `<div class="btns"><button class="btn sm" data-act="frcLapor" data-k="${d.k}">${ic('send')}Catat laporan</button></div>` : ''}</div></details>`; }).join('')}`).join('')}
@@ -13903,7 +13923,7 @@ VIEWS.skimpor = async (p, main) => {
       <div class="meta">Di Siskeudes buka laporan → <b>Cetak</b> → pilih printer <b>Microsoft Print to PDF</b> → simpan. Pilih beberapa PDF sekaligus di bawah; aplikasi mengenali jenisnya otomatis. Data tahun yang sama dicocokkan, jadi impor ulang memperbarui data, tidak menggandakan.</div>
       <div class="sk-daftar">${[['Parameter Rekening APB Desa', 'Laporan → Parameter → Rekening', 'kode rekening'], ['RAB 1 - Rincian Anggaran Pendapatan / Belanja / Pembiayaan', 'Laporan → Anggaran (murni atau perubahan)', 'APBDes'], ['Buku Kas Umum', 'Laporan → Penatausahaan → Buku Kas Umum (sumber dana dikosongkan)', 'penerimaan, belanja, pajak, mutasi kas'], ['Register SPP - Pencairan', 'Laporan → Penatausahaan', 'SPP & tanggal cair'], ['Register SPP Pengeluaran', 'Laporan → Penatausahaan', 'uraian SPP'], ['Buku Kas Pembantu Kegiatan', 'Laporan → Penatausahaan', 'kegiatan tiap SPP/belanja']].map((x, i) => `<div><b>${i + 1}. ${esc(x[0])}</b><span class="meta">${esc(x[1])} · mengisi ${esc(x[2])}</span></div>`).join('')}</div>
       <div class="meta">Urutan terbaik: impor sekaligus semua PDF satu tahun anggaran. Minimal RAB (untuk APBDes) dan Buku Kas Umum (untuk realisasi).</div>
-      <label class="btn pri" style="align-self:flex-start">${ic('file')}Pilih PDF Siskeudes<input type="file" id="skF" accept="application/pdf,.pdf" multiple hidden></label>
+      <label class="btn pri" style="align-self:flex-start">${ic('file')}Pilih PDF Siskeudes<input type="file" id="skF" accept="application/pdf,.pdf" multiple hidden data-nolimit></label>
       <div id="skSt" class="meta"></div></div>
     <div id="skHasil"></div></div>`;
   const tampil = () => {
