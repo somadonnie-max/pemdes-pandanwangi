@@ -394,6 +394,7 @@ body.privblur #main,body.privblur #layer,body.privblur .tabs{filter:blur(18px);t
 .f input[type=file]{font-size:11.5px}
 .inp:focus,.f input:focus,.f select:focus,.f textarea:focus{border-color:var(--pri);box-shadow:0 0 0 2px var(--pri-soft)}
 .hint{font-size:10.5px;color:var(--muted)}
+.hint.err-t{color:var(--bad,#c0392b)}.hint.err-t:empty{display:none}a.kontak{display:inline-flex;align-items:center;gap:5px;color:var(--pri,#0b6);text-decoration:none;font-weight:600}a.kontak svg{width:14px;height:14px}a.kontak:hover{text-decoration:underline}
 .checks{display:flex;flex-wrap:wrap;gap:4px}
 .checks label{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:7px;padding:3px 8px;font-size:11.5px;font-weight:500;color:var(--ink);cursor:pointer;background:var(--surface)}
 .checks input{accent-color:var(--pri)}
@@ -1594,7 +1595,7 @@ const UI = {
       F('pendidikan', 'Pendidikan', 'select', { opt: OPT.pendidikan }), F('pekerjaan', 'Pekerjaan', 'select', { opt: OPT.pekerjaan }),
       F('gol_darah', 'Golongan Darah', 'select', { opt: OPT.darah }), F('status_kawin', 'Status Perkawinan', 'select', { opt: OPT.kawin }), F('tgl_kawin', 'Tanggal Perkawinan', 'date', { when: { k: 'status_kawin', v: 'KAWIN TERCATAT' } }), F('tgl_cerai', 'Tanggal Perceraian', 'date', { when: { k: 'status_kawin', v: 'CERAI HIDUP TERCATAT' } }), F('hubungan', 'Hubungan dalam Keluarga', 'select', { opt: OPT.hubungan }),
       F('warga_negara', 'Kewarganegaraan', 'select', { opt: OPT.wn, def: 'WNI' }), F('no_paspor', 'No. Paspor', 'text', { sens: 1 }), F('no_kitap', 'No. KITAP', 'text', { sens: 1 }), F('ayah', 'Nama Ayah', 'text', { up: 1, hint: 'Ketik nama: bila ada di Data Penduduk muncul pilihan, atau ketuk Pilih' }), F('ayah_id', '', 'hidden'), F('ibu', 'Nama Ibu', 'text', { up: 1, hint: 'Ketik nama: bila ada di Data Penduduk muncul pilihan, atau ketuk Pilih' }), F('ibu_id', '', 'hidden'),
-      F('no_hp', 'No. HP / WA', 'tel', { hint: 'Dipakai otomatis di surat & formulir yang meminta No. HP' }), F('_h_al', 'Alamat', 'head', { hint: 'Mulai dari provinsi. Untuk warga Desa Pandanwangi: dusun, RW dan RT dipilih dari daftar baku. Warga luar desa: pilih wilayahnya, dusun/RT/RW diisi sesuai KK.' }),
+      F('no_hp', 'No. HP / WA', 'tel', { hint: 'Dipakai otomatis di surat & formulir yang meminta No. HP. Boleh diketik 08…, otomatis menjadi +628…' }), F('email', 'Email', 'email'), F('_h_al', 'Alamat', 'head', { hint: 'Mulai dari provinsi. Untuk warga Desa Pandanwangi: dusun, RW dan RT dipilih dari daftar baku. Warga luar desa: pilih wilayahnya, dusun/RT/RW diisi sesuai KK.' }),
       F('w_prov', 'Provinsi', 'text', { up: 1, dd: [] }), F('w_kab', 'Kabupaten/Kota', 'text', { up: 1, dd: [] }), F('w_kec', 'Kecamatan', 'text', { up: 1, dd: [] }), F('w_desa', 'Desa/Kelurahan', 'text', { up: 1, dd: [] }),
       F('dusun', 'Dusun', 'text', { up: 1, req: 1, dd: [] }), F('rw', 'RW', 'text', { pad: 3, dd: [] }), F('rt', 'RT', 'text', { pad: 3, dd: [] }),
       F('alamat_kk', 'Alamat sesuai KK', 'text', { up: 1, wide: 1, hint: 'Tulis persis seperti di KK (mis. KRAJAN 1, PEMUKIMAN TNI). Dipakai saat mencetak; bila kosong memakai Dusun.' }), F('lokasi', 'Koordinat Rumah (dari KK)', 'geo', { noform: 1 }), F('status', 'Status Penduduk', 'select', { opt: OPT.statusPend, noform: 1 }),
@@ -3875,8 +3876,36 @@ ACT.maptype = t => {
 };
 
 /* ---------------- Detail ---------------- */
-function valHtml(f, v) {
+/* ---- No. HP / WA & email (v170): +62 otomatis, cek format, klik -> WA / email (konfirmasi dulu) ---- */
+/** 081233568999 / 6281… / 81… / +62 812-… -> +6281233568999 (selain itu dibiarkan) */
+function normHp(v) {
+  const asli = String(v == null ? '' : v).trim(); if (!asli) return '';
+  let d = asli.replace(/[^\d+]/g, ''); if (/\+/.test(d.slice(1))) return asli;
+  if (/^\+62/.test(d)) d = d.slice(3); else if (/^62/.test(d)) d = d.slice(2); else if (/^\+/.test(d)) return asli; else if (/^0/.test(d)) d = d.slice(1);
+  d = d.replace(/^0+/, '');
+  return d ? '+62' + d : asli;
+}
+const hpSah = v => /^\+62\d{7,13}$/.test(v);
+const emailSah = v => /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/.test(v);
+const kontakHtml = (jenis, v, nama) => {
+  if (jenis === 'tel') { const n = normHp(v); return hpSah(n) ? `<a href="https://wa.me/${esc(n.slice(1))}" class="kontak mono" data-act="kontakWa" data-v="${esc(n)}" data-n="${esc(nama || '')}">${ic('send')}${esc(n)}</a>` : `<span class="mono">${esc(v)}</span>`; }
+  const m = String(v).trim(); return emailSah(m) ? `<a href="mailto:${esc(m)}" class="kontak" data-act="kontakMail" data-v="${esc(m)}" data-n="${esc(nama || '')}">${ic('inbox')}${esc(m)}</a>` : esc(m);
+};
+ACT.kontakWa = t => {
+  const n = t.dataset.v, nm = t.dataset.n;
+  const m = sheet('Kirim pesan WhatsApp?', `<div class="stack"><p style="margin:0">Buka WhatsApp untuk mengirim pesan ke <b>${esc(nm || n)}</b>${nm ? ` <span class="mono">(${esc(n)})</span>` : ''}?</p><div class="btns"><button class="btn pri" id="kwYa">${ic('send')}Buka WhatsApp</button><button class="btn" id="kwNo">Batal</button></div></div>`, { ikon: 'send' });
+  $('#kwNo', m.el).onclick = () => m.close();
+  $('#kwYa', m.el).onclick = () => { m.close(); window.open('https://wa.me/' + n.replace(/\D/g, ''), '_blank', 'noopener'); };
+};
+ACT.kontakMail = t => {
+  const a = t.dataset.v, nm = t.dataset.n;
+  const m = sheet('Kirim email?', `<div class="stack"><p style="margin:0">Buka aplikasi email untuk mengirim pesan ke <b>${esc(nm || a)}</b>${nm ? ` (${esc(a)})` : ''}?</p><div class="btns"><button class="btn pri" id="kmYa">${ic('inbox')}Buka email</button><button class="btn" id="kmNo">Batal</button></div></div>`, { ikon: 'inbox' });
+  $('#kmNo', m.el).onclick = () => m.close();
+  $('#kmYa', m.el).onclick = () => { m.close(); location.href = 'mailto:' + a; };
+};
+function valHtml(f, v, x) {
   if (v == null || v === '') return '';
+  if (f.t === 'tel' || f.t === 'email') return kontakHtml(f.t, v, x && (x.nama || x.kepala || x.ketua_nama));
   if (/desil/i.test(f.k)) return dtPill(v);
   if (f.t === 'date') return fDate(v);
   if (f.t === 'money') return esc(fMoney(v));
@@ -3907,7 +3936,7 @@ async function renderDetail(e, x, el, full) {
   const w = canWrite(e) && !(e === 'kegiatan' && x.sumber_mus);
   el.innerHTML = `
     ${e === 'kegiatan' && x.sumber_mus ? `<div class="card meta">${ic('lock')} Agenda ini terusan otomatis dari Musyawarah RKP/RPJM (tanggal, jam, tempat, dan foto mengikuti data musyawarah). Tidak bisa diubah atau dihapus di sini; ubah lewat Perencanaan → RKP/RPJM Desa → Musyawarah &amp; Tim.</div>` : ''}
-    ${shown.length ? `<dl class="dl">${shown.map(f => `<div class="${f.t === 'textarea' || f.wide && String(x[f.k]).length > 40 ? 'w' : ''}"><dt>${esc(f.l)}</dt><dd>${pendLinkVal(e, f, x) || valHtml(f, x[f.k])}</dd></div>`).join('')}</dl>` : ''}
+    ${shown.length ? `<dl class="dl">${shown.map(f => `<div class="${f.t === 'textarea' || f.wide && String(x[f.k]).length > 40 ? 'w' : ''}"><dt>${esc(f.l)}</dt><dd>${pendLinkVal(e, f, x) || valHtml(f, x[f.k], x)}</dd></div>`).join('')}</dl>` : ''}
     ${files.length && e !== 'penduduk' ? `<div class="btns">${files.map(f => `<button class="btn sm" data-act="file" data-id="${esc(x[f.k])}" data-priv="${f.priv ? 1 : 0}" data-name="${esc(f.l)}">${ic(x[f.k] === '•' ? 'lock' : f.img ? 'eye' : 'file')}${esc(f.l)}</button>`).join('')}</div>` : ''}
     ${galeri}${rws}
     <div class="xk"></div>
@@ -4555,6 +4584,7 @@ function readForm(u, root) {
       let s = el.value.trim();
       if (f.up && !el.dataset.nf) s = s.toUpperCase();
       if (f.pad && /^\d+$/.test(s)) s = s.padStart(f.pad, '0');
+      if (f.t === 'tel') s = normHp(s); else if (f.t === 'email') s = s.toLowerCase();
       v[f.k] = s;
     }
   });
@@ -4655,6 +4685,15 @@ VIEWS.form = async (p, main, alive) => {
   keuFormHook(e, frm, rec);
   if (e === 'surat_masuk') fwdHook(frm);
   orangHooks(frm, flds);
+  flds.filter(f => f.t === 'tel' || f.t === 'email').forEach(f => {
+    const el = $('#f_' + f.k, frm); if (!el || el.readOnly) return;
+    if (f.t === 'tel') { el.placeholder = '+628…'; if (el.value) el.value = normHp(el.value); }
+    else el.placeholder = 'nama@contoh.com';
+    const nt = document.createElement('span'); nt.className = 'hint err-t'; el.closest('.f').appendChild(nt);
+    const cek = () => { if (f.t === 'tel') el.value = normHp(el.value); else el.value = el.value.trim().toLowerCase();
+      const v = el.value; nt.textContent = !v ? '' : f.t === 'tel' ? (hpSah(v) ? '' : 'Nomor belum benar: harus +62 diikuti 7–13 angka.') : (emailSah(v) ? '' : 'Format email belum benar, contoh: nama@gmail.com'); };
+    el.addEventListener('blur', cek); el.addEventListener('change', cek);
+  });
   flds.filter(f => f.dd).forEach(f => ddHook(frm, f));
   S.vh.fileDel = t => {
     const k = t.dataset.k, box = t.closest('.fkeep');
@@ -4696,7 +4735,7 @@ VIEWS.form = async (p, main, alive) => {
         } else el.value = /^(nama|tempat_lahir|alamat)$/.test(k) ? tc(val) : val;
         n++;
       });
-      if (d.no_hp) ['hp', 'wa', 'telp', 'no_telp'].forEach(k => { const el = $('#f_' + pre + k, frm); if (el && !el.value.trim() && !el.readOnly) { el.value = d.no_hp; n++; } });
+      if (d.no_hp) ['hp', 'wa', 'telp', 'no_telp'].forEach(k => { const el = $('#f_' + pre + k, frm); if (el && !el.value.trim() && !el.readOnly) { el.value = normHp(d.no_hp); n++; } });
       note.textContent = n ? 'Cocok dengan Data Penduduk (' + tc(d.nama) + '): ' + n + ' kolom terisi otomatis.' : 'Cocok dengan Data Penduduk (' + tc(d.nama) + ').';
       hitungUmur();
       if ($('#f_nama', frm)) $('#f_nama', frm).dispatchEvent(new Event('change'));
@@ -4734,6 +4773,8 @@ VIEWS.form = async (p, main, alive) => {
     if (miss.length) { er.textContent = 'Lengkapi: ' + miss.map(f => f.l).join(', ') + '.'; er.hidden = false; $('#f_' + miss[0].k).focus(); return; }
     const bad = u.fields.find(f => f.len && val[f.k] && val[f.k].indexOf('•') < 0 && !new RegExp('^\\d{' + f.len + '}$').test(val[f.k]));
     if (bad) { er.textContent = bad.l + ' harus ' + bad.len + ' digit angka.'; er.hidden = false; $('#f_' + bad.k, frm) && $('#f_' + bad.k, frm).focus(); return; }
+    const kBad = flds.find(f => { const x = $('#f_' + f.k, frm), b = x && x.closest('.f'); if (!val[f.k] || !b || b.hidden || String(val[f.k]).indexOf('•') >= 0) return false; return f.t === 'tel' ? !hpSah(val[f.k]) : f.t === 'email' ? !emailSah(val[f.k]) : false; });
+    if (kBad) { er.textContent = kBad.t === 'tel' ? kBad.l + ' tidak sah: ketik 08… atau +628… (9–15 angka), otomatis menjadi +62….' : kBad.l + ' tidak sah. Contoh yang benar: nama@gmail.com'; er.hidden = false; $('#f_' + kBad.k, frm).focus(); return; }
     const dupF = flds.find(f => { const x = $('#f_' + f.k, frm); return x && x._dup; });
     const wErr = frm._wilCek && frm._wilCek(); if (wErr) { er.textContent = wErr; er.hidden = false; er.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
     if (dupF) { const o = $('#f_' + dupF.k, frm)._dup; er.textContent = 'Sudah ada ' + dupF.l + ' ini dengan nama ' + (o.nama || o.kepala || '') + '. ' + dupF.l + ' tidak boleh dobel.'; er.hidden = false; $('#f_' + dupF.k, frm).focus(); return; }
@@ -8448,7 +8489,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '169', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '170', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
