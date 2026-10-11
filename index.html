@@ -2170,7 +2170,13 @@ const isSbFile = id => /^(sb[12]|r2):/.test(String(id || ''));   /* berkas milik
 let _bersihTm = null;
 function bersihkanNanti() {
   if (!S.token) return; clearTimeout(_bersihTm);
-  _bersihTm = setTimeout(async () => { for (let i = 0; i < 4; i++) { try { const r = await callBerkas('bersihkan', {}); if (!r || !r.sisa || !r.hapus && !r.dipakai) break; } catch (e) { break; } } }, 3000);
+  _bersihTm = setTimeout(bersihkanSekarang, 3000);
+}
+/** proses antrean sampai habis (maks. 8 putaran × 25 berkas); hasil: jumlah & ukuran yang dihapus */
+async function bersihkanSekarang() {
+  let n = 0, b = 0;
+  for (let i = 0; i < 8; i++) { try { const r = await callBerkas('bersihkan', {}); if (!r) break; n += r.hapus || 0; b += r.ukuran || 0; if (!r.sisa || !r.hapus && !r.dipakai) break; } catch (e) { break; } }
+  return { n, b };
 }
 function callBerkas(action, p) {
   return fetch(BERKAS_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ action, token: S.token }, p || {})) })
@@ -3087,6 +3093,7 @@ async function boot() {
     S.faceOn = !!S.user.wajah;
     S.rkpYear = S.rkpYear || S.set.tahun_rkp || String(new Date().getFullYear() + 1);
     enter();
+    setTimeout(bersihkanNanti, 8000);   /* antrean berkas lepas dari perangkat lain / versi lama */
   } catch (e) { if (e.code !== 'AUTH') { loginCard(`<div class="err">${esc(e.message)}</div><button class="btn" onclick="boot()">Coba lagi</button>`); } }
 }
 
@@ -8573,7 +8580,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '178', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '179', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -8856,6 +8863,7 @@ function kuotaPeringatan(k) {
 }
 async function kuotaAmbil(paksa) {
   if (!paksa && S.kuota && Date.now() - S.kuota.at < 600000) return S.kuota.k;
+  try { await bersihkanSekarang(); } catch (e) { }
   const k = await callBerkas('kuota');
   S.kuota = { k, at: Date.now() };
   return k;
