@@ -1490,11 +1490,11 @@ const UI = {
     t: 'Sertifikat Aparatur', ic: 'badge', perm: 'tu_aparat', m: 'aparat', sub: 1, folder: 'TU/Aparat', file: 'dok_id', sort: 'tanggal',
     fields: [F('ref', '', 'hidden'), F('_h_ap', 'Aparatur', 'head'),
       F('dok_id', 'Foto / PDF sertifikat', 'file', { wide: 1, hint: 'Foto (kamera/galeri) atau PDF, maks. 25 MB' }),
-      F('nama', 'Nama kegiatan', 'text', { req: 1, wide: 1, hint: 'mis. Pelatihan Perpajakan dalam PBJ Desa' }),
+      F('nama', 'Nama kegiatan', 'text', { req: 1, wide: 1, listFrom: { e: 'aparat_sert', k: 'nama' }, fill: x => ({ jenis: x.jenis, penyelenggara: x.penyelenggara, tanggal: x.tanggal, tgl_selesai: x.tgl_selesai, metode: x.metode, tempat: x.tempat, jp: x.jp, berlaku: x.berlaku }), hint: 'Ketik atau pilih kegiatan yang pernah dicatat (mis. aparatur lain ikut pelatihan yang sama): penyelenggara, tanggal, tempat & JP ikut terisi' }),
       F('jenis', 'Jenis', 'select', { opt: SERT_JENIS, def: 'Pelatihan' }), F('peran', 'Sebagai', 'text', { def: 'Peserta', list: ['Peserta', 'Narasumber', 'Panitia', 'Moderator', 'Juara I', 'Juara II', 'Juara III', 'Harapan'] }),
-      F('penyelenggara', 'Penyelenggara', 'text', { wide: 1, list: ['Pemerintah Kabupaten Lumajang', 'DPMD Kabupaten Lumajang', 'Kecamatan Tempeh', 'BPSDM Provinsi Jawa Timur', 'Kementerian Desa PDT', 'Kementerian Dalam Negeri', 'BPS Kabupaten Lumajang'] }),
+      F('penyelenggara', 'Penyelenggara', 'text', { wide: 1, listFrom: { e: 'aparat_sert', k: 'penyelenggara' }, hint: 'Ketik atau pilih: penyelenggara yang pernah diisi muncul di daftar', list: ['Pemerintah Kabupaten Lumajang', 'DPMD Kabupaten Lumajang', 'Kecamatan Tempeh', 'BPSDM Provinsi Jawa Timur', 'Kementerian Desa PDT', 'Kementerian Dalam Negeri', 'BPS Kabupaten Lumajang'] }),
       F('nomor', 'Nomor sertifikat', 'text', { mono: 1 }), F('tanggal', 'Tanggal kegiatan', 'date'), F('tgl_selesai', 'Sampai tanggal', 'date', { hint: 'Kosongkan bila hanya 1 hari' }),
-      F('metode', 'Pelaksanaan', 'select', { opt: ['Luring (tatap muka)', 'Daring (online)', 'Campuran'] }), F('tempat', 'Tempat'), F('jp', 'Jumlah JP / jam', 'number', { hint: 'Jam pelajaran yang tertulis di sertifikat' }),
+      F('metode', 'Pelaksanaan', 'select', { opt: ['Luring (tatap muka)', 'Daring (online)', 'Campuran'] }), F('tempat', 'Tempat', 'text', { listFrom: { e: 'aparat_sert', k: 'tempat' } }), F('jp', 'Jumlah JP / jam', 'number', { hint: 'Jam pelajaran yang tertulis di sertifikat' }),
       F('berlaku', 'Berlaku sampai', 'date', { hint: 'Hanya untuk sertifikat yang punya masa berlaku (mis. sertifikat PBJ)' }), F('ket', 'Keterangan', 'text', { wide: 1 })],
     row: r => ({ t: r.nama, s: [r.peran, r.penyelenggara, r.tanggal ? fDate(r.tanggal) : ''].filter(Boolean).join(' · '), av: ic('badge'), file: r.dok_id, r: r.jp ? r.jp + ' JP' : '' }),
     print: { title: 'DAFTAR SERTIFIKAT APARATUR', land: 1, cols: [['Tanggal', r => fDate(r.tanggal)], ['Nama Kegiatan', 'nama'], ['Jenis', 'jenis'], ['Sebagai', 'peran'], ['Penyelenggara', 'penyelenggara'], ['Nomor', 'nomor'], ['JP', 'jp']] }
@@ -4652,7 +4652,7 @@ VIEWS.form = async (p, main, alive) => {
   if (e === 'register_surat') await muatJenisSurat();
   if (flds.some(f => f.gen) && !(p.buat || NASKAH[e] && NASKAH[e].ada(rec))) flds = flds.filter(f => !f.gen);
   if (p.buat && NASKAH[e]) flds = flds.filter(f => f.t !== 'file'); /* tombol Buat = menyusun naskah; unggah scan (berkas bertanda tangan) lewat Tambah/Ubah */
-  for (const f of flds.filter(f => f.listFrom)) { try { const r = await call('list', { entity: f.listFrom.e, limit: f.listFrom.limit || 2000 }); f._rows = r.rows; f._list = Array.from(new Set(r.rows.map(x => typeof f.listFrom.k === 'function' ? f.listFrom.k(x) : x[f.listFrom.k]).filter(Boolean))); } catch (x) { f._list = f._rows = []; } }
+  for (const f of flds.filter(f => f.listFrom)) { try { const r = await call('list', { entity: f.listFrom.e, limit: f.listFrom.limit || 2000 }); f._rows = r.rows; f._list = Array.from(new Set(r.rows.map(x => typeof f.listFrom.k === 'function' ? f.listFrom.k(x) : x[f.listFrom.k]).map(v => typeof v === 'string' ? v.trim() : v).filter(Boolean).sort((a, b) => String(a).localeCompare(String(b), 'id')).concat(f.list || []))); } catch (x) { f._list = f._rows = []; } }
   if (u.fields.some(f => f.t === 'sdgs') && !S.sdgs) { try { S.sdgs = (await call('list', { entity: 'ref_sdgs', limit: 50, desc: false })).rows; } catch (x) { S.sdgs = []; } }
   if (!alive()) return;
   main.innerHTML = `<form class="card stack" id="frm" novalidate>
@@ -8519,7 +8519,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '171', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '172', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
