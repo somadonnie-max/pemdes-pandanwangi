@@ -6968,7 +6968,7 @@ function sppTotal(r) { let a = []; try { a = JSON.parse(r.rincian || '[]'); } ca
 const rp = n => 'Rp ' + Number(n || 0).toLocaleString('id-ID', { maximumFractionDigits: 2 });
 const rpS = n => Number(n) < 0 ? '(' + rp(-Number(n)) + ')' : rp(n);
 const keuTh = () => S.keuTh = S.keuTh || String(new Date().getFullYear());
-const thChips = act => { const y = new Date().getFullYear(); return `<div class="chips">${[y, y - 1, y - 2].filter(v => v >= 2020).map(v => `<button class="chip ${keuTh() === String(v) ? 'on' : ''}" data-act="${act}" data-v="${v}">${v}</button>`).join('')}</div>`; };
+const thChips = act => { const y = new Date().getFullYear(); return `<div class="chips">${Array.from({ length: Math.max(1, y - 2020 + 1) }, (_, i) => y - i).map(v => `<button class="chip ${keuTh() === String(v) ? 'on' : ''}" data-act="${act}" data-v="${v}">${v}</button>`).join('')}</div>`; };
 /* ---------- Dashboard keuangan ---------- */
 const KEU_WARNA = { Pendapatan: 'pend', 'Penerimaan Pembiayaan': 'pemb', 'Pengeluaran Pembiayaan': 'pemb', Belanja: 'bel' };
 const KEU_MASUK = { Pendapatan: 1, 'Penerimaan Pembiayaan': 1, 'Pajak Dipungut': 1, 'Saldo Awal': 1, Belanja: -1, 'Pengeluaran Pembiayaan': -1, 'Pajak Disetor': -1 };
@@ -8767,7 +8767,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '185', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '186', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
