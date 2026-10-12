@@ -396,6 +396,7 @@ body.privblur #main,body.privblur #layer,body.privblur .tabs{filter:blur(18px);t
 .hint{font-size:10.5px;color:var(--muted)}
 details.sertbox>summary .btns{flex-wrap:nowrap;flex-shrink:0;align-items:center}details.sertbox>summary h2{min-width:0}details.sertbox>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px}details.sertbox>summary::-webkit-details-marker{display:none}details.sertbox>summary .chev{transition:transform .2s;width:18px;height:18px;color:var(--muted)}details.sertbox[open]>summary .chev{transform:rotate(180deg)}details.sertbox:not([open])>summary{opacity:.95}.smat{color:var(--pri)!important;font-weight:600}
 .sertbox .tx{display:flex;flex-direction:column;gap:1px;min-width:0}.sertbox .tx small{display:block;line-height:1.35}
+.spjbox .tx,.spjk .tx{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}.spjbox .tx small,.spjk .tx small{display:block;line-height:1.35}.spjbox .row>.btn,.spjk .row>.btn{flex-shrink:0}
 .sgrp{padding:8px 10px}.sgh{display:flex;align-items:center;gap:10px}.sgh .tx{flex:1;display:flex;flex-direction:column;min-width:0}.sgh .tx small{color:var(--muted)}.smr{margin-left:42px;width:auto!important;max-width:calc(100% - 42px);box-sizing:border-box;padding:6px 0 6px 10px!important;border-left:2px solid var(--pri-soft);gap:8px}.smr .tx{flex:1;min-width:0}.smr>.btn,.sgh>.btn{flex-shrink:0}.smr .tx b{font-weight:600;font-size:13px}
 .hint.err-t{color:var(--bad,#c0392b)}.hint.err-t:empty{display:none}a.kontak{display:inline-flex;align-items:center;gap:5px;color:var(--pri,#0b6);text-decoration:none;font-weight:600}a.kontak svg{width:14px;height:14px}a.kontak:hover{text-decoration:underline}
 .checks{display:flex;flex-wrap:wrap;gap:4px}
@@ -1306,6 +1307,9 @@ const KKA_UMUM = '400.10.2.2';
 const SERT_JENIS = ['Pelatihan', 'Bimbingan Teknis (Bimtek)', 'Workshop', 'Seminar / Webinar', 'Sosialisasi', 'Diklat', 'Uji Kompetensi / Sertifikasi', 'Lomba / Penghargaan', 'Lainnya'];
 const sertMateri = r => String((r && r.materi) || '').split(/\n+/).map(x => x.trim()).filter(Boolean);
 const SERT_SALIN = ['nama', 'jenis', 'peran', 'penyelenggara', 'tanggal', 'tgl_selesai', 'metode', 'tempat', 'berlaku'];
+const BUKTI_JENIS = ['Nota / Faktur / Kuitansi toko', 'Foto kegiatan / barang (0%, 50%, 100%)', 'Daftar hadir', 'Berita acara (serah terima / pemeriksaan)', 'Surat pesanan / perjanjian / kontrak', 'Daftar penerima / tanda terima', 'Bukti setor pajak (SSP / billing / NTPN)', 'Bukti transfer / CMS', 'SK / surat tugas', 'Lainnya'];
+/** kelengkapan dasar SPJ yang disarankan (Permendagri 20/2018) */
+const BUKTI_WAJIB = ['Nota / Faktur / Kuitansi toko', 'Foto kegiatan / barang (0%, 50%, 100%)'];
 const AP_ALASAN = ['Meninggal', 'Mengundurkan Diri', 'Pensiun (usia 60 tahun)', 'Berhenti / Diberhentikan'];
 /** alasan / jenis SK pemberhentian -> status aparatur */
 const apStatusDari = (jenis, alasan) => /pengunduran/i.test(jenis || '') || /mundur/i.test(alasan || '') ? 'Mengundurkan Diri' : /meninggal/i.test(alasan || '') ? 'Meninggal' : /pensiun/i.test(alasan || '') ? 'Pensiun' : 'Berhenti';
@@ -1877,7 +1881,25 @@ const UI = {
     views: [['Semua', () => ({})], ['Draf', () => ({ status: 'Draf' })], ['Disetujui', () => ({ status: 'Disetujui' })], ['Dicairkan', () => ({ status: 'Dicairkan' })]],
     row: r => ({ t: r.uraian, s: ['No. ' + (r.no || '-'), fDate(r.tanggal), r.kegiatan].filter(Boolean).join(' · '), r: fMoney(sppTotal(r)), pill: `<span class="pill ${r.status === 'Dicairkan' ? 'ok' : r.status === 'Disetujui' ? 'info' : ''}">${esc(r.status || 'Draf')}</span>` }),
     print: { title: 'REGISTER SURAT PERMINTAAN PEMBAYARAN (SPP)', land: 1, cols: [['No', 'no'], ['Tanggal', r => fDate(r.tanggal)], ['Kegiatan', 'kegiatan'], ['Uraian', 'uraian'], ['Jumlah', r => fMoney(sppTotal(r))], ['Status', 'status'], ['Tgl Cair', r => fDate(r.tgl_cair)]] }
+  },  keu_kwitansi: {
+    t: 'Kwitansi Pembayaran', ic: 'file', perm: 'keu_penatausahaan', sort: 'tanggal', year: 'tahun', folder: 'Keuangan/SPJ',
+    fields: [F('tahun', 'Tahun Anggaran', 'number', { req: 1, def: () => new Date().getFullYear() }), F('nomor', 'Nomor Kwitansi', 'text', { req: 1, mono: 1 }), F('tanggal', 'Tanggal', 'date'),
+      F('no_spp', 'Nomor SPP', 'text', { mono: 1 }), F('panjar', 'Panjar / Non Panjar', 'text', { list: ['Non Panjar', 'Panjar'] }), F('spj', 'Nomor SPJ (panjar)', 'text', { mono: 1 }),
+      F('kode_kegiatan', 'Kode Kegiatan', 'text', { mono: 1 }), F('kegiatan', 'Kegiatan', 'text', { wide: 1 }), F('rek', 'Kode Rekening', 'text', { wide: 1 }),
+      F('uraian', 'Uraian Pembayaran', 'text', { req: 1, wide: 1 }), F('jumlah', 'Jumlah (Rp)', 'money'),
+      F('penerima', 'Penerima', 'text', { wide: 1 }), F('npwp', 'NPWP', 'text', { mono: 1 }), F('bank', 'Bank'), F('rekening', 'No. Rekening', 'text', { mono: 1 }),
+      F('cms_tgl', 'Tanggal CMS', 'date'), F('cms_ref', 'No. Referensi CMS', 'text', { mono: 1 }), F('ref_spp', '', 'hidden'), F('ket', 'Keterangan', 'text', { wide: 1 })],
+    row: r => ({ t: r.uraian || r.nomor, s: [r.nomor, r.penerima, r.no_spp && 'SPP ' + r.no_spp].filter(Boolean).join(' · '), date: r.tanggal, r: fMoney(r.jumlah), mono: 0 }),
+    print: { title: 'REGISTER KWITANSI PEMBAYARAN', land: 1, cols: [['Tanggal', r => fDate(r.tanggal)], ['Nomor', 'nomor'], ['No. SPP', 'no_spp'], ['Uraian', 'uraian'], ['Penerima', r => esc([r.penerima, r.npwp && 'NPWP ' + r.npwp, [r.bank, r.rekening].filter(Boolean).join(' ')].filter(Boolean).join('<br>'))], ['Jumlah', r => fMoney(r.jumlah)]] }
   },
+  keu_bukti: {
+    t: 'Bukti Pendukung SPJ', ic: 'clip', perm: 'keu_penatausahaan', sub: 1, m: 'keu_spp', folder: 'Keuangan/SPJ', file: 'dok_id', sort: 'tanggal',
+    fields: [F('ref', '', 'hidden'), F('_h_spp', 'SPP', 'head'), F('jenis', 'Jenis bukti', 'select', { opt: BUKTI_JENIS, req: 1, def: 'Nota / Faktur / Kuitansi toko' }),
+      F('no_kwt', 'Untuk kwitansi', 'text', { mono: 1, hint: 'Kosongkan bila berlaku untuk seluruh SPP' }),
+      F('dok_id', 'Berkas (foto / PDF)', 'file', { wide: 1 }), F('tanggal', 'Tanggal', 'date', { def: isoToday }), F('ket', 'Keterangan', 'text', { wide: 1 })],
+    row: r => ({ t: r.jenis, s: [r.no_kwt && 'Kwitansi ' + r.no_kwt, r.ket].filter(Boolean).join(' · '), date: r.tanggal, file: r.dok_id, av: ic('clip') })
+  },
+
   kegiatan_berkas: {
     t: 'Berkas Kegiatan', ic: 'file', perm: 'kegiatan', sub: 1, folder: 'Kegiatan',
     fields: [F('jenis', 'Jenis', 'select', { opt: OPT.jenisBerkas }), F('ket', 'Keterangan'), F('file_id', 'Berkas', 'file')],
@@ -2135,7 +2157,7 @@ function MODS() {
     { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Buku NTCR', 'users', ['list', { e: 'ntcr' }], 'ntcr'], ['Formulir Adminduk', 'file', ['list', { e: 'adminduk' }], 'register_surat'], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
     { k: 'kesejahteraan', l: 'Kesejahteraan', ic: 'heart', items: [['Rekap Sosial', 'chart', ['sosrekap'], null, 'r:rentan'], ['Rentan / Sosial', 'heart', ['list', { e: 'rentan' }], 'rentan'], ['DTSEN Keluarga (SIKS-NG)', 'house', ['list', { e: 'dtsen' }], 'dtsen'], ['Usulan Bansos & DTSEN', 'send', ['list', { e: 'usulan_bansos' }], 'usulan_bansos'], ['Musdes/Muskel Bansos', 'users', ['list', { e: 'musdes_bansos' }], 'musdes_bansos'], ['Penyaluran Bansos', 'check', ['list', { e: 'penyaluran_bansos' }], 'penyaluran_bansos'], ['Lembaga / Yayasan', 'landmark', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru Ngaji', 'book', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
     { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RPJM Desa', 'book', ['rpjm', {}], null, 'r:rkp'], ['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['RAB & Gambar', 'hammer', ['rab', {}], null, 'r:rab'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Progres Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
-    { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Paket Kegiatan Dana Desa', 'box', ['list', { e: 'keu_paket' }], 'keu_paket'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['SPJ', 'check', ['spj', {}], null, 'r:spj'], ['Pengajuan ADD (Siltap & Dana Dusun)', 'send', ['addaju'], null, 'r:add'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Rekap Pajak', 'coin', ['keupajak'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek'], ['Impor PDF Siskeudes', 'down', ['skimpor'], null, 'w:keu_anggaran']] },
+    { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Paket Kegiatan Dana Desa', 'box', ['list', { e: 'keu_paket' }], 'keu_paket'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['Kwitansi & Bukti SPJ', 'clip', ['list', { e: 'keu_kwitansi' }], 'keu_kwitansi'], ['SPJ', 'check', ['spj', {}], null, 'r:spj'], ['Pengajuan ADD (Siltap & Dana Dusun)', 'send', ['addaju'], null, 'r:add'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Rekap Pajak', 'coin', ['keupajak'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek'], ['Impor PDF Siskeudes', 'down', ['skimpor'], null, 'w:keu_anggaran']] },
     { k: 'soon', l: 'Segera Hadir', ic: 'sprout', items: Object.keys(SOON).map(k => [SOON[k].t, SOON[k].ic, ['soon', { k }], null, '*', 1]) }
   ];
 }
@@ -4024,6 +4046,8 @@ async function renderDetail(e, x, el, full) {
   if (e === 'rpjm_gagasan' && canWrite(e) && x.status !== 'Masuk RPJM') xx.innerHTML = `<div class="btns"><button class="btn sm pri" data-act="rpjGagKeg" data-id="${esc(x.id)}">${ic('plus')}Jadikan kegiatan RPJM</button></div>`;
   if (e === 'pembangunan') await extraPembangunan(x, xx);
   if (e === 'petugas') await extraPetugas(x, xx);
+  if (e === 'keu_spp') await extraSppSpj(x, xx, canWrite('keu_bukti'));
+  if (e === 'keu_kwitansi') await extraKwtSpj(x, xx, canWrite('keu_bukti'));
   if (e === 'aparat') { extraAparat(x, xx, canWrite(e)); await extraAparatSK(x, xx, canWrite(e)); await extraAparatSert(x, xx, canWrite(e)); }
   if (e === 'tanah_desa' || e === 'tanah_sert') await extraTanah(e, x, xx);
   if (e === 'penduduk') xx.insertAdjacentHTML('afterbegin', mutasiHtml(x) + pendTombol(x));
@@ -4194,6 +4218,49 @@ async function extraAparatSK(x, el, w) {
     <div class="card stack" style="gap:6px">${mj.akhir || awal ? `<div><b>${esc(judul)}</b>${kurung ? ` <span class="meta">(${esc(kurung)})</span>` : ''}</div>` : '<div class="meta">Akhir masa jabatan belum dapat dihitung.</div>'}${status}${ket ? `<div class="meta">${esc(ket)}</div>` : ''}</div>
     ${L.length ? `<div class="list">${L.map(o => o.h).join('')}</div>` : '<div class="card meta">Belum ada riwayat SK. Tambahkan SK pengangkatan, pengangkatan kembali (mis. penyesuaian usia 60 tahun), atau pelantikan periode berikutnya.</div>'}</div>`);
 }
+/* =====================================================================
+   BERKAS SPJ (v182) — SPP ↔ kwitansi (dari Siskeudes) ↔ bukti pendukung (unggahan)
+   Alur desa: cetak SPP → bank (pencairan) → SPJ = SPP 1, SPP 2, SPTB, Kwitansi + bukti pendukung.
+   ===================================================================== */
+async function sppKwitansi(x) {
+  const r = await call('list', { entity: 'keu_kwitansi', filters: { tahun: String(x.tahun || '') }, limit: 2000 }).catch(() => ({ rows: [] }));
+  return (r.rows || []).filter(k => k.ref_spp === x.id || (k.no_spp && k.no_spp === x.no)).sort((a, b) => String(a.nomor).localeCompare(String(b.nomor)));
+}
+const buktiItem = b => `<div class="it"><div class="row" role="button" tabindex="0" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'keu_bukti', id: b.id }]))}'><span class="av">${ic('clip')}</span><span class="tx"><b>${esc(b.jenis || 'Bukti')}</b><small>${esc([b.no_kwt && 'Kwitansi ' + b.no_kwt, b.ket, b.tanggal && fDate(b.tanggal)].filter(Boolean).join(' · '))}</small></span>${b.dok_id ? `<button class="btn sm" data-act="file" data-id="${esc(b.dok_id)}" data-name="${esc(b.jenis || 'Bukti')}">${ic('eye')}Lihat</button>` : ''}</div></div>`;
+async function extraSppSpj(x, el, w) {
+  const [kw, bk] = await Promise.all([sppKwitansi(x), call('list', { entity: 'keu_bukti', filters: { ref: x.id }, limit: 300 }).then(r => r.rows || []).catch(() => [])]);
+  const tot = kw.reduce((t, k) => t + mNum(k.jumlah), 0);
+  const ada = j => bk.some(b => b.jenis === j), kurang = BUKTI_WAJIB.filter(j => !ada(j));
+  const kItem = k => { const nb = bk.filter(b => b.no_kwt === k.nomor).length; return `<div class="it"><div class="row" role="button" tabindex="0" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'keu_kwitansi', id: k.id }]))}'><span class="av">${ic('file')}</span><span class="tx"><b>${esc(k.uraian || k.nomor)}</b><small>${esc([k.nomor, k.penerima, [k.bank, k.rekening].filter(Boolean).join(' ')].filter(Boolean).join(' · '))}</small><small>${esc([k.rek, nb ? nb + ' bukti' : ''].filter(Boolean).join(' · '))}</small></span><span class="num">${fMoney(k.jumlah)}</span></div></div>`; };
+  const tambah = (o, l) => w ? `<button class="btn sm" data-act="addSub" data-e="keu_bukti" data-p='${esc(JSON.stringify(Object.assign({ ref: x.id }, o || {})))}'>${ic('plus')}${l || 'Bukti'}</button>` : '';
+  el.insertAdjacentHTML('beforeend', `<div class="stack spjbox">
+    <div class="sec-h"><h2>${ic('file')} Kwitansi (${kw.length})</h2><span class="meta">${kw.length ? 'Rp ' + addRp(tot) : ''}</span></div>
+    ${kw.length ? `<div class="list">${kw.map(kItem).join('')}</div>` : '<div class="card meta">Belum ada kwitansi. Impor <b>Register Kwitansi Pembayaran</b> dan <b>Register SPP/SPJ - Kwitansi</b> dari Siskeudes (Keuangan → Impor PDF Siskeudes).</div>'}
+    <div class="sec-h"><h2>${ic('clip')} Bukti pendukung (${bk.length})</h2>${tambah()}</div>
+    ${kurang.length ? `<div class="card meta">${ic('x')} Belum ada: ${kurang.map(esc).join(', ')}.</div>` : bk.length ? `<div class="card meta">${ic('check')} Bukti dasar sudah lengkap.</div>` : ''}
+    ${bk.length ? `<div class="list">${bk.sort((a, b) => String(a.no_kwt || '').localeCompare(String(b.no_kwt || '')) || String(a.jenis).localeCompare(String(b.jenis))).map(buktiItem).join('')}</div>` : ''}
+  </div>`);
+}
+async function extraKwtSpj(x, el, w) {
+  let sp = null; try { if (x.ref_spp) sp = await call('get', { entity: 'keu_spp', id: x.ref_spp }); } catch (er) { }
+  if (!sp && x.no_spp) { try { sp = ((await call('list', { entity: 'keu_spp', filters: { tahun: String(x.tahun) }, limit: 2000 })).rows || []).find(s => s.no === x.no_spp) || null; } catch (er) { } }
+  const bk = sp ? ((await call('list', { entity: 'keu_bukti', filters: { ref: sp.id }, limit: 300 }).catch(() => ({ rows: [] }))).rows || []).filter(b => !b.no_kwt || b.no_kwt === x.nomor) : [];
+  el.insertAdjacentHTML('beforeend', `<div class="stack spjk">
+    ${sp ? `<div class="btns"><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'keu_spp', id: sp.id }]))}'>${ic('file')}SPP ${esc(sp.no || '')}</button></div>` : '<div class="card meta">SPP-nya belum ada di aplikasi. Impor Register SPP dari Siskeudes.</div>'}
+    <div class="sec-h"><h2>${ic('clip')} Bukti pendukung (${bk.length})</h2>${sp && w ? `<button class="btn sm" data-act="addSub" data-e="keu_bukti" data-p='${esc(JSON.stringify({ ref: sp.id, no_kwt: x.nomor }))}'>${ic('plus')}Bukti</button>` : ''}</div>
+    ${bk.length ? `<div class="list">${bk.map(buktiItem).join('')}</div>` : '<div class="card meta">Belum ada bukti untuk kwitansi ini.</div>'}</div>`);
+}
+/* form bukti: info SPP di atas, pilihan nomor kwitansi SPP itu */
+function buktiHook(frm) {
+  const ref = ($('#f_ref', frm) || {}).value, hd = $('#f__h_spp', frm), nk = $('#f_no_kwt', frm); if (!ref) { if (hd) hd.hidden = true; return; }
+  call('get', { entity: 'keu_spp', id: ref }).then(async sp => {
+    if (!sp) return;
+    if (hd) hd.innerHTML = `<b>${esc(sp.no || '')}</b><span class="hint">${esc(sp.uraian || '')} · ${fMoney(sppTotal(sp))}</span>`;
+    const kw = await sppKwitansi(sp);
+    if (nk && kw.length) ddAttach(nk, kw.map(k => k.nomor));
+  }).catch(() => { });
+}
+
 /** detail aparatur: daftar sertifikat (banyak per orang), terbaru di atas */
 async function extraAparatSert(x, el, w) {
   let rs = []; try { rs = (await call('list', { entity: 'aparat_sert', filters: { ref: x.id }, limit: 200 })).rows || []; } catch (er) { }
@@ -4798,6 +4865,7 @@ VIEWS.form = async (p, main, alive) => {
   if (e === 'register_surat') { suketCariHook(frm); kkaHook(frm); ttdHook(frm); }
   if (e === 'aparat_sk') apSkHook(frm, p, rec);
   if (e === 'aparat_sert') apSertHook(frm);
+  if (e === 'keu_bukti') buktiHook(frm);
   if (e === 'aparat') apHook(frm, p, rec);
   namaHooks(frm, e, flds);
   /* NIK -> isi otomatis dari Data Penduduk (hanya kolom yang masih kosong) */
@@ -8581,7 +8649,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '181', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '182', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -12879,6 +12947,8 @@ function skJenis(lines) {
   const h = lines.slice(0, 30).map(l => l.s).join(' ').toUpperCase();
   if (/PARAMETER REKENING/.test(h)) return 'rek';
   if (/RENCANA ANGGARAN (BIAYA|PENDAPATAN|PEMBIAYAAN)|RINCIAN ANGGARAN/.test(h)) return 'rab';
+  if (/REGISTER SPP\s*\/\s*SPJ\s*-?\s*KWITANSI/.test(h)) return 'sppkwt';
+  if (/REGISTER KWITANSI PEMBAYARAN/.test(h)) return 'kwt';
   if (/BUKU KAS PEMBANTU KEGIATAN/.test(h)) return 'bkp';
   if (/BUKU KAS UMUM/.test(h)) return 'bku';
   if (/REGISTER PENCAIRAN/.test(h)) return 'cair';
@@ -12983,9 +13053,51 @@ function skParseBkp(lines) {
   }
   return R;
 }
+/* Register Kwitansi Pembayaran: nomor, tanggal, uraian, jumlah + Penerima / NPWP / Bank / No. Rek di baris-baris bawahnya */
+function skParseKwt(lines) {
+  const R = {}; let cur = null, uX = 0;
+  const isi = t => String(t || '').replace(/^[:\s]+/, '').replace(/^\.{3,}$/, '').replace(/^-$/, '').trim();
+  for (const l of lines) {
+    const s = l.s, m = s.match(/Nomor\s*:\s*(\S+\/KWT\/\S+)/i);
+    if (m) {
+      const c = l.c, ni = c.map((x, j) => SK_NUM.test(x.t) ? j : -1).filter(j => j >= 0).pop();
+      const ki = c.findIndex(x => /\/KWT\//i.test(x.t)), tg = (s.match(/\d{2}\/\d{2}\/\d{4}/) || [])[0];
+      const ur = c.slice(ki + 1, ni >= 0 ? ni : undefined).map(x => x.t).join(' ');
+      uX = c[ki + 1] ? c[ki + 1].x - 2 : 0;
+      cur = R[m[1]] = { nomor: m[1], tanggal: skTgl(tg), uraian: ur, jumlah: ni >= 0 ? skNum(c[ni].t) : 0, penerima: '', npwp: '', bank: '', rekening: '' };
+      continue;
+    }
+    if (!cur) continue;
+    if (/^Jumlah\b|KAUR KEUANGAN|BENDAHARA|^[A-Z ]+,\s*\d{2} \w+ \d{4}/i.test(s)) { cur = null; continue; }
+    if (/^Printed by|^Halaman|Periode \d|^NO\.|^\d\s+2\s+3/i.test(s)) { if (/^Printed by/i.test(s)) cur = null; continue; }
+    const kiri = l.c.filter(x => !uX || x.x < uX).map(x => x.t).join(' '), kanan = l.c.filter(x => uX && x.x >= uX).map(x => x.t).join(' ');
+    const f = kiri.match(/^(Penerima|NPWP|Bank|No\.?\s*Rek)\s*:?\s*(.*)$/i);
+    if (f) { const k = /^pen/i.test(f[1]) ? 'penerima' : /^npwp/i.test(f[1]) ? 'npwp' : /^bank/i.test(f[1]) ? 'bank' : 'rekening'; cur[k] = isi(f[2]); }
+    if (kanan && !SK_NUM.test(kanan)) cur.uraian = (cur.uraian + ' ' + kanan).trim();
+  }
+  return R;
+}
+/* Register SPP / SPJ - Kwitansi: nomor kwitansi -> nomor SPP, SPJ, kode kegiatan & rekening, jumlah, status CMS */
+function skParseSppKwt(lines) {
+  const R = {}; let cur = null;
+  for (const l of lines) {
+    const c = l.c.map(x => x.t), ki = c.findIndex(t => /\/KWT\//i.test(t));
+    if (ki >= 0) {
+      const si = c.findIndex(t => /\/SPP\//i.test(t)), kg = c.find(t => /^\d{2}\.\d{4}\.\d{2}\.\d{2}\.\d{2}\.?$/.test(t)) || '';
+      const tg = c.filter(t => /^\d{2}\/\d{2}\/\d{4}$/.test(t)), ni = c.findIndex((t, j) => j > ki && SK_NUM.test(t));
+      const spj = si >= 0 && c[si + 1] && !/^\d{2}\./.test(c[si + 1]) ? c[si + 1] : '';
+      const p = kg.replace(/\.$/, '').split('.'), keg = p.length === 5 && p.slice(2).some(x => Number(x)) ? skKeg(p.slice(2).join('.')) : '';
+      const ref = c.slice(ni + 1).filter(t => !/^\d{2}\/\d{2}\/\d{4}$/.test(t)).join(' ');
+      cur = R[c[ki]] = { nomor: c[ki], no_spp: si >= 0 ? c[si] : '', spj: /non\s*panjar/i.test(spj) ? '' : spj, panjar: /non\s*panjar/i.test(spj) ? 'Non Panjar' : (spj ? 'Panjar' : ''), kode_kegiatan: keg, rek: '', tanggal: skTgl(tg[0]), jumlah: ni >= 0 ? skNum(c[ni]) : 0, cms_tgl: skTgl(tg[1]), cms_ref: ref };
+      continue;
+    }
+    if (cur && !cur.rek) { const r = c.find(t => /^[456]\.\d+\.\d+\.\d+\.?$/.test(t)); if (r) cur.rek = r.replace(/\.$/, ''); }
+  }
+  return R;
+}
 /* gabungkan semua berkas → rekaman aplikasi */
 function skSusun(P, rekNama) {
-  const out = { keu_rek: [], keu_anggaran: [], keu_spp: [], keu_trans: [] }, warn = [];
+  const out = { keu_rek: [], keu_anggaran: [], keu_spp: [], keu_trans: [], keu_kwitansi: [] }, warn = [];
   const nm = k => rekNama[k] || '';
   P.filter(p => p.jenis === 'rek').forEach(p => p.rows.forEach(r => { out.keu_rek.push(r); rekNama[r.kode] = r.uraian; }));
   P.filter(p => p.jenis === 'rab').forEach(p => p.rows.forEach(r => { const k = r.rek.split(' ')[0]; if (!rekNama[k] && r.rek.indexOf(' ') > 0) rekNama[k] = r.rek.slice(k.length + 1); out.keu_anggaran.push(Object.assign({ tahun: p.tahun }, r)); }));
@@ -13021,6 +13133,14 @@ function skSusun(P, rekNama) {
     if (kg) Object.assign(d, { kegiatan: kg.nama, kode_kegiatan: kg.kode });
     out.keu_spp.push(d);
   });
+  /* kwitansi: gabungan Register Kwitansi (penerima, NPWP, bank) + Register SPP/SPJ-Kwitansi (SPP, kegiatan, rekening) */
+  const kw = Object.assign({}, ...P.filter(p => p.jenis === 'kwt').map(p => p.rows)), sk = Object.assign({}, ...P.filter(p => p.jenis === 'sppkwt').map(p => p.rows));
+  const kegNama = {}; Object.values(kegM).forEach(k => { kegNama[k.kode] = k.nama; });
+  Object.keys(Object.assign({}, kw, sk)).forEach(no => {
+    const a = kw[no] || {}, b = sk[no] || {}, rk = b.rek ? b.rek + (nm(b.rek) ? ' ' + nm(b.rek) : '') : '';
+    out.keu_kwitansi.push({ tahun: th, nomor: no, tanggal: a.tanggal || b.tanggal || '', no_spp: b.no_spp || '', panjar: b.panjar || '', spj: b.spj || '', kode_kegiatan: b.kode_kegiatan || '', kegiatan: kegNama[b.kode_kegiatan] || '', rek: rk,
+      uraian: a.uraian || '', jumlah: skAmt(a.jumlah || b.jumlah || 0), penerima: a.penerima || '', npwp: a.npwp || '', bank: a.bank || '', rekening: a.rekening || '', cms_tgl: b.cms_tgl || '', cms_ref: b.cms_ref || '' });
+  });
   return { out, warn };
 }
 /* kunci pencocokan supaya impor ulang tidak menggandakan data */
@@ -13028,12 +13148,13 @@ const SK_KEY = {
   keu_rek: r => r.kode,
   keu_anggaran: r => [r.tahun, String(r.rek || '').split(' ')[0], r.kode_kegiatan || '', String(r.uraian || '').toLowerCase().replace(/\s+/g, ' ').trim()].join('|'),
   keu_spp: r => [r.tahun, r.no].join('|'),
+  keu_kwitansi: r => [r.tahun, r.nomor].join('|'),
   keu_trans: r => [r.tahun, r.tanggal, r.jenis, r.no_bukti || '', String(r.rek || '').split(' ')[0], skAmt(Number(r.jumlah) || 0), r.pajak || ''].join('|')
 };
 async function skSimpan(out, lapor) {
   const hasil = {};
   const ambil = async (e, f) => { let rows = [], off = 0; for (;;) { const r = await call('list', { entity: e, filters: f || {}, limit: 2000, offset: off }); rows = rows.concat(r.rows || []); off += (r.rows || []).length; if (!(r.rows || []).length || off >= (r.total || 0)) break; } return rows; };
-  const tahun = (out.keu_anggaran[0] || out.keu_trans[0] || out.keu_spp[0] || {}).tahun;
+  const tahun = (out.keu_anggaran[0] || out.keu_trans[0] || out.keu_spp[0] || out.keu_kwitansi[0] || {}).tahun;
   const tandai = (e, rows, ada) => { const pakai = {}, idx = {}; ada.forEach(a => { const k = SK_KEY[e](a); (idx[k] = idx[k] || []).push(a.id); });
     return rows.map(r => { const k = SK_KEY[e](r), n = pakai[k] = (pakai[k] || 0) + 1, id = (idx[k] || [])[n - 1]; const o = Object.assign({}, r); if (id) o.id = id; return o; }); };
   const kirim = async (e, rows) => { let t = 0, u = 0, g = []; for (let i = 0; i < rows.length; i += 200) { lapor('Menyimpan ' + e.replace('keu_', '') + ' ' + Math.min(i + 200, rows.length) + '/' + rows.length + '…'); const r = await call('bulkSave', { entity: e, rows: rows.slice(i, i + 200).map((x, j) => Object.assign({ _baris: String(i + j + 1) }, x)) }); t += r.tambah; u += r.ubah; g = g.concat(r.gagal || []); } hasil[e] = { tambah: t, ubah: u, gagal: g }; };
@@ -13045,9 +13166,15 @@ async function skSimpan(out, lapor) {
     const tr = out.keu_trans.map(t => { const o = Object.assign({}, t); if (o._spp && sppId[o._spp]) o.ref_spp = sppId[o._spp]; delete o._spp; return o; });
     await kirim('keu_trans', tandai('keu_trans', tr, await ambil('keu_trans', { tahun })));
   }
+  if (out.keu_kwitansi.length) {
+    const sppId = {}; (await ambil('keu_spp', { tahun })).forEach(s => { sppId[s.no] = s.id; });
+    const kgN = {}; (await ambil('keu_anggaran', { tahun })).forEach(a => { if (a.kode_kegiatan && a.kegiatan) kgN[a.kode_kegiatan] = a.kegiatan; });
+    const kw = out.keu_kwitansi.map(k => Object.assign({}, k, sppId[k.no_spp] ? { ref_spp: sppId[k.no_spp] } : {}, !k.kegiatan && kgN[k.kode_kegiatan] ? { kegiatan: kgN[k.kode_kegiatan] } : {}));
+    await kirim('keu_kwitansi', tandai('keu_kwitansi', kw, await ambil('keu_kwitansi', { tahun })));
+  }
   return hasil;
 }
-const SK_NAMA = { rek: 'Parameter Rekening', rab: 'Rincian Anggaran (RAB/APBDes)', bku: 'Buku Kas Umum', cair: 'Register SPP - Pencairan', spp: 'Register SPP Pengeluaran', bkp: 'Buku Kas Pembantu Kegiatan' };
+const SK_NAMA = { kwt: 'Register Kwitansi Pembayaran', sppkwt: 'Register SPP/SPJ - Kwitansi', rek: 'Parameter Rekening', rab: 'Rincian Anggaran (RAB/APBDes)', bku: 'Buku Kas Umum', cair: 'Register SPP - Pencairan', spp: 'Register SPP Pengeluaran', bkp: 'Buku Kas Pembantu Kegiatan' };
 /* =====================================================================
    PAKET DESA BARU — membuat berkas SQL database kosong untuk desa lain
    (struktur + data referensi umum, tanpa data desa ini)
@@ -13972,7 +14099,7 @@ VIEWS.skimpor = async (p, main) => {
   main.innerHTML = `<div class="stack">
     <div class="card stack"><div class="sec-h" style="margin:0"><h2>${ic('down')} Impor laporan PDF Siskeudes</h2></div>
       <div class="meta">Di Siskeudes buka laporan → <b>Cetak</b> → pilih printer <b>Microsoft Print to PDF</b> → simpan. Pilih beberapa PDF sekaligus di bawah; aplikasi mengenali jenisnya otomatis. Data tahun yang sama dicocokkan, jadi impor ulang memperbarui data, tidak menggandakan.</div>
-      <div class="sk-daftar">${[['Parameter Rekening APB Desa', 'Laporan → Parameter → Rekening', 'kode rekening'], ['RAB 1 - Rincian Anggaran Pendapatan / Belanja / Pembiayaan', 'Laporan → Anggaran (murni atau perubahan)', 'APBDes'], ['Buku Kas Umum', 'Laporan → Penatausahaan → Buku Kas Umum (sumber dana dikosongkan)', 'penerimaan, belanja, pajak, mutasi kas'], ['Register SPP - Pencairan', 'Laporan → Penatausahaan', 'SPP & tanggal cair'], ['Register SPP Pengeluaran', 'Laporan → Penatausahaan', 'uraian SPP'], ['Buku Kas Pembantu Kegiatan', 'Laporan → Penatausahaan', 'kegiatan tiap SPP/belanja']].map((x, i) => `<div><b>${i + 1}. ${esc(x[0])}</b><span class="meta">${esc(x[1])} · mengisi ${esc(x[2])}</span></div>`).join('')}</div>
+      <div class="sk-daftar">${[['Parameter Rekening APB Desa', 'Laporan → Parameter → Rekening', 'kode rekening'], ['RAB 1 - Rincian Anggaran Pendapatan / Belanja / Pembiayaan', 'Laporan → Anggaran (murni atau perubahan)', 'APBDes'], ['Buku Kas Umum', 'Laporan → Penatausahaan → Buku Kas Umum (sumber dana dikosongkan)', 'penerimaan, belanja, pajak, mutasi kas'], ['Register SPP - Pencairan', 'Laporan → Penatausahaan', 'SPP & tanggal cair'], ['Register SPP Pengeluaran', 'Laporan → Penatausahaan', 'uraian SPP'], ['Buku Kas Pembantu Kegiatan', 'Laporan → Penatausahaan', 'kegiatan tiap SPP/belanja'], ['Register Kwitansi Pembayaran', 'Laporan → Penatausahaan', 'kwitansi: penerima, NPWP, bank, no. rekening'], ['Register SPP/SPJ - Kwitansi Pembayaran', 'Laporan → Penatausahaan', 'hubungan kwitansi ↔ SPP, kegiatan & rekening']].map((x, i) => `<div><b>${i + 1}. ${esc(x[0])}</b><span class="meta">${esc(x[1])} · mengisi ${esc(x[2])}</span></div>`).join('')}</div>
       <div class="meta">Urutan terbaik: impor sekaligus semua PDF satu tahun anggaran. Minimal RAB (untuk APBDes) dan Buku Kas Umum (untuk realisasi).</div>
       <label class="btn pri" style="align-self:flex-start">${ic('file')}Pilih PDF Siskeudes<input type="file" id="skF" accept="application/pdf,.pdf" multiple hidden data-nolimit></label>
       <div id="skSt" class="meta"></div></div>
@@ -13994,12 +14121,13 @@ VIEWS.skimpor = async (p, main) => {
           ${out.keu_rek.length ? `<tr><td>Kode rekening</td><td class="r">${out.keu_rek.length}</td><td></td></tr>` : ''}
           ${ang.length ? `<tr><td>Rincian APBDes</td><td class="r">${ang.length}</td><td class="r">Pendapatan ${fMoney(sum(ak('4'), 'jumlah_pak') || sum(ak('4'), 'jumlah'))}<br>Belanja ${fMoney(sum(ak('5'), 'jumlah_pak') || sum(ak('5'), 'jumlah'))}<br>Pembiayaan ${fMoney(sum(ak('6'), 'jumlah_pak') || sum(ak('6'), 'jumlah'))}</td></tr>` : ''}
           ${out.keu_spp.length ? `<tr><td>SPP (status Dicairkan)</td><td class="r">${out.keu_spp.length}</td><td></td></tr>` : ''}
+          ${out.keu_kwitansi.length ? `<tr><td>Kwitansi</td><td class="r">${out.keu_kwitansi.length}</td><td class="r">${fMoney(sum(out.keu_kwitansi, 'jumlah'))}<br>${out.keu_kwitansi.filter(k => k.penerima).length} dengan nama penerima · ${out.keu_kwitansi.filter(k => k.no_spp).length} terhubung ke SPP</td></tr>` : ''}
           ${out.keu_trans.length ? `<tr><td>Transaksi kas</td><td class="r">${out.keu_trans.length}</td><td class="r">Pendapatan ${fMoney(sum(jn('Pendapatan'), 'jumlah'))}<br>Belanja ${fMoney(sum(jn('Belanja'), 'jumlah'))}<br>Pajak dipungut ${fMoney(sum(jn('Pajak Dipungut'), 'jumlah'))} · disetor ${fMoney(sum(jn('Pajak Disetor'), 'jumlah'))}</td></tr>` : ''}
           ${saldo != null ? `<tr><td>Saldo akhir menurut BKU</td><td></td><td class="r"><b>${fMoney(saldo)}</b></td></tr>` : ''}
         </tbody></table>
         ${out.keu_trans.length && !P.some(p => p.jenis === 'bkp') ? '<div class="meta">Tanpa <b>Buku Kas Pembantu Kegiatan</b>, belanja tidak terhubung ke kegiatan (Laporan Realisasi per kegiatan jadi tidak lengkap).</div>' : ''}
         ${w.length ? `<details><summary class="meta">${w.length} catatan/peringatan</summary><div class="meta" style="max-height:200px;overflow:auto">${w.slice(0, 200).map(esc).join('<br>')}</div></details>` : ''}
-        <div class="btns"><button class="btn pri" data-act="skSimpan" ${tahun.length > 1 || !(ang.length + out.keu_trans.length + out.keu_spp.length + out.keu_rek.length) ? 'disabled' : ''}>${ic('check')}Simpan ke aplikasi</button></div></div>
+        <div class="btns"><button class="btn pri" data-act="skSimpan" ${tahun.length > 1 || !(ang.length + out.keu_trans.length + out.keu_spp.length + out.keu_rek.length + out.keu_kwitansi.length) ? 'disabled' : ''}>${ic('check')}Simpan ke aplikasi</button></div></div>
       ${st.hasil ? `<div class="card stack"><div class="lbl">Hasil impor</div>${Object.entries(st.hasil).map(([e, r]) => `<div>${esc(e.replace('keu_', '').replace('anggaran', 'APBDes'))}: <b>${r.tambah}</b> baru, <b>${r.ubah}</b> diperbarui${r.gagal.length ? `, <span style="color:var(--bad)">${r.gagal.length} gagal</span> <span class="meta">(${esc(r.gagal.slice(0, 3).map(g => 'baris ' + g.baris + ': ' + g.pesan).join('; '))})</span>` : ''}</div>`).join('')}
         <div class="btns"><button class="btn sm" data-act="go" data-go='["list",{"e":"keu_anggaran"}]'>APBDes</button><button class="btn sm" data-act="go" data-go='["keubuku"]'>Buku Kas</button><button class="btn sm" data-act="go" data-go='["keulap"]'>Laporan Realisasi</button></div></div>` : ''}</div>`;
   };
@@ -14016,6 +14144,8 @@ VIEWS.skimpor = async (p, main) => {
         else if (j === 'cair') o.rows = skParseCair(L);
         else if (j === 'spp') o.rows = skParseSpp(L);
         else if (j === 'bkp') o.rows = skParseBkp(L);
+        else if (j === 'kwt') o.rows = skParseKwt(L);
+        else if (j === 'sppkwt') o.rows = skParseSppKwt(L);
         o.n = Array.isArray(o.rows) ? o.rows.length : Object.keys(o.rows).length;
         st.P = st.P.filter(x => x.nama !== f.name).concat(o);
       } catch (x) { st.P.push({ nama: f.name, jenis: '', rows: [], n: 0, warn: [x.message] }); }
