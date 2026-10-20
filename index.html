@@ -4073,7 +4073,7 @@ async function renderDetail(e, x, el, full) {
     <div class="xk"></div>
     ${geo ? mapHtml(geo, 'Lokasi ' + (u.row(x).t || '')) : ''}
     <div class="xx"></div>
-    <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button>${/^tanah_/.test(e) && !S.user.admin ? '' : `<button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>`}` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak (tanpa QR)</button>` : ''}${e === 'keu_spp' ? `<button class="btn sm" data-act="sppWord" data-id="${esc(x.id)}">${ic('file')}SPP + SPTJM (Word)</button><button class="btn sm" data-act="kuitansi" data-id="${esc(x.id)}">${ic('print')}Cetak kuitansi</button>` : ''}${e === 'keu_spp' && w && x.status !== 'Dicairkan' ? `<button class="btn sm pri" data-act="keuCair" data-id="${esc(x.id)}">${ic('check')}Cairkan</button>` : ''}${e === 'keu_spp' && w && x.status === 'Dicairkan' ? `<button class="btn sm danger" data-act="keuBatal" data-id="${esc(x.id)}">${ic('x')}Batalkan pencairan</button>` : ''}${e === 'keu_trans' && w && x.jenis === 'Pajak Dipungut' ? `<button class="btn sm" data-act="setorPajak" data-id="${esc(x.id)}">${ic('send')}Setor pajak</button>` : ''}${NASKAH[e] && (w || e === 'surat_keluar') && !(e === 'surat_keluar' && !skAdaDraf(x)) ? `<button class="btn sm" data-act="cetakNaskah" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic(e === 'surat_keluar' ? 'eye' : 'print')}${e === 'surat_keluar' ? 'Lihat Draf' : 'Buat dokumen (Word)'}</button>` : ''}${e === 'surat_keluar' && w && skDraf(x) ? `<button class="btn sm pri" data-act="skSetuju" data-id="${esc(x.id)}">${ic('check')}Disetujui</button>` : ''}${e === 'surat_keluar' && w && x.status === 'Disetujui' && !x.dok_id ? `<button class="btn sm" data-act="skSetuju" data-id="${esc(x.id)}" data-pdf="1">${ic('plus')}Unggah PDF bertanda tangan</button>` : ''}${e === 'surat_masuk' && x.jenis === 'Surat Undangan' && x.acara_tgl && !(/Agenda/.test(x.terusan || '') && !x.agenda_id) ? (x.agenda_id ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'kegiatan', id: x.agenda_id }]))}'>${ic('cal')}Lihat di Agenda</button>` : canWrite('kegiatan') && w ? `<button class="btn sm" data-act="smAgenda" data-id="${esc(x.id)}">${ic('cal')}Masukkan ke Agenda</button>` : '') : ''}${e === 'kegiatan' && w && kgBisaSelesai(x) ? `<button class="btn sm pri" data-act="kgSelesai" data-id="${esc(x.id)}">${ic('check')}Selesai</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>`;
+    <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button>${/^tanah_/.test(e) && !S.user.admin ? '' : `<button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>`}` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak (tanpa QR)</button>` : ''}${e === 'keu_spp' ? `<button class="btn sm" data-act="sppWord" data-id="${esc(x.id)}">${ic('file')}SPP + SPTJM (Word)</button><button class="btn sm" data-act="kuitansi" data-id="${esc(x.id)}">${ic('print')}Cetak kuitansi</button>` : ''}${e === 'keu_spp' && w && x.status !== 'Dicairkan' ? `<button class="btn sm pri" data-act="keuCair" data-id="${esc(x.id)}">${ic('check')}Cairkan</button>` : ''}${e === 'keu_spp' && w && x.status === 'Dicairkan' ? `<button class="btn sm danger" data-act="keuBatal" data-id="${esc(x.id)}">${ic('x')}Batalkan pencairan</button>` : ''}${e === 'keu_trans' && w && x.jenis === 'Pajak Dipungut' ? `<button class="btn sm" data-act="setorPajak" data-id="${esc(x.id)}">${ic('send')}Setor pajak</button>` : ''}${NASKAH[e] && (w || e === 'surat_keluar') && !(e === 'surat_keluar' && !skAdaDraf(x)) ? `<button class="btn sm" data-act="cetakNaskah" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic(e === 'surat_keluar' ? 'eye' : 'print')}${e === 'surat_keluar' ? 'Lihat Draf' : 'Buat dokumen (Word)'}</button>` : ''}${e === 'surat_keluar' && x.jenis === 'Surat Tugas' ? `<button class="btn sm" data-act="sppdBuat" data-id="${esc(x.id)}">${ic('send')}Buat SPPD</button>` : ''}${e === 'surat_keluar' && w && skDraf(x) ? `<button class="btn sm pri" data-act="skSetuju" data-id="${esc(x.id)}">${ic('check')}Disetujui</button>` : ''}${e === 'surat_keluar' && w && x.status === 'Disetujui' && !x.dok_id ? `<button class="btn sm" data-act="skSetuju" data-id="${esc(x.id)}" data-pdf="1">${ic('plus')}Unggah PDF bertanda tangan</button>` : ''}${e === 'surat_masuk' && x.jenis === 'Surat Undangan' && x.acara_tgl && !(/Agenda/.test(x.terusan || '') && !x.agenda_id) ? (x.agenda_id ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'kegiatan', id: x.agenda_id }]))}'>${ic('cal')}Lihat di Agenda</button>` : canWrite('kegiatan') && w ? `<button class="btn sm" data-act="smAgenda" data-id="${esc(x.id)}">${ic('cal')}Masukkan ke Agenda</button>` : '') : ''}${e === 'kegiatan' && w && kgBisaSelesai(x) ? `<button class="btn sm pri" data-act="kgSelesai" data-id="${esc(x.id)}">${ic('check')}Selesai</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>`;
   const xk = $('.xk', el), xx = $('.xx', el);
   if (e === 'penduduk' && !diKK) {
     try {
@@ -8882,7 +8882,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '193', tgl: '2026-10-20', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '194', tgl: '2026-10-20', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -9778,6 +9778,21 @@ const NX = (() => {
     bP('Sejak penandatanganan berita acara ini, tanggung jawab atas hal yang diserahkan beralih kepada PIHAK KEDUA. Demikian berita acara serah terima ini dibuat dengan sebenarnya untuk dipergunakan sebagaimana mestinya.', { ind: 1, before: 160 }),
     ...baTtd(['PIHAK KEDUA,'], ['PIHAK PERTAMA,']), ...baFoto()];
   T.naskah_berita_acara.f4 = T.naskah_berita_acara_serah_terima.f4 = 1;
+  /* SPPD lembar belakang (visum tiba/berangkat), kertas F4 — dari Surat Tugas */
+  const sKv = rows => tbl([450, 1600, 200, 2300], rows), sTtd = (j, n, nip) => [C(j, { before: 160, after: 900 }), C(n, { bold: 1, u: 1 }), C('NIP ' + nip, { size: 20 })];
+  const sBrk = () => sKv([['', 'Berangkat dari (Tempat Berkedudukan)', ':', ''], ['', 'Ke', ':', ''], ['', 'Pada Tanggal', ':', '']]);
+  const sTiba = no => sKv([[no, 'Tiba di', ':', ''], ['', 'Pada Tanggal', ':', '']]);
+  T.naskah_sppd = () => [
+    tbl([4680, 4680], [
+      [[L('I.')], [sKv([['I.', 'Berangkat dari (Tempat Berkedudukan)', ':', '{{Berangkat Dari}}'], ['', 'Ke', ':', '{{Tujuan}}'], ['', 'Pada Tanggal', ':', '{{Tanggal Berangkat}}']]), ...sTtd('Kepala Desa {{Desa}}', '{{Kepala Desa_U}}', '{{NIP Kepala Desa}}')]],
+      [[sTiba('II.'), P('', { after: 1100 }), C('.............................................', { after: 120 })], [sBrk(), P('', { after: 900 }), C('.............................................', { after: 120 })]],
+      [[sTiba('III.'), P('', { after: 300 })], [sBrk()]],
+      [[sTiba('IV.'), P('', { after: 300 })], [sBrk()]],
+      [[sKv([['V.', 'Tiba di (Tempat Berkedudukan)', ':', '{{Tiba Kembali}}'], ['', 'Pada Tanggal', ':', '{{Tanggal Kembali}}']]), ...sTtd('{{Jabatan PPK}}', '{{PPK}}', '{{NIP PPK}}')],
+        [P('Telah diperiksa dengan keterangan bahwa perjalanan tersebut atas perintahnya dan semata-mata untuk kepentingan jabatan dalam waktu yang sesingkat-singkatnya', { after: 0, al: 'J' }), ...sTtd('{{Jabatan PPK}}', '{{PPK}}', '{{NIP PPK}}')]]
+    ], 0, 1).replace(/<w:vAlign w:val="center"\/>/g, '<w:vAlign w:val="top"/>'),
+    tbl([9360], [[[L('Catatan Lain-lain: {{Catatan}}'), P('', { after: 360 })]]], 0, 1)];
+  T.naskah_sppd.f4 = 1;
   const DOC = (body, land, f4) => `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"><w:body>${body}<w:sectPr>${pgS(land, f4)}</w:sectPr></w:body></w:document>`;
   const PKG = {
     '[Content_Types].xml': '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>',
@@ -10161,6 +10176,38 @@ ACT.skSetuju = async t => {
       await call('save', { entity: 'surat_keluar', record: rec });
       m.close(); toast(fl ? 'Surat disetujui dan dokumen tersimpan.' : 'Surat disetujui. Unggah PDF bertanda tangan bila sudah ada.'); refresh();
     } catch (x2) { er.textContent = x2.message; er.hidden = false; b.disabled = false; b.innerHTML = ic('check') + (pdfSaja ? 'Unggah' : 'Setujui'); }
+  };
+};
+/* SPPD dari Surat Tugas: lengkapi isian (tersimpan di surat tugasnya), lalu dokumen dari template surat/naskah_sppd.docx */
+const SPPD_F = [['sppd_dari', 'Berangkat dari (tempat berkedudukan)'], ['sppd_ke', 'Ke (tujuan)'], ['sppd_tgl', 'Tanggal berangkat', 'date'], ['sppd_kembali', 'Tiba kembali di (tempat berkedudukan)'], ['sppd_tgl_kembali', 'Tanggal tiba kembali', 'date'],
+  ['sppd_ppk', 'Nama Pejabat Pembuat Komitmen'], ['sppd_ppk_nip', 'NIP Pejabat Pembuat Komitmen'], ['sppd_ppk_jab', 'Jabatan penanda tangan (kolom V)'], ['sppd_catatan', 'Catatan lain-lain']];
+ACT.sppdBuat = async t => {
+  let x; try { x = await call('get', { entity: 'surat_keluar', id: t.dataset.id }); } catch (er) { return toast(er.message, 1); }
+  let lalu = {}; try { lalu = JSON.parse(store.get('sppd_ppk') || '{}'); } catch (er) { }
+  let tk = []; try { tk = (await call('list', { entity: 'tokoh_luar', limit: 500 })).rows || []; } catch (er) { }
+  const d = { sppd_dari: 'Balai Desa ' + ND(), sppd_ke: x.tugas_tempat || '', sppd_tgl: x.tugas_tanggal || '', sppd_kembali: lalu.sppd_kembali || '', sppd_ppk: lalu.sppd_ppk || '', sppd_ppk_nip: lalu.sppd_ppk_nip || '', sppd_ppk_jab: lalu.sppd_ppk_jab || 'Pejabat Pembuat Komitmen', sppd_catatan: '' };
+  SPPD_F.forEach(([k]) => { if (x[k]) d[k] = x[k]; });
+  const m = sheet('Buat SPPD', `<form class="stack" id="spF"><div class="meta"><b>${esc(x.isi || 'Surat Tugas')}</b> · ${esc(x.nomor || '')}<br>${esc(skPetugas(x).map(o => o.nama).join(', '))}</div>
+    <datalist id="spPpk">${tk.filter(z => z.nama).map(z => `<option value="${esc(z.nama)}" label="${esc(z.jabatan || '')}">`).join('')}</datalist>
+    <div class="form">${SPPD_F.map(([k, l, ty]) => `<div class="f${/catatan|ppk$/.test(k) ? ' wide' : ''}"><label for="sp_${k}">${esc(l)}</label>${k === 'sppd_catatan' ? `<textarea id="sp_${k}" rows="2">${esc(d[k] || '')}</textarea>` : `<input id="sp_${k}" type="${ty || 'text'}" value="${esc(d[k] || '')}"${k === 'sppd_ppk' ? ' list="spPpk" autocomplete="off"' : ''}>`}</div>`).join('')}</div>
+    <div class="btns"><button class="btn pri" type="submit">${ic('print')}Buat SPPD</button></div></form>`, { ikon: 'send' });
+  const nm = $('#sp_sppd_ppk', m.el);
+  nm.addEventListener('change', () => { const z = tk.find(o => o.nama === nm.value.trim()); if (z) { if (z.nip) $('#sp_sppd_ppk_nip', m.el).value = z.nip; if (z.instansi && !$('#sp_sppd_kembali', m.el).value.trim()) $('#sp_sppd_kembali', m.el).value = z.instansi; } });
+  $('#spF', m.el).onsubmit = async ev => {
+    ev.preventDefault();
+    const v = {}; SPPD_F.forEach(([k]) => { v[k] = $('#sp_' + k, m.el).value.trim(); });
+    try { store.set('sppd_ppk', JSON.stringify({ sppd_kembali: v.sppd_kembali, sppd_ppk: v.sppd_ppk, sppd_ppk_nip: v.sppd_ppk_nip, sppd_ppk_jab: v.sppd_ppk_jab })); } catch (er) { }
+    if (canWrite('surat_keluar')) { try { await call('save', { entity: 'surat_keluar', record: Object.assign({ id: x.id }, v) }); } catch (er) { toast('Isian SPPD tidak tersimpan: ' + er.message, 1); } }
+    m.close();
+    const md = modal('Membuat SPPD', `<div class="stack"><div class="skel"></div><div class="meta">Mengisi template SPPD…</div></div>`);
+    try {
+      const r = Object.assign({}, x, v), tg = z => z ? dPanjang(z).replace(/^0/, '') : '';
+      const M = await petaNaskah('surat_keluar', r);
+      Object.assign(M, tambahU({ 'Berangkat Dari': v.sppd_dari || TITIK, Tujuan: v.sppd_ke || TITIK, 'Tanggal Berangkat': tg(v.sppd_tgl) || TITIK, 'Tiba Kembali': v.sppd_kembali, 'Tanggal Kembali': tg(v.sppd_tgl_kembali),
+        PPK: v.sppd_ppk || TITIK, 'NIP PPK': v.sppd_ppk_nip || TITIK, 'Jabatan PPK': v.sppd_ppk_jab || 'Pejabat Pembuat Komitmen', 'NIP Kepala Desa': (S.set && S.set.nip_kades) || '……………………………..', Catatan: v.sppd_catatan }));
+      const rows = [{ key: 'T Nama', items: skPetugas(r).map((o, i, A) => ({ 'T No': A.length > 1 ? String(i + 1) : '', 'T Nomor': A.length > 1 ? (i + 1) + '.' : '', 'T Nama': o.nama, 'T Jabatan': o.jabatan || '', 'T Kepada': i ? '' : 'Kepada', 'T Titik': i ? '' : ':' })) }];
+      hasilDokumen(md, await buatDokumen({ path: 'surat/naskah_sppd.docx', M, rows, jenis: 'surat', nama: 'SPPD - ' + (x.isi || '').replace(/^Surat Tugas – /, '').slice(0, 60) }));
+    } catch (er) { md.body.innerHTML = `<div class="err">${esc(er.message)}</div>`; }
   };
 };
 /* surat masuk undangan -> Agenda Kegiatan */
@@ -11025,7 +11072,7 @@ VIEWS.template = async (p, main) => {
   try { list = await tplDaftar(true); await muatJenisSurat(true); } catch (x) { main.innerHTML = `<div class="err">${esc(x.message)}</div>`; return; }
   const ada = new Set(list.map(x => x.path));
   const kitN = NX.nama;
-  const lblN = nm => nm === 'naskah_surat_keluar' ? 'Surat Keluar – Surat Biasa (juga dipakai jenis yang belum punya template)' : /^naskah_surat_keluar_/.test(nm) ? 'Surat Keluar – ' + judulKata(nm.replace('naskah_surat_keluar_', '').replace(/_/g, ' ')) : UI[nm.replace('naskah_', '')] ? UI[nm.replace('naskah_', '')].t : nm;
+  const lblN = nm => nm === 'naskah_sppd' ? 'Surat Keluar – SPPD (dibuat dari Surat Tugas: tombol Buat SPPD)' : nm === 'naskah_surat_keluar' ? 'Surat Keluar – Surat Biasa (juga dipakai jenis yang belum punya template)' : /^naskah_surat_keluar_/.test(nm) ? 'Surat Keluar – ' + judulKata(nm.replace('naskah_surat_keluar_', '').replace(/_/g, ' ')) : UI[nm.replace('naskah_', '')] ? UI[nm.replace('naskah_', '')].t : nm;
   const naskahSemua = Array.from(new Set(kitN.filter(n => /^naskah_/.test(n)).map(n => 'surat/' + n + '.docx').concat(list.filter(x => /^surat\/naskah_/.test(x.path)).map(x => x.path)))).sort().map(pth => [pth, lblN(pth.split('/').pop().replace(/\.docx$/, ''))]);
   const isBA = pth => /\/naskah_berita_acara/.test(pth), naskahDaftar = naskahSemua.filter(x => !isBA(x[0]));
   const baDaftar = naskahSemua.filter(x => isBA(x[0])).map(([pth]) => { const nm = pth.split('/').pop().replace(/\.docx$/, '').replace(/^naskah_berita_acara_?/, ''); return [pth, nm ? 'Berita Acara ' + judulKata(nm.replace(/_/g, ' ')) : 'Berita Acara – Umum (juga dipakai jenis yang belum punya template)']; }).sort((a, b) => a[1].indexOf('Umum') >= 0 ? -1 : b[1].indexOf('Umum') >= 0 ? 1 : a[1].localeCompare(b[1]));
