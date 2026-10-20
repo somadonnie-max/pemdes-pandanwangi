@@ -1239,8 +1239,9 @@ function notifTombol(el, id, kunci) {
 }
 /* Surat Tugas: dasar dari surat masuk -> isian tugas terisi dari undangannya */
 const skDasarLbl = r => r.nomor ? 'Surat dari ' + (r.dari || '…') + ' Nomor : ' + r.nomor + (r.tgl_surat ? ' tanggal ' + dPanjang(r.tgl_surat).replace(/^0/, '') : '') : '';
-const skDasarIsi = r => ({ tugas_untuk: r.acara || r.isi || '', tugas_tgl: r.acara_tgl ? dHari(r.acara_tgl) + ', ' + dPanjang(r.acara_tgl).replace(/^0/, '') : '', tugas_jam_mulai: /^\d{1,2}:\d{2}$/.test(r.acara_jam || '') ? r.acara_jam : '', tugas_tempat: r.acara_tempat || '' });
+const skDasarIsi = r => ({ tugas_untuk: r.acara || r.isi || '', tugas_tanggal: r.acara_tgl || '', tugas_jam_mulai: /^\d{1,2}:\d{2}$/.test(r.acara_jam || '') ? r.acara_jam : '', tugas_tempat: r.acara_tempat || '' });
 /* jam tugas: "08.00 WIB – Selesai" atau "08.00 – 11.30 WIB" */
+const stTgl = r => r.tugas_tanggal ? dHari(r.tugas_tanggal) + ', ' + dPanjang(r.tugas_tanggal).replace(/^0/, '') : String(r.tugas_tgl || '');   /* hari/tanggal tugas: dari pilihan tanggal (isian lama berupa teks tetap dipakai) */
 const skJam = r => { const t = x => String(x || '').trim().replace(':', '.'); const a = t(r.tugas_jam_mulai), b = t(r.tugas_jam_selesai); return a ? (b ? a + ' – ' + b + ' WIB' : a + ' WIB – Selesai') : String(r.tugas_jam || ''); };
 /* daftar petugas Surat Tugas: dari isian tabel (atau isian lama satu baris per orang "Nama – Jabatan") */
 function skPetugas(r) {
@@ -1588,7 +1589,7 @@ const UI = {
       F('dasar', 'Dasar (surat masuk)', 'text', { wide: 1, grp: ['Surat Tugas'], listFrom: { e: 'surat_masuk', k: skDasarLbl }, fill: skDasarIsi, smPick: 1, nodl: 1, hint: 'Ketik/pilih surat masuk yang menjadi dasar — keperluan, hari/tanggal, jam & tempat terisi otomatis dari undangannya' }),
       F('petugas', 'Yang Ditugaskan', 'rows', { grp: ['Surat Tugas'], orang: 1, cols: [['nama', 'Nama', 'text'], ['jabatan', 'Jabatan', 'text']] }),
       F('tugas_nama', 'Yang Diberi Rekomendasi', 'textarea', { grp: ['Surat Rekomendasi'], hint: 'Satu orang per baris, mis. "1. Nama – Jabatan"' }),
-      F('tugas_untuk', 'Keperluan Tugas', 'text', { wide: 1, grp: ['Surat Tugas'] }), F('tugas_tgl', 'Hari/Tanggal Pelaksanaan', 'text', { grp: ['Surat Tugas'], hint: 'mis. Rabu, 21 Oktober 2026' }), F('tugas_jam_mulai', 'Jam Mulai', 'time', { grp: ['Surat Tugas'] }), F('tugas_jam_selesai', 'Jam Selesai', 'time', { grp: ['Surat Tugas'], hint: 'Kosongkan bila sampai selesai' }), F('tugas_jam', 'Jam (lama)', 'text', { noform: 1 }),
+      F('tugas_untuk', 'Keperluan Tugas', 'textarea', { wide: 1, rows: 3, grp: ['Surat Tugas'], hint: 'Boleh panjang; kotak bisa diperbesar dengan menarik pojok kanan bawah' }), F('tugas_tanggal', 'Hari/Tanggal Pelaksanaan', 'date', { grp: ['Surat Tugas'], hint: 'Pilih tanggal — tercetak mis. Rabu, 21 Oktober 2026' }), F('tugas_tgl', 'Hari/Tanggal (lama)', 'text', { noform: 1 }), F('tugas_jam_mulai', 'Jam Mulai', 'time', { grp: ['Surat Tugas'] }), F('tugas_jam_selesai', 'Jam Selesai', 'time', { grp: ['Surat Tugas'], hint: 'Kosongkan bila sampai selesai' }), F('tugas_jam', 'Jam (lama)', 'text', { noform: 1 }),
       F('tugas_tempat', 'Tempat Tujuan', 'text', { grp: ['Surat Tugas'] }),
       F('tugas_biaya', 'Pembebanan Biaya', 'text', { noform: 1 }),
       F('kuasa_penerima', 'Penerima Kuasa', 'textarea', { grp: ['Surat Kuasa'], hint: 'Baris 1: nama; berikutnya jabatan/alamat' }), F('kuasa_untuk', 'Keperluan Kuasa', 'text', { wide: 1, grp: ['Surat Kuasa'] }),
@@ -8880,7 +8881,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '191', tgl: '2026-10-20', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '192', tgl: '2026-10-20', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -10107,8 +10108,8 @@ async function petaNaskah(e, r) {
     Tentang: v('tentang'), Menimbang: v('menimbang') || TITIK, Mengingat: v('mengingat') || TITIK, Memperhatikan: v('memperhatikan') || '-', Isi: v('isi_naskah') || TITIK,
     Jenis: v('jenis'), Perihal: v('isi'), Kepada: v('kepada'), Di: v('di') || 'Tempat', Sifat: v('sifat') || 'Biasa', Lampiran: v('lampiran') || '-', 'Isi Surat': v('isi_surat'), Tembusan: v('tembusan') || '-', 'Tembusan Lengkap': v('tembusan').trim() ? 'Tembusan:\n' + v('tembusan').trim() : '',
     'Hari Acara': dHari(r.acara_tgl), 'Tanggal Acara': dPanjang(r.acara_tgl), 'Waktu Acara': v('acara_jam'), 'Tempat Acara': v('acara_tempat'), Acara: v('acara'),
-    'Yang Ditugaskan': e === 'surat_keluar' && skPetugas(r).length ? skPetugas(r).map((o, i) => (i + 1) + '. ' + o.nama + (o.jabatan ? ' – ' + o.jabatan : '')).join('\n') : v('tugas_nama'), 'Keperluan Tugas': v('tugas_untuk'), 'Tanggal Tugas': v('tugas_tgl'), 'Tempat Tugas': v('tugas_tempat'),
-    Dasar: v('dasar') || TITIK, 'Hari Tanggal Tugas': v('tugas_tgl') || TITIK, 'Jam Tugas': skJam(r) || TITIK, 'Waktu Pelaksanaan': [v('tugas_tgl'), skJam(r)].filter(Boolean).join(', pukul '), 'Tempat Tujuan': v('tugas_tempat'), 'Pembebanan Biaya': v('tugas_biaya') || '-', 'Hal Dimohon': v('mohon_isi'), 'Daftar Kiriman': v('pengantar_daftar'), 'Berlaku Mulai': dPanjang(r.berlaku_tgl) || dPanjang(tgl),
+    'Yang Ditugaskan': e === 'surat_keluar' && skPetugas(r).length ? skPetugas(r).map((o, i) => (i + 1) + '. ' + o.nama + (o.jabatan ? ' – ' + o.jabatan : '')).join('\n') : v('tugas_nama'), 'Keperluan Tugas': v('tugas_untuk'),  'Tempat Tugas': v('tugas_tempat'),
+    Dasar: v('dasar') || TITIK, 'Hari Tanggal Tugas': stTgl(r) || TITIK, 'Tanggal Tugas': stTgl(r), 'Jam Tugas': skJam(r) || TITIK, 'Waktu Pelaksanaan': [stTgl(r), skJam(r)].filter(Boolean).join(', pukul '), 'Tempat Tujuan': v('tugas_tempat'), 'Pembebanan Biaya': v('tugas_biaya') || '-', 'Hal Dimohon': v('mohon_isi'), 'Daftar Kiriman': v('pengantar_daftar'), 'Berlaku Mulai': dPanjang(r.berlaku_tgl) || dPanjang(tgl),
     'Penerima Kuasa': v('kuasa_penerima'), 'Penerima Kuasa Nama': kp, 'Keperluan Kuasa': v('kuasa_untuk'),
     'Desa Mitra': judulKata(v('desa_mitra')), 'Kepala Desa Mitra': v('kades_mitra'), 'Ketua BPD': v('ketua_bpd') || TITIK
   }, e === 'berita_acara' ? await petaBA(r) : {}));
