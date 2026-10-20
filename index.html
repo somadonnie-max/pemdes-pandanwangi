@@ -1084,6 +1084,7 @@ section.docx,section.docx *{-webkit-hyphens:manual!important;hyphens:manual!impo
 .chip.sk-ok{min-height:22px;padding:1px 9px;font-size:12px;vertical-align:middle}.chip.sk-ok svg{width:13px;height:13px}
 /* pilihan jenis surat: satu baris, digeser ke samping */
 .chips.geser1{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;mask-image:linear-gradient(90deg,#000 92%,transparent)}.chips.geser1 .chip{flex:none;scroll-snap-align:start}
+.ntf-x{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;box-shadow:0 2px 0 var(--line)}.ntf-x svg{width:15px;height:15px}.ntf-x:hover{background:var(--surface2)}
 </style>
 </head>
 <body>
@@ -1227,6 +1228,23 @@ function brand() { const s = (typeof S !== 'undefined' && S.set) || {}, b = bran
 const ND = () => brand().desa;
 /* status surat keluar: Draf (dari tombol Buat) -> Disetujui (+ PDF bertanda tangan); data lama tanpa status = surat jadi */
 const skDraf = r => r && r.status === 'Draf';
+/* kartu pemberitahuan di beranda bisa ditutup; muncul lagi hanya bila isinya berubah */
+const notifTutup = (id, kunci) => store.get('ntf_' + id) === kunci;
+function notifTombol(el, id, kunci) {
+  el.style.position = 'relative'; el.style.paddingRight = '40px';
+  el.insertAdjacentHTML('beforeend', `<button type="button" class="ntf-x" title="Tutup pemberitahuan ini" aria-label="Tutup pemberitahuan">${ic('x')}</button>`);
+  $('.ntf-x', el).onclick = () => { store.set('ntf_' + id, kunci); el.style.transition = 'opacity .25s, transform .25s'; el.style.opacity = '0'; el.style.transform = 'translateY(-6px)'; setTimeout(() => el.remove(), 260); };
+}
+/* Surat Tugas: dasar dari surat masuk -> isian tugas terisi dari undangannya */
+const skDasarLbl = r => r.nomor ? 'Surat dari ' + (r.dari || '…') + ' Nomor : ' + r.nomor + (r.tgl_surat ? ' tanggal ' + dPanjang(r.tgl_surat).replace(/^0/, '') : '') : '';
+const skDasarIsi = r => ({ tugas_untuk: r.acara || r.isi || '', tugas_tgl: r.acara_tgl ? dHari(r.acara_tgl) + ', ' + dPanjang(r.acara_tgl).replace(/^0/, '') : '', tugas_jam: r.acara_jam ? String(r.acara_jam).replace(':', '.') + ' – Selesai' : '', tugas_tempat: r.acara_tempat || '' });
+/* daftar petugas Surat Tugas: dari isian tabel (atau isian lama satu baris per orang "Nama – Jabatan") */
+function skPetugas(r) {
+  let a = []; try { a = JSON.parse(r.petugas || '[]'); } catch (x) { }
+  a = a.filter(o => String(o.nama || '').trim());
+  if (!a.length) a = String(r.tugas_nama || '').split('\n').map(l => l.replace(/^\s*\d+[.)]\s*/, '').trim()).filter(Boolean).map(l => { const m = l.split(/\s+[–-]\s+|\s*;\s*/); return { nama: m[0], jabatan: m.slice(1).join(' ') }; });
+  return a;
+}
 const skAdaDraf = r => skDraf(r) || (r && (r.asal === 'draf' || !!r.isi_surat));   /* surat yang punya draf (dibuat lewat tombol Buat) */
 const skPill = r => skDraf(r) ? `<span class="pill warn">Draf</span>${canWrite('surat_keluar') ? ` <button type="button" class="chip on sk-ok" data-act="skSetuju" data-id="${esc(r.id)}">${ic('check')}Disetujui</button>` : ''}` : r && r.status === 'Disetujui' && !r.dok_id ? '<span class="pill info">Disetujui · belum ada PDF</span>' : '';
 const JENIS_BA = ['Berita Acara Musyawarah', 'Berita Acara Rapat', 'Berita Acara Serah Terima', 'Berita Acara Pemeriksaan', 'Berita Acara Penyerahan Bantuan', 'Berita Acara Kesepakatan', 'Berita Acara Klarifikasi'];
@@ -1563,8 +1581,11 @@ const UI = {
       F('kepada', 'Ditujukan Kepada', 'text', { req: 1, wide: 1 }), F('di', 'Di (tempat tujuan)', 'text', { def: 'Tempat' }), F('isi', 'Perihal / Isi Ringkas', 'textarea', { req: 1, wide: 1 }),
       F('acara_tgl', 'Hari/Tanggal Acara', 'date', { grp: ['Surat Undangan', 'Surat Pemberitahuan', 'Pengumuman', 'Berita Acara'] }), F('acara_jam', 'Waktu Acara', 'text', { grp: ['Surat Undangan', 'Surat Pemberitahuan', 'Pengumuman'], hint: 'mis. 09.00 WIB s.d. selesai' }),
       F('acara_tempat', 'Tempat Acara', 'text', { grp: ['Surat Undangan', 'Surat Pemberitahuan', 'Pengumuman', 'Berita Acara'], def: () => 'Balai Desa ' + ND() }), F('acara', 'Acara', 'text', { wide: 1, grp: ['Surat Undangan', 'Surat Pemberitahuan', 'Pengumuman', 'Berita Acara'] }),
-      F('tugas_nama', 'Yang Ditugaskan / Diberi Rekomendasi', 'textarea', { grp: ['Surat Tugas', 'Surat Rekomendasi'], hint: 'Satu orang per baris, mis. "1. Nama – Jabatan"' }),
-      F('tugas_untuk', 'Keperluan Tugas', 'text', { wide: 1, grp: ['Surat Tugas'] }), F('tugas_tempat', 'Tempat Tujuan', 'text', { grp: ['Surat Tugas'] }), F('tugas_tgl', 'Waktu Pelaksanaan', 'text', { grp: ['Surat Tugas'], hint: 'mis. Senin, 20 Oktober 2026 pukul 08.00 WIB s.d. selesai' }),
+      F('dasar', 'Dasar (surat masuk)', 'text', { wide: 1, grp: ['Surat Tugas'], listFrom: { e: 'surat_masuk', k: skDasarLbl }, fill: skDasarIsi, hint: 'Ketik/pilih surat masuk yang menjadi dasar — keperluan, hari/tanggal, jam & tempat terisi otomatis dari undangannya' }),
+      F('petugas', 'Yang Ditugaskan', 'rows', { grp: ['Surat Tugas'], orang: 1, cols: [['nama', 'Nama', 'list'], ['jabatan', 'Jabatan', 'text']] }),
+      F('tugas_nama', 'Yang Diberi Rekomendasi', 'textarea', { grp: ['Surat Rekomendasi'], hint: 'Satu orang per baris, mis. "1. Nama – Jabatan"' }),
+      F('tugas_untuk', 'Keperluan Tugas', 'text', { wide: 1, grp: ['Surat Tugas'] }), F('tugas_tgl', 'Hari/Tanggal Pelaksanaan', 'text', { grp: ['Surat Tugas'], hint: 'mis. Rabu, 21 Oktober 2026' }), F('tugas_jam', 'Jam', 'text', { grp: ['Surat Tugas'], hint: 'mis. 08.00 – Selesai' }),
+      F('tugas_tempat', 'Tempat Tujuan', 'text', { grp: ['Surat Tugas'] }),
       F('tugas_biaya', 'Pembebanan Biaya', 'text', { grp: ['Surat Tugas'], hint: 'mis. APBDes Tahun 2026 / Tidak dibebankan biaya' }),
       F('kuasa_penerima', 'Penerima Kuasa', 'textarea', { grp: ['Surat Kuasa'], hint: 'Baris 1: nama; berikutnya jabatan/alamat' }), F('kuasa_untuk', 'Keperluan Kuasa', 'text', { wide: 1, grp: ['Surat Kuasa'] }),
       F('mohon_isi', 'Hal yang Dimohon', 'textarea', { grp: ['Surat Permohonan'], hint: 'mis. bantuan narasumber / izin penggunaan tempat' }),
@@ -4923,6 +4944,13 @@ VIEWS.form = async (p, main, alive) => {
   if (flds.some(f => f.gen) && !(p.buat || NASKAH[e] && NASKAH[e].ada(rec))) flds = flds.filter(f => !f.gen);
   if (p.buat && NASKAH[e]) flds = flds.filter(f => f.t !== 'file'); /* tombol Buat = menyusun naskah; unggah scan (berkas bertanda tangan) lewat Tambah/Ubah */
   for (const f of flds.filter(f => f.listFrom)) { try { const r = await call('list', { entity: f.listFrom.e, limit: f.listFrom.limit || 2000 }); f._rows = r.rows; f._list = Array.from(new Set(r.rows.map(x => typeof f.listFrom.k === 'function' ? f.listFrom.k(x) : x[f.listFrom.k]).map(v => typeof v === 'string' ? v.trim() : v).filter(Boolean).sort((a, b) => String(a).localeCompare(String(b), 'id')).concat(f.list || []))); } catch (x) { f._list = f._rows = []; } }
+  for (const f of flds.filter(f => f.orang)) {   /* nama dari Aparatur, Petugas & Lembaga, Tokoh luar desa (+ cari Data Penduduk saat mengetik) */
+    try {
+      const [pp, tk] = await Promise.all([people().catch(() => []), call('list', { entity: 'tokoh_luar', limit: 500 }).then(r => r.rows || []).catch(() => [])]);
+      f._jab = {}; pp.concat(tk.filter(x => x.nama).map(x => ({ nama: x.nama, jabatan: x.jabatan }))).forEach(x => { const n = String(x.nama).trim(); if (n && !f._jab[n]) f._jab[n] = x.jabatan || ''; });
+      f._list = Object.keys(f._jab).sort((a, b) => a.localeCompare(b, 'id'));
+    } catch (x) { f._list = []; f._jab = {}; }
+  }
   if (u.fields.some(f => f.t === 'sdgs') && !S.sdgs) { try { S.sdgs = (await call('list', { entity: 'ref_sdgs', limit: 50, desc: false })).rows; } catch (x) { S.sdgs = []; } }
   if (!alive()) return;
   main.innerHTML = `<form class="card stack" id="frm" novalidate>
@@ -4981,6 +5009,13 @@ VIEWS.form = async (p, main, alive) => {
   });
   $$('.fotos', frm).forEach(fotoBox);
   flds.filter(f => f.t === 'rows').forEach(f => { const b = $('#f_' + f.k, frm); if (b) rowsBox(b, f); });
+  flds.filter(f => f.orang).forEach(f => {   /* pilih nama -> jabatan terisi; ketik >= 3 huruf -> nama dari Data Penduduk ikut ditawarkan */
+    const b = $('#f_' + f.k, frm), dl = b && $('datalist', b); if (!b) return;
+    let tm = null, pend = {};
+    b.addEventListener('change', ev => { const t = ev.target; if (t.dataset.c !== 'nama') return; const n = t.value.trim(), j = t.closest('tr').querySelector('[data-c="jabatan"]'); const jb = f._jab[n] != null ? f._jab[n] : pend[n]; if (j && !j.value.trim() && jb) j.value = jb; });
+    b.addEventListener('input', ev => { const t = ev.target; if (t.dataset.c !== 'nama' || !dl) return; clearTimeout(tm); const q = t.value.trim(); if (q.length < 3) return;
+      tm = setTimeout(async () => { try { const rs = await wargaCari(q, 8); rs.forEach(x => { const n = fmtNama(x.nama, 'p'); if (!n || f._jab[n] != null || pend[n] != null) return; pend[n] = ''; const o = document.createElement('option'); o.value = n; o.label = 'Penduduk · ' + String(x.dusun || '').replace(/^DUSUN /i, ''); dl.appendChild(o); }); } catch (x) { } }, 300); });
+  });
   keuFormHook(e, frm, rec);
   if (e === 'surat_masuk') fwdHook(frm);
   orangHooks(frm, flds);
@@ -5104,6 +5139,7 @@ VIEWS.form = async (p, main, alive) => {
         val[f.k] = out.length ? JSON.stringify(out) : '';
       }
       if (NASKAH[e] && !String(val.nomor || '').trim() && (e === 'surat_keluar' || NASKAH[e].nomor)) val.nomor = await nomorOtomatis(e, val);
+      if (e === 'surat_keluar' && p.id && !rec.status) { const dr = 'tembusan' in rec || !!rec.isi_surat; val.status = dr && !(val.dok_id || rec.dok_id) ? 'Draf' : 'Disetujui'; if (dr) val.asal = 'draf'; }   /* data lama */
       if (e === 'surat_keluar' && !p.id) { if (p.buat) { val.status = 'Draf'; val.asal = 'draf'; } else { val.status = 'Disetujui'; val.tgl_setuju = val.tgl_surat || isoToday(); } }
       if (p.id) val.id = p.id;
       Object.assign(val, p.preset && !p.id ? Object.fromEntries(Object.entries(p.preset).filter(([k]) => !(k in val))) : {});
@@ -6175,7 +6211,8 @@ async function suratPeringatan(main) {
   const d = new Date(Date.now() - 3 * 864e5 + 7 * 3600e3).toISOString().slice(0, 10);
   let r; try { r = await call('list', { entity: 'register_surat', filters: { vf_status: 'menunggu', vf_cetak__lt: d }, limit: 3 }); } catch (x) { return; }
   const n = r.total || (r.rows || []).length; if (!n || !main.isConnected || $('#vfWarn', main)) return;
-  const el = document.createElement('div'); el.id = 'vfWarn'; el.className = 'card stack';
+  const kunciN = n + ':' + (r.rows || []).map(x => x.id).join(','); if (notifTutup('vf', kunciN)) return;
+  const el = document.createElement('div'); el.id = 'vfWarn'; el.className = 'card stack'; setTimeout(() => notifTombol(el, 'vf', kunciN));
   el.style.cssText = 'border:1px solid #e8a400;background:rgba(232,164,0,.10)';
   el.innerHTML = `<div style="display:flex;gap:8px;align-items:flex-start">${ic('clock')}<div style="flex:1"><b>${n} surat keterangan belum disahkan</b><div class="meta" style="margin-top:2px">Sudah dicetak dengan QR lebih dari 3 hari tetapi belum ditandai "Sudah ditandatangani".${(r.rows || []).length ? ' ' + esc(r.rows.map(x => x.nama).join(', ')) + (n > r.rows.length ? ', dll.' : '.') : ''}</div></div></div><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['list', { e: 'register_surat', v: 1 }]))}' style="align-self:flex-start">${ic('next')}Lihat daftar</button>`;
   const home = $('.home2', main) || main;
@@ -8796,7 +8833,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '188', tgl: '2026-10-20', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '189', tgl: '2026-10-20', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -9090,9 +9127,10 @@ async function berandaPeringatan(main) {
   let k; try { k = await kuotaAmbil(); } catch (x) { return; }
   const W = kuotaPeringatan(k);
   if (!W.length || !main.isConnected || $('#kqWarn', main)) return;
+  const kunciN = W.map(w => w.t + w.teks).join('|'); if (notifTutup('kuota', kunciN)) return;
   const merah = W.some(w => w.t === 2);
   const el = document.createElement('div');
-  el.id = 'kqWarn'; el.className = 'card stack';
+  el.id = 'kqWarn'; el.className = 'card stack'; setTimeout(() => notifTombol(el, 'kuota', kunciN));
   el.style.cssText = 'border:1px solid ' + (merah ? '#d93025' : '#e8a400') + ';background:' + (merah ? 'rgba(217,48,37,.08)' : 'rgba(232,164,0,.10)');
   el.innerHTML = `<div style="display:flex;gap:8px;align-items:flex-start">${ic('mega')}<div style="flex:1"><b>Penyimpanan perlu perhatian</b>${W.map(w => `<div class="meta" style="margin-top:2px">${esc(w.teks)}</div>`).join('')}</div></div><button class="btn sm" data-act="go" data-go='["penyimpanan"]' style="align-self:flex-start">${ic('next')}Penyimpanan & Cadangan</button>`;
   const home = $('.home2', main) || main;
@@ -9276,13 +9314,14 @@ const DOCX = (() => {
         if (!tr) break;
         const cells = Array.from(tr.childNodes).filter(n => n.localName === 'tc'), col = cells.findIndex(c => re.test(textOf(c)));
         const items = spec.items.length ? spec.items : [spec.empty || { [spec.key]: '' }];
-        const proto = tr.cloneNode(true); let cur = tr;
+        /* satu item bisa beberapa baris tabel: baris sesudahnya yang memuat tanda berawalan sama (mis. {{T Jabatan}} di bawah {{T Nama}}) ikut diulang */
+        const pre = spec.key.split(/[\s_]+/)[0], reP = new RegExp('\\{\\{\\s*' + pre.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '[\\s_]', 'i'), grp = [tr];
+        for (let nx = tr.nextSibling; nx && nx.localName === 'tr' && reP.test(textOf(nx)) && !re.test(textOf(nx)); nx = nx.nextSibling) grp.push(nx);
+        const protos = grp.map(g => g.cloneNode(true)); let cur = grp[grp.length - 1];
         items.forEach((it, i) => {
-          let row = tr;
-          if (i > 0) { row = proto.cloneNode(true); cur.parentNode.insertBefore(row, cur.nextSibling); }
-          if (spec.fn && spec.items.length) spec.fn(row, it, i + 1, i === 0, col, setCell);
-          fillNode(row, Object.assign({ [spec.key]: '' }, it), false);
-          cur = row;
+          const rowsI = i > 0 ? protos.map(pr => { const c = pr.cloneNode(true); cur.parentNode.insertBefore(c, cur.nextSibling); cur = c; return c; }) : grp;
+          if (spec.fn && spec.items.length) spec.fn(rowsI[0], it, i + 1, i === 0, col, setCell);
+          rowsI.forEach(row => fillNode(row, Object.assign({ [spec.key]: '' }, it), false));
         });
       }
     });
@@ -9519,10 +9558,12 @@ const NX = (() => {
     naskah_surat_keluar_surat_pengantar: () => [...kop(), ...judulNo('SURAT PENGANTAR'), P('Kepada Yth. {{Kepada}} di {{Di}}', { after: 160 }),
       tbl([600, 5160, 1400, 2200], [[[C('No.', { bold: 1 })], [C('Naskah Dinas yang Dikirimkan', { bold: 1 })], [C('Banyaknya', { bold: 1 })], [C('Keterangan', { bold: 1 })]], [[C('1.')], [P('{{Isi Surat}}', { al: 'L', after: 40 })], [C('{{Lampiran}}')], [P('{{Perihal}}', { al: 'L', after: 40 })]]], 0, 1),
       ...ttdK([L('Diterima tanggal: ......................'), L('Penerima,', { after: 1100 }), L('(.................................)')])],
-    naskah_surat_keluar_surat_tugas: () => [...kop(), ...judulNo('SURAT TUGAS'), P('Yang bertanda tangan di bawah ini Kepala Desa {{Desa}}, Kecamatan {{Kecamatan}}, Kabupaten {{Kabupaten}}, menugaskan kepada:', { ind: 1 }),
-      P('{{Yang Ditugaskan}}', { left: 720 }), P('Untuk:', { before: 120 }), P('{{Keperluan Tugas}}', { left: 720 }),
-      tbl([2100, 250, W - 3070], [['Tanggal', ':', '{{Tanggal Tugas}}'], ['Tempat', ':', '{{Tempat Tugas}}']], 720),
-      P('{{Isi Surat}}', { ind: 1, before: 120 }), P('Demikian surat tugas ini dibuat untuk dilaksanakan dengan penuh tanggung jawab.', { ind: 1 }), ...ttdK(), ...tembusan()],
+    /* Surat Tugas: dasar dari surat masuk, daftar petugas (baris {{T …}} diulang per orang: Nama + Jabatan), keperluan, hari/tanggal, jam, tempat */
+    naskah_surat_keluar_surat_tugas: () => [...kop(), ...judulNo('SURAT TUGAS'),
+      P('Berdasarkan {{Dasar}}, yang bertanda tangan di bawah ini Kepala Desa {{Desa}}, Kecamatan {{Kecamatan}}, Kabupaten {{Kabupaten}}, menugaskan:', { ind: 1 }),
+      tbl([1900, 250, 450, 1200, 250, W - 4050], [['{{T Kepada}}', '{{T Titik}}', '{{T No}}.', 'Nama', ':', [P([r('{{T Nama}}', { bold: 1 })], { after: 40, al: 'L' })]], ['', '', '', 'Jabatan', ':', '{{T Jabatan}}']]),
+      tbl([1900, 250, W - 2150], [['Keperluan Tugas', ':', '{{Keperluan Tugas}}'], ['Hari/Tanggal', ':', '{{Hari Tanggal Tugas}}'], ['Jam', ':', '{{Jam Tugas}}'], ['Tempat', ':', '{{Tempat Tugas}}']]),
+      P('Demikian surat perintah tugas ini dibuat untuk dilaksanakan dengan penuh tanggung jawab.', { ind: 1, before: 160 }), ...ttdK(), ...tembusan()],
     naskah_surat_keluar_surat_kuasa: () => [...kop(), ...judulNo('SURAT KUASA'), P('Yang bertanda tangan di bawah ini:'), tbl([2100, 250, W - 3070], [['Nama', ':', '{{Kepala Desa}}'], ['Jabatan', ':', 'Kepala Desa {{Desa}}'], ['Alamat', ':', '{{Alamat Desa}}']], 720),
       P('Selanjutnya disebut PEMBERI KUASA. Dengan ini memberikan kuasa kepada:', { before: 120 }), P('{{Penerima Kuasa}}', { left: 720 }),
       P('Selanjutnya disebut PENERIMA KUASA, untuk {{Keperluan Kuasa}}.', { before: 120 }), P('{{Isi Surat}}', { ind: 1 }), P('Demikian surat kuasa ini dibuat untuk dipergunakan sebagaimana mestinya.', { ind: 1 }),
@@ -10018,8 +10059,8 @@ async function petaNaskah(e, r) {
     Tentang: v('tentang'), Menimbang: v('menimbang') || TITIK, Mengingat: v('mengingat') || TITIK, Memperhatikan: v('memperhatikan') || '-', Isi: v('isi_naskah') || TITIK,
     Jenis: v('jenis'), Perihal: v('isi'), Kepada: v('kepada'), Di: v('di') || 'Tempat', Sifat: v('sifat') || 'Biasa', Lampiran: v('lampiran') || '-', 'Isi Surat': v('isi_surat'), Tembusan: v('tembusan') || '-',
     'Hari Acara': dHari(r.acara_tgl), 'Tanggal Acara': dPanjang(r.acara_tgl), 'Waktu Acara': v('acara_jam'), 'Tempat Acara': v('acara_tempat'), Acara: v('acara'),
-    'Yang Ditugaskan': v('tugas_nama'), 'Keperluan Tugas': v('tugas_untuk'), 'Tanggal Tugas': v('tugas_tgl'), 'Tempat Tugas': v('tugas_tempat'),
-    'Waktu Pelaksanaan': v('tugas_tgl'), 'Tempat Tujuan': v('tugas_tempat'), 'Pembebanan Biaya': v('tugas_biaya') || '-', 'Hal Dimohon': v('mohon_isi'), 'Daftar Kiriman': v('pengantar_daftar'), 'Berlaku Mulai': dPanjang(r.berlaku_tgl) || dPanjang(tgl),
+    'Yang Ditugaskan': e === 'surat_keluar' && skPetugas(r).length ? skPetugas(r).map((o, i) => (i + 1) + '. ' + o.nama + (o.jabatan ? ' – ' + o.jabatan : '')).join('\n') : v('tugas_nama'), 'Keperluan Tugas': v('tugas_untuk'), 'Tanggal Tugas': v('tugas_tgl'), 'Tempat Tugas': v('tugas_tempat'),
+    Dasar: v('dasar') || TITIK, 'Hari Tanggal Tugas': v('tugas_tgl') || TITIK, 'Jam Tugas': v('tugas_jam') || TITIK, 'Waktu Pelaksanaan': [v('tugas_tgl'), v('tugas_jam')].filter(Boolean).join(', pukul '), 'Tempat Tujuan': v('tugas_tempat'), 'Pembebanan Biaya': v('tugas_biaya') || '-', 'Hal Dimohon': v('mohon_isi'), 'Daftar Kiriman': v('pengantar_daftar'), 'Berlaku Mulai': dPanjang(r.berlaku_tgl) || dPanjang(tgl),
     'Penerima Kuasa': v('kuasa_penerima'), 'Penerima Kuasa Nama': kp, 'Keperluan Kuasa': v('kuasa_untuk'),
     'Desa Mitra': judulKata(v('desa_mitra')), 'Kepala Desa Mitra': v('kades_mitra'), 'Ketua BPD': v('ketua_bpd') || TITIK
   }, e === 'berita_acara' ? await petaBA(r) : {}));
@@ -10037,7 +10078,7 @@ async function petaBA(r) {
     'Judul Dokumentasi': 'DOKUMENTASI ' + (v('jenis') || 'BERITA ACARA').toUpperCase(), 'Foto Dokumentasi': ft.length ? '' : 'Belum ada foto dokumentasi.', 'Jumlah Foto': String(ft.length), __foto: r.foto || '' };
 }
 const TAG_BA = ['Desa', 'Kecamatan', 'Kabupaten', 'Kode Desa', 'Kepala Desa', 'Nomor', 'Tahun', 'Jenis BA', 'Tentang', 'Hari', 'Tanggal', 'Tanggal Terbilang', 'Jam', 'Tempat', 'Dasar', 'Peserta', 'Uraian', 'Hasil', 'Pihak 1', 'Jabatan Pihak 1', 'Pihak 2', 'Jabatan Pihak 2', 'Mengetahui', 'Jabatan Mengetahui', 'Nama Mengetahui', 'Judul Dokumentasi', 'Foto Dokumentasi', 'Jumlah Foto'];
-const TAG_NASKAH = ['Desa', 'Kecamatan', 'Kabupaten', 'Alamat Desa', 'Kode Pos', 'Kode Desa', 'Kepala Desa', 'Sekretaris Desa', 'Nomor', 'No', 'Tahun', 'Kode Klasifikasi', 'Tanggal Surat', 'Hari Surat', 'Perihal', 'Kepada', 'Di', 'Sifat', 'Lampiran', 'Isi Surat', 'Tembusan', 'Hari Acara', 'Tanggal Acara', 'Waktu Acara', 'Tempat Acara', 'Acara', 'Yang Ditugaskan', 'Keperluan Tugas', 'Tanggal Tugas', 'Tempat Tugas', 'Waktu Pelaksanaan', 'Tempat Tujuan', 'Pembebanan Biaya', 'Hal Dimohon', 'Daftar Kiriman', 'Berlaku Mulai', 'Penerima Kuasa', 'Penerima Kuasa Nama', 'Keperluan Kuasa', 'Tentang', 'Menimbang', 'Mengingat', 'Memperhatikan', 'Isi', 'Tanggal Ditetapkan', 'Tanggal Diundangkan', 'No Lembaran', 'No Berita', 'Desa Mitra', 'Kepala Desa Mitra', 'Ketua BPD'];
+const TAG_NASKAH = ['Desa', 'Kecamatan', 'Kabupaten', 'Alamat Desa', 'Kode Pos', 'Kode Desa', 'Kepala Desa', 'Sekretaris Desa', 'Nomor', 'No', 'Tahun', 'Kode Klasifikasi', 'Tanggal Surat', 'Hari Surat', 'Perihal', 'Kepada', 'Di', 'Sifat', 'Lampiran', 'Isi Surat', 'Tembusan', 'Hari Acara', 'Tanggal Acara', 'Waktu Acara', 'Tempat Acara', 'Acara', 'Yang Ditugaskan', 'Keperluan Tugas', 'Tanggal Tugas', 'Tempat Tugas', 'Dasar', 'Hari Tanggal Tugas', 'Jam Tugas', 'T No', 'T Nama', 'T Jabatan', 'T Kepada', 'T Titik', 'Waktu Pelaksanaan', 'Tempat Tujuan', 'Pembebanan Biaya', 'Hal Dimohon', 'Daftar Kiriman', 'Berlaku Mulai', 'Penerima Kuasa', 'Penerima Kuasa Nama', 'Keperluan Kuasa', 'Tentang', 'Menimbang', 'Mengingat', 'Memperhatikan', 'Isi', 'Tanggal Ditetapkan', 'Tanggal Diundangkan', 'No Lembaran', 'No Berita', 'Desa Mitra', 'Kepala Desa Mitra', 'Ketua BPD'];
 async function cetakNaskah(e, rec) {
   const path = naskahPath(e, rec), label = rec.jenis || UI[e].t;
   const m = modal('Membuat dokumen', `<div class="stack"><b>${esc(label)}</b><div class="skel"></div><div class="meta">Mengisi template…</div></div>`);
@@ -10047,7 +10088,8 @@ async function cetakNaskah(e, rec) {
     if (umum && path !== umum) { const nm = path.split('/').pop().replace(/\.docx$/, ''); let ada = NX.nama.indexOf(nm) >= 0; if (!ada) { try { ada = (await tplDaftar()).some(x => x.path === path); } catch (x) { } } if (!ada) pth = umum; }
     const M = await petaNaskah(e, rec);
     const nama = NASKAH[e].nama ? NASKAH[e].nama(rec) : UI[e].t + ' ' + (rec.nomor || '') + ' - ' + String(rec.tentang || '').slice(0, 60);
-    hasilDokumen(m, await buatDokumen({ path: pth, M, rows: [], jenis: 'surat', nama }));
+    const rows = e === 'surat_keluar' ? [{ key: 'T No', items: skPetugas(rec).map((o, i) => ({ 'T No': String(i + 1), 'T Nama': o.nama, 'T Jabatan': o.jabatan || '', 'T Kepada': i ? '' : 'Kepada', 'T Titik': i ? '' : ':' })), empty: { 'T No': '1', 'T Nama': TITIK, 'T Jabatan': TITIK, 'T Kepada': 'Kepada', 'T Titik': ':' } }] : [];
+    hasilDokumen(m, await buatDokumen({ path: pth, M, rows, jenis: 'surat', nama }));
   } catch (x) { m.body.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
 }
 /* Draf surat keluar disetujui: tanggal persetujuan + PDF bertanda tangan (boleh menyusul) */
