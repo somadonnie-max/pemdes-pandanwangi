@@ -1086,6 +1086,7 @@ section.docx,section.docx *{-webkit-hyphens:manual!important;hyphens:manual!impo
 .chips.geser1{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;mask-image:linear-gradient(90deg,#000 92%,transparent)}.chips.geser1 .chip{flex:none;scroll-snap-align:start}
 .ntf-x{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;box-shadow:0 2px 0 var(--line)}.ntf-x svg{width:15px;height:15px}.ntf-x:hover{background:var(--surface2)}
 .smpk{position:absolute;left:0;right:0;top:100%;z-index:30;max-height:320px;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.16);padding:4px;margin-top:2px}.smpk-i{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;text-align:left;border:0;background:none;padding:7px 10px;border-radius:9px;cursor:pointer;color:inherit;font:inherit}.smpk-i:hover,.smpk-i:focus{background:var(--surface2)}.smpk-i b{font-size:13.5px;font-weight:600;line-height:1.3}.smpk-i small{font-size:11.5px;color:var(--muted);line-height:1.3}
+.orpk{position:fixed;z-index:200;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.2);padding:4px}.orpk-i{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;text-align:left;border:0;background:none;padding:7px 10px;border-radius:9px;cursor:pointer;color:inherit;font:inherit}.orpk-i:hover{background:var(--surface2)}.orpk-i b{font-size:13.5px;font-weight:600}.orpk-i small{font-size:11.5px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -1238,7 +1239,9 @@ function notifTombol(el, id, kunci) {
 }
 /* Surat Tugas: dasar dari surat masuk -> isian tugas terisi dari undangannya */
 const skDasarLbl = r => r.nomor ? 'Surat dari ' + (r.dari || '…') + ' Nomor : ' + r.nomor + (r.tgl_surat ? ' tanggal ' + dPanjang(r.tgl_surat).replace(/^0/, '') : '') : '';
-const skDasarIsi = r => ({ tugas_untuk: r.acara || r.isi || '', tugas_tgl: r.acara_tgl ? dHari(r.acara_tgl) + ', ' + dPanjang(r.acara_tgl).replace(/^0/, '') : '', tugas_jam: r.acara_jam ? String(r.acara_jam).replace(':', '.') + ' – Selesai' : '', tugas_tempat: r.acara_tempat || '' });
+const skDasarIsi = r => ({ tugas_untuk: r.acara || r.isi || '', tugas_tgl: r.acara_tgl ? dHari(r.acara_tgl) + ', ' + dPanjang(r.acara_tgl).replace(/^0/, '') : '', tugas_jam_mulai: /^\d{1,2}:\d{2}$/.test(r.acara_jam || '') ? r.acara_jam : '', tugas_tempat: r.acara_tempat || '' });
+/* jam tugas: "08.00 WIB – Selesai" atau "08.00 – 11.30 WIB" */
+const skJam = r => { const t = x => String(x || '').trim().replace(':', '.'); const a = t(r.tugas_jam_mulai), b = t(r.tugas_jam_selesai); return a ? (b ? a + ' – ' + b + ' WIB' : a + ' WIB – Selesai') : String(r.tugas_jam || ''); };
 /* daftar petugas Surat Tugas: dari isian tabel (atau isian lama satu baris per orang "Nama – Jabatan") */
 function skPetugas(r) {
   let a = []; try { a = JSON.parse(r.petugas || '[]'); } catch (x) { }
@@ -1578,22 +1581,22 @@ const UI = {
     fields: [F('no_agenda', 'No. Agenda', 'number', { auto: 1 }), F('tgl_surat', 'Tanggal Surat', 'date', { req: 1, def: isoToday }),
       F('jenis', 'Jenis Surat', 'text', { dd: OPT.jenisKeluar, def: 'Surat Biasa', hint: 'Ketuk untuk memilih — menentukan template draf dan isian tambahan' }), F('klasifikasi', 'Kode Klasifikasi Arsip', 'text', { list: OPT.kka, def: '400.10.2.2' }),
       F('nomor', 'Nomor Surat', 'text', { mono: 1, wide: 1, hint: 'Kosongkan: dibuat otomatis kode klasifikasi/no. agenda/kode desa/tahun' }),
-      F('sifat', 'Sifat', 'select', { opt: ['Biasa', 'Segera', 'Sangat Segera', 'Penting', 'Rahasia'], def: 'Biasa' }), F('lampiran', 'Lampiran', 'text', { def: '-' }),
-      F('kepada', 'Ditujukan Kepada', 'text', { req: 1, wide: 1 }), F('di', 'Di (tempat tujuan)', 'text', { def: 'Tempat' }), F('isi', 'Perihal / Isi Ringkas', 'textarea', { req: 1, wide: 1 }),
+      F('sifat', 'Sifat', 'select', { opt: ['Biasa', 'Segera', 'Sangat Segera', 'Penting', 'Rahasia'], def: 'Biasa', tanpa: ['Surat Tugas'] }), F('lampiran', 'Lampiran', 'text', { def: '-', tanpa: ['Surat Tugas'] }),
+      F('kepada', 'Ditujukan Kepada', 'text', { req: 1, wide: 1, tanpa: ['Surat Tugas'] }), F('di', 'Di (tempat tujuan)', 'text', { def: 'Tempat', tanpa: ['Surat Tugas'] }), F('isi', 'Perihal / Isi Ringkas', 'textarea', { req: 1, wide: 1, tanpa: ['Surat Tugas'] }),
       F('acara_tgl', 'Hari/Tanggal Acara', 'date', { grp: ['Surat Undangan', 'Surat Pemberitahuan', 'Pengumuman', 'Berita Acara'] }), F('acara_jam', 'Waktu Acara', 'text', { grp: ['Surat Undangan', 'Surat Pemberitahuan', 'Pengumuman'], hint: 'mis. 09.00 WIB s.d. selesai' }),
       F('acara_tempat', 'Tempat Acara', 'text', { grp: ['Surat Undangan', 'Surat Pemberitahuan', 'Pengumuman', 'Berita Acara'], def: () => 'Balai Desa ' + ND() }), F('acara', 'Acara', 'text', { wide: 1, grp: ['Surat Undangan', 'Surat Pemberitahuan', 'Pengumuman', 'Berita Acara'] }),
       F('dasar', 'Dasar (surat masuk)', 'text', { wide: 1, grp: ['Surat Tugas'], listFrom: { e: 'surat_masuk', k: skDasarLbl }, fill: skDasarIsi, smPick: 1, nodl: 1, hint: 'Ketik/pilih surat masuk yang menjadi dasar — keperluan, hari/tanggal, jam & tempat terisi otomatis dari undangannya' }),
-      F('petugas', 'Yang Ditugaskan', 'rows', { grp: ['Surat Tugas'], orang: 1, cols: [['nama', 'Nama', 'list'], ['jabatan', 'Jabatan', 'text']] }),
+      F('petugas', 'Yang Ditugaskan', 'rows', { grp: ['Surat Tugas'], orang: 1, cols: [['nama', 'Nama', 'text'], ['jabatan', 'Jabatan', 'text']] }),
       F('tugas_nama', 'Yang Diberi Rekomendasi', 'textarea', { grp: ['Surat Rekomendasi'], hint: 'Satu orang per baris, mis. "1. Nama – Jabatan"' }),
-      F('tugas_untuk', 'Keperluan Tugas', 'text', { wide: 1, grp: ['Surat Tugas'] }), F('tugas_tgl', 'Hari/Tanggal Pelaksanaan', 'text', { grp: ['Surat Tugas'], hint: 'mis. Rabu, 21 Oktober 2026' }), F('tugas_jam', 'Jam', 'text', { grp: ['Surat Tugas'], hint: 'mis. 08.00 – Selesai' }),
+      F('tugas_untuk', 'Keperluan Tugas', 'text', { wide: 1, grp: ['Surat Tugas'] }), F('tugas_tgl', 'Hari/Tanggal Pelaksanaan', 'text', { grp: ['Surat Tugas'], hint: 'mis. Rabu, 21 Oktober 2026' }), F('tugas_jam_mulai', 'Jam Mulai', 'time', { grp: ['Surat Tugas'] }), F('tugas_jam_selesai', 'Jam Selesai', 'time', { grp: ['Surat Tugas'], hint: 'Kosongkan bila sampai selesai' }), F('tugas_jam', 'Jam (lama)', 'text', { noform: 1 }),
       F('tugas_tempat', 'Tempat Tujuan', 'text', { grp: ['Surat Tugas'] }),
-      F('tugas_biaya', 'Pembebanan Biaya', 'text', { grp: ['Surat Tugas'], hint: 'mis. APBDes Tahun 2026 / Tidak dibebankan biaya' }),
+      F('tugas_biaya', 'Pembebanan Biaya', 'text', { noform: 1 }),
       F('kuasa_penerima', 'Penerima Kuasa', 'textarea', { grp: ['Surat Kuasa'], hint: 'Baris 1: nama; berikutnya jabatan/alamat' }), F('kuasa_untuk', 'Keperluan Kuasa', 'text', { wide: 1, grp: ['Surat Kuasa'] }),
       F('mohon_isi', 'Hal yang Dimohon', 'textarea', { grp: ['Surat Permohonan'], hint: 'mis. bantuan narasumber / izin penggunaan tempat' }),
       F('pengantar_daftar', 'Daftar yang Dikirim (satu per baris)', 'textarea', { grp: ['Surat Pengantar'], hint: 'mis. "1. Laporan Realisasi APBDes – 1 bendel"' }),
       F('berlaku_tgl', 'Berlaku Mulai', 'date', { grp: ['Surat Edaran', 'Pengumuman'] }),
-      F('isi_surat', 'Isi Surat', 'textarea', { gen: 1, rows: 8, hint: 'Isi pokok surat. Enter = paragraf baru.' }), F('tembusan', 'Tembusan', 'textarea', { gen: 1, hint: 'Satu per baris, mis. "1. Camat Tempeh"' }),
-      F('pengolah', 'Pengolah', 'text', { def: 'Kaur TU & Umum' }), F('ket', 'Keterangan', 'text', { def: 'Arsip' }),
+      F('isi_surat', 'Isi Surat', 'textarea', { gen: 1, tanpa: ['Surat Tugas'], rows: 8, hint: 'Isi pokok surat. Enter = paragraf baru.' }), F('tembusan', 'Tembusan', 'textarea', { gen: 1, hint: 'Satu per baris, mis. "1. Camat Tempeh"' }),
+      F('pengolah', 'Pengolah', 'text', { def: 'Kaur TU & Umum', tanpa: ['Surat Tugas'] }), F('ket', 'Keterangan', 'text', { def: 'Arsip', tanpa: ['Surat Tugas'] }),
       F('status', 'Status', 'select', { opt: ['Draf', 'Disetujui'], noform: 1 }), F('tgl_setuju', 'Tanggal Disetujui', 'date', { noform: 1 }),
       F('dok_id', 'Upload surat', 'file', { wide: 1, lihat: 'Lihat Surat' })],
     year: 'tgl_surat', sort: 'tgl_surat', grpBy: 'jenis', chips: { k: 'jenis', opt: OPT.jenisKeluar, dyn: 1, baris: 1 },
@@ -4975,9 +4978,10 @@ VIEWS.form = async (p, main, alive) => {
     const jf = $('#f_' + u.grpBy, frm);
     const sync = () => {
       const jv = jf.value.trim(), def = (S.jenisSurat || []).find(j => j.nama === jv), lbs = def ? isianJenis(def) : [];
-      flds.filter(f => f.grp || f.dyn).forEach(f => {
+      flds.filter(f => f.grp || f.dyn || f.tanpa).forEach(f => {
         const el = $('#f_' + f.k, frm), box = el && el.closest('.f'); if (!box) return;
         if (f.dyn) { box.hidden = f.dyn > lbs.length; const lb = box.querySelector('label'); if (lb && lbs[f.dyn - 1]) lb.textContent = lbs[f.dyn - 1]; }
+        else if (f.tanpa) box.hidden = f.tanpa.indexOf(jv) >= 0;   /* isian yang tidak dipakai template jenis ini */
         else box.hidden = f.grp.indexOf(jv) < 0;
       });
       const pm = $('#f_pemohon', frm);
@@ -5004,7 +5008,7 @@ VIEWS.form = async (p, main, alive) => {
     el.addEventListener('change', () => {
       const x = (f._rows || []).find(r => String((typeof f.listFrom.k === 'function' ? f.listFrom.k(r) : r[f.listFrom.k]) || '').trim().toLowerCase() === el.value.trim().toLowerCase()); if (!x) return;
       const m = f.fill(x);
-      Object.keys(m).forEach(k => { const t = $('#f_' + k, frm); if (!t || !m[k] || t.readOnly) return; if (t.tagName === 'SELECT' && !Array.from(t.options).some(o => o.value === m[k])) return; t.value = m[k]; });
+      Object.keys(m).forEach(k => { const t = $('#f_' + k, frm); if (!t || !m[k] || t.readOnly) return; if (t.tagName === 'SELECT' && !Array.from(t.options).some(o => o.value === m[k])) return; t.value = m[k]; if (/^(date|time|month)$/.test(t.type)) t.dispatchEvent(new Event('change', { bubbles: true })); });
       const nk = $('#f_nik', frm); if (nk && /^\d{16}$/.test(nk.value)) nk.dispatchEvent(new Event('input'));
     });
   });
@@ -5027,12 +5031,32 @@ VIEWS.form = async (p, main, alive) => {
     dd.addEventListener('click', ev => { const b = ev.target.closest('.smpk-i'); if (!b) return; const r = rows.find(x => x.id === b.dataset.id); if (!r) return; el.value = skDasarLbl(r); dd.hidden = true; el.dispatchEvent(new Event('change', { bubbles: true })); });
     el.addEventListener('blur', () => setTimeout(() => { dd.hidden = true; }, 150));
   });
-  flds.filter(f => f.orang).forEach(f => {   /* pilih nama -> jabatan terisi; ketik >= 3 huruf -> nama dari Data Penduduk ikut ditawarkan */
-    const b = $('#f_' + f.k, frm), dl = b && $('datalist', b); if (!b) return;
-    let tm = null, pend = {};
-    b.addEventListener('change', ev => { const t = ev.target; if (t.dataset.c !== 'nama') return; const n = t.value.trim(), j = t.closest('tr').querySelector('[data-c="jabatan"]'); const jb = f._jab[n] != null ? f._jab[n] : pend[n]; if (j && !j.value.trim() && jb) j.value = jb; });
-    b.addEventListener('input', ev => { const t = ev.target; if (t.dataset.c !== 'nama' || !dl) return; clearTimeout(tm); const q = t.value.trim(); if (q.length < 3) return;
-      tm = setTimeout(async () => { try { const rs = await wargaCari(q, 8); rs.forEach(x => { const n = fmtNama(x.nama, 'p'); if (!n || f._jab[n] != null || pend[n] != null) return; pend[n] = ''; const o = document.createElement('option'); o.value = n; o.label = 'Penduduk · ' + String(x.dusun || '').replace(/^DUSUN /i, ''); dl.appendChild(o); }); } catch (x) { } }, 300); });
+  flds.filter(f => f.orang).forEach(f => {   /* ketik nama -> pilihan muncul DI ATAS kolom (tidak tertutup tabel); pilih -> jabatan terisi; >= 3 huruf -> Data Penduduk ikut dicari */
+    const b = $('#f_' + f.k, frm); if (!b) return;
+    const pk = document.createElement('div'); pk.className = 'orpk'; pk.hidden = true; document.body.appendChild(pk);
+    const obs = new MutationObserver(() => { if (!frm.isConnected) { pk.remove(); obs.disconnect(); } }); obs.observe(document.body, { childList: true, subtree: true });
+    let cur = null, tm = null, pend = [];
+    const tutup = () => { pk.hidden = true; cur = null; };
+    const letak = () => {
+      if (!cur) return; const rc = cur.getBoundingClientRect(), w = Math.max(rc.width, 260), atas = rc.top > 240 || rc.top > innerHeight - rc.bottom;
+      pk.style.left = Math.max(6, Math.min(rc.left, innerWidth - w - 6)) + 'px'; pk.style.width = w + 'px';
+      if (atas) { pk.style.top = ''; pk.style.bottom = (innerHeight - rc.top + 4) + 'px'; pk.style.maxHeight = Math.min(300, rc.top - 10) + 'px'; }
+      else { pk.style.bottom = ''; pk.style.top = (rc.bottom + 4) + 'px'; pk.style.maxHeight = Math.min(300, innerHeight - rc.bottom - 10) + 'px'; }
+    };
+    const tampil = () => {
+      if (!cur) return; const q = cur.value.trim().toLowerCase();
+      const a = f._list.filter(n => !q || n.toLowerCase().indexOf(q) >= 0).slice(0, 30).map(n => ({ n, j: f._jab[n] || '', s: 'Aparatur / Petugas' }))
+        .concat(pend.filter(x => !f._jab[x.n] && (!q || x.n.toLowerCase().indexOf(q) >= 0)).slice(0, 10));
+      pk.innerHTML = a.length ? a.map(x => `<button type="button" class="orpk-i" data-n="${esc(x.n)}" data-j="${esc(x.j)}"><b>${esc(x.n)}</b><small>${esc([x.j, x.s].filter(Boolean).join(' · '))}</small></button>`).join('') : '<div class="meta" style="padding:8px 10px">Ketik minimal 3 huruf untuk mencari di Data Penduduk.</div>';
+      pk.hidden = false; letak();
+    };
+    b.addEventListener('focusin', ev => { if (ev.target.dataset.c !== 'nama') return; cur = ev.target; cur.setAttribute('autocomplete', 'off'); tampil(); });
+    b.addEventListener('input', ev => { if (ev.target.dataset.c !== 'nama') return; cur = ev.target; tampil(); clearTimeout(tm); const q = cur.value.trim(); if (q.length < 3) return;
+      tm = setTimeout(async () => { try { const rs = await wargaCari(q, 8); pend = rs.map(x => ({ n: fmtNama(x.nama, 'p'), j: '', s: 'Penduduk ' + String(x.dusun || '').replace(/^DUSUN /i, 'Dusun ').toLowerCase().replace(/(^|\s)\S/g, m => m.toUpperCase()) })).filter(x => x.n); tampil(); } catch (x) { } }, 300); });
+    b.addEventListener('focusout', () => setTimeout(() => { if (!pk.contains(document.activeElement)) tutup(); }, 180));
+    pk.addEventListener('mousedown', ev => ev.preventDefault());
+    pk.addEventListener('click', ev => { const it = ev.target.closest('.orpk-i'); if (!it || !cur) return; cur.value = it.dataset.n; const j = cur.closest('tr').querySelector('[data-c="jabatan"]'); if (j && it.dataset.j && !j.value.trim()) j.value = it.dataset.j; const c = cur; tutup(); (j && !j.value.trim() ? j : c).focus(); });
+    addEventListener('scroll', letak, true); addEventListener('resize', letak);
   });
   keuFormHook(e, frm, rec);
   if (e === 'surat_masuk') fwdHook(frm);
@@ -5123,6 +5147,11 @@ VIEWS.form = async (p, main, alive) => {
     const er = $('#ferr'), btn = $('#save');
     er.hidden = true;
     const val = readForm(u, frm);
+    if (e === 'surat_keluar' && val.jenis === 'Surat Tugas') {   /* Surat Tugas: "kepada" & perihal diambil dari petugas & keperluan */
+      const pt = skPetugas(val);
+      if (!pt.length) { er.textContent = 'Isi minimal satu nama di "Yang Ditugaskan".'; er.hidden = false; return; }
+      val.kepada = pt.map(o => o.nama).join(', '); if (!String(val.isi || '').trim() || /^Surat Tugas – /.test(rec.isi || '') || !rec.isi) val.isi = 'Surat Tugas – ' + (val.tugas_untuk || pt.map(o => o.nama).join(', '));
+    }
     const miss = flds.filter(f => f.req && f.t !== 'file' && !String(val[f.k] || '').trim());
     if (miss.length) { er.textContent = 'Lengkapi: ' + miss.map(f => f.l).join(', ') + '.'; er.hidden = false; $('#f_' + miss[0].k).focus(); return; }
     const bad = u.fields.find(f => f.len && val[f.k] && val[f.k].indexOf('•') < 0 && !new RegExp('^\\d{' + f.len + '}$').test(val[f.k]));
@@ -8851,7 +8880,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '190', tgl: '2026-10-20', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '191', tgl: '2026-10-20', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -10079,7 +10108,7 @@ async function petaNaskah(e, r) {
     Jenis: v('jenis'), Perihal: v('isi'), Kepada: v('kepada'), Di: v('di') || 'Tempat', Sifat: v('sifat') || 'Biasa', Lampiran: v('lampiran') || '-', 'Isi Surat': v('isi_surat'), Tembusan: v('tembusan') || '-', 'Tembusan Lengkap': v('tembusan').trim() ? 'Tembusan:\n' + v('tembusan').trim() : '',
     'Hari Acara': dHari(r.acara_tgl), 'Tanggal Acara': dPanjang(r.acara_tgl), 'Waktu Acara': v('acara_jam'), 'Tempat Acara': v('acara_tempat'), Acara: v('acara'),
     'Yang Ditugaskan': e === 'surat_keluar' && skPetugas(r).length ? skPetugas(r).map((o, i) => (i + 1) + '. ' + o.nama + (o.jabatan ? ' – ' + o.jabatan : '')).join('\n') : v('tugas_nama'), 'Keperluan Tugas': v('tugas_untuk'), 'Tanggal Tugas': v('tugas_tgl'), 'Tempat Tugas': v('tugas_tempat'),
-    Dasar: v('dasar') || TITIK, 'Hari Tanggal Tugas': v('tugas_tgl') || TITIK, 'Jam Tugas': v('tugas_jam') || TITIK, 'Waktu Pelaksanaan': [v('tugas_tgl'), v('tugas_jam')].filter(Boolean).join(', pukul '), 'Tempat Tujuan': v('tugas_tempat'), 'Pembebanan Biaya': v('tugas_biaya') || '-', 'Hal Dimohon': v('mohon_isi'), 'Daftar Kiriman': v('pengantar_daftar'), 'Berlaku Mulai': dPanjang(r.berlaku_tgl) || dPanjang(tgl),
+    Dasar: v('dasar') || TITIK, 'Hari Tanggal Tugas': v('tugas_tgl') || TITIK, 'Jam Tugas': skJam(r) || TITIK, 'Waktu Pelaksanaan': [v('tugas_tgl'), skJam(r)].filter(Boolean).join(', pukul '), 'Tempat Tujuan': v('tugas_tempat'), 'Pembebanan Biaya': v('tugas_biaya') || '-', 'Hal Dimohon': v('mohon_isi'), 'Daftar Kiriman': v('pengantar_daftar'), 'Berlaku Mulai': dPanjang(r.berlaku_tgl) || dPanjang(tgl),
     'Penerima Kuasa': v('kuasa_penerima'), 'Penerima Kuasa Nama': kp, 'Keperluan Kuasa': v('kuasa_untuk'),
     'Desa Mitra': judulKata(v('desa_mitra')), 'Kepala Desa Mitra': v('kades_mitra'), 'Ketua BPD': v('ketua_bpd') || TITIK
   }, e === 'berita_acara' ? await petaBA(r) : {}));
