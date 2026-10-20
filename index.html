@@ -1082,6 +1082,8 @@ img.bf-pg{width:auto;max-width:100%;max-height:70vh;object-fit:contain}
 section.docx,section.docx *{-webkit-hyphens:manual!important;hyphens:manual!important}section.docx img{vertical-align:top}
 /* tombol Disetujui kecil di baris surat keluar */
 .chip.sk-ok{min-height:22px;padding:1px 9px;font-size:12px;vertical-align:middle}.chip.sk-ok svg{width:13px;height:13px}
+/* pilihan jenis surat: satu baris, digeser ke samping */
+.chips.geser1{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;mask-image:linear-gradient(90deg,#000 92%,transparent)}.chips.geser1 .chip{flex:none;scroll-snap-align:start}
 </style>
 </head>
 <body>
@@ -1225,6 +1227,7 @@ function brand() { const s = (typeof S !== 'undefined' && S.set) || {}, b = bran
 const ND = () => brand().desa;
 /* status surat keluar: Draf (dari tombol Buat) -> Disetujui (+ PDF bertanda tangan); data lama tanpa status = surat jadi */
 const skDraf = r => r && r.status === 'Draf';
+const skAdaDraf = r => skDraf(r) || (r && (r.asal === 'draf' || !!r.isi_surat));   /* surat yang punya draf (dibuat lewat tombol Buat) */
 const skPill = r => skDraf(r) ? `<span class="pill warn">Draf</span>${canWrite('surat_keluar') ? ` <button type="button" class="chip on sk-ok" data-act="skSetuju" data-id="${esc(r.id)}">${ic('check')}Disetujui</button>` : ''}` : r && r.status === 'Disetujui' && !r.dok_id ? '<span class="pill info">Disetujui · belum ada PDF</span>' : '';
 const JENIS_BA = ['Berita Acara Musyawarah', 'Berita Acara Rapat', 'Berita Acara Serah Terima', 'Berita Acara Pemeriksaan', 'Berita Acara Penyerahan Bantuan', 'Berita Acara Kesepakatan', 'Berita Acara Klarifikasi'];
 (function () { const b = brandCache(); if (b.logo) { LOGO = b.logo; document.getElementById('favi').href = b.logo; } document.title = 'Pemdes ' + (b.desa || CFG.namaDesa || DESA0); })();
@@ -1545,8 +1548,8 @@ const UI = {
       F('tugas_nama', 'Yang Ditugaskan', 'textarea', { grp: ['Surat Tugas'], hint: 'Satu orang per baris' }), F('tugas_tempat', 'Tempat Tujuan', 'text', { grp: ['Surat Tugas'] }), F('tugas_tgl', 'Waktu Pelaksanaan', 'text', { grp: ['Surat Tugas'], hint: 'mis. 20 – 22 Oktober 2026' }),
       F('batas_tgl', 'Batas Waktu Tindak Lanjut', 'date', { grp: ['Surat Permohonan', 'Surat Edaran', 'Surat Instruksi', 'Surat Pemberitahuan', 'Surat Tugas'] }),
       F('pengolah', 'Pengolah', 'text', { def: 'Kaur TU & Umum' }),
-      F('disposisi', 'Disposisi', 'text'), F('ket', 'Keterangan', 'text', { def: 'Arsip' }), F('dok_id', 'Scan surat (PDF/foto)', 'file', { wide: 1 })],
-    year: 'tgl_terima', sort: 'tgl_terima', grpBy: 'jenis', chips: { k: 'jenis', opt: OPT.jenisMasuk, dyn: 1 },
+      F('disposisi', 'Disposisi', 'text'), F('ket', 'Keterangan', 'text', { def: 'Arsip' }), F('dok_id', 'Upload surat', 'file', { wide: 1, lihat: 'Lihat Surat' })],
+    year: 'tgl_terima', sort: 'tgl_terima', grpBy: 'jenis', chips: { k: 'jenis', opt: OPT.jenisMasuk, dyn: 1, baris: 1 },
     row: r => ({ t: r.isi, s: [r.jenis, 'dari ' + r.dari, r.nomor].filter(Boolean).join(' · ') + (r.acara_tgl ? ' · acara ' + fDate(r.acara_tgl) : ''), date: r.tgl_terima, file: r.dok_id, r: r.no_agenda ? 'No. ' + r.no_agenda : '', pill: r.terusan ? `<span class="pill info">→ ${esc(r.terusan)}</span>` : '' }),
     print: { title: 'BUKU AGENDA SURAT MASUK', land: 1, cols: [['No. Agenda', 'no_agenda'], ['Tgl Terima', r => fDate(r.tgl_terima)], ['Nomor Surat', 'nomor'], ['Tgl Surat', r => fDate(r.tgl_surat)], ['Pengirim', 'dari'], ['Isi Singkat', 'isi'], ['Disposisi', 'disposisi'], ['Ket', 'ket']] }
   },
@@ -1570,8 +1573,8 @@ const UI = {
       F('isi_surat', 'Isi Surat', 'textarea', { gen: 1, rows: 8, hint: 'Isi pokok surat. Enter = paragraf baru.' }), F('tembusan', 'Tembusan', 'textarea', { gen: 1, hint: 'Satu per baris, mis. "1. Camat Tempeh"' }),
       F('pengolah', 'Pengolah', 'text', { def: 'Kaur TU & Umum' }), F('ket', 'Keterangan', 'text', { def: 'Arsip' }),
       F('status', 'Status', 'select', { opt: ['Draf', 'Disetujui'], noform: 1 }), F('tgl_setuju', 'Tanggal Disetujui', 'date', { noform: 1 }),
-      F('dok_id', 'Dokumen surat bertanda tangan (PDF/foto)', 'file', { wide: 1 })],
-    year: 'tgl_surat', sort: 'tgl_surat', grpBy: 'jenis', chips: { k: 'jenis', opt: OPT.jenisKeluar, dyn: 1 },
+      F('dok_id', 'Upload surat', 'file', { wide: 1, lihat: 'Lihat Surat' })],
+    year: 'tgl_surat', sort: 'tgl_surat', grpBy: 'jenis', chips: { k: 'jenis', opt: OPT.jenisKeluar, dyn: 1, baris: 1 },
     row: r => ({ t: r.isi, s: [r.jenis, 'kepada ' + r.kepada, r.nomor].filter(Boolean).join(' · '), date: r.tgl_surat, file: r.dok_id, r: r.no_agenda ? 'No. ' + r.no_agenda : '', pill: skPill(r) }),
     print: { title: 'BUKU AGENDA SURAT KELUAR', land: 1, cols: [['No. Agenda', 'no_agenda'], ['Tgl Surat', r => fDate(r.tgl_surat)], ['Nomor Surat', 'nomor'], ['Ditujukan Kepada', 'kepada'], ['Isi Singkat', 'isi'], ['Ket', 'ket']] }
   },
@@ -3805,7 +3808,7 @@ VIEWS.list = async (p, main, alive) => {
     ${GRUP_OF[e] ? `<div class="gtabs" role="tablist">${grpEs(GRUP_OF[e]).map(([k, l]) => `<button role="tab" class="${k === e ? 'on' : ''}" data-act="grpTab" data-v="${k}">${esc(l)}</button>`).join('')}</div>` : ''}
     ${pers ? `<div class="chips">${pers.map(y => `<button class="chip ${st.per === y || (y === 'Semua' && st.per === 'all') ? 'on' : ''}" data-act="per" data-v="${y === 'Semua' ? 'all' : y}">${y}</button>`).join('')}</div>` : ''}
     ${u.views ? `<div class="chips">${u.views.map((v, i) => `<button class="chip ${st.view === i ? 'on' : ''}" data-act="view" data-v="${i}">${esc(v[0])}</button>`).join('')}</div>` : ''}
-    ${u.chips ? `<div class="chips${u.chips.dyn ? ' wrap' : ''}"><button class="chip ${!st.chip ? 'on' : ''}" data-act="chip" data-v="">Semua</button>${chipOpt.map(o => `<button class="chip ${st.chip === o ? 'on' : ''}" data-act="chip" data-v="${esc(o)}">${esc(u.chips.lbl ? u.chips.lbl(o) : o)}${chipN[o] ? ` <small class="num">${chipN[o]}</small>` : ''}</button>`).join('')}</div>` : ''}
+    ${u.chips ? `<div class="chips${u.chips.dyn && !u.chips.baris ? ' wrap' : u.chips.baris ? ' geser1' : ''}"><button class="chip ${!st.chip ? 'on' : ''}" data-act="chip" data-v="">Semua</button>${chipOpt.map(o => `<button class="chip ${st.chip === o ? 'on' : ''}" data-act="chip" data-v="${esc(o)}">${esc(u.chips.lbl ? u.chips.lbl(o) : o)}${chipN[o] ? ` <small class="num">${chipN[o]}</small>` : ''}</button>`).join('')}</div>` : ''}
     ${fltN ? `<div class="fltbar">${Object.keys(st.flt).map(k => `<button class="chip on" data-act="fltX" data-k="${esc(k)}" title="Hapus kriteria">${esc(fltLabel(e, k, st.flt[k]))}${ic('x')}</button>`).join('')}<button class="chip" data-act="fltX" data-k="">Hapus semua</button></div>` : ''}
     <div class="meta" id="cnt"></div>
     <div id="rows"><div class="skel"></div></div>
@@ -4039,12 +4042,12 @@ async function renderDetail(e, x, el, full) {
   el.innerHTML = `
     ${e === 'kegiatan' && x.sumber_mus ? `<div class="card meta">${ic('lock')} Agenda ini terusan otomatis dari Musyawarah RKP/RPJM (tanggal, jam, tempat, dan foto mengikuti data musyawarah). Tidak bisa diubah atau dihapus di sini; ubah lewat Perencanaan → RKP/RPJM Desa → Musyawarah &amp; Tim.</div>` : ''}
     ${shown.length ? `<dl class="dl">${shown.map(f => `<div class="${f.t === 'textarea' || f.wide && String(x[f.k]).length > 40 ? 'w' : ''}"><dt>${esc(f.l)}</dt><dd>${pendLinkVal(e, f, x) || valHtml(f, x[f.k], x)}</dd></div>`).join('')}</dl>` : ''}
-    ${files.length && e !== 'penduduk' ? `<div class="btns">${files.map(f => `<button class="btn sm" data-act="file" data-id="${esc(x[f.k])}" data-priv="${f.priv ? 1 : 0}" data-name="${esc(f.l)}">${ic(x[f.k] === '•' ? 'lock' : f.img ? 'eye' : 'file')}${esc(f.l)}</button>`).join('')}</div>` : ''}
+    ${files.length && e !== 'penduduk' ? `<div class="btns">${files.map(f => `<button class="btn sm" data-act="file" data-id="${esc(x[f.k])}" data-priv="${f.priv ? 1 : 0}" data-name="${esc(f.lihat || f.l)}">${ic(x[f.k] === '•' ? 'lock' : f.img ? 'eye' : 'file')}${esc(f.lihat || f.l)}</button>`).join('')}</div>` : ''}
     ${galeri}${rws}
     <div class="xk"></div>
     ${geo ? mapHtml(geo, 'Lokasi ' + (u.row(x).t || '')) : ''}
     <div class="xx"></div>
-    <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button>${/^tanah_/.test(e) && !S.user.admin ? '' : `<button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>`}` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak (tanpa QR)</button>` : ''}${e === 'keu_spp' ? `<button class="btn sm" data-act="sppWord" data-id="${esc(x.id)}">${ic('file')}SPP + SPTJM (Word)</button><button class="btn sm" data-act="kuitansi" data-id="${esc(x.id)}">${ic('print')}Cetak kuitansi</button>` : ''}${e === 'keu_spp' && w && x.status !== 'Dicairkan' ? `<button class="btn sm pri" data-act="keuCair" data-id="${esc(x.id)}">${ic('check')}Cairkan</button>` : ''}${e === 'keu_spp' && w && x.status === 'Dicairkan' ? `<button class="btn sm danger" data-act="keuBatal" data-id="${esc(x.id)}">${ic('x')}Batalkan pencairan</button>` : ''}${e === 'keu_trans' && w && x.jenis === 'Pajak Dipungut' ? `<button class="btn sm" data-act="setorPajak" data-id="${esc(x.id)}">${ic('send')}Setor pajak</button>` : ''}${NASKAH[e] && w && !(e === 'surat_keluar' && !skDraf(x) && !x.isi_surat) ? `<button class="btn sm" data-act="cetakNaskah" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('print')}${e === 'surat_keluar' ? 'Buat Draf' : 'Buat dokumen (Word)'}</button>` : ''}${e === 'surat_keluar' && w && skDraf(x) ? `<button class="btn sm pri" data-act="skSetuju" data-id="${esc(x.id)}">${ic('check')}Disetujui</button>` : ''}${e === 'surat_keluar' && w && x.status === 'Disetujui' && !x.dok_id ? `<button class="btn sm" data-act="skSetuju" data-id="${esc(x.id)}" data-pdf="1">${ic('plus')}Unggah PDF bertanda tangan</button>` : ''}${e === 'surat_masuk' && x.jenis === 'Surat Undangan' && x.acara_tgl && !(/Agenda/.test(x.terusan || '') && !x.agenda_id) ? (x.agenda_id ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'kegiatan', id: x.agenda_id }]))}'>${ic('cal')}Lihat di Agenda</button>` : canWrite('kegiatan') && w ? `<button class="btn sm" data-act="smAgenda" data-id="${esc(x.id)}">${ic('cal')}Masukkan ke Agenda</button>` : '') : ''}${e === 'kegiatan' && w && kgBisaSelesai(x) ? `<button class="btn sm pri" data-act="kgSelesai" data-id="${esc(x.id)}">${ic('check')}Selesai</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>`;
+    <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button>${/^tanah_/.test(e) && !S.user.admin ? '' : `<button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>`}` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak (tanpa QR)</button>` : ''}${e === 'keu_spp' ? `<button class="btn sm" data-act="sppWord" data-id="${esc(x.id)}">${ic('file')}SPP + SPTJM (Word)</button><button class="btn sm" data-act="kuitansi" data-id="${esc(x.id)}">${ic('print')}Cetak kuitansi</button>` : ''}${e === 'keu_spp' && w && x.status !== 'Dicairkan' ? `<button class="btn sm pri" data-act="keuCair" data-id="${esc(x.id)}">${ic('check')}Cairkan</button>` : ''}${e === 'keu_spp' && w && x.status === 'Dicairkan' ? `<button class="btn sm danger" data-act="keuBatal" data-id="${esc(x.id)}">${ic('x')}Batalkan pencairan</button>` : ''}${e === 'keu_trans' && w && x.jenis === 'Pajak Dipungut' ? `<button class="btn sm" data-act="setorPajak" data-id="${esc(x.id)}">${ic('send')}Setor pajak</button>` : ''}${NASKAH[e] && (w || e === 'surat_keluar') && !(e === 'surat_keluar' && !skAdaDraf(x)) ? `<button class="btn sm" data-act="cetakNaskah" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic(e === 'surat_keluar' ? 'eye' : 'print')}${e === 'surat_keluar' ? 'Lihat Draf' : 'Buat dokumen (Word)'}</button>` : ''}${e === 'surat_keluar' && w && skDraf(x) ? `<button class="btn sm pri" data-act="skSetuju" data-id="${esc(x.id)}">${ic('check')}Disetujui</button>` : ''}${e === 'surat_keluar' && w && x.status === 'Disetujui' && !x.dok_id ? `<button class="btn sm" data-act="skSetuju" data-id="${esc(x.id)}" data-pdf="1">${ic('plus')}Unggah PDF bertanda tangan</button>` : ''}${e === 'surat_masuk' && x.jenis === 'Surat Undangan' && x.acara_tgl && !(/Agenda/.test(x.terusan || '') && !x.agenda_id) ? (x.agenda_id ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'kegiatan', id: x.agenda_id }]))}'>${ic('cal')}Lihat di Agenda</button>` : canWrite('kegiatan') && w ? `<button class="btn sm" data-act="smAgenda" data-id="${esc(x.id)}">${ic('cal')}Masukkan ke Agenda</button>` : '') : ''}${e === 'kegiatan' && w && kgBisaSelesai(x) ? `<button class="btn sm pri" data-act="kgSelesai" data-id="${esc(x.id)}">${ic('check')}Selesai</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>`;
   const xk = $('.xk', el), xx = $('.xx', el);
   if (e === 'penduduk' && !diKK) {
     try {
@@ -4848,7 +4851,7 @@ function fieldHtml(f, v, rec) {
     case 'geo': inp = `<div class="btns" style="flex-wrap:nowrap"><input id="${id}" value="${esc(v)}" placeholder="-8.2367, 113.1907" style="flex:1"><button type="button" class="btn sm" data-act="geo" data-t="${id}">${ic('pin')}Lokasi saya</button></div>`; break;
     case 'file': {
       const locked = v === '•';
-      inp = `<div class="filebox">${v ? `<span class="btns fkeep"><button type="button" class="btn sm" data-act="file" data-id="${esc(v)}" data-priv="${f.priv ? 1 : 0}" data-name="${esc(f.l)}">${ic(locked ? 'lock' : 'eye')}Berkas tersimpan</button>${locked ? '' : `<button type="button" class="btn sm danger" data-act="fileDel" data-k="${esc(f.k)}">${ic('trash')}Hapus</button>`}</span><input type="hidden" id="fd_${esc(f.k)}" value="">` : ''}
+      inp = `<div class="filebox">${v ? `<span class="btns fkeep"><button type="button" class="btn sm" data-act="file" data-id="${esc(v)}" data-priv="${f.priv ? 1 : 0}" data-name="${esc(f.lihat || f.l)}">${ic(locked ? 'lock' : 'eye')}${esc(f.lihat || 'Berkas tersimpan')}</button>${locked ? '' : `<button type="button" class="btn sm danger" data-act="fileDel" data-k="${esc(f.k)}">${ic('trash')}Hapus</button>`}</span><input type="hidden" id="fd_${esc(f.k)}" value="">` : ''}
         ${locked ? '<span class="hint">Anda tidak punya izin mengganti dokumen kependudukan.</span>' : `<input type="file" id="${id}"${f.maxAdm ? ` data-maxadm="${f.maxAdm}"` : ''} accept="${f.img ? IMG_ANY : 'application/pdf,' + IMG_ANY + ',.doc,.docx,.xls,.xlsx'}"><span class="hint">${v ? 'Pilih berkas baru untuk mengganti.' : f.img ? 'Foto akan diperkecil otomatis.' : f.maxAdm ? (S.user && S.user.admin ? 'PDF / dokumen maks. ' + f.maxAdm + ' MB (khusus admin) · foto otomatis diperkecil.' : HINT_DOK + '. Dokumen sampai ' + f.maxAdm + ' MB hanya bisa diunggah admin.') : HINT_DOK + '.'}</span><span class="hint err-t"></span>`}</div>`;
       break;
     }
@@ -5101,7 +5104,7 @@ VIEWS.form = async (p, main, alive) => {
         val[f.k] = out.length ? JSON.stringify(out) : '';
       }
       if (NASKAH[e] && !String(val.nomor || '').trim() && (e === 'surat_keluar' || NASKAH[e].nomor)) val.nomor = await nomorOtomatis(e, val);
-      if (e === 'surat_keluar' && !p.id) { if (p.buat) val.status = 'Draf'; else { val.status = 'Disetujui'; val.tgl_setuju = val.tgl_surat || isoToday(); } }
+      if (e === 'surat_keluar' && !p.id) { if (p.buat) { val.status = 'Draf'; val.asal = 'draf'; } else { val.status = 'Disetujui'; val.tgl_setuju = val.tgl_surat || isoToday(); } }
       if (p.id) val.id = p.id;
       Object.assign(val, p.preset && !p.id ? Object.fromEntries(Object.entries(p.preset).filter(([k]) => !(k in val))) : {});
       if (u.rkp && !val.tahun_rkp) val.tahun_rkp = rec.tahun_rkp || S.rkpYear;
@@ -8793,7 +8796,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '187', tgl: '2026-10-20', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '188', tgl: '2026-10-20', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -9980,7 +9983,7 @@ const NASKAH = {
   /* berita acara: template per jenis (surat/naskah_berita_acara_<jenis>.docx), jenis tanpa template memakai template umum */
   berita_acara: { buat: 'Buat Berita Acara', ada: r => !!r.jenis, nomor: 1, umum: 'surat/naskah_berita_acara.docx', nama: r => (r.jenis || 'Berita Acara') + ' - ' + String(r.tentang || '').slice(0, 60) + (r.nomor ? ' - ' + r.nomor : ''),
     path: r => { const sl = slugNaskah(String(r.jenis || '').replace(/^\s*berita acara\s*/i, '')); return 'surat/naskah_berita_acara' + (sl && sl !== 'umum' ? '_' + sl : '') + '.docx'; } },
-  surat_keluar: { buat: 'Buat draf surat keluar', ada: r => skDraf(r) || !!r.isi_surat, nama: r => (r.jenis || 'Surat') + ' - ' + (r.kepada || '') + (r.no_agenda ? ' - No ' + r.no_agenda : ''),
+  surat_keluar: { buat: 'Buat draf surat keluar', ada: r => skAdaDraf(r), nama: r => (r.jenis || 'Surat') + ' - ' + (r.kepada || '') + (r.no_agenda ? ' - No ' + r.no_agenda : ''),
     path: r => { const sl = slugNaskah(r.jenis); return 'surat/naskah_surat_keluar' + (sl && sl !== 'surat_biasa' ? '_' + sl : '') + '.docx'; } },
   perdes: { buat: 'Buat Peraturan Desa', ada: r => !!(r.menimbang || r.isi_naskah) },
   perkades: { buat: 'Buat Peraturan Kepala Desa', ada: r => !!(r.menimbang || r.isi_naskah) },
