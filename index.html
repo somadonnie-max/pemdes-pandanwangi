@@ -1583,7 +1583,7 @@ const UI = {
       F('jenis', 'Jenis Surat', 'text', { dd: OPT.jenisKeluar, def: 'Surat Biasa', hint: 'Ketuk untuk memilih — menentukan template draf dan isian tambahan' }), F('klasifikasi', 'Kode Klasifikasi Arsip', 'text', { list: OPT.kka, def: '400.10.2.2' }),
       F('nomor', 'Nomor Surat', 'text', { mono: 1, wide: 1, hint: 'Kosongkan: dibuat otomatis kode klasifikasi/no. agenda/kode desa/tahun' }),
       F('sifat', 'Sifat', 'select', { opt: ['Biasa', 'Segera', 'Sangat Segera', 'Penting', 'Rahasia'], def: 'Biasa', tanpa: ['Surat Tugas'] }), F('lampiran', 'Lampiran', 'text', { def: '-', tanpa: ['Surat Tugas'] }),
-      F('kepada', 'Ditujukan Kepada', 'text', { req: 1, wide: 1, tanpa: ['Surat Tugas'] }), F('di', 'Di (tempat tujuan)', 'text', { def: 'Tempat', tanpa: ['Surat Tugas'] }), F('isi', 'Perihal / Isi Ringkas', 'textarea', { req: 1, wide: 1, tanpa: ['Surat Tugas'] }),
+      F('kepada', 'Ditujukan Kepada', 'text', { req: 1, wide: 1, tanpa: ['Surat Tugas'] }), F('di', 'Di (tempat tujuan)', 'text', { def: 'Tempat', tanpa: ['Surat Tugas'] }), F('isi', 'Perihal / Isi Ringkas', 'textarea', { req: 1, wide: 1, hint: 'Judul yang tampil di daftar surat' }),
       F('acara_tgl', 'Hari/Tanggal Acara', 'date', { grp: ['Surat Undangan', 'Surat Pemberitahuan', 'Pengumuman', 'Berita Acara'] }), F('acara_jam', 'Waktu Acara', 'text', { grp: ['Surat Undangan', 'Surat Pemberitahuan', 'Pengumuman'], hint: 'mis. 09.00 WIB s.d. selesai' }),
       F('acara_tempat', 'Tempat Acara', 'text', { grp: ['Surat Undangan', 'Surat Pemberitahuan', 'Pengumuman', 'Berita Acara'], def: () => 'Balai Desa ' + ND() }), F('acara', 'Acara', 'text', { wide: 1, grp: ['Surat Undangan', 'Surat Pemberitahuan', 'Pengumuman', 'Berita Acara'] }),
       F('dasar', 'Dasar (surat masuk)', 'text', { wide: 1, grp: ['Surat Tugas'], listFrom: { e: 'surat_masuk', k: skDasarLbl }, fill: skDasarIsi, smPick: 1, nodl: 1, hint: 'Ketik/pilih surat masuk yang menjadi dasar — keperluan, hari/tanggal, jam & tempat terisi otomatis dari undangannya' }),
@@ -4960,6 +4960,7 @@ VIEWS.form = async (p, main, alive) => {
   if (!alive()) return;
   main.innerHTML = `<form class="card stack" id="frm" novalidate>
     ${e === 'petugas' && !p.id ? '<div id="dupNote"></div>' : ''}
+    ${e === 'surat_keluar' && !p.id && !p.buat ? `<div class="card" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 12px;box-shadow:none;background:var(--surface2)">${ic('file')}<div style="flex:1;min-width:200px" class="meta"><b>Tambah = surat yang sudah jadi</b> (sudah ditandatangani): langsung tercatat <b>Disetujui</b>, lalu unggah suratnya. Untuk menyusun <b>draf dari template</b> (bisa Lihat Draf & Disetujui), pakai tombol <b>› Buat</b>.</div><button type="button" class="btn sm pri" data-act="go" data-go='${esc(JSON.stringify(['form', { e, buat: 1 }]))}'>${ic('next')}Buat draf</button></div>` : ''}
     <div class="form">${flds.map(f => fieldHtml(f, rec[f.k], rec)).join('')}</div>
     ${e === 'surat_masuk' ? fwdHtml(rec) : ''}
     <div id="ferr" class="err" hidden></div>
@@ -5151,7 +5152,7 @@ VIEWS.form = async (p, main, alive) => {
     if (e === 'surat_keluar' && val.jenis === 'Surat Tugas') {   /* Surat Tugas: "kepada" & perihal diambil dari petugas & keperluan */
       const pt = skPetugas(val);
       if (!pt.length) { er.textContent = 'Isi minimal satu nama di "Yang Ditugaskan".'; er.hidden = false; return; }
-      val.kepada = pt.map(o => o.nama).join(', '); if (!String(val.isi || '').trim() || /^Surat Tugas – /.test(rec.isi || '') || !rec.isi) val.isi = 'Surat Tugas – ' + (val.tugas_untuk || pt.map(o => o.nama).join(', '));
+      val.kepada = pt.map(o => o.nama).join(', '); if (!String(val.isi || '').trim()) val.isi = 'Surat Tugas – ' + (val.tugas_untuk || pt.map(o => o.nama).join(', '));
     }
     const miss = flds.filter(f => f.req && f.t !== 'file' && !String(val[f.k] || '').trim());
     if (miss.length) { er.textContent = 'Lengkapi: ' + miss.map(f => f.l).join(', ') + '.'; er.hidden = false; $('#f_' + miss[0].k).focus(); return; }
@@ -8881,7 +8882,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '192', tgl: '2026-10-20', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '193', tgl: '2026-10-20', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
