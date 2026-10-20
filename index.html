@@ -1079,7 +1079,10 @@ img.bf-pg{width:auto;max-width:100%;max-height:70vh;object-fit:contain}
 @keyframes addBuka{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 .add-kunci{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--pri) 12%,transparent);font-size:13px}
 .add-kunci svg{flex:none;width:18px;height:18px;color:var(--pri)}
-section.docx,section.docx *{-webkit-hyphens:manual!important;hyphens:manual!important}section.docx img{vertical-align:top}</style>
+section.docx,section.docx *{-webkit-hyphens:manual!important;hyphens:manual!important}section.docx img{vertical-align:top}
+/* tombol Disetujui kecil di baris surat keluar */
+.chip.sk-ok{min-height:22px;padding:1px 9px;font-size:12px;vertical-align:middle}.chip.sk-ok svg{width:13px;height:13px}
+</style>
 </head>
 <body>
 <div id="app"></div>
@@ -1220,6 +1223,9 @@ const DESA0 = 'Pandanwangi', KEC0 = 'Tempeh', KAB0 = 'Lumajang';
 const brandCache = () => { try { return JSON.parse(localStorage.getItem('pd_brand') || '{}') || {}; } catch (e) { return {}; } };
 function brand() { const s = (typeof S !== 'undefined' && S.set) || {}, b = brandCache(); return { desa: s.nama_desa || b.desa || CFG.namaDesa || DESA0, kec: s.kecamatan || b.kec || CFG.kecamatan || KEC0, kab: s.kabupaten || b.kab || CFG.kabupaten || KAB0 }; }
 const ND = () => brand().desa;
+/* status surat keluar: Draf (dari tombol Buat) -> Disetujui (+ PDF bertanda tangan); data lama tanpa status = surat jadi */
+const skDraf = r => r && r.status === 'Draf';
+const skPill = r => skDraf(r) ? `<span class="pill warn">Draf</span>${canWrite('surat_keluar') ? ` <button type="button" class="chip on sk-ok" data-act="skSetuju" data-id="${esc(r.id)}">${ic('check')}Disetujui</button>` : ''}` : r && r.status === 'Disetujui' && !r.dok_id ? '<span class="pill info">Disetujui · belum ada PDF</span>' : '';
 const JENIS_BA = ['Berita Acara Musyawarah', 'Berita Acara Rapat', 'Berita Acara Serah Terima', 'Berita Acara Pemeriksaan', 'Berita Acara Penyerahan Bantuan', 'Berita Acara Kesepakatan', 'Berita Acara Klarifikasi'];
 (function () { const b = brandCache(); if (b.logo) { LOGO = b.logo; document.getElementById('favi').href = b.logo; } document.title = 'Pemdes ' + (b.desa || CFG.namaDesa || DESA0); })();
 function terapBrand() {
@@ -1346,6 +1352,7 @@ const OPT = {
   jenisPerdes: ['Peraturan Desa'],
   sumberDana: ['DDS', 'ADD', 'PBH', 'PAD', 'PBK', 'PBP', 'SWD', 'DLL'],
   jenisTrans: ['Pendapatan', 'Penerimaan Pembiayaan', 'Pajak Disetor', 'Mutasi Kas', 'Saldo Awal', 'Belanja', 'Pengeluaran Pembiayaan', 'Pajak Dipungut'],
+  jenisMasuk: ['Surat Biasa', 'Surat Undangan', 'Surat Pemberitahuan', 'Surat Permohonan', 'Surat Edaran', 'Surat Keputusan', 'Surat Tugas', 'Surat Instruksi', 'Nota Dinas', 'Laporan', 'Lainnya'],
   jenisKeluar: ['Surat Biasa', 'Surat Undangan', 'Surat Pemberitahuan', 'Surat Permohonan', 'Surat Pengantar', 'Surat Tugas', 'Surat Kuasa', 'Surat Edaran', 'Surat Rekomendasi', 'Pengumuman', 'Berita Acara'],
   kka: ['400.10.2.2', '000.1.6', '100.3.3', '100.3.4', '400.10.3.1', '400.10.7', '400.9.12.5', '500.6', '900.1'],
   jenisTim: ['Tim Penyusun', 'Tim Verifikasi'],
@@ -1529,30 +1536,43 @@ const UI = {
   surat_masuk: {
     t: 'Surat Masuk', ic: 'inbox', perm: 'tu_surat', folder: 'TU/Surat Masuk', file: 'dok_id',
     fields: [F('no_agenda', 'No. Agenda', 'number', { auto: 1 }), F('tgl_terima', 'Tanggal Diterima', 'date', { req: 1, def: isoToday }), F('nomor', 'Nomor Surat', 'text', { req: 1, mono: 1 }), F('tgl_surat', 'Tanggal Surat', 'date'),
+      F('jenis', 'Jenis Surat', 'text', { dd: OPT.jenisMasuk, def: 'Surat Biasa', hint: 'Ketuk untuk memilih — isian tambahan menyesuaikan jenis surat' }),
       F('dari', 'Pengirim', 'text', { req: 1, list: ['Kecamatan Tempeh', 'Bupati Lumajang', 'Sekretariat Daerah Kab. Lumajang', 'DPMD Kab. Lumajang', 'Dinas Kesehatan P2KB Kab. Lumajang', 'Badan Pajak dan Retribusi Daerah Kab. Lumajang', 'BPS Kab. Lumajang'] }),
-      F('tujuan', 'Ditujukan Kepada', 'text', { def: 'Kepala Desa' }), F('isi', 'Perihal / Isi Ringkas', 'textarea', { req: 1, wide: 1 }), F('pengolah', 'Pengolah', 'text', { def: 'Kaur TU & Umum' }),
+      F('tujuan', 'Ditujukan Kepada', 'text', { def: 'Kepala Desa' }), F('isi', 'Perihal / Isi Ringkas', 'textarea', { req: 1, wide: 1 }),
+      F('acara_tgl', 'Hari/Tanggal Acara', 'date', { grp: ['Surat Undangan', 'Surat Pemberitahuan'] }), F('acara_jam', 'Jam Acara', 'time', { grp: ['Surat Undangan', 'Surat Pemberitahuan'] }),
+      F('acara_tempat', 'Tempat Acara', 'text', { grp: ['Surat Undangan', 'Surat Pemberitahuan'] }), F('acara', 'Acara', 'text', { wide: 1, grp: ['Surat Undangan', 'Surat Pemberitahuan'] }),
+      F('acara_peserta', 'Yang Diundang / Harus Hadir', 'text', { grp: ['Surat Undangan'], list: ['Kepala Desa', 'Sekretaris Desa', 'Kepala Desa / Perangkat yang ditunjuk', 'Semua perangkat', 'Ketua BPD', 'Kader'] }),
+      F('tugas_nama', 'Yang Ditugaskan', 'textarea', { grp: ['Surat Tugas'], hint: 'Satu orang per baris' }), F('tugas_tempat', 'Tempat Tujuan', 'text', { grp: ['Surat Tugas'] }), F('tugas_tgl', 'Waktu Pelaksanaan', 'text', { grp: ['Surat Tugas'], hint: 'mis. 20 – 22 Oktober 2026' }),
+      F('batas_tgl', 'Batas Waktu Tindak Lanjut', 'date', { grp: ['Surat Permohonan', 'Surat Edaran', 'Surat Instruksi', 'Surat Pemberitahuan', 'Surat Tugas'] }),
+      F('pengolah', 'Pengolah', 'text', { def: 'Kaur TU & Umum' }),
       F('disposisi', 'Disposisi', 'text'), F('ket', 'Keterangan', 'text', { def: 'Arsip' }), F('dok_id', 'Scan surat (PDF/foto)', 'file', { wide: 1 })],
-    year: 'tgl_terima', sort: 'tgl_terima',
-    row: r => ({ t: r.isi, s: 'dari ' + r.dari + ' · ' + r.nomor, date: r.tgl_terima, file: r.dok_id, r: r.no_agenda ? 'No. ' + r.no_agenda : '', pill: r.terusan ? `<span class="pill info">→ ${esc(r.terusan)}</span>` : '' }),
+    year: 'tgl_terima', sort: 'tgl_terima', grpBy: 'jenis', chips: { k: 'jenis', opt: OPT.jenisMasuk, dyn: 1 },
+    row: r => ({ t: r.isi, s: [r.jenis, 'dari ' + r.dari, r.nomor].filter(Boolean).join(' · ') + (r.acara_tgl ? ' · acara ' + fDate(r.acara_tgl) : ''), date: r.tgl_terima, file: r.dok_id, r: r.no_agenda ? 'No. ' + r.no_agenda : '', pill: r.terusan ? `<span class="pill info">→ ${esc(r.terusan)}</span>` : '' }),
     print: { title: 'BUKU AGENDA SURAT MASUK', land: 1, cols: [['No. Agenda', 'no_agenda'], ['Tgl Terima', r => fDate(r.tgl_terima)], ['Nomor Surat', 'nomor'], ['Tgl Surat', r => fDate(r.tgl_surat)], ['Pengirim', 'dari'], ['Isi Singkat', 'isi'], ['Disposisi', 'disposisi'], ['Ket', 'ket']] }
   },
   surat_keluar: {
     t: 'Surat Keluar', ic: 'send', perm: 'tu_surat', folder: 'TU/Surat Keluar', file: 'dok_id',
+    /* "> Buat" = draf surat (Word) yang menunggu persetujuan; "+ Tambah" = surat jadi (scan/PDF) yang sudah disetujui */
     fields: [F('no_agenda', 'No. Agenda', 'number', { auto: 1 }), F('tgl_surat', 'Tanggal Surat', 'date', { req: 1, def: isoToday }),
-      F('jenis', 'Jenis Surat', 'text', { gen: 1, dd: OPT.jenisKeluar, hint: 'Ketuk untuk memilih — menentukan template yang dipakai (kosong = Surat Biasa)' }), F('klasifikasi', 'Kode Klasifikasi Arsip', 'text', { gen: 1, list: OPT.kka, def: '400.10.2.2' }),
+      F('jenis', 'Jenis Surat', 'text', { dd: OPT.jenisKeluar, def: 'Surat Biasa', hint: 'Ketuk untuk memilih — menentukan template draf dan isian tambahan' }), F('klasifikasi', 'Kode Klasifikasi Arsip', 'text', { list: OPT.kka, def: '400.10.2.2' }),
       F('nomor', 'Nomor Surat', 'text', { mono: 1, wide: 1, hint: 'Kosongkan: dibuat otomatis kode klasifikasi/no. agenda/kode desa/tahun' }),
-      F('sifat', 'Sifat', 'select', { gen: 1, opt: ['Biasa', 'Segera', 'Sangat Segera', 'Penting', 'Rahasia'], def: 'Biasa' }), F('lampiran', 'Lampiran', 'text', { gen: 1, def: '-' }),
-      F('kepada', 'Ditujukan Kepada', 'text', { req: 1, wide: 1 }), F('di', 'Di (tempat tujuan)', 'text', { gen: 1, def: 'Tempat' }), F('isi', 'Perihal / Isi Ringkas', 'textarea', { req: 1, wide: 1 }),
-      F('acara_tgl', 'Hari/Tanggal Acara', 'date', { gen: 1, grp: ['Surat Undangan', 'Berita Acara'] }), F('acara_jam', 'Waktu Acara', 'text', { gen: 1, grp: ['Surat Undangan'], hint: 'mis. 09.00 WIB s.d. selesai' }),
-      F('acara_tempat', 'Tempat Acara', 'text', { gen: 1, grp: ['Surat Undangan', 'Berita Acara'], def: () => 'Balai Desa ' + ND() }), F('acara', 'Acara', 'text', { gen: 1, wide: 1, grp: ['Surat Undangan', 'Berita Acara'] }),
-      F('tugas_nama', 'Yang Ditugaskan / Diberi Rekomendasi', 'textarea', { gen: 1, grp: ['Surat Tugas', 'Surat Rekomendasi'], hint: 'Satu orang per baris, mis. "1. Nama – Jabatan"' }),
-      F('tugas_untuk', 'Keperluan Tugas', 'text', { gen: 1, wide: 1, grp: ['Surat Tugas'] }), F('tugas_tgl', 'Tanggal Tugas', 'text', { gen: 1, grp: ['Surat Tugas'] }), F('tugas_tempat', 'Tempat Tugas', 'text', { gen: 1, grp: ['Surat Tugas'] }),
-      F('kuasa_penerima', 'Penerima Kuasa', 'textarea', { gen: 1, grp: ['Surat Kuasa'], hint: 'Baris 1: nama; berikutnya jabatan/alamat' }), F('kuasa_untuk', 'Keperluan Kuasa', 'text', { gen: 1, wide: 1, grp: ['Surat Kuasa'] }),
+      F('sifat', 'Sifat', 'select', { opt: ['Biasa', 'Segera', 'Sangat Segera', 'Penting', 'Rahasia'], def: 'Biasa' }), F('lampiran', 'Lampiran', 'text', { def: '-' }),
+      F('kepada', 'Ditujukan Kepada', 'text', { req: 1, wide: 1 }), F('di', 'Di (tempat tujuan)', 'text', { def: 'Tempat' }), F('isi', 'Perihal / Isi Ringkas', 'textarea', { req: 1, wide: 1 }),
+      F('acara_tgl', 'Hari/Tanggal Acara', 'date', { grp: ['Surat Undangan', 'Surat Pemberitahuan', 'Pengumuman', 'Berita Acara'] }), F('acara_jam', 'Waktu Acara', 'text', { grp: ['Surat Undangan', 'Surat Pemberitahuan', 'Pengumuman'], hint: 'mis. 09.00 WIB s.d. selesai' }),
+      F('acara_tempat', 'Tempat Acara', 'text', { grp: ['Surat Undangan', 'Surat Pemberitahuan', 'Pengumuman', 'Berita Acara'], def: () => 'Balai Desa ' + ND() }), F('acara', 'Acara', 'text', { wide: 1, grp: ['Surat Undangan', 'Surat Pemberitahuan', 'Pengumuman', 'Berita Acara'] }),
+      F('tugas_nama', 'Yang Ditugaskan / Diberi Rekomendasi', 'textarea', { grp: ['Surat Tugas', 'Surat Rekomendasi'], hint: 'Satu orang per baris, mis. "1. Nama – Jabatan"' }),
+      F('tugas_untuk', 'Keperluan Tugas', 'text', { wide: 1, grp: ['Surat Tugas'] }), F('tugas_tempat', 'Tempat Tujuan', 'text', { grp: ['Surat Tugas'] }), F('tugas_tgl', 'Waktu Pelaksanaan', 'text', { grp: ['Surat Tugas'], hint: 'mis. Senin, 20 Oktober 2026 pukul 08.00 WIB s.d. selesai' }),
+      F('tugas_biaya', 'Pembebanan Biaya', 'text', { grp: ['Surat Tugas'], hint: 'mis. APBDes Tahun 2026 / Tidak dibebankan biaya' }),
+      F('kuasa_penerima', 'Penerima Kuasa', 'textarea', { grp: ['Surat Kuasa'], hint: 'Baris 1: nama; berikutnya jabatan/alamat' }), F('kuasa_untuk', 'Keperluan Kuasa', 'text', { wide: 1, grp: ['Surat Kuasa'] }),
+      F('mohon_isi', 'Hal yang Dimohon', 'textarea', { grp: ['Surat Permohonan'], hint: 'mis. bantuan narasumber / izin penggunaan tempat' }),
+      F('pengantar_daftar', 'Daftar yang Dikirim (satu per baris)', 'textarea', { grp: ['Surat Pengantar'], hint: 'mis. "1. Laporan Realisasi APBDes – 1 bendel"' }),
+      F('berlaku_tgl', 'Berlaku Mulai', 'date', { grp: ['Surat Edaran', 'Pengumuman'] }),
       F('isi_surat', 'Isi Surat', 'textarea', { gen: 1, rows: 8, hint: 'Isi pokok surat. Enter = paragraf baru.' }), F('tembusan', 'Tembusan', 'textarea', { gen: 1, hint: 'Satu per baris, mis. "1. Camat Tempeh"' }),
       F('pengolah', 'Pengolah', 'text', { def: 'Kaur TU & Umum' }), F('ket', 'Keterangan', 'text', { def: 'Arsip' }),
-      F('dok_id', 'Arsip surat (PDF/foto)', 'file', { wide: 1 })],
-    year: 'tgl_surat', sort: 'tgl_surat', grpBy: 'jenis',
-    row: r => ({ t: r.isi, s: 'kepada ' + r.kepada + ' · ' + r.nomor, date: r.tgl_surat, file: r.dok_id, r: r.no_agenda ? 'No. ' + r.no_agenda : '' }),
+      F('status', 'Status', 'select', { opt: ['Draf', 'Disetujui'], noform: 1 }), F('tgl_setuju', 'Tanggal Disetujui', 'date', { noform: 1 }),
+      F('dok_id', 'Dokumen surat bertanda tangan (PDF/foto)', 'file', { wide: 1 })],
+    year: 'tgl_surat', sort: 'tgl_surat', grpBy: 'jenis', chips: { k: 'jenis', opt: OPT.jenisKeluar, dyn: 1 },
+    row: r => ({ t: r.isi, s: [r.jenis, 'kepada ' + r.kepada, r.nomor].filter(Boolean).join(' · '), date: r.tgl_surat, file: r.dok_id, r: r.no_agenda ? 'No. ' + r.no_agenda : '', pill: skPill(r) }),
     print: { title: 'BUKU AGENDA SURAT KELUAR', land: 1, cols: [['No. Agenda', 'no_agenda'], ['Tgl Surat', r => fDate(r.tgl_surat)], ['Nomor Surat', 'nomor'], ['Ditujukan Kepada', 'kepada'], ['Isi Singkat', 'isi'], ['Ket', 'ket']] }
   },
   ekspedisi: {
@@ -4024,7 +4044,7 @@ async function renderDetail(e, x, el, full) {
     <div class="xk"></div>
     ${geo ? mapHtml(geo, 'Lokasi ' + (u.row(x).t || '')) : ''}
     <div class="xx"></div>
-    <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button>${/^tanah_/.test(e) && !S.user.admin ? '' : `<button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>`}` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak (tanpa QR)</button>` : ''}${e === 'keu_spp' ? `<button class="btn sm" data-act="sppWord" data-id="${esc(x.id)}">${ic('file')}SPP + SPTJM (Word)</button><button class="btn sm" data-act="kuitansi" data-id="${esc(x.id)}">${ic('print')}Cetak kuitansi</button>` : ''}${e === 'keu_spp' && w && x.status !== 'Dicairkan' ? `<button class="btn sm pri" data-act="keuCair" data-id="${esc(x.id)}">${ic('check')}Cairkan</button>` : ''}${e === 'keu_spp' && w && x.status === 'Dicairkan' ? `<button class="btn sm danger" data-act="keuBatal" data-id="${esc(x.id)}">${ic('x')}Batalkan pencairan</button>` : ''}${e === 'keu_trans' && w && x.jenis === 'Pajak Dipungut' ? `<button class="btn sm" data-act="setorPajak" data-id="${esc(x.id)}">${ic('send')}Setor pajak</button>` : ''}${NASKAH[e] && w ? `<button class="btn sm" data-act="cetakNaskah" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('print')}Buat dokumen (Word)</button>` : ''}${e === 'kegiatan' && w && kgBisaSelesai(x) ? `<button class="btn sm pri" data-act="kgSelesai" data-id="${esc(x.id)}">${ic('check')}Selesai</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>`;
+    <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button>${/^tanah_/.test(e) && !S.user.admin ? '' : `<button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>`}` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak (tanpa QR)</button>` : ''}${e === 'keu_spp' ? `<button class="btn sm" data-act="sppWord" data-id="${esc(x.id)}">${ic('file')}SPP + SPTJM (Word)</button><button class="btn sm" data-act="kuitansi" data-id="${esc(x.id)}">${ic('print')}Cetak kuitansi</button>` : ''}${e === 'keu_spp' && w && x.status !== 'Dicairkan' ? `<button class="btn sm pri" data-act="keuCair" data-id="${esc(x.id)}">${ic('check')}Cairkan</button>` : ''}${e === 'keu_spp' && w && x.status === 'Dicairkan' ? `<button class="btn sm danger" data-act="keuBatal" data-id="${esc(x.id)}">${ic('x')}Batalkan pencairan</button>` : ''}${e === 'keu_trans' && w && x.jenis === 'Pajak Dipungut' ? `<button class="btn sm" data-act="setorPajak" data-id="${esc(x.id)}">${ic('send')}Setor pajak</button>` : ''}${NASKAH[e] && w && !(e === 'surat_keluar' && !skDraf(x) && !x.isi_surat) ? `<button class="btn sm" data-act="cetakNaskah" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('print')}${e === 'surat_keluar' ? 'Buat Draf' : 'Buat dokumen (Word)'}</button>` : ''}${e === 'surat_keluar' && w && skDraf(x) ? `<button class="btn sm pri" data-act="skSetuju" data-id="${esc(x.id)}">${ic('check')}Disetujui</button>` : ''}${e === 'surat_keluar' && w && x.status === 'Disetujui' && !x.dok_id ? `<button class="btn sm" data-act="skSetuju" data-id="${esc(x.id)}" data-pdf="1">${ic('plus')}Unggah PDF bertanda tangan</button>` : ''}${e === 'surat_masuk' && x.jenis === 'Surat Undangan' && x.acara_tgl && !(/Agenda/.test(x.terusan || '') && !x.agenda_id) ? (x.agenda_id ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'kegiatan', id: x.agenda_id }]))}'>${ic('cal')}Lihat di Agenda</button>` : canWrite('kegiatan') && w ? `<button class="btn sm" data-act="smAgenda" data-id="${esc(x.id)}">${ic('cal')}Masukkan ke Agenda</button>` : '') : ''}${e === 'kegiatan' && w && kgBisaSelesai(x) ? `<button class="btn sm pri" data-act="kgSelesai" data-id="${esc(x.id)}">${ic('check')}Selesai</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>`;
   const xk = $('.xk', el), xx = $('.xx', el);
   if (e === 'penduduk' && !diKK) {
     try {
@@ -5081,6 +5101,7 @@ VIEWS.form = async (p, main, alive) => {
         val[f.k] = out.length ? JSON.stringify(out) : '';
       }
       if (NASKAH[e] && !String(val.nomor || '').trim() && (e === 'surat_keluar' || NASKAH[e].nomor)) val.nomor = await nomorOtomatis(e, val);
+      if (e === 'surat_keluar' && !p.id) { if (p.buat) val.status = 'Draf'; else { val.status = 'Disetujui'; val.tgl_setuju = val.tgl_surat || isoToday(); } }
       if (p.id) val.id = p.id;
       Object.assign(val, p.preset && !p.id ? Object.fromEntries(Object.entries(p.preset).filter(([k]) => !(k in val))) : {});
       if (u.rkp && !val.tahun_rkp) val.tahun_rkp = rec.tahun_rkp || S.rkpYear;
@@ -6887,11 +6908,16 @@ function fwdHook(frm) {
     const k = t.dataset.k, b = $('#fw_' + k, frm); if (!b) return;
     b.hidden = !b.hidden; t.classList.toggle('pri', !b.hidden);
     if (b.hidden) return;
-    if (k === 'ag') { isi('ag_nama', v('isi')); isi('ag_tanggal', v('tgl_surat') || isoToday()); isi('ag_peny', v('dari')); isi('ag_ket', v('nomor') ? 'Surat masuk No. ' + v('nomor') + (v('dari') ? ' dari ' + v('dari') : '') : ''); }
+    if (k === 'ag') { const set = (id, val) => { const el = $('#' + id, frm); if (el && val) el.value = val; };   /* undangan: isian acara dipakai lebih dulu */
+      set('ag_nama', v('acara')); set('ag_tanggal', v('acara_tgl')); set('ag_jam', v('acara_jam')); set('ag_tempat', v('acara_tempat')); set('ag_peserta', v('acara_peserta'));
+      isi('ag_nama', v('isi')); isi('ag_tanggal', v('tgl_surat') || isoToday()); isi('ag_peny', v('dari')); isi('ag_ket', v('nomor') ? 'Surat masuk No. ' + v('nomor') + (v('dari') ? ' dari ' + v('dari') : '') : ''); }
     else { isi('br_judul', v('isi')); isi('br_isi', v('isi')); if (/undangan/i.test(v('isi'))) $('#br_kat', frm).value = 'Undangan'; else if (/edaran/i.test(v('isi'))) $('#br_kat', frm).value = 'Surat Edaran'; }
     b.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   };
   const on = k => { const b = $('#fw_' + k, frm); return b && !b.hidden; };
+  /* jenis Surat Undangan + tanggal acara terisi: kotak "Agenda kegiatan" dibuka otomatis */
+  const agOto = () => { const bt = box.querySelector('[data-act="fwdT"][data-k="ag"]'); if (bt && !on('ag') && v('jenis') === 'Surat Undangan' && v('acara_tgl')) S.vh.fwdT(bt); };
+  ['jenis', 'acara_tgl'].forEach(k => { const el = $('#f_' + k, frm); if (el) el.addEventListener('change', agOto); });
   frm._fwdTag = lama => { const a = String(lama || '').split(',').map(x => x.trim()).filter(Boolean); if (on('ag') && a.indexOf('Agenda') < 0) a.push('Agenda'); if (on('br') && a.indexOf('Berita') < 0) a.push('Berita'); return a.join(', '); };
   const cek = () => {
     if (on('ag') && (!$('#ag_nama', frm).value.trim() || !$('#ag_tanggal', frm).value)) throw new Error('Isi nama kegiatan dan tanggal agenda.');
@@ -8767,7 +8793,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '186', tgl: '2026-10-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '187', tgl: '2026-10-20', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -9954,7 +9980,7 @@ const NASKAH = {
   /* berita acara: template per jenis (surat/naskah_berita_acara_<jenis>.docx), jenis tanpa template memakai template umum */
   berita_acara: { buat: 'Buat Berita Acara', ada: r => !!r.jenis, nomor: 1, umum: 'surat/naskah_berita_acara.docx', nama: r => (r.jenis || 'Berita Acara') + ' - ' + String(r.tentang || '').slice(0, 60) + (r.nomor ? ' - ' + r.nomor : ''),
     path: r => { const sl = slugNaskah(String(r.jenis || '').replace(/^\s*berita acara\s*/i, '')); return 'surat/naskah_berita_acara' + (sl && sl !== 'umum' ? '_' + sl : '') + '.docx'; } },
-  surat_keluar: { buat: 'Buat surat keluar', ada: r => !!r.jenis, nama: r => (r.jenis || 'Surat') + ' - ' + (r.kepada || '') + (r.no_agenda ? ' - No ' + r.no_agenda : ''),
+  surat_keluar: { buat: 'Buat draf surat keluar', ada: r => skDraf(r) || !!r.isi_surat, nama: r => (r.jenis || 'Surat') + ' - ' + (r.kepada || '') + (r.no_agenda ? ' - No ' + r.no_agenda : ''),
     path: r => { const sl = slugNaskah(r.jenis); return 'surat/naskah_surat_keluar' + (sl && sl !== 'surat_biasa' ? '_' + sl : '') + '.docx'; } },
   perdes: { buat: 'Buat Peraturan Desa', ada: r => !!(r.menimbang || r.isi_naskah) },
   perkades: { buat: 'Buat Peraturan Kepala Desa', ada: r => !!(r.menimbang || r.isi_naskah) },
@@ -9990,6 +10016,7 @@ async function petaNaskah(e, r) {
     Jenis: v('jenis'), Perihal: v('isi'), Kepada: v('kepada'), Di: v('di') || 'Tempat', Sifat: v('sifat') || 'Biasa', Lampiran: v('lampiran') || '-', 'Isi Surat': v('isi_surat'), Tembusan: v('tembusan') || '-',
     'Hari Acara': dHari(r.acara_tgl), 'Tanggal Acara': dPanjang(r.acara_tgl), 'Waktu Acara': v('acara_jam'), 'Tempat Acara': v('acara_tempat'), Acara: v('acara'),
     'Yang Ditugaskan': v('tugas_nama'), 'Keperluan Tugas': v('tugas_untuk'), 'Tanggal Tugas': v('tugas_tgl'), 'Tempat Tugas': v('tugas_tempat'),
+    'Waktu Pelaksanaan': v('tugas_tgl'), 'Tempat Tujuan': v('tugas_tempat'), 'Pembebanan Biaya': v('tugas_biaya') || '-', 'Hal Dimohon': v('mohon_isi'), 'Daftar Kiriman': v('pengantar_daftar'), 'Berlaku Mulai': dPanjang(r.berlaku_tgl) || dPanjang(tgl),
     'Penerima Kuasa': v('kuasa_penerima'), 'Penerima Kuasa Nama': kp, 'Keperluan Kuasa': v('kuasa_untuk'),
     'Desa Mitra': judulKata(v('desa_mitra')), 'Kepala Desa Mitra': v('kades_mitra'), 'Ketua BPD': v('ketua_bpd') || TITIK
   }, e === 'berita_acara' ? await petaBA(r) : {}));
@@ -10007,7 +10034,7 @@ async function petaBA(r) {
     'Judul Dokumentasi': 'DOKUMENTASI ' + (v('jenis') || 'BERITA ACARA').toUpperCase(), 'Foto Dokumentasi': ft.length ? '' : 'Belum ada foto dokumentasi.', 'Jumlah Foto': String(ft.length), __foto: r.foto || '' };
 }
 const TAG_BA = ['Desa', 'Kecamatan', 'Kabupaten', 'Kode Desa', 'Kepala Desa', 'Nomor', 'Tahun', 'Jenis BA', 'Tentang', 'Hari', 'Tanggal', 'Tanggal Terbilang', 'Jam', 'Tempat', 'Dasar', 'Peserta', 'Uraian', 'Hasil', 'Pihak 1', 'Jabatan Pihak 1', 'Pihak 2', 'Jabatan Pihak 2', 'Mengetahui', 'Jabatan Mengetahui', 'Nama Mengetahui', 'Judul Dokumentasi', 'Foto Dokumentasi', 'Jumlah Foto'];
-const TAG_NASKAH = ['Desa', 'Kecamatan', 'Kabupaten', 'Alamat Desa', 'Kode Pos', 'Kode Desa', 'Kepala Desa', 'Sekretaris Desa', 'Nomor', 'No', 'Tahun', 'Kode Klasifikasi', 'Tanggal Surat', 'Hari Surat', 'Perihal', 'Kepada', 'Di', 'Sifat', 'Lampiran', 'Isi Surat', 'Tembusan', 'Hari Acara', 'Tanggal Acara', 'Waktu Acara', 'Tempat Acara', 'Acara', 'Yang Ditugaskan', 'Keperluan Tugas', 'Tanggal Tugas', 'Tempat Tugas', 'Penerima Kuasa', 'Penerima Kuasa Nama', 'Keperluan Kuasa', 'Tentang', 'Menimbang', 'Mengingat', 'Memperhatikan', 'Isi', 'Tanggal Ditetapkan', 'Tanggal Diundangkan', 'No Lembaran', 'No Berita', 'Desa Mitra', 'Kepala Desa Mitra', 'Ketua BPD'];
+const TAG_NASKAH = ['Desa', 'Kecamatan', 'Kabupaten', 'Alamat Desa', 'Kode Pos', 'Kode Desa', 'Kepala Desa', 'Sekretaris Desa', 'Nomor', 'No', 'Tahun', 'Kode Klasifikasi', 'Tanggal Surat', 'Hari Surat', 'Perihal', 'Kepada', 'Di', 'Sifat', 'Lampiran', 'Isi Surat', 'Tembusan', 'Hari Acara', 'Tanggal Acara', 'Waktu Acara', 'Tempat Acara', 'Acara', 'Yang Ditugaskan', 'Keperluan Tugas', 'Tanggal Tugas', 'Tempat Tugas', 'Waktu Pelaksanaan', 'Tempat Tujuan', 'Pembebanan Biaya', 'Hal Dimohon', 'Daftar Kiriman', 'Berlaku Mulai', 'Penerima Kuasa', 'Penerima Kuasa Nama', 'Keperluan Kuasa', 'Tentang', 'Menimbang', 'Mengingat', 'Memperhatikan', 'Isi', 'Tanggal Ditetapkan', 'Tanggal Diundangkan', 'No Lembaran', 'No Berita', 'Desa Mitra', 'Kepala Desa Mitra', 'Ketua BPD'];
 async function cetakNaskah(e, rec) {
   const path = naskahPath(e, rec), label = rec.jenis || UI[e].t;
   const m = modal('Membuat dokumen', `<div class="stack"><b>${esc(label)}</b><div class="skel"></div><div class="meta">Mengisi template…</div></div>`);
@@ -10020,6 +10047,42 @@ async function cetakNaskah(e, rec) {
     hasilDokumen(m, await buatDokumen({ path: pth, M, rows: [], jenis: 'surat', nama }));
   } catch (x) { m.body.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
 }
+/* Draf surat keluar disetujui: tanggal persetujuan + PDF bertanda tangan (boleh menyusul) */
+ACT.skSetuju = async t => {
+  let x; try { x = await call('get', { entity: 'surat_keluar', id: t.dataset.id }); } catch (er) { return toast(er.message, 1); }
+  const pdfSaja = !!t.dataset.pdf;
+  const m = sheet(pdfSaja ? 'Unggah surat bertanda tangan' : 'Setujui draf surat', `<form class="stack" id="skF"><div class="meta"><b>${esc(x.jenis || 'Surat')}</b> · ${esc(x.nomor || '')}<br>${esc(x.isi || '')}</div>
+    ${pdfSaja ? '' : `<div class="f"><label for="skT">Tanggal disetujui</label><input type="date" id="skT" value="${esc(x.tgl_setuju || isoToday())}"></div>`}
+    <div class="f"><label for="skD">Dokumen bertanda tangan (PDF/foto)</label><input type="file" id="skD" accept="application/pdf,image/*"><span class="hint">${pdfSaja ? 'Pilih file surat yang sudah ditandatangani.' : 'Boleh dikosongkan dan diunggah nanti lewat tombol "Unggah PDF bertanda tangan".'}</span></div>
+    <div id="skE" class="err" hidden></div><div class="btns"><button class="btn pri" type="submit" id="skB">${ic('check')}${pdfSaja ? 'Unggah' : 'Setujui'}</button></div></form>`, { ikon: 'check' });
+  $('#skF', m.el).onsubmit = async ev => {
+    ev.preventDefault(); const b = $('#skB', m.el), fl = $('#skD', m.el).files[0], er = $('#skE', m.el);
+    if (pdfSaja && !fl) { er.textContent = 'Pilih file dokumennya dulu.'; er.hidden = false; return; }
+    b.disabled = true;
+    try {
+      const rec = { id: x.id, status: 'Disetujui' };
+      if (!pdfSaja) rec.tgl_setuju = $('#skT', m.el).value || isoToday();
+      if (fl) { b.textContent = 'Mengunggah…'; rec.dok_id = (await uploadFile(fl, UI.surat_keluar.folder)).id; }
+      await call('save', { entity: 'surat_keluar', record: rec });
+      m.close(); toast(fl ? 'Surat disetujui dan dokumen tersimpan.' : 'Surat disetujui. Unggah PDF bertanda tangan bila sudah ada.'); refresh();
+    } catch (x2) { er.textContent = x2.message; er.hidden = false; b.disabled = false; b.innerHTML = ic('check') + (pdfSaja ? 'Unggah' : 'Setujui'); }
+  };
+};
+/* surat masuk undangan -> Agenda Kegiatan */
+async function smKeAgenda(x) {
+  const ag = await call('save', { entity: 'kegiatan', record: { nama: x.acara || x.isi || 'Undangan', tanggal: x.acara_tgl, jam: x.acara_jam || '', sampai: 'Selesai', tempat: x.acara_tempat || '', penyelenggara: x.dari || '', peserta: x.acara_peserta || 'Kepala Desa',
+    keterangan: ['Undangan ' + (x.dari ? 'dari ' + x.dari : ''), x.nomor && 'nomor ' + x.nomor, x.tgl_surat && 'tanggal ' + dPanjang(x.tgl_surat)].filter(Boolean).join(', ') + '. Otomatis dari Arsip → Surat Masuk.' } });
+  const tr = String(x.terusan || '').split(',').map(z => z.trim()).filter(Boolean); if (tr.indexOf('Agenda') < 0) tr.push('Agenda');
+  if (ag && ag.id) await call('save', { entity: 'surat_masuk', record: { id: x.id, agenda_id: ag.id, terusan: tr.join(', ') } });
+  return ag;
+}
+function smTawarAgenda(x) {
+  if (!canWrite('kegiatan')) return;
+  const m = sheet('Masukkan ke Agenda?', `<div class="stack"><p style="margin:0">Undangan <b>${esc(x.acara || x.isi || '')}</b> pada ${esc(dPanjang(x.acara_tgl))}${x.acara_jam ? ' pukul ' + esc(x.acara_jam) : ''}${x.acara_tempat ? ' di ' + esc(x.acara_tempat) : ''}. Masukkan ke Kegiatan → Agenda?</p><div class="btns"><button class="btn pri" id="agYa">${ic('cal')}Ya, masukkan</button><button class="btn" id="agNo">Nanti saja</button></div></div>`, { ikon: 'cal' });
+  $('#agNo', m.el).onclick = () => m.close();
+  $('#agYa', m.el).onclick = async ev => { ev.target.disabled = true; try { await smKeAgenda(x); m.close(); toast('Masuk ke Kegiatan → Agenda.'); refresh(); } catch (er) { toast(er.message, 1); ev.target.disabled = false; } };
+}
+ACT.smAgenda = async t => { try { smTawarAgenda(await call('get', { entity: 'surat_masuk', id: t.dataset.id })); } catch (er) { toast(er.message, 1); } };
 ACT.cetakNaskah = async t => { try { cetakNaskah(t.dataset.e, await call('get', { entity: t.dataset.e, id: t.dataset.id })); } catch (x) { toast(x.message, 1); } };
 async function tplSimpan(path, blob) {
   const r = await callBerkas('tplUp', { path, size: blob.size });
