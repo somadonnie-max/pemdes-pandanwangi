@@ -8891,7 +8891,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '199', tgl: '2026-10-28', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '200', tgl: '2026-10-28', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -13280,6 +13280,7 @@ async function skBacaPdf(file) {
 function skJenis(lines) {
   const h = lines.slice(0, 30).map(l => l.s).join(' ').toUpperCase();
   if (/PARAMETER REKENING/.test(h)) return 'rek';
+  if (/RENCANA ANGGARAN KAS/.test(h)) return 'rak';
   if (/RENCANA ANGGARAN (BIAYA|PENDAPATAN|PEMBIAYAAN)|RINCIAN ANGGARAN/.test(h)) return 'rab';
   if (/REGISTER SPP\s*\/\s*SPJ\s*-?\s*KWITANSI/.test(h)) return 'sppkwt';
   if (/REGISTER KWITANSI PEMBAYARAN/.test(h)) return 'kwt';
@@ -13339,6 +13340,50 @@ function skParseRab(lines) {
   }
   R.forEach(r => delete r._x);
   return { rows: R, ubah, warn };
+}
+/* RAK — Rencana Anggaran Kas Desa. Tata letak: tiap rekening = 3 sub-baris berimpit
+   (atas: kode + Jan–Jun; tengah: Semula/Menjadi; bawah: Jul–Des), angka rata-kanan per
+   kolom bulan. Pembacaan dibuat TAHAN-BANTING dengan memakai posisi-x (bukan urutan,
+   karena nilai 0,00 kadang tak tercetak) + VALIDASI: hanya baris yang jumlah 12 bulannya
+   sama persis dengan nilai Menjadi (anggaran berlaku) yang dipakai. Hasil per baris:
+   {akun, rek(obyek), kode_kegiatan, m{1..12}}. */
+function skParseRak(lines) {
+  const warn = [], raw = []; lines.forEach(l => (l.it || []).forEach(i => raw.push(i)));
+  if (!raw.length) return { rows: [], warn: ['RAK: teks tak terbaca'] };
+  const ctr = i => i.x + (i.w || 0) / 2;
+  /* titik tengah-x tiap kolom bulan dari header JANUARI..JUNI */
+  const ORD = ['JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI'], hc = {};
+  raw.forEach(i => { const t = String(i.t || '').trim().toUpperCase(); if (ORD.indexOf(t) >= 0 && hc[t] == null) hc[t] = ctr(i); });
+  let mC = ORD.map(n => hc[n]);
+  const ada = mC.map((v, k) => v != null ? k : -1).filter(k => k >= 0);
+  if (ada.length < 2) return { rows: [], warn: ['RAK: header bulan tak terbaca'] };
+  const sp = (mC[ada[ada.length - 1]] - mC[ada[0]]) / (ada[ada.length - 1] - ada[0]);  // jarak antar kolom
+  for (let k = 0; k < 6; k++) if (mC[k] == null) mC[k] = mC[ada[0]] + (k - ada[0]) * sp; // isi kolom yang hilang
+  const amonth = i => { const c = ctr(i); let b = null, bd = Math.min(34, sp * 0.5); for (let k = 0; k < 6; k++) { const d = Math.abs(c - mC[k]); if (d < bd) { bd = d; b = k; } } return b; };
+  const janX = mC[0];
+  const inMenjadi = i => { const c = ctr(i); return c < janX - sp * 0.45 && c > janX - sp * 1.35; };  // kolom Menjadi (kanan dari dua kolom anggaran)
+  /* susun token angka & token kode (kolom kiri) dengan posisi aslinya */
+  const num = raw.filter(i => SK_NUM.test(String(i.t || '').trim()));
+  const kode = raw.filter(i => i.x < 130 && /^[\d(]/.test(String(i.t || '').trim()) && /^\d[\d.]*\.?$/.test(String(i.t || '').trim()));
+  const menj = num.filter(inMenjadi).sort((a, b) => b.y - a.y);
+  const near = (arr, y, d) => arr.filter(i => Math.abs(i.y - y) <= d);
+  const R = []; let keg = '', lewat = 0;
+  menj.forEach(mn => {
+    const yc = mn.y + 6;                                   // baris kode/Jan–Jun ada di atas baris Menjadi
+    const kc = near(kode, yc, 5)[0]; if (!kc) return;
+    const ct = String(kc.t || '').trim(); let mt;
+    if ((mt = ct.match(/^(0[1-5]\.\d{2}\.\d{2})\.?$/))) { keg = skKeg(mt[1]); return; }  // baris kegiatan → set konteks
+    if (!(mt = ct.match(/^([456]\.\d+\.\d+\.\d+)\.?$/))) return;                          // bukan baris rekening (leaf) → lewati subtotal
+    const obj = mt[1], akun = obj[0], mm = {};
+    near(num, mn.y + 6, 4).forEach(i => { const k = amonth(i); if (k != null) mm[k + 1] = (mm[k + 1] || 0) + skNum(i.t); });   // Jan–Jun
+    near(num, mn.y - 6, 4).forEach(i => { const k = amonth(i); if (k != null) mm[k + 7] = (mm[k + 7] || 0) + skNum(i.t); });   // Jul–Des
+    let tot = 0; for (let b = 1; b <= 12; b++) tot += (mm[b] || 0);
+    if (Math.abs(tot - skNum(mn.t)) > 1) { lewat++; return; }   // validasi: jumlah 12 bln harus = Menjadi
+    const clean = {}; for (let b = 1; b <= 12; b++) if (mm[b]) clean[b] = mm[b];
+    R.push({ akun, rek: obj, kode_kegiatan: akun === '5' ? keg : '', m: clean });
+  });
+  if (lewat) warn.push(lewat + ' baris RAK dilewati (jumlah bulanan tidak cocok dengan anggaran — kemungkinan baris gabungan).');
+  return { rows: R, warn };
 }
 function skParseBku(lines) {
   const R = [], warn = [];
@@ -13431,10 +13476,11 @@ function skParseSppKwt(lines) {
 }
 /* gabungkan semua berkas → rekaman aplikasi */
 function skSusun(P, rekNama) {
-  const out = { keu_rek: [], keu_anggaran: [], keu_spp: [], keu_trans: [], keu_kwitansi: [] }, warn = [];
+  const out = { keu_rek: [], keu_anggaran: [], keu_spp: [], keu_trans: [], keu_kwitansi: [], _rak: [] }, warn = [];
   const nm = k => rekNama[k] || '';
   P.filter(p => p.jenis === 'rek').forEach(p => p.rows.forEach(r => { out.keu_rek.push(r); rekNama[r.kode] = r.uraian; }));
   P.filter(p => p.jenis === 'rab').forEach(p => p.rows.forEach(r => { const k = r.rek.split(' ')[0]; if (!rekNama[k] && r.rek.indexOf(' ') > 0) rekNama[k] = r.rek.slice(k.length + 1); out.keu_anggaran.push(Object.assign({ tahun: p.tahun }, r)); }));
+  P.filter(p => p.jenis === 'rak').forEach(p => p.rows.forEach(r => out._rak.push(Object.assign({ tahun: p.tahun }, r))));
   const cair = Object.assign({}, ...P.filter(p => p.jenis === 'cair').map(p => p.rows)), sppU = Object.assign({}, ...P.filter(p => p.jenis === 'spp').map(p => p.rows)), kegM = Object.assign({}, ...P.filter(p => p.jenis === 'bkp').map(p => p.rows));
   const sd = k => (SK_SD_PREF.find(([a]) => k.indexOf(a) === 0) || [])[1] || '';
   const pj = t => { t = String(t).toUpperCase(); return /PPN/.test(t) ? 'PPN' : /21/.test(t) ? 'PPh 21' : /22/.test(t) ? 'PPh 22' : /23/.test(t) ? 'PPh 23' : /4\s*\(?2|FINAL/.test(t) ? 'PPh Final 4(2)' : 'Pajak Daerah'; };
@@ -13490,12 +13536,33 @@ async function skSimpan(out, lapor) {
   const hasil = {};
   const ambil = async (e, f) => { let rows = [], off = 0; for (;;) { const r = await call('list', { entity: e, filters: f || {}, limit: 2000, offset: off }); rows = rows.concat(r.rows || []); off += (r.rows || []).length; if (!(r.rows || []).length || off >= (r.total || 0)) break; } return rows; };
   out.keu_paket = out.keu_paket || [];
-  const tahun = (out.keu_anggaran[0] || out.keu_trans[0] || out.keu_spp[0] || out.keu_kwitansi[0] || out.keu_paket[0] || {}).tahun;
+  const tahun = (out.keu_anggaran[0] || out.keu_trans[0] || out.keu_spp[0] || out.keu_kwitansi[0] || out.keu_paket[0] || (out._rak || [])[0] || {}).tahun;
   const tandai = (e, rows, ada) => { const pakai = {}, idx = {}; ada.forEach(a => { const k = SK_KEY[e](a); (idx[k] = idx[k] || []).push(a.id); });
     return rows.map(r => { const k = SK_KEY[e](r), n = pakai[k] = (pakai[k] || 0) + 1, id = (idx[k] || [])[n - 1]; const o = Object.assign({}, r); if (id) o.id = id; return o; }); };
   const kirim = async (e, rows) => { let t = 0, u = 0, g = []; for (let i = 0; i < rows.length; i += 200) { lapor('Menyimpan ' + e.replace('keu_', '') + ' ' + Math.min(i + 200, rows.length) + '/' + rows.length + '…'); const r = await call('bulkSave', { entity: e, rows: rows.slice(i, i + 200).map((x, j) => Object.assign({ _baris: String(i + j + 1) }, x)) }); t += r.tambah; u += r.ubah; g = g.concat(r.gagal || []); } hasil[e] = { tambah: t, ubah: u, gagal: g }; };
   if (out.keu_rek.length) await kirim('keu_rek', tandai('keu_rek', out.keu_rek, await ambil('keu_rek')));
   if (out.keu_anggaran.length) await kirim('keu_anggaran', tandai('keu_anggaran', out.keu_anggaran, await ambil('keu_anggaran', { tahun })));
+  if ((out._rak || []).length) {
+    lapor('Menyesuaikan Anggaran Kas (RAK)…');
+    const ang = await ambil('keu_anggaran', { tahun }), idx = {};
+    const key = (kk, obj) => (kk || '') + '|' + obj;
+    ang.forEach(a => { const obj = String(a.rek || '').split(' ')[0]; const kk = /^5/.test(obj) ? (a.kode_kegiatan || '') : ''; (idx[key(kk, obj)] = idx[key(kk, obj)] || []).push(a); });
+    const upd = []; let takCocok = 0;
+    out._rak.forEach(r => {
+      const kk = r.akun === '5' ? (r.kode_kegiatan || '') : '';
+      const rows = idx[key(kk, r.rek)] || idx[key('', r.rek)] || [];
+      if (!rows.length) { takCocok++; return; }
+      const base = rows.map(a => Math.max(0, mNum(a.jumlah_pak != null && a.jumlah_pak !== '' ? a.jumlah_pak : a.jumlah)));
+      const tot = base.reduce((a, b) => a + b, 0);
+      rows.forEach((a, k) => {
+        const frac = rows.length === 1 ? 1 : (tot > 0 ? base[k] / tot : 1 / rows.length);
+        const mm = {}; for (let b = 1; b <= 12; b++) { const v = Math.round((r.m[b] || 0) * frac); if (v) mm[b] = v; }
+        upd.push({ id: a.id, rak: JSON.stringify(mm) });
+      });
+    });
+    let ub = 0, gg = []; for (let i = 0; i < upd.length; i += 200) { const rr = await call('bulkSave', { entity: 'keu_anggaran', rows: upd.slice(i, i + 200) }); ub += rr.ubah; gg = gg.concat(rr.gagal || []); }
+    hasil['keu_rak'] = { tambah: 0, ubah: ub, gagal: gg, _takcocok: takCocok };
+  }
   if (out.keu_spp.length) await kirim('keu_spp', tandai('keu_spp', out.keu_spp, await ambil('keu_spp', { tahun })));
   if (out.keu_trans.length) {
     const sppId = {}; (await ambil('keu_spp', { tahun })).forEach(s => { sppId[s.no] = s.id; });
@@ -13511,7 +13578,7 @@ async function skSimpan(out, lapor) {
   if (out.keu_paket.length) await kirim('keu_paket', tandai('keu_paket', out.keu_paket, await ambil('keu_paket', { tahun })));
   return hasil;
 }
-const SK_NAMA = { db: 'Database Siskeudes (.mde/.smd)', kwt: 'Register Kwitansi Pembayaran', sppkwt: 'Register SPP/SPJ - Kwitansi', rek: 'Parameter Rekening', rab: 'Rincian Anggaran (RAB/APBDes)', bku: 'Buku Kas Umum', cair: 'Register SPP - Pencairan', spp: 'Register SPP Pengeluaran', bkp: 'Buku Kas Pembantu Kegiatan' };
+const SK_NAMA = { db: 'Database Siskeudes (.mde/.smd)', kwt: 'Register Kwitansi Pembayaran', sppkwt: 'Register SPP/SPJ - Kwitansi', rek: 'Parameter Rekening', rab: 'Rincian Anggaran (RAB/APBDes)', rak: 'Anggaran Kas Desa (RAK)', bku: 'Buku Kas Umum', cair: 'Register SPP - Pencairan', spp: 'Register SPP Pengeluaran', bkp: 'Buku Kas Pembantu Kegiatan' };
 /* =====================================================================
    IMPOR DATABASE SISKEUDES (.mde / .mdb / .smd hasil ekspor) — dibaca langsung di peramban,
    tanpa unggah ke server. Pembaca Access Jet4 sederhana (hanya baca) + konversi ke data aplikasi.
@@ -15217,7 +15284,7 @@ VIEWS.skimpor = async (p, main) => {
   main.innerHTML = `<div class="stack">
     <div class="card stack"><div class="sec-h" style="margin:0"><h2>${ic('down')} Impor laporan PDF Siskeudes</h2></div>
       <div class="meta">Di Siskeudes buka laporan → <b>Cetak</b> → pilih printer <b>Microsoft Print to PDF</b> → simpan. Pilih beberapa PDF sekaligus di bawah; aplikasi mengenali jenisnya otomatis. Data tahun yang sama dicocokkan, jadi impor ulang memperbarui data, tidak menggandakan.</div>
-      <div class="sk-daftar">${[['Parameter Rekening APB Desa', 'Laporan → Parameter → Rekening', 'kode rekening'], ['RAB 1 - Rincian Anggaran Pendapatan / Belanja / Pembiayaan', 'Laporan → Anggaran (murni atau perubahan)', 'APBDes'], ['Buku Kas Umum', 'Laporan → Penatausahaan → Buku Kas Umum (sumber dana dikosongkan)', 'penerimaan, belanja, pajak, mutasi kas'], ['Register SPP - Pencairan', 'Laporan → Penatausahaan', 'SPP & tanggal cair'], ['Register SPP Pengeluaran', 'Laporan → Penatausahaan', 'uraian SPP'], ['Buku Kas Pembantu Kegiatan', 'Laporan → Penatausahaan', 'kegiatan tiap SPP/belanja'], ['Register Kwitansi Pembayaran', 'Laporan → Penatausahaan', 'kwitansi: penerima, NPWP, bank, no. rekening'], ['Register SPP/SPJ - Kwitansi Pembayaran', 'Laporan → Penatausahaan', 'hubungan kwitansi ↔ SPP, kegiatan & rekening']].map((x, i) => `<div><b>${i + 1}. ${esc(x[0])}</b><span class="meta">${esc(x[1])} · mengisi ${esc(x[2])}</span></div>`).join('')}</div>
+      <div class="sk-daftar">${[['Parameter Rekening APB Desa', 'Laporan → Parameter → Rekening', 'kode rekening'], ['RAB 1 - Rincian Anggaran Pendapatan / Belanja / Pembiayaan', 'Laporan → Anggaran (murni atau perubahan)', 'APBDes'], ['RAK - Rincian Anggaran Kas Desa', 'Laporan → Penganggaran (impor RAB dulu agar cocok)', 'rencana kas bulanan tiap baris APBDes'], ['Buku Kas Umum', 'Laporan → Penatausahaan → Buku Kas Umum (sumber dana dikosongkan)', 'penerimaan, belanja, pajak, mutasi kas'], ['Register SPP - Pencairan', 'Laporan → Penatausahaan', 'SPP & tanggal cair'], ['Register SPP Pengeluaran', 'Laporan → Penatausahaan', 'uraian SPP'], ['Buku Kas Pembantu Kegiatan', 'Laporan → Penatausahaan', 'kegiatan tiap SPP/belanja'], ['Register Kwitansi Pembayaran', 'Laporan → Penatausahaan', 'kwitansi: penerima, NPWP, bank, no. rekening'], ['Register SPP/SPJ - Kwitansi Pembayaran', 'Laporan → Penatausahaan', 'hubungan kwitansi ↔ SPP, kegiatan & rekening']].map((x, i) => `<div><b>${i + 1}. ${esc(x[0])}</b><span class="meta">${esc(x[1])} · mengisi ${esc(x[2])}</span></div>`).join('')}</div>
       <div class="meta">Urutan terbaik: impor sekaligus semua PDF satu tahun anggaran. Minimal RAB (untuk APBDes) dan Buku Kas Umum (untuk realisasi).</div>
       <label class="btn pri" style="align-self:flex-start">${ic('file')}Pilih PDF Siskeudes<input type="file" id="skF" accept="application/pdf,.pdf" multiple hidden data-nolimit></label></div>
     <div class="card stack"><div class="sec-h" style="margin:0"><h2>${ic('box')} Impor dari database Siskeudes (.mde / .smd)</h2></div>
@@ -15257,9 +15324,9 @@ VIEWS.skimpor = async (p, main) => {
         </tbody></table>
         ${out.keu_trans.length && !mde && !P.some(p => p.jenis === 'bkp') ? '<div class="meta">Tanpa <b>Buku Kas Pembantu Kegiatan</b>, belanja tidak terhubung ke kegiatan (Laporan Realisasi per kegiatan jadi tidak lengkap).</div>' : ''}
         ${w.length ? `<details><summary class="meta">${w.length} catatan/peringatan</summary><div class="meta" style="max-height:200px;overflow:auto">${w.slice(0, 200).map(esc).join('<br>')}</div></details>` : ''}
-        <div class="btns"><button class="btn pri" data-act="skSimpan" ${tahun.length > 1 || !(ang.length + out.keu_trans.length + out.keu_spp.length + out.keu_rek.length + out.keu_kwitansi.length + out.keu_paket.length) ? 'disabled' : ''}>${ic('check')}Simpan ke aplikasi</button></div></div>
+        <div class="btns"><button class="btn pri" data-act="skSimpan" ${tahun.length > 1 || !(ang.length + out.keu_trans.length + out.keu_spp.length + out.keu_rek.length + out.keu_kwitansi.length + out.keu_paket.length + (out._rak ? out._rak.length : 0)) ? 'disabled' : ''}>${ic('check')}Simpan ke aplikasi</button></div></div>
       ${st.hasil ? `<div class="card stack"><div class="lbl">Hasil impor</div>${Object.entries(st.hasil).map(([e, r]) => `<div>${esc(e.replace('keu_', '').replace('anggaran', 'APBDes'))}: <b>${r.tambah}</b> baru, <b>${r.ubah}</b> diperbarui${r.gagal.length ? `, <span style="color:var(--bad)">${r.gagal.length} gagal</span> <span class="meta">(${esc(r.gagal.slice(0, 3).map(g => 'baris ' + g.baris + ': ' + g.pesan).join('; '))})</span>` : ''}</div>`).join('')}
-        <div class="btns"><button class="btn sm" data-act="go" data-go='["list",{"e":"keu_anggaran"}]'>APBDes</button><button class="btn sm" data-act="go" data-go='["keubuku"]'>Buku Kas</button><button class="btn sm" data-act="go" data-go='["keulap"]'>Laporan Realisasi</button></div></div>` : ''}</div>`;
+        <div class="btns"><button class="btn sm" data-act="go" data-go='["list",{"e":"keu_anggaran"}]'>APBDes</button><button class="btn sm" data-act="go" data-go='["keurak"]'>Anggaran Kas (RAK)</button><button class="btn sm" data-act="go" data-go='["keubuku"]'>Buku Kas</button><button class="btn sm" data-act="go" data-go='["keulap"]'>Laporan Realisasi</button></div></div>` : ''}</div>`;
   };
   $('#skF').onchange = async ev => {
     const fs = Array.from(ev.target.files || []); ev.target.value = '';
@@ -15270,6 +15337,7 @@ VIEWS.skimpor = async (p, main) => {
         let o = { nama: f.name, jenis: j, tahun: th, rows: [], n: 0 };
         if (j === 'rek') o.rows = skParseRek(L);
         else if (j === 'rab') { const r = skParseRab(L); o.rows = r.rows; o.ubah = r.ubah; o.warn = r.warn; }
+        else if (j === 'rak') { const r = skParseRak(L); o.rows = r.rows; o.warn = r.warn; }
         else if (j === 'bku') { const r = skParseBku(L); o.rows = r.rows; o.warn = r.warn; }
         else if (j === 'cair') o.rows = skParseCair(L);
         else if (j === 'spp') o.rows = skParseSpp(L);
