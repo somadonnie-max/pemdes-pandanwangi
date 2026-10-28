@@ -3135,7 +3135,17 @@ let instPrompt = null;
 const isStandalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); instPrompt = e; });
 window.addEventListener('appinstalled', () => { instPrompt = null; const c = $('#instCard'); if (c) c.remove(); toast('Aplikasi terpasang. Buka dari layar utama HP Anda.'); });
-if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => { });
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  navigator.serviceWorker.register('sw.js').catch(() => { });
+  navigator.serviceWorker.addEventListener('message', e => {
+    if (e.data && e.data.t === 'versi-baru' && !$('#verBaru')) {
+      const d = document.createElement('div'); d.id = 'verBaru'; d.className = 'toast'; d.style.cursor = 'pointer';
+      d.innerHTML = 'Versi baru aplikasi sudah siap. <b style="text-decoration:underline">Muat ulang</b>';
+      d.onclick = () => location.reload(); document.body.appendChild(d);
+      setTimeout(() => { if (d.parentNode) d.remove(); }, 12000);
+    }
+  });
+}
 function installHtml() {
   if (isStandalone() || Date.now() - Number(store.get('inst_hide') || 0) < 7 * 864e5) return '';
   return `<div class="card" id="instCard" style="display:flex;gap:10px;align-items:center;padding:8px 10px"><img src="${LOGO}" alt="" style="width:34px;height:34px;border-radius:50%;flex:none"><div style="flex:1;min-width:0"><b>Pasang aplikasi di HP</b><div class="meta">Tambahkan ke layar utama agar bisa dibuka seperti aplikasi biasa.</div></div><button class="btn sm pri" data-act="install">${ic('plus')}Pasang</button><button class="iconbtn" data-act="instHide" aria-label="Sembunyikan">${ic('x')}</button></div>`;
@@ -8891,7 +8901,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '200', tgl: '2026-10-28', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '201', tgl: '2026-10-28', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -13348,7 +13358,16 @@ function skParseRab(lines) {
    sama persis dengan nilai Menjadi (anggaran berlaku) yang dipakai. Hasil per baris:
    {akun, rek(obyek), kode_kegiatan, m{1..12}}. */
 function skParseRak(lines) {
-  const warn = [], raw = []; lines.forEach(l => (l.it || []).forEach(i => raw.push(i)));
+  /* pdf.js memulai koordinat-y dari nol di tiap halaman → geser per halaman supaya baris
+     dari halaman berbeda tidak bertabrakan. Item yang memuat beberapa kata dipecah per kata
+     (posisi-x diperkirakan dari jumlah huruf). */
+  const warn = [], raw = [];
+  lines.forEach(l => (l.it || []).forEach(i => {
+    const y = i.y - (Number(l.p) || 0) * 100000, t = String(i.t || ''), parts = t.trim().split(/\s+/).filter(Boolean);
+    if (parts.length <= 1) { raw.push({ x: i.x, y, w: i.w, h: i.h, t: t.trim() }); return; }
+    const pw = (i.w || 0) / Math.max(1, t.length); let pos = 0;
+    parts.forEach(pt => { const at = t.indexOf(pt, pos); pos = at + pt.length; raw.push({ x: i.x + at * pw, y, w: pt.length * pw, h: i.h, t: pt }); });
+  }));
   if (!raw.length) return { rows: [], warn: ['RAK: teks tak terbaca'] };
   const ctr = i => i.x + (i.w || 0) / 2;
   /* titik tengah-x tiap kolom bulan dari header JANUARI..JUNI */
