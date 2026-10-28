@@ -2210,7 +2210,7 @@ function MODS() {
     { k: 'kesejahteraan', l: 'Kesejahteraan', ic: 'heart', items: [['Rekap Sosial', 'chart', ['sosrekap'], null, 'r:rentan'], ['Rentan / Sosial', 'heart', ['list', { e: 'rentan' }], 'rentan'], ['DTSEN Keluarga (SIKS-NG)', 'house', ['list', { e: 'dtsen' }], 'dtsen'], ['Usulan Bansos & DTSEN', 'send', ['list', { e: 'usulan_bansos' }], 'usulan_bansos'], ['Musdes/Muskel Bansos', 'users', ['list', { e: 'musdes_bansos' }], 'musdes_bansos'], ['Penyaluran Bansos', 'check', ['list', { e: 'penyaluran_bansos' }], 'penyaluran_bansos'], ['Lembaga / Yayasan', 'landmark', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru Ngaji', 'book', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
     { k: 'pendidikan', l: 'Pendidikan', ic: 'book', items: [['Verifikasi ATS (Anak Tidak Sekolah)', 'book', ['ats'], null, 'r:ats'], ['Siap Diinput ke Situs ATS', 'send', ['ats', { f: 'input' }], null, 'ats_operator']] },
     { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RPJM Desa', 'book', ['rpjm', {}], null, 'r:rkp'], ['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['RAB & Gambar', 'hammer', ['rab', {}], null, 'r:rab'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Progres Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
-    { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Status Kegiatan', 'target', ['keukeg'], null, 'r:keu_penatausahaan'], ['APBDes', 'wallet', ['list', { e: 'keu_anggaran' }], 'keu_anggaran'], ['Paket Kegiatan Dana Desa', 'box', ['list', { e: 'keu_paket' }], 'keu_paket'], ['Penerimaan & Pajak', 'down', ['list', { e: 'keu_trans' }], 'keu_trans'], ['SPP & Pencairan', 'file', ['list', { e: 'keu_spp' }], 'keu_spp'], ['Kwitansi & Bukti SPJ', 'clip', ['list', { e: 'keu_kwitansi' }], 'keu_kwitansi'], ['SPJ', 'check', ['spj', {}], null, 'r:spj'], ['Pengajuan ADD (Siltap & Dana Dusun)', 'send', ['addaju'], null, 'r:add'], ['Buku Kas', 'book', ['keubuku'], null, 'r:keu_laporan'], ['Laporan Realisasi', 'chart', ['keulap'], null, 'r:keu_laporan'], ['Cetak Dokumen APBDes', 'print', ['keulamp'], null, 'r:keu_anggaran'], ['Rekap Pajak', 'coin', ['keupajak'], null, 'r:keu_laporan'], ['Kode Rekening', 'list', ['list', { e: 'keu_rek' }], 'keu_rek'], ['Impor Siskeudes (PDF / Database)', 'down', ['skimpor'], null, 'w:keu_anggaran']] },
+    { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Penganggaran', 'wallet', ['keuhub', { g: 'ang' }], null, 'r:keu_anggaran'], ['Penatausahaan', 'coin', ['keuhub', { g: 'pta' }], null, 'r:keu_penatausahaan'], ['Pelaporan', 'book', ['keuhub', { g: 'lap' }], null, 'r:keu_laporan'], ['Pengajuan ADD (Siltap & Dana Dusun)', 'send', ['addaju'], null, 'r:add'], ['Impor Siskeudes (PDF / Database)', 'down', ['skimpor'], null, 'w:keu_anggaran']] },
     { k: 'soon', l: 'Segera Hadir', ic: 'sprout', items: Object.keys(SOON).map(k => [SOON[k].t, SOON[k].ic, ['soon', { k }], null, '*', 1]) }
   ];
 }
@@ -8889,7 +8889,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '196', tgl: '2026-10-28', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '197', tgl: '2026-10-28', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -14882,6 +14882,31 @@ async function lampCetak(leaf) {
   const judul = { '1a': 'Ringkasan APBDes (Lampiran I.a)', '1b': 'APBDes per Bidang (Lampiran I.b)', '1c': 'Penjabaran APBDes (Lampiran I.c)' }[leaf];
   printDocs(judul + ' ' + th, lampHal(d, leaf), 'apbdes_' + leaf);
 }
+/* Halaman kelompok menu Keuangan (menyederhanakan sidebar: 1 pintu → beberapa menu) */
+const KEU_HUB = {
+  ang: ['Penganggaran', 'wallet', 'Anggaran & dokumen APBDes', [
+    ['APBDes', 'Rincian anggaran pendapatan, belanja & pembiayaan', 'wallet', ['list', { e: 'keu_anggaran' }], () => canRead('keu_anggaran')],
+    ['Paket Kegiatan Dana Desa', 'Daftar paket & output kegiatan DD', 'box', ['list', { e: 'keu_paket' }], () => canRead('keu_paket')],
+    ['Kode Rekening', 'Daftar akun / kode rekening APBDes', 'list', ['list', { e: 'keu_rek' }], () => canRead('keu_rek')],
+    ['Cetak Dokumen APBDes', 'Lampiran I.a / I.b / I.c (format Siskeudes)', 'print', ['keulamp'], () => can('r:keu_anggaran')]]],
+  pta: ['Penatausahaan', 'coin', 'Penerimaan, belanja, SPP & pajak', [
+    ['Penerimaan & Pajak', 'Transaksi kas: pendapatan, belanja, pajak, mutasi', 'down', ['list', { e: 'keu_trans' }], () => canRead('keu_trans')],
+    ['SPP & Pencairan', 'Surat Permintaan Pembayaran & pencairannya', 'file', ['list', { e: 'keu_spp' }], () => canRead('keu_spp')],
+    ['Kwitansi & Bukti SPJ', 'Kwitansi pembayaran & bukti pendukung', 'clip', ['list', { e: 'keu_kwitansi' }], () => canRead('keu_kwitansi')],
+    ['SPJ', 'Cetak berkas SPJ (SPP 1, SPP 2, SPTB, Kwitansi)', 'check', ['spj', {}], () => can('r:spj')],
+    ['Status Kegiatan', 'Perencanaan / realisasi / selesai per kegiatan', 'target', ['keukeg'], () => can('r:keu_penatausahaan')]]],
+  lap: ['Pelaporan', 'book', 'Buku kas & laporan', [
+    ['Buku Kas', 'Buku Kas Umum, Bank, Tunai & Pembantu Pajak', 'book', ['keubuku'], () => can('r:keu_laporan')],
+    ['Laporan Realisasi', 'Realisasi APBDes & per kegiatan', 'chart', ['keulap'], () => can('r:keu_laporan')],
+    ['Rekap Pajak', 'Rekap pajak dipungut & disetor per bulan', 'coin', ['keupajak'], () => can('r:keu_laporan')]]]
+};
+VIEWS.keuhub = async (p, main) => {
+  const h = KEU_HUB[p.g] || KEU_HUB.ang;
+  setTop(h[0], 'Keuangan');
+  const kartu = h[3].filter(x => { try { return x[4](); } catch (e) { return true; } });
+  main.innerHTML = `<div class="stack"><div class="card stack"><div class="sec-h" style="margin:0"><h2>${ic(h[1])} ${esc(h[0])}</h2></div><div class="meta">${esc(h[2])}</div>
+    <div class="lmp-pick">${kartu.map(x => `<button class="card lmp-c" data-act="go" data-go='${esc(JSON.stringify(x[3]))}'><span class="av">${ic(x[2])}</span><span class="main"><b>${esc(x[0])}</b><span class="meta">${esc(x[1])}</span></span><span class="r">${ic('next')}</span></button>`).join('') || '<div class="meta">Tidak ada menu yang bisa Anda akses di kelompok ini.</div>'}</div></div></div>`;
+};
 VIEWS.keulamp = async (p, main) => {
   setTop('Cetak Dokumen APBDes', 'Tahun ' + keuTh());
   main.innerHTML = `<div class="stack">${thChips('llTh')}
