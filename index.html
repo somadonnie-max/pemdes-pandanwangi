@@ -662,6 +662,7 @@ details.more>summary{cursor:pointer;color:var(--muted);font-size:11.5px;font-wei
 .rak .rk-t tr.r1 td{border-top:1.3px solid #000}.rak .rk-t tr.r2 td.n{border-top:.6px solid #000}.rak .rk-t td.n{text-align:right;white-space:nowrap;border-left:.6px solid #000;border-right:.6px solid #000}.rak .rk-t td.mid{vertical-align:middle;border-left:1px solid #000;border-right:1px solid #000}.rak .rk-t td.kd{border-top:0!important;padding-left:2.5mm}.rak .rk-t tr.b td{font-weight:700}.rak .rk-t td.ura.c{text-align:center;vertical-align:middle}
 .rak .rk-ttd{display:grid;grid-template-columns:1fr 1fr 1fr;font-weight:700;font-size:6.6pt;margin:4mm 0 0 18mm;line-height:1.9}.rak .rk-ttd .sp{height:12mm}
 .rak .rk-ft{position:absolute;left:9mm;right:9mm;bottom:6mm;display:flex;justify-content:space-between;align-items:center;border-top:1.5px solid #000;padding-top:2px;font-size:6.4pt}.rak .rk-ft b{background:#000;color:#fff;font-weight:400;padding:1px 18px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.rk-kts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px}.rk-kt{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;border-left:4px solid var(--ok)}.rk-kt.out{border-left-color:var(--warn)}.rk-kh{display:flex;flex-direction:column}.rk-kh b{font-size:15px}.rk-kh span{font-size:11px;color:var(--muted)}.rk-kb{display:grid;grid-template-columns:1fr 1fr;gap:8px}.rk-kb div{display:flex;flex-direction:column}.rk-kb span{font-size:11px;color:var(--muted);font-weight:600}.rk-kb b{font-size:15px;font-variant-numeric:tabular-nums}.rk-kf{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 10px;font-size:12px;color:var(--muted)}
 .rk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px 10px}.rk-mb{display:flex;flex-direction:column;gap:2px}.rk-mb label{font-size:11px;font-weight:600;color:var(--muted)}.rk-in{text-align:right;font-variant-numeric:tabular-nums}
 .paper.skd{font:9pt/1.35 Arial,Helvetica,sans-serif;padding:14mm 14mm 16mm}.skd .c{text-align:center}.skd .r{text-align:right}.skd .b,.skd tr.b td{font-weight:700}.skd .big{font-size:10.5pt}.skd p{margin:6px 0}.skd .skl{border-collapse:collapse}.skd .skl td{padding:2px 6px 2px 0;vertical-align:top}.skd .skl td:nth-child(2){padding:2px 8px}.skd .skt{width:100%;border-collapse:collapse;margin-top:8px}.skd .skt th,.skd .skt td{border:1px solid #000;padding:3px 5px;vertical-align:top}.skd .skt th{font-weight:700;text-align:center;vertical-align:middle}.skd .skt tr.nr th{padding:1px}.skd .skbox{border:1px solid #000;padding:3px 10px;display:inline-block}.skd .skfr{border:1px solid #000;margin-top:8px}.skd .skbx{border:1px solid #000;border-top:0;padding:4px 0 8px}.skd .skttd{display:grid;grid-template-columns:1fr 1fr}.skd .skttd4{display:grid;grid-template-columns:repeat(4,1fr);text-align:left;padding:4px 40px 0}.paper.skd.skh{position:relative;box-sizing:border-box;min-height:296mm;padding-bottom:22mm}.paper.land.skd.skh{min-height:209mm}.skd .skft{display:flex;align-items:center;gap:14px;font-size:7.5pt;line-height:1.2}.skd.skh>.skft{position:absolute;left:14mm;right:14mm;bottom:9mm;border-top:2px solid #000;padding-top:3px}.skd .skft b{background:#000;color:#fff;font-weight:400;padding:1px 24px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.skd .skft .hl{margin-left:auto}
 .paper h2{text-align:center;font-size:12.5pt;font-weight:700;margin:10px 0 2px;text-transform:uppercase}
@@ -8907,7 +8908,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '202', tgl: '2026-10-28', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '203', tgl: '2026-10-28', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -15000,8 +15001,34 @@ const verUr = v => Number(v.urut) || 0;
 /* nilai baris pada suatu versi (warisi versi sebelumnya bila belum diubah) */
 function verVal(r, vers, urut) {
   let v = mNum(r.jumlah); const vp = verVp(r);
-  vers.filter(x => x.kode !== 'awal' && verUr(x) <= urut).sort((a, b) => verUr(a) - verUr(b)).forEach(x => { if (vp[x.kode] != null && vp[x.kode] !== '') v = mNum(vp[x.kode]); });
+  vers.filter(x => x.kode !== 'awal' && verUr(x) <= urut).sort((a, b) => verUr(a) - verUr(b)).forEach(x => {
+    if (vp[x.kode] != null && vp[x.kode] !== '') v = mNum(vp[x.kode]);
+    else if (x.kode === 'imp' && r.jumlah_pak != null && r.jumlah_pak !== '') v = mNum(r.jumlah_pak);   /* versi hasil impor Siskeudes = kolom Menjadi */
+  });
   return v;
+}
+/* Bila APBDes diimpor dari Siskeudes dalam format Perubahan (ada kolom Menjadi) tetapi belum ada catatan
+   versi, tampilkan versi "Perubahan APBDes (hasil impor Siskeudes)" sebagai versi berlaku — sama dengan
+   acuan server (jumlah_pak || jumlah) dan sama dengan Siskeudes. */
+function verLengkapi(vers, ang) {
+  if (vers.some(v => v.kode === 'imp')) return vers;
+  const adaPak = (ang || []).some(r => r.jumlah_pak != null && r.jumlah_pak !== '' && mNum(r.jumlah_pak) !== mNum(r.jumlah));
+  if (!adaPak) return vers;
+  const adaBerlakuNyata = vers.some(v => !v._synth && v.status === 'Berlaku');
+  vers.forEach(v => { if (v.kode === 'awal' && v._synth) v.status = 'Diganti'; });
+  return vers.concat({ kode: 'imp', urut: '0.5', jenis: 'Perubahan APBDes', dasar: '', nomor: '', ket: 'Hasil impor Siskeudes (kolom Menjadi)', status: adaBerlakuNyata ? 'Diganti' : 'Berlaku', tahun: (vers[0] || {}).tahun, _synth: 1 }).sort((a, b) => verUr(a) - verUr(b));
+}
+/* simpan versi sintetis (awal / hasil impor) jadi catatan nyata sebelum ada perubahan status/versi baru;
+   nilai Menjadi hasil impor diamankan ke vp.imp supaya tidak hilang bila versi lain dijadikan berlaku */
+async function verSimpanSintetis(th, vers, ang) {
+  for (const v of vers.filter(x => x._synth)) {
+    const r = await call('save', { entity: 'keu_apbdes', record: { tahun: th, kode: v.kode, urut: String(v.urut), jenis: v.jenis, dasar: v.dasar || '', nomor: v.nomor || '', status: v.status, ket: v.ket || '' } });
+    v.id = (r && (r.id || (r.record && r.record.id))) || v.id; delete v._synth;
+    if (v.kode === 'imp' && ang) {
+      const pay = ang.filter(a => a.jumlah_pak != null && a.jumlah_pak !== '').map(a => { const vp = verVp(a); if (vp.imp != null) return null; vp.imp = String(mNum(a.jumlah_pak)); a.vp = JSON.stringify(vp); return { id: a.id, vp: a.vp }; }).filter(Boolean);
+      if (pay.length) await verSimpanBaris(pay);
+    }
+  }
 }
 const verAktif = vers => { const b = vers.filter(v => v.status === 'Berlaku'); return (b.length ? b : vers).slice().sort((a, b) => verUr(b) - verUr(a))[0] || vers[0]; };
 async function verMuat(th) {
@@ -15027,7 +15054,8 @@ async function verSinkron(th, vers, ang) {
 VIEWS.keuver = async (p, main, alive) => {
   const th = keuTh();
   setTop('Versi APBDes', 'Tahun ' + th);
-  const [vers, ang] = await Promise.all([verMuat(th), verAng(th)]); if (!alive()) return;
+  const [vers0, ang] = await Promise.all([verMuat(th), verAng(th)]); if (!alive()) return;
+  const vers = verLengkapi(vers0, ang);
   const w = canWrite('keu_anggaran'), aktif = verAktif(vers);
   const tot = (v) => ({ p: ang.filter(r => String(r.rek || '')[0] === '4').reduce((a, r) => a + verVal(r, vers, verUr(v)), 0), b: ang.filter(r => String(r.rek || '')[0] === '5').reduce((a, r) => a + verVal(r, vers, verUr(v)), 0) });
   main.innerHTML = `<div class="stack">${thChips('vrTh')}
@@ -15042,7 +15070,7 @@ VIEWS.keuver = async (p, main, alive) => {
       <div class="meta">Perubahan di sini hanya di aplikasi (untuk mencoba). Angka resmi tetap dari Siskeudes.</div></div></div>`;
   S.vh.vrTh = t => { S.keuTh = t.dataset.v; refresh(); };
   S.vh.vrTambah = () => {
-    const urutBaru = Math.max(0, ...vers.map(verUr)) + 1, kode = 'v' + urutBaru;
+    const urutBaru = Math.floor(Math.max(0, ...vers.map(verUr))) + 1, kode = 'v' + urutBaru;
     const m = modal('Tambah versi APBDes ' + th, `<form class="stack" id="vf"><div class="form">
       <div class="f"><label>Jenis <i>*</i></label><select id="vj">${VER_JENIS.filter(j => j !== 'APBDes Awal' || !vers.some(v => v.kode === 'awal' && !v._synth)).map(j => `<option ${j === 'Perubahan APBDes' ? 'selected' : ''}>${esc(j)}</option>`).join('')}</select></div>
       <div class="f"><label>Dasar</label><select id="vd"><option>Perdes</option><option>Perkades</option></select></div>
@@ -15056,6 +15084,7 @@ VIEWS.keuver = async (p, main, alive) => {
       ev.preventDefault(); const b = $('button[type=submit]', m.el); b.disabled = true;
       try {
         const jn = $('#vj', m.el).value, awal = jn === 'APBDes Awal';
+        if (!awal) await verSimpanSintetis(th, vers, ang);
         await call('save', { entity: 'keu_apbdes', record: { tahun: th, kode: awal ? 'awal' : kode, urut: awal ? '0' : String(urutBaru), jenis: jn, dasar: $('#vd', m.el).value, nomor: $('#vn', m.el).value, tanggal: $('#vt', m.el).value, status: 'Draf', ket: $('#vk', m.el).value } });
         m.close(); toast('Versi ditambahkan. Isi nilainya lalu jadikan berlaku bila sudah benar.'); refresh();
       } catch (x) { const e = $('#verr', m.el); e.textContent = x.message; e.hidden = false; b.disabled = false; }
@@ -15068,9 +15097,10 @@ VIEWS.keuver = async (p, main, alive) => {
     $('#vbOk', m.el).onclick = async () => {
       $('#vbOk', m.el).disabled = true;
       try {
+        await verSimpanSintetis(th, vers, ang);
         if (v.id) { await call('save', { entity: 'keu_apbdes', record: { id: v.id, status: 'Berlaku' } }); }
         for (const o of vers) { if (o.id && o !== v && o.status === 'Berlaku') await call('save', { entity: 'keu_apbdes', record: { id: o.id, status: 'Diganti' } }); }
-        const vbaru = await verMuat(th); const n = await verSinkron(th, vbaru, ang);
+        const vbaru = verLengkapi(await verMuat(th), ang); const n = await verSinkron(th, vbaru, ang);
         m.close(); toast('Versi berlaku diperbarui' + (n ? ' · ' + n + ' baris anggaran disesuaikan.' : '.')); refresh();
       } catch (x) { toast(x.message, 1); $('#vbOk', m.el).disabled = false; }
     };
@@ -15124,12 +15154,12 @@ async function rakData(th) {
   const [ang, rek, rb, vers] = await Promise.all([amb('keu_anggaran', { tahun: th }), amb('keu_rek'), amb('ref_bidang'), verMuat(th)]);
   const rekNama = {}; rek.forEach(r => { rekNama[r.kode] = r.uraian; });
   const subNama = {}; rb.forEach(r => { const ks = String(r.kode_sub || '').replace(/\.+$/, '').split('.').map(Number).join('.'); if (ks && r.sub_bidang) subNama[ks] = r.sub_bidang; });
-  const au = verUr(verAktif(vers));
-  const rows = ang.map(r => { const obj = String(r.rek || '').split(' ')[0]; return { id: r.id, rek: r.rek, obj, kb: String(r.kode_bidang || '').replace(/^0+/, '') || (r.kode_kegiatan || '').split('.')[0], kk: r.kode_kegiatan || '', keg: r.kegiatan || '', bidN: r.bidang || '', nama: rekNama[obj] || String(r.rek || '').split(' ').slice(1).join(' '), uraian: r.uraian || '', sumber: r.sumber || '', sem: mNum(r.jumlah), ang: verVal(r, vers, au), m: rakM(r) }; });
+  const versL = verLengkapi(vers, ang), au = verUr(verAktif(versL));
+  const rows = ang.map(r => { const obj = String(r.rek || '').split(' ')[0]; return { id: r.id, rek: r.rek, obj, kb: String(r.kode_bidang || '').replace(/^0+/, '') || (r.kode_kegiatan || '').split('.')[0], kk: r.kode_kegiatan || '', keg: r.kegiatan || '', bidN: r.bidang || '', nama: rekNama[obj] || String(r.rek || '').split(' ').slice(1).join(' '), uraian: r.uraian || '', sumber: r.sumber || '', sem: mNum(r.jumlah), ang: verVal(r, versL, au), m: rakM(r) }; });
   const kades = S.set.nama_kades || await namaKades() || '';
   const sekdes = await namaJabatan('^\\s*sekretaris desa');
   const kaur = await namaJabatan('kaur keuangan|kepala urusan keuangan|bendahara');
-  const va = verAktif(vers), adaPAK = rows.some(r => Math.abs(r.sem - r.ang) > 0.009);
+  const va = verAktif(versL), adaPAK = rows.some(r => Math.abs(r.sem - r.ang) > 0.009);
   const jenisApb = va && va.kode !== 'awal' ? (/perubahan/i.test(va.jenis) ? va.jenis.replace(/^Perubahan APBDes$/, 'Perubahan APBDes') : va.jenis) : (adaPAK ? 'Perubahan APBDes' : 'APBDes Awal');
   return { th, rows, rekNama, subNama, kades, sekdes, kaur, adaPAK, jenisApb };
 }
@@ -15235,17 +15265,27 @@ VIEWS.keurak = async (p, main, alive) => {
     ['Belanja', d.rows.filter(r => String(r.obj)[0] === '5')],
     ['Pembiayaan', d.rows.filter(r => String(r.obj)[0] === '6')]
   ].filter(g => g[1].length);
-  const totAng = d.rows.reduce((a, r) => a + r.ang, 0), totRak = d.rows.reduce((a, r) => a + rakTot(r.m), 0);
+  /* dua sisi APBDes (sama seperti TOTAL PENERIMAAN / TOTAL PENGELUARAN di RAK Siskeudes) — tidak boleh dijumlah jadi satu */
+  const sisiP = r => /^4/.test(r.obj) || /^6\.1/.test(r.obj), sisiK = r => /^5/.test(r.obj) || /^6\.2/.test(r.obj);
+  const ringkas = f => { const R = d.rows.filter(f), o = { sem: 0, men: 0, rak: 0, b: {} }; R.forEach(r => { o.sem += r.sem; o.men += r.ang; o.rak += rakTot(r.m); for (let b = 1; b <= 12; b++) o.b[b] = (o.b[b] || 0) + (r.m[b] || 0); }); return o; };
+  const PN = ringkas(sisiP), PK = ringkas(sisiK);
   const belum = d.rows.filter(r => r.ang && rakTot(r.m) === 0).length;
-  const bln = {}; for (let b = 1; b <= 12; b++) bln[b] = d.rows.reduce((a, r) => a + (r.m[b] || 0), 0);
+  const rp2 = v => 'Rp ' + rakRp(v);
+  const kartu = (judul, ket, x, kls) => { const sel = Math.round((x.rak - x.men) * 100) / 100; return `<div class="rk-kt ${kls}"><div class="rk-kh"><b>${judul}</b><span>${ket}</span></div>
+    <div class="rk-kb"><div><span>Semula</span><b>${rp2(x.sem)}</b></div><div><span>Menjadi (berlaku)</span><b>${rp2(x.men)}</b></div></div>
+    <div class="rk-kf">${x.sem !== x.men ? `<span>${x.men > x.sem ? 'Bertambah' : 'Berkurang'} ${rp2(Math.abs(x.men - x.sem))}</span>` : '<span>Tidak berubah</span>'}<span>Teralokasi RAK ${rp2(x.rak)} ${!x.rak ? '<span class="pill warn">belum</span>' : Math.abs(sel) < 0.01 ? '<span class="pill ok">pas</span>' : `<span class="pill ${sel > 0 ? 'bad' : ''}">${sel > 0 ? 'lebih' : 'kurang'} ${rp2(Math.abs(sel))}</span>`}</span></div></div>`; };
+  const selM = Math.round((PN.men - PK.men) * 100) / 100, selS = Math.round((PN.sem - PK.sem) * 100) / 100;
   const stat = r => { const t = rakTot(r.m), a = Math.round(r.ang); if (!t) return '<span class="pill warn">belum diatur</span>'; const d0 = Math.round(t) - a; return d0 === 0 ? '<span class="pill ok">pas</span>' : d0 > 0 ? `<span class="pill bad">lebih ${esc(fMoney(d0))}</span>` : `<span class="pill">sisa ${esc(fMoney(-d0))}</span>`; };
-  const rowHtml = r => `<div class="row" style="cursor:default"><span class="main"><span class="t">${esc(r.uraian || r.nama)}</span><span class="s">${esc(String(r.rek || '').split(' ')[0])}${r.keg ? ' · ' + esc(r.keg) : ''} · Anggaran ${esc(fMoney(r.ang))} · RAK ${esc(fMoney(rakTot(r.m)))} ${stat(r)}</span></span>${w ? `<span class="r"><button class="btn sm" data-act="rkAtur" data-id="${esc(r.id)}">${ic('cal')}Atur bulan</button></span>` : ''}</div>`;
+  const rowHtml = r => `<div class="row" style="cursor:default"><span class="main"><span class="t">${esc(r.uraian || r.nama)}</span><span class="s">${esc(String(r.rek || '').split(' ')[0])}${r.keg ? ' · ' + esc(r.keg) : ''} · ${r.sem !== r.ang ? 'Semula ' + esc(fMoney(r.sem)) + ' → ' : ''}Menjadi ${esc(fMoney(r.ang))} · RAK ${esc(fMoney(rakTot(r.m)))} ${stat(r)}</span></span>${w ? `<span class="r"><button class="btn sm" data-act="rkAtur" data-id="${esc(r.id)}">${ic('cal')}Atur bulan</button></span>` : ''}</div>`;
   main.innerHTML = `<div class="stack">${thChips('rkTh')}
     <div class="card stack"><div class="sec-h" style="margin:0"><h2>${ic('cal')} Anggaran Kas Desa ${esc(th)}</h2></div>
       <div class="meta">Rencana penarikan dana tiap bulan (Jan–Des) untuk tiap baris APBDes. Dipakai menyusun RAK/DPA dan mengatur arus kas. Acuan anggaran = versi APBDes yang <b>berlaku</b>.</div>
       ${!d.rows.length ? `<div class="meta">Belum ada data APBDes tahun ${esc(th)}. Isi dulu di <b>Penganggaran → APBDes</b> atau impor dari Siskeudes.</div>` : `
-      <div class="stats">${[['Total anggaran', fMoney(totAng)], ['Teralokasi di RAK', fMoney(totRak)], ['Belum diatur', belum + ' baris']].map(x => `<div class="rk-st"><div class="lbl">${x[0]}</div><b>${esc(x[1])}</b></div>`).join('')}</div>
-      <div style="overflow-x:auto"><table class="tbl" style="min-width:560px;font-size:12px"><thead><tr><th>Bulan</th>${BULAN.map(b => `<th class="r">${esc(b.slice(0, 3))}</th>`).join('')}</tr></thead><tbody><tr><td>Rencana kas</td>${BULAN.map((b, i) => `<td class="r mono">${bln[i + 1] ? esc(fMoney(bln[i + 1])) : '–'}</td>`).join('')}</tr></tbody></table></div>
+      <div class="rk-kts">${kartu('Penerimaan', 'Pendapatan + Penerimaan Pembiayaan', PN, 'in')}${kartu('Pengeluaran', 'Belanja + Pengeluaran Pembiayaan', PK, 'out')}</div>
+      <div class="meta">Selisih penerimaan − pengeluaran: semula <b>${rp2(selS)}</b> · menjadi <b>${rp2(selM)}</b> ${Math.abs(selM) < 0.01 && Math.abs(selS) < 0.01 ? '<span class="pill ok">seimbang</span>' : '<span class="pill bad">tidak seimbang</span>'}${belum ? ` · <span class="pill warn">${belum} baris belum diatur RAK-nya</span>` : ''}</div>
+      <div style="overflow-x:auto"><table class="tbl" style="min-width:760px;font-size:12px"><thead><tr><th>Rencana kas</th>${BULAN.map(b => `<th class="r">${esc(b.slice(0, 3))}</th>`).join('')}</tr></thead><tbody>
+        ${[['Penerimaan', PN.b], ['Pengeluaran', PK.b]].map(x => `<tr><td>${x[0]}</td>${BULAN.map((b, i) => `<td class="r mono">${x[1][i + 1] ? esc(rakRp(x[1][i + 1])) : '–'}</td>`).join('')}</tr>`).join('')}
+        <tr class="b"><td>Selisih</td>${BULAN.map((b, i) => { const v = Math.round(((PN.b[i + 1] || 0) - (PK.b[i + 1] || 0)) * 100) / 100; return `<td class="r mono">${v ? esc(rakRp(v)) : '0,00'}</td>`; }).join('')}</tr></tbody></table></div>
       ${w ? `<div class="btns"><button class="btn" data-act="rkAuto">${ic('cog')}Isi otomatis rata 12 bln (baris yang belum diatur)</button><button class="btn pri" data-act="rkCetak">${ic('print')}Cetak RAK</button></div>` : `<div class="btns"><button class="btn pri" data-act="rkCetak">${ic('print')}Cetak RAK</button></div>`}
       ${grp.map(g => `<div class="sec-h" style="margin:.4rem 0 0"><h3 style="margin:0">${esc(g[0])}</h3></div><div class="list">${g[1].slice().sort((a, b) => String(a.obj).localeCompare(String(b.obj))).map(rowHtml).join('')}</div>`).join('')}`}
       <div class="meta">Perubahan di sini hanya di aplikasi (untuk mencoba &amp; menyusun draf). Angka resmi tetap dari Siskeudes.</div></div></div>`;
