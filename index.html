@@ -835,6 +835,11 @@ option,optgroup{background-color:var(--surface)!important;color:var(--ink)!impor
 .ig-g{display:grid;grid-template-columns:1.1fr 1.1fr 1fr;gap:4mm;flex:1}.ig-c{display:flex;flex-direction:column;gap:4mm}.ig-k{border:1.5px solid var(--c);border-radius:4mm;padding:3mm;display:flex;flex-direction:column;gap:2mm;border-top-width:5px}.ig-h{font-weight:900;color:var(--c);font-size:10pt;letter-spacing:.5px}.ig-t{font-size:15pt;font-weight:900;color:#111}.ig-t small{display:block;font-size:8pt;font-weight:600;color:#555}
 .ig-r{display:grid;grid-template-columns:1fr;gap:.6mm}.ig-n{font-size:8pt;font-weight:700;color:#222}.ig-b{position:relative;height:3.2mm;border-radius:2mm;overflow:hidden;background:#f1f1f1}.ig-b i{position:absolute;left:0;top:0;bottom:0;border-radius:2mm}.ig-v{font-size:8.5pt;font-weight:700;text-align:right}.ig-v small{display:block;font-weight:400;color:#666;font-size:7pt}
 .ig-ft{display:flex;justify-content:space-between;gap:6mm;font-size:7.5pt;color:#444;border-top:1px solid #ccc;padding-top:2mm}
+.hk-t .r{text-align:right}.hk-t input{max-width:170px;text-align:right}
+.mg-a{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:6px}.mg-a>div{border:1px solid var(--line);border-radius:9px;padding:6px 9px;display:flex;flex-direction:column;font-size:12px}.mg-a b{font-size:14px}
+.mg-ds{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}.mg-d{border:1px solid var(--line);border-radius:9px;padding:6px 9px;font-size:12px;display:flex;flex-direction:column;gap:2px}.mg-d>div{display:flex;justify-content:space-between;gap:6px}
+.paper.mgp{font:10pt/1.3 Arial,Helvetica,sans-serif;padding:9mm 10mm;min-height:210mm;box-sizing:border-box;display:flex;flex-direction:column;gap:5mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}.mgp-h{text-align:center;font-size:24pt;font-weight:900;color:#14532d;border-bottom:3px solid #15803d;padding-bottom:2mm}.mgp-h small{display:block;font-size:9.5pt;color:#444;font-weight:700}
+.mgp-g{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm;flex:1}.mgp-k{border:1.5px solid #15803d;border-top-width:5px;border-radius:4mm;padding:3mm;display:flex;flex-direction:column;gap:1.4mm}.mgp-k>b{color:#15803d;font-size:11pt;letter-spacing:.5px}.mgp-k>div{display:flex;justify-content:space-between;gap:3mm;border-bottom:1px dotted #bbb;font-size:9.5pt}.mgp-k>div b{text-align:right}
 .frc-nv{font-size:10.5px;font-weight:700;color:#7c3aed;background:#ede9fe;border-radius:5px;padding:0 5px;margin-left:4px;white-space:nowrap}.frc-baru{display:flex;gap:6px;align-items:flex-start;font-size:11.5px;color:#9a3412;background:#fff7ed;border:1px dashed #fdba74;border-radius:7px;padding:5px 7px}.frc-baru .ic{width:14px;height:14px;flex:none;margin-top:1px}.frc-up{font-size:11.5px;color:var(--muted)}
 .frc-bn{border-left:3px solid var(--pri-soft);padding-left:8px;display:flex;flex-direction:column;gap:6px}.frc-bh{display:flex;gap:7px;align-items:flex-start}.frc-bno{flex:none;width:20px;height:20px;border-radius:50%;background:var(--pri);color:var(--pri-ink);font-size:11px;font-weight:800;display:grid;place-items:center}.frc-bt{flex:1;font-size:12.5px;font-weight:600}.frc-bv{flex:none;font-size:11px;font-weight:800;color:#15803d;background:#dcfce7;border-radius:6px;padding:1px 6px}.frc-bv.k{color:#b45309;background:#fef3c7}
 .frc-ls{display:block;font-weight:500;font-size:11px;color:var(--muted)}.frc-x summary{cursor:pointer;font-size:12.5px;font-weight:700;display:flex;gap:6px;align-items:center;padding:4px 0}.frc-x .ic{width:15px;height:15px}.frc-lv{font-size:12px;margin:4px 0 6px}.frc-lv ul{margin:2px 0 0;padding-left:18px;color:var(--muted)}
@@ -2241,7 +2246,7 @@ function MODS() {
       ['Pengadaan', 'plus', ['list', { e: 'aset_trx', chip: 'Pengadaan' }], 'aset_trx'], ['Penggunaan, Pemanfaatan & Penghapusan', 'list', ['list', { e: 'aset_trx' }], 'aset_trx'], ['Persediaan', 'box', ['list', { e: 'persediaan' }], 'persediaan'],
       ['Inventarisasi Fisik', 'check', ['list', { e: 'aset_cek' }], 'aset_cek'], ['Laporan Format SIPADES', 'print', ['sipadeslap'], null, 'r:aset'], ['Cetak Laporan Aset (format awal)', 'print', ['asetcetak'], null, 'r:aset'], ['Cetak Register Label', 'crop', ['asetlabel'], null, 'r:aset'],
       ['Data Ruangan', 'house', ['list', { e: 'aset_ruang' }], 'aset_ruang'], ['Perangkat & Tim Inventarisasi', 'users', ['list', { e: 'aset_tim' }], 'aset_tim'], ['Kode Rekening Aset', 'list', ['list', { e: 'ref_kode_barang' }], 'ref_kode_barang'], ['SOP, Template BA/SK & Pedoman', 'book', ['asetsop'], null, 'r:aset']] },
-    { k: 'pemerintahan', l: 'Pemerintahan', ic: 'landmark', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, 'r:penduduk'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga'], ['Tanah di Desa', 'map', ['tanah'], 'tanah_desa'], ['FRC Desa (Desa Anti Korupsi)', 'check', ['frc'], null, 'r:frc']] },
+    { k: 'pemerintahan', l: 'Pemerintahan', ic: 'landmark', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, 'r:penduduk'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga'], ['Tanah di Desa', 'map', ['tanah'], 'tanah_desa'], ['FRC Desa (Desa Anti Korupsi)', 'check', ['frc'], null, 'r:frc'], ['Kinerja Perangkat', 'target', ['list', { e: 'kinerja' }], 'kinerja'], ['Monografi Desa', 'chart', ['monografi'], null, 'r:frc'], ['Pemantauan Harga Komoditas', 'chart', ['hargakom'], null, 'r:frc'], ['Aset Negara di Desa', 'landmark', ['list', { e: 'aset_negara' }], 'aset_negara']] },
     { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Buku NTCR', 'users', ['list', { e: 'ntcr' }], 'ntcr'], ['Formulir Adminduk', 'file', ['list', { e: 'adminduk' }], 'register_surat'], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
     { k: 'kesejahteraan', l: 'Kesejahteraan', ic: 'heart', items: [['Rekap Sosial', 'chart', ['sosrekap'], null, 'r:rentan'], ['Rentan / Sosial', 'heart', ['list', { e: 'rentan' }], 'rentan'], ['DTSEN Keluarga (SIKS-NG)', 'house', ['list', { e: 'dtsen' }], 'dtsen'], ['Usulan Bansos & DTSEN', 'send', ['list', { e: 'usulan_bansos' }], 'usulan_bansos'], ['Musdes/Muskel Bansos', 'users', ['list', { e: 'musdes_bansos' }], 'musdes_bansos'], ['Penyaluran Bansos', 'check', ['list', { e: 'penyaluran_bansos' }], 'penyaluran_bansos'], ['Lembaga / Yayasan', 'landmark', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru Ngaji', 'book', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
     { k: 'pendidikan', l: 'Pendidikan', ic: 'book', items: [['Verifikasi ATS (Anak Tidak Sekolah)', 'book', ['ats'], null, 'r:ats'], ['Siap Diinput ke Situs ATS', 'send', ['ats', { f: 'input' }], null, 'ats_operator']] },
@@ -3883,12 +3888,13 @@ VIEWS.list = async (p, main, alive) => {
   main.innerHTML = `<div class="stack">${e === 'tanah_desa' ? tanahTabs('list') : e === 'tanah_sert' ? tanahTabs('sert') : ''}${SOS_TAB_E[e] ? rentanTabs(SOS_TAB_E[e]) : ''}
     <div class="toolbar"><label class="search">${ic('search')}<input id="q" placeholder="Cari…" value="${esc(st.q)}" autocomplete="off"></label>${fltF.length ? `<button class="btn sm${fltN ? ' pri' : ''}" data-act="flt" title="Cari berdasarkan kriteria">${ic('filter')}Filter<span class="fcnt">${fltN || ''}</span></button>` : ''}
       ${u.month ? `<input type="month" class="inp" id="per" value="${esc(st.per)}" style="max-width:180px">` : ''}
-      ${e === 'rkp_rutin' && canWrite(e) ? `<button class="btn sm" data-act="rkpRutinIsi">${ic('down')}Salin dari APBDes ${esc(keuTh())}</button>` : ''}${NASKAH[e] && canWrite(e) ? `<button class="btn sm pri" data-act="go" data-go='${esc(JSON.stringify(['form', { e, buat: 1 }]))}' title="${esc(NASKAH[e].buat)}">${ic('next')}Buat</button>` : ''}${u.print ? `<button class="btn sm" data-act="cetak" title="Cetak buku register">${ic('print')}Cetak</button>` : ''}${u.excel ? `<button class="btn sm" data-act="xlsOut">${ic('down')}Ekspor Excel</button>${canWrite(e) ? `<label class="btn sm">${ic('plus')}Impor Excel<input type="file" id="xlsIn" accept=".xlsx,.csv" hidden></label>` : ''}` : ''}${u.print2 ? `<button class="btn sm" data-act="cetak2">${ic('print')}${esc(u.print2.label)}</button>` : ''}</div>
+      ${e === 'rkp_rutin' && canWrite(e) ? `<button class="btn sm" data-act="rkpRutinIsi">${ic('down')}Salin dari APBDes ${esc(keuTh())}</button>` : ''}${NASKAH[e] && canWrite(e) ? `<button class="btn sm pri" data-act="go" data-go='${esc(JSON.stringify(['form', { e, buat: 1 }]))}' title="${esc(NASKAH[e].buat)}">${ic('next')}Buat</button>` : ''}${u.tools ? u.tools() : ''}${u.print ? `<button class="btn sm" data-act="cetak" title="Cetak buku register">${ic('print')}Cetak</button>` : ''}${u.excel ? `<button class="btn sm" data-act="xlsOut">${ic('down')}Ekspor Excel</button>${canWrite(e) ? `<label class="btn sm">${ic('plus')}Impor Excel<input type="file" id="xlsIn" accept=".xlsx,.csv" hidden></label>` : ''}` : ''}${u.print2 ? `<button class="btn sm" data-act="cetak2">${ic('print')}${esc(u.print2.label)}</button>` : ''}</div>
     ${GRUP_OF[e] ? `<div class="gtabs" role="tablist">${grpEs(GRUP_OF[e]).map(([k, l]) => `<button role="tab" class="${k === e ? 'on' : ''}" data-act="grpTab" data-v="${k}">${esc(l)}</button>`).join('')}</div>` : ''}
     ${pers ? `<div class="chips">${pers.map(y => `<button class="chip ${st.per === y || (y === 'Semua' && st.per === 'all') ? 'on' : ''}" data-act="per" data-v="${y === 'Semua' ? 'all' : y}">${y}</button>`).join('')}</div>` : ''}
     ${u.views ? `<div class="chips">${u.views.map((v, i) => `<button class="chip ${st.view === i ? 'on' : ''}" data-act="view" data-v="${i}">${esc(v[0])}</button>`).join('')}</div>` : ''}
     ${u.chips ? `<div class="chips${u.chips.dyn && !u.chips.baris ? ' wrap' : u.chips.baris ? ' geser1' : ''}"><button class="chip ${!st.chip ? 'on' : ''}" data-act="chip" data-v="">Semua</button>${chipOpt.map(o => `<button class="chip ${st.chip === o ? 'on' : ''}" data-act="chip" data-v="${esc(o)}">${esc(u.chips.lbl ? u.chips.lbl(o) : o)}${chipN[o] ? ` <small class="num">${chipN[o]}</small>` : ''}</button>`).join('')}</div>` : ''}
     ${fltN ? `<div class="fltbar">${Object.keys(st.flt).map(k => `<button class="chip on" data-act="fltX" data-k="${esc(k)}" title="Hapus kriteria">${esc(fltLabel(e, k, st.flt[k]))}${ic('x')}</button>`).join('')}<button class="chip" data-act="fltX" data-k="">Hapus semua</button></div>` : ''}
+    ${u.intro ? `<div class="card meta">${u.intro}</div>` : ''}
     <div class="meta" id="cnt"></div>
     <div id="rows"><div class="skel"></div></div>
     <div id="more"></div>
@@ -4141,6 +4147,7 @@ async function renderDetail(e, x, el, full) {
   if (e === 'register_surat') { try { await extraSuratVerif(x, xx); } catch (er) { console.warn(er); } }
   if (e === 'aset' && x.paket_id) xx.insertAdjacentHTML('afterbegin', `<div class="btns"><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'keu_paket', id: x.paket_id }]))}'>${ic('box')}Paket kegiatan asal</button></div>`);
   if (e === 'rkp_musyawarah') await extraMusyawarah(x, xx);
+  if (u.extra) { try { await u.extra(x, xx); } catch (er) { console.warn(er); } }
   if (e === 'aset') await extraAset(x, xx);
   if (e === 'aset_trx') { const dv = document.createElement('div'); dv.className = 'btns'; dv.innerHTML = `<button class="btn sm" data-act="trxDok">${ic('file')}Buat Berita Acara / SK</button>`; xx.appendChild(dv); S.vh.trxDok = () => asetDokTrx(x); }
   if (e === 'aset_trx' && canWrite('aset') && x.posting !== 'Sudah' && /Penghapusan|Ubah Kondisi|Kapitalisasi/.test(x.jenis || '')) { xx.insertAdjacentHTML('afterbegin', `<div class="btns"><button class="btn sm pri" data-act="trxPost">${ic('check')}Posting ke data aset</button></div><div class="meta">Menerapkan ${esc(x.jenis)} ke aset yang dipilih di daftar barang.</div>`); S.vh.trxPost = async t => { t.disabled = true; try { const n = await asetTrxPosting(x); toast(n + ' aset diperbarui.'); refresh(); } catch (er) { toast(er.message, 1); t.disabled = false; } }; }
@@ -8937,7 +8944,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '207', tgl: '2026-10-29', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '208', tgl: '2026-10-29', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -14263,6 +14270,7 @@ async function addCetak(x, rows, pg, lalu, laluPer) {
    dh = Dasar Hukum, lv = kriteria level (Mandatory). */
 const L_ = (t, o) => Object.assign({ t }, o || {});
 const FG = {
+  kinerja: ['Kinerja Perangkat', ['list', { e: 'kinerja' }]], monografi: ['Monografi Desa', ['monografi']], hargakom: ['Harga Komoditas', ['hargakom']], asetneg: ['Aset Negara', ['list', { e: 'aset_negara' }]],
   calk: ['CaLK', ['keucalk']], bakas: ['BA Pemeriksaan Kas', ['keukas', { tab: 'ba' }]], rekkoran: ['Rekening Koran', ['keukas', { tab: 'rk' }]],
   infoapb: ['Baliho APBDes', ['keuinfo', { mode: 'apb' }]], inforeal: ['Baliho Realisasi', ['keuinfo', { mode: 'real' }]],
   sk: ['SK Kepala Desa', ['list', { e: 'sk_kades' }]], perkades: ['Peraturan Kepala Desa', ['list', { e: 'perkades' }]], perdes: ['Peraturan Desa', ['list', { e: 'perdes' }]],
@@ -14373,18 +14381,18 @@ const FRC_IND = [
   { k: 'K1', g: 'Mandiri', no: '9', j: 'Kelembagaan, Kapasitas Dan Kompetensi Aparat Pada Penyelenggaraan Pemerintahan Desa',
     n: ['Kelembagaan Pemerintahan Desa telah Terisi', 'Terdapat Perjanjian kinerja/Indikator dan target kinerja / nama lainnya untuk seluruh perangkat desa dan Laporan penyelenggaraan Tugas dan fungsi perangkat desa', 'Telah terdapat Peningkatan Kemampuan dasar, kemampuan manajemen, Kemampuan teknis perangkat desa'],
     l: [L_('Laporan/ Daftar struktur organisasi/ kelembagaan yang telah terisi, jika belum terisi penuh', { nv: '1', ni: 0, go: g_('aparat'), cek: 'aparat' }), L_('Struktur organisasi/ kelembagaan terisi penuh', { nv: '2', ni: 0, go: g_('aparat'), cek: 'aparat' }),
-      L_('Perjanjian kinerja/indikator dan target kinerja/nama lainnya untuk seluruh perangkat desa', { nv: '1', ni: 1, baru: 'Perjanjian Kinerja Perangkat Desa (cetak per perangkat)' }),
-      L_('Laporan capaian atas perjanjian kinerja/ indikator dan target kinerja/nama lainnya tahun berjalan', { nv: '1', ni: 1, baru: 'Laporan Capaian Kinerja Perangkat Desa' }),
+      L_('Perjanjian kinerja/indikator dan target kinerja/nama lainnya untuk seluruh perangkat desa', { nv: '1', ni: 1, go: g_('kinerja') }),
+      L_('Laporan capaian atas perjanjian kinerja/ indikator dan target kinerja/nama lainnya tahun berjalan', { nv: '1', ni: 1, go: g_('kinerja') }),
       L_('Telah ada laporan peningkatan kapasitas/ kompetensi (minimal 3 orang)', { nv: '1', ni: 2, go: g_('sert'), cek: 'sert' })],
     dh: ['Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 84 Tahun 2015 Tentang Susunan Organisasi Dan Tata Kerja Pemerintah Desa', 'Pasal 55 Undang-Undang Republik Indonesia Nomor 6 Tahun 2014 Tentang Desa', 'Pasal 66 Peraturan Daerah Kabupaten Lumajang Nomor 7 Tahun 2016 Tentang Penyelenggaraan Pemerintahan Desa'] },
   { k: 'S1', g: 'Mandiri', no: '10', j: 'Statistik Desa',
     n: ['Persentase Pencapaian Pendapatan Pajak Daerah (PBB) di Tingkat Desa', 'Dukungan Desa terhadap Program Peningkatan IPM di tingkat Desa (misal intervensi data anak putus sekolah, buta huruf, update KK, dst)', 'Inventarisasi Pendataan Aset negara di wilayah Desa', 'Data Monografi Desa telah Terupdate', 'Data SDGs telah terupdate sesuai Peraturan Menteri Desa PDTT No. 7 Tahun 2021 (mengirimkan data lansia, pengangguran, penerima bantuan)', 'Aspek Strategis Mandatory I (Dukungan Pemantauan Inflasi/ laporan pemantauan harga komoditas di tingkat Desa berkala)', 'Aspek Strategis Mandatory II (Laporan Penyelenggaraan Program Strategis Persertifikatan tanah / PTSL diantaranya SK Pokmas, BA Kesepakatan, RAB, Rekap Belanja, dst)'],
     l: [L_('Persentase capaian PBB antara 60-80 persen', { nv: '1', ni: 0, go: g_('pbb'), cek: 'pbb' }), L_('Persentase capaian PBB diatas 80 persen', { nv: '2', ni: 0, go: g_('pbb'), cek: 'pbb' }),
       L_('Laporan penyelenggaraan dimana desa telah turut mendukung (program peningkatan IPM)', { nv: '2', ni: 1, go: g_('pstat', 'rentan') }),
-      L_('Laporan/informasi hasil pendataan aset negara di wilayah desa dalam laporan /data monografi/lainnya', { ni: 2, baru: 'Data Aset Negara di Wilayah Desa' }),
-      L_('Data monografi telah terupdate', { nv: '1', ni: 3, go: g_('pstat'), cek: 'penduduk', baru: 'Monografi Desa (format Permendagri 13/2012)' }), L_('Data monografi telah terpampang', { nv: '1', ni: 3, go: g_('pstat'), baru: 'Monografi Desa (format Permendagri 13/2012)' }),
+      L_('Laporan/informasi hasil pendataan aset negara di wilayah desa dalam laporan /data monografi/lainnya', { ni: 2, go: g_('asetneg') }),
+      L_('Data monografi telah terupdate', { nv: '1', ni: 3, go: g_('monografi', 'pstat'), cek: 'penduduk' }), L_('Data monografi telah terpampang', { nv: '1', ni: 3, go: g_('monografi') }),
       L_('Bukti data SDGs telah terupdate', { ni: 4, go: g_('pstat'), up: 1 }),
-      L_('Laporan aspek mandatory Strategis I (pemantauan harga komoditas)', { ni: 5, baru: 'Pemantauan Harga Komoditas / Inflasi (laporan berkala)' }),
+      L_('Laporan aspek mandatory Strategis I (pemantauan harga komoditas)', { ni: 5, go: g_('hargakom') }),
       L_('Laporan aspek mandatory Strategis II (SK pokmasdartibnah, Kesepakatan PTSL, RAB PTSL, SPJ PTSL, Rekap Peserta PTSL dan Status Penyelesaian Sertifikat, dst)', { ni: 6, go: g_('tanah', 'sk') })],
     dh: ['Pasal 6 Peraturan Bupati Lumajang Nomor 37 Tahun 2018 tentang Pengawasan Setoran Pajak Bumi dan Bangunan Sektor Perdesaan dan Perkotaan Berbasis Web', 'Pasal 3 Peraturan Bupati Lumajang Nomor 39 Tahun 2020 Tentang Perubahan Ketiga Atas Perbup Nomor 35 Tahun 2014 Tentang Petunjuk Pelaksanaan Pemberian Dan Pemanfaatan Insentif Pemungutan Pajak Daerah Dan Retribusi Daerah', 'Pasal 6 Peraturan Menteri Desa PDTT Nomor 21 Tahun 2020 Tentang Pedoman Umum Pembangunan Desa Dan Pemberdayaan Masyarakat Desa', 'Pasal 3 Peraturan Bupati Lumajang Nomor 106 Tahun 2019 Tentang Pedoman Pelaksanaan Gerakan Membangun Pendidikan Kesetaraan Desa (Gempita Desa)', 'Pasal 2 Peraturan Menteri Dalam Negeri Nomor 13 Tahun 2012 Tentang Monografi Desa Dan Kelurahan', 'Peraturan Menteri Dalam Negeri Nomor 114 Tahun 2014 Tentang Pedoman Pembangunan Desa'] },
   { k: 'G1', g: 'Mandiri', no: '11', j: 'Desa Anti Korupsi dan Anti Pungli — G1. Register risiko',
@@ -15830,7 +15838,7 @@ async function kkPejabat() {
   const [kades, kaur, sekdes] = await Promise.all([(S.set.nama_kades ? Promise.resolve(S.set.nama_kades) : namaKades()).catch(() => ''), namaJabatan('kaur keuangan|kepala urusan keuangan|bendahara').catch(() => ''), namaJabatan('^\\s*sekretaris desa').catch(() => '')]);
   return { kades: kades || '', kaur: kaur || '', sekdes: sekdes || '' };
 }
-const kkTtd2 = (kiriJab, kiriNama, kananJab, kananNama, tgl, bawah) => `<div class="kk-ttd"><div>${kiriJab}<div class="sp"></div><b><u>${esc(kiriNama || '..............................')}</u></b></div><div>${esc(ND())}, ${esc(fDate(tgl))}<br>${kananJab}<div class="sp"></div><b><u>${esc(kananNama || '..............................')}</u></b></div></div>${bawah ? `<div class="kk-ttd1">${bawah}</div>` : ''}`;
+const kkTtd2 = (kiriJab, kiriNama, kananJab, kananNama, tgl, bawah) => `<div class="kk-ttd"><div>${kiriJab ? `<br>${kiriJab}<div class="sp"></div><b><u>${esc(kiriNama || '..............................')}</u></b>` : ''}</div><div>${esc(ND())}, ${esc(fDate(tgl))}<br>${kananJab}<div class="sp"></div><b><u>${esc(kananNama || '..............................')}</u></b></div></div>${bawah ? `<div class="kk-ttd1">${bawah}</div>` : ''}`;
 
 VIEWS.keukas = async (p, main, alive) => {
   const th = keuTh(), st = S.kkSt = S.kkSt || { tab: 'ba' };
@@ -16058,6 +16066,215 @@ VIEWS.keuinfo = async (p, main, alive) => {
   S.vh.igM = t => { st.mode = t.dataset.v; st.th = ''; refresh(); };
   S.vh.igTh = t => { st.th = t.dataset.v; refresh(); };
   S.vh.igCetak = () => printDocs((real ? 'Realisasi APBDes ' : 'APBDes ') + th, [poster()], 'infografis');
+};
+
+/* ================= Kelompok 3 FRC (v208): Kinerja Perangkat (K1), Monografi, Harga Komoditas, Aset Negara (S1) ================= */
+const PK_TPL = [
+  [/sekretaris/i, 'Terselenggaranya administrasi dan koordinasi pemerintahan desa yang tertib', [['Persentase surat masuk/keluar teradministrasi', '100', '%'], ['Rancangan APBDes dan LPPD/LKPPD tersusun tepat waktu', '2', 'dokumen'], ['Rapat koordinasi perangkat desa', '12', 'kali'], ['Laporan tugas bulanan perangkat terekap', '12', 'laporan']]],
+  [/tata usaha|kaur tu|umum/i, 'Tertibnya administrasi umum, ketatausahaan dan aset desa', [['Persentase surat masuk/keluar teragenda dan terarsip', '100', '%'], ['Buku administrasi umum desa termutakhirkan', '100', '%'], ['Inventaris aset desa termutakhirkan (SIPADES)', '100', '%'], ['Rekap presensi perangkat desa', '12', 'laporan']]],
+  [/keuangan|bendahara/i, 'Terwujudnya penatausahaan keuangan desa yang tertib dan akuntabel', [['SPJ kegiatan selesai tepat waktu', '100', '%'], ['Buku Kas Umum & buku pembantu ditutup tiap bulan', '12', 'bulan'], ['Pajak yang dipungut disetor tepat waktu', '100', '%'], ['Laporan realisasi APBDes semester & akhir tahun', '2', 'dokumen']]],
+  [/perencanaan/i, 'Tersusunnya dokumen perencanaan dan evaluasi pembangunan desa', [['RKP Desa ditetapkan tepat waktu', '1', 'dokumen'], ['Rancangan APBDes disusun sesuai RKP Desa', '1', 'dokumen'], ['Laporan monitoring & evaluasi pembangunan', '4', 'laporan'], ['Profil/data desa termutakhirkan', '1', 'dokumen']]],
+  [/pemerintahan/i, 'Meningkatnya kualitas tata praja dan ketenteraman desa', [['Data kependudukan termutakhirkan', '100', '%'], ['Capaian setoran PBB', '80', '%'], ['Laporan ketenteraman & ketertiban', '12', 'laporan'], ['Administrasi pertanahan terlayani', '100', '%']]],
+  [/kesejahteraan/i, 'Terlaksananya pembangunan dan pemberdayaan masyarakat', [['Kegiatan pembangunan selesai tepat waktu', '100', '%'], ['Data penerima bantuan sosial termutakhirkan', '100', '%'], ['Kegiatan pemberdayaan masyarakat', '4', 'kegiatan'], ['Laporan pelaksanaan kegiatan', '4', 'laporan']]],
+  [/pelayanan/i, 'Meningkatnya kualitas pelayanan kepada masyarakat', [['Surat keterangan selesai dalam 1 hari', '100', '%'], ['Sosialisasi/penyuluhan kepada masyarakat', '4', 'kali'], ['Pembinaan lembaga keagamaan & kemasyarakatan', '4', 'kali'], ['Tindak lanjut pengaduan masyarakat', '100', '%']]],
+  [/dusun|kasun/i, 'Terselenggaranya pemerintahan, pembangunan dan kemasyarakatan di wilayah dusun', [['Musyawarah dusun', '4', 'kali'], ['Laporan mutasi penduduk dusun', '12', 'laporan'], ['Capaian setoran PBB dusun', '80', '%'], ['Laporan situasi ketenteraman dusun', '12', 'laporan']]],
+  [/.*/, 'Terlaksananya tugas dan fungsi jabatan', [['Tugas pokok terlaksana sesuai rencana', '100', '%'], ['Laporan pelaksanaan tugas', '12', 'laporan']]]];
+const pkCap = r => { const t = mNum(String(r.target || '').replace(',', '.')), x = mNum(String(r.realisasi || '').replace(',', '.')); return t > 0 && String(r.realisasi || '').trim() !== '' ? Math.min(x / t * 100, 120) : null; };
+const pkRows = x => { try { const a = JSON.parse(x.indikator || '[]'); return Array.isArray(a) ? a.filter(r => r.indikator) : []; } catch (e) { return []; } };
+const pkRata = x => { const c = pkRows(x).map(pkCap).filter(v => v != null); return c.length ? c.reduce((a, b) => a + b, 0) / c.length : null; };
+const pkPct = v => v == null ? '-' : v.toLocaleString('id-ID', { maximumFractionDigits: 1 }) + '%';
+function pkCetak(list, jenis) {
+  const desa = ND();
+  Promise.resolve(S.set.nama_kades || namaKades()).catch(() => '').then(kades => {
+    const pages = list.map(x => {
+      const R = pkRows(x), th = x.tahun;
+      if (jenis === 'pk') return `<div class="paper">${kop()}<h2>PERJANJIAN KINERJA TAHUN ${esc(th)}</h2><h3></h3>
+        <p>Dalam rangka mewujudkan manajemen pemerintahan desa yang efektif, transparan, dan akuntabel serta berorientasi pada hasil, kami yang bertanda tangan di bawah ini:</p>
+        <table class="kk-reg"><tr><td style="width:90px">Nama</td><td style="width:10px">:</td><td><b>${esc(x.nama)}</b></td></tr><tr><td>Jabatan</td><td>:</td><td>${esc(x.jabatan)}</td></tr></table><p>selanjutnya disebut <b>PIHAK PERTAMA</b>,</p>
+        <table class="kk-reg"><tr><td style="width:90px">Nama</td><td style="width:10px">:</td><td><b>${esc(kades || '')}</b></td></tr><tr><td>Jabatan</td><td>:</td><td>Kepala Desa ${esc(desa)}</td></tr></table><p>selaku atasan langsung PIHAK PERTAMA, selanjutnya disebut <b>PIHAK KEDUA</b>.</p>
+        <p>PIHAK PERTAMA berjanji akan mewujudkan target kinerja tahunan sesuai lampiran perjanjian ini dalam rangka mencapai target kinerja jangka menengah seperti yang telah ditetapkan dalam RPJM Desa. Keberhasilan dan kegagalan pencapaian target kinerja tersebut menjadi tanggung jawab PIHAK PERTAMA.</p>
+        <p>PIHAK KEDUA akan melakukan supervisi yang diperlukan serta akan melakukan evaluasi terhadap capaian kinerja dari perjanjian ini dan mengambil tindakan yang diperlukan dalam rangka pemberian penghargaan dan sanksi.</p>
+        ${kkTtd2('PIHAK KEDUA,<br>KEPALA DESA ' + esc(desa.toUpperCase()), kades, 'PIHAK PERTAMA,<br>' + esc(String(x.jabatan || '').toUpperCase()), x.nama, x.tgl_pk || th + '-01-02')}
+        <div style="page-break-before:always"></div><h2>LAMPIRAN PERJANJIAN KINERJA TAHUN ${esc(th)}</h2><h3>${esc(String(x.jabatan || '').toUpperCase())}</h3>
+        <table class="pt"><thead><tr><th>No</th><th>Sasaran</th><th>Indikator Kinerja</th><th>Target</th></tr></thead><tbody>${R.map((r, i) => `<tr><td style="text-align:center">${i + 1}</td><td>${esc(r.sasaran || x.sasaran || '')}</td><td>${esc(r.indikator)}</td><td style="text-align:center">${esc(r.target || '')} ${esc(r.satuan || '')}</td></tr>`).join('')}</tbody></table>
+        ${kkTtd2('PIHAK KEDUA,<br>KEPALA DESA ' + esc(desa.toUpperCase()), kades, 'PIHAK PERTAMA,<br>' + esc(String(x.jabatan || '').toUpperCase()), x.nama, x.tgl_pk || th + '-01-02')}</div>`;
+      return `<div class="paper">${kop()}<h2>LAPORAN CAPAIAN PERJANJIAN KINERJA</h2><h3>TAHUN ${esc(th)}</h3>
+        <table class="kk-reg"><tr><td style="width:90px">Nama</td><td style="width:10px">:</td><td><b>${esc(x.nama)}</b></td></tr><tr><td>Jabatan</td><td>:</td><td>${esc(x.jabatan)}</td></tr></table>
+        <table class="pt"><thead><tr><th>No</th><th>Indikator Kinerja</th><th>Target</th><th>Realisasi</th><th>Capaian</th><th>Keterangan</th></tr></thead><tbody>${R.map((r, i) => `<tr><td style="text-align:center">${i + 1}</td><td>${esc(r.indikator)}</td><td style="text-align:center">${esc(r.target || '')} ${esc(r.satuan || '')}</td><td style="text-align:center">${esc(r.realisasi || '')} ${r.realisasi ? esc(r.satuan || '') : ''}</td><td style="text-align:center">${esc(pkPct(pkCap(r)))}</td><td>${esc(r.ket || '')}</td></tr>`).join('')}
+        <tr><td colspan="4" style="text-align:right"><b>Rata-rata capaian</b></td><td style="text-align:center"><b>${esc(pkPct(pkRata(x)))}</b></td><td></td></tr></tbody></table>
+        ${x.uraian ? `<p><b>Uraian pelaksanaan tugas:</b><br>${esc(x.uraian).replace(/\n/g, '<br>')}</p>` : ''}
+        ${kkTtd2('Mengetahui,<br>KEPALA DESA ' + esc(desa.toUpperCase()), kades, 'Yang melaporkan,<br>' + esc(String(x.jabatan || '').toUpperCase()), x.nama, x.tgl_lap || isoToday())}</div>`;
+    });
+    if (jenis === 'rekap') {
+      const th = (list[0] || {}).tahun || new Date().getFullYear();
+      pages.length = 0;
+      pages.push(`<div class="paper">${kop()}<h2>REKAPITULASI CAPAIAN KINERJA PERANGKAT DESA</h2><h3>TAHUN ${esc(th)}</h3>
+        <table class="pt"><thead><tr><th>No</th><th>Nama</th><th>Jabatan</th><th>Jumlah Indikator</th><th>Rata-rata Capaian</th><th>Predikat</th></tr></thead><tbody>${list.map((x, i) => { const v = pkRata(x); return `<tr><td style="text-align:center">${i + 1}</td><td>${esc(x.nama)}</td><td>${esc(x.jabatan)}</td><td style="text-align:center">${pkRows(x).length}</td><td style="text-align:center">${esc(pkPct(v))}</td><td style="text-align:center">${v == null ? '-' : v >= 90 ? 'Sangat Baik' : v >= 75 ? 'Baik' : v >= 60 ? 'Cukup' : 'Kurang'}</td></tr>`; }).join('')}</tbody></table>
+        ${kkTtd2('', '', 'KEPALA DESA ' + esc(desa.toUpperCase()), kades, isoToday())}</div>`);
+    }
+    printDocs(jenis === 'pk' ? 'Perjanjian Kinerja' : jenis === 'rekap' ? 'Rekap Capaian Kinerja' : 'Laporan Capaian Kinerja', pages, 'kinerja');
+  });
+}
+async function pkBuatSemua(th) {
+  const [ap, ada] = await Promise.all([ambilSemua('aparat', {}), ambilSemua('kinerja', { tahun: String(th) }).catch(() => [])]);
+  const aktif = ap.filter(a => apAktif(a) && !/kepala desa$/i.test(String(a.jabatan || '').trim()) && !/^kepala desa/i.test(String(a.jabatan || '').trim())).sort((a, b) => mNum(a.no_urut) - mNum(b.no_urut));
+  const sudah = new Set(ada.map(x => x.aparat_id || x.nama));
+  const baru = aktif.filter(a => !sudah.has(a.id) && !sudah.has(a.nama));
+  if (!baru.length) return toast('Semua perangkat aktif sudah punya Perjanjian Kinerja ' + th + '.');
+  toast('Membuat ' + baru.length + ' perjanjian kinerja…');
+  for (const a of baru) {
+    const t = PK_TPL.find(x => x[0].test(a.jabatan || ''));
+    await call('save', { entity: 'kinerja', record: { tahun: String(th), aparat_id: a.id, nama: a.nama, jabatan: a.jabatan, sasaran: t[1], tgl_pk: th + '-01-02', indikator: JSON.stringify(t[2].map(r => ({ sasaran: t[1], indikator: r[0], target: r[1], satuan: r[2], realisasi: '', ket: '' }))) } });
+  }
+  toast(baru.length + ' perjanjian kinerja dibuat — sesuaikan indikatornya bila perlu.'); refresh();
+}
+const pkThAktif = () => { const c = document.querySelector('#main .chip.on[data-act="per"]'); const v = c && c.dataset.v; return /^\d{4}$/.test(v || '') ? v : String(new Date().getFullYear()); };
+Object.assign(ACT, {
+  pkSemua: () => pkBuatSemua(pkThAktif()).catch(er => toast(er.message, 1)),
+  pkCetakSemua: async t => { const th = pkThAktif(); const L = (await ambilSemua('kinerja', { tahun: th }).catch(() => [])).sort((a, b) => String(a.nama).localeCompare(String(b.nama))); if (!L.length) return toast('Belum ada perjanjian kinerja tahun ' + th + '.', 1); pkCetak(L, t.dataset.j); }
+});
+const HK_DEF = [['Beras medium', 'kg'], ['Beras premium', 'kg'], ['Gula pasir', 'kg'], ['Minyak goreng curah', 'liter'], ['Minyak goreng kemasan', 'liter'], ['Telur ayam ras', 'kg'], ['Daging ayam ras', 'kg'], ['Daging sapi', 'kg'], ['Cabai merah besar', 'kg'], ['Cabai rawit', 'kg'], ['Bawang merah', 'kg'], ['Bawang putih', 'kg'], ['Tepung terigu', 'kg'], ['Jagung pipil', 'kg'], ['Kedelai', 'kg'], ['Tomat', 'kg'], ['Ikan tongkol', 'kg'], ['LPG 3 kg', 'tabung']];
+Object.assign(UI, {
+  kinerja: {
+    t: 'Perjanjian Kinerja Perangkat', ic: 'target', m: 'aparat', year: 'tahun', sort: 'nama', asc: 1,
+    intro: 'Untuk SIMWAS K1 butir 2: perjanjian kinerja/indikator & target seluruh perangkat (awal tahun) dan laporan capaiannya (akhir tahun). Tombol <b>Buat untuk semua perangkat</b> menyiapkan draf indikator sesuai jabatan dari Data Aparatur.',
+    fields: [F('tahun', 'Tahun', 'number', { req: 1, def: () => new Date().getFullYear() }), F('nama', 'Nama Perangkat', 'text', { req: 1, listFrom: { e: 'aparat', k: 'nama' }, fill: x => ({ jabatan: x.jabatan, aparat_id: x.id }) }), F('aparat_id', '', 'hidden'), F('jabatan', 'Jabatan', 'text', { req: 1 }),
+      F('sasaran', 'Sasaran strategis', 'text', { wide: 1 }), F('tgl_pk', 'Tanggal perjanjian', 'date'),
+      F('indikator', 'Indikator kinerja, target & realisasi', 'rows', { cols: [['indikator', 'Indikator Kinerja', 'text'], ['target', 'Target', 'text'], ['satuan', 'Satuan', 'text'], ['realisasi', 'Realisasi', 'text'], ['ket', 'Keterangan', 'text']] }),
+      F('uraian', 'Uraian pelaksanaan tugas (untuk laporan capaian)', 'textarea', { wide: 1 }), F('tgl_lap', 'Tanggal laporan capaian', 'date'), F('dok_id', 'Scan perjanjian bertanda tangan', 'file')],
+    row: r => { const v = pkRata(r); return { t: r.nama, s: [r.jabatan, pkRows(r).length + ' indikator'].join(' · '), av: ic('target'), r: v == null ? '' : 'capaian ' + pkPct(v) }; },
+    tools: () => `${canWrite('kinerja') ? `<button class="btn sm pri" data-act="pkSemua">${ic('plus')}Buat untuk semua perangkat</button>` : ''}<button class="btn sm" data-act="pkCetakSemua" data-j="pk">${ic('print')}Cetak semua PK</button><button class="btn sm" data-act="pkCetakSemua" data-j="lap">${ic('print')}Cetak semua laporan</button><button class="btn sm" data-act="pkCetakSemua" data-j="rekap">${ic('print')}Rekap capaian</button>`,
+    extra: (x, el) => { el.insertAdjacentHTML('beforeend', `<div class="btns"><button class="btn sm" data-act="pkCetak1" data-id="${esc(x.id)}" data-j="pk">${ic('print')}Cetak Perjanjian Kinerja</button><button class="btn sm" data-act="pkCetak1" data-id="${esc(x.id)}" data-j="lap">${ic('print')}Cetak Laporan Capaian</button></div>`); S.vh.pkCetak1 = t => pkCetak([x], t.dataset.j); }
+  },
+  aset_negara: {
+    t: 'Aset Negara di Wilayah Desa', ic: 'landmark', m: 'frc', sort: 'nama', asc: 1, excel: 1,
+    intro: 'Untuk SIMWAS S1 butir 3: inventarisasi aset milik negara (pusat/provinsi/kabupaten/BUMN) yang berada di wilayah desa — bukan aset desa. Aset desa dicatat di menu Aset Desa.',
+    fields: [F('nama', 'Nama aset', 'text', { req: 1, wide: 1, hint: 'mis. SDN Pandanwangi 01, Jembatan Kali …, Saluran irigasi primer …' }),
+      F('jenis', 'Jenis', 'select', { opt: ['Tanah', 'Gedung/Bangunan', 'Sekolah', 'Fasilitas Kesehatan', 'Jalan', 'Jembatan', 'Saluran Irigasi/Bendung', 'Jaringan Listrik/Telekomunikasi', 'Tempat Ibadah', 'Lainnya'] }),
+      F('pemilik', 'Pemilik', 'select', { opt: ['Pemerintah Pusat', 'Pemerintah Provinsi', 'Pemerintah Kabupaten', 'BUMN/BUMD', 'TNI/Polri', 'Lainnya'] }), F('instansi', 'Instansi pengelola', 'text', { listFrom: { e: 'aset_negara', k: 'instansi' } }),
+      F('dusun', 'Dusun', 'select', { opt: OPT.dusun }), F('lokasi', 'Alamat / letak', 'text', { wide: 1 }), F('ukuran', 'Luas / ukuran', 'text', { hint: 'mis. 1.200 m², 2 km, 8 x 6 m' }), F('tahun', 'Tahun dibangun/perolehan', 'text'),
+      F('kondisi', 'Kondisi', 'select', { opt: ['Baik', 'Rusak Ringan', 'Rusak Berat'] }), F('status_hak', 'Status hak / sertifikat', 'text'), F('koordinat', 'Koordinat', 'geo'), F('foto', 'Foto', 'fotos', { max: 4 }), F('ket', 'Keterangan', 'text', { wide: 1 })],
+    chips: { k: 'jenis', opt: ['Tanah', 'Gedung/Bangunan', 'Sekolah', 'Fasilitas Kesehatan', 'Jalan', 'Jembatan', 'Saluran Irigasi/Bendung', 'Lainnya'] },
+    row: r => ({ t: r.nama, s: [r.jenis, r.pemilik, r.instansi].filter(Boolean).join(' · '), s2: [r.dusun, r.ukuran, r.kondisi].filter(Boolean).join(' · '), av: ic('landmark') }),
+    print: { title: 'DATA INVENTARISASI ASET NEGARA DI WILAYAH DESA', land: 1, cols: [['Nama Aset', 'nama'], ['Jenis', 'jenis'], ['Pemilik', 'pemilik'], ['Instansi Pengelola', 'instansi'], ['Letak', r => [r.lokasi, r.dusun].filter(Boolean).join(', ')], ['Luas/Ukuran', 'ukuran'], ['Tahun', 'tahun'], ['Kondisi', 'kondisi'], ['Status Hak', 'status_hak'], ['Ket', 'ket']] }
+  },
+  harga_komoditas: {
+    t: 'Harga Komoditas', ic: 'chart', m: 'frc', month: 'tanggal', sort: 'tanggal', excel: 1,
+    intro: 'Untuk SIMWAS S1 butir 6 (dukungan pemantauan inflasi). Cara cepat: tombol <b>Isi harga sekaligus</b> — semua komoditas dalam satu layar, harga terakhir sudah terisi, tinggal diubah yang naik/turun.',
+    fields: [F('tanggal', 'Tanggal pantau', 'date', { req: 1, def: isoToday }), F('komoditas', 'Komoditas', 'text', { req: 1, list: HK_DEF.map(k => k[0]) }), F('satuan', 'Satuan', 'text', { def: 'kg' }), F('harga', 'Harga (Rp)', 'money', { req: 1 }), F('lokasi', 'Lokasi pantau', 'text', { listFrom: { e: 'harga_komoditas', k: 'lokasi' } }), F('ket', 'Keterangan', 'text')],
+    row: r => ({ t: r.komoditas, s: [fDate(r.tanggal), r.lokasi].filter(Boolean).join(' · '), r: rp(r.harga) + (r.satuan ? '/' + r.satuan : ''), av: ic('chart') }),
+    tools: () => `<button class="btn sm pri" data-act="go" data-go='${esc(JSON.stringify(['hargakom']))}'>${ic('edit')}Isi harga sekaligus & laporan</button>`,
+    print: { title: 'DAFTAR PEMANTAUAN HARGA KOMODITAS', cols: [['Tanggal', r => fDate(r.tanggal)], ['Komoditas', 'komoditas'], ['Satuan', 'satuan'], ['Harga (Rp)', r => Number(r.harga || 0).toLocaleString('id-ID')], ['Lokasi', 'lokasi'], ['Ket', 'ket']] }
+  },
+  monografi: { t: 'Monografi Desa', ic: 'chart', m: 'frc', noAdd: 1, fields: [F('tahun', 'Tahun', 'number')], row: r => ({ t: 'Monografi ' + r.tahun }) }
+});
+VIEWS.hargakom = async (p, main, alive) => {
+  const st = S.hkSt = S.hkSt || { bln: isoToday().slice(0, 7) };
+  setTop('Pemantauan Harga Komoditas', 'Inflasi · SIMWAS S1');
+  const all = await ambilSemua('harga_komoditas', {}).catch(() => []); if (!alive()) return;
+  const w = canWrite('harga_komoditas');
+  const kom = HK_DEF.slice(); all.forEach(r => { if (r.komoditas && !kom.some(k => k[0].toLowerCase() === String(r.komoditas).toLowerCase())) kom.push([r.komoditas, r.satuan || 'kg']); });
+  const sort = all.slice().sort((a, b) => String(a.tanggal).localeCompare(String(b.tanggal)));
+  const terakhir = k => sort.filter(r => String(r.komoditas).toLowerCase() === k.toLowerCase()).pop();
+  const lok0 = (sort[sort.length - 1] || {}).lokasi || ('Pasar ' + (S.set.kecamatan || ''));
+  const blnPrev = (() => { const [y, m] = st.bln.split('-').map(Number); return m === 1 ? (y - 1) + '-12' : y + '-' + String(m - 1).padStart(2, '0'); })();
+  const rata = (k, b) => { const v = all.filter(r => String(r.komoditas).toLowerCase() === k.toLowerCase() && String(r.tanggal).slice(0, 7) === b).map(r => mNum(r.harga)); return v.length ? v.reduce((a, c) => a + c, 0) / v.length : null; };
+  const tglBln = Array.from(new Set(all.filter(r => String(r.tanggal).slice(0, 7) === st.bln).map(r => r.tanggal))).sort();
+  const rows = kom.map(([k, s]) => { const a = rata(k, st.bln), b = rata(k, blnPrev); return { k, s, a, b, ch: a != null && b ? (a - b) / b * 100 : null }; }).filter(r => r.a != null || r.b != null);
+  const chTxt = v => v == null ? '-' : (v > 0 ? '▲ ' : v < 0 ? '▼ ' : '') + Math.abs(v).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + '%';
+  main.innerHTML = `<div class="stack">
+    ${w ? `<div class="card stack"><div class="sec-h" style="margin:0"><h2>${ic('edit')} Isi harga hari pantau</h2></div>
+      <div class="form two"><div class="f"><label>Tanggal pantau</label><input type="date" id="hkT" value="${esc(isoToday())}"></div><div class="f"><label>Lokasi pantau</label><input id="hkL" value="${esc(lok0)}"></div></div>
+      <div class="tbl-wrap"><table class="tbl hk-t"><thead><tr><th>Komoditas</th><th>Satuan</th><th class="r">Harga terakhir</th><th>Harga hari ini (Rp)</th></tr></thead><tbody>
+      ${kom.map(([k, s], i) => { const t = terakhir(k); return `<tr data-i="${i}"><td>${esc(k)}</td><td>${esc(s)}</td><td class="r mono">${t ? esc(Number(t.harga).toLocaleString('id-ID')) + `<br><small class="meta">${esc(fDate(t.tanggal))}</small>` : '-'}</td><td><input class="inp" data-hk="${i}" inputmode="numeric" value="${t ? esc(Number(t.harga).toLocaleString('id-ID')) : ''}" placeholder="kosongkan bila tidak dipantau"></td></tr>`; }).join('')}</tbody></table></div>
+      <div class="btns"><button class="btn pri" data-act="hkSimpan">${ic('check')}Simpan harga</button><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['list', { e: 'harga_komoditas' }]))}'>${ic('list')}Daftar semua catatan</button></div></div>` : ''}
+    <div class="card stack"><div class="sec-h" style="margin:0"><h2>${ic('chart')} Laporan bulanan</h2><input type="month" class="inp" id="hkB" value="${esc(st.bln)}" style="max-width:170px"></div>
+      <div class="meta">${tglBln.length ? 'Dipantau ' + tglBln.length + ' kali bulan ini (' + tglBln.map(fDate).join(', ') + ').' : 'Belum ada pemantauan bulan ini.'} Dibandingkan rata-rata bulan sebelumnya.</div>
+      <div class="tbl-wrap"><table class="tbl hk-t"><thead><tr><th>Komoditas</th><th class="r">Rata-rata bulan lalu</th><th class="r">Rata-rata bulan ini</th><th class="r">Perubahan</th></tr></thead><tbody>
+      ${rows.length ? rows.map(r => `<tr><td>${esc(r.k)} <small class="meta">/${esc(r.s)}</small></td><td class="r mono">${r.b == null ? '-' : esc(Math.round(r.b).toLocaleString('id-ID'))}</td><td class="r mono">${r.a == null ? '-' : esc(Math.round(r.a).toLocaleString('id-ID'))}</td><td class="r ${r.ch > 0 ? 'kk-no' : r.ch < 0 ? 'kk-ok' : ''}">${esc(chTxt(r.ch))}</td></tr>`).join('') : '<tr><td colspan="4" class="meta">Tidak ada data.</td></tr>'}</tbody></table></div>
+      <div class="btns"><button class="btn sm" data-act="hkCetak">${ic('print')}Cetak laporan ke Camat</button></div></div></div>`;
+  $('#hkB', main).onchange = e => { st.bln = e.target.value || st.bln; refresh(); };
+  S.vh.hkSimpan = async b => {
+    const tg = $('#hkT', main).value, lok = $('#hkL', main).value.trim(); if (!tg) return toast('Isi tanggal pantau.', 1);
+    const isi = $$('[data-hk]', main).map(i => ({ k: kom[Number(i.dataset.hk)], v: Number(String(i.value).replace(/\D/g, '')) })).filter(x => x.v > 0);
+    if (!isi.length) return toast('Belum ada harga yang diisi.', 1);
+    b.disabled = true;
+    try {
+      for (const x of isi) { const ada = all.find(r => r.tanggal === tg && String(r.komoditas).toLowerCase() === x.k[0].toLowerCase()); await call('save', { entity: 'harga_komoditas', record: Object.assign(ada ? { id: ada.id } : {}, { tanggal: tg, komoditas: x.k[0], satuan: x.k[1], harga: String(x.v), lokasi: lok }) }); }
+      toast(isi.length + ' harga tersimpan.'); st.bln = tg.slice(0, 7); refresh();
+    } catch (er) { toast(er.message, 1); b.disabled = false; }
+  };
+  S.vh.hkCetak = async () => {
+    const kades = S.set.nama_kades || await namaKades().catch(() => '');
+    const [y, m] = st.bln.split('-').map(Number);
+    printDocs('Harga Komoditas ' + st.bln, [`<div class="paper">${kop()}<h2>LAPORAN PEMANTAUAN HARGA KOMODITAS</h2><h3>BULAN ${esc(BULAN[m - 1].toUpperCase())} ${y}</h3>
+      <p>Kepada Yth. Camat ${esc(S.set.kecamatan || '')} — dalam rangka dukungan pengendalian inflasi daerah, berikut hasil pemantauan harga komoditas di ${esc(lok0)}${tglBln.length ? ' pada tanggal ' + esc(tglBln.map(fDate).join(', ')) : ''}:</p>
+      <table class="pt"><thead><tr><th>No</th><th>Komoditas</th><th>Satuan</th><th>Rata-rata Bulan Lalu (Rp)</th><th>Rata-rata Bulan Ini (Rp)</th><th>Perubahan</th></tr></thead><tbody>
+      ${rows.map((r, i) => `<tr><td style="text-align:center">${i + 1}</td><td>${esc(r.k)}</td><td style="text-align:center">${esc(r.s)}</td><td style="text-align:right">${r.b == null ? '-' : Math.round(r.b).toLocaleString('id-ID')}</td><td style="text-align:right">${r.a == null ? '-' : Math.round(r.a).toLocaleString('id-ID')}</td><td style="text-align:center">${esc(chTxt(r.ch))}</td></tr>`).join('')}</tbody></table>
+      <p>Komoditas dengan kenaikan tertinggi: ${esc(rows.filter(r => r.ch > 0).sort((a, b) => b.ch - a.ch).slice(0, 3).map(r => r.k + ' (' + chTxt(r.ch) + ')').join(', ') || '-')}.</p>
+      ${kkTtd2('', '', 'KEPALA DESA ' + esc(ND().toUpperCase()), kades, isoToday())}</div>`], 'hargakom');
+  };
+};
+/* ---------------- Monografi Desa (Permendagri 13/2012) ---------------- */
+const MG_F = [
+  ['I. UMUM', [['luas', 'Luas wilayah (ha)'], ['b_utara', 'Batas utara'], ['b_selatan', 'Batas selatan'], ['b_timur', 'Batas timur'], ['b_barat', 'Batas barat'], ['rw', 'Jumlah RW'], ['rt', 'Jumlah RT'], ['ketinggian', 'Ketinggian (mdpl)'], ['topografi', 'Topografi (dataran rendah/tinggi)']]],
+  ['II. ORBITASI', [['jarak_kec', 'Jarak ke kantor kecamatan (km)'], ['jarak_kab', 'Jarak ke ibu kota kabupaten (km)'], ['jarak_prov', 'Jarak ke ibu kota provinsi (km)']]],
+  ['III. PENGGUNAAN LAHAN', [['l_sawah', 'Sawah (ha)'], ['l_tegal', 'Tegal/ladang (ha)'], ['l_pemukiman', 'Pemukiman (ha)'], ['l_pekarangan', 'Pekarangan (ha)'], ['l_kas', 'Tanah kas desa (ha)'], ['l_lain', 'Lainnya (ha)']]],
+  ['IV. SARANA PRASARANA', [['s_paud', 'PAUD/TK'], ['s_sd', 'SD/MI'], ['s_smp', 'SMP/MTs'], ['s_sma', 'SMA/SMK/MA'], ['s_ponpes', 'Pondok pesantren'], ['s_masjid', 'Masjid'], ['s_musholla', 'Musholla'], ['s_gereja', 'Gereja/pura/vihara'], ['s_posyandu', 'Posyandu'], ['s_polindes', 'Polindes/Poskesdes/Pustu'], ['s_pasar', 'Pasar/kios'], ['s_jalan', 'Panjang jalan desa (km)'], ['s_jembatan', 'Jembatan']]],
+  ['V. EKONOMI', [['e_bumdes', 'BUMDes (nama/unit usaha)'], ['e_umkm', 'Jumlah UMKM'], ['e_koperasi', 'Koperasi'], ['e_unggulan', 'Komoditas/potensi unggulan']]]];
+VIEWS.monografi = async (p, main, alive) => {
+  const th = String(S.mgTh || new Date().getFullYear());
+  setTop('Monografi Desa', 'Tahun ' + th);
+  const [ps, rec, ap, lb, R] = await Promise.all([call('pendudukStats').catch(() => null), ambilSemua('monografi', { tahun: th }).catch(() => []), ambilSemua('aparat', {}).catch(() => []), call('list', { entity: 'lembaga', limit: 1 }).catch(() => ({ total: 0 })), rlRingkas(th).catch(() => null)]);
+  if (!alive()) return;
+  const r0 = rec.sort((a, b) => String(b._waktu || '').localeCompare(String(a._waktu || '')))[0] || {};
+  let D = {}; try { D = JSON.parse(r0.isi || '{}'); } catch (e) { }
+  if (!r0.id) { const lama = (await ambilSemua('monografi', {}).catch(() => [])).sort((a, b) => String(b.tahun).localeCompare(String(a.tahun)))[0]; if (lama) try { D = JSON.parse(lama.isi || '{}'); } catch (e) { } }
+  const w = canWrite('monografi'), N = n => Number(n || 0).toLocaleString('id-ID');
+  const aktif = ap.filter(a => apAktif(a));
+  const dist = (k, n) => ((ps && ps.dist && ps.dist[k]) || []).filter(x => x.k !== '(BELUM DIISI)').slice().sort((a, b) => b.n - a.n).slice(0, n || 8);
+  const auto = ps ? [['Jumlah penduduk', N(ps.total) + ' jiwa'], ['Laki-laki', N(ps.L) + ' jiwa'], ['Perempuan', N(ps.P) + ' jiwa'], ['Jumlah KK', N(ps.kk) + ' KK'], ['Jumlah dusun', (ps.dusun || []).length + ' dusun'],
+    ['Kepadatan', D.luas ? N(Math.round(ps.total / (mNum(String(D.luas).replace(',', '.')) / 100))) + ' jiwa/km²' : '— isi luas wilayah'], ['Aparatur desa aktif', aktif.length + ' orang'], ['Lembaga desa', N(lb.total) + ' lembaga']] : [];
+  if (R) auto.push(['Pendapatan desa ' + th, rp(R.P[0])], ['Belanja desa ' + th, rp(R.B[0])]);
+  const tabel = (judul, L) => L.length ? `<div class="mg-d"><b>${esc(judul)}</b>${L.map(x => `<div><span>${esc(x.k)}</span><span class="mono">${N(x.n)}</span></div>`).join('')}</div>` : '';
+  main.innerHTML = `<div class="stack"><div class="chips">${Array.from({ length: 4 }, (_, i) => String(new Date().getFullYear() - i)).map(y => `<button class="chip ${y === th ? 'on' : ''}" data-act="mgTh" data-v="${y}">${y}</button>`).join('')}</div>
+    <div class="card stack"><div class="meta">Untuk SIMWAS S1 butir 4: <b>data monografi terupdate</b> (nilai 1) dan <b>terpampang</b> (nilai 1). Angka kependudukan, aparatur, lembaga dan APBDes terisi otomatis; isi sekali data wilayah & sarana (tersalin ke tahun berikutnya). Cetak <b>Papan Monografi</b> untuk dipasang di kantor desa lalu fotonya diunggah di FRC.</div>
+      <div class="btns"><button class="btn pri sm" data-act="mgCetak" data-j="buku">${ic('print')}Cetak Monografi</button><button class="btn sm" data-act="mgCetak" data-j="papan">${ic('print')}Cetak Papan Monografi</button><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['pstat']))}'>${ic('next')}Ringkasan Penduduk</button></div></div>
+    <div class="card stack"><div class="lbl">Otomatis dari data aplikasi</div><div class="mg-a">${auto.map(a => `<div><span>${esc(a[0])}</span><b>${esc(a[1])}</b></div>`).join('')}</div>
+      <div class="mg-ds">${tabel('Agama', dist('agama'))}${tabel('Pendidikan', dist('pendidikan', 10))}${tabel('Pekerjaan (10 terbanyak)', dist('pekerjaan', 10))}</div></div>
+    ${MG_F.map(g => `<div class="card stack"><div class="lbl">${esc(g[0])}</div><div class="form two">${g[1].map(f => `<div class="f"><label>${esc(f[1])}</label><input data-mg="${f[0]}" value="${esc(D[f[0]] || '')}" ${w ? '' : 'readonly'}></div>`).join('')}</div></div>`).join('')}
+    ${w ? `<div class="btns"><button class="btn pri" data-act="mgSimpan">${ic('check')}Simpan monografi ${th}</button></div>` : ''}</div>`;
+  S.vh.mgTh = t => { S.mgTh = t.dataset.v; refresh(); };
+  const baca = () => { const o = {}; $$('[data-mg]', main).forEach(i => { if (i.value.trim()) o[i.dataset.mg] = i.value.trim(); }); return o; };
+  S.vh.mgSimpan = async () => { try { await call('save', { entity: 'monografi', record: Object.assign(r0.id ? { id: r0.id } : {}, { tahun: th, isi: JSON.stringify(baca()) }) }); toast('Monografi tersimpan.'); refresh(); } catch (er) { toast(er.message, 1); } };
+  S.vh.mgCetak = async t => {
+    const X = baca(), kades = S.set.nama_kades || await namaKades().catch(() => ''), desa = ND();
+    if (ps && X.luas) { const lu = mNum(String(X.luas).replace(',', '.')); if (lu > 0) auto[5] = ['Kepadatan', N(Math.round(ps.total / (lu / 100))) + ' jiwa/km²']; }
+    const v = k => X[k] || '-';
+    const blokF = g => `<tr><td colspan="3" style="background:#eee"><b>${esc(g[0])}</b></td></tr>` + g[1].map((f, i) => `<tr><td style="width:24px">${i + 1}.</td><td>${esc(f[1])}</td><td>${esc(v(f[0]))}</td></tr>`).join('');
+    const blokD = (j, L) => `<tr><td colspan="3" style="background:#eee"><b>${esc(j)}</b></td></tr>` + L.map((x, i) => `<tr><td>${i + 1}.</td><td>${esc(x.k)}</td><td>${N(x.n)} jiwa (L ${N(x.l)}, P ${N(x.p)})</td></tr>`).join('');
+    if (t.dataset.j === 'buku') {
+      printDocs('Monografi ' + th, [`<div class="paper">${kop()}<h2>MONOGRAFI DESA ${esc(desa.toUpperCase())}</h2><h3>TAHUN ${esc(th)}</h3>
+        <table class="pt">${blokF(MG_F[0])}${blokF(MG_F[1])}
+        <tr><td colspan="3" style="background:#eee"><b>KEPENDUDUKAN</b></td></tr>${auto.slice(0, 6).map((a, i) => `<tr><td>${i + 1}.</td><td>${esc(a[0])}</td><td>${esc(a[1])}</td></tr>`).join('')}
+        ${(ps && ps.dusun || []).map((d, i) => `<tr><td></td><td>${esc(d.k)}</td><td>${N(d.total)} jiwa · ${N(d.kk)} KK (L ${N(d.L)}, P ${N(d.P)})</td></tr>`).join('')}
+        ${blokD('AGAMA', dist('agama'))}${blokD('PENDIDIKAN', dist('pendidikan', 12))}${blokD('PEKERJAAN', dist('pekerjaan', 15))}
+        ${blokF(MG_F[2])}${blokF(MG_F[3])}${blokF(MG_F[4])}
+        <tr><td colspan="3" style="background:#eee"><b>PEMERINTAHAN</b></td></tr><tr><td>1.</td><td>Kepala Desa</td><td>${esc(kades || '-')}</td></tr><tr><td>2.</td><td>Jumlah aparatur aktif</td><td>${aktif.length} orang</td></tr><tr><td>3.</td><td>Jumlah lembaga desa</td><td>${N(lb.total)}</td></tr>
+        ${R ? `<tr><td>4.</td><td>APBDes ${esc(th)}</td><td>Pendapatan ${esc(rp(R.P[0]))}; Belanja ${esc(rp(R.B[0]))}</td></tr>` : ''}</table>
+        ${kkTtd2('', '', 'KEPALA DESA ' + esc(desa.toUpperCase()), kades, isoToday())}</div>`], 'monografi');
+    } else {
+      const kotak = (j, isi) => `<div class="mgp-k"><b>${j}</b>${isi}</div>`, baris = L => L.map(a => `<div><span>${esc(a[0])}</span><b>${esc(a[1])}</b></div>`).join('');
+      printDocs('Papan Monografi ' + th, [`<div class="paper land mgp"><div class="mgp-h">MONOGRAFI DESA ${esc(desa.toUpperCase())}<small>KECAMATAN ${esc(String(S.set.kecamatan || '').toUpperCase())} · KABUPATEN ${esc(String(S.set.kabupaten || '').toUpperCase())} · TAHUN ${esc(th)}</small></div>
+        <div class="mgp-g">${kotak('WILAYAH', baris([['Luas', v('luas') + ' ha'], ['Utara', v('b_utara')], ['Selatan', v('b_selatan')], ['Timur', v('b_timur')], ['Barat', v('b_barat')], ['Dusun / RW / RT', ((ps && ps.dusun || []).length) + ' / ' + v('rw') + ' / ' + v('rt')]]))}
+        ${kotak('PENDUDUK', baris(auto.slice(0, 6)))}
+        ${kotak('AGAMA', baris(dist('agama', 6).map(x => [x.k, N(x.n)])))}
+        ${kotak('PENDIDIKAN', baris(dist('pendidikan', 7).map(x => [x.k, N(x.n)])))}
+        ${kotak('PEKERJAAN', baris(dist('pekerjaan', 7).map(x => [x.k, N(x.n)])))}
+        ${kotak('SARANA', baris([['PAUD/TK · SD · SMP · SMA', [v('s_paud'), v('s_sd'), v('s_smp'), v('s_sma')].join(' · ')], ['Masjid · Musholla', v('s_masjid') + ' · ' + v('s_musholla')], ['Posyandu · Polindes', v('s_posyandu') + ' · ' + v('s_polindes')], ['Jalan desa', v('s_jalan') + ' km'], ['Lahan sawah · tegal', v('l_sawah') + ' · ' + v('l_tegal') + ' ha']]))}</div>
+        <div class="ig-ft"><span>Data per ${esc(fDate(isoToday()))}</span><span>Pemerintah Desa ${esc(desa)}</span></div></div>`], 'papanmono');
+    }
+  };
 };
 
 const KEU_HUB = {
