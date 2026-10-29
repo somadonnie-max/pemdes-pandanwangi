@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sarana &amp; Prasarana — Desa Pandanwangi</title>
+<meta name="description" content="Ambulans desa, GOR, Radhens Jek, perpustakaan, posyandu, klinik, sekolah, tempat ibadah dan Padang Savana Pandanwangi.">
+<meta name="theme-color" content="#0f241a">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Caveat:wght@600&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='30' r='16' fill='%23e8b84a'/%3E%3Cpath d='M4 46c10-6 18-6 28 0s18 6 28 0v14H4z' fill='%232f5d3f'/%3E%3C/svg%3E">
+<style>
+.svc{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.svc .pcard .ph.ic{display:grid;place-items:center}
+.svc .pcard .ph.ic svg{width:90px;height:90px;transition:transform .6s}
+.svc .pcard:hover .ph.ic svg{transform:scale(1.15) rotate(-6deg)}
+@media(max-width:900px){.svc{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.svc{grid-template-columns:1fr}}
+.sav{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:start}
+.sav-pics{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.sav-pics img{border-radius:18px;border:2px solid var(--padi);width:100%;height:240px;object-fit:cover}
+.sav-pics img:nth-child(1){height:500px;grid-row:span 2}
+.sav-pics img:nth-child(4){grid-column:span 2;height:260px}
+.facts{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.facts span{border:1.5px solid var(--padi);color:var(--padi);border-radius:999px;padding:8px 14px;font-weight:700;font-size:14px}
+@media(max-width:900px){.sav{grid-template-columns:1fr}.sav-pics img:nth-child(1){height:320px}}
+</style>
+</head>
+<body>
+<main>
+<section class="phero">
+  <div class="hero-grid"></div>
+  <div class="wrap">
+    <div class="crumb"><a href="index.html">Beranda</a> / Sarana &amp; Prasarana</div>
+    <span class="eyebrow">Sarana &amp; prasarana</span>
+    <h1 data-lines>Fasilitas untuk<br>kebutuhan <span style="color:var(--padi)">warga</span>.</h1>
+    <p class="reveal d2">Ambulans desa, GOR yang bisa disewa, Radhens Jek, Perpustakaan Tunas Bangsa, posyandu di setiap dusun, klinik, puskesmas pembantu, lebih dari 25 lembaga pendidikan, tempat ibadah, dan Padang Savana sebagai ruang terbuka.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <div class="tabs" data-tabs>
+      <button class="chip on" data-tab="t-umum">Layanan umum</button>
+      <button class="chip" data-tab="t-sehat">Kesehatan</button>
+      <button class="chip" data-tab="t-didik">Pendidikan</button>
+      <button class="chip" data-tab="t-ibadah">Tempat ibadah</button>
+    </div>
+
+    <div class="tab-p on" id="t-umum">
+      <div class="svc">
+        <div class="pcard reveal"><div class="ph ic" style="background:var(--senja-2)"><svg viewBox="0 0 64 64" fill="none" stroke="#0f241a" stroke-width="3"><rect x="4" y="22" width="40" height="22" rx="3"/><path d="M44 28h9l7 8v8H44"/><circle cx="16" cy="46" r="5" fill="#fffaf0"/><circle cx="50" cy="46" r="5" fill="#fffaf0"/><path d="M24 27v12M18 33h12"/></svg></div><div class="bd"><h3>Ambulans Desa</h3><p>Transportasi kesehatan dari pemerintah desa yang dapat digunakan seluruh warga untuk keperluan darurat medis.</p><a class="btn" href="https://wa.me/6285746609203" target="_blank" rel="noopener">Pesan ambulans</a></div></div>
+        <div class="pcard reveal d1"><div class="ph ic" style="background:var(--padi)"><svg viewBox="0 0 64 64" fill="none" stroke="#0f241a" stroke-width="3"><path d="M8 54V26L32 10l24 16v28z"/><path d="M22 54V36h20v18"/><path d="M32 18v6"/></svg></div><div class="bd"><h3>GOR Badminton</h3><p>Berada di Balai Desa dan dapat digunakan seluruh warga untuk berbagai kegiatan.</p><a class="btn" href="https://wa.me/6281553976472" target="_blank" rel="noopener">Pesan GOR</a></div></div>
+        <div class="pcard reveal d2"><div class="ph ic" style="background:var(--sage)"><svg viewBox="0 0 64 64" fill="none" stroke="#0f241a" stroke-width="3"><circle cx="14" cy="46" r="8"/><circle cx="50" cy="46" r="8"/><path d="M14 46l12-18h14l10 18M26 28l-4-8h-6M40 28l4-10h6"/></svg></div><div class="bd"><h3>Radhens Jek</h3><p>Layanan transportasi daring desa: pesan antar makanan atau barang, kurir, dan ojek.</p><a class="btn" href="https://wa.me/6287754424040" target="_blank" rel="noopener">Pesan Radhens Jek</a></div></div>
+        <div class="pcard reveal"><div class="ph"><img src="img/sarana-perpustakaan.webp" alt="Perpustakaan Tunas Bangsa" loading="lazy"></div><div class="bd"><h3>Perpustakaan Tunas Bangsa</h3><p>Pusat literasi di Dusun Pemukiman dengan berbagai koleksi buku untuk mendukung minat baca dan pendidikan warga.</p><a class="btn" href="https://maps.app.goo.gl/cUziaJYCXg1k342J8" target="_blank" rel="noopener">Buka di Maps</a></div></div>
+        <div class="pcard reveal d1"><div class="ph"><img src="img/lbg-bumdes.webp" alt="BUMDesa Jaya Sentosa" loading="lazy"></div><div class="bd"><h3>BUMDesa Jaya Sentosa</h3><p>Unit usaha desa: penyewaan peralatan, GOR, dan pengembangan produk UMKM.</p><a class="btn" href="https://wa.me/6281553976472" target="_blank" rel="noopener">Hubungi BUMDesa</a></div></div>
+        <div class="pcard reveal d2"><div class="ph"><img src="img/bangun-balai-desa-2.webp" alt="Balai Desa Pandanwangi" loading="lazy"></div><div class="bd"><h3>Balai Desa</h3><p>Pusat pelayanan administrasi warga, musyawarah desa, dan kegiatan masyarakat.</p><a class="btn" href="kontak.html">Lokasi kantor desa</a></div></div>
+      </div>
+    </div>
+
+    <div class="tab-p" id="t-sehat">
+      <div class="grid g3">
+        <div class="pcard reveal"><div class="ph"><img src="img/kes-klinik-hakim-m.webp" alt="" loading="lazy"></div><div class="bd"><h3>Klinik Hakim Medika</h3><p>Rawat jalan dan rawat inap 24 jam, dilengkapi IGD, ruang inap, laboratorium dan apotek. Terdaftar sebagai faskes BPJS.</p></div></div>
+        <div class="pcard reveal d1"><div class="ph"><img src="img/kes-puskesmas-pembantu-1.webp" alt="" loading="lazy"></div><div class="bd"><h3>Puskesmas Pembantu</h3><p>Fasilitas kesehatan tingkat pertama di bawah Puskesmas yang mendekatkan layanan kesehatan dasar kepada masyarakat.</p></div></div>
+        <div class="pcard reveal d2"><div class="ph"><img src="img/kes-krajan-1.webp" alt="" loading="lazy"></div><div class="bd"><h3>Posyandu Krajan 1</h3><p>Kesehatan dasar ibu dan anak: imunisasi dan penimbangan.</p></div></div>
+        <div class="pcard reveal"><div class="ph"><img src="img/kes-krajan-2.webp" alt="" loading="lazy"></div><div class="bd"><h3>Posyandu Krajan 2</h3><p>Kesehatan dasar ibu dan anak: imunisasi dan penimbangan.</p></div></div>
+        <div class="pcard reveal d1"><div class="ph"><img src="img/kes-krajan-3.webp" alt="" loading="lazy"></div><div class="bd"><h3>Posyandu Krajan 3</h3><p>Kesehatan dasar ibu dan anak: imunisasi dan penimbangan.</p></div></div>
+        <div class="pcard reveal d2"><div class="ph"><img src="img/kes-timur-sawah.webp" alt="" loading="lazy"></div><div class="bd"><h3>Posyandu Timur Sawah</h3><p>Kesehatan dasar ibu dan anak di Dusun Timur Sawah, berseberangan dengan Masjid At-Taqwa.</p></div></div>
+        <div class="pcard reveal"><div class="ph"><img src="img/kes-tunjungan.webp" alt="" loading="lazy"></div><div class="bd"><h3>Posyandu Tunjungan</h3><p>Kesehatan dasar lansia, ibu dan anak: imunisasi dan penimbangan.</p></div></div>
+        <div class="pcard reveal d1"><div class="ph ic" style="background:var(--sand);display:grid;place-items:center"><svg viewBox="0 0 64 64" width="90" height="90" fill="none" stroke="#0f241a" stroke-width="3"><path d="M32 54S8 40 8 24a12 12 0 0 1 24-4 12 12 0 0 1 24 4c0 16-24 30-24 30z"/><path d="M20 30h8l4-6 4 12 3-6h6"/></svg></div><div class="bd"><h3>Posyandu Pemukiman</h3><p>Kesehatan dasar ibu dan anak: imunisasi dan penimbangan.</p></div></div>
+      </div>
+    </div>
+
+    <div class="tab-p" id="t-didik">
+      <p class="muted reveal" style="max-width:640px;margin-bottom:24px;font-size:18px">Lebih dari <b data-count="27">0</b> lembaga pendidikan dari PAUD sampai SMA/SMK/MA ada di Desa Pandanwangi.</p>
+      <div class="edu">
+        <div class="col reveal"><small>5 lembaga</small><h4>PAUD</h4><ul><li>PAUD At-Thohariyah</li><li>PAUD Tunas Bangsa</li><li>PAUD Al Islah</li><li>PAUD Brawijaya</li><li>PAUD Dliyaul Quran</li></ul></div>
+        <div class="col reveal d1" style="background:var(--padi)"><small style="color:var(--ink)">3 lembaga</small><h4>TK</h4><ul><li>TK Salafiyah</li><li>TK Darul Ulum</li><li>TK Miftahul Ulum</li></ul></div>
+        <div class="col reveal d2"><small>8 lembaga</small><h4>SD / MI</h4><ul><li>SDI Pandanwangi 01</li><li>SDN Pandanwangi 01</li><li>SDN Pandanwangi 02</li><li>SDN Pandanwangi 03</li><li>SDN Pandanwangi 04</li><li>MI Salafiyah</li><li>MI Darul Ulum</li><li>MI Miftahul Ulum</li></ul></div>
+        <div class="col reveal d3" style="background:var(--senja-2)"><small style="color:var(--ink)">6 lembaga</small><h4>SMP / MTs</h4><ul><li>MTs Salafiyah</li><li>MTs Darul Ulum</li><li>MTs Miftahul Ulum</li><li>SMP As-Syarify</li><li>SMP Qur'ani Dliyaul Quran</li><li>SMP Anwarul Ahad</li></ul></div>
+        <div class="col reveal d4"><small>5 lembaga</small><h4>SMA / SMK / MA</h4><ul><li>SMK As-Syarify</li><li>SMA Miftahul Ulum</li><li>SMA Darul Ulum</li><li>MA Miftahul Ulum</li><li>MA Excellent As-Syarify</li></ul></div>
+      </div>
+    </div>
+
+    <div class="tab-p" id="t-ibadah">
+      <div class="grid g3">
+        <div class="pcard reveal"><div class="ph"><img src="img/ibadah-al-amin.webp" alt="" loading="lazy"></div><div class="bd"><h3>Masjid Al-Amin</h3><p>Terletak di Dusun Krajan 2, dengan interior bernuansa hijau.</p></div></div>
+        <div class="pcard reveal d1"><div class="ph"><img src="img/ibadah-at-taqwa.webp" alt="" loading="lazy"></div><div class="bd"><h3>Masjid At-Taqwa</h3><p>Terletak di Dusun Timur Sawah, berseberangan dengan Posyandu Timur Sawah.</p></div></div>
+        <div class="pcard reveal d2"><div class="ph"><img src="img/ibadah-gereja.webp" alt="" loading="lazy"></div><div class="bd"><h3>Gereja Oikumene</h3><p>Terletak di Dusun Pemukiman dan digunakan oleh jemaat Desa Pandanwangi.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="marq rev"><div class="marq-t"><span>Padang Savana Pandanwangi</span><span>Berburu senja</span><span>Kerbau &amp; laut selatan</span><span>Gunung Semeru</span><span>Padang Savana Pandanwangi</span><span>Berburu senja</span><span>Kerbau &amp; laut selatan</span><span>Gunung Semeru</span></div></div>
+
+<section class="sec dark" id="savana">
+  <div class="wrap sav">
+    <div class="sticky-col">
+      <span class="eyebrow reveal">Wisata alam</span>
+      <h2 class="reveal d1" style="font-size:clamp(36px,5vw,64px);margin:14px 0 18px">Padang Savana <span style="color:var(--padi)">Pandanwangi</span>.</h2>
+      <p class="reveal d2" style="opacity:.85;font-size:18px">Hamparan padang rumput luas yang berbatasan langsung dengan pantai selatan. Pemandangannya sering disebut mirip savana di Afrika atau Selandia Baru. Pengunjung bisa menikmati suasana tenang berlatar laut, melihat kerbau yang berkeliaran, serta panorama Gunung Semeru dan Pegunungan Tengger saat cuaca cerah.</p>
+      <p class="reveal d2" style="opacity:.85;font-size:18px">Tempat favorit untuk piknik sore, berkemah, hingga berburu senja.</p>
+      <div class="facts reveal d3"><span>Tanpa tiket masuk</span><span>Area parkir</span><span>Toilet</span><span>Warung buka sampai malam</span><span>Bisa dijangkau motor &amp; mobil</span></div>
+    </div>
+    <div class="sav-pics">
+      <img class="reveal" src="img/savana-1.webp" alt="Senja di Padang Savana" loading="lazy">
+      <img class="reveal d1" src="img/savana-2.webp" alt="Matahari di atas savana" loading="lazy">
+      <img class="reveal d2" src="img/savana-4.webp" alt="Kerbau di tepi sungai savana" loading="lazy">
+      <img class="reveal d1" src="img/savana-6.webp" alt="Kerbau dan sungai saat fajar" loading="lazy">
+    </div>
+  </div>
+</section>
+</main>
+<script src="assets/site.js"></script>
+</body>
+</html>

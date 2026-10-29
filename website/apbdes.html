@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>APBDes &amp; Realisasi — Desa Pandanwangi</title>
+<meta name="description" content="Dasbor keterbukaan informasi APBDes Desa Pandanwangi: anggaran dan realisasi pendapatan, belanja per bidang, kegiatan, dan arus kas bulanan, langsung dari aplikasi desa.">
+<meta name="theme-color" content="#0f241a">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Caveat:wght@600&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='30' r='16' fill='%23e8b84a'/%3E%3Cpath d='M4 46c10-6 18-6 28 0s18 6 28 0v14H4z' fill='%232f5d3f'/%3E%3C/svg%3E">
+<style>
+.years{display:flex;gap:8px;flex-wrap:wrap;margin-top:26px}
+.years .chip{background:transparent;color:var(--cream);border-color:rgba(248,242,228,.35)}
+.years .chip.on,.years .chip:hover{background:var(--padi);color:var(--ink);border-color:var(--padi)}
+.upd{display:inline-flex;align-items:center;gap:8px;margin-top:16px;font-size:14px;opacity:.8}
+.upd i{width:9px;height:9px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 0 rgba(74,222,128,.6);animation:live 1.8s infinite}
+@keyframes live{70%{box-shadow:0 0 0 10px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
+.dash{display:grid;gap:22px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:-60px;position:relative;z-index:5}
+.kpi{background:var(--paper);border:2px solid var(--ink);border-radius:var(--r);padding:20px 22px;box-shadow:var(--hard);position:relative;overflow:hidden}
+.kpi small{font-weight:800;letter-spacing:.1em;text-transform:uppercase;font-size:11.5px;color:var(--muted)}
+.kpi b{display:block;font:800 clamp(24px,2.6vw,34px)/1.1 var(--f-d);margin:8px 0 2px}
+.kpi .sub{font-size:13px;color:var(--muted);font-weight:600}
+.kpi .meter{height:10px;border-radius:9px;background:var(--sand);margin-top:14px;overflow:hidden}
+.kpi .meter i{display:block;height:100%;width:0;border-radius:9px;background:var(--ink);transition:width 1.6s cubic-bezier(.2,.8,.2,1)}
+.kpi .pct{position:absolute;top:16px;right:16px;font:800 14px var(--f-b);padding:4px 10px;border-radius:999px;background:var(--ink);color:var(--padi)}
+.kpi.y{background:var(--padi)}.kpi.y .meter{background:rgba(255,255,255,.5)}
+.kpi.g{background:var(--forest);color:var(--cream)}.kpi.g small,.kpi.g .sub{color:var(--sage)}.kpi.g .meter{background:rgba(255,255,255,.15)}.kpi.g .meter i{background:var(--padi)}.kpi.g .pct{background:var(--padi);color:var(--ink)}
+@media(max-width:1000px){.kpis{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.kpis{grid-template-columns:1fr}}
+.panel{background:var(--paper);border:2px solid var(--ink);border-radius:var(--r);padding:24px;box-shadow:var(--hard);min-width:0}
+.panel h3{font-size:22px;margin-bottom:4px}
+.panel .ds{color:var(--muted);font-size:14px;margin:0 0 18px}
+.row2{display:grid;grid-template-columns:1.1fr .9fr;gap:22px}
+.row2.r{grid-template-columns:.9fr 1.1fr}
+@media(max-width:960px){.row2,.row2.r{grid-template-columns:1fr}}
+.gauge{display:grid;place-items:center;position:relative}
+.gauge svg{width:100%;max-width:360px}
+.gauge .val{text-align:center;margin-top:6px}
+.gauge .val b{font:800 52px/1 var(--f-d);display:block}
+.gauge .val span{font-weight:700;color:var(--muted);font-size:14px}
+.gauge .needle{transform-origin:180px 180px;transition:transform 2s cubic-bezier(.3,1.3,.4,1)}
+.donut-wrap{display:grid;grid-template-columns:220px 1fr;gap:22px;align-items:center}
+@media(max-width:560px){.donut-wrap{grid-template-columns:1fr}.donut-wrap svg{max-width:220px;margin:auto}}
+.donut-wrap svg circle.seg{transition:stroke-width .2s;cursor:pointer}
+.donut-wrap svg circle.seg:hover{stroke-width:30}
+.lg-list{display:grid;gap:9px}
+.lg-list div{display:grid;grid-template-columns:14px 1fr auto;gap:10px;align-items:center;font-size:14px;font-weight:600}
+.lg-list i{width:14px;height:14px;border-radius:4px}
+.lg-list b{font-family:var(--f-d);white-space:nowrap}
+.lg-list em{font-style:normal;color:var(--muted);font-size:12px;display:block;font-weight:600}
+.bars{display:grid;gap:18px}
+.br .hd2{display:flex;justify-content:space-between;gap:10px;font-weight:700;font-size:14px;margin-bottom:6px}
+.br .hd2 span:last-child{white-space:nowrap;color:var(--muted)}
+.br .tr{position:relative;height:22px;border-radius:7px;background:var(--sand);overflow:hidden}
+.br .tr .a{position:absolute;left:0;top:0;bottom:0;width:0;border:2px dashed rgba(15,36,26,.45);border-radius:7px;transition:width 1.4s cubic-bezier(.2,.8,.2,1)}
+.br .tr .r{position:absolute;left:0;top:4px;bottom:4px;width:0;border-radius:4px;background:var(--c,#1d7a4b);transition:width 1.6s cubic-bezier(.2,.8,.2,1) .25s}
+.br .ft2{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-top:4px;font-weight:600}
+.key{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;font-weight:700;margin-bottom:14px}
+.key i{display:inline-block;width:14px;height:10px;border-radius:3px;margin-right:6px;vertical-align:0}
+.stack{display:flex;height:34px;border-radius:10px;overflow:hidden;gap:2px;background:var(--paper)}
+.stack div{width:0;transition:width 1.4s cubic-bezier(.2,.8,.2,1);min-width:0}
+.line svg{width:100%;height:auto;display:block;overflow:visible}
+.line .ax{font:600 11px var(--f-b);fill:#5d6b62}
+.line .gl{stroke:rgba(15,36,26,.1)}
+.line .ln{fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.line .ar{opacity:0;transition:opacity 1.2s .8s}
+.line.in .ar,.line .ar.on{opacity:.14}
+.line .hit{fill:transparent;cursor:crosshair}
+.line .xh{stroke:var(--ink);stroke-dasharray:3 4;opacity:0}
+.sd{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.sd div{border:2px solid var(--ink);border-radius:16px;padding:14px;background:var(--cream);position:relative;overflow:hidden}
+.sd div:before{content:"";position:absolute;left:0;bottom:0;height:5px;width:var(--w,0);background:var(--c);transition:width 1.5s cubic-bezier(.2,.8,.2,1)}
+.sd small{font-weight:800;font-size:12px;color:var(--muted)}
+.sd b{display:block;font:800 20px/1.2 var(--f-d);margin-top:4px}
+.tbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.tbar .search{margin:0;flex:1;min-width:220px;max-width:none;padding:10px 16px}
+.tbar select{flex:1 1 160px;max-width:100%;font:600 14px var(--f-b);padding:11px 14px;border-radius:999px;border:2px solid var(--ink);background:var(--paper)}
+.kg{display:grid;gap:10px}
+.kg details{border:1.5px solid var(--line);border-radius:16px;background:var(--cream);transition:.2s}
+.kg details[open]{border-color:var(--ink);background:var(--paper)}
+.kg summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:1fr 140px 140px 110px;gap:14px;align-items:center;padding:14px 16px}
+.kg summary::-webkit-details-marker{display:none}
+.kg summary b{font-weight:700;font-size:14.5px;line-height:1.35;display:block}
+.kg summary em{font-style:normal;font-size:12px;color:var(--muted);font-weight:700}
+.kg .num{text-align:right;font:700 14px var(--f-b);white-space:nowrap}
+.kg .num small{display:block;font-size:11px;color:var(--muted);font-weight:700}
+.kg .pg{height:8px;border-radius:9px;background:var(--sand);overflow:hidden}
+.kg .pg i{display:block;height:100%;border-radius:9px;background:var(--c,#1d7a4b)}
+.kg .pgt{font:800 13px var(--f-b);text-align:right;margin-top:4px}
+.kg .tw{overflow-x:auto;margin:0 16px 14px}.kg table{width:100%;min-width:480px;border-collapse:collapse;font-size:13px}
+.kg td,.kg th{padding:7px 6px;border-top:1px solid var(--line);text-align:left}
+.kg td.n,.kg th.n{text-align:right;white-space:nowrap}
+.kg th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+@media(max-width:760px){.kg summary{grid-template-columns:1fr 1fr}.kg summary>div:first-child{grid-column:1/-1}.kg .num{text-align:left}}
+.more{margin-top:14px}
+.tip{position:fixed;z-index:400;pointer-events:none;background:var(--ink);color:var(--cream);border-radius:12px;padding:10px 12px;font-size:13px;font-weight:600;box-shadow:0 10px 24px rgba(0,0,0,.3);opacity:0;transition:opacity .15s;max-width:280px}
+.tip b{color:var(--padi);display:block;font-size:13.5px;margin-bottom:2px}
+.tip.on{opacity:1}
+.empty{padding:40px;text-align:center;color:var(--muted)}
+.pb{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.pb div{border-radius:16px;padding:16px;border:2px solid var(--ink)}
+.pb small{font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.pb b{display:block;font:800 22px/1.2 var(--f-d);margin-top:6px}
+@media(max-width:700px){.pb{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<section class="phero" style="padding-bottom:120px">
+  <div class="hero-grid"></div>
+  <div class="wrap">
+    <div class="crumb"><a href="index.html">Beranda</a> / APBDes</div>
+    <span class="eyebrow">Keterbukaan informasi publik</span>
+    <h1 data-lines>Uang desa,<br><span style="color:var(--padi)">terbuka</span> untuk warga.</h1>
+    <p class="reveal d2">Anggaran Pendapatan dan Belanja Desa beserta realisasinya, ditarik langsung dari pembukuan di aplikasi desa. Pilih tahun anggaran untuk melihat datanya.</p>
+    <div class="years" id="years"><span class="chip" style="opacity:.6">memuat tahun…</span></div>
+    <div class="upd" id="upd"><i></i><span>Menghubungkan ke data desa…</span></div>
+  </div>
+</section>
+
+<section class="sec" style="padding-top:0">
+  <div class="wrap dash">
+    <div class="kpis" id="kpis">
+      <div class="kpi"><small>Pendapatan</small><b class="skel" style="height:34px"></b></div>
+      <div class="kpi y"><small>Belanja</small><b class="skel" style="height:34px"></b></div>
+      <div class="kpi"><small>Pembiayaan netto</small><b class="skel" style="height:34px"></b></div>
+      <div class="kpi g"><small>Surplus / defisit berjalan</small><b class="skel" style="height:34px"></b></div>
+    </div>
+
+    <div class="row2 r">
+      <div class="panel reveal"><h3>Serapan belanja</h3><p class="ds">Persentase realisasi belanja terhadap anggaran.</p><div class="gauge" id="gauge"></div></div>
+      <div class="panel reveal d1"><h3>Sumber pendapatan</h3><p class="ds">Komposisi anggaran pendapatan desa.</p><div class="donut-wrap" id="donut"></div></div>
+    </div>
+
+    <div class="panel reveal"><h3>Arus kas kumulatif</h3><p class="ds">Akumulasi realisasi pendapatan dan belanja dari bulan ke bulan. Arahkan kursor ke grafik untuk melihat angkanya.</p>
+      <div class="key"><span><i style="background:#1d7a4b"></i>Pendapatan</span><span><i style="background:#e08a1e"></i>Belanja</span></div>
+      <div class="line" id="line"></div></div>
+
+    <div class="row2">
+      <div class="panel reveal"><h3>Belanja per bidang</h3><p class="ds">Garis putus-putus = anggaran, batang berwarna = realisasi.</p><div class="bars" id="bidang"></div></div>
+      <div class="dash" style="gap:22px">
+        <div class="panel reveal d1"><h3>Jenis belanja</h3><p class="ds">Pembagian anggaran belanja menurut jenisnya.</p><div id="jenis"></div></div>
+        <div class="panel reveal d2"><h3>Sumber dana belanja</h3><p class="ds">Anggaran belanja menurut sumber dananya; garis bawah menunjukkan realisasi.</p><div class="sd" id="sumber"></div></div>
+      </div>
+    </div>
+
+    <div class="panel reveal"><h3>Pembiayaan</h3><p class="ds">Penerimaan dan pengeluaran pembiayaan desa.</p><div class="pb" id="pemb"></div></div>
+
+    <div class="panel reveal" id="kegiatan"><h3>Kegiatan &amp; realisasinya</h3><p class="ds">Seluruh kegiatan belanja tahun ini. Ketuk kegiatan untuk melihat rincian belanjanya.</p>
+      <div class="tbar"><label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="kq" type="search" placeholder="Cari kegiatan…" aria-label="Cari kegiatan"></label>
+        <select id="kb" aria-label="Saring bidang"><option value="">Semua bidang</option></select>
+        <select id="ks" aria-label="Urutkan"><option value="ang">Anggaran terbesar</option><option value="pct">Serapan tertinggi</option><option value="low">Serapan terendah</option><option value="kode">Kode kegiatan</option></select></div>
+      <div class="kg" id="kgList"></div>
+      <button class="btn more" id="kgMore" hidden>Tampilkan semua</button>
+    </div>
+    <p class="note">Angka realisasi bersumber dari transaksi yang sudah dibukukan di aplikasi desa dan dapat berubah sampai laporan akhir tahun ditetapkan. Untuk dokumen resmi APBDes, silakan menghubungi kantor desa.</p>
+  </div>
+</section>
+</main>
+<div class="tip" id="tip"></div>
+<script src="assets/site.js"></script>
+<script src="assets/apbdes.js"></script>
+</body>
+</html>

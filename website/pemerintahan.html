@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pemerintahan — Desa Pandanwangi</title>
+<meta name="description" content="Struktur organisasi, perangkat desa dan tugas masing-masing jabatan di Pemerintah Desa Pandanwangi.">
+<meta name="theme-color" content="#0f241a">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Caveat:wght@600&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='30' r='16' fill='%23e8b84a'/%3E%3Cpath d='M4 46c10-6 18-6 28 0s18 6 28 0v14H4z' fill='%232f5d3f'/%3E%3C/svg%3E">
+</head>
+<body>
+<main>
+<section class="phero">
+  <div class="hero-grid"></div>
+  <div class="wrap">
+    <div class="crumb"><a href="index.html">Beranda</a> / Pemerintahan</div>
+    <span class="eyebrow">Kepengurusan</span>
+    <h1 data-lines>Orang-orang yang<br>melayani <span style="color:var(--padi)">Pandanwangi</span>.</h1>
+    <p class="reveal d2">Struktur pemerintah desa terdiri dari kepala desa, sekretaris desa, kepala urusan, kepala seksi, dan kepala dusun. Masing-masing memegang bidang tugasnya: pelayanan umum, kesejahteraan, pemerintahan, keuangan, dan perencanaan pembangunan.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-h"><span class="eyebrow reveal">Perangkat desa</span><h2 class="reveal d1">Pilih nama, <span class="mark">kenali</span> tugasnya.</h2><p class="reveal d2">Kartu di samping ikut berganti saat Anda menggulir atau mengetuk nama perangkat.</p></div>
+    <div class="ppl">
+      <div class="ppl-list" id="pplList"><div class="skel" style="height:420px"></div></div>
+      <aside class="ppl-card" id="pplCard" aria-live="polite">
+        <div class="ph"><div class="sun"></div><img id="pcImg" alt=""></div>
+        <div class="bd"><b id="pcNama">Memuat…</b><small id="pcJab"></small><p id="pcTugas"></p></div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="sec sand">
+  <div class="wrap">
+    <div class="sec-h"><span class="eyebrow reveal">Struktur organisasi</span><h2 class="reveal d1">Bagan pemerintah desa.</h2></div>
+    <figure class="reveal d1" style="margin:0;border:2px solid var(--ink);border-radius:var(--r);overflow:hidden;box-shadow:var(--hard);background:#fff"><img src="img/struktur-struktur-fix.webp" alt="Bagan struktur organisasi Pemerintah Desa Pandanwangi" loading="lazy" style="width:100%"></figure>
+    <p class="note" style="margin-top:12px">Bagan dari dokumentasi desa. Daftar nama di atas mengikuti data perangkat aktif di aplikasi desa.</p>
+  </div>
+</section>
+
+<section class="band">
+  <div class="sun2" data-par="-.12"></div>
+  <div class="wrap"><span class="hand" style="color:var(--ink)">butuh surat?</span><h2 data-lines>Kasi Pelayanan siap<br>membantu Anda.</h2><a class="btn dark" href="layanan.html" style="margin-top:18px">Lihat persyaratan layanan</a></div>
+</section>
+</main>
+<script src="assets/site.js"></script>
+<script>
+(function(){
+var P=PW,$=P.$,esc=P.esc;
+var FOTO=[['edi santoso','edi-santoso'],['ainur','ainur-rofiq'],['rofiq','ainur-rofiq'],['zainul','zainul-arifin-s-pd-rofiq'],['muliyanah','muliyanah-s-pd-arifin-s-pd-rofiq'],['sugianto','sugianto-s-pd-s-pd-arifin-s-pd-rofiq'],['soma','soma-romadhoni'],['pingkan','pinkan-agum-s-s-pd'],['pinkan','pinkan-agum-s-s-pd'],['hariyanto','edi-hariyanto-s-e'],['sugeng','sugeng-waluyo'],['sunariyo','sunariyo'],['khoirul','khoirul-anam'],['hadi','hadi-sukarno'],['heruman','heruman-akbar'],['agus subali','agus-subali']];
+var TUGAS=[
+ [/kepala desa|kades/i,'Memimpin penyelenggaraan pemerintahan desa secara keseluruhan: pembangunan, pembinaan kemasyarakatan dan pemberdayaan masyarakat. Kepala Desa juga mewakili desa dalam hubungan dengan pihak luar dan memastikan semua program berjalan sesuai rencana.'],
+ [/sekretaris|sekdes/i,'Kepala staf yang membantu Kepala Desa dalam administrasi dan pengelolaan internal: penataan kesekretariatan, pengelolaan keuangan desa dari perencanaan hingga pelaporan APBDes, serta kebutuhan teknis dan administratif pemerintahan.'],
+ [/pelayanan/i,'Garda terdepan pelayanan langsung kepada masyarakat: administrasi publik seperti surat-surat keterangan, sosialisasi dan penyuluhan, serta mendorong partisipasi warga dalam kegiatan desa.'],
+ [/kesejahteraan/i,'Merencanakan dan melaksanakan program pembangunan fisik (infrastruktur) serta pembangunan sosial di bidang pendidikan, kesehatan, keagamaan, dan pemberdayaan ekonomi lokal.'],
+ [/pemerintahan/i,'Tata kelola pemerintahan, hukum dan ketertiban: administrasi kependudukan, penataan pertanahan, penyiapan rancangan peraturan desa, serta ketenteraman dan ketertiban umum.'],
+ [/tata usaha|umum/i,'Mengelola administrasi umum dan kerumahtanggaan kantor desa: surat-menyurat, kearsipan, pengadaan dan perawatan inventaris serta aset desa, dan sarana prasarana kantor.'],
+ [/keuangan/i,'Penatausahaan pendapatan dan belanja desa di bawah koordinasi Sekretaris Desa, verifikasi bukti-bukti keuangan, serta laporan pertanggungjawaban keuangan yang akurat dan tepat waktu.'],
+ [/perencanaan/i,'Menyusun dan mengelola data perencanaan pembangunan desa: pengumpulan data, dokumen RPJM Desa dan RKP Desa, serta evaluasi pelaksanaan program pembangunan.'],
+ [/dusun|kasun/i,'Perpanjangan tangan Kepala Desa di tingkat dusun: menjaga ketenteraman, membantu program pembangunan, membina lembaga kemasyarakatan, menyerap aspirasi warga, dan melaporkan perkembangan wilayahnya.'],
+ [/pendamping|staf/i,'Membantu perangkat desa dalam pelayanan dan administrasi kantor desa sehari-hari.']];
+var FALLBACK=[['Edi Santoso','Kepala Desa'],['Muhammad Ainur Rofiq, S.Pd','Sekretaris Desa'],['Zainul Amin, S.Pd','Kasi Pelayanan'],['Muliyanah, S.Pd','Kasi Kesejahteraan'],['Sugianto, S.Pd','Kasi Pemerintahan'],['Soma Romadhoni','Kaur Tata Usaha dan Umum'],['Pingkan Agum Sasikirana, S.Pd','Kaur Keuangan'],['Edi Hariyanto, S.E','Kaur Perencanaan'],['Sugeng Waluyo','Kepala Dusun Krajan 2'],['Sunariyo','Kepala Dusun Krajan 3'],['Khoirul Anam','Kepala Dusun Timur Sawah'],['Muhammad Hadi Sukarno','Kepala Dusun Tunjungan'],['Heruman Akbar','Kepala Dusun Pemukiman']];
+function foto(n){n=String(n).toLowerCase();for(var i=0;i<FOTO.length;i++)if(n.indexOf(FOTO[i][0])>-1)return 'img/perangkat-'+FOTO[i][1]+'.webp';return ''}
+function tugas(j){for(var i=0;i<TUGAS.length;i++)if(TUGAS[i][0].test(j))return TUGAS[i][1];return 'Perangkat Desa Pandanwangi.'}
+function ini(n){return String(n).replace(/,.*$/,'').split(/\s+/).slice(0,2).map(function(w){return w[0]}).join('').toUpperCase()}
+var list=[],cur=-1;
+function show(i){
+  if(i===cur)return;cur=i;var p=list[i];
+  P.$$('.pp').forEach(function(e,k){e.classList.toggle('act',k===i)});
+  var img=$('#pcImg'),f=foto(p.nama);
+  img.style.opacity=0;setTimeout(function(){if(f){img.src=f;img.alt='Foto '+p.nama;img.style.display=''}else{img.style.display='none'}img.style.opacity=1},180);
+  ['pcNama','pcJab','pcTugas'].forEach(function(id){var e=$('#'+id);e.classList.remove('fade-sw');void e.offsetWidth;e.classList.add('fade-sw')});
+  $('#pcNama').textContent=p.nama;$('#pcJab').textContent=p.jabatan;$('#pcTugas').textContent=tugas(p.jabatan);
+}
+function render(arr){
+  list=arr;cur=-1;
+  $('#pplList').innerHTML=arr.map(function(p,i){var f=foto(p.nama);return '<div class="pp reveal" tabindex="0" data-i="'+i+'">'+(f?'<img src="'+f+'" alt="" loading="lazy">':'<span class="ini">'+ini(p.nama)+'</span>')+'<div><b>'+esc(p.nama)+'</b><small>'+esc(p.jabatan)+'</small></div><em>'+String(i+1).padStart(2,'0')+'</em></div>'}).join('');
+  var items=P.$$('.pp');
+  items.forEach(function(e){var i=+e.getAttribute('data-i');e.onclick=function(){show(i)};e.onkeydown=function(k){if(k.key==='Enter')show(i)}});
+  if('IntersectionObserver' in window&&matchMedia('(min-width:981px)').matches){var o=new IntersectionObserver(function(es){es.forEach(function(x){if(x.isIntersecting)show(+x.target.getAttribute('data-i'))})},{rootMargin:'-48% 0px -48% 0px'});items.forEach(function(e){o.observe(e)})}
+  P.observe($('#pplList'));show(0);
+}
+document.addEventListener('pw:profil',function(ev){
+  var d=ev.detail,a=d&&d.aparat&&d.aparat.length?d.aparat.map(function(x){return{nama:x.nama,jabatan:x.jabatan}}):FALLBACK.map(function(x){return{nama:x[0],jabatan:x[1]}});
+  render(a);
+});
+})();
+</script>
+</body>
+</html>

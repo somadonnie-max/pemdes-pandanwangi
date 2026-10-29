@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Layanan Administrasi — Desa Pandanwangi</title>
+<meta name="description" content="Alur pelayanan dan persyaratan surat-menyurat di Desa Pandanwangi: e-KTP, KIA, KK, akta, surat pindah, SKCK, ahli waris, IKD dan lainnya.">
+<meta name="theme-color" content="#0f241a">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Caveat:wght@600&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='30' r='16' fill='%23e8b84a'/%3E%3Cpath d='M4 46c10-6 18-6 28 0s18 6 28 0v14H4z' fill='%232f5d3f'/%3E%3C/svg%3E">
+<style>
+.ill{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 70% 20%,rgba(232,184,74,.35),transparent 55%),var(--forest)}
+.scene.ui{padding:0}.scene.ui:before{display:none}
+.doc{color:var(--ink);width:62%;max-width:300px;aspect-ratio:3/4;background:var(--paper);border:2px solid var(--ink);border-radius:14px;box-shadow:8px 8px 0 var(--padi);padding:18px;position:relative;transform:rotate(-3deg);transition:transform .8s}
+.scene.act .doc{transform:rotate(0)}
+.doc i{display:block;height:9px;border-radius:9px;background:var(--sand);margin:10px 0}
+.doc i.s{width:60%}.doc i.h{height:14px;width:70%;background:var(--ink)}
+.doc .stamp{position:absolute;right:-18px;bottom:28px;width:96px;height:96px;border-radius:50%;border:4px solid var(--senja);color:var(--senja);display:grid;place-items:center;font:800 13px/1.1 var(--f-b);text-align:center;transform:scale(2) rotate(-20deg);opacity:0;transition:.5s cubic-bezier(.3,1.6,.5,1) .4s;background:rgba(255,250,240,.85)}
+.scene.act .doc .stamp{transform:scale(1) rotate(-14deg);opacity:1}
+.doc .qr{position:absolute;left:18px;bottom:18px;width:58px;height:58px;background:conic-gradient(var(--ink) 25%,transparent 0 50%,var(--ink) 0 75%,transparent 0) 0 0/14px 14px;border:3px solid var(--ink);border-radius:6px}
+.chk{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:8px}
+.chk li{display:flex;gap:8px;align-items:center;font-weight:700;font-size:14px;opacity:0;transform:translateX(-14px);transition:.5s}
+.scene.act .chk li{opacity:1;transform:none}
+.scene.act .chk li:nth-child(2){transition-delay:.25s}.scene.act .chk li:nth-child(3){transition-delay:.5s}.scene.act .chk li:nth-child(4){transition-delay:.75s}
+.chk li:before{content:"✓";width:22px;height:22px;border-radius:6px;display:grid;place-items:center;background:var(--leaf);color:#fff;font-size:13px}
+.bubble{background:#fff;color:var(--ink);border-radius:18px 18px 18px 4px;padding:12px 16px;font-weight:600;font-size:14px;max-width:80%;box-shadow:0 8px 20px rgba(0,0,0,.2);opacity:0;transform:translateY(20px);transition:.5s}
+.bubble.me{background:#d9fdd3;border-radius:18px 18px 4px 18px;justify-self:end}
+.scene.act .bubble{opacity:1;transform:none}.scene.act .bubble:nth-child(2){transition-delay:.4s}.scene.act .bubble:nth-child(3){transition-delay:.8s}
+.chat{display:grid;gap:10px;width:78%;max-width:340px}
+.desk{display:flex;gap:14px;align-items:flex-end}
+.desk .p{width:84px;height:120px;border-radius:42px 42px 12px 12px;border:2px solid var(--ink);background:var(--padi);position:relative}
+.desk .p:before{content:"";position:absolute;top:-46px;left:17px;width:50px;height:50px;border-radius:50%;background:var(--senja-2);border:2px solid var(--ink)}
+.desk .p.b{background:var(--sage)}
+.desk .t{width:120px;height:70px;background:var(--paper);border:2px solid var(--ink);border-radius:10px;display:grid;place-items:center;font:800 12px var(--f-b)}
+.stars{display:flex;gap:8px;font-size:40px;color:var(--padi)}
+.stars span{opacity:0;transform:scale(0);transition:.4s cubic-bezier(.3,1.6,.5,1)}
+.scene.act .stars span{opacity:1;transform:none}
+.scene.act .stars span:nth-child(2){transition-delay:.15s}.scene.act .stars span:nth-child(3){transition-delay:.3s}.scene.act .stars span:nth-child(4){transition-delay:.45s}
+.ways{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:800px){.ways{grid-template-columns:1fr}}
+.acc .src{font-size:12px;color:var(--muted);margin-top:12px}
+</style>
+</head>
+<body>
+<main>
+<section class="phero">
+  <div class="hero-grid"></div>
+  <div class="wrap">
+    <div class="crumb"><a href="index.html">Beranda</a> / Layanan</div>
+    <span class="eyebrow">Pelayanan administrasi</span>
+    <h1 data-lines>Urus surat, <span style="color:var(--padi)">jelas</span><br>dari awal sampai selesai.</h1>
+    <p class="reveal d2">Desa Pandanwangi melayani pembuatan surat keterangan, SKCK, surat usaha, dan dokumen kependudukan lainnya. Layanan bisa diakses langsung di kantor desa maupun secara daring lewat WhatsApp Pelayanan Online.</p>
+    <div class="hero-cta reveal d3"><a class="btn" href="https://wa.me/6285790565999" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg> Pelayanan Online (Bang Opick)</a><a class="btn ghost" href="#syarat" style="color:var(--cream)">Cek persyaratan</a></div>
+  </div>
+</section>
+
+<section class="sec tight">
+  <div class="wrap ways">
+    <div class="card tilt reveal"><div class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V9l7-5 7 5v12M10 21v-6h4v6"/></svg></div><h3>Datang ke kantor desa</h3><p>Bawa berkas persyaratan ke Balai Desa Pandanwangi pada jam kerja. Petugas Kasi Pelayanan akan memeriksa dan memproses surat Anda.</p></div>
+    <div class="card tilt reveal d1" style="background:var(--padi)"><div class="icn" style="background:var(--paper)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg></div><h3>Lewat WhatsApp</h3><p style="color:var(--ink)">Kirim foto berkas ke WhatsApp Pelayanan Online. Surat disiapkan lebih dulu, Anda tinggal mengambil saat sudah jadi.</p></div>
+  </div>
+</section>
+
+<section class="sec dark" id="alur">
+  <div class="wrap">
+    <div class="sec-h"><span class="eyebrow reveal">Alur pelayanan</span><h2 class="reveal d1">Lima langkah, satu surat <span style="color:var(--padi)">sah</span>.</h2><p class="reveal d2">Gulir pelan-pelan: panel di samping memperlihatkan apa yang terjadi di setiap langkah.</p></div>
+    <div class="story" data-story>
+      <div class="story-steps">
+        <div class="st"><span class="num">01 · Siapkan</span><h3>Siapkan berkas</h3><p>Cek persyaratan surat yang Anda butuhkan di daftar bawah. Umumnya cukup fotokopi e-KTP dan Kartu Keluarga.</p></div>
+        <div class="st"><span class="num">02 · Ajukan</span><h3>Ajukan di kantor atau lewat WA</h3><p>Sampaikan keperluan Anda ke petugas di meja pelayanan, atau kirim berkas lewat WhatsApp Pelayanan Online.</p></div>
+        <div class="st"><span class="num">03 · Periksa</span><h3>Data diperiksa petugas</h3><p>Kasi Pelayanan mencocokkan berkas dengan data kependudukan desa, lalu menyiapkan surat lengkap dengan nomor registernya.</p></div>
+        <div class="st"><span class="num">04 · Sahkan</span><h3>Ditandatangani &amp; dicap</h3><p>Surat diparaf Sekretaris Desa dan ditandatangani Kepala Desa. Surat dilengkapi kode QR sehingga keasliannya bisa dicek siapa saja.</p></div>
+        <div class="st"><span class="num">05 · Selesai</span><h3>Surat diterima, beri penilaian</h3><p>Ambil surat Anda. Bantu kami memperbaiki pelayanan dengan mengisi survei kepuasan masyarakat yang singkat.</p></div>
+      </div>
+      <div class="story-view">
+        <div class="prog"><b>01</b><i></i><b>02</b><i></i><b>03</b><i></i><b>04</b><i></i><b>05</b></div>
+        <div class="screen">
+          <div class="scene ui"><div class="ill"><div class="doc"><i class="h"></i><ul class="chk"><li>Fotokopi e-KTP</li><li>Fotokopi KK</li><li>Berkas pendukung</li><li>Map</li></ul></div></div></div>
+          <div class="scene ui"><div class="ill"><div class="chat"><div class="bubble me">Assalamualaikum, mau urus surat keterangan usaha 🙏</div><div class="bubble">Waalaikumsalam. Silakan kirim foto e-KTP &amp; KK ya.</div><div class="bubble me">📎 KTP.jpg · KK.jpg</div></div></div></div>
+          <div class="scene ui"><div class="ill"><div class="desk"><div class="p"></div><div class="t">MEJA LAYANAN</div><div class="p b"></div></div></div></div>
+          <div class="scene ui"><div class="ill"><div class="doc"><i class="h"></i><i></i><i></i><i class="s"></i><i></i><i class="s"></i><span class="qr"></span><span class="stamp">PEMDES<br>PANDAN<br>WANGI</span></div></div></div>
+          <div class="scene ui"><div class="ill" style="gap:14px;align-content:center"><div class="stars"><span>★</span><span>★</span><span>★</span><span>★</span></div><b style="font:800 26px var(--f-d);color:var(--cream)">Terima kasih!</b></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="syarat">
+  <div class="wrap">
+    <div class="sec-h"><span class="eyebrow reveal">Persyaratan</span><h2 class="reveal d1">Apa saja yang <span class="mark">perlu dibawa</span>?</h2><p class="reveal d2">Ketuk nama layanan untuk melihat persyaratannya.</p></div>
+    <label class="search reveal"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="q" type="search" placeholder="Cari layanan, misal: KK, SKCK, pindah…" aria-label="Cari layanan"></label>
+    <div class="acc" id="acc"></div>
+    <p class="note" id="accSrc" style="margin-top:16px"></p>
+  </div>
+</section>
+
+<section class="band">
+  <div class="sun2" data-par="-.12"></div>
+  <div class="wrap"><span class="hand" style="color:var(--ink)">masih bingung?</span><h2 data-lines>Tanyakan langsung<br>ke petugas pelayanan.</h2><a class="btn dark" href="https://wa.me/6285790565999" target="_blank" rel="noopener" style="margin-top:18px">Chat WhatsApp Pelayanan</a></div>
+</section>
+</main>
+<script src="assets/site.js"></script>
+<script>
+(function(){
+var P=PW,$=P.$,esc=P.esc,FB=[["KTP elektronik", ["e-KTP Baru: fotocopy KK, langsung ke Kecamatan untuk perekaman", "e-KTP Hilang: fotocopy KK 2 lembar, surat kehilangan dari kepolisian, pengantar dari Desa", "e-KTP Rusak: fotocopy KK dan e-KTP yang rusak, langsung ke Kecamatan"]], ["Kartu Identitas Anak (KIA)", ["Usia 0 s/d di bawah 5 tahun: fotocopy Akte Kelahiran dan KK (1 lembar)", "Usia 5 s/d di bawah 17 tahun: fotocopy Akte Kelahiran, KK, dan pas foto berwarna 4x6 (1 lembar)"]], ["Kartu Keluarga (KK)", ["Mengisi blok Daftar Rumah Tangga (DRT) melalui Aplikasi Kependudukan Desa yang diisi oleh Kasi Pemerintahan", "Membawa KK asli yang lama", "Untuk semua perubahan KK wajib membawa fotocopy surat nikah apabila di KK lama belum tertulis tanggal perkawinan", "KK yang masih bertanda tangan Camat/Dispenduk wajib diperbarui", "Penambahan jiwa bayi: fotocopy surat kelahiran Bidan/Dokter", "Penambahan anggota baru: surat pindah datang, e-KTP, dan KK asli asal", "Pembetulan data: fotocopy surat nikah, ijazah atau akte kelahiran dan e-KTP asli yang salah apabila sudah ber-e-KTP", "Pecah KK: bawa KK asli yang mau dipecah", "KK hilang: urus surat kehilangan kepolisian dengan pengantar dari desa"]], ["Akte Kelahiran", ["Mengisi formulir akte", "Mengisi formulir permohonan akte terlambat", "Mengisi surat pernyataan tidak punya akte kelahiran", "Surat keterangan kelahiran asli dari Bidan/Dokter", "Fotocopy KTP kedua orang tua 1 lembar", "Fotocopy KK terbaru 1 lembar", "Surat nikah asli atau fotocopy surat nikah/surat cerai orang tua 1 lembar dilegalisir", "Map 1 lembar", "Apabila orang tua tidak mempunyai surat nikah harus mengisi SPTJM Perkawinan", "Apabila kelahiran di dukun bayi harus mengisi SPTJM Kelahiran"]], ["Kebenaran Identitas", ["Fotocopy e-KTP 1 lembar", "Fotocopy KK 1 lembar", "Data yang salah (KIS, BPJS, sertifikat, dll.)"]], ["Surat Pindah", ["e-KTP asli (fotocopy 2 lembar)", "KK asli", "Fotocopy surat nikah bagi yang sudah menikah 2 lembar", "Fotocopy akte cerai bagi yang cerai hidup 1 lembar", "Pas foto warna 4x6 1 lembar (untuk pindah antar kabupaten)", "Alamat tujuan", "Mengisi blangko F-1.03 yang disediakan oleh Desa"]], ["Letter C", ["Membawa fotocopy Akte Jual Beli atau Akte Hibah", "Menghadap Sekretaris Desa"]], ["Akte Kematian", ["Mengisi blanko permohonan akte kematian dari Desa", "e-KTP dan KK asli yang meninggal", "Fotocopy e-KTP dan KK pemohon masing-masing 1 lembar", "Surat keterangan domisili yang meninggal apabila belum punya e-KTP", "Surat kematian asli dari Desa/Dokter 1 lembar"]], ["Sertifikat, Akta Jual Beli & Akta Hibah", ["Langsung menghadap Kepala Desa, Sekretaris Desa atau Kepala Dusun wilayah"]], ["Legalisir", ["Membawa fotocopy yang mau dilegalisir", "Membawa dokumen yang asli"]], ["Identitas Kependudukan Digital (IKD)", ["Memiliki e-KTP atau sudah melakukan perekaman", "Memiliki e-mail yang aktif", "Memiliki smartphone dan mengunduh aplikasi IKD di Play Store/App Store", "Smartphone Android minimal versi 7.1 atau iOS 11.0", "Verifikasi di kecamatan"]], ["SKCK Kepolisian", ["Fotocopy e-KTP 1 lembar", "Fotocopy KK 1 lembar", "Fotocopy akte kelahiran; bila tidak punya, surat keterangan lahir dari Desa", "Fotocopy BPJS Kesehatan atau tangkapan layar aplikasi JKN Mobile", "Foto 4x6 warna latar merah 4 lembar"]], ["Keterangan Ahli Waris", ["Fotocopy e-KTP 1 lembar", "Fotocopy KK 1 lembar", "e-KTP dan KK semua ahli waris di hadapan Sekretaris Desa"]]];
+function norm(n){var s=P.title(n).replace(/\bE-?ktp\b/i,'e-KTP').replace(/\(e-ktp\)/i,'(e-KTP)').replace(/\bKia\b/,'KIA').replace(/\bKk\b/,'KK').replace(/\bSkck\b/,'SKCK').replace(/\bIkd\b/,'IKD').replace(/\bSktm\b/i,'SKTM').replace(/,/g,', ').replace(/\s+/g,' ');return s}
+function render(list,src){
+  $('#acc').innerHTML=list.map(function(l,i){return '<details class="reveal" data-q="'+esc((l.nama+' '+l.syarat.join(' ')).toLowerCase())+'"><summary><span class="n">'+(i+1)+'</span>'+esc(l.nama)+'<span class="pl">+</span></summary><div class="in-acc"><ol>'+l.syarat.map(function(s){return '<li>'+esc(s)+'</li>'}).join('')+'</ol>'+((l.waktu||l.biaya)?'<div class="meta">'+(l.waktu?'<span>⏱ '+esc(l.waktu)+'</span>':'')+(l.biaya?'<span>💰 '+esc(l.biaya)+'</span>':'')+'</div>':'')+(l.ket?'<p class="src">'+esc(l.ket)+'</p>':'')+'</div></details>'}).join('');
+  $('#accSrc').textContent=src;P.observe($('#acc'));
+}
+render(FB.map(function(x){return{nama:x[0],syarat:x[1]}}),'');
+document.addEventListener('pw:profil',function(ev){
+  var d=ev.detail,l=d&&d.layanan||[];l=l.filter(function(x){return x.nama&&x.syarat});
+  if(!l.length)return;
+  render(l.map(function(x){return{nama:norm(x.nama),syarat:String(x.syarat).split(/\n+/).map(function(s){return s.replace(/^\s*[a-z0-9]{1,2}[.)]\s*/i,'').trim()}).filter(Boolean),waktu:x.waktu,biaya:x.biaya,ket:x.ket}}),'Persyaratan diambil dari daftar Produk Layanan di aplikasi desa.');
+});
+$('#q').addEventListener('input',function(){var v=this.value.toLowerCase().trim();P.$$('#acc details').forEach(function(e){var m=!v||e.getAttribute('data-q').indexOf(v)>-1;e.style.display=m?'':'none';if(v&&m)e.open=true})});
+})();
+</script>
+</body>
+</html>
