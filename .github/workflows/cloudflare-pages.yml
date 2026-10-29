@@ -18,10 +18,16 @@ jobs:
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: |
           mkdir _situs
-          rsync -a --exclude '.git' --exclude '.github' --exclude '_situs' ./ _situs/
+          rsync -a --exclude '.git' --exclude '.github' --exclude '_situs' --exclude 'website' ./ _situs/
       - name: Buat proyek Pages jika belum ada
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: npx --yes wrangler@3 pages project create pemdespandanwangi --production-branch=main || true
       - name: Kirim
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: npx --yes wrangler@3 pages deploy _situs --project-name=pemdespandanwangi --branch=main --commit-dirty=true
+      - name: Buat proyek website desa jika belum ada
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        run: npx --yes wrangler@3 pages project create desapandanwangi --production-branch=main || true
+      - name: Kirim website desa
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        run: npx --yes wrangler@3 pages deploy website --project-name=desapandanwangi --branch=main --commit-dirty=true
