@@ -823,6 +823,12 @@ option,optgroup{background-color:var(--surface)!important;color:var(--ink)!impor
 .add-tbl input,.add-tbl textarea{width:100%;min-width:80px;font:inherit;font-size:12px;padding:3px 5px}.add-tbl td.r{text-align:right;white-space:nowrap}
 .frc-i summary{display:flex;align-items:center;gap:8px;cursor:pointer;list-style:none}.frc-i summary::-webkit-details-marker{display:none}.frc-k{font-weight:800;font-size:11px;background:var(--pri-soft);color:var(--pri);border-radius:6px;padding:2px 6px}.frc-j{flex:1;font-weight:700;font-size:13px}.frc-p{font-weight:800;font-size:12px;color:var(--muted)}.frc-p.mid{color:#d97706}.frc-p.ok{color:#16a34a}
 .frc-n{margin:0;padding-left:18px;font-size:12px;color:var(--muted)}.frc-l{display:flex;flex-direction:column;gap:6px}.frc-r{border:1px solid var(--line);border-radius:9px;padding:7px 8px;display:flex;flex-direction:column;gap:5px}.frc-t{font-size:12.5px}.frc-auto{color:#2563eb;font-weight:600}.frc-a{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.frc-nv{font-size:10.5px;font-weight:700;color:#7c3aed;background:#ede9fe;border-radius:5px;padding:0 5px;margin-left:4px;white-space:nowrap}.frc-baru{display:flex;gap:6px;align-items:flex-start;font-size:11.5px;color:#9a3412;background:#fff7ed;border:1px dashed #fdba74;border-radius:7px;padding:5px 7px}.frc-baru .ic{width:14px;height:14px;flex:none;margin-top:1px}.frc-up{font-size:11.5px;color:var(--muted)}
+.frc-bn{border-left:3px solid var(--pri-soft);padding-left:8px;display:flex;flex-direction:column;gap:6px}.frc-bh{display:flex;gap:7px;align-items:flex-start}.frc-bno{flex:none;width:20px;height:20px;border-radius:50%;background:var(--pri);color:var(--pri-ink);font-size:11px;font-weight:800;display:grid;place-items:center}.frc-bt{flex:1;font-size:12.5px;font-weight:600}.frc-bv{flex:none;font-size:11px;font-weight:800;color:#15803d;background:#dcfce7;border-radius:6px;padding:1px 6px}.frc-bv.k{color:#b45309;background:#fef3c7}
+.frc-ls{display:block;font-weight:500;font-size:11px;color:var(--muted)}.frc-x summary{cursor:pointer;font-size:12.5px;font-weight:700;display:flex;gap:6px;align-items:center;padding:4px 0}.frc-x .ic{width:15px;height:15px}.frc-lv{font-size:12px;margin:4px 0 6px}.frc-lv ul{margin:2px 0 0;padding-left:18px;color:var(--muted)}
+.frc-sum{display:flex;flex-wrap:wrap;gap:6px;font-size:12px}.frc-sum span{border:1px solid var(--line);border-radius:7px;padding:2px 8px}.frc-sum .ok{color:#15803d;border-color:#86efac}.frc-sum .mid{color:#b45309;border-color:#fcd34d}
+.frc-hist{display:flex;flex-direction:column;gap:6px}.frc-h{border:1px solid var(--line);border-radius:9px;padding:6px 8px;display:flex;flex-direction:column;gap:4px}.frc-hh{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px}.frc-hh .ok{color:#15803d;font-weight:700}.frc-hh .tunggu{color:#b45309}.frc-hh .btn{margin-left:auto}
+.frc-ht{width:100%;border-collapse:collapse;font-size:11.5px}.frc-ht th,.frc-ht td{border:1px solid var(--line);padding:3px 5px;text-align:left;vertical-align:top}.frc-ht th{background:var(--soft,#f6f7f9)}.frc-ht td:nth-child(n+2),.frc-ht th:nth-child(n+2){width:70px;text-align:center}.frc-in input{width:100%;font:inherit;font-size:12px;padding:3px 4px;text-align:center}
 .frc-st{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}.frc-st button{border:0;background:none;padding:4px 8px;font:inherit;font-size:11.5px;color:var(--muted);cursor:pointer}.frc-st button.on.belum{background:#fee2e2;color:#b91c1c}.frc-st button.on.sebagian{background:#fef3c7;color:#b45309}.frc-st button.on.ada{background:#dcfce7;color:#15803d}.frc-c{width:100%;font:inherit;font-size:12px;padding:5px 7px}
 .tn-lk{display:flex;align-items:center;gap:6px}.tn-lk .main{flex:1;min-width:0}.tn-wp .btns{margin-top:4px}
 .pl-map{position:relative;height:min(62vh,460px);border-radius:10px;overflow:hidden;border:1px solid var(--line)}.pl-map #plMap{position:absolute;inset:0}.pl-pin{position:absolute;left:50%;top:50%;transform:translate(-50%,-100%);z-index:500;color:#dc2626;pointer-events:none}.pl-pin .ic{width:34px;height:34px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))}
@@ -7554,6 +7560,7 @@ function lapSusun(rows, rekNama, rinci) {
 const keuBidangNama = k => ({ 1: 'Penyelenggaraan Pemerintahan Desa', 2: 'Pelaksanaan Pembangunan Desa', 3: 'Pembinaan Kemasyarakatan', 4: 'Pemberdayaan Masyarakat', 5: 'Penanggulangan Bencana, Darurat dan Mendesak Desa' })[k] || 'Lainnya';
 VIEWS.keulap = async (p, main, alive) => {
   const st = S.lapSt = S.lapSt && S.lapSt.mode ? S.lapSt : { mode: 'smt1', sampai: '', rinci: false };
+  if (p && p.mode && !p._d) { st.mode = p.mode; p._d = 1; }
   const th = keuTh(), sd = st.mode === 'smt1' ? th + '-06-30' : st.mode === 'smt2' ? th + '-12-31' : st.sampai;
   const judul = st.mode === 'smt1' ? 'LAPORAN REALISASI PELAKSANAAN APBDES SEMESTER PERTAMA' : st.mode === 'smt2' ? 'LAPORAN REALISASI PELAKSANAAN APBDES SEMESTER AKHIR TAHUN' : 'LAPORAN REALISASI PELAKSANAAN APBDES';
   const kolR = st.mode === 'smt1' ? 'Realisasi s.d. Semester I' : st.mode === 'smt2' ? 'Realisasi s.d. Semester II' : 'Realisasi' + (st.sampai ? ' s.d. ' + fDate(st.sampai) : '');
@@ -7663,6 +7670,7 @@ async function sppWord(id) {
 ACT.sppWord = t => sppWord(t.dataset.id);
 VIEWS.keubuku = async (p, main, alive) => {
   const st = S.bukuSt = S.bukuSt || { buku: 'BKU', bulan: '' };
+  if (p && p.buku && !p._d) { st.buku = p.buku; p._d = 1; }
   setTop({ BKU: 'Buku Kas Umum', Bank: 'Buku Bank', Tunai: 'Buku Kas Tunai', Pajak: 'Buku Pembantu Pajak' }[st.buku], 'Tahun ' + keuTh());
   const d = await call('keuBuku', { tahun: keuTh(), buku: st.buku, bulan: st.bulan }); if (!alive()) return;
   const tbl = (cetak) => `<table class="${cetak ? 'pt' : 'tbl'}"><thead><tr><th>Tanggal</th><th>No. Bukti</th><th>Uraian</th><th style="text-align:right">Penerimaan</th><th style="text-align:right">Pengeluaran</th><th style="text-align:right">Saldo</th></tr></thead><tbody>
@@ -8917,7 +8925,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '205', tgl: '2026-10-28', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '206', tgl: '2026-10-29', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -14235,133 +14243,302 @@ async function addCetak(x, rows, pg, lalu, laluPer) {
    tautan ke data aplikasi yang menjadi sumbernya (relasi), plus catatan
    riwayat laporan ke SIMWAS (klaim %, tanggal lapor, verifikasi).
    ===================================================================== */
-const L_ = (t, go, cek) => ({ t, go, cek });
+/* ---- FRC Desa (Desa Anti Korupsi) — disalin dari SIMWAS Inspektorat Lumajang (monitoring/dana) ----
+   Tiap indikator: n = Info Nilai (yang diverifikasi Inspektorat, satu persen per butir),
+   l = Info Lampiran persis SIMWAS: { t, nv: catatan nilai, ni: butir Info Nilai yang didukung,
+       go: [[label, rute]] tombol pintas ke menu aplikasi, cek: ringkasan otomatis,
+       baru: menu yang belum ada (dibuat bertahap), up: cukup unggah dokumen dari luar aplikasi },
+   dh = Dasar Hukum, lv = kriteria level (Mandatory). */
+const L_ = (t, o) => Object.assign({ t }, o || {});
+const FG = {
+  sk: ['SK Kepala Desa', ['list', { e: 'sk_kades' }]], perkades: ['Peraturan Kepala Desa', ['list', { e: 'perkades' }]], perdes: ['Peraturan Desa', ['list', { e: 'perdes' }]],
+  ba: ['Berita Acara', ['list', { e: 'berita_acara' }]], keg: ['Kegiatan', ['list', { e: 'kegiatan' }]], sk_out: ['Surat Keluar', ['list', { e: 'surat_keluar' }]],
+  musrkp: ['Musyawarah RKP', ['list', { e: 'rkp_musyawarah' }]], rkp: ['RKP Desa', ['rkp']], rpjm: ['RPJM Desa', ['rpjm']], rpjmdok: ['Cetak RPJM', ['rpjmdok']],
+  apb: ['APBDes', ['list', { e: 'keu_anggaran' }]], lamp: ['Cetak APBDes', ['keulamp']], rak: ['RAK', ['keurak']], rab: ['RAB Kegiatan', ['list', { e: 'rkp_rab' }]], paket: ['Paket DD', ['list', { e: 'keu_paket' }]],
+  lra1: ['LRA Semester I', ['keulap', { mode: 'smt1' }]], lra2: ['LRA Akhir Tahun', ['keulap', { mode: 'smt2' }]],
+  bku: ['Buku Kas Umum', ['keubuku', { buku: 'BKU' }]], bank: ['Buku Bank', ['keubuku', { buku: 'Bank' }]], tunai: ['Buku Kas Tunai', ['keubuku', { buku: 'Tunai' }]], bpajak: ['Buku Pajak', ['keubuku', { buku: 'Pajak' }]],
+  rpajak: ['Rekap Pajak', ['keupajak']], setor: ['Setor Pajak', ['pta', { t: 'pajak' }]], pta: ['Penatausahaan', ['pta']], skimpor: ['Impor Siskeudes', ['skimpor']],
+  sipades: ['Buku Inventaris (SIPADES)', ['sipadeslap']], asetdash: ['Dashboard Aset', ['asetdash']], asettim: ['Pengurus Aset', ['list', { e: 'aset_tim' }]], asetsop: ['SOP Aset', ['asetsop']],
+  asettrx: ['Sewa / Pinjam Pakai', ['list', { e: 'aset_trx' }]], sedia: ['Persediaan', ['list', { e: 'persediaan' }]], label: ['Label Aset', ['asetlabel']], tanah: ['Tanah Desa', ['tanah']], aset: ['Inventaris Aset', ['list', { e: 'aset' }]],
+  bangun: ['Pembangunan', ['list', { e: 'pembangunan' }]], rabp: ['Proyek RAB & Gambar', ['rabproyek']], bast: ['BAST', ['list', { e: 'bast' }]], spj: ['SPJ', ['spj', {}]],
+  sert: ['Sertifikat Aparatur', ['list', { e: 'aparat_sert' }]], aparat: ['Aparatur', ['list', { e: 'aparat' }]], skbpd: ['SK BPD', ['list', { e: 'sk_bpd' }]],
+  layanan: ['Produk Layanan', ['list', { e: 'produk_layanan' }]], kir: ['Kartu Inventaris Ruangan', ['list', { e: 'aset_ruang' }]], lembaga: ['Lembaga Desa', ['list', { e: 'lembaga' }]],
+  pbb: ['Data PBB', ['list', { e: 'tanah_desa' }]], pstat: ['Statistik Penduduk', ['pstat']], rentan: ['Data Rentan', ['list', { e: 'rentan' }]], sosrekap: ['Rekap Sosial', ['sosrekap']],
+  bansos: ['Penyaluran Bansos', ['list', { e: 'penyaluran_bansos' }]], musbansos: ['Musdes Bansos', ['list', { e: 'musdes_bansos' }]], usulbansos: ['Usulan Bantuan', ['list', { e: 'usulan_bansos' }]]
+};
+const g_ = (...k) => k.map(x => FG[x]);
+const FRC_DH_KPK = ['Buku Panduan Desa Antikorupsi KPK'];
 const FRC_IND = [
-  { k: 'M1', g: 'Mandatory', j: 'Penguatan Kualitas Pelayanan Publik',
-    n: ['Adanya layanan pengaduan bagi masyarakat', 'Adanya survei kepuasan masyarakat terhadap layanan pemerintah desa', 'Keterbukaan & akses informasi standar pelayanan minimal, pembangunan, kependudukan, keuangan, dan pelayanan lain', 'Media informasi APBDes di balai desa / tempat yang mudah diakses', 'Adanya Maklumat Pelayanan'],
-    l: [L_('Kotak aduan, dokumentasi foto, pernyataan tokoh masyarakat (rekap & tindak lanjut aduan)'), L_('Perangkat survei / hasil survei kepuasan / rencana tindak lanjut'), L_('Informasi jenis layanan: syarat, alur, lama, biaya (banner/poster/digital)', ['list', { e: 'produk_layanan' }], 'layanan'), L_('Media informasi APBDes (baliho/poster/digital)', ['keu']), L_('Maklumat Pelayanan terpasang & dipublikasikan')] },
-  { k: 'M2', g: 'Mandatory', j: 'Penguatan Partisipasi Masyarakat',
-    n: ['Partisipasi masyarakat dalam penyusunan RKP Desa', 'Kesadaran masyarakat mencegah gratifikasi, suap, dan konflik kepentingan', 'Keterlibatan lembaga kemasyarakatan & masyarakat dalam pelaksanaan pembangunan'],
-    l: [L_('Undangan, foto, notulen/risalah Musdus & Musdes RKP', ['list', { e: 'rkp_musyawarah' }], 'musrkp'), L_('Survei perilaku/gratifikasi, deklarasi & surat edaran anti gratifikasi dan konflik kepentingan'), L_('Undangan, foto, notulen pelaksanaan pembangunan (keterlibatan masyarakat)', ['list', { e: 'pembangunan' }], 'bangun')] },
-  { k: 'M3', g: 'Mandatory', j: 'Kearifan Lokal',
-    n: ['Budaya lokal/hukum adat yang mendorong pencegahan korupsi', 'Tokoh masyarakat, agama, adat, pemuda, dan perempuan yang mendorong pencegahan korupsi'],
-    l: [L_('Peraturan/SK/SE & dokumentasi budaya lokal antikorupsi (dipublikasikan)'), L_('SK penetapan tokoh & dokumentasi kegiatan tokoh antikorupsi', ['list', { e: 'lembaga' }])] },
-  { k: 'B1', g: 'Mandiri', j: 'Pengelolaan Keuangan — Perencanaan dan Penganggaran',
-    n: ['Keberadaan RPJMDes, RKPDes, APBDes tahun berjalan + daftar rencana pembangunan & RAB', 'Rancangan Perdes APBDes (N+1) disepakati Kades & BPD paling lambat Oktober', 'Keterlibatan masyarakat dalam perencanaan/penganggaran'],
-    l: [L_('RPJMDes', ['rpjm'], 'rpjm'), L_('RKPDes', ['rkp'], 'rkp'), L_('APBDes tahun berjalan', ['list', { e: 'keu_anggaran' }], 'apbdes'), L_('Lampiran APBDes (daftar rencana pembangunan & RAB)', ['list', { e: 'rkp_rab' }]), L_('Rancangan Perdes tentang APBDes (N+1)', ['list', { e: 'perdes' }]), L_('Kesepakatan Kepala Desa dan BPD'), L_('Undangan, daftar hadir, notulen, bukti keterlibatan masyarakat', ['list', { e: 'rkp_musyawarah' }], 'musrkp')] },
-  { k: 'B2', g: 'Mandiri', j: 'Pengelolaan Keuangan — Penatausahaan Keuangan',
-    n: ['SK PPKD & SK pelaksana kegiatan', 'Penunjukan operator Siskeudes desa', 'Dokumen penatausahaan & pertanggungjawaban tribulanan (LRA, BKU, CaLK, rekening koran)', 'Kas tunai tidak melebihi ketentuan', 'Kepatuhan penyetoran pajak', 'Siskeudes online', 'Publikasi realisasi APBDes tahun sebelumnya', 'Persiapan audit / penutupan kas'],
-    l: [L_('SK penetapan PPKD', ['list', { e: 'sk_kades' }]), L_('Penugasan pelaksana kegiatan (PKA/TPK)', ['list', { e: 'sk_kades' }]), L_('Penunjukan operator Siskeudes desa', ['list', { e: 'sk_kades' }]), L_('Laporan Realisasi APBDes (semester & tahunan)', ['keulap'], 'realisasi'), L_('Buku Kas Umum tribulanan & buku pembantu', ['keubuku']), L_('Catatan atas Laporan Keuangan akhir tahun'), L_('Rekening koran bank akhir bulan/tribulan'), L_('Saldo kas tunai di bendahara (buku kas tunai)', ['keubuku']), L_('Buku pajak: pajak dibayar tepat waktu', ['keupajak'], 'pajak'), L_('Bukti penggunaan Siskeudes online (screenshot)'), L_('Publikasi realisasi APBDes tahun lalu'), L_('BA penutupan kas, rekening koran, stock opname persediaan, buku inventaris per 30 Nov', ['list', { e: 'persediaan' }])] },
-  { k: 'B3', g: 'Mandiri', j: 'Pengelolaan Keuangan — Pendapatan Asli Desa',
-    n: ['Capaian pendapatan desa tahun berjalan', 'Laporan inovasi peningkatan PADes', 'BUMDes terbentuk, beroperasi, dan berlaba'],
-    l: [L_('Capaian pendapatan 40–80% / 80–100%', ['keulap'], 'pendapatan'), L_('Laporan/KAK inovasi peningkatan PADes'), L_('Bukti pembentukan BUMDes (Perdes, AD/ART, pengurus)', ['list', { e: 'lembaga' }]), L_('Bukti BUMDes beroperasi & penyertaan modal'), L_('Laporan keuangan BUMDes menunjukkan laba')] },
-  { k: 'B4', g: 'Mandiri', j: 'Pengelolaan Keuangan — Pengendalian dan Pengawasan',
-    n: ['Partisipasi masyarakat dalam pengawasan APBDes', 'Pengawasan BPD', 'Pembinaan & pengawasan kecamatan', 'Tindak lanjut hasil evaluasi'],
-    l: [L_('Laporan partisipasi masyarakat dalam pengawasan APBDes'), L_('Laporan hasil pengawasan BPD', ['list', { e: 'sk_bpd' }]), L_('Laporan pembinaan & pengawasan kecamatan'), L_('Laporan hasil tindak lanjut')] },
-  { k: 'C1', g: 'Mandiri', j: 'Pengelolaan Barang Desa — Penatausahaan Barang',
-    n: ['Penetapan pengurus aset & SOP pengelolaan aset', 'Buku inventaris aset yang informatif (kode, jumlah, spesifikasi, nilai, kondisi)', 'Pemanfaatan aset (sewa/pinjam pakai)', 'BA stock opname persediaan', 'Pengamanan aset (kodefikasi, sertifikat tanah, pajak kendaraan)'],
-    l: [L_('Penetapan/penugasan pengurus aset desa', ['list', { e: 'aset_tim' }], 'asettim'), L_('SOP/kebijakan pengelolaan aset', ['asetsop']), L_('Buku inventaris aset (format SIPADES)', ['sipadeslap'], 'aset'), L_('Buku inventaris cukup informatif (kode, nilai, kondisi lengkap)', ['asetdash'], 'asetinfo'), L_('Perjanjian sewa / pinjam pakai aset', ['list', { e: 'aset_trx' }]), L_('Laporan posisi persediaan (barang habis pakai) tidak berkala', ['list', { e: 'persediaan' }]), L_('Laporan posisi persediaan berkala', ['list', { e: 'persediaan' }]), L_('Bukti kodefikasi/label barang', ['asetlabel']), L_('Bukti proses pensertifikatan tanah', ['tanah']), L_('Seluruh tanah desa bersertifikat', ['tanah'], 'tkdsert'), L_('Pajak kendaraan dinas lunas 100%')] },
-  { k: 'C2', g: 'Mandiri', j: 'Pengelolaan Barang Desa — Pengadaan Barang/Jasa',
-    n: ['TPK telah mengikuti pelatihan pengadaan', 'Laporan pengadaan dari TPK & bukti penyerahan hasil (RAB, gambar, kontrak, BAST)'],
-    l: [L_('Penetapan TPK & daftar pekerjaan fisik', ['list', { e: 'sk_kades' }]), L_('Sertifikat pelatihan/bimtek pengadaan'), L_('Laporan penyelenggaraan pengadaan dari TPK', ['list', { e: 'pembangunan' }], 'bangun'), L_('Bukti penyerahan hasil (RAB, gambar, kontrak, BAST, SPJ, foto)', ['list', { e: 'bast' }], 'bast')] },
-  { k: 'C3', g: 'Mandiri', j: 'Pengelolaan Barang Desa — Pengendalian dan Pengawasan',
-    n: ['Laporan hasil pengawasan camat atas aset desa', 'Tindak lanjut pemerintah desa atas pengawasan camat'],
-    l: [L_('Laporan hasil pengawasan camat'), L_('Rekap laporan tindak lanjut'), L_('Seluruh tindak lanjut telah selesai')] },
-  { k: 'P1', g: 'Mandiri', j: 'Pelayanan Publik',
-    n: ['SOP pelayanan publik dipublikasikan di ruang pelayanan', 'Sarana & prasarana pelayanan memadai', 'Tindak lanjut survei kepuasan masyarakat'],
-    l: [L_('SOP/kebijakan pelayanan', ['list', { e: 'produk_layanan' }], 'layanan'), L_('Bukti penempelan/publikasi SOP'), L_('Kartu Inventaris Ruangan ruang layanan & dokumentasi', ['list', { e: 'aset_ruang' }]), L_('Hasil survei kepuasan masyarakat')] },
-  { k: 'K1', g: 'Mandiri', j: 'Kelembagaan, Kapasitas & Kompetensi Aparat',
-    n: ['Kelembagaan pemerintahan desa terisi', 'Perjanjian kinerja & laporan tugas perangkat', 'Peningkatan kapasitas perangkat'],
-    l: [L_('Struktur organisasi terisi', ['list', { e: 'aparat' }], 'aparat'), L_('Perjanjian kinerja/indikator & target seluruh perangkat'), L_('Laporan capaian perjanjian kinerja tahun berjalan'), L_('Laporan peningkatan kapasitas (min. 3 orang)')] },
-  { k: 'S1', g: 'Mandiri', j: 'Statistik Desa',
-    n: ['Capaian pendapatan PBB di tingkat desa', 'Dukungan program peningkatan IPM', 'Inventarisasi aset negara di wilayah desa', 'Data monografi terupdate', 'Data SDGs terupdate', 'Pemantauan inflasi/harga komoditas', 'Program PTSL'],
-    l: [L_('Capaian PBB 60–80% / di atas 80%', ['tanah'], 'pbb'), L_('Laporan dukungan peningkatan IPM (anak putus sekolah, buta huruf, update KK)', ['pstat']), L_('Data aset negara di wilayah desa'), L_('Data monografi terupdate & terpampang', ['pstat'], 'penduduk'), L_('Bukti data SDGs terupdate'), L_('Laporan pemantauan harga komoditas (inflasi)'), L_('Laporan PTSL (SK Pokmas, kesepakatan, RAB, SPJ, rekap peserta)', ['tanah'])] },
-  { k: 'G1', g: 'Mandiri', j: 'Desa Anti Korupsi — Register Risiko',
-    n: ['Identifikasi risiko korupsi (penggelembungan, fiktif, penggelapan, penyalahgunaan)', 'Rencana tindak pengendalian & laporan'],
-    l: [L_('Identifikasi risiko fraud (register risiko)'), L_('Rencana tindak pengendalian'), L_('Laporan manajemen risiko fraud ke Camat (tembusan Inspektorat)')] },
-  { k: 'G2', g: 'Mandiri', j: 'Desa Anti Korupsi — Anti Pungli',
-    n: ['Publikasi anti pungli di lingkungan pelayanan', 'Perangkat sebagai relawan anti pungli', 'Sosialisasi anti pungli', 'Kolaborasi dengan TNI & Polri'],
-    l: [L_('Bukti publikasi anti pungli'), L_('Penetapan perangkat sebagai relawan anti pungli', ['list', { e: 'sk_kades' }]), L_('Laporan sosialisasi anti pungli ke Camat'), L_('Dokumentasi, undangan, daftar hadir, banner'), L_('Bukti koordinasi dengan TNI'), L_('Bukti koordinasi dengan Polri')] },
-  { k: 'T1', g: 'Tematik Digitalisasi', j: 'Dukungan Desa dalam Penanganan Stunting',
-    n: ['Prevalensi stunting per dusun & desa', 'Data by name by address stunting', 'Cakupan penanganan stunting', 'Inovasi penanganan stunting', 'Dukungan swasta/masyarakat', 'Laporan capaian kinerja termasuk anggaran'],
-    l: [L_('Data by name by address balita stunting per dusun', ['list', { e: 'rentan' }], 'stunting'), L_('Persentase prevalensi & cakupan penanganan per dusun', ['sosrekap']), L_('Laporan inovasi & dukungan swasta/masyarakat'), L_('Laporan capaian kinerja & realisasi anggaran stunting', ['keulap'])] },
-  { k: 'T2', g: 'Tematik Digitalisasi', j: 'Database & Intervensi Stunting di Desa',
-    n: ['Database stunting, intervensi, dan publikasi', 'Akses air minum & sanitasi layak', 'Penerima bantuan (PKH, BPNT, PBI)', 'Bantuan spesifik stunting'],
-    l: [L_('Database anak stunting & intervensinya', ['list', { e: 'rentan' }], 'stunting'), L_('Data akses air minum & sanitasi layak per rumah tangga'), L_('Data penerima PKH/BPNT/PBI', ['list', { e: 'penyaluran_bansos' }], 'bansos'), L_('Bukti bantuan spesifik stunting (vitamin, susu, dll.)')] },
-  { k: 'T3', g: 'Tematik Penanggulangan Kemiskinan', j: 'Dukungan Desa dalam Penanggulangan Kemiskinan',
-    n: ['Data by name sasaran kemiskinan ekstrem, DTKS, stunting', 'Musdes penentuan penerima BLT & belanja diserahkan ke masyarakat', 'Data P3KE penerima BLT DD & bukti penyerahan', 'Data penerima barang yang diserahkan', 'Intervensi lain untuk masyarakat miskin'],
-    l: [L_('Data by name sasaran kemiskinan ekstrem/DTKS', ['list', { e: 'rentan' }], 'rentan'), L_('Berita acara Musdes penentuan penerima', ['list', { e: 'musdes_bansos' }], 'musbansos'), L_('Data penerima BLT DD & bukti penyerahan', ['list', { e: 'penyaluran_bansos' }], 'bansos'), L_('Data penerima barang yang diserahkan kepada masyarakat', ['list', { e: 'usulan_bansos' }])] }
+  { k: 'M1', g: 'Mandatory', no: '1', j: 'Penguatan Kualitas Pelayanan Publik', dh: FRC_DH_KPK,
+    n: ['Adanya layanan pengaduan bagi masyarakat', 'Adanya survei kepuasan masyarakat terhadap layanan pemerintah desa', 'Ada keterbukaan dan akses masyarakat desa terhadap informasi standar pelayanan minimal (kesehatan, pendidikan, sosial, lingkungan, tramtibumlinmas, pekerjaan umum), pembangunan, kependudukan, keuangan, dan pelayanan lainnya.', 'Adanya media informasi tentang APBDes di Balai Desa dan atau tempat lain yang mudah diakses oleh masyarakat', 'Adanya Maklumat Pelayanan'],
+    l: [L_('Kotak Aduan, Dokumentasi Foto, Pernyataan Tokoh Masyarakat, dll', { ni: 0, baru: 'Pengaduan Masyarakat (register aduan, rekap & tindak lanjut)' }),
+      L_('Perangkat Survey / Dokumen Hasil Survey Kepuasan / Rencana tindak lanjut survey, dll', { ni: 1, baru: 'Survei Kepuasan Masyarakat (kuesioner, rekap IKM, rencana tindak lanjut)' }),
+      L_('Maklumat/Spanduk/Banner/Poster/ Digital Informasi, dll. (jenis layanan: syarat, alur, lama, biaya)', { ni: 2, go: g_('layanan'), cek: 'layanan' }),
+      L_('Maklumat/Spanduk/Banner/Poster/ Digital Informasi, dll. (informasi APBDes)', { ni: 3, go: g_('lamp', 'rak'), cek: 'apbdes', baru: 'Infografis / Baliho APBDes (cetak dari data APBDes)' }),
+      L_('Maklumat/Spanduk/Banner/Poster/ Digital Informasi, dll. (Maklumat Pelayanan)', { ni: 4, baru: 'Maklumat Pelayanan (cetak & publikasi)' })],
+    lv: [['Level 5 (1,0)', ['Level 4 terpenuhi (Poin 1, 2, 3, 4, dan 5)', 'Adanya Random check terhadap unsur masyarakat yang menyampaikan aduan yang sudah selesai, (hasil diharapkan masy tau aduannya sudah di TL, memadai, dll) (Poin 1)', 'Terdapat anggota BPD yang mengetahui rekap dan tindak lanjut Pengaduan Masyarakat (Poin 1)', 'Laporan hasil survei Kuisioner diekspos melalui web desa (Poin 2)', 'Terdapat publikasi hasil survei Kuisioner dan ada rencana tindak lanjut (Poin 2)', 'Masyarakat mengetahui dengan jelas layanan yang diberikan oleh desa (on the spot interview) (Poin 3)', 'Ada aplikasi penunjang/grup WA dan sejenisnya sebagai forum interaksi masyarakat dan perangkat desa (hotline number) (Poin 3)', 'Masyarakat yang mengetahui Informasi mengenai APBDes (Poin 4)', 'Terdapat sosialiasi/kampanye tentang Maklumat Pelayanan. (Poin 5)', 'Unsur masyarakat mengetahui isi Maklumat Pelayanan Desa (Poin 5)']],
+      ['Level 4 (0,9)', ['Level 3 terpenuhi (Poin 1, 3, 4, dan 5)', 'Adanya informasi rekap dan progres tindak lanjut yang didiskusikan secara berkala di forum internal pemerintah desa (Poin 1)', 'Terdapat laporan/ekspos hasil survei Kuisioner yang dipaparkan di lokasi yang mudah dilihat di area balai desa (Poin 2)', 'Survei Kuisioner secara Web Based dan Ada laporan hasil Surveinya (Poin 2)', 'Di antara perangkat desa yang diwawancara mengetahui jenis layanan kepada masyarakat (Poin 3)', 'Di antara perangkat desa memahami struktur APBDes ( sumber pendapatan desa, belanja desa, dll) dan prioritas penggunaan dana desa. (Poin 4)', 'Terdapat perangkat desa yang memahami isi Maklumat Pelayanan desa (Poin 5)']],
+      ['Level 3 (0,8)', ['Evidence semua lengkap (Poin 1)', 'Terdapat Survei Kuisioner Web Based (Poin 2)', 'Telah terpublikasi dikantor desa/website : Syarat, Alur/Proses, dan SLA (Lama layanan), dan Biaya Pelayanan (Tim penilai lakukan observasi /verifikasi lapangan) (Poin 3)', 'Telah terpublikasi dengan jelas website/media digital lainnya (Poin 4)', 'Level 2 terpenuhi (Poin 5)', 'Maklumat Pelayanan juga tersedia pada website/media digital/media sosial (Poin 5)']],
+      ['Level 2 (0,7)', ['Minimal evidence dipenuhi 70% (Poin 1)', 'Terdapat Survei Kuisioner (Poin 2)', 'Terdapat informasi jenis layanan didusun dan lokasi strategis (Poin 3)', 'Terdapat informasi APBDes di dusun dan tempat strategis dalam bentuk fisik/konvensional (Poin 4)', 'Level 1 terpenuhi (Poin 5)', 'Terdapat publikasi tentang Maklumat Pelayanan di area strategis antara lain Rumah Kepala Dusun (Poin 5)']],
+      ['Level 1 (0,6)', ['Minimal evidence dipenuhi 40% (Poin 1)', 'Terdapat Survei puas dan tidak puas (Poin 2)', 'Terdapat informasi jenis layanan dikantor Pemerintah Desa dalam bentuk fisik/konvensional (Poin 3)', 'Terdapat informasi APBDes di kantor desa dalam bentuk fisik/konvensional (Terdapat media publikasi dalam bentuk cetak (poster, spanduk, banner dll) yang menjelaskan tentang perencanaan/pertanggungjawaban APBDes) (Poin 4)', 'Maklumat Pelayanan tersedia dibalai desa dalam ukuran cukup, dibingkai dan atau dipasang dalam bentuk yang proper. (Poin 5)']]] },
+  { k: 'M2', g: 'Mandatory', no: '2', j: 'Penguatan Partisipasi Masyarakat', dh: FRC_DH_KPK,
+    n: ['Adanya partisipasi dan keterlibatan masyarakat dalam penyusunan RKP Desa', 'Adanya kesadaran masyarakat dalam mencegah terjadinya praktik gratifikasi, suap dan konflik kepentingan', 'Adanya keterlibatan Lembaga Kemasyarakatan Desa dan masyarakat dalam pelaksanaan pembangunan desa'],
+    l: [L_('Surat Undangan, Dokumentasi Foto, Notulensi / Risalah Rapat, dll', { ni: 0, go: g_('musrkp', 'rkp'), cek: 'musrkp' }),
+      L_('Hasil Survey/Dokumentasi Foto / Verifikasi Tokoh Masyarakat (Masyarakat, agama, adat, pemuda / LSM, Perempuan), Forum Kepedulian / Kegiatan Nyata,dll', { ni: 1, go: g_('perkades', 'keg'), baru: 'Anti Gratifikasi: survei perilaku, deklarasi & surat edaran gratifikasi/konflik kepentingan' }),
+      L_('Surat Undangan, Dokumentasi Foto, Notulensi / Risalah Rapat, Keterangan masyarakat dll.', { ni: 2, go: g_('bangun', 'keg'), cek: 'bangun' })],
+    lv: [['Level 5 (1,0)', ['Level 4 terpenuhi (Poin 1, 2, dan 3)', 'Terdapat kesesuaian antara notulensi Musdus dan/atau Musdes dengan poin yang tercantum pada RKPDes (Poin 1)', 'Unsur masyarakat pada Tim Penyusun memahami RKPDes yang dihasilkan. (Poin 1)', 'Random check ke satu anggota masyarakat tentang ada tidaknya praktik/implementasi gratifikasi ke perangkat desa (Poin 2)', 'Hasil pelaksanaan pembangunan dapat dirasakan oleh masyarakat desa (Poin 3)']],
+      ['Level 4 (0,9)', ['Level 3 terpenuhi (Poin 1, 2, dan 3)', 'Terdapat aparat pemerintah desa yang memahami prosedur dalam penyusunan RKPDes (Poin 1)', 'Deklarasi aparat desa untuk tidak menerima gratifikasi dan suap dalam penyelenggaraan pemerintahan desa (banner, poster, media digital, media sosial) (Poin 2)', 'Terlaksananya deklarasi konflik kepentingan oleh aparat pemerintah desa (Poin 2)', 'Terdapat Tim Pelaksana Kegiatan yang mampu menjelaskan prosedur dalam pelaksanaan pembangunan desa (Poin 3)']],
+      ['Level 3 (0,8)', ['Evidence terpenuhi secara lengkap baik secara fisik maupun digital (Poin 1, 2, dan 3)', 'Keterlibatan seluruh unsur Masyarakat Desa (perwakilan Toga, Tomas, Todat, Laki-laki dan Perempuan) yang tercantum dalam SK Tim Penyusun Perkades (Poin 1)', 'Melakukan sosialisasi hasil survei dan menyampaikan surat edaran terkait gratifikasi, suap dan konflik kepentingan (Poin 2)', 'Surat edaran tentang Perkades Gratifikasi, Suap dan konflik kepentingan (Poin 2)', 'Keterlibatan seluruh unsur Masyarakat Desa (perwakilan Tokoh agama, Tokoh masyarakat, Tokoh adat, Laki-laki dan Perempuan) dalam pelaksanaan pembangunan desa (Poin 3)']],
+      ['Level 2 (0,7)', ['Minimal evidence dipenuhi 80% (Poin 1 dan 3)', 'Level 1 terpenuhi (Poin 2)', 'Terdapat hasil rekapitulasi dan analisa serta tindak lanjut kegiatan survei (Poin 2)']],
+      ['Level 1 (0,6)', ['Minimal evidence dipenuhi 40% (Poin 1 dan 3)', 'Terlaksananya survei perilaku (Poin 2)']]] },
+  { k: 'M3', g: 'Mandatory', no: '3', j: 'Kearifan lokal', dh: FRC_DH_KPK,
+    n: ['Adanya budaya lokal/hukum adat yang mendorong upaya pencegahan tindak pidana korupsi', 'Adanya tokoh masyarakat, tokoh agama, tokoh adat, tokoh pemuda dan kaum perempuan yang mendorong upaya pencegahan tindak pidana korupsi'],
+    l: [L_('Dokumentasi Foto / Verfifikasi tokoh (masyarakat, agama, adat, pemuda/LSM, Perempuan), Forum Kepedulian / Kegiatan Nyata', { ni: 0, go: g_('keg', 'perdes', 'perkades') }),
+      L_('Surat Penetapan sebagai tokoh, Dokumentasi Foto / Verifikasi Tokoh (masyarakat, agama, adat, pemuda/LSM, Perempuan), Forum Kepedulian / Kegiatan Nyata, Notulensi / Risalah Rapat, Sosialiasi, Forum forum Pertemuan, Kelompok Sadar Anti Korupsi, Keterangan dari masyarakat sekitar, dll', { ni: 1, go: g_('sk', 'lembaga', 'keg') })],
+    lv: [['Level 5 (1,0)', ['Level 4 terpenuhi (Poin 1 dan 2)', 'Terdapat budaya lokal yang mencerminkan nilai antikorupsi (Poin 1)', 'Konfirmasi masyarakat mengenai budaya lokal/hukum adat yang menggambarkan 9 (sembilan) nilai antikorupsi (Poin 1)', 'Terdapat bukti aktifitas tokoh yang mendorong upaya pencegahan tindak pidana korupsi, baik bukti secara fisik ataupun digital (Poin 2)']],
+      ['Level 4 (0,9)', ['Level 3 terpenuhi, Evidence terpenuhi semua (Poin 1 dan 2)', 'Terpublikasi secara rutin (Poin 1)', 'Konfirmasi dari masyarakat mengenai tokoh yang terdapat di desa (Poin 2)']],
+      ['Level 3 (0,8)', ['Level 2 terpenuhi (Poin 1 dan 2)', 'Terdapat budaya lokal yang dipublikasikan melalui website/media sosial/media digital (Poin 1)', 'Bukti aktifitas diupload di website dan media sosial (Poin 2)']],
+      ['Level 2 (0,7)', ['Level 1 terpenuhi (Poin 1 dan 2)', 'Terdapat dokumentasi kegiatan mengenai budaya lokal/ hukum adat/ kegiatan kemasyarakatan yang mendorong upaya pencegahan korupsi (Poin 1)', 'Testimoni dari masyarakat desa mengenai peran Tokoh Masyarakat, Tokoh Agama, Tokoh Adat, Tokoh Pemuda, dan Kaum Perempuan yang Mendorong Upaya Pencegahan Tindak Pidana Korupsi (Poin 2)']],
+      ['Level 1 (0,6)', ['Terdapat Peraturan/Surat Keputusan/Surat Edaran mengenai budaya lokal/ hukum adat/ kegiatan kemasyarakatan yang mendorong upaya pencegahan korupsi (Poin 1)', 'Terdapat Peraturan/Surat Keputusan/Surat Edaran penetapan Tokoh Masyarakat, Tokoh Agama, Tokoh Adat, Tokoh Pemuda, dan Kaum Perempuan yang Mendorong Upaya Pencegahan Tindak Pidana Korupsi (Poin 2)']]] },
+  { k: 'B1', g: 'Mandiri', no: '1', j: 'Pengelolaan Keuangan Desa — B1. Perencanaan dan Penganggaran',
+    n: ['Keberadaan RPJMDes, RKPDes, APBDes Tahun berjalan (N), dan dilampiri Daftar Rencana Pembangunan dan Keberadaan RAB', 'Rancangan Peraturan Desa tentang APBDesa (N+1) disepakati antara Kepala Desa dan BPD paling lambat bulan Oktober tahun berjalan', 'Keterlibatan Masyarakat dalam Perencanan/ Pengangggaran'],
+    l: [L_('RPJMDes', { nv: '1', ni: 0, go: g_('rpjm', 'rpjmdok'), cek: 'rpjm' }), L_('RKPDes', { nv: '1', ni: 0, go: g_('rkp'), cek: 'rkp' }), L_('APBDes', { nv: '1', ni: 0, go: g_('apb', 'lamp'), cek: 'apbdes' }),
+      L_('Lampiran APBD (Daftar Rencana Pembangunan & RAB)', { nv: '1', ni: 0, go: g_('rab', 'rak', 'paket') }), L_('Rancangan Perdes tentang APB Desa', { ni: 1, go: g_('perdes', 'lamp') }),
+      L_('Kesepakatan Kepala Desa dan BPD', { ni: 1, go: g_('ba') }), L_('Undangan, daftar hadir, notulen, bukti keterlibatan masyarakat/ hal lainnya', { ni: 2, go: g_('musrkp'), cek: 'musrkp' })],
+    dh: ['Pasal 79 Undang-Undang Republik Indonesia Nomor 6 Tahun 2014 Tentang Desa', 'Pasal 96, 120 Perda Kab. Lumajang no. 7 tahun 2016 tentang Penyelenggaraan Pemdes -- RKPDes', 'Pasal 4 Perbup No. 40 Tahun 2018 Petunjuk Teknis Penyusunan RPJM Des dan RKP Des', 'Pasal 3 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 20 Tahun 2018 Tentang Pengelolaan Keuangan Desa', 'Pasal 54 Undang-Undang Republik Indonesia Nomor 6 Tahun 2014 Tentang Desa', 'Pasal 39 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 20 Tahun 2018 Tentang Pengelolaan Keuangan Desa', 'Pasal 113 Peraturan Daerah Kabupaten Lumajang Nomor 7 2016 tentang Penyelenggaraan Pemerintahan Desa'] },
+  { k: 'B2', g: 'Mandiri', no: '2', j: 'Pengelolaan Keuangan Desa — B2. Penatausahaan Keuangan',
+    n: ['Keberadaan SK Penetapan Pelaksana Pengelolaan Keuangan Desa (PPKD) dan SK Pelaksana Kegiatan', 'Keberadaan Penunjukan Operator Siskeudes Tingkat Desa', 'Keberadaan Dokumen Penatausahaan keuangan dan pertanggungjawaban Tribulanan: Laporan Realisasi Pelaksanaan APBDes tahunan (tribulan IV) dan Semesteran (tribulan II), Buku Kas Umum (BKU) Tribulanan dan Buku Pembantu, Catatan Atas laporan keuangan Desa Akhir tahun (Tribulan IV), Saldo rekening koran Bank Tribulan', 'Kepatuhan penyimpanan Uang Kas Tunai Tidak melebihi ketentuan', 'Kepatuhan Penyetoran Pajak', 'Telah memanfaatkan Siskeudes Online', 'Publikasi Realisasi APBDes Tahun Sebelumnya', 'Persiapan Penyusunan Laporan Keuangan/ Audit Laporan Keuangan BPK'],
+    l: [L_('Keputusan penetapan PPKD', { nv: '1', ni: 0, go: g_('sk') }), L_('Penugasan Pelaksana Kegiatan/Nama lain', { nv: '1', ni: 0, go: g_('sk') }), L_('Penetapan/penunjukan Operator sistem untuk tingkat pemerintahan desa', { ni: 1, go: g_('sk') }),
+      L_('Laporan Realisasi Pelaksanaan APBDes', { nv: '1', ni: 2, go: g_('lra1', 'lra2'), cek: 'realisasi' }), L_('Buku Kas Umum (BKU) Tribulanan dan Buku Pembantu', { nv: '1', ni: 2, go: g_('bku', 'bank', 'tunai', 'bpajak') }),
+      L_('Catatan Atas laporan keuangan Desa Akhir tahun', { nv: '1', ni: 2, baru: 'CaLK — Catatan atas Laporan Keuangan (disusun dari data realisasi)' }),
+      L_('Saldo rekening koran Bank akhir bulan', { nv: '2', ni: 2, go: g_('bank'), baru: 'Register Rekening Koran per bulan (unggah & cocokkan saldo Buku Bank)' }),
+      L_('Nilai Saldo Kas Tunai di Bendahara (buku kas tunai/ bukti lainnya)', { nv: '2', ni: 3, go: g_('tunai'), cek: 'kastunai' }),
+      L_('Nilai saldo buku pajak menunjukkan pajak telah dibayar tepat waktu', { nv: '2', ni: 4, go: g_('bpajak', 'rpajak', 'setor'), cek: 'pajak' }),
+      L_('Bukti Screenshoot dan output penyelenggaraan Siskeudes online', { ni: 5, go: g_('skimpor'), up: 1 }),
+      L_('Dokumentasi / bukti Publikasi realisasi APBDes tahun sebelumnya di lokasi strategis dan dapat diakses', { ni: 6, go: g_('lra2'), baru: 'Infografis / Baliho Realisasi APBDes' }),
+      L_('Penutupan kas bendahara per 30 November (berita acara) dilengkapi dengan RK bank; BA Stock Opname persediaan per 30 November; Buku inventaris per 30 November; dokumen lainnya', { ni: 7, go: g_('sedia', 'sipades', 'tunai'), baru: 'Berita Acara Penutupan / Pemeriksaan Kas per 30 November' })],
+    dh: ['Pasal 3 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 20 Tahun 2018 Tentang Pengelolaan Keuangan Desa', 'Pasal 30 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 20 Tahun 2018 Tentang Pengelolaan Keuangan Desa', 'Pasal 63-67 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 20 Tahun 2018 Tentang Pengelolaan Keuangan Desa', 'Pasal 72-76 Peraturan Bupati Lumajang Nomor 59 Tahun 2018 Tentang Pedoman Pengelolaan Keuangan Desa', 'Pasal 53 Peraturan Bupati Lumajang Nomor 59 Tahun 2018 Tentang Pedoman Pengelolaan Keuangan Desa', 'Pasal 67 Peraturan Bupati Lumajang Nomor 59 Tahun 2018 Tentang Pedoman Pengelolaan Keuangan Desa', 'Pasal 72 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 20 Tahun 2018 Tentang Pengelolaan Keuangan Desa', 'Permintaan BPK persiapan pemeriksaan'] },
+  { k: 'B3', g: 'Mandiri', no: '3', j: 'Pengelolaan Keuangan Desa — B3. Pendapatan Asli Desa',
+    n: ['Persentase Capaian Pendapatan Desa Tahun berjalan (maksimal 100%)', 'Terdapat Laporan Upaya Inovasi peningkatan PADes', 'Terdapat Pembentukan BUMDes/ BUMDesma dan telah beroperasi serta telah mampu mendapatkan Laba (Bukti Pembentukan, AD/ART, Bukti Penyertaan, Analisa Kelayakan, Administrasi Keuangan, dst)'],
+    l: [L_('Capaian pendapatan antara 40-80%', { nv: '1', ni: 0, go: g_('lra1', 'lra2'), cek: 'pendapatan' }), L_('Capaian pendapatan antara 80-100%', { nv: '1', ni: 0, go: g_('lra2'), cek: 'pendapatan' }),
+      L_('Laporan/ KAK/ bukti penyelenggaraan inovasi peningkatan PADes', { ni: 1, go: g_('keg'), up: 1 }),
+      L_('Bukti pembentukan BUMDes', { nv: '1', ni: 2, go: g_('lembaga', 'perdes') }), L_('Bukti BUMDes telah beroperasi', { nv: '0,5', ni: 2, go: g_('lembaga'), up: 1 }),
+      L_('Laporan keuangan/ penyelenggaraan BUMDes menunjukkan laba (Bukti pembentukan dan pejabat BUMDes termasuk AD/ART, Bukti penyertaan modal, Analisa Kelayakan Usaha, Dokumen Penatausahaan dan Laporan keuangan BUMDes, dst)', { nv: '0,5', ni: 2, go: g_('apb'), up: 1 })],
+    dh: ['Pasal 26 Undang-Undang Republik Indonesia Nomor 6 Tahun 2014 Tentang Desa', 'Pasal 87 Undang-Undang Republik Indonesia Nomor 6 Tahun 2014 Tentang Desa'] },
+  { k: 'B4', g: 'Mandiri', no: '4', j: 'Pengelolaan Keuangan Desa — B4. Pengendalian dan Pengawasan',
+    n: ['Laporan Partisipasi masyarakat dalam pengawasan APBDes.', 'Laporan Pengawasan BPD dalam pengawasan pengelolaan keuangan desa', 'Laporan Pembinaan dan pengawasan Keuangan Kecamatan kepada Desa', 'Laporan Tindaklanjut Desa Atas Hasil Evaluasi'],
+    l: [L_('Laporan (partisipasi masyarakat dalam pengawasan APBDes)', { ni: 0, baru: 'Register Pengawasan & Tindak Lanjut (masyarakat, BPD, kecamatan)' }), L_('Laporan Hasil Pengawasan (BPD)', { ni: 1, go: g_('skbpd'), baru: 'Register Pengawasan & Tindak Lanjut' }),
+      L_('Laporan hasil pembinaan dan pengawasan (kecamatan)', { ni: 2, baru: 'Register Pengawasan & Tindak Lanjut' }), L_('Laporan Hasil Tindaklanjut', { ni: 3, baru: 'Register Pengawasan & Tindak Lanjut' })],
+    dh: ['Pasal 19 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 73 Tahun 2020 Tentang Pengawasan Pengelolaan Keuangan Desa', 'Pasal 20 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 73 Tahun 2020 Tentang Pengawasan Pengelolaan Keuangan Desa', 'Pasal 23 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 73 Tahun 2020 Tentang Pengawasan Pengelolaan Keuangan Desa'] },
+  { k: 'C1', g: 'Mandiri', no: '5', j: 'Pengelolaan Barang Desa — C1. Penatausahaan Barang',
+    n: ['Penetapan petugas/pengurus aset desa dan SOP/ Kebijakan pengelolaan barang/aset di desa', 'Keberadaan Buku Data Inventaris Aset/barang Desa yang informatif (sekurang-kurangnya menyajikan kode/penggolongan, Jumlah, spesifikasi, nilai barang, kondisi, dst)', 'Pemanfaatan aset desa yang tidak dipergunakan langsung untuk menunjang penyelenggaraan Pemerintahan Desa dilengkapi bukti berupa sewa, pinjam pakai, dst', 'Berita Acara Stock Opname Persediaan/Pemeriksaan barang habis pakai/ nama lainnya dalam rangka pengendalian', 'Pengamanan Aset desa'],
+    l: [L_('Penetapan/penugasan pengurus aset desa', { nv: '1', ni: 0, go: g_('asettim', 'sk'), cek: 'asettim' }), L_('SOP/Kebijakan Pengelolaan aset', { nv: '1', ni: 0, go: g_('asetsop') }),
+      L_('Buku Inventaris Tersedia tidak Informatif', { nv: '1', ni: 1, go: g_('sipades'), cek: 'aset' }), L_('Buku Inventaris Tersedia Cukup Informatif', { ni: 1, go: g_('sipades', 'asetdash'), cek: 'aset' }),
+      L_('Bukti perjanjian sewa/ Pinjam Pakai, dst', { ni: 2, go: g_('asettrx') }),
+      L_('Laporan posisi aset desa khususnya barang pakai habis secara tidak berkala/ nama lainnya', { nv: '1', ni: 3, go: g_('sedia'), cek: 'sedia' }), L_('Laporan posisi aset desa khususnya barang pakai habis secara berkala/ nama lainnya', { nv: '2', ni: 3, go: g_('sedia'), cek: 'sedia' }),
+      L_('Bukti kodefikasi barang', { nv: '0,5', ni: 4, go: g_('label') }), L_('Bukti proses Pensertifikatan Tanah', { nv: '0,5', ni: 4, go: g_('tanah') }), L_('Seluruh tanah telah bersertifikat', { nv: '1,5', ni: 4, go: g_('tanah') }),
+      L_('Persentase pajak kendaraan yang telah dibayar dari total kendaraan dinas 100%', { nv: '0,5', ni: 4, go: g_('aset'), up: 1 })],
+    dh: ['Pasal 5 Peraturan Bupati Lumajang Nomor 78 Tahun 2021 Tentang Pengelolaan Aset Desa', 'Pasal 6 Peraturan Bupati Lumajang Nomor 78 Tahun 2021 Tentang Pengelolaan Aset Desa', 'Pasal 12 Peraturan Bupati Lumajang Nomor 78 Tahun 2021 Tentang Pengelolaan Aset Desa', 'Pasal 34 Peraturan Bupati Lumajang Nomor 78 Tahun 2021 Tentang Pengelolaan Aset Desa', 'Pasal 71 Peraturan Bupati Lumajang Nomor 78 Tahun 2021 Tentang Pengelolaan Aset Desa', 'Pasal 116 Peraturan Daerah Kabupaten Lumajang Nomor 7 Tahun 2016 tentang Penyelenggaraan Pemerintahan Desa'] },
+  { k: 'C2', g: 'Mandiri', no: '6', j: 'Pengelolaan Barang Desa — C2. Pengadaan Barang/ Jasa Desa',
+    n: ['Telah terdapat Tim Pelaksana Kegiatan (TPK)/nama lainnya yang telah mengikuti Diklat Pengadaan barang/jasa Desa', 'Telah ada laporan penyelenggaraan pengadaan barang/jasa dari TPK/nama lainnya kepada Kaur/Kasi dan Bukti Penyerahan hasil pengadaan Kaur/Kasi Kepada Kepala Desa (pembangunan fisik dilengkapi RAB, Gambar, Kontrak Pengadaan, BAST, dst)'],
+    l: [L_('Bukti penugasan/penetapan Tim Pelaksana dan daftar pekerjaan proyek fisik / konstruksi/ rehab yang dilakukan', { nv: '1,5', ni: 0, go: g_('sk', 'bangun'), cek: 'bangun' }),
+      L_('Bukti Sertifikat Peningkatan Kapasitas (bintek/pelatihan/diklat/dst) terkait', { nv: '1,5', ni: 0, go: g_('sert'), cek: 'sert' }),
+      L_('Laporan penyelenggaraan pengadaan dari TPK', { nv: '1,5', ni: 1, go: g_('bangun', 'rabp') }),
+      L_('Laporan Bukti Penyerahan hasil pengadaan dari Kaur/Kasi (RAB, Gambar, Kontrak Pengadaan, BAST, SPJ, Foto, dst)', { nv: '1,5', ni: 1, go: g_('bast', 'rabp', 'spj'), cek: 'bast' })],
+    dh: ['Pasal 52, 53, 56 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 114 Tahun 2014 Tentang Pedoman Pembangunan Desa', 'Pasal 4 dan Pasal 28 Peraturan Lembaga Kebijakan Pengadaan Barang/Jasa Pemerintah Nomor 12 Tahun 2019 Tentang Pedoman Penyusunan Tata Cara Pengadaan Barang/Jasa Di Desa', 'Pasal 113 Peraturan Daerah Kabupaten Lumajang Nomor 7 Tahun 2016 tentang Penyelenggaraan Pemerintahan Desa', 'Pasal 10 Peraturan Bupati Lumajang Nomor 78 Tahun 2021 Tentang Pengelolaan Aset Desa', 'Keputusan Deputi I LKPP Nomor 2 Tahun 2024', 'Keputusan Deputi I LKPP Nomor 1 Tahun 2025'] },
+  { k: 'C3', g: 'Mandiri', no: '7', j: 'Pengelolaan Barang Desa — C3. Pengendalian dan Pengawasan',
+    n: ['Telah ada laporan hasil pengendalian dan pengawasan camat atas pengelolaan barang/ aset desa', 'Telah ada tindaklanjut dari pemerintahan desa atas pengawasan camat'],
+    l: [L_('Laporan hasil pengawasan camat terkait', { ni: 0, baru: 'Register Pengawasan & Tindak Lanjut (aset)' }), L_('Laporan hasil penanganan Tindaklanjut / Rekap', { nv: '1', ni: 1, baru: 'Register Pengawasan & Tindak Lanjut (aset)' }), L_('Seluruh Laporan Tindaklanjut Telah selesai', { nv: '2', ni: 1, baru: 'Register Pengawasan & Tindak Lanjut (aset)' })],
+    dh: ['Pasal 19 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 73 Tahun 2020 Tentang Pengawasan Pengelolaan Keuangan Desa', 'Pasal 78 Peraturan Bupati Lumajang Nomor 78 Tahun 2021 Tentang Pengelolaan Aset Desa'] },
+  { k: 'P1', g: 'Mandiri', no: '8', j: 'Pelayanan Publik',
+    n: ['Telah ada SOP pelayanan publik dan telah dipublikasikan/ ditempatkan di ruang pelayanan', 'Telah ada Sarana dan Prasarana pelayanan yang memadai', 'Telah ada tindaklanjut Survey Kepuasan Masyarakat'],
+    l: [L_('SOP/Kebijakan', { nv: '1', ni: 0, go: g_('layanan'), cek: 'layanan' }), L_('Bukti penempelan/Publikasi', { nv: '1', ni: 0, go: g_('layanan'), up: 1 }),
+      L_('Daftar Kartu Inventaris Ruangan Ruang layanan dan bukti dokumentasi, sarpras kurang memadai', { nv: '1', ni: 1, go: g_('kir') }), L_('Daftar Kartu Inventaris Ruangan Ruang layanan dan bukti dokumentasi, sarpras cukup memadai', { nv: '2', ni: 1, go: g_('kir') }),
+      L_('Hasil Survey Kepuasan Masyarakat', { ni: 2, baru: 'Survei Kepuasan Masyarakat (kuesioner, rekap IKM, rencana tindak lanjut)' })],
+    dh: ['Pasal 67, 68 Undang-Undang Republik Indonesia Nomor 6 Tahun 2014 Tentang Desa', 'Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 2 Tahun 2017 Tentang Standar Pelayanan Minimal Desa'] },
+  { k: 'K1', g: 'Mandiri', no: '9', j: 'Kelembagaan, Kapasitas Dan Kompetensi Aparat Pada Penyelenggaraan Pemerintahan Desa',
+    n: ['Kelembagaan Pemerintahan Desa telah Terisi', 'Terdapat Perjanjian kinerja/Indikator dan target kinerja / nama lainnya untuk seluruh perangkat desa dan Laporan penyelenggaraan Tugas dan fungsi perangkat desa', 'Telah terdapat Peningkatan Kemampuan dasar, kemampuan manajemen, Kemampuan teknis perangkat desa'],
+    l: [L_('Laporan/ Daftar struktur organisasi/ kelembagaan yang telah terisi, jika belum terisi penuh', { nv: '1', ni: 0, go: g_('aparat'), cek: 'aparat' }), L_('Struktur organisasi/ kelembagaan terisi penuh', { nv: '2', ni: 0, go: g_('aparat'), cek: 'aparat' }),
+      L_('Perjanjian kinerja/indikator dan target kinerja/nama lainnya untuk seluruh perangkat desa', { nv: '1', ni: 1, baru: 'Perjanjian Kinerja Perangkat Desa (cetak per perangkat)' }),
+      L_('Laporan capaian atas perjanjian kinerja/ indikator dan target kinerja/nama lainnya tahun berjalan', { nv: '1', ni: 1, baru: 'Laporan Capaian Kinerja Perangkat Desa' }),
+      L_('Telah ada laporan peningkatan kapasitas/ kompetensi (minimal 3 orang)', { nv: '1', ni: 2, go: g_('sert'), cek: 'sert' })],
+    dh: ['Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 84 Tahun 2015 Tentang Susunan Organisasi Dan Tata Kerja Pemerintah Desa', 'Pasal 55 Undang-Undang Republik Indonesia Nomor 6 Tahun 2014 Tentang Desa', 'Pasal 66 Peraturan Daerah Kabupaten Lumajang Nomor 7 Tahun 2016 Tentang Penyelenggaraan Pemerintahan Desa'] },
+  { k: 'S1', g: 'Mandiri', no: '10', j: 'Statistik Desa',
+    n: ['Persentase Pencapaian Pendapatan Pajak Daerah (PBB) di Tingkat Desa', 'Dukungan Desa terhadap Program Peningkatan IPM di tingkat Desa (misal intervensi data anak putus sekolah, buta huruf, update KK, dst)', 'Inventarisasi Pendataan Aset negara di wilayah Desa', 'Data Monografi Desa telah Terupdate', 'Data SDGs telah terupdate sesuai Peraturan Menteri Desa PDTT No. 7 Tahun 2021 (mengirimkan data lansia, pengangguran, penerima bantuan)', 'Aspek Strategis Mandatory I (Dukungan Pemantauan Inflasi/ laporan pemantauan harga komoditas di tingkat Desa berkala)', 'Aspek Strategis Mandatory II (Laporan Penyelenggaraan Program Strategis Persertifikatan tanah / PTSL diantaranya SK Pokmas, BA Kesepakatan, RAB, Rekap Belanja, dst)'],
+    l: [L_('Persentase capaian PBB antara 60-80 persen', { nv: '1', ni: 0, go: g_('pbb'), cek: 'pbb' }), L_('Persentase capaian PBB diatas 80 persen', { nv: '2', ni: 0, go: g_('pbb'), cek: 'pbb' }),
+      L_('Laporan penyelenggaraan dimana desa telah turut mendukung (program peningkatan IPM)', { nv: '2', ni: 1, go: g_('pstat', 'rentan') }),
+      L_('Laporan/informasi hasil pendataan aset negara di wilayah desa dalam laporan /data monografi/lainnya', { ni: 2, baru: 'Data Aset Negara di Wilayah Desa' }),
+      L_('Data monografi telah terupdate', { nv: '1', ni: 3, go: g_('pstat'), cek: 'penduduk', baru: 'Monografi Desa (format Permendagri 13/2012)' }), L_('Data monografi telah terpampang', { nv: '1', ni: 3, go: g_('pstat'), baru: 'Monografi Desa (format Permendagri 13/2012)' }),
+      L_('Bukti data SDGs telah terupdate', { ni: 4, go: g_('pstat'), up: 1 }),
+      L_('Laporan aspek mandatory Strategis I (pemantauan harga komoditas)', { ni: 5, baru: 'Pemantauan Harga Komoditas / Inflasi (laporan berkala)' }),
+      L_('Laporan aspek mandatory Strategis II (SK pokmasdartibnah, Kesepakatan PTSL, RAB PTSL, SPJ PTSL, Rekap Peserta PTSL dan Status Penyelesaian Sertifikat, dst)', { ni: 6, go: g_('tanah', 'sk') })],
+    dh: ['Pasal 6 Peraturan Bupati Lumajang Nomor 37 Tahun 2018 tentang Pengawasan Setoran Pajak Bumi dan Bangunan Sektor Perdesaan dan Perkotaan Berbasis Web', 'Pasal 3 Peraturan Bupati Lumajang Nomor 39 Tahun 2020 Tentang Perubahan Ketiga Atas Perbup Nomor 35 Tahun 2014 Tentang Petunjuk Pelaksanaan Pemberian Dan Pemanfaatan Insentif Pemungutan Pajak Daerah Dan Retribusi Daerah', 'Pasal 6 Peraturan Menteri Desa PDTT Nomor 21 Tahun 2020 Tentang Pedoman Umum Pembangunan Desa Dan Pemberdayaan Masyarakat Desa', 'Pasal 3 Peraturan Bupati Lumajang Nomor 106 Tahun 2019 Tentang Pedoman Pelaksanaan Gerakan Membangun Pendidikan Kesetaraan Desa (Gempita Desa)', 'Pasal 2 Peraturan Menteri Dalam Negeri Nomor 13 Tahun 2012 Tentang Monografi Desa Dan Kelurahan', 'Peraturan Menteri Dalam Negeri Nomor 114 Tahun 2014 Tentang Pedoman Pembangunan Desa'] },
+  { k: 'G1', g: 'Mandiri', no: '11', j: 'Desa Anti Korupsi dan Anti Pungli — G1. Register risiko',
+    n: ['Telah ada identifikasi risiko korupsi/ penyimpangan di tingkat desa (Risiko Penggelembungan Anggaran, Risiko Kegiatan/ Proyek Fiktif, Risiko Laporan Fiktif, Risiko Penggelapan, Risiko Penyalahgunaan Anggaran)', 'Telah ada Rencana Tindak Pengendalian dan laporan penyelenggaraan di tingkat desa'],
+    l: [L_('Bukti Identifikasi risiko fraud tidak lengkap', { nv: '1', ni: 0, baru: 'Register Risiko Fraud (identifikasi, RTP, laporan ke Camat)' }), L_('Bukti Identifikasi risiko fraud lengkap', { nv: '2', ni: 0, baru: 'Register Risiko Fraud' }),
+      L_('Dokumen Rencana Tindak Pengendalian', { nv: '1', ni: 1, baru: 'Register Risiko Fraud' }), L_('Laporan Penyelenggaraan Manajemen Risiko Fraud kepada Camat tembusan Kepala Daerah/ Inspektur Daerah', { nv: '1', ni: 1, baru: 'Register Risiko Fraud', go: g_('sk_out') })],
+    dh: ['Pasal 8 Peraturan Bupati Lumajang Nomor 88 Tahun 2019 Tentang Perubahan Atas Peraturan Bupati Nomor 14 Tahun 2010 Tentang Penyelenggaraan Sistem Pengendalian Intern Pemerintah Di Lingkungan Pemerintahan Kabupaten Lumajang'] },
+  { k: 'G2', g: 'Mandiri', no: '12', j: 'Desa Anti Korupsi dan Anti Pungli — G1. Pembangunan Desa Anti Pungli',
+    n: ['Adanya publikasi anti Pungli di lingkungan pelayanan desa', 'Adanya Perangkat Desa Sebagai Relawan / Pegiat anti pungli', 'Adanya Sosialisasi di tingkat Desa tentang pungli di tingkat desa (kepada RT/RW, masyarakat, dst)', 'Adanya kolaborasi pembentukan anti pungli dengan TNI dan polri'],
+    l: [L_('Bukti Publikasi informasi anti pungli di pemerintahan desa', { ni: 0, baru: 'Anti Pungli: poster/banner publikasi (cetak)' }), L_('Penetapan/penunjukan/Penugasan perangkat desa sebagai Relawan /pegiat anti pungli', { ni: 1, go: g_('sk') }),
+      L_('Laporan penyelenggaraan sosialisasi Kepala Camat tembusan Saber Pungli/Inspektorat Daerah', { nv: '1', ni: 2, go: g_('keg', 'sk_out'), baru: 'Anti Pungli: laporan sosialisasi ke Camat (cetak)' }), L_('Bukti pendukung dokumentasi, undangan, daftar hadir, dilengkapi banner', { nv: '1', ni: 2, go: g_('keg', 'ba') }),
+      L_('Bukti koordinasi / melibatkan TNI dalam program anti pungli', { ni: 3, go: g_('sk_out', 'keg') }), L_('Bukti koordinasi / melibatkan Polri dalam program anti pungli', { ni: 3, go: g_('sk_out', 'keg') })],
+    dh: ['Peraturan Presiden Nomor 87 Tahun 2016 tentang Satuan Tugas Sapu Bersih Pungutan Liar', 'Keputusan Bupati Lumajang Nomor 188.45/182/427.12/2021 Tentang Satuan Tugas Sapu Bersih Pungutan Liar', 'Pedoman kota bebas pungli dari Kemenkumham'] },
+  { k: 'T1', g: 'Tematik Digitalisasi', no: '1', j: 'Dukungan Desa terkait penanganan Stunting', dh: [], tanpaLamp: 1,
+    n: ['Persentase prevalensi angka stunting per wilayah dusun dan desa', 'Data by name by Address Stunting per wilayah', 'Persentase coverage penanganan stunting dibanding target per wilayah', 'ketersediaan inovasi yang efektif untuk penanggulangan stunting', 'upaya dukungan swasta/ masyarakat untuk penanggulangan stunting', 'Penyusunan laporan capaian kinerja penanganan stunting perwilayah termasuk anggaran dan realisasi anggaran'],
+    l: [L_('Rekap prevalensi stunting per dusun & desa', { ni: 0, go: g_('sosrekap', 'rentan') }), L_('Data by name by address stunting per wilayah', { ni: 1, go: g_('rentan'), cek: 'rentan' }), L_('Cakupan penanganan dibanding target per wilayah', { ni: 2, go: g_('sosrekap', 'bansos') }),
+      L_('Bukti inovasi penanggulangan stunting', { ni: 3, up: 1 }), L_('Bukti dukungan swasta/ masyarakat', { ni: 4, up: 1 }), L_('Laporan capaian kinerja penanganan stunting termasuk anggaran & realisasi', { ni: 5, go: g_('lra1', 'lra2') })] },
+  { k: 'T2', g: 'Tematik Digitalisasi', no: '2', j: 'Tersedianya database dan intervensi penyelenggaraan stunting pada tingkat desa', dh: [], tanpaLamp: 1,
+    n: ['Persentase prevalensi angka stunting per wilayah dusun dan desa', 'Data by name by Address anak Stunting per desa', 'Persentase coverage penanganan stunting dibanding target per wilayah (berupa bantuan, berupa edukasi, dst)', 'ketersediaan inovasi yang efektif untuk penanggulangan stunting di tingkat desa', 'upaya dukungan swasta/ masyarakat untuk penanggulangan stunting di tingkat desa', 'Penyusunan laporan capaian kinerja penanganan stunting perwilayah termasuk a) anggaran dan realisasi anggaran dan identifikasi permasalahan b) Jumlah publikasi data stunting per desa, kecamatan, kabupaten lokus stunting, c) jumlah kegiatan Kampanye/sosialisasi nasional pencegahan Stunting per desa lokus stunting, dan per kabupaten berikut data peserta, d) jumlah forum komunikasi perubahan perilaku dalam penurunan stunting lintas agama per desa lokus stunting dan Kabupaten', 'Persentase Jumlah Rumah tangga mendapatkan akses air minum layak, Akses Sanitasi layak per desa', 'Jumlah PUS yang menerima bantuan tunai bersyarat, menerima BPNT, Penerima Bantuan Iuran (PBI) Jaminan Kesehatan per desa dan Total Per Kabupaten', 'Bantuan Spesifik Penanganan Stunting (asam folat, vitamin, susu, dst) yang dilakukan di wilayah desa'],
+    l: [L_('Rekap prevalensi stunting per dusun & desa', { ni: 0, go: g_('sosrekap') }), L_('Data by name by address anak stunting', { ni: 1, go: g_('rentan'), cek: 'rentan' }), L_('Cakupan penanganan (bantuan, edukasi)', { ni: 2, go: g_('bansos', 'keg') }),
+      L_('Bukti inovasi penanggulangan stunting di desa', { ni: 3, up: 1 }), L_('Bukti dukungan swasta/ masyarakat', { ni: 4, up: 1 }), L_('Laporan capaian kinerja (anggaran & realisasi, publikasi, kampanye, forum lintas agama)', { ni: 5, go: g_('lra1', 'keg') }),
+      L_('Data akses air minum layak & sanitasi layak per rumah tangga', { ni: 6, go: g_('pstat'), up: 1 }), L_('Data PUS penerima PKH, BPNT, PBI JK', { ni: 7, go: g_('bansos'), cek: 'bansos' }), L_('Bukti bantuan spesifik stunting (asam folat, vitamin, susu, dst)', { ni: 8, go: g_('bansos') })] },
+  { k: 'T3', g: 'Tematik Penanggulangan Kemiskinan', no: '1', j: 'Dukungan Desa terkait Penanggulangan Kemiskinan', dh: [],
+    n: ['Data by name Pensasaran Kemiskinan Ekstrim di Desa, Data DTKS, keluarga dengan stunting, dan masyarakat miskin lainnya di desa', 'Musyawarah penentuan Masyarakat miskin penerima BLT dan Belanja yang diserahkan kepada masyarakat', 'Data masyarakat P3KE yang mendapat BLT DD, dan bukti penyerahan', 'Data masyarakat/ kelompok/lembaga memenuhi persyaratan menerima barang yang diserahkan kepada masyarakat', 'Data Intervensi yang dilakukan terhadap masyarakat miskin di desa dari dana desa dan dari sumber lainya (selain BLT DD, dst)'],
+    l: [L_('Data by name Pensasaran Kemiskinan Ekstrim di Desa, Data DTKS, keluarga dengan stunting, dan masyarakat miskin lainnya di desa', { ni: 0, go: g_('rentan'), cek: 'rentan' }),
+      L_('Data Musdes penentuan masyarakat miskin dan penentuan Belanja yang diserahkan kepada masyarakat', { ni: 1, go: g_('musbansos'), cek: 'musbansos' }),
+      L_('Data penerima BLT DD dari P3KE', { ni: 2, go: g_('bansos'), cek: 'bansos' }), L_('Data penerima barang yang diserahkan kepada masyarakat', { ni: 3, go: g_('usulbansos', 'bansos') }),
+      L_('Data intervensi lain terhadap masyarakat miskin (selain BLT DD)', { ni: 4, go: g_('bansos') })] }
 ];
 const FRC_NILAI = { Belum: 0, Sebagian: .5, Ada: 1 };
+const FRC_GRP = [['Mandatory', 'Indikator 1 — Mandatory'], ['Mandiri', 'Indikator 2 — Mandiri'], ['Tematik Digitalisasi', 'Indikator 3 — Tematik Digitalisasi'], ['Tematik Penanggulangan Kemiskinan', 'Indikator 4 — Tematik Penanggulangan Kemiskinan']];
+/* rute → entitas yang harus bisa dibaca (tombol pintas disembunyikan bila tak berhak) */
+const frcBoleh = go => { try { if (go[0] === 'list') return canRead(go[1].e); return true; } catch (x) { return true; } };
 /* ringkasan otomatis dari data aplikasi (relasi) */
 async function frcCek(th) {
   const n = async (e, f) => { try { return (await call('list', { entity: e, filters: f || {}, limit: 1 })).total || 0; } catch (x) { return null; } };
-  const tks = async (e, f) => { const v = await n(e, f); return v == null ? '' : v + ' data tercatat'; };
+  const tks = async (e, f, sat) => { const v = await n(e, f); return v == null ? '' : v + ' ' + (sat || 'data tercatat'); };
   const o = {};
   const tugas = {
-    layanan: () => tks('produk_layanan'), musrkp: () => tks('rkp_musyawarah'), bangun: () => tks('pembangunan'), bast: () => tks('bast'),
+    layanan: () => tks('produk_layanan', 0, 'jenis layanan tercatat'), musrkp: () => tks('rkp_musyawarah', 0, 'musyawarah tercatat'), bangun: () => tks('pembangunan', 0, 'kegiatan pembangunan'), bast: () => tks('bast', 0, 'BAST tercatat'),
     apbdes: async () => { const v = await n('keu_anggaran', { tahun: String(th) }); return v == null ? '' : v ? v + ' baris APBDes ' + th : 'APBDes ' + th + ' belum diimpor'; },
-    aset: () => tks('aset'), asettim: () => tks('aset_tim'), aparat: async () => { const v = await n('aparat'); return v == null ? '' : v + ' aparat tercatat'; },
-    stunting: () => tks('rentan'), rentan: () => tks('rentan'), bansos: () => tks('penyaluran_bansos'), musbansos: () => tks('musdes_bansos'),
-    pbb: async () => { try { const a = await n('tanah_desa'), l = await n('tanah_desa', { status_bayar: 'Lunas' }); return a ? 'PBB lunas ' + l + ' dari ' + a + ' SPPT (' + Math.round(l / a * 100) + '%)' : ''; } catch (x) { return ''; } },
-    penduduk: () => tks('penduduk'), rpjm: () => tks('rpjm_kegiatan'), rkp: () => tks('rkp_usulan')
+    aset: () => tks('aset', 0, 'barang di inventaris'), asettim: () => tks('aset_tim', 0, 'pengurus aset'), sedia: () => tks('persediaan', 0, 'catatan persediaan'), sert: () => tks('aparat_sert', 0, 'sertifikat aparatur'),
+    aparat: async () => { const v = await n('aparat'); return v == null ? '' : v + ' aparat tercatat'; },
+    rentan: () => tks('rentan', 0, 'warga rentan tercatat'), bansos: () => tks('penyaluran_bansos', 0, 'penyaluran tercatat'), musbansos: () => tks('musdes_bansos', 0, 'musdes tercatat'),
+    pbb: async () => { const a = await n('tanah_desa'), l = await n('tanah_desa', { status_bayar: 'Lunas' }); return a ? 'PBB lunas ' + l + ' dari ' + a + ' SPPT (' + Math.round(l / a * 100) + '%)' : ''; },
+    penduduk: () => tks('penduduk', 0, 'penduduk tercatat'), rpjm: () => tks('rpjm_kegiatan', 0, 'kegiatan RPJM'), rkp: () => tks('rkp_usulan', 0, 'usulan RKP'),
+    realisasi: async () => { try { const r = await call('keuRealisasi', { tahun: th, sampai: th + '-12-31' }); const b = r.filter(x => String(x.kode || '').charAt(0) === '5').reduce((a, x) => [a[0] + mNum(x.anggaran), a[1] + mNum(x.realisasi)], [0, 0]); return b[0] ? 'Belanja terealisasi ' + Math.round(b[1] / b[0] * 100) + '% (' + rp(b[1]) + ' dari ' + rp(b[0]) + ')' : ''; } catch (x) { return ''; } },
+    pendapatan: async () => { try { const r = await call('keuRealisasi', { tahun: th, sampai: th + '-12-31' }); const a = r.filter(x => String(x.kode || '').charAt(0) === '4').reduce((t, x) => [t[0] + mNum(x.anggaran), t[1] + mNum(x.realisasi)], [0, 0]); return a[0] ? 'Capaian pendapatan ' + Math.round(a[1] / a[0] * 100) + '% (' + rp(a[1]) + ' dari ' + rp(a[0]) + ')' : ''; } catch (x) { return ''; } },
+    kastunai: async () => { try { const d = await call('keuBuku', { tahun: th, buku: 'Tunai', bulan: '' }); const r = d.rows || []; const s = r.length ? r[r.length - 1].saldo : 0; return 'Saldo kas tunai ' + rp(s || 0); } catch (x) { return ''; } },
+    pajak: async () => { try { const P = ptaPajak(await ptaData(th)); const sisa = P.belum.reduce((t, x) => t + mNum(x.jumlah), 0); return sisa > 0.5 ? 'Pajak belum disetor ' + rp(sisa) : 'Semua pajak dipungut sudah disetor'; } catch (x) { return ''; } }
   };
   await Promise.all(Object.keys(tugas).map(async k => { try { o[k] = await tugas[k](); } catch (x) { o[k] = ''; } }));
   return o;
 }
+/* butir Info Nilai yang dilaporkan: rinci = JSON [{i, k: klaim %, v: verifikasi %}] */
+const frcRinci = x => { try { const a = JSON.parse(x.rinci || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } };
+const frcPct = v => (v === '' || v == null) ? '' : String(v).replace('.', ',') + '%';
+function frcCetakDaftar(th, B, lp, ids) {
+  const st = (k, i) => (B[k + '|' + i] || {}).status || 'Belum';
+  const pages = FRC_IND.filter(d => !ids || ids.includes(d.k)).map(d => {
+    const last = lp.filter(x => x.ind === d.k).sort((a, b) => String(b.tgl).localeCompare(String(a.tgl)))[0];
+    return `<div class="paper">${kop()}<h2>DAFTAR KELENGKAPAN DATA DUKUNG FRC DESA ANTI KORUPSI</h2><h3>TAHUN ${esc(th)}</h3>
+      <table class="pt"><tbody><tr><td style="width:28%">Indikator</td><td><b>${esc(FRC_GRP.find(g => g[0] === d.g)[1])} · ${esc(d.no)}. ${esc(d.j)}</b></td></tr>
+      ${last ? `<tr><td>Laporan terakhir SIMWAS</td><td>${esc(fDate(last.tgl))} · klaim ${esc(frcPct(last.persen))}${last.verif ? ' · terverifikasi ' + esc(frcPct(last.verif)) : ' · menunggu verifikasi'}</td></tr>` : ''}</tbody></table>
+      <table class="pt" style="margin-top:8px"><thead><tr><th style="width:26px">No</th><th>Info Nilai / Info Lampiran</th><th style="width:60px">Status</th><th style="width:30%">Keterangan / sumber</th></tr></thead><tbody>
+      ${d.n.map((n, ni) => { const L = d.l.map((x, i) => [x, i]).filter(a => a[0].ni === ni); return `<tr><td><b>${ni + 1}</b></td><td colspan="3"><b>${esc(n)}</b></td></tr>` + L.map(([x, i]) => { const b = B[d.k + '|' + i] || {}; return `<tr><td></td><td>${esc(x.t)}${x.nv ? ` <i>(nilai ${esc(x.nv)})</i>` : ''}</td><td>${esc(st(d.k, i))}</td><td>${esc([b.catatan, (x.go || []).map(g => g[0]).join(', ')].filter(Boolean).join(' — '))}</td></tr>`; }).join(''); }).join('')}
+      </tbody></table>${d.dh && d.dh.length ? `<p style="font-size:9pt;margin-top:8px"><b>Dasar hukum:</b> ${esc(d.dh.join('; '))}</p>` : ''}${ttdKades(isoToday())}</div>`;
+  });
+  printDocs('Kelengkapan FRC ' + th, pages, 'frc');
+}
 VIEWS.frc = async (p, main, alive) => {
   setTop('FRC Desa', 'Desa Anti Korupsi · SIMWAS');
   const th = Number(p.tahun || S.frcTh || new Date().getFullYear()); S.frcTh = th;
+  const grpAktif = S.frcGrp || '', buka = S.frcBuka = S.frcBuka || new Set();
   const w = can('w:frc');
   const [bk, lp] = await Promise.all([ambilSemua('frc_bukti', { tahun: String(th) }).catch(() => []), ambilSemua('frc_lapor', { tahun: String(th) }).catch(() => [])]);
   if (!alive()) return;
-  const B = {}; bk.forEach(b => { B[b.ind + '|' + b.item] = b; });
-  const prog = d => { const v = d.l.map((x, i) => FRC_NILAI[(B[d.k + '|' + i] || {}).status] || 0); return v.reduce((t, a) => t + a, 0) / d.l.length; };
+  /* bila ada baris ganda (bug lama), pakai yang paling baru */
+  const B = {}; bk.slice().sort((a, b) => String(a._waktu || '').localeCompare(String(b._waktu || ''))).forEach(b => { B[b.ind + '|' + b.item] = b; });
+  const prog = d => { const v = d.l.map((x, i) => FRC_NILAI[(B[d.k + '|' + i] || {}).status] || 0); return d.l.length ? v.reduce((t, a) => t + a, 0) / d.l.length : 0; };
   const tot = FRC_IND.reduce((t, d) => t + prog(d), 0) / FRC_IND.length;
-  const grp = [...new Set(FRC_IND.map(d => d.g))];
+  const hit = { Ada: 0, Sebagian: 0, Belum: 0 }, semuaL = FRC_IND.reduce((a, d) => a.concat(d.l.map((x, i) => [d, x, i])), []);
+  semuaL.forEach(([d, x, i]) => { hit[(B[d.k + '|' + i] || {}).status || 'Belum']++; });
+  const menuBaru = Array.from(new Set(semuaL.filter(a => a[1].baru).map(a => a[1].baru.replace(/\s*\(.*$/, ''))));
+  const lapDari = k => lp.filter(x => x.ind === k).sort((a, b) => String(b.tgl).localeCompare(String(a.tgl)));
+  const pill = (pr) => `<span class="frc-p ${pr >= 1 ? 'ok' : pr > 0 ? 'mid' : ''}">${Math.round(pr * 100)}%</span>`;
+  const tombolGo = x => (x.go || []).filter(g => frcBoleh(g[1])).map(g => `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(g[1]))}'>${ic('next')}${esc(g[0])}</button>`).join('');
+  const barisL = (d, x, i) => { const b = B[d.k + '|' + i] || {}; return `<div class="frc-r" data-i="${i}"><div class="frc-t">${esc(x.t)}${x.nv ? ` <span class="frc-nv">nilai ${esc(x.nv)}</span>` : ''}${x.cek ? `<small class="frc-auto" data-cek="${x.cek}"></small>` : ''}</div>
+      ${x.baru ? `<div class="frc-baru">${ic('plus')}<span>Menu belum ada di aplikasi — akan dibuat: <b>${esc(x.baru)}</b>. Sementara unggah dokumennya di sini.</span></div>` : x.up && !(x.go || []).length ? `<div class="frc-up">Dokumen dari luar aplikasi — cukup unggah buktinya.</div>` : ''}
+      <div class="frc-a"><span class="frc-st">${['Belum', 'Sebagian', 'Ada'].map(s => `<button class="${(b.status || 'Belum') === s ? 'on ' + s.toLowerCase() : ''}" data-st="${s}" ${w ? '' : 'disabled'}>${s}</button>`).join('')}</span>
+      ${tombolGo(x)}${b.file_id ? `<button class="btn sm" data-act="file" data-id="${esc(b.file_id)}" data-name="Bukti ${d.k}-${i + 1}">${ic('eye')}Bukti</button>` : ''}${w ? `<label class="btn sm" title="${HINT_DOK}">${ic('plus')}${b.file_id ? 'Ganti' : 'Unggah'}<input type="file" hidden data-up></label>` : ''}</div>
+      ${b.catatan || w ? `<input class="frc-c" data-cat placeholder="Catatan (mis. nomor SK, lokasi berkas, nama file di SIMWAS)" value="${esc(b.catatan || '')}" ${w ? '' : 'readonly'}>` : ''}</div>`; };
+  const kartu = d => {
+    const pr = prog(d), L = lapDari(d.k), last = L[0], rv = last ? frcRinci(last) : [];
+    return `<details class="card frc-i" data-k="${d.k}" ${buka.has(d.k) ? 'open' : ''}><summary><span class="frc-k">${esc(d.k)}</span><span class="frc-j">${esc(d.no)}. ${esc(d.j)}${last ? `<small class="frc-ls">SIMWAS ${esc(fDate(last.tgl))}: klaim ${esc(frcPct(last.persen))}${last.verif ? ' · verifikasi ' + esc(frcPct(last.verif)) : ' · menunggu verifikasi'}</small>` : ''}</span>${pill(pr)}</summary>
+      <div class="stack" style="margin-top:8px">
+      ${d.tanpaLamp ? '<div class="meta">Di SIMWAS indikator ini tidak mencantumkan Info Lampiran. Daftar di bawah disusun dari Info Nilai supaya setiap butir punya bukti.</div>' : ''}
+      ${d.n.map((n, ni) => { const r = rv.find(a => Number(a.i) === ni); const L2 = d.l.map((x, i) => [x, i]).filter(a => a[0].ni === ni); return `<div class="frc-bn"><div class="frc-bh"><span class="frc-bno">${ni + 1}</span><span class="frc-bt">${esc(n)}</span>${r && r.v !== '' && r.v != null ? `<span class="frc-bv" title="Verifikasi Inspektorat terakhir">${esc(frcPct(r.v))}</span>` : r && r.k ? `<span class="frc-bv k" title="Klaim desa terakhir">klaim ${esc(frcPct(r.k))}</span>` : ''}</div>
+        <div class="frc-l">${L2.length ? L2.map(([x, i]) => barisL(d, x, i)).join('') : '<div class="meta">Tidak ada lampiran khusus.</div>'}</div></div>`; }).join('')}
+      ${d.lv ? `<details class="frc-x"><summary>${ic('list')}Kriteria penilaian (Level 1–5)</summary>${d.lv.map(v => `<div class="frc-lv"><b>${esc(v[0])}</b><ul>${v[1].map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>`).join('')}</details>` : ''}
+      ${d.dh && d.dh.length ? `<details class="frc-x"><summary>${ic('book')}Dasar hukum (${d.dh.length})</summary><ol class="frc-n">${d.dh.map(t => `<li>${esc(t)}</li>`).join('')}</ol></details>` : ''}
+      <div class="lbl">Laporan ke SIMWAS ${th}</div>
+      ${L.length ? `<div class="frc-hist">${L.map(x => { const rr = frcRinci(x); return `<div class="frc-h"><div class="frc-hh"><b>${esc(fDate(x.tgl))}</b><span>klaim ${esc(frcPct(x.persen) || '-')}</span><span class="${x.verif ? 'ok' : 'tunggu'}">${x.verif ? 'terverifikasi ' + esc(frcPct(x.verif)) + (x.tgl_verif ? ' · ' + esc(fDate(x.tgl_verif)) : '') : 'menunggu verifikasi'}</span>${w ? `<button class="btn sm" data-act="frcLapor" data-k="${d.k}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button>` : ''}</div>
+          ${rr.length ? `<table class="frc-ht"><thead><tr><th>Butir Info Nilai</th><th>Klaim</th><th>Verifikasi</th></tr></thead><tbody>${rr.map(a => `<tr><td>${esc((Number(a.i) + 1) + '. ' + String(d.n[a.i] || '').slice(0, 90))}</td><td>${esc(frcPct(a.k))}</td><td>${esc(frcPct(a.v))}</td></tr>`).join('')}</tbody></table>` : ''}
+          ${x.ket ? `<div class="meta">${esc(x.ket)}</div>` : ''}${x.catatan_verif ? `<div class="meta"><b>Catatan verifikator${x.verifikator ? ' (' + esc(x.verifikator) + ')' : ''}:</b> ${esc(x.catatan_verif)}</div>` : ''}</div>`; }).join('')}</div>` : '<div class="meta">Belum dicatat.</div>'}
+      <div class="btns">${w ? `<button class="btn sm" data-act="frcLapor" data-k="${d.k}">${ic('send')}Catat laporan</button>` : ''}<button class="btn sm" data-act="frcCetak" data-k="${d.k}">${ic('print')}Cetak kelengkapan</button></div></div></details>`;
+  };
   main.innerHTML = `<div class="stack frc">
     <div class="chips">${[th - 1, th, th + 1].map(y => `<button class="chip ${y === th ? 'on' : ''}" data-act="go" data-go='${JSON.stringify(['frc', { tahun: y }])}'>${y}</button>`).join('')}</div>
-    <div class="card stack"><div class="sec-h"><h2>${ic('check')} Kesiapan bukti ${th}</h2><b>${Math.round(tot * 100)}%</b></div><div class="bar"><i style="width:${tot * 100}%;background:var(--pri)"></i></div>
-      <div class="meta">Tandai tiap lampiran Ada/Sebagian/Belum, unggah buktinya, lalu unggah ke SIMWAS (menu FRC Desa). Tombol data membuka sumbernya di aplikasi.</div>
-      <div class="btns"><a class="btn sm" href="https://simwas.itdalumajang.id" target="_blank" rel="noopener">${ic('send')}Buka SIMWAS</a></div></div>
-    ${grp.map(g => `<div class="sec-h"><h2>${esc(g)}</h2></div>${FRC_IND.filter(d => d.g === g).map(d => { const pr = prog(d), last = lp.filter(x => x.ind === d.k).sort((a, b) => String(b.tgl).localeCompare(String(a.tgl)))[0]; return `<details class="card frc-i" data-k="${d.k}"><summary><span class="frc-k">${d.k}</span><span class="frc-j">${esc(d.j)}</span><span class="frc-p ${pr >= 1 ? 'ok' : pr > 0 ? 'mid' : ''}">${Math.round(pr * 100)}%</span></summary>
-      <div class="stack" style="margin-top:8px"><div class="lbl">Yang dinilai</div><ol class="frc-n">${d.n.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
-      <div class="lbl">Lampiran / bukti</div><div class="frc-l">${d.l.map((x, i) => { const b = B[d.k + '|' + i] || {}; return `<div class="frc-r" data-i="${i}"><div class="frc-t">${i + 1}. ${esc(x.t)}${x.cek ? `<small class="frc-auto" data-cek="${x.cek}"></small>` : ''}</div>
-        <div class="frc-a"><span class="frc-st">${['Belum', 'Sebagian', 'Ada'].map(s => `<button class="${(b.status || 'Belum') === s ? 'on ' + s.toLowerCase() : ''}" data-st="${s}" ${w ? '' : 'disabled'}>${s}</button>`).join('')}</span>
-        ${x.go ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(x.go))}'>${ic('next')}Data</button>` : ''}${b.file_id ? `<button class="btn sm" data-act="file" data-id="${esc(b.file_id)}" data-name="Bukti ${d.k}-${i + 1}">${ic('eye')}Bukti</button>` : ''}${w ? `<label class="btn sm" title="${HINT_DOK}">${ic('plus')}${b.file_id ? 'Ganti' : 'Unggah'}<input type="file" hidden data-up></label>` : ''}</div>
-        ${b.catatan || w ? `<input class="frc-c" data-cat placeholder="Catatan (mis. nomor SK, lokasi berkas)" value="${esc(b.catatan || '')}" ${w ? '' : 'readonly'}>` : ''}</div>`; }).join('')}</div>
-      <div class="lbl">Laporan ke SIMWAS</div><div class="meta">${last ? `Terakhir: ${esc(fDate(last.tgl))} · klaim ${esc(last.persen || '')}%${last.verif ? ' · verifikasi ' + esc(last.verif) + '%' : ' · menunggu verifikasi'}` : 'Belum dicatat.'}</div>
-      ${w ? `<div class="btns"><button class="btn sm" data-act="frcLapor" data-k="${d.k}">${ic('send')}Catat laporan</button></div>` : ''}</div></details>`; }).join('')}`).join('')}
+    <div class="card stack"><div class="sec-h"><h2>${ic('check')} Kesiapan data dukung ${th}</h2><b>${Math.round(tot * 100)}%</b></div><div class="bar"><i style="width:${tot * 100}%;background:var(--pri)"></i></div>
+      <div class="frc-sum"><span class="ok">${hit.Ada} Ada</span><span class="mid">${hit.Sebagian} Sebagian</span><span>${hit.Belum} Belum</span><span>${semuaL.length} lampiran</span></div>
+      <div class="meta">Isi indikator, Info Nilai, Info Lampiran dan Dasar Hukum disalin dari SIMWAS Inspektorat. Inspektorat memverifikasi <b>per butir Info Nilai</b>, jadi lampiran dikelompokkan per butir. Tombol hijau membuka menu aplikasi yang menyimpan datanya — dari sana bisa langsung dicetak lalu diunggah ke SIMWAS.</div>
+      <div class="btns"><a class="btn sm" href="https://simwas.itdalumajang.id" target="_blank" rel="noopener">${ic('send')}Buka SIMWAS</a><button class="btn sm" data-act="frcCetak">${ic('print')}Cetak semua kelengkapan</button></div>
+      ${menuBaru.length ? `<details class="frc-x"><summary>${ic('plus')}${menuBaru.length} menu baru yang perlu dibuat</summary><ol class="frc-n">${menuBaru.map(t => `<li>${esc(t)}</li>`).join('')}</ol></details>` : ''}</div>
+    <div class="chips wrap">${[['', 'Semua']].concat(FRC_GRP.map(g => [g[0], g[0]])).map(c => `<button class="chip ${grpAktif === c[0] ? 'on' : ''}" data-act="frcG" data-v="${esc(c[0])}">${esc(c[1])}</button>`).join('')}</div>
+    ${FRC_GRP.filter(g => !grpAktif || g[0] === grpAktif).map(g => `<div class="sec-h"><h2>${esc(g[1])}</h2></div>${FRC_IND.filter(d => d.g === g[0]).map(kartu).join('')}`).join('')}
   </div>`;
-  /* ringkasan otomatis (tidak menahan tampilan) */
-  frcCek(th).then(o => { $$('.frc-auto', main).forEach(el => { const v = o[el.dataset.cek]; if (v) el.textContent = ' — ' + v; }); }).catch(() => { });
+  const root = main.firstElementChild;   /* pendengar dipasang di elemen baru tiap render → tidak menumpuk */
+  frcCek(th).then(o => { if (!alive()) return; $$('.frc-auto', root).forEach(el => { const v = o[el.dataset.cek]; if (v) el.textContent = ' — ' + v; }); }).catch(() => { });
+  root.addEventListener('toggle', ev => { const d = ev.target; if (!d.matches || !d.matches('.frc-i')) return; d.open ? buka.add(d.dataset.k) : buka.delete(d.dataset.k); }, true);
+  const sedang = {};
   const simpan = async (k, i, data) => {
-    const ada = B[k + '|' + i];
-    const r = await call('save', { entity: 'frc_bukti', record: Object.assign(ada ? { id: ada.id } : { tahun: String(th), ind: k, item: String(i) }, data) });
-    B[k + '|' + i] = Object.assign(ada || { tahun: String(th), ind: k, item: String(i) }, data, { id: (r && r.id) || (ada && ada.id) });
+    const kunci = k + '|' + i;
+    while (sedang[kunci]) await sedang[kunci];   /* antre: simpan kedua menunggu id dari simpan pertama */
+    const kerja = (async () => {
+      const ada = B[kunci];
+      const r = await call('save', { entity: 'frc_bukti', record: Object.assign(ada && ada.id ? { id: ada.id } : { tahun: String(th), ind: k, item: String(i) }, data) });
+      B[kunci] = Object.assign(ada || { tahun: String(th), ind: k, item: String(i) }, data, { id: (r && r.id) || (ada && ada.id) });
+    })();
+    sedang[kunci] = kerja.catch(() => { });
+    try { await kerja; } finally { delete sedang[kunci]; }
   };
-  main.addEventListener('click', async ev => {
+  root.addEventListener('click', async ev => {
     const s = ev.target.closest('[data-st]'); if (!s || s.disabled) return;
     const box = s.closest('.frc-r'), d = s.closest('.frc-i');
-    try { await simpan(d.dataset.k, box.dataset.i, { status: s.dataset.st }); $$('[data-st]', box).forEach(b => b.className = b === s ? 'on ' + s.dataset.st.toLowerCase() : ''); const it = FRC_IND.find(x => x.k === d.dataset.k), pr = prog(it), pe = $('.frc-p', d); pe.textContent = Math.round(pr * 100) + '%'; pe.className = 'frc-p ' + (pr >= 1 ? 'ok' : pr > 0 ? 'mid' : ''); }
+    try { await simpan(d.dataset.k, box.dataset.i, { status: s.dataset.st }); $$('[data-st]', box).forEach(b => b.className = b === s ? 'on ' + s.dataset.st.toLowerCase() : ''); const it = FRC_IND.find(x => x.k === d.dataset.k), pr = prog(it), pe = $('summary .frc-p', d); pe.textContent = Math.round(pr * 100) + '%'; pe.className = 'frc-p ' + (pr >= 1 ? 'ok' : pr > 0 ? 'mid' : ''); }
     catch (er) { toast(er.message, 1); }
   });
-  main.addEventListener('change', async ev => {
+  root.addEventListener('change', async ev => {
     const box = ev.target.closest('.frc-r'), d = ev.target.closest('.frc-i'); if (!box || !d) return;
     try {
-      if (ev.target.matches('[data-up]')) { const f = ev.target.files[0]; if (!f) return; toast('Mengunggah…'); const up = await uploadFile(f, 'FRC Desa/' + th); await simpan(d.dataset.k, box.dataset.i, { file_id: up.id, status: (B[d.dataset.k + '|' + box.dataset.i] || {}).status || 'Ada' }); toast('Bukti tersimpan.'); refresh(); }
+      if (ev.target.matches('[data-up]')) { const f = ev.target.files[0]; if (!f) return; toast('Mengunggah…'); const up = await uploadFile(f, 'FRC Desa/' + th); await simpan(d.dataset.k, box.dataset.i, { file_id: up.id, status: (B[d.dataset.k + '|' + box.dataset.i] || {}).status === 'Sebagian' ? 'Sebagian' : 'Ada' }); toast('Bukti tersimpan.'); refresh(); }
       else if (ev.target.matches('[data-cat]')) { await simpan(d.dataset.k, box.dataset.i, { catatan: ev.target.value.trim() }); toast('Catatan tersimpan.'); }
     } catch (er) { toast(er.message, 1); }
   });
+  S.vh.frcG = t => { S.frcGrp = t.dataset.v; refresh(); };
+  S.vh.frcCetak = t => frcCetakDaftar(th, B, lp, t.dataset.k ? [t.dataset.k] : null);
   S.vh.frcLapor = t => {
-    const k = t.dataset.k, it = FRC_IND.find(x => x.k === k), pr = Math.round(prog(it) * 100);
-    const m = sheet('Laporan ' + k + ' ke SIMWAS', `<form class="stack" id="flF"><div class="meta">${esc(it.j)}</div>
-      <div class="f"><label>Tanggal lapor</label><input type="date" id="flT" value="${isoToday()}"></div>
-      <div class="f"><label>Klaim progres (%)</label><input id="flP" inputmode="numeric" value="${pr}"></div>
-      <div class="f"><label>Nilai verifikasi (%) — isi bila sudah diverifikasi</label><input id="flV" inputmode="numeric"></div>
-      <div class="f"><label>Keterangan</label><input id="flK"></div>
+    const k = t.dataset.k, it = FRC_IND.find(x => x.k === k), x0 = t.dataset.id ? lp.find(x => x.id === t.dataset.id) || {} : {}, r0 = frcRinci(x0);
+    const pr = Math.round(prog(it) * 100);
+    const m = sheet((x0.id ? 'Ubah laporan ' : 'Laporan ') + k + ' ke SIMWAS', `<form class="stack" id="flF"><div class="meta">${esc(it.no + '. ' + it.j)}</div>
+      <div class="form two"><div class="f"><label>Tanggal lapor</label><input type="date" id="flT" value="${esc(x0.tgl || isoToday())}"></div>
+      <div class="f"><label>Klaim progres (%)</label><input id="flP" inputmode="decimal" value="${esc(x0.persen != null ? x0.persen : pr)}"></div></div>
+      <div class="lbl">Klaim & verifikasi per butir Info Nilai</div><div class="meta">Isi seperti layar "Details" SIMWAS: butir yang diklaim desa (Klaim Nilai) dan persen dari Inspektorat (Verifikasi Nilai). Kosongkan butir yang tidak dilaporkan.</div>
+      <table class="frc-ht frc-in"><thead><tr><th>Butir</th><th>Klaim %</th><th>Verifikasi %</th></tr></thead><tbody>${it.n.map((n, i) => { const a = r0.find(z => Number(z.i) === i) || {}; return `<tr><td>${i + 1}. ${esc(n.length > 110 ? n.slice(0, 110) + '…' : n)}</td><td><input data-ki="${i}" inputmode="decimal" value="${esc(a.k == null ? '' : a.k)}"></td><td><input data-vi="${i}" inputmode="decimal" value="${esc(a.v == null ? '' : a.v)}"></td></tr>`; }).join('')}</tbody></table>
+      <div class="f"><label>Keterangan (seperti di SIMWAS)</label><textarea id="flK" rows="2">${esc(x0.ket || '')}</textarea></div>
+      <div class="lbl">Hasil verifikasi Inspektorat</div>
+      <div class="form two"><div class="f"><label>Nilai terverifikasi (%)</label><input id="flV" inputmode="decimal" value="${esc(x0.verif || '')}"></div><div class="f"><label>Tanggal verifikasi</label><input type="date" id="flTV" value="${esc(x0.tgl_verif || '')}"></div>
+      <div class="f"><label>Diverifikasi oleh</label><input id="flO" value="${esc(x0.verifikator || '')}" placeholder="Nama petugas Inspektorat"></div></div>
+      <div class="f"><label>Catatan verifikator</label><textarea id="flC" rows="2">${esc(x0.catatan_verif || '')}</textarea></div>
       <div class="btns"><button class="btn pri" type="submit">${ic('check')}Simpan</button></div></form>`, { ikon: 'send' });
-    $('#flF', m.el).onsubmit = async ev => { ev.preventDefault(); try { await call('save', { entity: 'frc_lapor', record: { tahun: String(th), ind: k, tgl: $('#flT', m.el).value, persen: $('#flP', m.el).value.trim(), verif: $('#flV', m.el).value.trim(), ket: $('#flK', m.el).value.trim() } }); m.close(); toast('Tersimpan.'); refresh(); } catch (er) { toast(er.message, 1); } };
+    $('#flF', m.el).onsubmit = async ev => {
+      ev.preventDefault();
+      const num = v => String(v || '').trim().replace(',', '.');
+      const rinci = it.n.map((n, i) => ({ i, k: num($(`[data-ki="${i}"]`, m.el).value), v: num($(`[data-vi="${i}"]`, m.el).value) })).filter(a => a.k !== '' || a.v !== '');
+      const rec = { tahun: String(th), ind: k, tgl: $('#flT', m.el).value, persen: num($('#flP', m.el).value), verif: num($('#flV', m.el).value), tgl_verif: $('#flTV', m.el).value, verifikator: $('#flO', m.el).value.trim(), ket: $('#flK', m.el).value.trim(), catatan_verif: $('#flC', m.el).value.trim(), rinci: JSON.stringify(rinci) };
+      try { await call('save', { entity: 'frc_lapor', record: x0.id ? Object.assign({ id: x0.id }, rec) : rec }); m.close(); toast('Tersimpan.'); buka.add(k); refresh(); } catch (er) { toast(er.message, 1); }
+    };
   };
 };
 
@@ -15385,7 +15562,7 @@ async function ptaData(th) {
 VIEWS.pta = async (p, main, alive) => {
   const th = keuTh();
   const st = S.ptaSt = S.ptaSt || { t: 'tunai' };
-  if (p && p.t) st.t = p.t;
+  if (p && p.t && !p._d) { st.t = p.t; p._d = 1; }
   setTop('Penatausahaan', 'Tahun ' + th);
   const D = await ptaData(th); if (!alive()) return;
   const w = canWrite('keu_trans'), desa = String((S.set && S.set.nama_desa) || ND()).toUpperCase();
