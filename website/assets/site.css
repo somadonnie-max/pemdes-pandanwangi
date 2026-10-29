@@ -288,7 +288,7 @@ section{position:relative}
 .ppl-card .bd p{margin:0;color:var(--muted);font-size:15px;min-height:96px}
 .fade-sw{animation:sw .45s ease}
 @keyframes sw{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-@media(max-width:980px){.ppl{grid-template-columns:1fr}.ppl-card{position:sticky;top:76px;z-index:5;display:grid;grid-template-columns:120px 1fr}.ppl-card .ph{height:150px}.ppl-card .bd{border-top:0;border-left:2px solid var(--ink);padding:14px}.ppl-card .bd p{display:none}.ppl-card .bd b{font-size:19px}}
+@media(max-width:980px){.ppl{grid-template-columns:1fr}.ppl-card{order:-1;position:sticky;top:70px;z-index:5;display:grid;grid-template-columns:110px 1fr;box-shadow:4px 4px 0 var(--ink);border-radius:20px}.ppl{gap:16px}.ppl-card .ph{height:140px}.ppl-card .bd p{display:block!important;min-height:0;font-size:12.5px;line-height:1.4;display:-webkit-box!important;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.ppl-card .bd{border-top:0;border-left:2px solid var(--ink);padding:14px}.ppl-card .bd p{display:none}.ppl-card .bd b{font-size:19px}}
 
 /* lembaga */
 .lbg{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
@@ -342,12 +342,12 @@ section{position:relative}
 .ft{background:var(--ink);color:var(--cream);padding:80px 0 30px;position:relative;overflow:hidden}
 .ft-big{font:800 clamp(48px,11.5vw,180px)/.85 var(--f-d);letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1.5px rgba(248,242,228,.35);white-space:nowrap;margin:40px 0 10px;transition:color 1.2s}
 .ft-big.in{color:rgba(232,184,74,.12)}
-.ft-g{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:40px}
+.ft-g{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:34px}
 .ft h4{font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--padi);margin-bottom:14px;font-family:var(--f-b)}
 .ft a{text-decoration:none;opacity:.8;display:block;padding:3px 0}.ft a:hover{opacity:1;color:var(--padi)}
 .ft p{opacity:.8;margin:0}
 .ft-bot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.15);padding-top:20px;margin-top:30px;font-size:13px;opacity:.75}
-@media(max-width:800px){.ft-g{grid-template-columns:1fr}}
+@media(max-width:800px){.ft-g{grid-template-columns:1fr 1fr;gap:24px}.ft-g>div:first-child{grid-column:1/-1}}
 
 /* cursor glow */
 .glow{position:fixed;width:340px;height:340px;border-radius:50%;pointer-events:none;z-index:1;background:radial-gradient(circle,rgba(232,184,74,.18),transparent 65%);transform:translate(-50%,-50%);transition:opacity .3s;opacity:0}
@@ -362,3 +362,53 @@ section{position:relative}
 .note{font-size:13px;color:var(--muted)}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}.reveal,.line>span{opacity:1!important;transform:none!important}}
 @media(hover:none){.lb .fto{position:relative;inset:auto;opacity:1;height:170px;order:-1}.lb .lg{height:96px}.lb .lg img{height:70px}.lb .fto:after{display:none}}
+
+/* ---------- HP: huruf lebih kecil & rapat ---------- */
+@media(max-width:640px){
+  body{font-size:15px;line-height:1.55}
+  :root{--wrap:calc(100vw - 32px);--r:18px;--hard:4px 4px 0 var(--ink)}
+  h1,h2,h3,h4{letter-spacing:-.03em;line-height:1.02}
+  .hero{padding:110px 0 46px;min-height:auto}
+  .hero h1{font-size:46px;margin:6px 0 12px}
+  .hero p.lead{font-size:15px}
+  .hero .hand,.hand{font-size:1.3em}
+  .hero-cta{gap:10px;margin-top:18px}
+  .btn{padding:12px 17px;font-size:14px;gap:8px}
+  .fc{padding:11px 12px;border-radius:14px}.fc b{font-size:22px}.fc small{font-size:12px}.fc .tag{font-size:10px}
+  .phero{padding:108px 0 46px}.phero h1{font-size:38px}.phero p{font-size:15px;margin-top:12px}
+  .crumb{margin-bottom:10px}
+  .sec{padding:58px 0}.sec.tight{padding:44px 0}
+  .sec-h{margin-bottom:28px}.sec-h h2{font-size:30px;margin:10px 0}.sec-h p{font-size:15px}
+  .eyebrow{font-size:11.5px;letter-spacing:.12em;gap:8px}.eyebrow:before{width:20px}
+  .card{padding:18px}.card h3{font-size:19px;margin-bottom:6px}.card p{font-size:14.5px}
+  .grid{gap:14px}
+  .icn{width:44px;height:44px;border-radius:13px;margin-bottom:12px}.icn svg{width:22px;height:22px}
+  .stats{gap:10px}.stat{padding:16px}.stat b{font-size:30px}.stat span{font-size:13px}
+  .visi{font-size:27px}
+  .st h3{font-size:24px}.st p{font-size:15px}.story-steps .st{min-height:62vh}
+  .scene .cap b{font-size:22px}
+  .marq-t{font-size:19px;gap:26px}.marq-t span{gap:26px}.marq{padding:10px 0}
+  .band{padding:50px 0}.band h2{font-size:30px}
+  .ft{padding:56px 0 24px}.ft-big{margin:28px 0 6px}
+  .pcard .bd{padding:16px}.pcard h3{font-size:19px}.pcard p{font-size:14px}
+  .acc summary{font-size:16px;padding:14px}.acc .in-acc{padding:0 16px 16px 16px}.acc summary .n{width:30px;height:30px;font-size:12px}
+  .batas b{font-size:15.5px}.batas div{padding:11px}
+  .hbar-r{grid-template-columns:96px 1fr 48px;gap:8px;font-size:12px}
+  .pp{grid-template-columns:48px 1fr auto;gap:12px;padding:10px 12px}.pp img,.pp .ini{width:48px;height:48px}.pp b{font-size:16px}.pp small{font-size:12.5px}
+  .lb{min-height:0}.lb h3{font-size:19px}.lb p{font-size:14px}
+  .edu .col{padding:16px}.edu h4{font-size:21px}
+  .tabs{top:72px;gap:6px}.chip{padding:6px 11px;font-size:13px}
+  .search{padding:10px 14px}
+}
+
+/* kartu layanan warga & booklet */
+.portal-cards .pc{position:relative;display:flex;flex-direction:column;gap:6px;text-decoration:none;color:var(--ink);background:var(--paper);border:2px solid var(--padi);border-radius:var(--r);padding:24px 22px 20px;box-shadow:6px 6px 0 var(--padi);transition:transform .25s,box-shadow .25s;overflow:hidden}
+.portal-cards .pc:hover{transform:translate(-3px,-3px) rotate(-.6deg);box-shadow:9px 9px 0 var(--padi)}
+.portal-cards .pc.y{background:var(--padi)}.portal-cards .pc.s{background:var(--senja-2)}
+.portal-cards .pc h3{font-size:23px}.portal-cards .pc p{margin:0;font-size:14.5px;color:var(--ink);opacity:.8}
+.pc-n{position:absolute;right:16px;top:12px;font:800 44px/1 var(--f-d);opacity:.12}
+.pc-go{margin-top:auto;padding-top:12px;font-weight:800;font-size:14px}
+.pc .icn{transition:transform .5s cubic-bezier(.3,1.6,.5,1)}.pc:hover .icn{transform:rotate(-10deg) scale(1.1)}
+.flip{border:2px solid var(--ink);border-radius:var(--r);overflow:hidden;box-shadow:var(--hard);background:var(--ink);aspect-ratio:4/3}
+.flip iframe{width:100%;height:100%;border:0;display:block}
+@media(max-width:640px){.flip{aspect-ratio:3/4}.portal-cards .pc{padding:18px}.portal-cards .pc h3{font-size:19px}}

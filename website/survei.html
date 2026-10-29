@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Survei Kepuasan Masyarakat — Desa Pandanwangi</title>
+<meta name="description" content="Survei Kepuasan Masyarakat (9 unsur PermenPANRB 14/2017) atas pelayanan Pemerintah Desa Pandanwangi.">
+<meta name="theme-color" content="#0f241a">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Caveat:wght@600&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css"><link rel="stylesheet" href="assets/portal.css">
+<link rel="icon" href="img/favicon.png"><link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+</head>
+<body>
+<main>
+<section class="phero">
+  <div class="hero-grid"></div>
+  <div class="wrap">
+    <div class="crumb"><a href="index.html">Beranda</a> / Survei Kepuasan</div>
+    <span class="eyebrow">Survei kepuasan masyarakat</span>
+    <h1 data-lines>Satu menit Anda,<br><span style="color:var(--padi)">pelayanan lebih baik</span>.</h1>
+    <p class="reveal d2">Sembilan pertanyaan singkat tentang pelayanan yang baru Anda terima, mengikuti standar Survei Kepuasan Masyarakat (PermenPANRB Nomor 14 Tahun 2017). Jawaban Anda diolah menjadi Indeks Kepuasan Masyarakat dan dipakai untuk memperbaiki pelayanan desa. Identitas Anda tidak ditampilkan dalam hasil survei.</p>
+  </div>
+</section>
+
+<section class="sec" style="padding-top:50px">
+  <div class="wrap pt-wrap">
+    <div class="panel-f" id="pf">
+      <div class="pane on" id="pA"><h2>Mulai survei</h2><p class="ds" id="dsA">Verifikasi singkat untuk memastikan setiap warga mengisi satu kali.</p><div id="tkInfo"></div><div id="vbox"></div></div>
+      <div class="pane" id="pQ">
+        <div class="sv-top"><span id="svN">Pertanyaan 1 dari 9</span><button type="button" class="chip" id="back">← Sebelumnya</button></div>
+        <div class="sv-bar"><i id="svBar"></i></div>
+        <div id="qs"></div>
+      </div>
+      <div class="pane" id="pP">
+        <h2>Sedikit tentang Anda</h2><p class="ds">Untuk mengelompokkan hasil survei. Tidak ada nama yang disimpan.</p>
+        <div class="msg" id="mP"></div>
+        <div class="row2f"><div class="fld"><label for="jk">Jenis kelamin</label><select id="jk"><option>Laki-laki</option><option>Perempuan</option></select></div>
+        <div class="fld"><label for="pd">Pendidikan terakhir</label><select id="pd"><option>SD ke bawah</option><option>SMP</option><option selected>SMA</option><option>D1–D3</option><option>S1</option><option>S2 ke atas</option></select></div></div>
+        <div class="fld" id="layF"><label for="lay">Layanan yang Anda terima</label><select id="lay"><option value="">— pilih —</option><option>Surat keterangan</option><option>Pengantar SKCK</option><option>Kartu Keluarga / KTP / KIA</option><option>Akta kelahiran / kematian</option><option>Surat pindah</option><option>Legalisir</option><option>Pengaduan</option><option>Lainnya</option></select></div>
+        <div class="fld"><label for="saran">Saran atau masukan (opsional)</label><textarea id="saran" maxlength="1000" placeholder="Apa yang perlu kami perbaiki?"></textarea></div>
+        <div class="ts" id="ts" hidden></div>
+        <div class="btnrow"><button class="btn dark" id="kirim">Kirim survei</button></div>
+      </div>
+      <div class="pane" id="pS"></div>
+    </div>
+    <aside class="pt-side">
+      <div class="info y reveal"><h3>Sembilan unsur yang dinilai</h3><ul><li>Persyaratan</li><li>Sistem, mekanisme &amp; prosedur</li><li>Waktu penyelesaian</li><li>Biaya/tarif</li><li>Produk layanan</li><li>Kompetensi petugas</li><li>Perilaku petugas</li><li>Penanganan pengaduan</li><li>Sarana dan prasarana</li></ul></div>
+      <div class="info reveal d1"><h3>Hasilnya untuk apa?</h3><ul><li>Dihitung menjadi nilai IKM dan mutu pelayanan (A–D).</li><li>Unsur dengan nilai terendah menjadi prioritas perbaikan.</li><li>Hasilnya diumumkan kepada masyarakat.</li></ul></div>
+    </aside>
+  </div>
+</section>
+</main>
+<script src="assets/site.js"></script>
+<script src="assets/portal.js"></script>
+<script>
+(function(){
+var $=PT.$,$$=PT.$$,esc=PT.esc;
+var Q=[['Persyaratan','Bagaimana pendapat Anda tentang kesesuaian persyaratan pelayanan dengan jenis pelayanannya?',['Tidak sesuai','Kurang sesuai','Sesuai','Sangat sesuai']],
+['Sistem, mekanisme & prosedur','Bagaimana pemahaman Anda tentang kemudahan prosedur pelayanan di desa ini?',['Tidak mudah','Kurang mudah','Mudah','Sangat mudah']],
+['Waktu penyelesaian','Bagaimana pendapat Anda tentang kecepatan waktu dalam memberikan pelayanan?',['Tidak cepat','Kurang cepat','Cepat','Sangat cepat']],
+['Biaya/tarif','Bagaimana pendapat Anda tentang kewajaran biaya/tarif dalam pelayanan?',['Sangat mahal','Cukup mahal','Murah','Gratis']],
+['Produk layanan','Bagaimana pendapat Anda tentang kesesuaian produk pelayanan antara yang tercantum dalam standar pelayanan dengan hasil yang diberikan?',['Tidak sesuai','Kurang sesuai','Sesuai','Sangat sesuai']],
+['Kompetensi pelaksana','Bagaimana pendapat Anda tentang kompetensi/kemampuan petugas dalam pelayanan?',['Tidak kompeten','Kurang kompeten','Kompeten','Sangat kompeten']],
+['Perilaku pelaksana','Bagaimana pendapat Anda tentang perilaku petugas dalam pelayanan terkait kesopanan dan keramahan?',['Tidak sopan dan ramah','Kurang sopan dan ramah','Sopan dan ramah','Sangat sopan dan ramah']],
+['Penanganan pengaduan, saran & masukan','Bagaimana pendapat Anda tentang penanganan pengaduan, saran dan masukan pengguna layanan?',['Tidak ada','Ada tetapi tidak berfungsi','Berfungsi kurang maksimal','Dikelola dengan baik']],
+['Sarana dan prasarana','Bagaimana pendapat Anda tentang kualitas sarana dan prasarana pelayanan?',['Buruk','Cukup','Baik','Sangat baik']]];
+var EMO=['😞','🙁','🙂','😍'],A={},cur=0,mode=null,cap=null;
+var q=new URLSearchParams(location.search),sv=PT.ss('pt:sv'),tk=(q.get('t')||'').toUpperCase();
+function ke(id){$$('#pf .pane').forEach(function(p){p.classList.toggle('on',p.id===id)})}
+$('#qs').innerHTML=Q.map(function(x,i){return '<div class="sv-q" data-q="'+i+'"><span class="u">Unsur '+(i+1)+' · '+esc(x[0])+'</span><h3>'+esc(x[1])+'</h3><div class="emo">'+x[2].map(function(o,k){return '<button type="button" data-v="'+(k+1)+'"><em>'+EMO[k]+'</em>'+esc(o)+'</button>'}).join('')+'</div></div>'}).join('');
+function tampil(i){cur=i;$$('.sv-q').forEach(function(e,k){e.classList.toggle('on',k===i)});$('#svN').textContent='Pertanyaan '+(i+1)+' dari 9';$('#svBar').style.width=(i/9*100)+'%';$('#back').style.visibility=i?'visible':'hidden'}
+$$('.sv-q').forEach(function(e,i){$$('button',e).forEach(function(b){b.onclick=function(){A[i+1]=b.getAttribute('data-v');$$('button',e).forEach(function(x){x.classList.toggle('on',x===b)});setTimeout(function(){if(i<8)tampil(i+1);else{$('#svBar').style.width='100%';ke('pP');if(mode==='tiket'&&!cap){$('#ts').hidden=false;cap=PT.captcha($('#ts'))}}},280)}})});
+$('#back').onclick=function(){if(cur>0)tampil(cur-1)};
+function mulai(){ke('pQ');tampil(0)}
+if(tk&&sv&&sv.t===tk){
+  mode='tiket';$('#layF').hidden=true;
+  $('#dsA').textContent='Survei untuk layanan pada tiket berikut. Satu tiket hanya bisa dinilai satu kali.';
+  $('#tkInfo').innerHTML='<div class="tiket"><small>Tiket</small><b>'+esc(tk)+'</b><span style="font-weight:700">'+esc(sv.judul||'')+'</span></div><div class="btnrow"><button class="btn dark" id="mulai">Mulai menilai</button></div>';
+  $('#mulai').onclick=mulai;
+}else{
+  mode='nik';
+  PT.verifikasi($('#vbox'),function(){var b=document.createElement('div');b.className='btnrow';b.innerHTML='<button class="btn dark">Mulai survei</button>';$('#vbox').appendChild(b);b.firstChild.onclick=mulai});
+}
+$('#kirim').onclick=function(){
+  var m=$('#mP'),bt=this,body={aksi:'survei',jk:$('#jk').value,pendidikan:$('#pd').value,saran:$('#saran').value.trim()};
+  for(var i=1;i<=9;i++){if(!A[i])return PT.pesan(m,'Pertanyaan '+i+' belum dijawab.');body['u'+i]=A[i]}
+  if(mode==='tiket'){if(!cap||!cap.get())return PT.pesan(m,'Tunggu atau selesaikan pemeriksaan keamanan (captcha).');body.tiket=tk;body.nik4=sv.n;body.cf=cap.get()}
+  else{var s=PT.sesi();if(!s){PT.ss('pt:sesi',null);ke('pA');PT.verifikasi($('#vbox'));return PT.pesan(m,'Sesi verifikasi berakhir.')}body.sesi=s.sesi;if(!$('#lay').value)return PT.pesan(m,'Pilih layanan yang Anda terima.');body.layanan=$('#lay').value}
+  PT.sibuk(bt,true,'Mengirim…');
+  PT.kirim(body).then(function(r){
+    PT.sibuk(bt,false);if(cap)cap.reset();
+    if(!r.ok)return PT.pesan(m,r.pesan||'Gagal mengirim survei.');
+    PT.ss('pt:sv',null);
+    var rata=0;for(var i=1;i<=9;i++)rata+=+A[i];rata=rata/9;
+    $('#pS').innerHTML='<div class="ok-ic"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><div class="ikm"><span style="font-size:64px">'+EMO[Math.max(0,Math.min(3,Math.round(rata)-1))]+'</span><h2>Terima kasih atas penilaian Anda!</h2><p class="muted">Jawaban Anda sudah tercatat dan akan menjadi bahan perbaikan pelayanan Pemerintah Desa Pandanwangi.</p></div><div class="btnrow" style="justify-content:center"><a class="btn" href="index.html">Kembali ke beranda</a></div>';
+    ke('pS');PT.konfeti($('#pf'));
+  });
+};
+})();
+</script>
+</body>
+</html>

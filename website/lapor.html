@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lapor Desa — Desa Pandanwangi</title>
+<meta name="description" content="Laporkan masalah di lingkungan Anda ke Pemerintah Desa Pandanwangi: jalan rusak, lampu mati, pelayanan, dan lainnya. Dapatkan nomor tiket untuk memantau tindak lanjutnya.">
+<meta name="theme-color" content="#0f241a">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Caveat:wght@600&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css"><link rel="stylesheet" href="assets/portal.css">
+<link rel="icon" href="img/favicon.png"><link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+</head>
+<body>
+<main>
+<section class="phero">
+  <div class="hero-grid"></div>
+  <div class="wrap">
+    <div class="crumb"><a href="index.html">Beranda</a> / Lapor Desa</div>
+    <span class="eyebrow">Lapor desa</span>
+    <h1 data-lines>Suara Anda,<br><span style="color:var(--padi)">kami tindak lanjuti</span>.</h1>
+    <p class="reveal d2">Jalan berlubang, saluran tersumbat, lampu penerangan mati, bantuan yang tidak tepat sasaran, atau pelayanan yang kurang memuaskan: sampaikan di sini. Setiap laporan tercatat di aplikasi desa, mendapat nomor tiket, dan diteruskan ke petugas yang menangani bidangnya.</p>
+  </div>
+</section>
+
+<section class="sec" style="padding-top:50px">
+  <div class="wrap pt-wrap">
+    <div>
+      <div class="steps" id="steps"><div class="s on"><b>1</b><span>Verifikasi</span></div><i></i><div class="s"><b>2</b><span>Tulis laporan</span></div><i></i><div class="s"><b>3</b><span>Tiket</span></div></div>
+      <div class="panel-f">
+        <div class="pane on" id="p1"><h2>Verifikasi pelapor</h2><p class="ds">Laporan hanya diterima dari warga Desa Pandanwangi. Identitas Anda bisa dirahasiakan pada langkah berikutnya.</p><div id="vbox"></div></div>
+        <div class="pane" id="p2">
+          <div id="who2"></div>
+          <h2>Apa yang ingin Anda laporkan?</h2><p class="ds">Semakin jelas uraian dan lokasinya, semakin cepat petugas menindaklanjuti.</p>
+          <div class="msg" id="m2"></div>
+          <div class="opts" id="kat"></div>
+          <div class="fld"><label for="isi">Uraian laporan</label><textarea id="isi" maxlength="2000" placeholder="Ceritakan apa yang terjadi, sejak kapan, dan dampaknya bagi warga."></textarea><div class="cnt"><span id="isiN">0</span>/2000</div></div>
+          <div class="fld"><label for="lok">Lokasi kejadian</label><input id="lok" maxlength="200" placeholder="mis. Jalan depan musala Dusun Tunjungan RT 02"></div>
+          <div class="gps" style="margin:-6px 0 18px"><button type="button" class="chip" id="gpsB">📍 Gunakan lokasi saya sekarang</button><span class="pill" id="gpsT" hidden></span></div>
+          <div class="fld"><label>Foto pendukung (maks. 3)</label><div class="fotos" id="fotos"><label id="fAdd">📷<br>Tambah foto<input type="file" accept="image/*" hidden id="fIn"></label></div><small>Foto otomatis diperkecil agar hemat kuota.</small></div>
+          <div class="row2f"><div class="fld"><label for="hp">No. HP/WA (opsional)</label><input id="hp" inputmode="tel" maxlength="16" placeholder="08xxxxxxxxxx"><small>Untuk konfirmasi tindak lanjut.</small></div><div></div></div>
+          <label class="sw"><input type="checkbox" id="rhs"><span></span>Rahasiakan identitas saya dari publik</label>
+          <div class="btnrow"><button class="btn dark" id="kirim">Kirim laporan</button><span class="note">Laporan palsu atau berisi fitnah tidak akan ditindaklanjuti.</span></div>
+        </div>
+        <div class="pane" id="p3"></div>
+      </div>
+    </div>
+    <aside class="pt-side">
+      <div class="info y reveal"><h3>Apa yang terjadi setelah Anda melapor?</h3><ul><li><b>Diterima</b>: laporan masuk ke aplikasi desa.</li><li><b>Diproses</b>: petugas meninjau lokasi atau menindaklanjuti.</li><li><b>Selesai</b>: tindak lanjut dan tanggapan petugas bisa Anda baca di halaman Lacak Tiket.</li></ul></div>
+      <div class="info reveal d1"><h3>Identitas Anda aman</h3><ul><li>NIK hanya dipakai untuk memastikan Anda warga desa.</li><li>Bila memilih dirahasiakan, nama Anda tidak diumumkan.</li><li>Rekap pengaduan disampaikan kepada BPD sebagai bahan pengawasan.</li></ul></div>
+      <div class="info g reveal d2"><h3>Keadaan darurat?</h3><ul><li>Kebakaran, kecelakaan, atau orang sakit butuh segera ditangani: jangan menunggu tiket.</li><li>Hubungi kontak person desa atau layanan darurat setempat.</li></ul><a class="btn" href="kontak.html#kontak-person" style="margin-top:12px">Kontak person</a></div>
+    </aside>
+  </div>
+</section>
+</main>
+<script src="assets/site.js"></script>
+<script src="assets/portal.js"></script>
+<script>
+(function(){
+var $=PT.$,$$=PT.$$,esc=PT.esc;
+var K=[['Infrastruktur/pembangunan','🛣️'],['Lingkungan/kebersihan','🌿'],['Pelayanan administrasi','🗂️'],['Bantuan sosial','🎁'],['Keamanan & ketertiban','🛡️'],['Keuangan desa','💵'],['Perilaku aparat','🙋'],['Lainnya','💬']];
+var kat=null,foto=[],lat='',lng='',steps=$('#steps');
+function ke(n){$$('.pane').forEach(function(p,i){p.classList.toggle('on',i===n)});PT.langkah(steps,n);var top=steps.getBoundingClientRect().top+scrollY-100;if(scrollY>top)scrollTo({top:top,behavior:'smooth'})}
+$('#kat').innerHTML=K.map(function(k,i){return '<button type="button" class="opt" data-i="'+i+'"><span class="e">'+k[1]+'</span>'+esc(k[0])+'</button>'}).join('');
+$$('#kat .opt').forEach(function(b){b.onclick=function(){kat=K[+b.getAttribute('data-i')][0];$$('#kat .opt').forEach(function(x){x.classList.toggle('on',x===b)})}});
+var isi=$('#isi');isi.oninput=function(){$('#isiN').textContent=isi.value.length};
+function siap(){$('#who2').innerHTML=$('#vbox').innerHTML;var g=$('#who2 [data-ganti]');if(g)g.onclick=function(){PT.ss('pt:sesi',null);ke(0);PT.verifikasi($('#vbox'),siap)};setTimeout(function(){ke(1)},350)}
+PT.verifikasi($('#vbox'),siap);
+$('#gpsB').onclick=function(){
+  var t=$('#gpsT');t.hidden=false;
+  if(!navigator.geolocation){t.textContent='Perangkat tidak mendukung lokasi';return}
+  t.textContent='Mencari lokasi…';
+  navigator.geolocation.getCurrentPosition(function(p){lat=p.coords.latitude.toFixed(6);lng=p.coords.longitude.toFixed(6);t.textContent='✓ Titik lokasi tersimpan ('+lat+', '+lng+')'},function(){t.textContent='Lokasi tidak diizinkan. Tulis lokasinya saja di atas.'},{enableHighAccuracy:true,timeout:15000});
+};
+function gambar(){
+  var box=$('#fotos');$$('.ph',box).forEach(function(x){x.remove()});
+  foto.forEach(function(d,i){var e=document.createElement('div');e.className='ph';e.innerHTML='<img src="'+d+'" alt="Foto '+(i+1)+'"><button type="button" aria-label="Hapus foto">×</button>';e.querySelector('button').onclick=function(){foto.splice(i,1);gambar()};box.insertBefore(e,$('#fAdd'))});
+  $('#fAdd').hidden=foto.length>=3;
+}
+$('#fIn').onchange=function(){var f=this.files[0];this.value='';if(!f)return;PT.kecilkan(f).then(function(d){foto.push(d);gambar()}).catch(function(e){PT.pesan($('#m2'),e.message)})};
+$('#kirim').onclick=function(){
+  var m=$('#m2'),bt=this;
+  if(!kat)return PT.pesan(m,'Pilih kategori laporan.');
+  if(isi.value.trim().length<10)return PT.pesan(m,'Uraikan laporan Anda minimal 10 huruf.');
+  var s=PT.sesi();if(!s){PT.pesan(m,'Sesi verifikasi berakhir. Silakan verifikasi ulang.');ke(0);PT.verifikasi($('#vbox'),siap);return}
+  PT.sibuk(bt,true,'Mengirim laporan…');
+  PT.kirim({aksi:'lapor',sesi:s.sesi,kategori:kat,isi:isi.value.trim(),lokasi:$('#lok').value.trim(),lat:lat,lng:lng,foto:foto,rahasia:$('#rhs').checked,hp:$('#hp').value.trim()}).then(function(r){
+    PT.sibuk(bt,false);
+    if(!r.ok){if(r.sesiHabis){PT.ss('pt:sesi',null);ke(0);PT.verifikasi($('#vbox'),siap)}return PT.pesan(m,r.pesan||'Gagal mengirim.')}
+    var p3=$('#p3');p3.innerHTML=PT.tiketHtml(r.tiket,r.nik4,'Laporan diterima. Terima kasih!','Laporan Anda sudah masuk ke aplikasi desa dan akan ditinjau petugas. Tanggapan dan tindak lanjutnya bisa Anda baca di halaman Lacak Tiket.');
+    PT.pasangSalin(p3);ke(2);PT.konfeti($('.panel-f'));
+  });
+};
+})();
+</script>
+</body>
+</html>

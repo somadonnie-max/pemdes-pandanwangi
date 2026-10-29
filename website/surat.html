@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ajukan Surat Online — Desa Pandanwangi</title>
+<meta name="description" content="Ajukan permohonan surat keterangan Desa Pandanwangi secara online dengan NIK dan tanggal lahir. Dapatkan nomor tiket dan pantau prosesnya.">
+<meta name="theme-color" content="#0f241a">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Caveat:wght@600&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css"><link rel="stylesheet" href="assets/portal.css">
+<link rel="icon" href="img/favicon.png"><link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+</head>
+<body>
+<main>
+<section class="phero">
+  <div class="hero-grid"></div>
+  <div class="wrap">
+    <div class="crumb"><a href="index.html">Beranda</a> / <a href="layanan.html">Layanan</a> / Ajukan Surat</div>
+    <span class="eyebrow">Layanan surat online</span>
+    <h1 data-lines>Ajukan surat dari rumah,<br><span style="color:var(--padi)">ambil saat sudah jadi</span>.</h1>
+    <p class="reveal d2">Tidak perlu antre menunggu surat diketik. Verifikasi dengan NIK dan tanggal lahir, pilih jenis surat, lalu simpan nomor tiket Anda. Data Anda terisi otomatis dari data kependudukan desa, sehingga tidak perlu mengetik ulang. Petugas akan menyiapkan surat, dan Anda tinggal datang mengambilnya.</p>
+  </div>
+</section>
+
+<section class="sec" style="padding-top:50px">
+  <div class="wrap pt-wrap">
+    <div>
+      <div class="steps" id="steps"><div class="s on"><b>1</b><span>Verifikasi</span></div><i></i><div class="s"><b>2</b><span>Isi permohonan</span></div><i></i><div class="s"><b>3</b><span>Tiket</span></div></div>
+      <div class="panel-f">
+        <div class="pane on" id="p1"><h2>Siapa yang mengajukan?</h2><p class="ds">Gunakan NIK pemohon yang namanya akan tertulis di surat.</p><div id="vbox"></div></div>
+        <div class="pane" id="p2">
+          <div id="who2"></div>
+          <h2>Surat apa yang Anda perlukan?</h2><p class="ds">Pilih salah satu. Isian tambahan akan muncul sesuai jenis surat.</p>
+          <div class="msg" id="m2"></div>
+          <div class="opts" id="jenis"></div>
+          <div id="dyn"></div>
+          <div class="fld"><label for="kep">Keperluan</label><textarea id="kep" maxlength="500" placeholder="Contoh: persyaratan pengajuan pinjaman usaha di bank"></textarea><div class="cnt"><span id="kepN">0</span>/500</div></div>
+          <div class="row2f"><div class="fld"><label for="hp">No. HP/WA (opsional)</label><input id="hp" inputmode="tel" maxlength="16" placeholder="08xxxxxxxxxx"><small>Agar petugas bisa menghubungi bila ada data yang perlu dilengkapi.</small></div>
+          <div class="fld"><label for="ambil">Pengambilan surat</label><select id="ambil"><option>Diambil di kantor desa</option><option>Dititipkan ke kepala dusun</option></select></div></div>
+          <div class="btnrow"><button class="btn dark" id="kirim">Kirim permohonan</button><span class="note">Dengan mengirim, Anda menyatakan data yang diisi benar.</span></div>
+        </div>
+        <div class="pane" id="p3"></div>
+      </div>
+    </div>
+    <aside class="pt-side">
+      <div class="info y reveal"><h3>Saat mengambil surat, bawa:</h3><ul><li>e-KTP asli pemohon</li><li>Kartu Keluarga asli</li><li>Berkas pendukung sesuai jenis surat (lihat halaman Layanan)</li><li>Nomor tiket permohonan</li></ul></div>
+      <div class="info reveal d1"><h3>Bagaimana prosesnya?</h3><ul><li><b>Diajukan</b>: permohonan masuk ke aplikasi desa.</li><li><b>Diproses</b>: petugas menyiapkan dan memeriksa surat.</li><li><b>Siap diambil</b>: surat sudah ditandatangani, silakan datang.</li><li><b>Selesai</b>: surat telah diterima pemohon.</li></ul></div>
+      <div class="info g reveal d2"><h3>Jam pelayanan</h3><ul><li>Senin–Jumat, 08.00–15.00 WIB</li><li>Permohonan di luar jam kerja diproses pada hari kerja berikutnya.</li><li>Layanan surat tidak dipungut biaya.</li></ul></div>
+    </aside>
+  </div>
+</section>
+</main>
+<script src="assets/site.js"></script>
+<script src="assets/portal.js"></script>
+<script>
+(function(){
+var $=PT.$,$$=PT.$$,esc=PT.esc;
+var J=[
+ ['Surat Keterangan Domisili','🏠',[['alamat_domisili','Alamat domisili (kosongkan bila sama dengan KTP)'],['lama_tinggal','Tinggal sejak (tahun)']]],
+ ['Surat Keterangan Tidak Mampu','🤝',[]],
+ ['Surat Keterangan Usaha','🏪',[['usaha_nama','Nama usaha'],['usaha_jenis','Jenis usaha','mis. warung sembako, bengkel'],['usaha_alamat','Alamat usaha'],['usaha_mulai','Mulai usaha (tahun)']]],
+ ['Surat Pengantar SKCK','🛡️',[]],
+ ['Surat Keterangan Kelahiran','👶',[['bayi_nama','Nama bayi'],['bayi_jk','Jenis kelamin bayi','',['Laki-laki','Perempuan']],['bayi_tgl','Tanggal lahir bayi','','date'],['bayi_jam','Jam lahir','','time'],['bayi_tempat','Tempat lahir (bidan/RS/rumah)'],['anak_ke','Anak ke-'],['ayah_nama','Nama ayah'],['ibu_nama','Nama ibu']]],
+ ['Surat Keterangan Kematian','🕊️',[['mati_nama','Nama yang meninggal'],['mati_tgl','Tanggal meninggal','','date'],['mati_tempat','Tempat meninggal'],['mati_sebab','Sebab meninggal']]],
+ ['Surat Keterangan Pindah','🚚',[['pindah_tujuan','Alamat tujuan pindah (lengkap)'],['pindah_alasan','Alasan pindah'],['pengikut','Jumlah anggota keluarga yang ikut pindah']]],
+ ['Surat Keterangan Belum Menikah','💍',[]],
+ ['Surat Keterangan Penghasilan','💰',[['penghasilan','Penghasilan rata-rata per bulan (Rp)']]],
+ ['Surat Keterangan Masih Hidup','❤️',[]],
+ ['Surat Pernyataan Kehilangan','🔍',[['hilang_barang','Dokumen/barang yang hilang','mis. KTP-el, BPKB, ijazah'],['hilang_no','Nomor dokumen (bila ada)'],['hilang_tgl','Tanggal hilang','','date'],['hilang_tempat','Perkiraan tempat hilang'],['hilang_kronologi','Kronologi singkat']]],
+ ['Surat keterangan lainnya','📝',[['catatan','Sebutkan nama surat yang dibutuhkan']]]];
+var pilih=null,S=null,steps=$('#steps');
+function ke(n){$$('.pane').forEach(function(p,i){p.classList.toggle('on',i===n)});PT.langkah(steps,n);var top=steps.getBoundingClientRect().top+scrollY-100;if(scrollY>top)scrollTo({top:top,behavior:'smooth'})}
+$('#jenis').innerHTML=J.map(function(j,i){return '<button type="button" class="opt" data-i="'+i+'"><span class="e">'+j[1]+'</span>'+esc(j[0])+'</button>'}).join('');
+$('#dyn').innerHTML=J.map(function(j,i){if(!j[2].length)return '';return '<div class="dyn" data-d="'+i+'"><h4>Data untuk '+esc(j[0])+'</h4><div class="row2f">'+j[2].map(function(f){var t=Array.isArray(f[3])?'<select data-k="'+f[0]+'"><option value="">—</option>'+f[3].map(function(o){return '<option>'+o+'</option>'}).join('')+'</select>':'<input data-k="'+f[0]+'" type="'+(f[3]||'text')+'" maxlength="300"'+(f[2]?' placeholder="'+esc(f[2])+'"':'')+'>';return '<div class="fld"><label>'+esc(f[1])+'</label>'+t+'</div>'}).join('')+'</div></div>'}).join('');
+$$('#jenis .opt').forEach(function(b){b.onclick=function(){pilih=+b.getAttribute('data-i');$$('#jenis .opt').forEach(function(x){x.classList.toggle('on',x===b)});$$('.dyn').forEach(function(d){d.classList.toggle('on',+d.getAttribute('data-d')===pilih)})}});
+var kep=$('#kep');kep.oninput=function(){$('#kepN').textContent=kep.value.length};
+function siap(s){S=s;$('#who2').innerHTML=$('#vbox').innerHTML;var g=$('#who2 [data-ganti]');if(g)g.onclick=function(){PT.ss('pt:sesi',null);ke(0);PT.verifikasi($('#vbox'),siap)};setTimeout(function(){ke(1)},350)}
+PT.verifikasi($('#vbox'),siap);
+$('#kirim').onclick=function(){
+  var m=$('#m2'),bt=this;
+  if(pilih==null)return PT.pesan(m,'Pilih jenis surat terlebih dahulu.');
+  if(kep.value.trim().length<5)return PT.pesan(m,'Tuliskan keperluan surat (minimal 5 huruf).');
+  var isian={};$$('.dyn[data-d="'+pilih+'"] [data-k]').forEach(function(x){if(x.value.trim())isian[x.getAttribute('data-k')]=x.value.trim()});
+  if(J[pilih][0]==='Surat keterangan lainnya'&&!isian.catatan)return PT.pesan(m,'Sebutkan nama surat yang Anda butuhkan.');
+  var s=PT.sesi();if(!s){PT.pesan(m,'Sesi verifikasi berakhir. Silakan verifikasi ulang.');ke(0);PT.verifikasi($('#vbox'),siap);return}
+  PT.sibuk(bt,true,'Mengirim…');
+  PT.kirim({aksi:'surat',sesi:s.sesi,jenis:J[pilih][0],keperluan:kep.value.trim(),hp:$('#hp').value.trim(),ambil:$('#ambil').value,isian:isian}).then(function(r){
+    PT.sibuk(bt,false);
+    if(!r.ok){if(r.sesiHabis){PT.ss('pt:sesi',null);ke(0);PT.verifikasi($('#vbox'),siap)}return PT.pesan(m,r.pesan||'Gagal mengirim.')}
+    var p3=$('#p3');p3.innerHTML=PT.tiketHtml(r.tiket,r.nik4,'Permohonan terkirim!','Petugas akan memproses permohonan <b>'+esc(J[pilih][0])+'</b> pada jam kerja. Pantau statusnya di halaman Lacak Tiket. Bila status sudah <b>Siap diambil</b>, datanglah ke kantor desa dengan membawa e-KTP dan KK asli.');
+    PT.pasangSalin(p3);ke(2);PT.konfeti($('.panel-f'));
+  });
+};
+})();
+</script>
+</body>
+</html>

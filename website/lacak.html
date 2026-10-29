@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lacak Tiket — Desa Pandanwangi</title>
+<meta name="description" content="Pantau status permohonan surat dan laporan Anda di Desa Pandanwangi dengan nomor tiket.">
+<meta name="theme-color" content="#0f241a">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Caveat:wght@600&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css"><link rel="stylesheet" href="assets/portal.css">
+<link rel="icon" href="img/favicon.png"><link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+</head>
+<body>
+<main>
+<section class="phero">
+  <div class="hero-grid"></div>
+  <div class="wrap">
+    <div class="crumb"><a href="index.html">Beranda</a> / Lacak Tiket</div>
+    <span class="eyebrow">Lacak tiket</span>
+    <h1 data-lines>Sudah sampai mana<br><span style="color:var(--padi)">urusan Anda</span>?</h1>
+    <p class="reveal d2">Masukkan nomor tiket yang Anda terima saat mengajukan surat atau mengirim laporan, beserta 4 angka terakhir NIK pemohon. Status yang tampil sama persis dengan catatan petugas di aplikasi desa.</p>
+  </div>
+</section>
+
+<section class="sec" style="padding-top:50px">
+  <div class="wrap pt-wrap">
+    <div class="panel-f">
+      <div id="form">
+        <h2>Cek status tiket</h2><p class="ds">Contoh nomor tiket: <b>SRT-26-K7QP</b> (surat) atau <b>ADU-26-M3XD</b> (laporan).</p>
+        <div class="msg" id="m"></div>
+        <div class="row2f"><div class="fld"><label for="tk">Nomor tiket</label><input id="tk" maxlength="12" autocomplete="off" style="text-transform:uppercase;letter-spacing:.08em" placeholder="SRT-26-XXXX"></div>
+        <div class="fld"><label for="n4">4 angka terakhir NIK</label><input id="n4" class="nik" inputmode="numeric" maxlength="4" placeholder="••••"></div></div>
+        <div class="ts" id="ts"></div>
+        <div class="btnrow"><button class="btn dark" id="go">Lacak sekarang</button></div>
+      </div>
+      <div id="hasil"></div>
+    </div>
+    <aside class="pt-side">
+      <div class="info y reveal"><h3>Arti status permohonan surat</h3><ul><li><b>Diajukan</b>: menunggu diproses petugas.</li><li><b>Diproses</b>: surat sedang disiapkan.</li><li><b>Siap diambil</b>: datang ke kantor desa membawa e-KTP &amp; KK asli.</li><li><b>Selesai</b>: surat telah diterima.</li><li><b>Dikembalikan</b>: ada data yang perlu dilengkapi, baca pesan petugas.</li></ul></div>
+      <div class="info reveal d1"><h3>Lupa nomor tiket?</h3><ul><li>Cari di tangkapan layar atau catatan Anda.</li><li>Bila tetap tidak ketemu, datang ke kantor desa dengan e-KTP; petugas bisa mencarinya di aplikasi.</li></ul></div>
+    </aside>
+  </div>
+</section>
+</main>
+<script src="assets/site.js"></script>
+<script src="assets/portal.js"></script>
+<script>
+(function(){
+var $=PT.$,esc=PT.esc;
+var q=new URLSearchParams(location.search);if(q.get('t'))$('#tk').value=q.get('t').toUpperCase();
+var cap=PT.captcha($('#ts'));
+$('#n4').oninput=function(){this.value=this.value.replace(/\D/g,'').slice(0,4)};
+var ALUR={'Permohonan surat':['Diajukan','Diproses','Siap diambil','Selesai'],'Pengaduan':['Diterima','Diproses','Selesai']};
+var IKON={'Diajukan':'📨','Diterima':'📨','Diproses':'⚙️','Siap diambil':'📄','Selesai':'✓'};
+var KET={'Diajukan':'Permohonan masuk ke aplikasi desa','Diterima':'Laporan masuk ke aplikasi desa','Diproses':'Sedang ditangani petugas','Siap diambil':'Silakan datang ke kantor desa','Selesai':'Urusan telah selesai'};
+function fTgl(d){if(!d)return '';var b=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];var p=String(d).slice(0,10).split('-');return p.length===3?(+p[2])+' '+b[+p[1]-1]+' '+p[0]:d}
+$('#go').onclick=function(){
+  var m=$('#m'),bt=this,t=$('#tk').value.trim().toUpperCase(),n=$('#n4').value;
+  if(!/^(SRT|ADU)-\d{2}-[A-Z0-9]{4}$/.test(t))return PT.pesan(m,'Format nomor tiket belum benar, contoh SRT-26-K7QP.');
+  if(n.length!==4)return PT.pesan(m,'Isi 4 angka terakhir NIK.');
+  if(!cap.get())return PT.pesan(m,'Tunggu atau selesaikan pemeriksaan keamanan (captcha).');
+  PT.sibuk(bt,true,'Mencari…');
+  PT.kirim({aksi:'lacak',tiket:t,nik4:n,cf:cap.get()}).then(function(r){
+    PT.sibuk(bt,false);cap.reset();
+    if(!r.ok)return PT.pesan(m,r.pesan||'Tiket tidak ditemukan.');
+    m.className='msg';
+    var alur=ALUR[r.jenis]||ALUR['Pengaduan'],st=r.status,bad=/Ditolak|Dikembalikan/.test(st),idx=alur.indexOf(st);
+    var li=alur.map(function(a,i){var cls=bad?(i===0?'done':''):(i<idx||(i===idx&&a==='Selesai')?'done':i===idx?'now':'');return '<li class="'+cls+'" style="animation-delay:'+(i*.12)+'s"><b class="d">'+(cls==='done'?'✓':IKON[a])+'</b><div><strong>'+esc(a)+'</strong><span>'+(i===0?esc(fTgl(r.tanggal)+(r.jam?' · '+r.jam:'')):cls?esc(KET[a]):'Menunggu')+'</span></div></li>'}).join('');
+    if(bad)li+='<li class="bad" style="animation-delay:.5s"><b class="d">!</b><div><strong>'+esc(st)+'</strong><span>Baca pesan petugas di bawah</span></div></li>';
+    $('#hasil').innerHTML='<div class="tiket" style="margin-top:22px"><small>'+esc(r.jenis)+'</small><b>'+esc(r.tiket)+'</b><span style="font-weight:700">'+esc(r.judul||'')+'</span></div><ul class="tl">'+li+'</ul>'+
+      (r.pesan_petugas?'<p class="note-p"><b>Pesan petugas'+(r.pj?' ('+esc(r.pj)+')':'')+':</b><br>'+esc(r.pesan_petugas)+'</p>':'')+
+      (r.survei==='bisa'?'<div class="info y" style="margin-top:16px"><h3>Bagaimana pelayanan kami?</h3><p style="margin:0 0 12px">Isi survei kepuasan 9 pertanyaan, cukup 1 menit.</p><a class="btn dark" href="survei.html?t='+encodeURIComponent(r.tiket)+'" data-sv>Isi survei kepuasan</a></div>':r.survei==='sudah'?'<p class="note">Terima kasih, Anda sudah mengisi survei kepuasan untuk tiket ini.</p>':'');
+    var sv=document.querySelector('[data-sv]');if(sv)sv.onclick=function(){PT.ss('pt:sv',{t:r.tiket,n:n,judul:r.judul})};
+    $('#hasil').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+};
+})();
+</script>
+</body>
+</html>

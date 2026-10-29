@@ -18,7 +18,7 @@ function api(req){
   if(cacheP[k])return cacheP[k];
   cacheP[k]=fetch(API,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify({req:req})})
     .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
-    .then(function(d){if(d&&d.desa&&d.desa.logo_url){lstore('wp:logo',d.desa.logo_url);setLogo(d.desa.logo_url)}store(k,{t:Date.now(),d:d});return d});
+    .then(function(d){store(k,{t:Date.now(),d:d});return d});
   return cacheP[k];
 }
 
@@ -38,12 +38,12 @@ var ICON={
 };
 function shell(){
   var b=document.body; b.classList.add('grain');
-  var logo=lstore('wp:logo')||LOGO_SVG;
+  var logo='img/logo-pemdes.webp';
   var nav=NAV.map(function(n){var on=n[0].replace('.html','')===page;return '<a href="'+n[0]+'"'+(on?' class="on" aria-current="page"':'')+'>'+n[1]+'</a>'}).join('');
   var hd=document.createElement('header');hd.className='hd';
-  hd.innerHTML='<a class="hd-logo" href="index.html"><img data-logo src="'+logo+'" alt="Logo Desa Pandanwangi"><span><b>Pandanwangi</b><small>Kec. Tempeh · Lumajang</small></span></a><nav aria-label="Menu utama">'+nav+'</nav><a class="btn" href="kontak.html#lapor">Lapor Desa</a><button class="hd-burger" aria-label="Buka menu" aria-expanded="false"><i></i><i></i><i></i></button>';
+  hd.innerHTML='<a class="hd-logo" href="index.html"><img data-logo src="'+logo+'" alt="Logo Desa Pandanwangi"><span><b>Pandanwangi</b><small>Kec. Tempeh · Lumajang</small></span></a><nav aria-label="Menu utama">'+nav+'</nav><a class="btn" href="lapor.html">Lapor Desa</a><button class="hd-burger" aria-label="Buka menu" aria-expanded="false"><i></i><i></i><i></i></button>';
   b.prepend(hd);
-  var mn=document.createElement('div');mn.className='mnav';mn.innerHTML=nav+'<a href="kontak.html#lapor" style="color:var(--senja)">Lapor Desa →</a><p class="hand">Aman · Rukun · Damai · Sejahtera</p>';
+  var mn=document.createElement('div');mn.className='mnav';mn.innerHTML=nav+'<a href="surat.html" style="color:var(--padi)">Ajukan Surat →</a><a href="lapor.html" style="color:var(--senja)">Lapor Desa →</a><a href="lacak.html" style="font-size:24px">Lacak Tiket</a><a href="survei.html" style="font-size:24px">Survei Kepuasan</a><p class="hand">Aman · Rukun · Damai · Sejahtera</p>';
   $$('a',mn).forEach(function(a,i){a.style.transitionDelay=(.08+i*.05)+'s'});
   b.prepend(mn);
   var bt=$('.hd-burger',hd);
@@ -55,7 +55,7 @@ function shell(){
   var ft=document.createElement('footer');ft.className='ft';
   ft.innerHTML='<div class="wrap"><div class="ft-g"><div><a class="hd-logo" href="index.html"><img data-logo src="'+logo+'" alt=""><span><b>Pemerintah Desa Pandanwangi</b><small>Kecamatan Tempeh · Kabupaten Lumajang · Jawa Timur</small></span></a><p style="margin-top:18px" data-desa="alamat">Jl. K.H. Wahid Hasyim No. 84, Pandanwangi, Tempeh, Lumajang 67371</p><p class="hand" style="color:var(--padi);margin-top:14px">Aman, rukun, damai, sejahtera.</p></div>'+
    '<div><h4>Jelajah</h4>'+NAV.map(function(n){return '<a href="'+n[0]+'">'+n[1]+'</a>'}).join('')+'</div>'+
-   '<div><h4>Terhubung</h4><a href="https://whatsapp.com/channel/0029Vb6I135A2pLHQCFx5I1l" target="_blank" rel="noopener">Saluran WhatsApp</a><a href="https://wa.me/6285790565999" target="_blank" rel="noopener">Pelayanan Online (WA)</a><a href="https://www.instagram.com/kim_pandanwangi/" target="_blank" rel="noopener">Instagram KIM</a><a href="https://www.tiktok.com/@kim_pandanwangi" target="_blank" rel="noopener">TikTok KIM</a><a href="mailto:pandanwangipemdes@gmail.com">pandanwangipemdes@gmail.com</a></div></div>'+
+   '<div><h4>Layanan Warga</h4><a href="surat.html">Ajukan Surat Online</a><a href="lapor.html">Lapor Desa</a><a href="lacak.html">Lacak Tiket</a><a href="survei.html">Survei Kepuasan</a><a href="index.html#booklet">Booklet Profil Desa</a></div><div><h4>Terhubung</h4><a href="https://whatsapp.com/channel/0029Vb6I135A2pLHQCFx5I1l" target="_blank" rel="noopener">Saluran WhatsApp</a><a href="https://www.instagram.com/kim_pandanwangi/" target="_blank" rel="noopener">Instagram KIM</a><a href="https://www.tiktok.com/@kim_pandanwangi" target="_blank" rel="noopener">TikTok KIM</a><a href="mailto:pandanwangipemdes@gmail.com">pandanwangipemdes@gmail.com</a></div></div>'+
    '<div class="ft-big reveal-big">PANDANWANGI</div>'+
    '<div class="ft-bot"><span>© <span data-year></span> Pemerintah Desa Pandanwangi × MMD UB 2025 Kelompok 63</span><span>Data publik diambil langsung dari aplikasi Pemdes Pandanwangi</span></div></div>';
   b.appendChild(ft);

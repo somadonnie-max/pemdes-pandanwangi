@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Caveat:wght@600&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='30' r='16' fill='%23e8b84a'/%3E%3Cpath d='M4 46c10-6 18-6 28 0s18 6 28 0v14H4z' fill='%232f5d3f'/%3E%3C/svg%3E">
+<link rel="icon" href="img/favicon.png"><link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 </head>
 <body>
 <main>
@@ -19,13 +19,13 @@
     <div class="crumb"><a href="index.html">Beranda</a> / Pemerintahan</div>
     <span class="eyebrow">Kepengurusan</span>
     <h1 data-lines>Orang-orang yang<br>melayani <span style="color:var(--padi)">Pandanwangi</span>.</h1>
-    <p class="reveal d2">Struktur pemerintah desa terdiri dari kepala desa, sekretaris desa, kepala urusan, kepala seksi, dan kepala dusun. Masing-masing memegang bidang tugasnya: pelayanan umum, kesejahteraan, pemerintahan, keuangan, dan perencanaan pembangunan.</p>
+    <p class="reveal d2">Di balik setiap surat yang selesai, jalan yang dibangun, dan bantuan yang tersalurkan, ada perangkat desa yang bekerja setiap hari. Struktur pemerintah desa terdiri dari kepala desa, sekretaris desa, kepala urusan, kepala seksi, dan kepala dusun, masing-masing dengan bidang tugas yang jelas: pelayanan umum, kesejahteraan, pemerintahan, keuangan, dan perencanaan pembangunan.</p><p class="reveal d3">Bersama Badan Permusyawaratan Desa dan lembaga kemasyarakatan, mereka menjadi mitra warga untuk membawa Pandanwangi lebih maju.</p>
   </div>
 </section>
 
 <section class="sec">
   <div class="wrap">
-    <div class="sec-h"><span class="eyebrow reveal">Perangkat desa</span><h2 class="reveal d1">Pilih nama, <span class="mark">kenali</span> tugasnya.</h2><p class="reveal d2">Kartu di samping ikut berganti saat Anda menggulir atau mengetuk nama perangkat.</p></div>
+    <div class="sec-h"><span class="eyebrow reveal">Perangkat desa</span><h2 class="reveal d1">Pilih nama, <span class="mark">kenali</span> tugasnya.</h2><p class="reveal d2">Kartu foto ikut berganti saat Anda menggulir atau mengetuk nama perangkat. Kenali siapa yang bisa Anda temui untuk setiap keperluan, dari mengurus surat sampai menyampaikan aspirasi pembangunan di dusun Anda.</p></div>
     <div class="ppl">
       <div class="ppl-list" id="pplList"><div class="skel" style="height:420px"></div></div>
       <aside class="ppl-card" id="pplCard" aria-live="polite">
@@ -40,13 +40,13 @@
   <div class="wrap">
     <div class="sec-h"><span class="eyebrow reveal">Struktur organisasi</span><h2 class="reveal d1">Bagan pemerintah desa.</h2></div>
     <figure class="reveal d1" style="margin:0;border:2px solid var(--ink);border-radius:var(--r);overflow:hidden;box-shadow:var(--hard);background:#fff"><img src="img/struktur-struktur-fix.webp" alt="Bagan struktur organisasi Pemerintah Desa Pandanwangi" loading="lazy" style="width:100%"></figure>
-    <p class="note" style="margin-top:12px">Bagan dari dokumentasi desa. Daftar nama di atas mengikuti data perangkat aktif di aplikasi desa.</p>
+    <p class="note" style="margin-top:12px">Jabatan yang sedang kosong ditandai “(kosong)” sampai pejabat barunya ditetapkan. Daftar nama di atas selalu mengikuti data perangkat aktif di aplikasi desa.</p>
   </div>
 </section>
 
 <section class="band">
   <div class="sun2" data-par="-.12"></div>
-  <div class="wrap"><span class="hand" style="color:var(--ink)">butuh surat?</span><h2 data-lines>Kasi Pelayanan siap<br>membantu Anda.</h2><a class="btn dark" href="layanan.html" style="margin-top:18px">Lihat persyaratan layanan</a></div>
+  <div class="wrap"><span class="hand" style="color:var(--ink)">butuh surat?</span><h2 data-lines>Kasi Pelayanan siap<br>membantu Anda.</h2><p style="max-width:560px;font-size:17px">Datang langsung ke balai desa pada jam kerja, atau ajukan permohonan surat secara online dari rumah. Surat Anda disiapkan, Anda tinggal mengambilnya.</p><div class="hero-cta"><a class="btn dark" href="surat.html">Ajukan surat online</a><a class="btn ghost" href="layanan.html">Lihat persyaratan</a></div></div>
 </section>
 </main>
 <script src="assets/site.js"></script>
@@ -83,7 +83,7 @@ function render(arr){
   $('#pplList').innerHTML=arr.map(function(p,i){var f=foto(p.nama);return '<div class="pp reveal" tabindex="0" data-i="'+i+'">'+(f?'<img src="'+f+'" alt="" loading="lazy">':'<span class="ini">'+ini(p.nama)+'</span>')+'<div><b>'+esc(p.nama)+'</b><small>'+esc(p.jabatan)+'</small></div><em>'+String(i+1).padStart(2,'0')+'</em></div>'}).join('');
   var items=P.$$('.pp');
   items.forEach(function(e){var i=+e.getAttribute('data-i');e.onclick=function(){show(i)};e.onkeydown=function(k){if(k.key==='Enter')show(i)}});
-  if('IntersectionObserver' in window&&matchMedia('(min-width:981px)').matches){var o=new IntersectionObserver(function(es){es.forEach(function(x){if(x.isIntersecting)show(+x.target.getAttribute('data-i'))})},{rootMargin:'-48% 0px -48% 0px'});items.forEach(function(e){o.observe(e)})}
+  if('IntersectionObserver' in window){var o=new IntersectionObserver(function(es){es.forEach(function(x){if(x.isIntersecting)show(+x.target.getAttribute('data-i'))})},{rootMargin:matchMedia('(max-width:980px)').matches?'-55% 0px -40% 0px':'-48% 0px -48% 0px'});items.forEach(function(e){o.observe(e)})}
   P.observe($('#pplList'));show(0);
 }
 document.addEventListener('pw:profil',function(ev){
