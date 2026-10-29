@@ -1922,9 +1922,10 @@ const UI = {
     fields: [F('judul', 'Judul', 'text', { req: 1, wide: 1 }), F('tanggal', 'Tanggal Diterima', 'date', { req: 1, def: isoToday }),
       F('kategori', 'Kategori', 'select', { opt: ['Informasi', 'Himbauan', 'Pengumuman', 'Undangan', 'Surat Edaran', 'Lainnya'], def: 'Informasi' }), F('sumber', 'Dari / Sumber', 'text', { list: ['Kecamatan Tempeh', 'Pemkab Lumajang', 'DPMD Kab. Lumajang', 'Dinas Kesehatan', 'Puskesmas Tempeh', 'Polsek Tempeh', 'Koramil Tempeh', 'BPD Desa Pandanwangi'] }),
       F('isi', 'Isi Berita / Informasi', 'textarea', { wide: 1, rows: 6 }), F('dok_id', 'Lampiran', 'file'), F('foto', 'Foto', 'fotos', { max: 5 }),
-      F('tampil_dari', 'Tampil di Beranda mulai', 'date', { hint: 'Kosong = mulai tanggal diterima' }), F('tampil_sampai', 'Tampil di Beranda sampai', 'date', { hint: 'Kosong = 7 hari setelah tanggal diterima' })],
+      F('tampil_dari', 'Tampil di Beranda mulai', 'date', { hint: 'Kosong = mulai tanggal diterima' }), F('tampil_sampai', 'Tampil di Beranda sampai', 'date', { hint: 'Kosong = 7 hari setelah tanggal diterima' }),
+      F('publik', 'Tampilkan di website desa', 'select', { opt: ['Tidak', 'Ya'], def: 'Tidak', hint: 'Ya = judul & isi tampil untuk umum di desapandanwangi.pages.dev (lampiran tidak ikut)' })],
     chips: { k: 'kategori', opt: ['Informasi', 'Himbauan', 'Pengumuman', 'Undangan', 'Surat Edaran', 'Lainnya'] },
-    row: r => ({ t: r.judul, s: [fDay(r.tanggal), r.sumber].filter(Boolean).join(' · '), s2: String(r.isi || '').slice(0, 120), av: ic('mega'), pill: r.kategori ? `<span class="pill info">${esc(r.kategori)}</span>` : '' }),
+    row: r => ({ t: r.judul, s: [fDay(r.tanggal), r.sumber].filter(Boolean).join(' · '), s2: String(r.isi || '').slice(0, 120), av: ic('mega'), pill: (r.kategori ? `<span class="pill info">${esc(r.kategori)}</span>` : '') + (r.publik === 'Ya' ? ' <span class="pill ok">Website</span>' : '') }),
     print: { title: 'BUKU BERITA & INFORMASI', cols: [['Tanggal', r => fDate(r.tanggal)], ['Kategori', 'kategori'], ['Judul', 'judul'], ['Dari', 'sumber'], ['Isi', r => esc(r.isi || '').replace(/\n/g, '<br>')]] }
   },
   keu_rek: {
@@ -8954,7 +8955,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '210', tgl: '2026-10-29', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '211', tgl: '2026-10-29', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
