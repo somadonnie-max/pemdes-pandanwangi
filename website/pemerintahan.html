@@ -30,9 +30,16 @@
       <div class="ppl-list" id="pplList"><div class="skel" style="height:420px"></div></div>
       <aside class="ppl-card" id="pplCard" aria-live="polite">
         <div class="ph"><div class="sun"></div><img id="pcImg" alt=""></div>
-        <div class="bd"><b id="pcNama">Memuat…</b><small id="pcJab"></small><p id="pcTugas"></p></div>
+        <div class="bd"><b id="pcNama">Memuat…</b><small id="pcJab"></small><div class="pc-meta" id="pcMeta"></div><p id="pcTugas"></p><div class="pc-rw" id="pcRw"></div></div>
       </aside>
     </div>
+  </div>
+</section>
+
+<section class="sec" id="petugas">
+  <div class="wrap">
+    <div class="sec-h"><span class="eyebrow reveal">Mitra pemerintahan</span><h2 class="reveal d1">BPD, Ketua RW &amp; <span class="mark">Ketua RT</span>.</h2><p class="reveal d2">Badan Permusyawaratan Desa mengawasi jalannya pemerintahan dan menyalurkan aspirasi warga. Ketua RW dan RT menjadi pintu pertama warga untuk urusan lingkungan, surat pengantar, hingga pendataan. Kenali mereka di lingkungan Anda.</p></div>
+    <div id="pgBox" data-kel="BPD,RW,RT"><div class="skel" style="height:240px"></div></div>
   </div>
 </section>
 
@@ -50,6 +57,7 @@
 </section>
 </main>
 <script src="assets/site.js"></script>
+<script src="assets/petugas.js"></script>
 <script>
 (function(){
 var P=PW,$=P.$,esc=P.esc;
@@ -66,29 +74,38 @@ var TUGAS=[
  [/dusun|kasun/i,'Perpanjangan tangan Kepala Desa di tingkat dusun: menjaga ketenteraman, membantu program pembangunan, membina lembaga kemasyarakatan, menyerap aspirasi warga, dan melaporkan perkembangan wilayahnya.'],
  [/pendamping|staf/i,'Membantu perangkat desa dalam pelayanan dan administrasi kantor desa sehari-hari.']];
 var FALLBACK=[['Edi Santoso','Kepala Desa'],['Muhammad Ainur Rofiq, S.Pd','Sekretaris Desa'],['Zainul Amin, S.Pd','Kasi Pelayanan'],['Muliyanah, S.Pd','Kasi Kesejahteraan'],['Sugianto, S.Pd','Kasi Pemerintahan'],['Soma Romadhoni','Kaur Tata Usaha dan Umum'],['Pingkan Agum Sasikirana, S.Pd','Kaur Keuangan'],['Edi Hariyanto, S.E','Kaur Perencanaan'],['Sugeng Waluyo','Kepala Dusun Krajan 2'],['Sunariyo','Kepala Dusun Krajan 3'],['Khoirul Anam','Kepala Dusun Timur Sawah'],['Muhammad Hadi Sukarno','Kepala Dusun Tunjungan'],['Heruman Akbar','Kepala Dusun Pemukiman']];
-function foto(n){n=String(n).toLowerCase();for(var i=0;i<FOTO.length;i++)if(n.indexOf(FOTO[i][0])>-1)return 'img/perangkat-'+FOTO[i][1]+'.webp';return ''}
+var FT={};
+function foto(n,id){n=String(n).toLowerCase();for(var i=0;i<FOTO.length;i++)if(n.indexOf(FOTO[i][0])>-1)return 'img/perangkat-'+FOTO[i][1]+'.webp';return (id&&FT[id])||''}
+var BLN=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+function tgl(d){var p=String(d||'').slice(0,10).split('-');return p.length===3?(+p[2])+' '+BLN[+p[1]-1]+' '+p[0]:''}
+function lama(d){var p=String(d||'').slice(0,10).split('-');if(p.length<3)return '';var a=new Date(+p[0],+p[1]-1,+p[2]),b=new Date(),m=(b.getFullYear()-a.getFullYear())*12+b.getMonth()-a.getMonth()-(b.getDate()<a.getDate()?1:0);if(m<0)return '';var t=Math.floor(m/12),bl=m%12;return (t?t+' tahun ':'')+(bl||!t?bl+' bulan':'').trim()}
 function tugas(j){for(var i=0;i<TUGAS.length;i++)if(TUGAS[i][0].test(j))return TUGAS[i][1];return 'Perangkat Desa Pandanwangi.'}
 function ini(n){return String(n).replace(/,.*$/,'').split(/\s+/).slice(0,2).map(function(w){return w[0]}).join('').toUpperCase()}
 var list=[],cur=-1;
 function show(i){
   if(i===cur)return;cur=i;var p=list[i];
   P.$$('.pp').forEach(function(e,k){e.classList.toggle('act',k===i)});
-  var img=$('#pcImg'),f=foto(p.nama);
+  var img=$('#pcImg'),f=foto(p.nama,p.foto);
   img.style.opacity=0;setTimeout(function(){if(f){img.src=f;img.alt='Foto '+p.nama;img.style.display=''}else{img.style.display='none'}img.style.opacity=1},180);
-  ['pcNama','pcJab','pcTugas'].forEach(function(id){var e=$('#'+id);e.classList.remove('fade-sw');void e.offsetWidth;e.classList.add('fade-sw')});
+  var mt=[];if(p.nrpdesa)mt.push('<span><i>NRPDesa</i>'+esc(p.nrpdesa)+'</span>');if(p.mulai)mt.push('<span><i>Menjabat sejak</i>'+esc(tgl(p.mulai))+'</span>');if(p.mulai&&lama(p.mulai))mt.push('<span><i>Lama menjabat</i>'+esc(lama(p.mulai))+'</span>');if(p.akhir)mt.push('<span><i>Akhir masa jabatan</i>'+esc(tgl(p.akhir))+'</span>');if(p.tambahan)mt.push('<span class="w"><i>Tugas tambahan</i>'+esc(String(p.tambahan).replace(/\n+/g,', '))+'</span>');
+  $('#pcMeta').innerHTML=mt.join('');
+  var rw=(p.riwayat||[]).slice();if(p.jabatan_awal&&p.jabatan_awal!==p.jabatan&&!rw.length)rw.push({jabatan:p.jabatan_awal,jenis:'Jabatan awal'});
+  $('#pcRw').innerHTML=rw.length?'<b>Riwayat jabatan</b><ol>'+rw.map(function(r){return '<li><span>'+esc(tgl(r.tgl)||'')+'</span>'+esc(r.jabatan||'')+(r.jenis?' <em>('+esc(r.jenis)+')</em>':'')+'</li>'}).join('')+'<li><span>sekarang</span>'+esc(p.jabatan)+'</li></ol>':'';
+  ['pcNama','pcJab','pcTugas','pcMeta'].forEach(function(id){var e=$('#'+id);e.classList.remove('fade-sw');void e.offsetWidth;e.classList.add('fade-sw')});
   $('#pcNama').textContent=p.nama;$('#pcJab').textContent=p.jabatan;$('#pcTugas').textContent=tugas(p.jabatan);
 }
 function render(arr){
   list=arr;cur=-1;
-  $('#pplList').innerHTML=arr.map(function(p,i){var f=foto(p.nama);return '<div class="pp reveal" tabindex="0" data-i="'+i+'">'+(f?'<img src="'+f+'" alt="" loading="lazy">':'<span class="ini">'+ini(p.nama)+'</span>')+'<div><b>'+esc(p.nama)+'</b><small>'+esc(p.jabatan)+'</small></div><em>'+String(i+1).padStart(2,'0')+'</em></div>'}).join('');
+  $('#pplList').innerHTML=arr.map(function(p,i){var f=foto(p.nama,p.foto);return '<div class="pp reveal" tabindex="0" data-i="'+i+'">'+(f?'<img src="'+f+'" alt="" loading="lazy">':'<span class="ini">'+ini(p.nama)+'</span>')+'<div><b>'+esc(p.nama)+'</b><small>'+esc(p.jabatan)+(p.mulai?' · sejak '+esc(String(p.mulai).slice(0,4)):'')+'</small></div><em>'+String(i+1).padStart(2,'0')+'</em></div>'}).join('');
   var items=P.$$('.pp');
   items.forEach(function(e){var i=+e.getAttribute('data-i');e.onclick=function(){show(i)};e.onkeydown=function(k){if(k.key==='Enter')show(i)}});
   if('IntersectionObserver' in window){var o=new IntersectionObserver(function(es){es.forEach(function(x){if(x.isIntersecting)show(+x.target.getAttribute('data-i'))})},{rootMargin:matchMedia('(max-width:980px)').matches?'-55% 0px -40% 0px':'-48% 0px -48% 0px'});items.forEach(function(e){o.observe(e)})}
   P.observe($('#pplList'));show(0);
 }
 document.addEventListener('pw:profil',function(ev){
-  var d=ev.detail,a=d&&d.aparat&&d.aparat.length?d.aparat.map(function(x){return{nama:x.nama,jabatan:x.jabatan}}):FALLBACK.map(function(x){return{nama:x[0],jabatan:x[1]}});
-  render(a);
+  var d=ev.detail,a=d&&d.aparat&&d.aparat.length?d.aparat:FALLBACK.map(function(x){return{nama:x[0],jabatan:x[1]}});
+  var ids=a.filter(function(x){return x.foto&&!foto(x.nama)}).map(function(x){return x.foto});
+  if(ids.length)P.api({aksi:'foto',ids:ids}).then(function(m){FT=m||{};render(a)}).catch(function(){render(a)});else render(a);
 });
 })();
 </script>

@@ -75,7 +75,7 @@ function preloader(){
   store('wp:seen',1);
   var p=document.createElement('div');p.className='pre';
   var w='Pandanwangi'.split('').map(function(c,i){return '<span style="animation-delay:'+(.05*i)+'s">'+c+'</span>'}).join('');
-  p.innerHTML='<div class="pre-in"><div class="pre-sun"></div><div class="pre-w">'+w+'</div><small>selamat datang, sedulur…</small></div>';
+  p.innerHTML='<div class="pre-in"><div class="pre-sun"></div><div class="pre-w">'+w+'</div><small>selamat datang sedulur, setretanan!</small></div>';
   document.body.appendChild(p);
   setTimeout(function(){p.classList.add('out');setTimeout(function(){p.remove()},1100)},1500);
 }
