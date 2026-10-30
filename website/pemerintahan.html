@@ -75,7 +75,16 @@ var TUGAS=[
  [/pendamping|staf/i,'Membantu perangkat desa dalam pelayanan dan administrasi kantor desa sehari-hari.']];
 var FALLBACK=[['Edi Santoso','Kepala Desa'],['Muhammad Ainur Rofiq, S.Pd','Sekretaris Desa'],['Zainul Amin, S.Pd','Kasi Pelayanan'],['Muliyanah, S.Pd','Kasi Kesejahteraan'],['Sugianto, S.Pd','Kasi Pemerintahan'],['Soma Romadhoni','Kaur Tata Usaha dan Umum'],['Pingkan Agum Sasikirana, S.Pd','Kaur Keuangan'],['Edi Hariyanto, S.E','Kaur Perencanaan'],['Sugeng Waluyo','Kepala Dusun Krajan 2'],['Sunariyo','Kepala Dusun Krajan 3'],['Khoirul Anam','Kepala Dusun Timur Sawah'],['Muhammad Hadi Sukarno','Kepala Dusun Tunjungan'],['Heruman Akbar','Kepala Dusun Pemukiman']];
 var FT={};
-function foto(n,id){n=String(n).toLowerCase();for(var i=0;i<FOTO.length;i++)if(n.indexOf(FOTO[i][0])>-1)return 'img/perangkat-'+FOTO[i][1]+'.webp';return (id&&FT[id])||''}
+var PTG={};
+function kunci(n){return String(n||'').toLowerCase().replace(/,.*$/,'').replace(/[^a-z ]/g,'').replace(/\s+/g,' ').trim()}
+function statis(n){n=String(n).toLowerCase();for(var i=0;i<FOTO.length;i++)if(n.indexOf(FOTO[i][0])>-1)return 'img/perangkat-'+FOTO[i][1]+'.webp';return ''}
+/* urutan: foto di data Aparatur -> foto di data Petugas/Lembaga (nama sama) -> gambar lama di website */
+function fotoDaftar(p){var r=[],id=p.foto,pt=PTG[kunci(p.nama)];
+  if(id){r.push(P.fotoUrl(id));r.push(FT[id])}
+  if(pt){r.push(P.fotoUrl(pt));r.push(FT[pt])}
+  r.push(statis(p.nama));return r.filter(function(x,i,a){return x&&a.indexOf(x)===i})}
+function foto(p){return fotoDaftar(p)[0]||''}
+function pasang(img,p){var L=fotoDaftar(p),i=0;img.onerror=function(){i++;if(i<L.length)img.src=L[i];else img.style.display='none'};if(L.length){img.style.display='';img.src=L[0]}else img.style.display='none'}
 var BLN=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 function tgl(d){var p=String(d||'').slice(0,10).split('-');return p.length===3?(+p[2])+' '+BLN[+p[1]-1]+' '+p[0]:''}
 function lama(d){var p=String(d||'').slice(0,10).split('-');if(p.length<3)return '';var a=new Date(+p[0],+p[1]-1,+p[2]),b=new Date(),m=(b.getFullYear()-a.getFullYear())*12+b.getMonth()-a.getMonth()-(b.getDate()<a.getDate()?1:0);if(m<0)return '';var t=Math.floor(m/12),bl=m%12;return (t?t+' tahun ':'')+(bl||!t?bl+' bulan':'').trim()}
@@ -85,8 +94,8 @@ var list=[],cur=-1;
 function show(i){
   if(i===cur)return;cur=i;var p=list[i];
   P.$$('.pp').forEach(function(e,k){e.classList.toggle('act',k===i)});
-  var img=$('#pcImg'),f=foto(p.nama,p.foto);
-  img.style.opacity=0;setTimeout(function(){if(f){img.src=f;img.alt='Foto '+p.nama;img.style.display=''}else{img.style.display='none'}img.style.opacity=1},180);
+  var img=$('#pcImg');
+  img.style.opacity=0;setTimeout(function(){img.alt='Foto '+p.nama;pasang(img,p);img.style.opacity=1},180);
   var mt=[];if(p.nrpdesa)mt.push('<span><i>NRPDesa</i>'+esc(p.nrpdesa)+'</span>');if(p.mulai)mt.push('<span><i>Menjabat sejak</i>'+esc(tgl(p.mulai))+'</span>');if(p.mulai&&lama(p.mulai))mt.push('<span><i>Lama menjabat</i>'+esc(lama(p.mulai))+'</span>');if(p.akhir)mt.push('<span><i>Akhir masa jabatan</i>'+esc(tgl(p.akhir))+'</span>');if(p.tambahan)mt.push('<span class="w"><i>Tugas tambahan</i>'+esc(String(p.tambahan).replace(/\n+/g,', '))+'</span>');
   $('#pcMeta').innerHTML=mt.join('');
   var rw=(p.riwayat||[]).slice();if(p.jabatan_awal&&p.jabatan_awal!==p.jabatan&&!rw.length)rw.push({jabatan:p.jabatan_awal,jenis:'Jabatan awal'});
@@ -96,7 +105,8 @@ function show(i){
 }
 function render(arr){
   list=arr;cur=-1;
-  $('#pplList').innerHTML=arr.map(function(p,i){var f=foto(p.nama,p.foto);return '<div class="pp reveal" tabindex="0" data-i="'+i+'">'+(f?'<img src="'+f+'" alt="" loading="lazy">':'<span class="ini">'+ini(p.nama)+'</span>')+'<div><b>'+esc(p.nama)+'</b><small>'+esc(p.jabatan)+(p.mulai?' · sejak '+esc(String(p.mulai).slice(0,4)):'')+'</small></div><em>'+String(i+1).padStart(2,'0')+'</em></div>'}).join('');
+  $('#pplList').innerHTML=arr.map(function(p,i){var f=foto(p);return '<div class="pp reveal" tabindex="0" data-i="'+i+'">'+(f?'<img data-pi="'+i+'" alt="" loading="lazy">':'<span class="ini">'+ini(p.nama)+'</span>')+'<div><b>'+esc(p.nama)+'</b><small>'+esc(p.jabatan)+(p.mulai?' · sejak '+esc(String(p.mulai).slice(0,4)):'')+'</small></div><em>'+String(i+1).padStart(2,'0')+'</em></div>'}).join('');
+  P.$$('img[data-pi]').forEach(function(im){pasang(im,arr[+im.getAttribute('data-pi')])});
   var items=P.$$('.pp');
   items.forEach(function(e){var i=+e.getAttribute('data-i');e.onclick=function(){show(i)};e.onkeydown=function(k){if(k.key==='Enter')show(i)}});
   if('IntersectionObserver' in window){var o=new IntersectionObserver(function(es){es.forEach(function(x){if(x.isIntersecting)show(+x.target.getAttribute('data-i'))})},{rootMargin:matchMedia('(max-width:980px)').matches?'-55% 0px -40% 0px':'-48% 0px -48% 0px'});items.forEach(function(e){o.observe(e)})}
@@ -104,7 +114,8 @@ function render(arr){
 }
 document.addEventListener('pw:profil',function(ev){
   var d=ev.detail,a=d&&d.aparat&&d.aparat.length?d.aparat:FALLBACK.map(function(x){return{nama:x[0],jabatan:x[1]}});
-  var ids=a.filter(function(x){return x.foto&&!foto(x.nama)}).map(function(x){return x.foto});
+  PTG={};((d&&d.petugas)||[]).forEach(function(x){var k=kunci(x.nama);if(x.foto&&k&&!PTG[k])PTG[k]=x.foto});
+  var ids=[];a.forEach(function(x){if(x.foto)ids.push(x.foto);var t=PTG[kunci(x.nama)];if(t)ids.push(t)});
   if(ids.length)P.api({aksi:'foto',ids:ids}).then(function(m){FT=m||{};render(a)}).catch(function(){render(a)});else render(a);
 });
 })();

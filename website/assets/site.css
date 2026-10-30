@@ -272,7 +272,7 @@ section{position:relative}
 .ppl{display:grid;grid-template-columns:1fr 420px;gap:50px;align-items:start}
 .ppl-list{display:grid;gap:14px}
 .pp{display:grid;grid-template-columns:64px 1fr auto;gap:16px;align-items:center;padding:14px 18px;border:2px solid var(--line);border-radius:18px;background:var(--paper);cursor:pointer;transition:.3s}
-.pp img{width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:top;background:var(--sand);mix-blend-mode:multiply}
+.pp img{width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:50% 20%;background:var(--sand)}
 .pp .ini{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:var(--sand);font:800 22px/1 var(--f-d)}
 .pp b{display:block;font-family:var(--f-d);font-size:19px;line-height:1.2}
 .pp small{color:var(--muted);font-weight:600}
@@ -280,7 +280,7 @@ section{position:relative}
 .pp.act{border-color:var(--ink);box-shadow:var(--hard);transform:translateX(6px)}
 .ppl-card{position:sticky;top:110px;border-radius:28px;border:2px solid var(--ink);background:var(--padi);box-shadow:8px 8px 0 var(--ink);overflow:hidden}
 .ppl-card .ph{height:330px;background:radial-gradient(circle at 50% 110%,var(--senja-2),var(--padi) 65%);display:flex;align-items:flex-end;justify-content:center;position:relative}
-.ppl-card .ph img{height:100%;width:auto;object-fit:contain;mix-blend-mode:multiply;transition:opacity .35s,transform .5s}
+.ppl-card .ph{background:var(--sand)!important;overflow:hidden}.ppl-card .ph img{position:absolute;inset:0;height:100%;width:100%;object-fit:cover;object-position:50% 22%;transition:opacity .35s,transform .5s}.ppl-card .ph .sun{display:none}
 .ppl-card .ph .sun{position:absolute;width:160px;height:160px;border-radius:50%;background:var(--senja);opacity:.35;top:30px;left:50%;transform:translateX(-50%)}
 .ppl-card .bd{background:var(--paper);border-top:2px solid var(--ink);padding:22px 24px}
 .ppl-card .bd b{font:800 26px/1.1 var(--f-d);display:block}
@@ -288,7 +288,7 @@ section{position:relative}
 .ppl-card .bd p{margin:0;color:var(--muted);font-size:15px;min-height:96px}
 .fade-sw{animation:sw .45s ease}
 @keyframes sw{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-@media(max-width:980px){.ppl{grid-template-columns:1fr}.ppl-card{order:-1;position:sticky;top:70px;z-index:5;display:grid;grid-template-columns:110px 1fr;box-shadow:4px 4px 0 var(--ink);border-radius:20px}.ppl{gap:16px}.ppl-card .ph{height:140px}.ppl-card .bd p{display:block!important;min-height:0;font-size:12.5px;line-height:1.4;display:-webkit-box!important;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.ppl-card .bd{border-top:0;border-left:2px solid var(--ink);padding:14px}.ppl-card .bd p{display:none}.ppl-card .bd b{font-size:19px}}
+@media(max-width:980px){.ppl{grid-template-columns:1fr}.ppl-card{order:-1;position:sticky;top:84px;z-index:5;display:grid;grid-template-columns:110px 1fr;box-shadow:4px 4px 0 var(--ink);border-radius:20px}.ppl{gap:16px}.ppl-card .ph{height:auto;min-height:170px}.ppl-card .bd p{display:block!important;min-height:0;font-size:12.5px;line-height:1.45;margin-top:8px}.ppl-card .bd{border-top:0;border-left:2px solid var(--ink);padding:14px}.ppl-card .bd b{font-size:19px}}
 
 /* lembaga */
 .lbg{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
@@ -422,7 +422,7 @@ section{position:relative}
 .pc-rw li{position:relative}.pc-rw li:before{content:"";position:absolute;left:-20px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--padi);border:2px solid var(--ink)}
 .pc-rw li span{display:block;font-size:11px;color:var(--muted);font-weight:700}
 .pc-rw em{color:var(--muted);font-style:normal}
-@media(max-width:980px){.pc-meta{margin:2px 0 0}.pc-meta span{padding:3px 7px;font-size:11.5px}.pc-meta i{font-size:9px}.pc-meta span.w,.pc-rw{display:none}.ppl-card .bd p{display:none!important}}
+@media(max-width:980px){.pc-meta{margin:2px 0 0}.pc-meta span{padding:3px 7px;font-size:11.5px}.pc-meta i{font-size:9px}.pc-rw{display:none}.pc-meta span.w{flex-basis:100%;flex-wrap:wrap}}
 @media(max-width:980px){.ppl-card .ph .sun{display:none}.pc-meta{flex-direction:row}.pc-meta span{flex-direction:row;gap:4px;align-items:baseline}}
 
 /* pita pengumuman dari menu Website Desa */

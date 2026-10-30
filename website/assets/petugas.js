@@ -11,7 +11,7 @@ function judul(n){return String(n||'').toLowerCase().replace(/(^|[\s.'-])([a-z])
 function rwDari(j){var m=String(j).match(/RW\s*0*(\d+)/i);return m?+m[1]:99}
 function rtDari(j){var m=String(j).match(/RT\s*0*(\d+)/i);return m?+m[1]:99}
 var FT={};
-function kartu(x,top){var f=x.foto&&FT[x.foto];return '<div class="pg reveal'+(top?' top':'')+'"><span class="av">'+(f?'<img src="'+f+'" alt="" loading="lazy">':esc(ini(x.nama)))+'</span><div><b>'+esc(judul(x.nama))+'</b><small>'+esc(x.jabatan)+'</small></div></div>'}
+function kartu(x,top){var f=x.foto&&(P.fotoUrl(x.foto)||FT[x.foto]);return '<div class="pg reveal'+(top?' top':'')+'"><span class="av">'+(f?'<img src="'+f+'" alt="" loading="lazy"'+(FT[x.foto]&&f!==FT[x.foto]?' data-alt="'+FT[x.foto]+'" onerror="if(this.dataset.alt){this.src=this.dataset.alt;this.removeAttribute(\'data-alt\')}"':'')+'>':esc(ini(x.nama)))+'</span><div><b>'+esc(judul(x.nama))+'</b><small>'+esc(x.jabatan)+'</small></div></div>'}
 function isi(box,kel,L){
   var A=L.filter(function(x){return x.kelompok===kel});
   if(!A.length)return '<p class="muted">Belum ada data pengurus.</p>';

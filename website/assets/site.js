@@ -181,7 +181,9 @@ function initAll(root){splitLines();observe(root||document);tilt()}
 function slug(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}
 function title(s){return String(s||'').toLowerCase().replace(/(^|[\s/(-])([a-z])/g,function(m,a,b){return a+b.toUpperCase()}).replace(/\bSd\b/g,'SD').replace(/\bSltp\b/g,'SLTP').replace(/\bSlta\b/g,'SLTA').replace(/\bPns\b/g,'PNS').replace(/\bTni\b/g,'TNI').replace(/\bPolri\b/g,'POLRI').replace(/\bIi\b/g,'II').replace(/\bIii\b/g,'III').replace(/\bIv\b/g,'IV')}
 
-window.PW={setCount:setCount,api:api,$:$,$$:$$,esc:esc,nf:nf,observe:observe,initAll:initAll,story:story,rpShort:rpShort,ICON:ICON,slug:slug,title:title,RM:RM,typer:typer};
+/* foto perangkat/petugas dari data aplikasi (salinan publik dibuat server sekali per foto) */
+function fotoUrl(id){id=String(id||'');return /^r2:dokumen\//.test(id)?API.replace('/rest/v1/rpc/web_publik','/functions/v1/webkonten')+'?foto='+encodeURIComponent(id):''}
+window.PW={fotoUrl:fotoUrl,setCount:setCount,api:api,$:$,$$:$$,esc:esc,nf:nf,observe:observe,initAll:initAll,story:story,rpShort:rpShort,ICON:ICON,slug:slug,title:title,RM:RM,typer:typer};
 
 document.addEventListener('DOMContentLoaded',function(){
   shell();wkApply();preloader();initAll();wkMuat();parallax();dragScroll();story();tabs();
