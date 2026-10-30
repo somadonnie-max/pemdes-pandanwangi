@@ -38,3 +38,20 @@ self.addEventListener('fetch', e => {
     return lama;
   })());
 });
+/* Notifikasi HP: permohonan surat & laporan warga baru dari website desa */
+self.addEventListener('push', e => {
+  let d = {}; try { d = e.data ? e.data.json() : {}; } catch (x) { d = { body: e.data ? e.data.text() : '' }; }
+  e.waitUntil(self.registration.showNotification(d.title || 'Pemdes Pandanwangi', {
+    body: d.body || '', icon: './icon-192.png', badge: './icon-192.png', tag: d.tag || undefined, renotify: !!d.tag,
+    vibrate: [120, 60, 120], data: { url: d.url || './' }
+  }));
+});
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const url = new URL((e.notification.data && e.notification.data.url) || './', self.registration.scope).href;
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(cs => {
+    const c = cs.find(x => x.url.indexOf(self.registration.scope) === 0);
+    if (c) { c.postMessage({ t: 'buka', url }); return c.focus(); }
+    return self.clients.openWindow(url);
+  }));
+});
