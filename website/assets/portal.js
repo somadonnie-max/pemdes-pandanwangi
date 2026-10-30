@@ -38,9 +38,9 @@ function sibuk(btn,on,label){if(on){btn._t=btn.innerHTML;btn.disabled=true;btn.i
 
 /* ---- verifikasi NIK + tanggal lahir ---- */
 function sesi(){var s=ss('pt:sesi');if(s&&s.exp>Date.now())return s;ss('pt:sesi',null);return null}
-function verifikasi(box,onOk){
+function verifikasi(box,onOk,onGagal){
   var cur=sesi();
-  if(cur){tampilWho(box,cur,onOk);return}
+  if(cur&&!(cur.samar&&cur.samar.luar)){tampilWho(box,cur,onOk,onGagal);return}
   box.innerHTML='<div class="msg" data-m></div>'+
    '<div class="fld"><label for="vNik">NIK (16 angka, sesuai KTP/KK)</label><input id="vNik" class="nik" inputmode="numeric" autocomplete="off" maxlength="16" placeholder="3508xxxxxxxxxxxx"></div>'+
    '<div class="fld"><label for="vTgl">Tanggal lahir</label><input id="vTgl" type="date" max="'+new Date().toISOString().slice(0,10)+'"><small>Dicocokkan dengan data kependudukan Desa Pandanwangi.</small></div>'+
@@ -58,15 +58,15 @@ function verifikasi(box,onOk){
     sibuk(bt,true,'Memeriksa data…');
     kirim({aksi:'cek',nik:n,tgl:t,cf:cap.get()}).then(function(r){
       sibuk(bt,false);cap.reset();
-      if(!r.ok)return pesan(m,r.pesan||'Verifikasi gagal.');
-      var s={sesi:r.sesi,samar:r.samar,exp:Date.now()+28*60000};ss('pt:sesi',s);tampilWho(box,s,onOk);
+      if(!r.ok){pesan(m,r.pesan||'Verifikasi gagal.');if(r.luar_boleh&&onGagal)onGagal(m,n,t);return}
+      var s={sesi:r.sesi,samar:r.samar,exp:Date.now()+28*60000};ss('pt:sesi',s);tampilWho(box,s,onOk,onGagal);
     });
   };
 }
-function tampilWho(box,s,onOk){
+function tampilWho(box,s,onOk,onGagal){
   var w=s.samar||{};
   box.innerHTML='<div class="who"><span class="av">'+esc((w.nama||'?').slice(0,1))+'</span><div><b>'+esc(w.nama||'')+'</b><small>'+esc([w.dusun?'Dusun '+w.dusun:'',w.rt?'RT '+w.rt:'',w.rw?'RW '+w.rw:''].filter(Boolean).join(' · '))+' · NIK ••••'+esc(w.nik4||'')+'</small></div><button type="button" data-ganti>Bukan saya</button></div>';
-  $('[data-ganti]',box).onclick=function(){ss('pt:sesi',null);verifikasi(box,onOk)};
+  $('[data-ganti]',box).onclick=function(){ss('pt:sesi',null);verifikasi(box,onOk,onGagal)};
   onOk&&onOk(s);
 }
 

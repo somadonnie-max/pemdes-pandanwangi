@@ -12,11 +12,11 @@ function lstore(k,v){try{if(v===undefined)return localStorage.getItem(k);localSt
 
 /* ---------- data publik dari aplikasi ---------- */
 var cacheP={};
-function api(req){
-  var k='wp:'+JSON.stringify(req),c=store(k);
+function api(req,fn){
+  var k='wp:'+(fn||'')+JSON.stringify(req),c=store(k);
   if(c&&Date.now()-c.t<10*60*1000)return Promise.resolve(c.d);
   if(cacheP[k])return cacheP[k];
-  cacheP[k]=fetch(API,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify({req:req})})
+  cacheP[k]=fetch(fn?API.replace('web_publik',fn):API,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify({req:req})})
     .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
     .then(function(d){store(k,{t:Date.now(),d:d});return d});
   return cacheP[k];
