@@ -113,9 +113,9 @@
   <div class="hero-grid"></div>
   <div class="wrap">
     <div class="crumb"><a href="index.html">Beranda</a> / APBDes</div>
-    <span class="eyebrow">Keterbukaan informasi publik</span>
-    <h1 data-lines>Uang desa,<br><span style="color:var(--padi)">terbuka</span> untuk warga.</h1>
-    <p class="reveal d2">Anggaran Pendapatan dan Belanja Desa beserta realisasinya, ditarik langsung dari pembukuan di aplikasi desa. Pilih tahun anggaran untuk melihat datanya. Warga berhak tahu dari mana uang desa berasal, untuk apa dibelanjakan, dan sejauh mana kegiatannya terlaksana.</p>
+    <span data-ed="t1" class="eyebrow">Keterbukaan informasi publik</span>
+    <h1 data-ed="t2" data-lines>Uang desa,<br><span style="color:var(--padi)">terbuka</span> untuk warga.</h1>
+    <p data-ed="t3" class="reveal d2">Anggaran Pendapatan dan Belanja Desa beserta realisasinya, ditarik langsung dari pembukuan di aplikasi desa. Pilih tahun anggaran untuk melihat datanya. Warga berhak tahu dari mana uang desa berasal, untuk apa dibelanjakan, dan sejauh mana kegiatannya terlaksana.</p>
     <div class="years" id="years"><span class="chip" style="opacity:.6">memuat tahun…</span></div>
     <div class="upd" id="upd"><i></i><span>Menghubungkan ke data desa…</span></div>
   </div>
@@ -131,32 +131,32 @@
     </div>
 
     <div class="row2 r">
-      <div class="panel reveal"><h3>Serapan belanja</h3><p class="ds">Persentase realisasi belanja terhadap anggaran.</p><div class="gauge" id="gauge"></div></div>
-      <div class="panel reveal d1"><h3>Sumber pendapatan</h3><p class="ds">Komposisi anggaran pendapatan desa.</p><div class="donut-wrap" id="donut"></div></div>
+      <div class="panel reveal"><h3 data-ed="t4">Serapan belanja</h3><p data-ed="t5" class="ds">Persentase realisasi belanja terhadap anggaran.</p><div class="gauge" id="gauge"></div></div>
+      <div class="panel reveal d1"><h3 data-ed="t6">Sumber pendapatan</h3><p data-ed="t7" class="ds">Komposisi anggaran pendapatan desa.</p><div class="donut-wrap" id="donut"></div></div>
     </div>
 
-    <div class="panel reveal"><h3>Arus kas kumulatif</h3><p class="ds">Akumulasi realisasi pendapatan dan belanja dari bulan ke bulan. Arahkan kursor ke grafik untuk melihat angkanya.</p>
+    <div class="panel reveal"><h3 data-ed="t8">Arus kas kumulatif</h3><p data-ed="t9" class="ds">Akumulasi realisasi pendapatan dan belanja dari bulan ke bulan. Arahkan kursor ke grafik untuk melihat angkanya.</p>
       <div class="key"><span><i style="background:#1d7a4b"></i>Pendapatan</span><span><i style="background:#e08a1e"></i>Belanja</span></div>
       <div class="line" id="line"></div></div>
 
     <div class="row2">
-      <div class="panel reveal"><h3>Belanja per bidang</h3><p class="ds">Garis putus-putus = anggaran, batang berwarna = realisasi.</p><div class="bars" id="bidang"></div></div>
+      <div class="panel reveal"><h3 data-ed="t10">Belanja per bidang</h3><p data-ed="t11" class="ds">Garis putus-putus = anggaran, batang berwarna = realisasi.</p><div class="bars" id="bidang"></div></div>
       <div class="dash" style="gap:22px">
-        <div class="panel reveal d1"><h3>Jenis belanja</h3><p class="ds">Pembagian anggaran belanja menurut jenisnya.</p><div id="jenis"></div></div>
-        <div class="panel reveal d2"><h3>Sumber dana belanja</h3><p class="ds">Anggaran belanja menurut sumber dananya; garis bawah menunjukkan realisasi.</p><div class="sd" id="sumber"></div></div>
+        <div class="panel reveal d1"><h3 data-ed="t12">Jenis belanja</h3><p data-ed="t13" class="ds">Pembagian anggaran belanja menurut jenisnya.</p><div id="jenis"></div></div>
+        <div class="panel reveal d2"><h3 data-ed="t14">Sumber dana belanja</h3><p data-ed="t15" class="ds">Anggaran belanja menurut sumber dananya; garis bawah menunjukkan realisasi.</p><div class="sd" id="sumber"></div></div>
       </div>
     </div>
 
-    <div class="panel reveal"><h3>Pembiayaan</h3><p class="ds">Penerimaan dan pengeluaran pembiayaan desa.</p><div class="pb" id="pemb"></div></div>
+    <div class="panel reveal"><h3 data-ed="t16">Pembiayaan</h3><p data-ed="t17" class="ds">Penerimaan dan pengeluaran pembiayaan desa.</p><div class="pb" id="pemb"></div></div>
 
-    <div class="panel reveal" id="kegiatan"><h3>Kegiatan &amp; realisasinya</h3><p class="ds">Seluruh kegiatan belanja tahun ini. Ketuk kegiatan untuk melihat rincian belanjanya.</p>
+    <div class="panel reveal" id="kegiatan"><h3 data-ed="t18">Kegiatan &amp; realisasinya</h3><p data-ed="t19" class="ds">Seluruh kegiatan belanja tahun ini. Ketuk kegiatan untuk melihat rincian belanjanya.</p>
       <div class="tbar"><label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="kq" type="search" placeholder="Cari kegiatan…" aria-label="Cari kegiatan"></label>
         <select id="kb" aria-label="Saring bidang"><option value="">Semua bidang</option></select>
         <select id="ks" aria-label="Urutkan"><option value="ang">Anggaran terbesar</option><option value="pct">Serapan tertinggi</option><option value="low">Serapan terendah</option><option value="kode">Kode kegiatan</option></select></div>
       <div class="kg" id="kgList"></div>
       <button class="btn more" id="kgMore" hidden>Tampilkan semua</button>
     </div>
-    <p class="note">Angka realisasi bersumber dari transaksi yang sudah dibukukan di aplikasi desa dan dapat berubah sampai laporan akhir tahun ditetapkan. Untuk dokumen resmi APBDes, silakan menghubungi kantor desa.</p>
+    <p data-ed="t20" class="note">Angka realisasi bersumber dari transaksi yang sudah dibukukan di aplikasi desa dan dapat berubah sampai laporan akhir tahun ditetapkan. Untuk dokumen resmi APBDes, silakan menghubungi kantor desa.</p>
   </div>
 </section>
 </main>

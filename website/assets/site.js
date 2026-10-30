@@ -22,6 +22,34 @@ function api(req,fn){
   return cacheP[k];
 }
 
+/* ---------- konten yang diubah admin lewat aplikasi Pemdes (menu Website Desa) ---------- */
+var WK=null;try{WK=JSON.parse(lstore('pw:wk')||'null')}catch(e){}
+function G(k){return WK&&WK.g&&WK.g[k]||''}
+function urlOk(u,img){u=String(u||'');return /^https:\/\//.test(u)||(img&&/^img\/[\w.-]+$/.test(u))}
+function wkApply(){
+  if(!WK)return;var pg=WK.p&&WK.p[page]||{};
+  $$('[data-ed]').forEach(function(el){
+    var k=el.getAttribute('data-ed'),v=pg[k];if(v==null||v===''||el._wk===v){return}
+    var t=k.charAt(0);
+    if(t==='t'){var h=esc(v).replace(/\n/g,'<br>');
+      if(el._s)h=h.split('<br>').map(function(l){return '<span class="line in"><span>'+l+'</span></span>'}).join('');
+      el.innerHTML=h}
+    else if(t==='i'){if(!urlOk(v,1))return;el.removeAttribute('srcset');el.src=v}
+    else if(t==='b'){if(!urlOk(v,1))return;el.style.backgroundImage='url("'+v.replace(/"/g,'')+'")'}
+    else if(t==='l'){if(!urlOk(v))return;el.setAttribute(el.tagName==='IFRAME'?'src':'href',v)}
+    el._wk=v;
+  });
+  var an=document.getElementById('wkAnn'),pt=G('pengumuman');
+  if(pt&&!an&&!store('wp:ann:'+pt)){an=document.createElement('div');an.id='wkAnn';an.className='wk-ann';var m=document.querySelector('main');m&&m.parentNode.insertBefore(an,m)}
+  if(an){if(!pt)an.remove();else{var lk=G('pengumuman_link');an.innerHTML='<div class="wrap"><span>📢</span><p>'+esc(pt).replace(/\n/g,'<br>')+(urlOk(lk)?' <a href="'+esc(lk)+'" target="_blank" rel="noopener">Selengkapnya →</a>':'')+'</p><button type="button" aria-label="Tutup pengumuman">×</button></div>';an.querySelector('button').onclick=function(){store('wp:ann:'+pt,1);an.remove()}}}
+  $$('[data-g]').forEach(function(el){var k=el.getAttribute('data-g'),v=G(k);if(!v||el._wk===v)return;
+    if(el.tagName==='A'){if(urlOk(v))el.href=v}else el.textContent=v;el._wk=v});
+}
+function wkMuat(){
+  fetch(API.replace('web_publik','web_konten'),{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'},body:'{}'})
+    .then(function(r){return r.ok?r.json():null}).then(function(w){if(!w||typeof w!=='object')return;var j=JSON.stringify(w);if(j===lstore('pw:wk'))return;lstore('pw:wk',j);WK=w;wkApply()}).catch(function(){});
+}
+
 /* ---------- kerangka: header, menu, footer ---------- */
 var NAV=[['index.html','Beranda'],['pemerintahan.html','Pemerintahan'],['sarana.html','Sarana'],['lembaga.html','Lembaga'],['layanan.html','Layanan'],['apbdes.html','APBDes'],['kontak.html','Kontak']];
 var page=(location.pathname.split('/').pop()||'index.html').replace(/\.html?$/,'')||'index';
@@ -53,9 +81,9 @@ function shell(){
   var gl=document.createElement('div');gl.className='glow';b.appendChild(gl);
   addEventListener('pointermove',function(e){gl.style.left=e.clientX+'px';gl.style.top=e.clientY+'px'},{passive:true});
   var ft=document.createElement('footer');ft.className='ft';
-  ft.innerHTML='<div class="wrap"><div class="ft-g"><div><a class="hd-logo" href="index.html"><img data-logo src="'+logo+'" alt=""><span><b>Pemerintah Desa Pandanwangi</b><small>Kecamatan Tempeh · Kabupaten Lumajang · Jawa Timur</small></span></a><p style="margin-top:18px" data-desa="alamat">Jl. K.H. Wahid Hasyim No. 84, Pandanwangi, Tempeh, Lumajang 67371</p><p class="hand" style="color:var(--padi);margin-top:14px">Aman, rukun, damai, sejahtera.</p></div>'+
+  ft.innerHTML='<div class="wrap"><div class="ft-g"><div><a class="hd-logo" href="index.html"><img data-logo src="'+logo+'" alt=""><span><b>Pemerintah Desa Pandanwangi</b><small>Kecamatan Tempeh · Kabupaten Lumajang · Jawa Timur</small></span></a><p style="margin-top:18px" data-desa="alamat">Jl. K.H. Wahid Hasyim No. 84, Pandanwangi, Tempeh, Lumajang 67371</p><p class="hand" data-g="motto" style="color:var(--padi);margin-top:14px">Aman, rukun, damai, sejahtera.</p></div>'+
    '<div><h4>Jelajah</h4>'+NAV.map(function(n){return '<a href="'+n[0]+'">'+n[1]+'</a>'}).join('')+'</div>'+
-   '<div><h4>Layanan Warga</h4><a href="surat.html">Ajukan Surat Online</a><a href="lapor.html">Lapor Desa</a><a href="lacak.html">Lacak Tiket</a><a href="survei.html">Survei Kepuasan</a><a href="index.html#booklet">Booklet Profil Desa</a></div><div><h4>Terhubung</h4><a href="https://whatsapp.com/channel/0029Vb6I135A2pLHQCFx5I1l" target="_blank" rel="noopener">Saluran WhatsApp</a><a href="https://www.instagram.com/kim_pandanwangi/" target="_blank" rel="noopener">Instagram KIM</a><a href="https://www.tiktok.com/@kim_pandanwangi" target="_blank" rel="noopener">TikTok KIM</a><a href="mailto:pandanwangipemdes@gmail.com">pandanwangipemdes@gmail.com</a></div></div>'+
+   '<div><h4>Layanan Warga</h4><a href="surat.html">Ajukan Surat Online</a><a href="lapor.html">Lapor Desa</a><a href="lacak.html">Lacak Tiket</a><a href="survei.html">Survei Kepuasan</a><a href="index.html#booklet">Booklet Profil Desa</a></div><div><h4>Terhubung</h4><a data-g="wa_saluran" href="https://whatsapp.com/channel/0029Vb6I135A2pLHQCFx5I1l" target="_blank" rel="noopener">Saluran WhatsApp</a><a data-g="ig" href="https://www.instagram.com/kim_pandanwangi/" target="_blank" rel="noopener">Instagram KIM</a><a data-g="tiktok" href="https://www.tiktok.com/@kim_pandanwangi" target="_blank" rel="noopener">TikTok KIM</a><a href="mailto:pandanwangipemdes@gmail.com">pandanwangipemdes@gmail.com</a></div></div>'+
    '<div class="ft-big reveal-big">PANDANWANGI</div>'+
    '<div class="ft-bot"><span>© <span data-year></span> Pemerintah Desa Pandanwangi × MMD UB 2025 Kelompok 63</span><span>Data publik diambil langsung dari aplikasi Pemdes Pandanwangi</span></div></div>';
   b.appendChild(ft);
@@ -75,7 +103,7 @@ function preloader(){
   store('wp:seen',1);
   var p=document.createElement('div');p.className='pre';
   var w='Pandanwangi'.split('').map(function(c,i){return '<span style="animation-delay:'+(.05*i)+'s">'+c+'</span>'}).join('');
-  p.innerHTML='<div class="pre-in"><div class="pre-sun"></div><div class="pre-w">'+w+'</div><small>selamat datang sedulur, setretanan!</small></div>';
+  p.innerHTML='<div class="pre-in"><div class="pre-sun"></div><div class="pre-w">'+w+'</div><small data-g="salam">'+esc(G('salam')||'selamat datang sedulur, setretanan!')+'</small></div>';
   document.body.appendChild(p);
   setTimeout(function(){p.classList.add('out');setTimeout(function(){p.remove()},1100)},1500);
 }
@@ -156,7 +184,7 @@ function title(s){return String(s||'').toLowerCase().replace(/(^|[\s/(-])([a-z])
 window.PW={setCount:setCount,api:api,$:$,$$:$$,esc:esc,nf:nf,observe:observe,initAll:initAll,story:story,rpShort:rpShort,ICON:ICON,slug:slug,title:title,RM:RM,typer:typer};
 
 document.addEventListener('DOMContentLoaded',function(){
-  shell();preloader();initAll();parallax();dragScroll();story();tabs();
+  shell();wkApply();preloader();initAll();wkMuat();parallax();dragScroll();story();tabs();
   $$('[data-type]').forEach(typer);
   api({aksi:'profil'}).then(function(d){
     var ds=d.desa||{};
