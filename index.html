@@ -176,6 +176,7 @@ button.stat:hover{border-color:var(--pri)}
 .fpic{aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:var(--surface2);border:1px dashed var(--line);display:grid}
 .fpic img{width:100%;height:100%;object-fit:cover}.fadd{display:grid;place-items:center;align-content:center;gap:4px;color:var(--muted);cursor:pointer;font-size:12.5px;font-weight:600}
 .fslot .fket{font-size:13px;padding:6px 8px}.fpic{position:relative}.fpic[data-no]::before{content:attr(data-no);position:absolute;top:5px;left:5px;z-index:1;min-width:20px;height:20px;border-radius:10px;background:rgba(0,0,0,.65);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;padding:0 6px}.fpic .fcr{position:absolute;right:5px;top:5px;z-index:1;border-radius:10px;background:var(--gold,#c9a227);color:#000;font-size:11px;font-weight:700;padding:1px 6px}.pgp .fbt{grid-template-columns:1fr}.pimg{position:relative}.pimg .fcr{position:absolute;right:3px;top:3px;border-radius:10px;background:var(--gold,#c9a227);color:#000;font-size:10px;font-weight:700;padding:1px 5px}.fbt{display:grid;grid-template-columns:1fr 1fr;gap:4px}.fbt .btn{justify-content:center;padding:6px 4px;min-width:0;font-size:12px;gap:4px;white-space:nowrap}.fbt .btn .ic{width:14px;height:14px;margin:0;flex:none}.fbt .fgn,.fbt .fdel{grid-column:auto}.fbt .fdel{grid-column:1/-1}.fbt label.btn{cursor:pointer}
+.pf-guide{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 34% 30% at 50% 40%,transparent 96%,rgba(255,255,255,.55) 98%,transparent 100%)}
 .cropf{position:relative;width:100%;max-width:440px;margin:0 auto;overflow:hidden;background:#111;border-radius:8px;touch-action:none;cursor:grab;user-select:none}.cropf img{position:absolute;max-width:none;pointer-events:none}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px;margin-top:6px}
 .pslot{display:flex;flex-direction:column;gap:3px;align-items:stretch;text-align:center}
@@ -1537,7 +1538,7 @@ const UI = {
       F('jabatan', 'Jabatan', 'text', { req: 1, dd: () => jabDaftar(), hint: 'Ketuk untuk memilih. Bila mengisi kekosongan jabatan, pilih yang berawalan "Plt."' }), F('jabatan_awal', 'Jabatan saat SK pertama', 'text', { dd: () => jabDaftar(), when: { fn: frm => !!(($('#f_jabatan_awal', frm) || {}).value) }, hint: 'Terisi otomatis bila jabatan pernah berganti (mutasi). Pergantian jabatan sebaiknya lewat tombol Mutasi Jabatan di halaman detail.' }), F('jabatan_tambahan', 'Jabatan Tambahan (satu per baris)', 'textarea', { wide: 1, rows: 2 }), F('niap', 'NIAP'), F('nip', 'NRPDesa / NIP', 'text', { mono: 1, lblFn: { k: 'jabatan', fn: v => NO_INDUK(v) }, hint: 'NRPDesa untuk Sekdes, Kaur, Kasi, Kasun; NIP untuk ASN/PPPK; selain itu No. Induk' }), F('pangkat', 'Pangkat/Golongan'), F('no_sk_angkat', 'Nomor SK Pengangkatan (pertama)'), F('tgl_sk_angkat', 'Tanggal SK Pengangkatan (pertama)', 'date'), F('dok_sk_id', 'Dokumen SK Pengangkatan (pertama)', 'file'), F('akhir_jabatan', 'Akhir masa jabatan', 'date', { hint: 'Otomatis: Kepala Desa 8 tahun sejak pelantikan (UU 3/2024); Sekdes, Kaur, Kasi, Kasun sampai usia 60 tahun. SK berikutnya dicatat lewat tombol di halaman detail.' }),
       F('_h_st', 'Status', 'head'), F('status_jab', 'Status', 'select', { opt: ['Aktif', 'Berhenti', 'Mengundurkan Diri', 'Pensiun', 'Meninggal'], def: 'Aktif', hint: 'Perangkat terdahulu tetap disimpan dengan status Berhenti / Pensiun / Meninggal' }),
       F('no_sk_henti', 'Nomor SK Pemberhentian', 'text', { when: { k: 'status_jab', v: ['Berhenti', 'Mengundurkan Diri', 'Pensiun', 'Meninggal'] } }), F('tgl_sk_henti', 'Tanggal SK Pemberhentian', 'date', { when: { k: 'status_jab', v: ['Berhenti', 'Mengundurkan Diri', 'Pensiun', 'Meninggal'] } }), F('dok_henti_id', 'Dokumen SK Pemberhentian', 'file', { when: { k: 'status_jab', v: ['Berhenti', 'Mengundurkan Diri', 'Pensiun', 'Meninggal'] } }),
-      F('_h_kt', 'Kontak, BPJS & foto', 'head'), F('wa', 'Nomor WhatsApp', 'tel'), F('email', 'Email', 'email'), F('bpjs_kes', 'No. BPJS Kesehatan', 'text', { mono: 1, sens: 1 }), F('bpjs_tk', 'No. BPJS Ketenagakerjaan', 'text', { mono: 1, sens: 1 }), F('ket', 'Keterangan'), F('foto_id', 'Foto', 'file', { img: 1 })],
+      F('_h_kt', 'Kontak, BPJS & foto', 'head'), F('wa', 'Nomor WhatsApp', 'tel'), F('email', 'Email', 'email'), F('bpjs_kes', 'No. BPJS Kesehatan', 'text', { mono: 1, sens: 1 }), F('bpjs_tk', 'No. BPJS Ketenagakerjaan', 'text', { mono: 1, sens: 1 }), F('ket', 'Keterangan'), F('foto_id', 'Foto', 'file', { img: 1, crop: 0.75 })],
     sort: 'no_urut',
     chips: { k: 'status_jab', opt: ['Aktif', 'Berhenti', 'Mengundurkan Diri', 'Pensiun', 'Meninggal'] },
     row: r => ({ t: r.nama, s: [r.jabatan].concat(jabTambah(r)).join(' · '), s2: apAktif(r) && r.akhir_jabatan ? 'Masa jabatan s.d. ' + fDate(r.akhir_jabatan) : '', img: r.foto_id, av: initials(r.nama), r: r.no_urut ? '#' + r.no_urut : '', pill: apAktif(r) ? '' : `<span class="pill">${esc(r.status_jab && r.status_jab !== 'Aktif' ? r.status_jab : 'berhenti')}</span>` }),
@@ -1553,7 +1554,7 @@ const UI = {
       F('nama', 'Nama', 'text', { wide: 1, hint: 'Gelar ditulis di belakang koma, mis. "Budi Santoso, S.STP, M.Si". Gelar depan (Drs., H., dr.) boleh di depan nama.' }),
       F('instansi', 'Instansi / Kantor', 'text', { wide: 1 }), F('kelompok', 'Kelompok', 'select', { opt: ['Kecamatan', 'Keamanan', 'Keagamaan', 'Kesehatan', 'Pendamping', 'Lainnya'] }),
       F('pangkat', 'Pangkat / Golongan'), F('nip', 'NIP / NRP', 'text', { mono: 1, lblFn: { k: 'jabatan', fn: v => NO_INDUK(v) === 'NRP' ? 'NRP' : 'NIP' } }), F('hp', 'No. HP / WA', 'tel'), F('alamat', 'Alamat Kantor', 'text', { wide: 1 }),
-      F('mulai', 'Menjabat sejak', 'date'), F('selesai', 'Sampai', 'date'), F('aktif', 'Aktif', 'select', { opt: ['Ya', 'Tidak'], def: 'Ya' }), F('ket', 'Keterangan', 'textarea', { wide: 1 }), F('foto_id', 'Foto', 'file', { img: 1 })],
+      F('mulai', 'Menjabat sejak', 'date'), F('selesai', 'Sampai', 'date'), F('aktif', 'Aktif', 'select', { opt: ['Ya', 'Tidak'], def: 'Ya' }), F('ket', 'Keterangan', 'textarea', { wide: 1 }), F('foto_id', 'Foto', 'file', { img: 1, crop: 0.75 })],
     row: r => ({ t: r.nama || '— belum diisi —', s: [r.jabatan, r.instansi].filter(Boolean).join(' · '), s2: [r.pangkat, r.nip ? (NO_INDUK(r.jabatan) === 'NRP' ? 'NRP ' : 'NIP ') + r.nip : '', r.hp].filter(Boolean).join(' · '), img: r.foto_id, av: r.nama ? initials(r.nama) : ic('landmark'), pill: r.aktif === 'Tidak' ? '<span class="pill">tidak aktif</span>' : !r.nama ? '<span class="pill warn">belum diisi</span>' : '' }),
     print: { title: 'DAFTAR TOKOH & PEJABAT LUAR DESA', land: 1, cols: [['Jabatan', 'jabatan'], ['Nama', 'nama'], ['Instansi', 'instansi'], ['Pangkat', 'pangkat'], ['NIP/NRP', 'nip'], ['No. HP', 'hp'], ['Ket', 'ket']] }
   },
@@ -1567,7 +1568,7 @@ const UI = {
       F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk2 }), F('tempat_lahir', 'Tempat Lahir'), F('tgl_lahir', 'Tanggal Lahir', 'date'), F('alamat', 'Alamat', 'text', { wide: 1 }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }),
       F('agama', 'Agama', 'select', { opt: OPT.agama2 }), F('pendidikan', 'Pendidikan'),
       F('email', 'Email', 'email'), F('wa', 'Nomor WhatsApp', 'tel'), F('nrpdes', 'NRPDesa / NIP', 'text', { mono: 1, lblFn: { k: 'jabatan', fn: (v, frm) => NO_INDUK(v, ($('#f_kelompok', frm) || {}).value) } }),
-      F('npwp', 'NPWP', 'text', { sens: 1, mono: 1 }), F('bpjs_kes', 'BPJS Kesehatan', 'text', { sens: 1, mono: 1 }), F('bpjs_tk', 'BPJS Ketenagakerjaan', 'text', { sens: 1, mono: 1 }), F('ket', 'Keterangan', 'text', { wide: 1 }), F('foto_id', 'Foto', 'file', { img: 1 })],
+      F('npwp', 'NPWP', 'text', { sens: 1, mono: 1 }), F('bpjs_kes', 'BPJS Kesehatan', 'text', { sens: 1, mono: 1 }), F('bpjs_tk', 'BPJS Ketenagakerjaan', 'text', { sens: 1, mono: 1 }), F('ket', 'Keterangan', 'text', { wide: 1 }), F('foto_id', 'Foto', 'file', { img: 1, crop: 0.75 })],
     chips: { k: 'kelompok', opt: OPT.lembaga, dyn: 1, distE: 'petugas_jabatan', plus: { 'Perangkat Desa': 'aparat' } },
     row: r => ({ t: r.nama, s: r.jid ? [r.jabatan, r.kelompok].filter(Boolean).join(' · ') : (r.jabatan_list || 'Belum ada jabatan'), s2: [r.tempat_lahir && r.tgl_lahir ? r.tempat_lahir + ', ' + fDate(r.tgl_lahir, 1) : r.tempat_lahir, r.wa].filter(Boolean).join(' · '), img: r.foto_id, av: initials(r.nama), r: r.jid && r.no_urut ? '#' + r.no_urut : '' }),
     print: { title: 'DAFTAR PETUGAS DAN LEMBAGA DESA', land: 1, cols: [['No. Urut', r => r.jid ? esc(r.no_urut || '') : ''], ['Nama', 'nama'], ['Jabatan', r => esc(r.jid ? r.jabatan : r.jabatan_list)], ['Kelompok', 'kelompok'], ['L/P', r => (r.jk || '').slice(0, 1)], ['Alamat', r => esc([r.alamat, r.rt && 'RT ' + r.rt, r.rw && 'RW ' + r.rw].filter(Boolean).join(' '))], ['Tempat & Tgl Lahir', r => esc(r.tempat_lahir || '') + (r.tgl_lahir ? ', ' + fDate(r.tgl_lahir) : '')], ['Pendidikan', 'pendidikan'], ['No. SK', r => esc(r.no_sk || '') + (r.tgl_sk ? '<br>' + fDate(r.tgl_sk) : '')], ['Ket', 'ket']] }
@@ -1921,7 +1922,7 @@ const UI = {
       F('jk', 'Jenis Kelamin', 'select', { opt: OPT.jk }), F('tempat_lahir', 'Tempat Lahir', 'text', { up: 1 }), F('tgl_lahir', 'Tanggal Lahir', 'date'),
       F('dusun', 'Dusun', 'select', { opt: OPT.dusun }), F('rt', 'RT', 'text', { pad: 3 }), F('rw', 'RW', 'text', { pad: 3 }), F('telp', 'No. HP', 'tel'),
       F('lembaga', 'TPQ / Lembaga / Tempat Mengajar', 'text', { wide: 1, listFrom: { e: 'lembaga', k: 'nama' } }), F('tempat_jenis', 'Jenis Tempat Mengajar', 'select', { opt: ['TPQ/TPA', 'Musholla', 'Masjid', 'Rumah sendiri', 'Madrasah Diniyah', 'Pondok Pesantren', 'Lainnya'] }),
-      F('jml_santri', 'Jumlah Santri', 'number'), F('sejak', 'Mengajar Sejak (tahun)'), F('ket', 'Keterangan', 'textarea', { wide: 1 }), F('foto_id', 'Foto', 'file', { img: 1 })],
+      F('jml_santri', 'Jumlah Santri', 'number'), F('sejak', 'Mengajar Sejak (tahun)'), F('ket', 'Keterangan', 'textarea', { wide: 1 }), F('foto_id', 'Foto', 'file', { img: 1, crop: 0.75 })],
     chips: { k: 'dusun', opt: OPT.dusun, lbl: s => s.replace('DUSUN ', '') },
     row: r => ({ t: r.nama, s: [r.lembaga, r.jml_santri ? r.jml_santri + ' santri' : ''].filter(Boolean).join(' · '), s2: [String(r.dusun || '').replace('DUSUN ', ''), r.rt ? 'RT ' + r.rt + (r.rw ? '/' + r.rw : '') : '', r.telp].filter(Boolean).join(' · '), av: initials(r.nama), img: r.foto_id }),
     print: { title: 'DAFTAR GURU NGAJI', land: 1, cols: [['Nama', 'nama'], ['L/P', r => esc((r.jk || '').slice(0, 1))], ['Alamat', r => esc([String(r.dusun || '').replace('DUSUN ', ''), r.rt ? 'RT ' + r.rt + '/' + (r.rw || '') : ''].filter(Boolean).join(' '))], ['Tempat Mengajar', 'lembaga'], ['Santri', 'jml_santri'], ['Sejak', 'sejak'], ['No. HP', 'telp']] }
@@ -4957,6 +4958,73 @@ function fotoPotong(slot, idx, n, opt) {
     m.close(); if (opt.onOk) opt.onOk(slot.dataset); else fotoRapi(slot.parentNode);
   };
 }
+/* potong & posisikan foto profil sebelum diunggah (aparat, petugas, akun): hasil JPEG tegak 3:4, maks. 900 px */
+function potongFotoProfil(file, asp) {
+  asp = asp || 0.75;
+  return new Promise(res => {
+    let selesai = false;
+    const m = modal('Atur posisi foto', `<div class="stack"><div class="cropf" id="pf" style="aspect-ratio:${asp};max-width:320px"><div class="skel" style="position:absolute;inset:0"></div><div class="pf-guide"></div></div>
+      <div class="f"><label for="pz">Perbesar</label><input type="range" id="pz" min="1" max="4" step="0.02" value="1"></div>
+      <div class="meta">Geser foto dengan jari/mouse agar wajah berada di tengah bingkai. Cubit atau geser bar untuk memperbesar.</div>
+      <div class="btns"><button class="btn pri" id="pok">${ic('check')}Pakai foto ini</button><button class="btn" id="prot">Putar</button><button class="btn" data-x>Batal</button></div></div>`, { onClose: () => { if (!selesai) res(null); } });
+    const fr = $('#pf', m.el), rg = $('#pz', m.el), st = { fx: .5, fy: .4, z: 1, rot: 0 };
+    let img = null, src = null;
+    const dim = () => st.rot % 180 ? [img.naturalHeight, img.naturalWidth] : [img.naturalWidth, img.naturalHeight];
+    const draw = () => {
+      if (!src) return;
+      const Wf = fr.clientWidth, Hf = fr.clientHeight, [iw, ih] = dim(), sc = Math.max(Wf / iw, Hf / ih) * st.z;
+      const hx = Wf / 2 / (iw * sc), hy = Hf / 2 / (ih * sc);
+      st.fx = Math.min(1 - hx, Math.max(hx, st.fx)); st.fy = Math.min(1 - hy, Math.max(hy, st.fy));
+      src.style.width = iw * sc + 'px'; src.style.height = ih * sc + 'px';
+      src.style.left = (Wf / 2 - st.fx * iw * sc) + 'px'; src.style.top = (Hf / 2 - st.fy * ih * sc) + 'px';
+    };
+    const putarKanvas = () => {   /* gambar sumber (sudah diputar) sebagai kanvas agar seret & simpan memakai ukuran yang sama */
+      const [iw, ih] = dim(), c = document.createElement('canvas'), k = Math.min(1, 2400 / Math.max(iw, ih));
+      c.width = Math.round(iw * k); c.height = Math.round(ih * k);
+      const g = c.getContext('2d'); g.translate(c.width / 2, c.height / 2); g.rotate(st.rot * Math.PI / 180);
+      const w = (st.rot % 180 ? c.height : c.width), h = (st.rot % 180 ? c.width : c.height); g.drawImage(img, -w / 2, -h / 2, w, h);
+      c.style.position = 'absolute'; c.style.maxWidth = 'none'; c.style.pointerEvents = 'none';
+      if (src) src.remove(); src = c; fr.insertBefore(c, fr.querySelector('.pf-guide')); draw();
+    };
+    const u = URL.createObjectURL(file), im = new Image();
+    im.onload = () => { $('.skel', fr) && $('.skel', fr).remove(); img = im; putarKanvas(); };
+    im.onerror = () => { fr.innerHTML = '<div class="err">Berkas bukan gambar yang bisa dibuka. Pakai JPG/PNG.</div>'; };
+    im.src = u;
+    const ptr = new Map(); let dr = null, pinch = null;
+    fr.addEventListener('pointerdown', e => { if (!src) return; fr.setPointerCapture(e.pointerId); ptr.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (ptr.size === 1) dr = { x: e.clientX, y: e.clientY, fx: st.fx, fy: st.fy };
+      if (ptr.size === 2) { const [a, b] = [...ptr.values()]; pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), z: st.z }; dr = null; } });
+    fr.addEventListener('pointermove', e => { if (!ptr.has(e.pointerId)) return; ptr.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pinch && ptr.size >= 2) { const [a, b] = [...ptr.values()]; st.z = Math.min(4, Math.max(1, pinch.z * Math.hypot(a.x - b.x, a.y - b.y) / pinch.d)); rg.value = st.z; draw(); return; }
+      if (!dr) return; const [iw, ih] = dim(), sc = Math.max(fr.clientWidth / iw, fr.clientHeight / ih) * st.z;
+      st.fx = dr.fx - (e.clientX - dr.x) / (iw * sc); st.fy = dr.fy - (e.clientY - dr.y) / (ih * sc); draw(); });
+    const lepas = e => { ptr.delete(e.pointerId); if (ptr.size < 2) pinch = null; if (!ptr.size) dr = null; else if (ptr.size === 1) { const [a] = [...ptr.values()]; dr = { x: a.x, y: a.y, fx: st.fx, fy: st.fy }; } };
+    fr.addEventListener('pointerup', lepas); fr.addEventListener('pointercancel', lepas);
+    fr.addEventListener('wheel', e => { e.preventDefault(); st.z = Math.min(4, Math.max(1, st.z * (e.deltaY < 0 ? 1.08 : 0.93))); rg.value = st.z; draw(); }, { passive: false });
+    rg.oninput = () => { st.z = +rg.value; draw(); };
+    $('#prot', m.el).onclick = () => { if (!img) return; st.rot = (st.rot + 90) % 360; putarKanvas(); };
+    $('#pok', m.el).onclick = () => {
+      if (!src) return;
+      const sw = src.width, sh = src.height, sc = Math.max(1 / sw, (1 / asp) / sh) * st.z;   /* ukuran bingkai dinormalisasi: lebar 1 */
+      const cw = 1 / sc, ch = (1 / asp) / sc, x = st.fx * sw - cw / 2, y = st.fy * sh - ch / 2;
+      const outH = Math.min(900, Math.round(ch)), outW = Math.round(outH * asp), c = document.createElement('canvas');
+      c.width = Math.max(1, outW); c.height = Math.max(1, outH);
+      const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.imageSmoothingQuality = 'high';
+      g.drawImage(src, x, y, cw, ch, 0, 0, c.width, c.height);
+      c.toBlob(b => { selesai = true; URL.revokeObjectURL(u); m.close(); res(b ? new File([b], (file.name || 'foto').replace(/\.\w+$/, '') + '.jpg', { type: 'image/jpeg' }) : null); }, 'image/jpeg', 0.88);
+    };
+  });
+}
+/* input berkas bertanda data-crop: buka jendela atur posisi dulu, lalu teruskan ke penanganan biasa */
+document.addEventListener('change', async ev => {
+  const inp = ev.target;
+  if (!(inp instanceof HTMLInputElement) || inp.type !== 'file' || !inp.dataset.crop || inp._potong || !inp.files || !inp.files[0] || !/^image\//.test(inp.files[0].type)) return;
+  ev.stopImmediatePropagation();
+  const f = await potongFotoProfil(inp.files[0], +inp.dataset.crop);
+  if (!f) { inp.value = ''; return; }
+  try { const dt = new DataTransfer(); dt.items.add(f); inp.files = dt.files; } catch (x) { toast('Peramban ini tidak mendukung potong foto; foto asli dipakai.'); }
+  inp._potong = true; inp.dispatchEvent(new Event('change', { bubbles: true })); inp._potong = false;
+}, true);
 /* nomor urut & tanda potong pada tiap foto */
 function fotoRapi(box) {
   $$('.fslot', box).filter(sl => sl.dataset.id || sl._file).forEach((sl, i) => {
@@ -5040,7 +5108,7 @@ function fieldHtml(f, v, rec) {
     case 'file': {
       const locked = v === '•';
       inp = `<div class="filebox">${v ? `<span class="btns fkeep"><button type="button" class="btn sm" data-act="file" data-id="${esc(v)}" data-priv="${f.priv ? 1 : 0}" data-name="${esc(f.lihat || f.l)}">${ic(locked ? 'lock' : 'eye')}${esc(f.lihat || 'Berkas tersimpan')}</button>${locked ? '' : `<button type="button" class="btn sm danger" data-act="fileDel" data-k="${esc(f.k)}">${ic('trash')}Hapus</button>`}</span><input type="hidden" id="fd_${esc(f.k)}" value="">` : ''}
-        ${locked ? '<span class="hint">Anda tidak punya izin mengganti dokumen kependudukan.</span>' : `<input type="file" id="${id}"${f.maxAdm ? ` data-maxadm="${f.maxAdm}"` : ''} accept="${f.img ? IMG_ANY : 'application/pdf,' + IMG_ANY + ',.doc,.docx,.xls,.xlsx'}"><span class="hint">${v ? 'Pilih berkas baru untuk mengganti.' : f.img ? 'Foto akan diperkecil otomatis.' : f.maxAdm ? (S.user && S.user.admin ? 'PDF / dokumen maks. ' + f.maxAdm + ' MB (khusus admin) · foto otomatis diperkecil.' : HINT_DOK + '. Dokumen sampai ' + f.maxAdm + ' MB hanya bisa diunggah admin.') : HINT_DOK + '.'}</span><span class="hint err-t"></span>`}</div>`;
+        ${locked ? '<span class="hint">Anda tidak punya izin mengganti dokumen kependudukan.</span>' : `<input type="file" id="${id}"${f.maxAdm ? ` data-maxadm="${f.maxAdm}"` : ''} ${f.crop ? ` data-crop="${f.crop}"` : ''} accept="${f.img ? IMG_ANY : 'application/pdf,' + IMG_ANY + ',.doc,.docx,.xls,.xlsx'}"><span class="hint">${v ? 'Pilih berkas baru untuk mengganti.' : f.img ? 'Foto akan diperkecil otomatis.' : f.maxAdm ? (S.user && S.user.admin ? 'PDF / dokumen maks. ' + f.maxAdm + ' MB (khusus admin) · foto otomatis diperkecil.' : HINT_DOK + '. Dokumen sampai ' + f.maxAdm + ' MB hanya bisa diunggah admin.') : HINT_DOK + '.'}</span><span class="hint err-t"></span>`}</div>`;
       break;
     }
     case 'checks': { const sel = String(v).split(/\s*,\s*/); inp = `<div class="checks" id="${id}">${f.opt.map(o => `<label><input type="checkbox" value="${esc(o)}" ${sel.indexOf(o) >= 0 ? 'checked' : ''}>${esc(o)}</label>`).join('')}</div>`; break; }
@@ -9013,7 +9081,8 @@ VIEWS.akun = async (p, main) => {
   S.vh.accent = t => { store.set('accent', t.dataset.v || null); applyTheme(); refresh(); };
   S.vh.logout = () => { const m = sheet('Keluar dari akun?', `<div class="stack"><p style="margin:0">Anda perlu masuk lagi (Google atau sidik jari/Face ID) untuk memakai aplikasi.</p><div class="btns"><button class="btn danger solid" id="loYa">${ic('out')}Ya, keluar</button><button class="btn" id="loNo">Batal</button></div></div>`, { ikon: 'out' }); $('#loNo', m.el).onclick = () => m.close(); $('#loYa', m.el).onclick = () => { m.close(); doLogout(); }; };
   $('#fotoMe').onchange = async ev => {
-    const f = ev.target.files[0]; if (!f) return;
+    let f = ev.target.files[0]; if (!f) return;
+    f = await potongFotoProfil(f, 0.75); ev.target.value = ''; if (!f) return;
     const box = $('.pfoto'); box.classList.add('busy');
     try {
       const up = await uploadFile(f, 'TU/Aparat');
@@ -9046,7 +9115,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '215', tgl: '2026-10-30', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '216', tgl: '2026-10-30', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
