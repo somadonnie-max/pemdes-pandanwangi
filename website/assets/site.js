@@ -14,7 +14,7 @@ function lstore(k,v){try{if(v===undefined)return localStorage.getItem(k);localSt
 var cacheP={};
 function api(req,fn){
   var k='wp:'+(fn||'')+JSON.stringify(req),c=store(k);
-  if(c&&Date.now()-c.t<10*60*1000)return Promise.resolve(c.d);
+  if(c&&Date.now()-c.t<90*1000)return Promise.resolve(c.d);
   if(cacheP[k])return cacheP[k];
   cacheP[k]=fetch(fn?API.replace('web_publik',fn):API,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify({req:req})})
     .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
@@ -75,7 +75,10 @@ function shell(){
   $$('a',mn).forEach(function(a,i){a.style.transitionDelay=(.08+i*.05)+'s'});
   b.prepend(mn);
   var bt=$('.hd-burger',hd);
-  bt.onclick=function(){var o=b.classList.toggle('menu-open');bt.setAttribute('aria-expanded',o);b.style.overflow=o?'hidden':''};
+  var sc=document.createElement('div');sc.className='mnav-scrim';b.appendChild(sc);
+  var tutup=function(){b.classList.remove('menu-open');bt.setAttribute('aria-expanded',false)};
+  bt.onclick=function(){var o=b.classList.toggle('menu-open');bt.setAttribute('aria-expanded',o)};
+  sc.onclick=tutup;addEventListener('keydown',function(e){if(e.key==='Escape')tutup()});
   var pt=document.createElement('div');pt.className='prog-top';b.prepend(pt);
   var tt=document.createElement('button');tt.className='toTop';tt.setAttribute('aria-label','Kembali ke atas');tt.innerHTML=ICON.up;tt.onclick=function(){scrollTo({top:0,behavior:'smooth'})};b.appendChild(tt);
   var gl=document.createElement('div');gl.className='glow';b.appendChild(gl);

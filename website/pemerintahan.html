@@ -45,9 +45,9 @@
 
 <section class="sec sand">
   <div class="wrap">
-    <div class="sec-h"><span data-ed="t11" class="eyebrow reveal">Struktur organisasi</span><h2 data-ed="t12" class="reveal d1">Bagan pemerintah desa.</h2></div>
-    <figure class="reveal d1" style="margin:0;border:2px solid var(--ink);border-radius:var(--r);overflow:hidden;box-shadow:var(--hard);background:#fff"><img data-ed="i1" src="img/struktur-struktur-fix.webp" alt="Bagan struktur organisasi Pemerintah Desa Pandanwangi" loading="lazy" style="width:100%"></figure>
-    <p data-ed="t13" class="note" style="margin-top:12px">Jabatan yang sedang kosong ditandai “(kosong)” sampai pejabat barunya ditetapkan. Daftar nama di atas selalu mengikuti data perangkat aktif di aplikasi desa.</p>
+    <div class="sec-h"><span data-ed="t11" class="eyebrow reveal">Struktur organisasi</span><h2 data-ed="t12" class="reveal d1">Bagan <span class="mark">pemerintah desa</span>.</h2></div>
+    <div class="org" id="org"><div class="skel" style="height:520px"></div></div>
+    <p data-ed="t13" class="note" style="margin-top:12px">Bagan ini tersusun otomatis dari data perangkat aktif di aplikasi desa, lengkap dengan fotonya. Jabatan yang sedang kosong ditandai “kosong” sampai pejabat barunya ditetapkan. Ketuk kartu untuk melihat tugasnya.</p>
   </div>
 </section>
 
@@ -66,7 +66,7 @@ var TUGAS=[
  [/kepala desa|kades/i,'Memimpin penyelenggaraan pemerintahan desa secara keseluruhan: pembangunan, pembinaan kemasyarakatan dan pemberdayaan masyarakat. Kepala Desa juga mewakili desa dalam hubungan dengan pihak luar dan memastikan semua program berjalan sesuai rencana.'],
  [/sekretaris|sekdes/i,'Kepala staf yang membantu Kepala Desa dalam administrasi dan pengelolaan internal: penataan kesekretariatan, pengelolaan keuangan desa dari perencanaan hingga pelaporan APBDes, serta kebutuhan teknis dan administratif pemerintahan.'],
  [/pelayanan/i,'Garda terdepan pelayanan langsung kepada masyarakat: administrasi publik seperti surat-surat keterangan, sosialisasi dan penyuluhan, serta mendorong partisipasi warga dalam kegiatan desa.'],
- [/kesejahteraan/i,'Merencanakan dan melaksanakan program pembangunan fisik (infrastruktur) serta pembangunan sosial di bidang pendidikan, kesehatan, keagamaan, dan pemberdayaan ekonomi lokal.'],
+ [/kesejahteraan|kesra/i,'Melaksanakan pembangunan sarana prasarana perdesaan dan pembangunan bidang pendidikan dan kesehatan; sosialisasi dan motivasi masyarakat di bidang budaya, ekonomi, politik, lingkungan hidup, pemberdayaan keluarga, pemuda, olahraga, dan karang taruna; serta mendampingi penyaluran bantuan sosial dan kegiatan keagamaan warga.'],
  [/pemerintahan/i,'Tata kelola pemerintahan, hukum dan ketertiban: administrasi kependudukan, penataan pertanahan, penyiapan rancangan peraturan desa, serta ketenteraman dan ketertiban umum.'],
  [/tata usaha|umum/i,'Mengelola administrasi umum dan kerumahtanggaan kantor desa: surat-menyurat, kearsipan, pengadaan dan perawatan inventaris serta aset desa, dan sarana prasarana kantor.'],
  [/keuangan/i,'Penatausahaan pendapatan dan belanja desa di bawah koordinasi Sekretaris Desa, verifikasi bukti-bukti keuangan, serta laporan pertanggungjawaban keuangan yang akurat dan tepat waktu.'],
@@ -110,7 +110,39 @@ function render(arr){
   var items=P.$$('.pp');
   items.forEach(function(e){var i=+e.getAttribute('data-i');e.onclick=function(){show(i)};e.onkeydown=function(k){if(k.key==='Enter')show(i)}});
   if('IntersectionObserver' in window){var o=new IntersectionObserver(function(es){es.forEach(function(x){if(x.isIntersecting)show(+x.target.getAttribute('data-i'))})},{rootMargin:matchMedia('(max-width:980px)').matches?'-55% 0px -40% 0px':'-48% 0px -48% 0px'});items.forEach(function(e){o.observe(e)})}
-  P.observe($('#pplList'));show(0);
+  P.observe($('#pplList'));show(0);bagan(arr);
+}
+
+/* ---------- bagan struktur organisasi digital (dari data Aparatur) ---------- */
+var DUSUN=['Krajan 1','Krajan 2','Krajan 3','Timur Sawah','Tunjungan','Pemukiman'];
+function jenis(j){j=String(j||'');if(/^kepala desa|^kades/i.test(j))return 'kades';if(/sekretaris|sekdes/i.test(j))return 'sekdes';if(/kepala urusan|^kaur/i.test(j))return 'kaur';if(/kepala seksi|^kasi/i.test(j))return 'kasi';if(/dusun|kasun/i.test(j))return 'kasun';return 'lain'}
+function oc(p,i,kecil){
+  if(!p)return '';
+  var kos=p.kosong;
+  return '<button type="button" class="oc'+(kos?' kos':'')+(kecil?' sm':'')+'"'+(i>=0?' data-oi="'+i+'"':'')+'><span class="oc-f">'+(kos?'<i>?</i>':'<img data-of="'+i+'" alt="">'+'<em>'+esc(ini(p.nama))+'</em>')+'</span><b>'+esc(kos?'kosong':p.nama)+'</b><small>'+esc(p.jabatan)+'</small></button>';
+}
+function grp(lbl,isi,cls){return '<div class="og inview '+(cls||'')+'"><span class="og-l">'+esc(lbl)+'</span><div class="og-g">'+isi+'</div></div>'}
+function bagan(arr){
+  var el=$('#org');if(!el)return;
+  var by={kades:[],sekdes:[],kaur:[],kasi:[],kasun:[],lain:[]};
+  arr.forEach(function(p,i){by[jenis(p.jabatan)].push(i)});
+  var c=function(i,k){return oc(arr[i],i,k)},kos=function(j){return oc({kosong:1,jabatan:j},-1)};
+  var kaurU=['Tata Usaha','Keuangan','Perencanaan'],kasiU=['Pemerintahan','Kesejahteraan','Pelayanan'];
+  var urut=function(L,U,pre){var out=[],sisa=L.slice();U.forEach(function(u){var k=sisa.findIndex(function(i){return new RegExp(u.split(' ')[0],'i').test(arr[i].jabatan)});if(k>-1)out.push(c(sisa.splice(k,1)[0]));else out.push(kos(pre+u))});return out.concat(sisa.map(function(i){return c(i)})).join('')};
+  var dus=DUSUN.map(function(d){var k=by.kasun.find(function(i){return arr[i].jabatan.toLowerCase().indexOf(d.toLowerCase())>-1});return k!=null?c(k):kos('Kepala Dusun '+d)});
+  by.kasun.forEach(function(i){if(!DUSUN.some(function(d){return arr[i].jabatan.toLowerCase().indexOf(d.toLowerCase())>-1}))dus.push(c(i))});
+  el.innerHTML='<div class="org-in">'+
+    '<div class="og top inview"><div class="og-g">'+(by.kades.length?by.kades.map(function(i){return c(i)}).join(''):kos('Kepala Desa'))+'</div><span class="og-bpd">mitra: <b>BPD</b></span></div>'+
+    '<div class="ow inview"><div class="ow-sek">'+(by.sekdes.length?c(by.sekdes[0]):kos('Sekretaris Desa'))+'</div></div>'+
+    grp('Sekretariat · Kepala Urusan',urut(by.kaur,kaurU,'Kepala Urusan '),'kaur')+
+    grp('Pelaksana teknis · Kepala Seksi',urut(by.kasi,kasiU,'Kepala Seksi '),'kasi')+
+    grp('Pelaksana kewilayahan · Kepala Dusun',dus.join(''),'kasun')+
+    (by.lain.length?grp('Pendukung',by.lain.map(function(i){return c(i,1)}).join(''),'lain'):'')+
+  '</div>';
+  P.$$('.og-g,.ow-sek',el).forEach(function(g){P.$$('.oc',g).forEach(function(c,k){c.style.setProperty('--d',(k*90+260)+'ms')})});
+  P.$$('img[data-of]',el).forEach(function(im){var p=arr[+im.getAttribute('data-of')];im.onload=function(){im.parentNode.classList.add('ada')};pasang(im,p)});
+  P.$$('[data-oi]',el).forEach(function(b){b.onclick=function(){var i=+b.getAttribute('data-oi'),it=P.$$('.pp')[i];show(i);if(it)scrollTo({top:it.getBoundingClientRect().top+scrollY-(matchMedia('(max-width:980px)').matches?innerHeight*.55:innerHeight*.45),behavior:'smooth'})}});
+  P.observe(el);
 }
 document.addEventListener('pw:profil',function(ev){
   var d=ev.detail,a=d&&d.aparat&&d.aparat.length?d.aparat:FALLBACK.map(function(x){return{nama:x[0],jabatan:x[1]}});
