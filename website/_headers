@@ -6,7 +6,7 @@
 /img/*
   Cache-Control: public, max-age=2592000
 /assets/*
-  Cache-Control: public, max-age=3600
+  Cache-Control: public, max-age=300
 
 /assets/slot.json
   Access-Control-Allow-Origin: *
