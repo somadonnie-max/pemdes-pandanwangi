@@ -2012,6 +2012,8 @@ const UI = {
     t: 'Surat Keterangan', ic: 'file', perm: 'pelayanan', excel: 1,
     fields: [F('tgl_surat', 'Tanggal Surat', 'date', { def: isoToday }), F('no', 'No. Register', 'text', { auto: 1 }), F('jenis_surat', 'Surat / Jenis Keterangan', 'text', { req: 1, wide: 1, list: ['Surat Keterangan Domisili', 'Surat Keterangan Tidak Mampu', 'Surat Keterangan Usaha', 'Surat Pengantar SKCK', 'Surat Keterangan Kelahiran', 'Surat Keterangan Kematian', 'Surat Keterangan Pindah', 'Surat Keterangan Belum Menikah', 'Surat Keterangan Penghasilan', 'Surat Keterangan Domisili Yayasan/Lembaga', 'Surat Keterangan Perbedaan Data Pupuk Bersubsidi', 'Surat Keterangan Masih Hidup', 'Surat Keterangan Ahli Waris Pupuk Bersubsidi', 'Surat Pernyataan Ahli Waris', 'Surat Kuasa', 'Surat Pernyataan Kehilangan', 'Surat Pernyataan Penghasilan'] }),
       F('klasifikasi', 'Kode Klasifikasi Arsip', 'text', { mono: 1, list: KKA_SK.map(x => x[0]), hint: 'Terisi otomatis sesuai jenis surat (Permendagri 83/2022). Boleh diubah.' }), F('penduduk_id', '', 'hidden'),
+      F('kategori_pemohon', 'Status pemohon', 'select', { opt: ['Warga desa', 'Luar desa'], def: 'Warga desa', hint: 'Luar desa: KTP bukan Desa Pandanwangi (pemilik tanah/usaha, pendatang, dll.)' }),
+      F('alamat_luar', 'Alamat sesuai KTP (pemohon luar desa)', 'text', { wide: 1, up: 1, when: { k: 'kategori_pemohon', v: 'Luar desa' }, hint: 'Ditulis lengkap sampai kabupaten. Dusun/RT/RW di bawah = lokasi di Desa Pandanwangi.' }),
       F('pemohon', 'Pemohon', 'select', { opt: ['Perorangan', 'Lembaga / Instansi'], def: 'Perorangan', hint: 'Lembaga / Instansi: yayasan, masjid, TPQ, sekolah, kelompok, instansi, dll.' }),
       F('lembaga_nama', 'Nama Lembaga / Instansi', 'text', { wide: 1, when: { k: 'pemohon', v: 'Lembaga / Instansi' }, listFrom: { e: 'lembaga', k: 'nama' }, hint: 'Ketik atau pilih dari data Lembaga/Yayasan: data lembaga & penanggung jawab terisi otomatis',
         fill: x => ({ lembaga_jenis: x.jenis, lembaga_alamat: [x.alamat, x.dusun ? 'Dusun ' + judulKata(String(x.dusun).replace(/^DUSUN\s+/i, '')) : '', x.rt ? 'RT ' + x.rt : '', x.rw ? 'RW ' + x.rw : ''].filter(Boolean).join(' '), lembaga_no: x.no_sk, lembaga_bidang: x.bidang, lembaga_kemenkumham: x.no_kemenkumham, pj_jabatan: x.ketua_jabatan || 'Ketua', nik: String(x.ketua_nik || '').indexOf('•') >= 0 ? '' : x.ketua_nik, nama: x.ketua_nama }) }),
@@ -2060,8 +2062,11 @@ const UI = {
       F('isi', 'Kalimat isi surat', 'textarea', { wide: 1, hint: 'Boleh memakai tanda, mis. Orang tersebut di atas benar penduduk Desa {{Desa}} dan ...' }),
       F('isian', 'Isian tambahan (maks. 8)', 'textarea', { wide: 1, hint: 'Tulis nama isian dipisah koma atau baris baru, mis.: Nama Yayasan, Bidang Kegiatan, Nomor Akta. Di template Word tulis sama persis dalam kurung kurawal: {{Nama Yayasan}}. Jangan memakai nama tanda bawaan seperti Nama, Alamat, Nama_U.' }),
       F('klasifikasi', 'Kode Klasifikasi Arsip', 'text', { mono: 1, list: KKA_SK.map(x => x[0]), hint: 'Kosongkan: dipilih otomatis dari nama jenis surat (Permendagri 83/2022)' }),
-      F('aktif', 'Aktif', 'select', { opt: ['Ya', 'Tidak'], def: 'Ya' })],
-    row: r => ({ t: r.nama, s: [r.klasifikasi, isianJenis(r).join(', ') || 'Tanpa isian tambahan'].filter(Boolean).join(' · '), av: ic('file'), pill: r.aktif === 'Tidak' ? '<span class="pill">Tidak aktif</span>' : '' })
+      F('aktif', 'Aktif', 'select', { opt: ['Ya', 'Tidak'], def: 'Ya' }),
+      F('_h_web', 'Website desa (Ajukan Surat Online)', 'head'), F('portal', 'Tampil di website untuk', 'select', { opt: ['Tidak', 'Semua', 'Warga desa', 'Luar desa'], def: 'Tidak', hint: 'Luar desa = pemohon ber-KTP luar Desa Pandanwangi (unggah foto KTP & KK)' }),
+      F('grup', 'Kelompok di website', 'text', { list: ['Pertanahan & pajak', 'Usaha & ekonomi', 'Kependudukan & tempat tinggal', 'Nikah & peristiwa penting', 'Kegiatan & lainnya'] }), F('ikon', 'Ikon (emoji)', 'text', { hint: 'mis. 📜 🏪 🎉' }),
+      F('syarat', 'Persyaratan (satu per baris, tampil di website)', 'textarea', { wide: 1 })],
+    row: r => ({ t: (r.ikon ? r.ikon + ' ' : '') + r.nama, pill: r.portal && r.portal !== 'Tidak' ? '<span class="pill ok">Web: ' + esc(r.portal) + '</span>' : '', s: [r.klasifikasi, isianJenis(r).join(', ') || 'Tanpa isian tambahan'].filter(Boolean).join(' · '), av: ic('file'), pill: r.aktif === 'Tidak' ? '<span class="pill">Tidak aktif</span>' : '' })
   },
   ref_hukum: {
     t: 'Dasar Hukum', ic: 'book', perm: '*', write: 'perencanaan', sort: 'no', asc: 1,
@@ -10681,7 +10686,7 @@ async function petaSurat(reg) {
     'Status Perkawinan': judulKata(v('status_kawin')),
     Pemohon: reg.pemohon || 'Perorangan', 'Nama Lembaga': reg.lembaga_nama || TITIK, 'Jenis Lembaga': reg.lembaga_jenis || TITIK, 'Alamat Lembaga': reg.lembaga_alamat || alamat || TITIK,
     'No SK Lembaga': reg.lembaga_no || TITIK, 'No Akta': reg.lembaga_no || TITIK, 'Bidang Kegiatan': reg.lembaga_bidang || TITIK, 'SK Kemenkumham': reg.lembaga_kemenkumham || '-', Jabatan: reg.pj_jabatan || TITIK, 'Penanggung Jawab': judulKata(v('nama')), Kewarganegaraan: String(p.warga_negara || 'WNI').toUpperCase() === 'WNI' ? 'Indonesia' : (p.warga_negara || ''), Pendidikan: judulKata(p.pendidikan || ''),
-    Alamat: alamat, Dusun: dusun, RT: v('rt'), RW: v('rw'), Keperluan: reg.keperluan || (reg.jenis_surat === SK_DL ? 'kelengkapan persyaratan administrasi' : TITIK),
+    Alamat: reg.kategori_pemohon === 'Luar desa' && reg.alamat_luar ? judulKata(reg.alamat_luar).replace(/\bRt\b/g, 'RT').replace(/\bRw\b/g, 'RW') : alamat, 'Alamat Asal': reg.alamat_luar ? judulKata(reg.alamat_luar) : alamat, 'Status Pemohon': reg.kategori_pemohon || 'Warga desa', 'Lokasi di Desa': dusun ? 'Dusun ' + dusun : TITIK, Dusun: dusun, RT: v('rt'), RW: v('rw'), Keperluan: reg.keperluan || (reg.jenis_surat === SK_DL ? 'kelengkapan persyaratan administrasi' : TITIK),
     'Alamat Domisili': reg.alamat_domisili || alamat, 'Lama Tinggal': reg.lama_tinggal || TITIK,
     'Nama Usaha': reg.usaha_nama || TITIK, 'Jenis Usaha': reg.usaha_jenis || TITIK, 'Alamat Usaha': reg.usaha_alamat || TITIK, 'Mulai Usaha': reg.usaha_mulai || TITIK,
     'Nama Bayi': judulKata(reg.bayi_nama) || TITIK, 'JK Bayi': judulKata(reg.bayi_jk) || TITIK, 'Tanggal Lahir Bayi': dPanjang(reg.bayi_tgl) || TITIK, 'Hari Lahir Bayi': dHari(reg.bayi_tgl) || TITIK,
@@ -16520,13 +16525,18 @@ Object.assign(UI, {
     intro: 'Permohonan dari website desa (desapandanwangi.pages.dev/surat.html). Pemohon sudah diverifikasi dengan NIK + tanggal lahir. Ketuk permohonan → <b>Buat surat keterangan</b> (data pemohon terisi otomatis), lalu ubah status menjadi <b>Siap diambil</b>. Status & pesan petugas tampil di halaman Lacak Tiket.',
     fields: [F('tiket', 'Nomor tiket', 'text', { mono: 1 }), F('tanggal', 'Tanggal masuk', 'date', { def: isoToday }), F('jam', 'Jam', 'text'),
       F('status', 'Status', 'select', { opt: PS_ST, def: 'Diajukan' }), F('jenis_surat', 'Jenis surat', 'text', { req: 1, wide: 1 }), F('keperluan', 'Keperluan', 'textarea', { wide: 1 }),
-      F('penduduk_id', '', 'hidden'), F('nama', 'Nama pemohon', 'text', { up: 1 }), F('nik', 'NIK', 'text', { mono: 1, sens: 1 }), F('dusun', 'Dusun', 'select', { opt: OPT.dusun }), F('rt', 'RT', 'text'), F('rw', 'RW', 'text'),
+      F('kategori_pemohon', 'Status pemohon', 'select', { opt: ['Warga desa', 'Luar desa'], def: 'Warga desa' }),
+      F('penduduk_id', '', 'hidden'), F('nama', 'Nama pemohon', 'text', { up: 1 }), F('nik', 'NIK', 'text', { mono: 1, sens: 1 }), F('alamat_luar', 'Alamat sesuai KTP (luar desa)', 'text', { wide: 1, when: { k: 'kategori_pemohon', v: 'Luar desa' } }),
+      F('dusun', 'Dusun / lokasi di desa', 'select', { opt: OPT.dusun }), F('rt', 'RT', 'text'), F('rw', 'RW', 'text'),
+      F('ktp_id', 'Foto KTP (luar desa)', 'file', { img: 1, priv: 1, when: { k: 'kategori_pemohon', v: 'Luar desa' } }), F('kk_id', 'Foto KK (luar desa)', 'file', { img: 1, priv: 1, when: { k: 'kategori_pemohon', v: 'Luar desa' } }),
       F('hp', 'No. HP/WA', 'tel'), F('ambil', 'Pengambilan', 'select', { opt: ['Diambil di kantor desa', 'Dititipkan ke kepala dusun'] }),
       F('_h_p', 'Tanggapan petugas', 'head'), F('tanggapan', 'Pesan untuk pemohon', 'textarea', { wide: 1, hint: 'Tampil di halaman Lacak Tiket. Wajib diisi bila permohonan dikembalikan/ditolak.' }), F('no_surat', 'No. surat yang diterbitkan', 'text'), F('tgl_selesai', 'Tanggal selesai', 'date')],
     chips: { k: 'status', opt: PS_ST },
-    row: r => ({ t: (r.jenis_surat || '') + ' — ' + (r.nama || ''), s: [r.tiket, String(r.dusun || '').replace(/^DUSUN\s+/i, ''), r.keperluan].filter(Boolean).join(' · '), date: r.tanggal, av: ic('inbox'), pill: `<span class="pill" style="background:${PS_WARNA[r.status] || '#e0e7ff;color:#3730a3'}">${esc(r.status || 'Diajukan')}</span>` }),
-    extra: (x, el) => {
-      const isi = Object.keys(PS_LBL).filter(k => x[k]).map(k => `<tr><td style="width:200px">${esc(PS_LBL[k])}</td><td>${esc(x[k])}</td></tr>`).join('');
+    row: r => ({ t: (r.jenis_surat || '') + ' — ' + (r.nama || ''), s: [r.kategori_pemohon === 'Luar desa' ? 'LUAR DESA' : '', r.tiket, String(r.dusun || '').replace(/^DUSUN\s+/i, ''), r.keperluan].filter(Boolean).join(' · '), date: r.tanggal, av: ic('inbox'), pill: `<span class="pill" style="background:${PS_WARNA[r.status] || '#e0e7ff;color:#3730a3'}">${esc(r.status || 'Diajukan')}</span>` }),
+    extra: async (x, el) => {
+      await muatJenisSurat().catch(() => []);
+      const jdef = (S.jenisSurat || []).find(j => j.nama === x.jenis_surat), jl = jdef ? isianJenis(jdef) : [];
+      const isi = Object.keys(PS_LBL).filter(k => x[k]).map(k => `<tr><td style="width:200px">${esc(PS_LBL[k])}</td><td>${esc(x[k])}</td></tr>`).join('') + [1, 2, 3, 4, 5, 6, 7, 8].filter(n => x['isian' + n]).map(n => `<tr><td style="width:200px">${esc(jl[n - 1] || 'Isian ' + n)}</td><td>${esc(x['isian' + n])}</td></tr>`).join('');
       const pesanWa = `Assalamualaikum ${x.nama || ''}. Permohonan ${x.jenis_surat || 'surat'} Anda (tiket ${x.tiket || '-'}) di Desa ${ND()} berstatus: ${x.status || 'Diajukan'}.${x.status === 'Siap diambil' ? ' Silakan datang ke kantor desa membawa e-KTP dan KK asli.' : ''}${x.tanggapan ? ' ' + x.tanggapan : ''}${x.tiket ? ' Lacak: ' + WEB_DESA + 'lacak.html?t=' + x.tiket : ''}`;
       el.insertAdjacentHTML('beforeend', `${isi ? `<div class="card"><b>Isian tambahan dari pemohon</b><table class="kk-reg">${isi}</table></div>` : ''}<div class="btns">${canWrite('register_surat') ? `<button class="btn pri sm" data-act="psBuat">${ic('file')}Buat surat keterangan</button>` : ''}${canWrite('permohonan_surat') ? ['Diproses', 'Siap diambil', 'Selesai'].filter(v => v !== x.status).map(v => `<button class="btn sm" data-act="psSt" data-v="${v}">${ic('check')}${v}</button>`).join('') + `<button class="btn sm" data-act="psBalik">${ic('back')}Kembalikan / tolak</button>` : ''}${x.hp ? `<a class="btn sm" target="_blank" rel="noopener" href="${esc(waKabar(x.hp, pesanWa))}">${ic('send')}Kabari via WA</a>` : ''}</div>`);
       const simpan = async rec => { try { await call('save', { entity: 'permohonan_surat', record: Object.assign({ id: x.id }, rec) }); toast('Status permohonan diperbarui.'); refresh(); } catch (er) { toast(er.message, 1); } };
@@ -16537,8 +16547,12 @@ Object.assign(UI, {
       };
       S.vh.psBuat = async () => {
         if (x.status === 'Diajukan' && canWrite('permohonan_surat')) { try { await call('save', { entity: 'permohonan_surat', record: { id: x.id, status: 'Diproses' } }); } catch (er) { } }
-        const pre = { penduduk_id: x.penduduk_id || '', jenis_surat: x.jenis_surat === 'Surat keterangan lainnya' ? (x.catatan || '') : x.jenis_surat, keperluan: x.keperluan || '', hp: x.hp || '' };
-        ['nama', 'nik', 'tempat_lahir', 'tgl_lahir', 'jk', 'agama', 'pekerjaan', 'status_kawin', 'dusun', 'rt', 'rw', ...Object.keys(PS_LBL).filter(k => k !== 'catatan' && k !== 'mati_nama')].forEach(k => { if (x[k]) pre[k] = x[k]; });
+        const orang = pre => { const o = {}; o[pre + 'penduduk_id'] = x.penduduk_id || ''; ['nama', 'nik', 'tempat_lahir', 'tgl_lahir', 'jk', 'agama', 'pekerjaan'].forEach(k => { if (x[k]) o[pre + k] = x[k]; }); return o; };
+        if (/^Pengantar Nikah/.test(x.jenis_surat || '')) return go('form', { e: 'ntcr', preset: Object.assign({ jenis: 'Nikah', tahap: 'Pengantar (belum akad)' }, orang(/^L/i.test(x.jk || '') ? 's_' : 'i_')) });
+        const fm = /^Formulir .*\((F-[\d.]+)\)/.exec(x.jenis_surat || '');
+        if (fm) { const f = F_ADM.find(a => a[0] === fm[1]); return go('form', { e: 'adminduk', preset: Object.assign({ formulir: f ? f[1] : '' }, orang('p_')) }); }
+        const pre = { penduduk_id: x.penduduk_id || '', jenis_surat: x.jenis_surat === 'Surat keterangan lainnya' ? (x.catatan || '') : x.jenis_surat, keperluan: x.keperluan || '', hp: x.hp || '', kategori_pemohon: x.kategori_pemohon || 'Warga desa', alamat_luar: x.alamat_luar || '' };
+        ['nama', 'nik', 'tempat_lahir', 'tgl_lahir', 'jk', 'agama', 'pekerjaan', 'status_kawin', 'dusun', 'rt', 'rw', 'isian1', 'isian2', 'isian3', 'isian4', 'isian5', 'isian6', 'isian7', 'isian8', ...Object.keys(PS_LBL).filter(k => k !== 'catatan' && k !== 'mati_nama')].forEach(k => { if (x[k]) pre[k] = x[k]; });
         if (x.tgl_lahir) pre.umur = umur(x.tgl_lahir) + ' tahun';
         go('form', { e: 'register_surat', preset: pre });
       };
