@@ -66,6 +66,7 @@ h1,h2,h3{margin:0;line-height:1.25;text-wrap:balance}
 .top .title{flex:1;min-width:0;font-weight:700;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .top .sub{display:inline;font-weight:500;font-size:11.5px;opacity:.75;margin-left:6px}
 .iconbtn{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:9px;border:0;background:transparent;color:inherit;cursor:pointer}
+.bell{position:relative;margin-left:4px}.bell svg{width:20px;height:20px}.bell .bdg{position:absolute;top:1px;right:0;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#dc2626;color:#fff;font:700 10.5px/17px system-ui;text-align:center}.bell.goyang svg{animation:goyang .9s ease}@keyframes goyang{20%,60%{transform:rotate(14deg)}40%,80%{transform:rotate(-14deg)}}.nt-l{display:grid;gap:6px;max-height:50vh;overflow:auto}.nt-i{display:flex;gap:10px;align-items:center;text-align:left;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card,#fff);cursor:pointer;color:inherit;font:inherit}.nt-i:hover{border-color:var(--pri)}.nt-i b{display:block;font-size:14px}.nt-i small{display:block;color:var(--muted);font-size:12px}.nt-ic{font-size:20px}
 .iconbtn .ic{width:18px;height:18px}
 .iconbtn:hover{background:rgba(255,255,255,.12)}
 main{flex:1;width:100%;max-width:1100px;margin:0 auto;padding:10px 10px 84px}
@@ -2362,6 +2363,7 @@ function shell() {
         <img class="tlogo" src="${LOGO}" alt="Logo Desa">
         <div class="title" id="ttl"></div>
         <span id="topAct"></span>
+        <button class="iconbtn bell" id="btnBell" aria-label="Notifikasi" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="bdg" id="bellN" hidden></span></button>
       </header>
       <main id="main"></main>
     </div>
@@ -2380,6 +2382,7 @@ function shell() {
     <div class="sb-foot"><button class="sb-user" data-go='["akun"]' title="Akun saya"><span class="sb-av">${S.user.foto ? `<img src="${esc(thumb(S.user.foto, 120))}" alt="">` : esc(initials(S.user.nama))}</span><span class="sb-un"><b>${esc(S.user.nama)}</b><small>${esc(S.user.jabatan || (S.user.admin ? 'Administrator' : 'Pengguna'))}</small></span></button><button class="sb-theme" data-sb="tema" title="Ganti tema terang / gelap" aria-label="Ganti tema">${ic('moon')}${ic('sun')}</button></div>`;
   sideHook();
   $('#btnBack').onclick = back;
+  notifMulai();
   $('#tabs').onclick = e => { const b = e.target.closest('[data-tab]'); if (b) root(b.dataset.tab); };
   $('#side').onclick = e => { if (sideKlik(e)) return; const b = e.target.closest('[data-go]'); if (b) { const g = JSON.parse(b.dataset.go); if (g[0] === 'home') return root('home'); S.stack = [{ name: 'home', params: {} }]; S.cur = null; go(g[0], g[1] || {}, true); } };
 }
@@ -2841,7 +2844,7 @@ function aktSambung() {
     ws.onmessage = ev => {
       let m; try { m = JSON.parse(ev.data); } catch (x) { return; }
       if (m.event === 'phx_reply' && m.topic === 'realtime:aktivitas') { const ok = m.payload && m.payload.status === 'ok'; const lv = $('#akLive'); if (lv) lv.classList.toggle('on', ok); }
-      if (m.event === 'broadcast') { clearTimeout(AKT.tunda); AKT.tunda = setTimeout(() => aktMuat(true), 400); }
+      if (m.event === 'broadcast') { clearTimeout(AKT.tunda); AKT.tunda = setTimeout(() => { aktMuat(true); notifCek(); }, 400); }
     };
     ws.onclose = () => { clearInterval(AKT.hb); const lv = $('#akLive'); if (lv) lv.classList.remove('on'); if (S.user) setTimeout(aktSambung, 8000); };
   } catch (x) { }
@@ -2852,6 +2855,79 @@ setInterval(() => {   /* cadangan bila siaran terputus + perbarui "x mnt lalu" *
   if (!AKT.ws || AKT.ws.readyState !== 1) aktMuat(true);
 }, 60000);
 
+
+/* =====================================================================
+   NOTIFIKASI: lonceng di atas + notifikasi HP (Web Push) untuk permohonan surat & laporan warga
+   ===================================================================== */
+const NOTIF_URL = SB_URL + '/functions/v1/notif';
+const NT = { n: -1, rows: [], t: null };
+const notifBoleh = () => !atsOnly() && (canRead('permohonan_surat') || canRead('pengaduan'));
+function notifMulai() {
+  const b = $('#btnBell'); if (!b) return;
+  const h = (location.hash || '').slice(1); if (/^(permohonan_surat|pengaduan)$/.test(h) && canRead(h)) { history.replaceState(null, '', location.pathname); setTimeout(() => go('list', { e: h }), 600); }
+  if (!notifBoleh()) { b.hidden = true; return; }
+  b.hidden = false; b.onclick = notifBuka;
+  clearInterval(NT.t); NT.t = setInterval(() => { if (!document.hidden) notifCek(); }, 60000);
+  setTimeout(notifCek, 1200);
+}
+async function notifCek() {
+  if (!S.user || !notifBoleh()) return;
+  const ambil = async (e, st) => canRead(e) ? ((await call('list', { entity: e, limit: 40 }).catch(() => ({ rows: [] }))).rows || []).filter(r => (r.status || st) === st).map(r => Object.assign({ _e: e }, r)) : [];
+  const rows = (await ambil('permohonan_surat', 'Diajukan')).concat(await ambil('pengaduan', 'Diterima')).sort((a, b) => String(b.tanggal || '').localeCompare(String(a.tanggal || '')) || String(b.jam || '').localeCompare(String(a.jam || '')));
+  const lama = NT.n; NT.rows = rows; NT.n = rows.length;
+  const bd = $('#bellN'); if (bd) { bd.hidden = !rows.length; bd.textContent = rows.length > 99 ? '99+' : rows.length; }
+  if (lama >= 0 && rows.length > lama) {
+    const x = rows[0], j = x._e === 'pengaduan' ? 'Laporan warga baru' : 'Permohonan surat baru';
+    toast(j + ': ' + (x.jenis_surat || x.kategori || '') + (x.tiket ? ' · ' + x.tiket : ''));
+    const bb = $('#btnBell'); if (bb) { bb.classList.remove('goyang'); void bb.offsetWidth; bb.classList.add('goyang'); }
+  }
+}
+const nB64 = s => { const p = '='.repeat((4 - s.length % 4) % 4), b = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(b, c => c.charCodeAt(0)); };
+async function notifPanggil(body) {
+  const r = await fetch(NOTIF_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(x => x.json()).catch(() => ({ ok: false, error: 'Tidak ada koneksi ke server notifikasi.' }));
+  if (!r.ok) throw new Error(r.error || 'Gagal.'); return r.data;
+}
+async function notifStatusHP() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return { bisa: false, ket: /iphone|ipad/i.test(navigator.userAgent) ? 'Di iPhone/iPad: pasang aplikasi ke Layar Utama (Bagikan → Tambah ke Layar Utama, iOS 16.4+), lalu buka dari ikonnya.' : 'Peramban ini belum mendukung notifikasi.' };
+  const reg = await Promise.race([navigator.serviceWorker.ready.catch(() => null), new Promise(ok => setTimeout(() => ok(null), 3000))]); if (!reg) return { bisa: false, ket: 'Aplikasi belum terpasang lengkap. Muat ulang halaman.' };
+  const sub = await reg.pushManager.getSubscription();
+  return { bisa: true, reg, sub, izin: Notification.permission };
+}
+async function notifAktifkan(uji) {
+  const st = await notifStatusHP(); if (!st.bisa) throw new Error(st.ket);
+  if (Notification.permission !== 'granted') { const p = await Notification.requestPermission(); if (p !== 'granted') throw new Error('Izin notifikasi ditolak. Buka pengaturan situs di peramban untuk mengizinkannya.'); }
+  let sub = st.sub;
+  if (!sub) { const key = await notifPanggil({ aksi: 'kunci' }); sub = await st.reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: nB64(key) }); }
+  const perangkat = (navigator.userAgentData && navigator.userAgentData.platform) || (navigator.userAgent.match(/\(([^)]+)\)/) || [])[1] || '';
+  await notifPanggil({ aksi: uji ? 'uji' : 'simpan', token: S.token, sub: sub.toJSON(), perangkat });
+}
+async function notifMatikan() {
+  const st = await notifStatusHP(); if (!st.bisa || !st.sub) return;
+  try { await notifPanggil({ aksi: 'hapus', token: S.token, endpoint: st.sub.endpoint }); } catch (e) { }
+  await st.sub.unsubscribe().catch(() => { });
+}
+async function notifBuka() {
+  const st = await notifStatusHP().catch(() => ({ bisa: false, ket: '' }));
+  const aktif = st.bisa && st.sub && st.izin === 'granted';
+  const item = x => `<button class="nt-i" data-e="${esc(x._e)}"><span class="nt-ic">${x._e === 'pengaduan' ? '📣' : '📄'}</span><span><b>${esc(x._e === 'pengaduan' ? (x.kategori || 'Laporan warga') : (x.jenis_surat || 'Permohonan surat'))}</b><small>${esc([x.kategori_pemohon === 'Luar desa' ? 'Luar desa' : '', x.anonim === 'Ya' ? '(pelapor dirahasiakan)' : x.nama, x.tiket, fDate(x.tanggal) + (x.jam ? ' ' + x.jam : '')].filter(Boolean).join(' · '))}</small></span></button>`;
+  const m = modal('Notifikasi', `<div class="stack">
+    <div class="meta">Permohonan surat dan laporan warga dari website desa yang <b>belum diproses</b>.</div>
+    <div class="nt-l">${NT.rows.length ? NT.rows.slice(0, 15).map(item).join('') : '<div class="meta" style="padding:14px;text-align:center">Tidak ada yang menunggu. 🎉</div>'}</div>
+    <div class="btns">${canRead('permohonan_surat') ? `<button class="btn sm" data-ntgo="permohonan_surat">${ic('inbox')}Permohonan Surat Online</button>` : ''}${canRead('pengaduan') ? `<button class="btn sm" data-ntgo="pengaduan">${ic('mega')}Pengaduan Masyarakat</button>` : ''}</div>
+    <div class="card"><b>Notifikasi di HP / perangkat ini</b><div class="meta" style="margin:4px 0 8px">${!st.bisa ? esc(st.ket || '') : aktif ? '✓ Aktif. Perangkat ini menerima kabar walaupun aplikasi sedang ditutup.' : 'Belum aktif. Aktifkan agar HP berbunyi saat ada permohonan surat atau laporan baru, walaupun aplikasi ditutup. Di HP, pasang aplikasi ke layar utama terlebih dahulu.'}</div>
+      ${st.bisa ? `<div class="btns">${aktif ? `<button class="btn sm" id="ntUji">${ic('send')}Kirim notifikasi uji</button><button class="btn sm" id="ntOff">${ic('x')}Matikan di perangkat ini</button>` : `<button class="btn pri sm" id="ntOn">${ic('check')}Aktifkan notifikasi</button>`}</div>` : ''}</div></div>`);
+  m.el.addEventListener('click', async ev => {
+    const it = ev.target.closest('[data-e],[data-ntgo]');
+    if (it) { m.close(); go('list', { e: it.dataset.e || it.dataset.ntgo }); return; }
+    const b = ev.target.closest('#ntOn,#ntUji,#ntOff'); if (!b) return;
+    b.disabled = true;
+    try {
+      if (b.id === 'ntOff') { await notifMatikan(); toast('Notifikasi di perangkat ini dimatikan.'); }
+      else { await notifAktifkan(true); toast(b.id === 'ntOn' ? 'Notifikasi aktif. Notifikasi uji dikirim.' : 'Notifikasi uji dikirim.'); }
+      m.close(); notifBuka();
+    } catch (er) { toast(er.message, 1); b.disabled = false; }
+  });
+}
 /* =====================================================================
    BERKAS
    ===================================================================== */
@@ -3193,6 +3269,7 @@ window.addEventListener('appinstalled', () => { instPrompt = null; const c = $('
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   navigator.serviceWorker.register('sw.js').catch(() => { });
   navigator.serviceWorker.addEventListener('message', e => {
+    if (e.data && e.data.t === 'buka') { const h = String(e.data.url || '').split('#')[1] || ''; if (S.user && /^(permohonan_surat|pengaduan)$/.test(h) && canRead(h)) go('list', { e: h }); return; }
     if (e.data && e.data.t === 'versi-baru' && !$('#verBaru')) {
       const d = document.createElement('div'); d.id = 'verBaru'; d.className = 'toast'; d.style.cursor = 'pointer';
       d.innerHTML = 'Versi baru aplikasi sudah siap. <b style="text-decoration:underline">Muat ulang</b>';
@@ -8961,7 +9038,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '212', tgl: '2026-10-29', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '214', tgl: '2026-10-30', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
