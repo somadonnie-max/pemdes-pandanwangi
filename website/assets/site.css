@@ -479,3 +479,12 @@ section{position:relative}
 .org-hint{display:none;font-size:13px;color:var(--muted);margin:10px 0 0}
 
 @media (prefers-reduced-motion:reduce){.oc,.oc-bpd,.org-lbl{opacity:1!important;transform:none!important;animation:none!important}.org-c .ln path{stroke-dashoffset:0;transition:none}.org-c .ln circle{display:none}}
+
+/* kolom peta administrasi di Beranda */
+#tentang .split-l{align-items:stretch}
+.peta-col{display:flex;flex-direction:column;min-height:560px}
+.peta-hd{display:flex;align-items:baseline;justify-content:space-between;gap:6px 14px;flex-wrap:wrap;margin-bottom:12px}
+.peta-hd h3{font:800 clamp(20px,2.2vw,26px)/1.15 var(--f-d)}
+.peta-hd .hand{margin:0;font-size:17px;color:var(--muted)}
+.peta-col .mapbox{flex:1;height:auto;min-height:480px;position:relative;z-index:0;isolation:isolate}
+@media(max-width:900px){.peta-col{min-height:0}.peta-col .mapbox{flex:none;height:calc(100svh - 150px);min-height:420px}}

@@ -4,14 +4,14 @@
 (function(){
 'use strict';
 var P=window.PW,box=document.getElementById('petaDesa');if(!box||!P)return;
-var V='?v=223';
+var V='?v=224';
 var SB='https://niaqgsqfsztcsgdyzavt.supabase.co',KEY='sb_publishable_FrjuzHg6pJFQhJRIqBoXIw_5sL7E5sH';
 var WARNA={'krajan 1':'#e8b84a','krajan 2':'#ee7340','krajan 3':'#5b8a4c','timur sawah':'#3b6fc4','tunjungan':'#9b5fb5','pemukiman':'#2aa198'};
 var URUT=['krajan 1','krajan 2','krajan 3','timur sawah','tunjungan','pemukiman'];
 var esc=P.esc,nf=function(n){return (+n||0).toLocaleString('id-ID')};
 var css=document.createElement('style');
 css.textContent=
-'#petaDesa{position:relative;background:#f3ead4}#petaDesa .leaflet-container{background:transparent;font:inherit}'+
+'#petaDesa{position:relative;z-index:0;isolation:isolate;background:#f3ead4}#petaDesa .leaflet-container{background:transparent;font:inherit}'+
 '#petaDesa.polos .leaflet-container{background:radial-gradient(circle at 30% 20%,#fbf4e2,#efe3c8 70%)}'+
 '.pt-rt{transition:fill-opacity .25s,stroke-width .25s}'+
 '.pt-draw{stroke-dasharray:var(--L);stroke-dashoffset:var(--L);animation:ptDraw 1.4s var(--d) cubic-bezier(.5,0,.2,1) forwards,ptFill .8s calc(var(--d) + .7s) ease forwards;fill-opacity:0}'+
@@ -39,8 +39,12 @@ css.textContent=
 '.pt-o .av img{width:100%;height:100%;object-fit:cover;object-position:50% 20%}.pt-o b{display:block;font-size:13px;line-height:1.2}.pt-o small{font-size:11px;color:#5d6b62}'+
 '.pt-o .ks{opacity:.6;font-style:italic}'+
 '.pt-ld{position:absolute;inset:0;display:grid;place-items:center;z-index:600;font:700 14px var(--f-b);color:#0f241a;background:#f3ead4;transition:opacity .5s}'+
-'@media(max-width:640px){#petaDesa{height:500px!important}.pt-ui button{font-size:10.5px;padding:5px 8px;box-shadow:1px 1px 0 #0f241a}.pt-ui.bl{gap:4px;right:10px}.pt-ui .dz i{width:8px;height:8px}.pt-ic{width:20px;height:20px;font-size:11px}.pt-pop .leaflet-popup-content{width:236px!important}.pt-g b{font-size:14px}}'+
+'@media(max-width:640px){.pt-ui button{font-size:10.5px;padding:5px 8px;box-shadow:1px 1px 0 #0f241a}.pt-ui.bl{gap:4px;right:10px}.pt-ui .dz i{width:8px;height:8px}.pt-ic{width:20px;height:20px;font-size:11px}.pt-pop .leaflet-popup-content{width:236px!important}.pt-g b{font-size:14px}}'+
 '#petaDesa.pop .pt-ui{opacity:0;pointer-events:none}.pt-ui{transition:opacity .2s}'+
+'.pt-kunci{position:absolute;inset:0;z-index:650;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(15,36,26,.08);pointer-events:none;text-align:center;padding:20px}'+
+'.pt-kunci[hidden]{display:none}.pt-kunci button{pointer-events:auto;font:800 14px var(--f-b);padding:11px 18px;border-radius:999px;border:2px solid #0f241a;background:#e8b84a;color:#0f241a;box-shadow:3px 3px 0 #0f241a}'+
+'.pt-kunci small{font:600 11.5px/1.35 var(--f-b);color:#0f241a;background:#fffaf0e6;padding:4px 10px;border-radius:10px;max-width:250px}'+
+'.pt-lepas{position:absolute;z-index:650;left:50%;transform:translateX(-50%);top:10px;font:800 12px var(--f-b);padding:7px 14px;border-radius:999px;border:2px solid #0f241a;background:#0f241a;color:#e8b84a}.pt-lepas[hidden]{display:none}'+
 '.pt-ft{position:absolute;right:10px;bottom:10px;z-index:500;font-size:11px;background:#fffaf0cc;border-radius:8px;padding:3px 7px;color:#5d6b62}';
 document.head.appendChild(css);
 
@@ -130,7 +134,7 @@ function bangun(gRT,gJL,gFS,D,gKX){
     ly.on('mouseout',function(){RTL.resetStyle(ly)});
     ly._urut=n++;
   }});
-  JL.addTo(map);RTL.addTo(map);JL.bringToFront();
+  RTL.addTo(map);
   /* fasilitas */
   var IK={'kantor desa':'🏛️','masjid':'🕌','musholla':'🕌','gereja':'⛪','pondok pesantren':'📖','paud':'🧸','tk':'🧸','sd/mi':'🏫','smp/mts':'🏫','sma/smk/ma':'🏫','sekolah':'🏫','puskesmas':'🏥','posyandu':'🩺'};
   var fi=0,FS=L.geoJSON(gFS,{pointToLayer:function(f,ll){var p=f.properties||{},j=String(p.jenis||p.REMARK||'').toLowerCase(),kec=/jembatan/.test(j);
@@ -151,13 +155,23 @@ function bangun(gRT,gJL,gFS,D,gKX){
   var ui1=document.createElement('div');ui1.className='pt-ui tr';
   ui1.innerHTML='<button data-d="polos" class="on">Polos</button><button data-d="jalan">Peta jalan</button><button data-d="satelit">Satelit</button>';
   var ui2=document.createElement('div');ui2.className='pt-ui bl';
-  ui2.innerHTML=URUT.map(function(d){return '<button class="dz" data-z="'+d+'"><i style="background:'+WARNA[d]+'"></i>'+d.replace(/\b\w/g,function(c){return c.toUpperCase()})+'</button>'}).join('')+'<button data-l="jl" class="on">Jalan & sungai</button><button data-l="fs" class="on">Fasilitas</button>';
+  ui2.innerHTML=URUT.map(function(d){return '<button class="dz" data-z="'+d+'"><i style="background:'+WARNA[d]+'"></i>'+d.replace(/\b\w/g,function(c){return c.toUpperCase()})+'</button>'}).join('')+'<button data-l="jl">Jalan & sungai</button><button data-l="fs" class="on">Fasilitas</button>';
   box.appendChild(ui1);box.appendChild(ui2);box.appendChild(ft);ft.style.display='none';
   L.DomEvent.disableClickPropagation(ui1);L.DomEvent.disableClickPropagation(ui2);L.DomEvent.disableScrollPropagation(ui2);
   ui1.querySelectorAll('[data-d]').forEach(function(b){b.onclick=function(){dasar(b.getAttribute('data-d'))}});
   ui2.querySelectorAll('[data-z]').forEach(function(b){b.onclick=function(){var L_=dusunLay[b.getAttribute('data-z')]||[];if(!L_.length)return;map.flyToBounds(window.L.featureGroup(L_).getBounds(),{padding:[30,30],duration:.8});L_.forEach(function(ly,i){setTimeout(function(){ly.setStyle({fillOpacity:.9,weight:2.6});setTimeout(function(){RTL.resetStyle(ly)},900)},500+i*60)})}});
   ui2.querySelector('[data-l=jl]').onclick=function(){var on=this.classList.toggle('on');on?JL.addTo(map):map.removeLayer(JL)};
   ui2.querySelector('[data-l=fs]').onclick=function(){var on=this.classList.toggle('on');on?FS.addTo(map):map.removeLayer(FS)};
+
+  /* HP/tablet: peta terkunci dulu supaya halaman tetap bisa digulir; ketuk "Aktifkan peta" untuk menggeser/memperbesar */
+  if(matchMedia('(pointer:coarse)').matches){
+    var kunci=document.createElement('div');kunci.className='pt-kunci';kunci.innerHTML='<button type="button">👆 Aktifkan peta</button><small>Geser halaman seperti biasa; ketuk tombol untuk menggeser & memperbesar peta</small>';
+    var lepas=document.createElement('button');lepas.type='button';lepas.className='pt-lepas';lepas.textContent='✓ Selesai';lepas.hidden=true;
+    box.appendChild(kunci);box.appendChild(lepas);
+    var kc=function(on){[map.dragging,map.touchZoom,map.doubleClickZoom,map.boxZoom,map.keyboard].forEach(function(h){h&&(on?h.disable():h.enable())});if(map.tap)on?map.tap.disable():map.tap.enable();kunci.hidden=!on;lepas.hidden=on;box.classList.toggle('terkunci',on)};
+    kunci.querySelector('button').onclick=function(e){e.stopPropagation();kc(false)};lepas.onclick=function(e){e.stopPropagation();kc(true)};
+    L.DomEvent.disableClickPropagation(lepas);kc(true);
+  }
   map.on('popupopen',function(){box.classList.add('pop')});map.on('popupclose',function(){box.classList.remove('pop')});
   setTimeout(function(){map.invalidateSize()},200);
 }
