@@ -581,3 +581,15 @@ section{position:relative}
   .sav-pics img:nth-child(1){height:268px!important}.sav-pics img:nth-child(4){height:140px!important}
   .tab-p .card,.tab-p .pcard{min-width:0}
 }
+
+@media(max-width:640px){
+  .demo-g{grid-template-columns:1fr!important}
+  p{margin-top:0;margin-bottom:.55em}
+  .sec-h h2{margin:6px 0 8px}.sec-h p{margin:0}
+  .split-l{gap:20px}
+  .card h3{margin-bottom:4px}
+  .stats{gap:8px}
+  .gal{gap:12px;padding:6px 16px 18px}.gal img{height:220px}.gal figcaption{padding:28px 12px 10px;font-size:13px}
+  .hero-cta,.btnrow{margin-top:12px}
+  .batas{gap:8px!important;margin-top:16px!important}
+}

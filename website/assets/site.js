@@ -42,6 +42,9 @@ function wkApply(){
   var an=document.getElementById('wkAnn'),pt=G('pengumuman');
   if(pt&&!an&&!store('wp:ann:'+pt)){an=document.createElement('div');an.id='wkAnn';an.className='wk-ann';var m=document.querySelector('main');m&&m.parentNode.insertBefore(an,m)}
   if(an){if(!pt)an.remove();else{var lk=G('pengumuman_link');an.innerHTML='<div class="wrap"><span>📢</span><p>'+esc(pt).replace(/\n/g,'<br>')+(urlOk(lk)?' <a href="'+esc(lk)+'" target="_blank" rel="noopener">Selengkapnya →</a>':'')+'</p><button type="button" aria-label="Tutup pengumuman">×</button></div>';an.querySelector('button').onclick=function(){store('wp:ann:'+pt,1);an.remove()}}}
+  /* galeri pembangunan (diatur di aplikasi: Website Desa > Galeri pembangunan, maks. 10 foto) */
+  var gl=WK.g&&WK.g.galeri,gb=document.getElementById('galBangun');
+  if(gb&&Array.isArray(gl)&&gl.length){var js=JSON.stringify(gl);if(gb._wk!==js){gb._wk=js;gb.innerHTML=gl.slice(0,10).filter(function(x){return x&&urlOk(x.u,1)}).map(function(x){return '<figure><img src="'+esc(x.u)+'" alt="'+esc(x.k||'Foto pembangunan')+'" loading="lazy"><figcaption>'+esc(x.k||'')+'</figcaption></figure>'}).join('')}}
   $$('[data-g]').forEach(function(el){var k=el.getAttribute('data-g'),v=G(k);if(!v||el._wk===v)return;
     if(el.tagName==='A'){if(urlOk(v))el.href=v}else el.textContent=v;el._wk=v});
 }
