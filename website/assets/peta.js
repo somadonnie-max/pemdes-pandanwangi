@@ -4,7 +4,7 @@
 (function(){
 'use strict';
 var P=window.PW,box=document.getElementById('petaDesa');if(!box||!P)return;
-var V='?v=222';
+var V='?v=223';
 var SB='https://niaqgsqfsztcsgdyzavt.supabase.co',KEY='sb_publishable_FrjuzHg6pJFQhJRIqBoXIw_5sL7E5sH';
 var WARNA={'krajan 1':'#e8b84a','krajan 2':'#ee7340','krajan 3':'#5b8a4c','timur sawah':'#3b6fc4','tunjungan':'#9b5fb5','pemukiman':'#2aa198'};
 var URUT=['krajan 1','krajan 2','krajan 3','timur sawah','tunjungan','pemukiman'];
@@ -17,7 +17,9 @@ css.textContent=
 '.pt-draw{stroke-dasharray:var(--L);stroke-dashoffset:var(--L);animation:ptDraw 1.4s var(--d) cubic-bezier(.5,0,.2,1) forwards,ptFill .8s calc(var(--d) + .7s) ease forwards;fill-opacity:0}'+
 '@keyframes ptDraw{to{stroke-dashoffset:0}}@keyframes ptFill{to{fill-opacity:var(--fo)}}'+
 '.pt-ln{animation:ptLn 1.6s 1.2s ease both}@keyframes ptLn{from{opacity:0}}'+
-'.pt-lab{background:none;border:0;box-shadow:none;font:800 10px/1 var(--f-b);color:#0f241a;text-shadow:0 0 3px #fff,0 0 3px #fff;padding:0}.pt-lab:before{display:none}'+
+'.leaflet-tooltip.pt-lab{background:linear-gradient(135deg,#e8b84a,#ee7340);border:1.5px solid #0f241a;border-radius:999px;box-shadow:1.5px 1.5px 0 #0f241a;font:800 9.5px/1 var(--f-b);color:#0f241a;padding:3px 7px;white-space:nowrap}.leaflet-tooltip.pt-lab:before{display:none}'+
+'.leaflet-tooltip.pt-cx{background:none;border:0;box-shadow:none;padding:0;font:700 11px/1.1 var(--f-b);color:#5d4a2e;text-shadow:0 0 3px #fffaf0,0 0 3px #fffaf0;white-space:nowrap;text-align:center}.leaflet-tooltip.pt-cx:before{display:none}'+
+'.leaflet-tooltip.pt-cx.kab{font:800 15px var(--f-d);letter-spacing:.06em;text-transform:uppercase;color:#0f241a}.leaflet-tooltip.pt-cx.kec{font:800 12.5px var(--f-d);color:#3d3326}.leaflet-tooltip.pt-cx.laut{font:italic 700 14px var(--f-b);color:#2b6cb0;letter-spacing:.2em;text-shadow:none}.leaflet-tooltip.pt-cx.luar{color:#8a7d66;font-size:12px}'+
 '.pt-ic{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#fffaf0;border:2px solid #0f241a;font-size:13px;box-shadow:2px 2px 0 #0f241a;animation:ptPop .5s var(--d) cubic-bezier(.3,1.6,.5,1) both}'+
 '.pt-ic.kecil{width:10px;height:10px;border-width:1.5px;box-shadow:none;background:#7a6a55}'+
 '@keyframes ptPop{from{transform:scale(0)}}'+
@@ -63,10 +65,10 @@ function orang(o,peran){
 function mulai(){
   box.classList.add('polos');box.innerHTML='<div class="pt-ld">Memuat peta desa…</div>';
   Promise.all([muat('assets/leaflet/leaflet.css'+V,'link'),muat('assets/leaflet/leaflet.js'+V,'script')]).then(function(){
-    return Promise.all([ambilGeo('rt','rt'),ambilGeo('jalan','jalan'),ambilGeo('fasilitas','fasilitas'),ambilData()]);
-  }).then(function(r){bangun(r[0],r[1],r[2],r[3]||{})}).catch(function(e){console.warn(e);box.innerHTML='<div class="pt-ld">Peta belum bisa dimuat. Coba muat ulang halaman.</div>'});
+    return Promise.all([ambilGeo('rt','rt'),ambilGeo('jalan','jalan'),ambilGeo('fasilitas','fasilitas'),ambilData(),fetch('data/konteks.geojson'+V).then(function(r){return r.json()}).catch(function(){return null})]);
+  }).then(function(r){bangun(r[0],r[1],r[2],r[3]||{},r[4])}).catch(function(e){console.warn(e);box.innerHTML='<div class="pt-ld">Peta belum bisa dimuat. Coba muat ulang halaman.</div>'});
 }
-function bangun(gRT,gJL,gFS,D){
+function bangun(gRT,gJL,gFS,D,gKX){
   var L=window.L;box.innerHTML='';
   var map=L.map(box,{zoomControl:true,attributionControl:false,scrollWheelZoom:false,zoomSnap:.25,preferCanvas:false});
   map.on('focus click',function(){map.scrollWheelZoom.enable()});map.on('blur',function(){map.scrollWheelZoom.disable()});
@@ -76,7 +78,31 @@ function bangun(gRT,gJL,gFS,D){
   var KET={polos:'',jalan:'© OpenStreetMap',satelit:'Citra © Esri'};
   var ft=document.createElement('div');ft.className='pt-ft';
   var curD='polos';
-  function dasar(k){if(DASAR[curD])map.removeLayer(DASAR[curD]);curD=k;if(DASAR[k])DASAR[k].addTo(map).bringToBack();box.classList.toggle('polos',k==='polos');ft.textContent=KET[k];ft.style.display=KET[k]?'':'none';ui1.querySelectorAll('[data-d]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-d')===k)});RTL.setStyle(gaya)}
+  function dasar(k){if(DASAR[curD])map.removeLayer(DASAR[curD]);curD=k;if(DASAR[k])DASAR[k].addTo(map).bringToBack();box.classList.toggle('polos',k==='polos');ft.textContent=KET[k];ft.style.display=KET[k]?'':'none';ui1.querySelectorAll('[data-d]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-d')===k)});RTL.setStyle(gaya);if(KX)KX.setStyle(cxGaya)}
+  /* wilayah sekitar: laut, kabupaten tetangga, Kab. Lumajang, Kec. Kunir & Pasirian, desa tetangga, desa se-Kec. Tempeh (dari SLS: batasnya sama persis dengan RT) */
+  var PAS=['#f3e3b8','#e9dcc0','#f0d9c4','#dfe5c8','#e6dccf','#f1e4cc','#e3d7bd','#ece0c2','#e8dcc8','#f2dcc0','#e0dfc6','#eadfc9'];
+  var pi=0,KX=null,labs=[];
+  function cxGaya(f){var l=f.properties.lvl,pol=curD==='polos';
+    var st={laut:{color:'#9cc7e2',weight:0,fillColor:'#cfe6f3',fillOpacity:pol?1:0},luar:{color:'#cbbf9f',weight:1,fillColor:'#ebe5d5',fillOpacity:pol?1:0},kab:{color:'#0f241a',weight:2.2,fillColor:'#f8f1df',fillOpacity:pol?1:0,dashArray:'8 5'},
+      kec:{color:'#9a8a6a',weight:1.6,fillColor:f.properties.nama.indexOf('Kunir')>-1?'#ead9b8':'#e2d6b3',fillOpacity:pol?1:.08},desa_luar:{color:'#a8977a',weight:1,fillColor:'#efe1c0',fillOpacity:pol?1:.08},
+      desa:{color:'#8b7a5c',weight:1.1,fillColor:f._c,fillOpacity:pol?1:.08},kec_tempeh:{color:'#0f241a',weight:2.4,fill:false,dashArray:'2 6',lineCap:'round'}}[l]||{};
+    if(l==='desa'&&/pandanwangi/i.test(f.properties.nama))st={color:'#0f241a',weight:3.2,fill:false};
+    st.interactive=false;return st}
+  if(gKX&&gKX.features){
+    var B=null;gKX.features.forEach(function(f){if(f.properties.lvl==='kab'){B=L.geoJSON(f).getBounds()}});
+    if(B){var S=B.getSouth(),W_=B.getWest()-.6,E_=B.getEast()+.6;gKX.features.unshift({type:'Feature',properties:{lvl:'laut',nama:'Samudra Indonesia'},geometry:{type:'Polygon',coordinates:[[[W_,S+.35],[E_,S+.35],[E_,S-.9],[W_,S-.9],[W_,S+.35]]]}})}
+    var URL_=['laut','luar','kab','kec','desa_luar','desa','kec_tempeh'];
+    gKX.features.sort(function(a,b){return URL_.indexOf(a.properties.lvl)-URL_.indexOf(b.properties.lvl)});
+    gKX.features.forEach(function(f){if(f.properties.lvl==='desa')f._c=PAS[pi++%PAS.length]});
+    KX=L.geoJSON(gKX,{style:cxGaya,onEachFeature:function(f,ly){var l=f.properties.lvl,nm=f.properties.nama;
+      if(l==='kec_tempeh'||(l==='desa'&&/pandanwangi/i.test(nm)))return;
+      var pos=l==='laut'?[S-.12,(W_+E_)/2+.35]:null;
+      var t=L.tooltip({permanent:true,direction:'center',className:'pt-cx '+l,interactive:false}).setContent(esc(l==='desa'||l==='desa_luar'?'Desa '+nm:nm));
+      if(pos){t.setLatLng(pos)}else{t.setLatLng(ly.getBounds().getCenter())}
+      labs.push({t:t,l:l});
+    }}).addTo(map);
+  }
+  function cxLab(){var z=map.getZoom();labs.forEach(function(o){var show={laut:z<14,luar:z<12.5,kab:z<12,kec:z>=10.5&&z<14,desa_luar:z>=12.5,desa:z>=12.5}[o.l];if(show&&!map.hasLayer(o.t))o.t.addTo(map);else if(!show&&map.hasLayer(o.t))map.removeLayer(o.t)})}
   /* jalan & sungai */
   var JL=L.geoJSON(gJL,{interactive:false,style:function(f){var j=String((f.properties||{}).jenis||(f.properties||{}).REMARK||'').toLowerCase();
     if(/sungai|saluran|irigasi/.test(j))return {color:'#3a8fd0',weight:2.4,opacity:.9,className:'pt-ln'};
@@ -92,7 +118,7 @@ function bangun(gRT,gJL,gFS,D){
   var RTL=L.geoJSON(gRT,{style:gaya,onEachFeature:function(f,ly){
     var s=f._s,k=s.rw+'/'+s.rt,d=(D.rt||{})[k]||{},kk=(D.kk||{})[k],lu=s.luas!=null?+s.luas:luasHa(f.geometry);
     (dusunLay[s.dusun.toLowerCase()]=dusunLay[s.dusun.toLowerCase()]||[]).push(ly);
-    ly.bindTooltip('RT '+s.rt+' / RW '+s.rw,{className:'pt-lab',direction:'center',permanent:true,opacity:1});
+    ly.bindTooltip('RT '+s.rt.slice(1)+' · RW '+s.rw.slice(1),{className:'pt-lab',direction:'center',permanent:true,opacity:1});
     var w=warna(f),kas=(D.kasun||{})[s.dusun.toLowerCase()];
     ly.bindPopup('<div class="pt-h" style="background:'+w+'"><b>RT '+s.rt+' / RW '+s.rw+'</b><small>Dusun '+esc(s.dusun)+'</small></div>'+
       '<div class="pt-g"><div><b>'+nf(d.n)+'</b><small>Penduduk</small></div><div><b>'+nf(d.l)+'</b><small>Laki-laki</small></div><div><b>'+nf(d.p)+'</b><small>Perempuan</small></div>'+
@@ -110,7 +136,9 @@ function bangun(gRT,gJL,gFS,D){
       m.bindTooltip(esc(p.nama||p.NAMOBJ||p.jenis||'Fasilitas')+(p.jenis&&p.nama&&p.nama!==p.jenis?' · '+esc(p.jenis):''),{direction:'top',offset:[0,-10]});return m}});
   FS.addTo(map);
   /* tampilan awal + animasi garis */
-  map.fitBounds(RTL.getBounds(),{padding:[16,16]});map.setMaxBounds(RTL.getBounds().pad(1.2));map.setMinZoom(map.getZoom()-1);
+  map.fitBounds(RTL.getBounds(),{padding:[16,16]});var KB=null;if(KX)KX.eachLayer(function(l){if(l.feature.properties.lvl==='kab')KB=l.getBounds()});
+  if(KB){map.setMaxBounds(KB.pad(.35));map.setMinZoom(Math.max(8,map.getBoundsZoom(KB)-.5))}else{map.setMaxBounds(RTL.getBounds().pad(1.2));map.setMinZoom(map.getZoom()-1)}
+  map.on('zoomend',cxLab);cxLab();
   RTL.eachLayer(function(ly){var pth=ly._path;if(!pth||P.RM)return;var Ln=Math.ceil(pth.getTotalLength?pth.getTotalLength():800);
     pth.style.setProperty('--L',Ln);pth.style.setProperty('--d',(ly._urut*.025).toFixed(3)+'s');pth.style.setProperty('--fo',gaya(ly.feature).fillOpacity);pth.classList.add('pt-draw');
     setTimeout(function(){pth.classList.remove('pt-draw');pth.style.removeProperty('--L')},2600+ly._urut*25)});
