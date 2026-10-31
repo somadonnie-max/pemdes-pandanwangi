@@ -6,9 +6,12 @@ var PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
 var OK=/^https:\/\/[a-z0-9]+\.supabase\.co\/storage\/v1\/object\/public\/booklet\/booklet-[a-z0-9]+\.pdf$/;
 var css=document.createElement('style');
 css.textContent=
-'.bk{position:relative;width:100%;height:100%;display:flex;flex-direction:column;background:var(--ink);color:#fff;user-select:none;-webkit-user-select:none}'+
-'.bk-st{flex:1;position:relative;display:flex;align-items:center;justify-content:center;perspective:2200px;padding:14px 14px 0;min-height:0;overflow:hidden}'+
-'.bk-bk{position:relative;display:flex;box-shadow:0 18px 40px rgba(0,0,0,.45)}'+
+'.flip.flip-pdf{border:0;border-radius:0;box-shadow:none;background:none;overflow:visible}'+
+'.bk{position:relative;width:100%;height:100%;display:flex;flex-direction:column;background:none;color:var(--ink);user-select:none;-webkit-user-select:none}'+
+'.bk-nv{display:none!important}'+
+'.bk-tip{text-align:center;font:600 12.5px var(--f-b,system-ui);color:var(--muted);margin-top:8px}'+
+'.bk-st{flex:1;position:relative;display:flex;align-items:center;justify-content:center;perspective:2200px;padding:0;min-height:0;overflow:visible}'+
+'.bk-bk{position:relative;display:flex;box-shadow:0 22px 45px -18px rgba(15,36,26,.55),0 2px 6px rgba(15,36,26,.15)}'+
 '.bk-p{position:relative;background:#fff center/contain no-repeat;overflow:hidden}'+
 '.bk-p img{width:100%;height:100%;object-fit:contain;display:block}'+
 '.bk-p.kosong{background:transparent}'+
@@ -26,8 +29,8 @@ css.textContent=
 '.bk-nv button:hover:not(:disabled){background:var(--padi,#e9ff70);color:var(--ink);border-color:var(--padi,#e9ff70)}'+
 '.bk-nv button:disabled{opacity:.35;cursor:default}'+
 '.bk-nv .pg{min-width:86px;text-align:center;font:700 13px var(--f-b,system-ui);opacity:.9}'+
-'.bk-ld{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font:700 14px var(--f-b,system-ui);opacity:.85}'+
-'.bk-ld i{display:block;width:34px;height:34px;margin:0 auto 10px;border-radius:50%;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;animation:bkspin 1s linear infinite}'+
+'.bk-ld{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font:700 14px var(--f-b,system-ui);opacity:.85;color:var(--ink)}'+
+'.bk-ld i{display:block;width:34px;height:34px;margin:0 auto 10px;border-radius:50%;border:3px solid rgba(15,36,26,.18);border-top-color:var(--ink);animation:bkspin 1s linear infinite}'+
 '@keyframes bkspin{to{transform:rotate(1turn)}}'+
 '.bk-hit{position:absolute;top:0;bottom:0;width:28%;z-index:4;cursor:pointer}.bk-hit.a{left:0}.bk-hit.b{right:0}'+
 '.flip:fullscreen{aspect-ratio:auto;border-radius:0;border:0}.flip:-webkit-full-screen{aspect-ratio:auto}';
@@ -43,15 +46,17 @@ function pasang(url){
   var box=document.querySelector('#booklet .flip');if(!box||aktif===url)return;aktif=url;
   var full=document.querySelector('#booklet .hero-cta a');
   box.innerHTML='<div class="bk"><div class="bk-st"><div class="bk-ld"><div><i></i>Memuat booklet…</div></div></div><div class="bk-nv"><button type="button" data-b="p" aria-label="Halaman sebelumnya" disabled>‹</button><span class="pg">…</span><button type="button" data-b="n" aria-label="Halaman berikutnya" disabled>›</button><button type="button" data-b="f" aria-label="Layar penuh" title="Layar penuh">⛶</button></div></div>';
-  if(full){full.removeAttribute('target');full.href='#booklet';full.onclick=function(e){e.preventDefault();layarPenuh(box)}}
+  box.classList.add('flip-pdf');
+  if(full){full.href=url;full.target='_blank';full.rel='noopener';full.textContent='Unduh PDF booklet';full.onclick=null}
   var st=box.querySelector('.bk-st'),pgEl=box.querySelector('.pg'),bP=box.querySelector('[data-b=p]'),bN=box.querySelector('[data-b=n]');
   box.querySelector('[data-b=f]').onclick=function(){layarPenuh(box)};
+  var tip=document.createElement('div');tip.className='bk-tip';tip.textContent='Ketuk sisi kanan/kiri buku atau geser untuk membalik halaman';box.querySelector('.bk').appendChild(tip);
   var doc,n=0,ratio=1.414,img={},janji={},cur=1,sibuk=false,dua=true,W=0,H=0;
   function mulai(){
     muatPdfjs().then(function(lib){return lib.getDocument({url:url}).promise}).then(function(d){
       doc=d;n=d.numPages;return d.getPage(1)}).then(function(p){
       var v=p.getViewport({scale:1});ratio=v.height/v.width;ukur();gambar();siapkan(cur);
-    }).catch(function(){st.innerHTML='<div class="bk-ld"><div>Booklet belum bisa dimuat.<br><a href="'+url+'" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline">Buka PDF</a></div></div>'});
+    }).catch(function(){st.innerHTML='<div class="bk-ld"><div>Booklet belum bisa dimuat.<br><a href="'+url+'" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Buka PDF</a></div></div>'});
   }
   function render(i){
     if(img[i])return Promise.resolve(img[i]);if(janji[i])return janji[i];
