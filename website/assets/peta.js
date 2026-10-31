@@ -44,8 +44,10 @@ css.textContent=
 '.pt-ft{position:absolute;right:10px;bottom:10px;z-index:500;font-size:11px;background:#fffaf0cc;border-radius:8px;padding:3px 7px;color:#5d6b62}';
 document.head.appendChild(css);
 
+/* fetch dengan batas waktu: peta tetap tampil walau satu lapisan lambat */
+function ambil(u,ms){var c=window.AbortController?new AbortController():null;var t=setTimeout(function(){c&&c.abort()},ms||10000);return fetch(u,c?{signal:c.signal}:{}).then(function(r){clearTimeout(t);if(!r.ok)throw 0;return r.json()})}
 function muat(src,tag){return new Promise(function(ok,no){var e=document.createElement(tag);if(tag==='link'){e.rel='stylesheet';e.href=src;e.onload=ok;e.onerror=ok}else{e.src=src;e.onload=ok;e.onerror=no}document.head.appendChild(e)})}
-function ambilGeo(k,cad){var u=P.wk&&P.wk('peta_'+k);if(!(u&&/^https:\/\/[a-z0-9]+\.supabase\.co\/storage\/v1\/object\/public\/web\/peta\//.test(u)))u='data/'+cad+'.geojson'+V;return fetch(u).then(function(r){if(!r.ok)throw 0;return r.json()}).catch(function(){return fetch('data/'+cad+'.geojson'+V).then(function(r){return r.json()})})}
+function ambilGeo(k,cad){var u=P.wk&&P.wk('peta_'+k);if(!(u&&/^https:\/\/[a-z0-9]+\.supabase\.co\/storage\/v1\/object\/public\/web\/peta\//.test(u)))u='data/'+cad+'.geojson'+V;return ambil(u).catch(function(){return ambil('data/'+cad+'.geojson',10000)})}
 function ambilData(){return fetch(SB+'/rest/v1/rpc/web_peta',{method:'POST',headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json'},body:'{}'}).then(function(r){return r.ok?r.json():{}}).catch(function(){return {}})}
 function p3(x){x=String(x==null?'':x).replace(/\D/g,'');return x?('00'+(+x)).slice(-3):''}
 function sifat(p){ /* properti RT: bentuk aplikasi (rt,rw,dusun,luas) atau bentuk BPS (nmsls) */
@@ -65,7 +67,7 @@ function orang(o,peran){
 function mulai(){
   box.classList.add('polos');box.innerHTML='<div class="pt-ld">Memuat peta desa…</div>';
   Promise.all([muat('assets/leaflet/leaflet.css'+V,'link'),muat('assets/leaflet/leaflet.js'+V,'script')]).then(function(){
-    return Promise.all([ambilGeo('rt','rt'),ambilGeo('jalan','jalan'),ambilGeo('fasilitas','fasilitas'),ambilData(),fetch('data/konteks.geojson'+V).then(function(r){return r.json()}).catch(function(){return null})]);
+    return Promise.all([ambilGeo('rt','rt'),ambilGeo('jalan','jalan'),ambilGeo('fasilitas','fasilitas'),ambilData(),ambil('data/konteks.geojson'+V,8000).catch(function(){return null})]);
   }).then(function(r){bangun(r[0],r[1],r[2],r[3]||{},r[4])}).catch(function(e){console.warn(e);box.innerHTML='<div class="pt-ld">Peta belum bisa dimuat. Coba muat ulang halaman.</div>'});
 }
 function bangun(gRT,gJL,gFS,D,gKX){
