@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#0f241a">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Caveat:wght@600&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/site.css?v=228">
+<link rel="stylesheet" href="assets/site.css?v=229">
 <link rel="icon" href="img/favicon.png"><link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <style>
 .lapor{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
@@ -23,6 +23,40 @@
 .cp{display:grid;grid-template-columns:64px 1fr;gap:16px;align-items:start}.cp-av{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:var(--padi);border:2px solid var(--ink);font:800 22px var(--f-d)}.cp .btn{margin-top:14px}.cp h3{margin:6px 0}
 .kantor{display:grid;grid-template-columns:.8fr 1.2fr;gap:30px;align-items:stretch}
 @media(max-width:900px){.lapor,.kantor{grid-template-columns:1fr}}
+/* ===== tampilan baru halaman kontak ===== */
+.kq{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:26px;max-width:900px}
+.kq a{display:flex;flex-direction:column;gap:3px;padding:14px 16px;border-radius:18px;background:rgba(255,250,240,.07);border:1.5px solid rgba(255,250,240,.2);color:var(--cream);text-decoration:none;transition:transform .2s,background .2s,border-color .2s}
+.kq a:hover{transform:translateY(-3px);background:rgba(232,184,74,.14);border-color:var(--padi)}
+.kq span{font-size:22px;line-height:1}.kq b{font:800 15px/1.2 var(--f-d);margin-top:6px}.kq small{font-size:12px;opacity:.7}
+.chan{grid-template-columns:repeat(3,1fr)!important;gap:18px}
+.chan .card{display:flex;flex-direction:column}.chan .card p{flex:1}.chan .card .btn{align-self:flex-start;margin-top:12px}
+.soc{display:grid!important;grid-template-columns:repeat(3,1fr);gap:14px}
+.soc a{display:flex!important;align-items:center;gap:14px;padding:18px 20px!important;border-radius:20px!important;font-weight:700;font-size:15px;line-height:1.25;border:1.5px solid rgba(255,250,240,.25)!important;transition:transform .2s,box-shadow .2s}
+.soc a:hover{transform:translateY(-3px);box-shadow:4px 4px 0 var(--padi)}
+.soc a svg{width:44px!important;height:44px!important;flex:none;padding:10px;border-radius:14px;background:var(--cream);color:var(--ink)}
+.soc a.ig svg{background:linear-gradient(135deg,#f9ce34,#ee2a7b 55%,#6228d7);color:#fff}.soc a.tt svg{background:#111;color:#fff}.soc a.em svg{background:var(--padi)}
+.lapor li{display:block!important;position:relative;padding-left:56px;min-height:42px;padding-top:9px;font-weight:500;line-height:1.45}
+.lapor li:before{position:absolute;left:0;top:0}
+.lapor li b{font-weight:800}
+#kontak-person .g2{grid-template-columns:1fr 1fr;gap:18px}
+.cp{height:100%}
+.kinfo{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px}
+.kinfo span{font:700 12.5px/1 var(--f-b);padding:8px 12px;border-radius:999px;background:var(--paper);border:1.5px solid var(--ink)}
+.kantor .mapbox{min-height:380px}
+@media(max-width:900px){.kq{grid-template-columns:1fr 1fr}.chan{grid-template-columns:1fr!important}.soc{grid-template-columns:1fr}}
+@media(max-width:640px){
+  .kq{gap:8px;margin-top:18px}.kq a{padding:11px 12px;border-radius:14px}.kq span{font-size:18px}.kq b{font-size:13.5px;margin-top:4px}.kq small{font-size:10.5px}
+  .chan{gap:10px!important}
+  .chan .card{display:grid!important;grid-template-columns:40px 1fr;column-gap:12px;padding:13px}
+  .chan .card .icn{grid-row:1/4;width:40px;height:40px;margin:0}
+  .chan .card h3{grid-column:2;margin:0 0 3px}.chan .card p{grid-column:2;margin:0}.chan .card .btn{grid-column:2;margin-top:9px;justify-self:start}
+  .soc{gap:8px}.soc a{padding:11px 13px!important;font-size:13px;border-radius:14px!important}.soc a svg{width:36px!important;height:36px!important;padding:8px;border-radius:11px}
+  .lapor{gap:18px}.lapor li{padding-left:46px;padding-top:6px;font-size:13.5px}.lapor li:before{width:34px!important;height:34px!important;font-size:13px!important}
+  .phone{max-width:230px;padding:10px;border-radius:28px}.phone .scr{min-height:0;padding:12px;gap:7px;border-radius:20px}.phone .f{padding:7px 9px;font-size:11.5px}
+  #kontak-person .g2{grid-template-columns:1fr!important;gap:10px}
+  .cp{grid-template-columns:48px 1fr;gap:12px}.cp-av{width:48px;height:48px;font-size:17px}.cp h3{font-size:17px!important}.cp .btn{margin-top:10px}
+  .kantor{gap:16px}.kantor .mapbox{min-height:260px}.kinfo span{font-size:11px;padding:6px 9px}
+}
 </style>
 </head>
 <body>
@@ -34,10 +68,16 @@
     <span data-ed="t1" class="eyebrow">Forum desa</span>
     <h1 data-ed="t2" data-lines>Ngobrol, berkabar,<br>dan <span style="color:var(--padi)">melapor</span>.</h1>
     <p data-ed="t3" class="reveal d2">Jangan sampai ketinggalan info desa! Gabung saluran WhatsApp, pantau konten KIM Pandanwangi di media sosial, larisi dagangan tetangga di Pasar Online, atau laporkan masalah di lingkunganmu. Kami siap mendengar, karena Pandanwangi yang maju berawal dari suara warganya.</p>
+    <div class="kq reveal d3">
+      <a href="#wa"><span>💬</span><b>Grup &amp; saluran WA</b><small>info resmi &amp; obrolan warga</small></a>
+      <a href="lapor.html"><span>📣</span><b>Lapor Desa</b><small>dapat nomor tiket</small></a>
+      <a href="#kontak-person"><span>🚑</span><b>Darurat</b><small>Kasi Pelayanan &amp; ambulans</small></a>
+      <a href="#kantor"><span>📍</span><b>Balai Desa</b><small>Sen–Jum · 08.00–15.00</small></a>
+    </div>
   </div>
 </section>
 
-<section class="sec">
+<section class="sec" id="wa">
   <div class="wrap">
     <div class="sec-h"><span data-ed="t4" class="eyebrow reveal">WhatsApp</span><h2 data-ed="t5" class="reveal d1">Tiga ruang untuk <span class="mark">warga</span>.</h2></div>
     <div class="chan">
@@ -52,9 +92,9 @@
   <div class="wrap">
     <div class="sec-h" style="margin-bottom:26px"><span data-ed="t12" class="eyebrow reveal">Media sosial &amp; email</span><h2 data-ed="t13" class="reveal d1">Ikuti medsos kreatif desa (KIM).</h2><p data-ed="t32" class="reveal d2">Tonton liputan kegiatan desa, profil potensi lokal, dan konten kreatif seputar Pandanwangi di Instagram &amp; TikTok resmi kami.</p></div>
     <div class="soc reveal d2">
-      <a href="https://www.instagram.com/kim_pandanwangi/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/></svg>Instagram · Kim Pandanwangi Lumajang</a>
-      <a href="https://www.tiktok.com/@kim_pandanwangi" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.1v12.4a2.6 2.6 0 1 1-1.8-2.5V9.7a5.7 5.7 0 1 0 4.9 5.7V9a7.4 7.4 0 0 0 4.3 1.4V7.3a4.3 4.3 0 0 1-3.2-1.5z"/></svg>TikTok · @kim_pandanwangi</a>
-      <a href="mailto:pandanwangipemdes@gmail.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>pandanwangipemdes@gmail.com</a>
+      <a class="ig" href="https://www.instagram.com/kim_pandanwangi/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/></svg>Instagram · Kim Pandanwangi Lumajang</a>
+      <a class="tt" href="https://www.tiktok.com/@kim_pandanwangi" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.1v12.4a2.6 2.6 0 1 1-1.8-2.5V9.7a5.7 5.7 0 1 0 4.9 5.7V9a7.4 7.4 0 0 0 4.3 1.4V7.3a4.3 4.3 0 0 1-3.2-1.5z"/></svg>TikTok · @kim_pandanwangi</a>
+      <a class="em" href="mailto:pandanwangipemdes@gmail.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>pandanwangipemdes@gmail.com</a>
     </div>
   </div>
 </section>
@@ -66,7 +106,7 @@
       <h2 data-ed="t15" class="reveal d1" style="font-size:clamp(32px,5vw,60px);margin:14px 0">Ada jalan rusak? Lampu mati? <span class="mark senja">Laporkan.</span></h2>
       <p data-ed="t16" class="reveal d2 muted" style="font-size:17px">Lihat jalan berlubang, lampu jalan padam, atau punya ide untuk kemajuan desa? Jangan dipendam! Laporan langsung masuk ke sistem desa dan diteruskan ke perangkat terkait. Pantau tindak lanjutnya lewat nomor tiket, dan identitas pelapor bisa dirahasiakan (anonim).</p>
       <ol class="reveal d2"><li data-ed="t17"><b>Verifikasi cepat:</b> cukup NIK dan tanggal lahir, tanpa membuat akun.</li><li data-ed="t18"><b>Tulis &amp; foto:</b> ceritakan masalahnya, tandai lokasinya, dan lampirkan foto bukti.</li><li data-ed="t19"><b>Pantau progresnya:</b> simpan nomor tiket dan cek tanggapan perangkat desa di menu Lacak Tiket.</li></ol>
-      <div class="hero-cta reveal d3"><a class="btn" href="lapor.html">Buat laporan</a><a class="btn ghost" href="lacak.html">Lacak tiket</a></div>
+      <div class="hero-cta reveal d3"><a class="btn" href="lapor.html">Buat Laporan →</a><a class="btn ghost" href="lacak.html">Lacak Tiket</a></div>
     </div>
     <div class="reveal d2"><div class="phone"><div class="scr"><b style="font:800 20px var(--f-d)">Lapor Desa</b><div class="f"><b>Kategori</b>Jalan &amp; jembatan</div><div class="f"><b>Lokasi</b>📍 Dusun Tunjungan, RT 02</div><div class="f"><b>Uraian</b>Jalan berlubang di depan musala…</div><div class="f"><b>Foto</b>📷 1 foto dilampirkan</div><div class="ok">Kirim laporan</div></div></div></div>
   </div>
@@ -82,18 +122,19 @@
   </div>
 </section>
 
-<section class="sec">
+<section class="sec" id="kantor">
   <div class="wrap kantor">
     <div>
       <span data-ed="t29" class="eyebrow reveal">Kantor desa</span>
       <h2 data-ed="t30" class="reveal d1" style="font-size:clamp(32px,4.4vw,54px);margin:14px 0">Balai Desa Pandanwangi</h2>
       <p data-ed="t31" class="reveal d2 muted" style="font-size:16px;margin:0 0 8px">Pintu balai desa selalu terbuka untuk seluruh warga, baik untuk mengurus dokumen, berkonsultasi, maupun berdiskusi. Kami melayani Senin–Jumat, pukul 08.00–15.00 WIB.</p><p class="reveal d2" style="font-size:18px" data-desa="alamat">Jl. K.H. Wahid Hasyim No. 84, Pandanwangi, Tempeh, Lumajang 67371</p>
+      <div class="kinfo reveal d2"><span>🕗 Senin–Jumat · 08.00–15.00 WIB</span><span>🆓 Layanan administrasi gratis</span></div>
       <div class="hero-cta reveal d3"><a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=-8.238306,113.193733" target="_blank" rel="noopener">Buka Rute di Google Maps →</a></div>
     </div>
     <div class="mapbox reveal d2"><iframe data-ed="l3" title="Lokasi Balai Desa Pandanwangi" loading="lazy" src="https://maps.google.com/maps?q=-8.238306,113.193733&amp;z=16&amp;output=embed"></iframe></div>
   </div>
 </section>
 </main>
-<script src="assets/site.js?v=228"></script>
+<script src="assets/site.js?v=229"></script>
 </body>
 </html>
