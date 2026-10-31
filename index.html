@@ -218,7 +218,7 @@ button.stat:hover{border-color:var(--pri)}
 .it.open>.row .chev{transform:rotate(180deg)}
 .av{width:28px;height:28px;border-radius:8px;background:var(--pri-soft);color:var(--pri);display:grid;place-items:center;font-weight:700;font-size:10.5px;flex:none;overflow:hidden}
 .av .ic{width:15px;height:15px}
-.av.ph{width:40px;height:50px;border-radius:9px;margin:-4px 0} .ad .list .row .av.ph{width:34px;height:42px} .av img{width:100%;height:100%;object-fit:cover}
+.av img{width:100%;height:100%;object-fit:cover}
 .xp{padding:4px 10px 10px 47px;display:flex;flex-direction:column;gap:8px}
 @media (max-width:520px){.xp{padding-left:10px}}
 .empty{padding:22px 12px;text-align:center;color:var(--muted)}
@@ -4066,7 +4066,7 @@ VIEWS.list = async (p, main, alive) => {
 function rowHtml(e, x, act) {
   const d = UI[e].row(x);
   const img = d.img && thumb(d.img, 120);
-  const av = img ? `<span class="av ph"><img src="${esc(img)}" alt="" loading="lazy"></span>` : d.av != null ? `<span class="av">${/^</.test(d.av) ? d.av : esc(d.av)}</span>` : '';
+  const av = img ? `<span class="av"><img src="${esc(img)}" alt="" loading="lazy"></span>` : d.av != null ? `<span class="av">${/^</.test(d.av) ? d.av : esc(d.av)}</span>` : '';
   return `<div class="it" data-e="${esc(e)}" data-id="${esc(x.id)}"><div class="row" role="button" tabindex="0" aria-expanded="false" data-act="${act || 'row'}">${av}<span class="main"><span class="t">${esc(d.t)}${d.pill ? ' ' + d.pill : ''}</span><span class="s ${d.mono ? 'mono' : ''}">${d.raw ? d.s : esc(d.s)}</span>${d.s2 ? `<span class="s2">${d.raw2 ? d.s2 : esc(d.s2)}</span>` : ''}</span><span class="r">${d.date ? `<span class="num">${fDate(d.date, 1)}</span>` : ''}${d.r ? `<span class="num">${esc(d.r)}</span>` : ''}${d.file ? ic('file') : ''}${d.geo ? ic('pin') : ''}</span>${ic('down', 'chev')}</div><div class="xp" hidden></div></div>`;
 }
 /* ---------------- Filter daftar: cari berdasarkan kriteria (pilihan, rentang tanggal, umur) ---------------- */
@@ -9472,7 +9472,7 @@ VIEWS.webdesa = async (p, main, alive) => {
     const o = pg === '_g' ? W.g : (W.p[pg] = W.p[pg] || {});
     const lama = o[k];
     if (v == null || v === '' || v === d) delete o[k]; else o[k] = v;
-    if (lama && lama !== o[k] && /\/storage\/v1\/object\/public\/(web\/konten|booklet)\//.test(lama)) buang.add(lama);
+    if (lama && lama !== o[k] && /\/storage\/v1\/object\/public\/web\/konten\//.test(lama)) buang.add(lama);
     if (pg !== '_g' && !Object.keys(o).length) delete W.p[pg];
     tandai();
   };
@@ -9485,7 +9485,6 @@ VIEWS.webdesa = async (p, main, alive) => {
       <div class="chips wrap" id="wkPg">${halaman.map(h => `<button type="button" class="chip${h.p === cur ? ' on' : ''}" data-pg="${h.p}">${esc(h.j)}</button>`).join('')}</div>
       <input id="wkCari" type="search" placeholder="Cari teks di halaman ini…" autocomplete="off">
     </div>
-    <div class="card stack" id="wkBk"></div>
     <div id="wkBox" class="stack"></div>
     <div class="wk-bar"><button class="btn pri" id="wkSave" disabled>${ic('check')}Tersimpan</button><span class="meta wk-note">Teks ditampilkan apa adanya (tanpa format). Baris baru = ganti baris.</span></div>
   </div>`;
@@ -9518,27 +9517,6 @@ VIEWS.webdesa = async (p, main, alive) => {
       } catch (e) { toast(e.message, 1); box.classList.remove('busy'); }
     });
   };
-  const bookletBox = () => {
-    const el = $('#wkBk', main); if (!el) return; const v = W.g.booklet_pdf || '';
-    el.innerHTML = `<div class="wk-h"><span class="pill">PDF</span><b>Booklet profil desa</b>${v ? '<span class="pill ok">Aktif</span>' : ''}</div>
-      <div class="meta">${v ? 'Website menampilkan booklet dari PDF ini, bisa dibalik seperti buku. Ada pembaruan? Cukup unggah PDF baru, yang lama otomatis diganti.' : 'Belum ada PDF. Website masih memakai tautan AnyFlip lama. Unggah PDF booklet (maks. 30 MB) supaya tampil langsung di website.'}</div>
-      <div class="btns"><label class="btn sm pri">${ic('file')}${v ? 'Ganti PDF booklet' : 'Unggah PDF booklet'}<input type="file" accept="application/pdf" id="wkBkF" hidden></label>${v ? `<a class="btn sm" href="${esc(v)}" target="_blank" rel="noopener">${ic('eye')}Lihat PDF</a><button type="button" class="btn sm" id="wkBkX">Lepas PDF</button>` : ''}</div>`;
-    $('#wkBkF', el).onchange = async e => {
-      const f = e.target.files[0]; if (!f) return;
-      if (!/\.pdf$/i.test(f.name) && f.type !== 'application/pdf') { toast('Pilih berkas PDF.', 1); return; }
-      if (f.size > 30 * 1024 * 1024) { toast('PDF terlalu besar (maks. 30 MB).', 1); return; }
-      el.classList.add('busy'); toast('Mengunggah PDF booklet…');
-      try {
-        const sg = await webkCall('booklet_sign', { size: f.size });
-        const r = await fetch(sg.upload, { method: 'PUT', headers: { 'Content-Type': 'application/pdf', 'x-upsert': 'false' }, body: f });
-        if (!r.ok) throw new Error('Gagal mengunggah PDF (' + r.status + ').');
-        setNilai('_g', 'booklet_pdf', sg.url, ''); el.classList.remove('busy');
-        $('#wkSave').click();
-      } catch (x) { el.classList.remove('busy'); toast(x.message, 1); }
-    };
-    const xb = $('#wkBkX', el); if (xb) xb.onclick = () => { setNilai('_g', 'booklet_pdf', '', ''); bookletBox(); toast('PDF dilepas. Tekan Simpan perubahan.'); };
-  };
-  bookletBox();
   $$('#wkPg [data-pg]', main).forEach(b => b.onclick = () => { cur = S.vh.webPg = b.dataset.pg; $$('#wkPg [data-pg]', main).forEach(x => x.classList.toggle('on', x === b)); gambarBox(); });
   let tm; $('#wkCari').oninput = e => { clearTimeout(tm); tm = setTimeout(() => { cari = e.target.value.trim(); gambarBox(); }, 200); };
   $('#wkSave').onclick = async () => {
