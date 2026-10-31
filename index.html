@@ -9116,7 +9116,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '217', tgl: '2026-10-30', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '218', tgl: '2026-10-30', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -9473,7 +9473,7 @@ VIEWS.webdesa = async (p, main, alive) => {
     const o = pg === '_g' ? W.g : (W.p[pg] = W.p[pg] || {});
     const lama = o[k];
     if (v == null || v === '' || v === d) delete o[k]; else o[k] = v;
-    if (lama && lama !== o[k] && /\/storage\/v1\/object\/public\/(web\/konten|booklet)\//.test(lama)) buang.add(lama);
+    if (lama && lama !== o[k] && /\/storage\/v1\/object\/public\/(web\/konten|web\/peta|booklet)\//.test(lama)) buang.add(lama);
     if (pg !== '_g' && !Object.keys(o).length) delete W.p[pg];
     tandai();
   };
@@ -9487,6 +9487,7 @@ VIEWS.webdesa = async (p, main, alive) => {
       <input id="wkCari" type="search" placeholder="Cari teks di halaman ini…" autocomplete="off">
     </div>
     <div class="card stack" id="wkBk"></div>
+    <div class="card stack" id="wkPeta"></div>
     <div id="wkBox" class="stack"></div>
     <div class="wk-bar"><button class="btn pri" id="wkSave" disabled>${ic('check')}Tersimpan</button><span class="meta wk-note">Teks ditampilkan apa adanya (tanpa format). Baris baru = ganti baris.</span></div>
   </div>`;
@@ -9540,6 +9541,57 @@ VIEWS.webdesa = async (p, main, alive) => {
     const xb = $('#wkBkX', el); if (xb) xb.onclick = () => { setNilai('_g', 'booklet_pdf', '', ''); bookletBox(); toast('PDF dilepas. Tekan Simpan perubahan.'); };
   };
   bookletBox();
+
+  /* peta desa di Beranda website: 3 lapisan GeoJSON (WGS84) — dirapikan di sini sebelum diunggah agar ringan */
+  const PETA = [['rt', 'Batas RT', 'Poligon RT. Boleh langsung file SLS BPS se-kecamatan: otomatis diambil yang Desa Pandanwangi saja (nama RT, RW, dusun dibaca dari "nmsls").'],
+    ['fasilitas', 'Titik bangunan / fasilitas', 'Titik (Point). Kolom nama: "nama"/"NAMOBJ"; jenis: "jenis"/"REMARK" (mis. Masjid, SD/MI, Kantor Desa, Jembatan).'],
+    ['jalan', 'Jalan & sungai', 'Garis (LineString). Kolom jenis: "jenis"/"REMARK" (mis. Jalan utama, Jalan setapak, Sungai/saluran, Garis pantai); nama: "nama"/"NAMRJL".']];
+  const bulat = c => typeof c[0] === 'number' ? [Math.round(c[0] * 1e6) / 1e6, Math.round(c[1] * 1e6) / 1e6] : c.map(bulat);
+  const petaRapikan = (jenis, g) => {
+    if (!g || g.type !== 'FeatureCollection' || !Array.isArray(g.features)) throw new Error('Berkas harus GeoJSON FeatureCollection.');
+    const T = { rt: /Polygon$/, fasilitas: /^Point$/, jalan: /LineString$/ }[jenis];
+    let F = g.features.filter(f => f && f.geometry && T.test(f.geometry.type));
+    const p0 = (F[0] || {}).properties || {};
+    if (jenis === 'rt' && ('nmdesa' in p0 || 'kddesa' in p0)) F = F.filter(f => /pandanwangi/i.test(f.properties.nmdesa || '') || (f.properties.kddesa === '002' && f.properties.kdkec === '050'));
+    if (!F.length) throw new Error('Tidak ada fitur ' + { rt: 'poligon', fasilitas: 'titik', jalan: 'garis' }[jenis] + ' yang cocok di berkas ini.');
+    let cek = F[0].geometry.coordinates; while (Array.isArray(cek[0])) cek = cek[0];
+    if (Math.abs(cek[0]) > 180 || Math.abs(cek[1]) > 90) throw new Error('Koordinat bukan derajat (masih UTM?). Ekspor ulang dari QGIS dengan CRS EPSG:4326 (WGS 84).');
+    const out = F.map(f => {
+      const p = f.properties || {}; let q;
+      if (jenis === 'rt') {
+        const m = /RT\s*(\d+)\s*RW\s*(\d+)\s*(?:DUSUN\s*)?(.*)/i.exec(p.nmsls || '');
+        const p3 = v => { v = String(v == null ? '' : v).replace(/\D/g, ''); return v ? String(+v).padStart(3, '0') : ''; };
+        q = { rt: p3(p.rt || (m && m[1])), rw: p3(p.rw || (m && m[2])), dusun: String(p.dusun || (m && m[3]) || '').replace(/^dusun\s*/i, '').trim().replace(/\b\w/g, c => c.toUpperCase()).replace(/\B\w/g, c => c.toLowerCase()) };
+        if (p.idsls && p.luas != null) q.luas = Math.round(p.luas * 100 * 100) / 100; else if (p.luas_ha != null) q.luas = +p.luas_ha; else if (p.rt != null && p.dusun && p.luas != null) q.luas = +p.luas;   /* luas dalam hektare (format aplikasi) */
+        if (!q.rt || !q.rw) throw new Error('Ada poligon tanpa nomor RT/RW. Isi kolom "rt" dan "rw" (atau "nmsls" seperti "RT 001 RW 01 DUSUN KRAJAN 1").');
+      } else if (jenis === 'fasilitas') q = { nama: String(p.nama || p.NAMOBJ || p.name || p.Name || '').slice(0, 80), jenis: String(p.jenis || p.REMARK || p.kategori || 'Fasilitas').slice(0, 40) };
+      else q = { jenis: String(p.jenis || p.REMARK || 'Jalan').slice(0, 40), nama: String(p.nama || p.NAMRJL || p.NAMOBJ || '').slice(0, 80) };
+      return { type: 'Feature', properties: q, geometry: { type: f.geometry.type, coordinates: bulat(f.geometry.coordinates) } };
+    });
+    return { type: 'FeatureCollection', name: jenis, features: out };
+  };
+  const petaBox = () => {
+    const el = $('#wkPeta', main); if (!el) return;
+    el.innerHTML = `<div class="wk-h"><span class="pill">GeoJSON</span><b>Peta desa (Beranda website)</b></div>
+      <div class="meta">Peta dibuat dari 3 lapisan. Angka penduduk, KK, Ketua RT/RW dan Kasun di peta selalu langsung dari data aplikasi. Unggah GeoJSON berkoordinat derajat (EPSG:4326), maks. 3 MB per berkas.</div>
+      ${PETA.map(([k, l, h]) => { const v = W.g['peta_' + k] || ''; return `<div class="wk-s"><div class="wk-h"><b>${esc(l)}</b>${v ? '<span class="pill ok">Diunggah</span>' : '<span class="pill">Bawaan</span>'}</div><span class="meta">${esc(h)}</span>
+        <div class="btns"><label class="btn sm pri">${ic('map')}${v ? 'Ganti' : 'Unggah'} GeoJSON<input type="file" accept=".geojson,.json,application/geo+json,application/json" data-peta="${k}" data-nolimit hidden></label>${v ? `<a class="btn sm" href="${esc(v)}" target="_blank" rel="noopener">${ic('eye')}Lihat</a><button type="button" class="btn sm" data-petax="${k}">Kembalikan bawaan</button>` : ''}</div></div>`; }).join('')}`;
+    $$('[data-peta]', el).forEach(inp => inp.onchange = async () => {
+      const f = inp.files[0], k = inp.dataset.peta; if (!f) return;
+      if (f.size > 40 * 1024 * 1024) { toast('Berkas terlalu besar.', 1); return; }
+      el.classList.add('busy'); toast('Membaca & merapikan GeoJSON…');
+      try {
+        const g = petaRapikan(k, JSON.parse(await f.text()));
+        const txt = JSON.stringify(g);
+        if (txt.length > 3e6) throw new Error('Setelah dirapikan masih ' + (txt.length / 1048576).toFixed(1) + ' MB (maks. 3 MB). Sederhanakan geometri di QGIS (Vector › Geometry › Simplify).');
+        const r = await webkCall('peta_unggah', { jenis: k, data: txt });
+        setNilai('_g', 'peta_' + k, r.url, ''); el.classList.remove('busy');
+        toast(r.n + ' fitur diunggah. Menyimpan…'); $('#wkSave').click();
+      } catch (x) { el.classList.remove('busy'); toast(x.message, 1); inp.value = ''; }
+    });
+    $$('[data-petax]', el).forEach(b => b.onclick = () => { setNilai('_g', 'peta_' + b.dataset.petax, '', ''); petaBox(); toast('Kembali ke peta bawaan. Tekan Simpan perubahan.'); });
+  };
+  petaBox();
   $$('#wkPg [data-pg]', main).forEach(b => b.onclick = () => { cur = S.vh.webPg = b.dataset.pg; $$('#wkPg [data-pg]', main).forEach(x => x.classList.toggle('on', x === b)); gambarBox(); });
   let tm; $('#wkCari').oninput = e => { clearTimeout(tm); tm = setTimeout(() => { cari = e.target.value.trim(); gambarBox(); }, 200); };
   $('#wkSave').onclick = async () => {
