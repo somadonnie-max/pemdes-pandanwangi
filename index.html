@@ -1147,6 +1147,7 @@ section.docx,section.docx *{-webkit-hyphens:manual!important;hyphens:manual!impo
 .wk-h{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .wk-img{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.wk-img img{width:160px;height:96px;object-fit:cover;border-radius:9px;background:var(--surface2);border:1px solid var(--line)}
 .wk-s.busy{opacity:.5;pointer-events:none}
+.wk-gal{display:flex;flex-direction:column;gap:8px}.wk-gi{display:flex;gap:10px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:10px}.wk-gi img{width:96px;height:64px;object-fit:cover;border-radius:8px;flex:none;background:var(--surface2)}.wk-gi input{width:100%;font:inherit;font-size:13px}#wkGal.busy,#wkPeta.busy,#wkBk.busy{opacity:.5;pointer-events:none}
 @media (max-width:600px){.wk-note{display:none}}
 </style>
 </head>
@@ -9116,7 +9117,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '218', tgl: '2026-10-30', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '219', tgl: '2026-10-30', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -9487,6 +9488,7 @@ VIEWS.webdesa = async (p, main, alive) => {
       <input id="wkCari" type="search" placeholder="Cari teks di halaman ini…" autocomplete="off">
     </div>
     <div class="card stack" id="wkBk"></div>
+    <div class="card stack" id="wkGal"></div>
     <div class="card stack" id="wkPeta"></div>
     <div id="wkBox" class="stack"></div>
     <div class="wk-bar"><button class="btn pri" id="wkSave" disabled>${ic('check')}Tersimpan</button><span class="meta wk-note">Teks ditampilkan apa adanya (tanpa format). Baris baru = ganti baris.</span></div>
@@ -9592,6 +9594,34 @@ VIEWS.webdesa = async (p, main, alive) => {
     $$('[data-petax]', el).forEach(b => b.onclick = () => { setNilai('_g', 'peta_' + b.dataset.petax, '', ''); petaBox(); toast('Kembali ke peta bawaan. Tekan Simpan perubahan.'); });
   };
   petaBox();
+
+  /* galeri pembangunan di Beranda: maks. 10 foto + keterangan; bawaan = foto lama di website */
+  const galBawaan = () => { const pg = (SL.pages || []).find(x => x.p === 'index'); if (!pg) return []; const L = pg.s.filter(x => /pembangunan/i.test(x.g)); const out = [];
+    L.forEach((x, i) => { if (x.t === 'img') { const t = L[i + 1] && L[i + 1].t === 'text' ? L[i + 1].d : ''; out.push({ u: x.d, k: t }); } }); return out; };
+  const galBox = () => {
+    const el = $('#wkGal', main); if (!el) return;
+    const G = Array.isArray(W.g.galeri) ? W.g.galeri : galBawaan(), ubah = Array.isArray(W.g.galeri);
+    el.innerHTML = `<div class="wk-h"><span class="pill">Foto</span><b>Galeri pembangunan (Beranda)</b>${ubah ? '<span class="pill ok">Diubah</span>' : '<span class="pill">Bawaan</span>'}<span class="meta">${G.length}/10 foto</span></div>
+      <div class="meta">Foto pembangunan yang bisa digeser di Beranda. Ganti foto, ubah keterangan, atur urutan, atau tambah foto baru (maks. 10). Tekan <b>Simpan perubahan</b> setelah selesai.</div>
+      <div class="wk-gal">${G.map((x, i) => `<div class="wk-gi" data-i="${i}"><img src="${esc(webAbs(x.u))}" alt="" loading="lazy"><div class="stack" style="gap:6px;flex:1;min-width:0"><input data-gk="${i}" value="${esc(x.k || '')}" maxlength="80" placeholder="Keterangan foto, mis. Jalan paving Dusun Tunjungan">
+        <div class="btns"><label class="btn sm">${ic('cam')}Ganti<input type="file" accept="image/*" data-gu="${i}" hidden></label><button type="button" class="btn sm" data-gm="${i}" data-d="-1" ${i ? '' : 'disabled'}>▲</button><button type="button" class="btn sm" data-gm="${i}" data-d="1" ${i < G.length - 1 ? '' : 'disabled'}>▼</button><button type="button" class="btn sm danger" data-gx="${i}">${ic('trash')}</button></div></div></div>`).join('')}</div>
+      <div class="btns">${G.length < 10 ? `<label class="btn sm pri">${ic('plus')}Tambah foto<input type="file" accept="image/*" data-gu="baru" hidden></label>` : '<span class="meta">Sudah 10 foto (maksimal).</span>'}${ubah ? '<button type="button" class="btn sm" data-greset>Kembalikan bawaan</button>' : ''}</div>`;
+    const cur = () => Array.isArray(W.g.galeri) ? W.g.galeri : G;
+    const simpanG = (arr, lama) => { (lama || []).forEach(u => { if (/\/storage\/v1\/object\/public\/web\/konten\//.test(u) && !arr.some(x => x.u === u)) buang.add(u); }); W.g.galeri = arr; tandai(); galBox(); };
+    $$('[data-gk]', el).forEach(t => t.oninput = () => { const A = cur().map(x => Object.assign({}, x)); A[+t.dataset.gk].k = t.value.trim(); W.g.galeri = A; tandai(); });
+    $$('[data-gm]', el).forEach(b => b.onclick = () => { const A = cur().slice(), i = +b.dataset.gm, j = i + (+b.dataset.d); [A[i], A[j]] = [A[j], A[i]]; simpanG(A); });
+    $$('[data-gx]', el).forEach(b => b.onclick = () => { const A = cur().slice(), [x] = A.splice(+b.dataset.gx, 1); simpanG(A, [x.u]); });
+    const rs = $('[data-greset]', el); if (rs) rs.onclick = () => { const lama = cur().map(x => x.u); delete W.g.galeri; lama.forEach(u => { if (/\/web\/konten\//.test(u)) buang.add(u); }); tandai(); galBox(); };
+    $$('[data-gu]', el).forEach(inp => inp.onchange = async () => {
+      const f = inp.files[0]; if (!f) return; el.classList.add('busy'); toast('Mengunggah foto…');
+      try {
+        const d = await webKecilkan(f, 1600), r = await webkCall('unggah', { data: d, slot: 'galeri' }), A = cur().map(x => Object.assign({}, x));
+        if (inp.dataset.gu === 'baru') A.push({ u: r.url, k: '' }); else { const i = +inp.dataset.gu; const lama = A[i].u; A[i].u = r.url; if (/\/web\/konten\//.test(lama)) buang.add(lama); }
+        el.classList.remove('busy'); W.g.galeri = A; tandai(); galBox(); toast('Foto terunggah. Isi keterangannya lalu tekan Simpan perubahan.');
+      } catch (x) { el.classList.remove('busy'); toast(x.message, 1); }
+    });
+  };
+  galBox();
   $$('#wkPg [data-pg]', main).forEach(b => b.onclick = () => { cur = S.vh.webPg = b.dataset.pg; $$('#wkPg [data-pg]', main).forEach(x => x.classList.toggle('on', x === b)); gambarBox(); });
   let tm; $('#wkCari').oninput = e => { clearTimeout(tm); tm = setTimeout(() => { cari = e.target.value.trim(); gambarBox(); }, 200); };
   $('#wkSave').onclick = async () => {
