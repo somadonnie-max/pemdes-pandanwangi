@@ -488,3 +488,28 @@ section{position:relative}
 .peta-hd .hand{margin:0;font-size:17px;color:var(--muted)}
 .peta-col .mapbox{flex:1;height:auto;min-height:480px;position:relative;z-index:0;isolation:isolate}
 @media(max-width:900px){.peta-col{min-height:0}.peta-col .mapbox{flex:none;height:calc(100svh - 150px);min-height:420px}}
+
+/* tombol halaman berikutnya */
+.nextpg{padding:10px 0 70px}
+.nextpg .wrap{display:grid;grid-template-columns:1fr 2fr;gap:16px;align-items:stretch}
+.nextpg a{display:flex;flex-direction:column;justify-content:center;gap:6px;text-decoration:none;color:var(--ink);border:2px solid var(--ink);border-radius:var(--r);padding:20px 24px;transition:transform .2s,box-shadow .2s;background:var(--paper)}
+.nextpg a:hover{transform:translate(-3px,-3px);box-shadow:var(--hard)}
+.nextpg small{font:700 12px/1 var(--f-b);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.nextpg b{font:800 clamp(24px,3.4vw,40px)/1.05 var(--f-d);display:flex;align-items:center;gap:12px}
+.nextpg .np-prev b{font-size:clamp(18px,2vw,22px)}
+.nextpg .np-next{background:var(--padi);box-shadow:var(--hard)}
+.nextpg .np-next span{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--ink);color:var(--padi);transition:transform .25s}
+.nextpg .np-next span svg{width:22px;height:22px}
+.nextpg .np-next:hover span{transform:translateX(6px)}
+.nextpg em{font-style:normal;color:#3d3326;font-size:15px}
+@media(max-width:640px){.nextpg .wrap{grid-template-columns:1fr}.nextpg .np-prev{order:2;padding:14px 18px}}
+/* info resmi & pembuat di kaki halaman */
+.ft-info{display:grid;grid-template-columns:1fr 1fr;gap:26px 40px;padding:26px 0;border-top:1px solid rgba(255,255,255,.14);margin-top:10px}
+.ft-info h4{margin-bottom:8px}.ft-info p{margin:0 0 8px;font-size:14px;line-height:1.6;opacity:.85}
+.ft .ft-info a{display:inline;padding:0;margin:0;color:var(--padi);text-decoration:underline}
+.ft-info .ft-jasa{background:rgba(232,184,74,.12);border:1px dashed rgba(232,184,74,.5);border-radius:12px;padding:10px 12px;opacity:1}
+.ft-info details{grid-column:1/-1;font-size:14px;opacity:.9}
+.ft-info summary{cursor:pointer;font-weight:700;color:var(--padi)}
+.ft-info ol{margin:10px 0 0;padding-left:20px;line-height:1.6}
+.ft-kenang{font-size:11.5px;opacity:.55;text-align:center;margin:6px 0 0;padding-bottom:6px}
+@media(max-width:760px){.ft-info{grid-template-columns:1fr}}
