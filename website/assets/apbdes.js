@@ -40,7 +40,7 @@ function render(a){
   var T={pa:sum(pend,function(r){return r.anggaran}),pr:sum(pend,function(r){return r.realisasi}),ba:sum(bel,function(r){return r.anggaran}),br:sum(bel,function(r){return r.realisasi}),
          ma:sum(pm,function(r){return r.anggaran}),mr:sum(pm,function(r){return r.realisasi}),ka:sum(pk,function(r){return r.anggaran}),kr:sum(pk,function(r){return r.realisasi})};
   var tt=a.transaksi_terakhir;
-  $('#upd span').textContent=tt?'Realisasi sampai transaksi '+(+tt.slice(8,10))+' '+BLNP[+tt.slice(5,7)-1]+' '+tt.slice(0,4):'Belum ada transaksi yang dibukukan untuk tahun '+a.tahun;
+  $('#upd span').textContent=tt?'Data live · diperbarui per transaksi '+(+tt.slice(8,10))+' '+BLNP[+tt.slice(5,7)-1]+' '+tt.slice(0,4):'Belum ada transaksi yang dibukukan untuk tahun '+a.tahun;
   if(!rows.length){$('#kpis').innerHTML='<div class="kpi" style="grid-column:1/-1"><p class="empty">APBDes tahun '+esc(a.tahun)+' belum tersedia.</p></div>';['gauge','donut','line','bidang','jenis','sumber','pemb','kgList'].forEach(function(id){$('#'+id).innerHTML=''});return}
 
   /* KPI */
@@ -48,8 +48,8 @@ function render(a){
   $('#kpis').innerHTML=[
     ['','Pendapatan',T.pr,'dari anggaran '+rs(T.pa),pc(T.pr,T.pa)],
     ['y','Belanja',T.br,'dari anggaran '+rs(T.ba),pc(T.br,T.ba)],
-    ['','Pembiayaan netto',T.ma-T.ka,'penerimaan '+rs(T.ma)+' · pengeluaran '+rs(T.ka),null],
-    ['g','Kas berjalan',sur,'pendapatan + pembiayaan − belanja (realisasi)',null]
+    ['','Pembiayaan netto',T.ma-T.ka,'SiLPA/penerimaan '+rs(T.ma)+' dikurangi pengeluaran pembiayaan '+rs(T.ka),null],
+    ['g','Kas berjalan',sur,'saldo kas aktif: total dana masuk dikurangi belanja yang sudah cair',null]
   ].map(function(k){return '<div class="kpi '+k[0]+'"><small>'+k[1]+'</small>'+(k[4]!=null?'<span class="pct">'+fp(k[4])+'</span>':'')+'<b data-count="'+Math.round(k[2])+'" data-fmt="rp" data-pre="Rp ">Rp 0</b><div class="sub">'+k[3]+'</div>'+(k[4]!=null?'<div class="meter"><i data-w="'+Math.min(100,k[4]).toFixed(1)+'%"></i></div>':'')+'</div>'}).join('');
   P.observe($('#kpis'));
 
@@ -111,8 +111,7 @@ function listKg(){
   l.sort(s==='ang'?function(a,b){return b.ang-a.ang}:s==='kode'?function(a,b){return a.kode.localeCompare(b.kode,undefined,{numeric:true})}:s==='pct'?function(a,b){return pc(b.rea,b.ang)-pc(a.rea,a.ang)}:function(a,b){return pc(a.rea,a.ang)-pc(b.rea,b.ang)});
   var lim=showAll||q||b?l.length:10;
   $('#kgList').innerHTML=l.length?l.slice(0,lim).map(function(x){var p=pc(x.rea,x.ang),col=p>=100?'#1d7a4b':p>=50?'#7d9b28':p>0?'#e08a1e':'#b8475e';
-    return '<details><summary><div><em>'+esc(x.kode)+' · Bidang '+esc(x.bid)+'</em><b>'+esc(x.nama)+'</b></div><div class="num"><small>Anggaran</small>'+rp(x.ang)+'</div><div class="num"><small>Realisasi</small>'+rp(x.rea)+'</div><div><div class="pg" style="--c:'+col+'"><i style="width:'+Math.min(100,p).toFixed(1)+'%"></i></div><div class="pgt">'+fp(p)+'</div></div></summary>'+
-      '<div class="tw"><table><thead><tr><th>Rekening</th><th>Sumber</th><th class="n">Anggaran</th><th class="n">Realisasi</th></tr></thead><tbody>'+x.rows.filter(function(r){return r.anggaran||r.realisasi}).map(function(r){return '<tr><td>'+esc(r.kode)+' '+esc(r.uraian||(D.rek||{})[r.kode]||'')+'</td><td>'+esc(r.sumber||'')+'</td><td class="n">'+rp(r.anggaran)+'</td><td class="n">'+rp(r.realisasi)+'</td></tr>'}).join('')+'</tbody></table></div></details>'}).join(''):'<p class="empty">Tidak ada kegiatan yang cocok.</p>';
+    return '<details class="nr"><summary onclick="return false"><div><em>'+esc(x.kode)+' · Bidang '+esc(x.bid)+'</em><b>'+esc(x.nama)+'</b></div><div class="num"><small>Anggaran</small>'+rp(x.ang)+'</div><div class="num"><small>Realisasi</small>'+rp(x.rea)+'</div><div><div class="pg" style="--c:'+col+'"><i style="width:'+Math.min(100,p).toFixed(1)+'%"></i></div><div class="pgt">'+fp(p)+'</div></div></summary>'+'</details>'}).join(''):'<p class="empty">Tidak ada kegiatan yang cocok.</p>';
   var m=$('#kgMore');m.hidden=lim>=l.length;m.textContent='Tampilkan semua '+l.length+' kegiatan';
 }
 $('#kq').addEventListener('input',listKg);$('#kb').addEventListener('change',listKg);$('#ks').addEventListener('change',listKg);

@@ -48,7 +48,7 @@ function pasang(url){
   var full=document.querySelector('#booklet .hero-cta a');
   box.innerHTML='<div class="bk"><div class="bk-st"><div class="bk-ld"><div><i></i>Memuat booklet…</div></div></div><div class="bk-nv"><button type="button" data-b="p" aria-label="Halaman sebelumnya" disabled>‹</button><span class="pg">…</span><button type="button" data-b="n" aria-label="Halaman berikutnya" disabled>›</button><button type="button" data-b="f" aria-label="Layar penuh" title="Layar penuh">⛶</button></div></div>';
   box.classList.add('flip-pdf');
-  if(full){full.href=url;full.target='_blank';full.rel='noopener';full.textContent='Unduh PDF booklet';full.onclick=null}
+  if(full){full.href=url;full.target='_blank';full.rel='noopener';full.textContent='Simpan Versi PDF →';full.onclick=null}
   var st=box.querySelector('.bk-st'),pgEl=box.querySelector('.pg'),bP=box.querySelector('[data-b=p]'),bN=box.querySelector('[data-b=n]');
   box.querySelector('[data-b=f]').onclick=function(){layarPenuh(box)};
   var tip=document.createElement('div');tip.className='bk-tip';tip.textContent='Ketuk sisi kanan/kiri buku atau geser untuk membalik halaman';box.querySelector('.bk').appendChild(tip);

@@ -46,7 +46,7 @@ function verifikasi(box,onOk,onGagal){
    '<div class="fld"><label for="vTgl">Tanggal lahir</label><input id="vTgl" type="date" max="'+new Date().toISOString().slice(0,10)+'"><small>Dicocokkan dengan data kependudukan Desa Pandanwangi.</small></div>'+
    '<label class="cek"><input type="checkbox" id="vSetuju"><span>Saya menyetujui data kependudukan saya diperiksa dan dipakai oleh Pemerintah Desa Pandanwangi hanya untuk keperluan layanan ini, sesuai UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi.</span></label>'+
    '<div class="ts" data-ts></div>'+
-   '<div class="btnrow"><button class="btn dark" data-go>Verifikasi data saya</button></div>';
+   '<div class="btnrow"><button class="btn dark" data-go>'+(/survei/.test(location.pathname)?'Mulai Isi Rating →':/surat/.test(location.pathname)?'Tarik Data Saya Otomatis →':'Verifikasi data saya')+'</button></div>';
   var nik=$('#vNik',box),m=$('[data-m]',box),cap=captcha($('[data-ts]',box)),bt=$('[data-go]',box);
   nik.addEventListener('input',function(){nik.value=nik.value.replace(/\D/g,'').slice(0,16)});
   bt.onclick=function(){
