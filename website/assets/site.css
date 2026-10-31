@@ -513,3 +513,71 @@ section{position:relative}
 .ft-info ol{margin:10px 0 0;padding-left:20px;line-height:1.6}
 .ft-kenang{font-size:11.5px;opacity:.55;text-align:center;margin:6px 0 0;padding-bottom:6px}
 @media(max-width:760px){.ft-info{grid-template-columns:1fr}}
+
+/* ===== ringkas: kaki halaman & tombol halaman berikutnya (semua ukuran) ===== */
+.ft{padding:56px 0 18px;font-size:14px}
+.ft-g{gap:22px}
+.ft h4{font-size:12.5px;margin-bottom:8px}
+.ft a{padding:2px 0;font-size:14px}
+.ft-big{font-size:clamp(40px,9vw,130px);margin:26px 0 4px}
+.ft-info{gap:14px 34px;padding:16px 0}
+.ft-info h4{margin-bottom:5px}.ft-info p{font-size:13px;line-height:1.5;margin-bottom:6px}
+.ft-info .ft-jasa{padding:8px 10px}
+.ft-info details{font-size:13px}.ft-info ol{margin-top:6px;line-height:1.5}
+.ft-bot{margin-top:14px;padding-top:12px;font-size:12px}
+.ft-kenang{font-size:10.5px;margin-top:4px}
+.nextpg{padding:0 0 46px}
+.nextpg .wrap{grid-template-columns:auto 1fr;gap:10px;max-width:760px}
+.nextpg a{padding:12px 16px;gap:3px;border-radius:16px}
+.nextpg small{font-size:10.5px}
+.nextpg b{font-size:clamp(17px,2vw,22px);gap:8px}
+.nextpg .np-prev b{font-size:15px}
+.nextpg .np-next{box-shadow:4px 4px 0 var(--ink)}
+.nextpg .np-next span{width:28px;height:28px}.nextpg .np-next span svg{width:15px;height:15px}
+.nextpg em{font-size:12.5px}
+
+/* ===== HP: lebih ringkas, kartu 2 kolom ===== */
+@media(max-width:640px){
+  body{font-size:14px;line-height:1.5}
+  .hero h1{font-size:38px}.hero p.lead{font-size:14px}
+  .phero{padding:96px 0 34px}.phero h1{font-size:29px}.phero p{font-size:14px}
+  .sec{padding:42px 0}.sec.tight{padding:34px 0}
+  .sec-h{margin-bottom:20px}.sec-h h2{font-size:24px}.sec-h p{font-size:13.5px}
+  .btn{padding:10px 14px;font-size:13px}
+  .grid{gap:10px}
+  .g2,.g3,.g4,.lbg,.edu,.chan{grid-template-columns:repeat(2,1fr)!important;gap:10px}
+  .misi{grid-template-columns:1fr!important}
+  .card{padding:13px;border-radius:14px}.card h3{font-size:15.5px;line-height:1.15}.card p{font-size:12.5px;line-height:1.45}
+  .misi .card{padding-top:40px}.misi .card:before{top:14px;left:14px;font-size:13px}
+  .icn{width:34px;height:34px;border-radius:10px;margin-bottom:8px}.icn svg{width:17px;height:17px}
+  .stat{padding:12px}.stat b{font-size:24px}.stat span{font-size:11.5px}
+  .visi{font-size:21px}
+  .st h3{font-size:20px}.st p{font-size:13.5px}
+  .band{padding:40px 0}.band h2{font-size:24px}.band p{font-size:14px!important}
+  .pcard .bd{padding:12px}.pcard h3{font-size:15.5px}.pcard p{font-size:12.5px}
+  .lb h3{font-size:16px}.lb p{font-size:12.5px}
+  .edu .col{padding:12px}.edu h4{font-size:16px}
+  .portal-cards .pc{padding:13px 12px;gap:4px}.portal-cards .pc h3{font-size:15px!important}.portal-cards .pc p{font-size:12px}
+  .batas b{font-size:13.5px}.batas div{padding:9px}.batas small{font-size:10.5px}
+  .acc summary{font-size:14.5px;padding:12px}
+  .peta-hd h3{font-size:19px}.peta-hd .hand{font-size:14px}
+  .ft{padding:40px 0 14px;font-size:13px}
+  .ft-g{grid-template-columns:1fr 1fr;gap:14px 18px}
+  .ft a{font-size:13px;padding:1px 0}
+  .ft-big{margin:18px 0 2px}
+  .ft-info{grid-template-columns:1fr;padding:12px 0;gap:10px}
+  .nextpg{padding:0 0 34px}
+  .nextpg .wrap{grid-template-columns:1fr 2fr}
+  .nextpg .np-prev{order:0;padding:10px 12px}
+  .nextpg em{display:none}
+}
+@media(max-width:640px){
+  .svc,.kpis{grid-template-columns:repeat(2,1fr)!important;gap:10px!important}
+  .svc .pcard .ph.ic svg{width:48px!important;height:48px!important}
+  .pcard{box-shadow:3px 3px 0 var(--ink);border-radius:14px}
+  .pcard .ph{aspect-ratio:4/3}
+  .pcard .btn{padding:7px 10px;font-size:11.5px;box-shadow:2px 2px 0 var(--ink)}
+  .sav-pics{gap:8px!important}.sav-pics img{height:130px!important;border-radius:12px!important}
+  .sav-pics img:nth-child(1){height:268px!important}.sav-pics img:nth-child(4){height:140px!important}
+  .tab-p .card,.tab-p .pcard{min-width:0}
+}
