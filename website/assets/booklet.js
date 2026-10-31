@@ -11,7 +11,8 @@ css.textContent=
 '.bk-nv{display:none!important}'+
 '.bk-tip{text-align:center;font:600 12.5px var(--f-b,system-ui);color:var(--muted);margin-top:8px}'+
 '.bk-st{flex:1;position:relative;display:flex;align-items:center;justify-content:center;perspective:2200px;padding:0;min-height:0;overflow:visible}'+
-'.bk-bk{position:relative;display:flex;box-shadow:0 22px 45px -18px rgba(15,36,26,.55),0 2px 6px rgba(15,36,26,.15)}'+
+'.bk-bk{position:relative;display:flex}'+
+'.bk-p:not(.kosong),.bk-lf{box-shadow:0 22px 45px -18px rgba(15,36,26,.55),0 2px 6px rgba(15,36,26,.15)}'+
 '.bk-p{position:relative;background:#fff center/contain no-repeat;overflow:hidden}'+
 '.bk-p img{width:100%;height:100%;object-fit:contain;display:block}'+
 '.bk-p.kosong{background:transparent}'+
