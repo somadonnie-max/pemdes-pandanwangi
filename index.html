@@ -383,6 +383,12 @@ body.privblur #main,body.privblur #layer,body.privblur .tabs{filter:blur(18px);t
 .pmdd.up{top:auto!important;bottom:100%;margin:0 0 3px}
 .selwrap{position:relative;display:inline-block;max-width:100%;vertical-align:middle}.selwrap.blk{display:block}.selwrap.blk>select{width:100%}
 .selhit{position:absolute;inset:0;cursor:pointer;z-index:1}.selwrap select:disabled+.selhit{cursor:not-allowed}.pmok{font-size:11px;color:#16a34a}
+.a78ck{overflow:auto;border:1px solid var(--line);border-radius:8px;padding:2px 0;display:block}
+.a78ck>label{display:flex!important;gap:10px;align-items:flex-start;margin:0!important;padding:8px 10px;font-size:13.5px!important;font-weight:500!important;line-height:1.4!important;text-transform:none!important;letter-spacing:0!important;color:var(--ink)!important;border-bottom:1px solid var(--line);cursor:pointer}
+.a78ck>label:last-child{border-bottom:0}
+.a78ck>label:has(input:checked){background:var(--pri-soft)}
+.a78ck input[type=checkbox]{flex:none;width:18px!important;height:18px!important;min-height:0!important;margin:1px 0 0!important;padding:0!important;accent-color:var(--pri)}
+.a78ck>label>span{flex:1;min-width:0}
 .gtabs{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:3px;overflow-x:auto;scrollbar-width:none}
 .gtabs button{flex:1 0 auto;border:0;background:none;border-radius:7px;padding:5px 12px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap}
 .gtabs button.on{background:var(--surface);color:var(--pri);box-shadow:0 1px 2px rgba(0,0,0,.12)}
@@ -12976,12 +12982,12 @@ VIEWS.aset78dok = async (p, main, alive) => {
     const [k, l, t, o] = f, v = st[k];
     if (t === 'check') return `<div class="f wide"><label style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" data-k="${k}" ${v ? 'checked' : ''} style="width:18px;height:18px;flex:none"> <span>${esc(l)}</span></label></div>`;
     if (t === 'select') return `<div class="f wide"><label>${esc(l)}</label><select data-k="${k}">${(o || []).map(x => `<option value="${esc(x[0])}" ${String(v) === String(x[0]) ? 'selected' : ''}>${esc(x[1])}</option>`).join('')}</select></div>`;
-    if (t === 'multi') return `<div class="f wide"><label>${esc(l)}</label><div class="stack" style="gap:2px;max-height:180px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:6px">${(o || []).map(x => `<label style="display:flex;gap:6px;align-items:center;font-size:13px"><input type="checkbox" data-k="${k}" data-multi="1" value="${esc(x[0])}" ${(v || []).indexOf(x[0]) >= 0 ? 'checked' : ''}> ${esc(x[1])}</label>`).join('') || '<span class="meta">—</span>'}</div></div>`;
+    if (t === 'multi') return `<div class="f wide"><label>${esc(l)}</label><div class="a78ck" style="max-height:260px">${(o || []).map(x => `<label><input type="checkbox" data-k="${k}" data-multi="1" value="${esc(x[0])}" ${(v || []).indexOf(x[0]) >= 0 ? 'checked' : ''}><span>${esc(x[1])}</span></label>`).join('') || '<span class="meta">—</span>'}</div></div>`;
     if (t === 'aset') {
       const q = (st.q || '').toLowerCase(), fk = st.fk || 'RB';
       const L = c.A.filter(a => a.status !== 'Dihapus').filter(a => fk === 'pilih' ? (st.pilih || []).indexOf(a.id) >= 0 : fk === 'RB' ? a.kondisi === 'Rusak Berat' || (st.pilih || []).indexOf(a.id) >= 0 : true).filter(a => !q || (a78Jenis(a) + ' ' + (a.kode_barang || '') + ' ' + (a.ruang || '')).toLowerCase().indexOf(q) >= 0).slice(0, 300);
       return `<div class="f wide"><label>${esc(l)} — dipilih ${(st.pilih || []).length}</label><div class="chips wrap" style="margin-bottom:4px">${[['RB', 'Rusak berat + terpilih'], ['pilih', 'Terpilih saja'], ['all', 'Semua aset']].map(x => `<button type="button" class="chip ${fk === x[0] ? 'on' : ''}" data-act="a78Fk" data-v="${x[0]}">${x[1]}</button>`).join('')}</div><input class="inp" id="a78Q" placeholder="Cari nama/kode/ruang" value="${esc(st.q || '')}">
-        <div class="stack" style="gap:2px;max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:6px;margin-top:4px">${L.map(a => `<label style="display:flex;gap:6px;align-items:flex-start;font-size:13px"><input type="checkbox" data-k="pilih" data-multi="1" value="${esc(a.id)}" ${(st.pilih || []).indexOf(a.id) >= 0 ? 'checked' : ''}><span><b>${esc(a.nama || a.nama_rekening)}</b> <span class="meta">${esc(a78Kode(a))} · ${esc(a.kondisi || '')}${a.status === 'Draf' ? ' · Draf' : ''}${a78Strategis(a) ? ' · strategis' : ''}</span></span></label>`).join('') || '<span class="meta">Tidak ada aset sesuai filter.</span>'}</div></div>`;
+        <div class="a78ck" style="max-height:300px;margin-top:4px">${L.map(a => `<label><input type="checkbox" data-k="pilih" data-multi="1" value="${esc(a.id)}" ${(st.pilih || []).indexOf(a.id) >= 0 ? 'checked' : ''}><span><b>${esc(a.nama || a.nama_rekening)}</b> <span class="meta">${esc(a78Kode(a))} · ${esc(a.kondisi || '')}${a.status === 'Draf' ? ' · Draf' : ''}${a78Strategis(a) ? ' · strategis' : ''}</span></span></label>`).join('') || '<span class="meta">Tidak ada aset sesuai filter.</span>'}</div></div>`;
     }
     return `<div class="f"><label>${esc(l)}</label><input data-k="${k}" type="${t === 'number' ? 'number' : t === 'date' ? 'date' : 'text'}" value="${esc(v == null ? '' : v)}"></div>`;
   };
