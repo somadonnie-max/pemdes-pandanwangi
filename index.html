@@ -2281,7 +2281,7 @@ function MODS() {
     { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [asetGrpItem('suratket'), ['Pengaduan Masyarakat', 'mega', ['list', { e: 'pengaduan' }], 'pengaduan'], asetGrpItem('mutu')] },
     { k: 'kesejahteraan', l: 'Kesejahteraan & Pendidikan', ic: 'heart', items: [['Rekap Sosial', 'chart', ['sosrekap'], null, 'r:rentan'], asetGrpItem('sosial'), asetGrpItem('lembaga'), asetGrpItem('ats')] },
     { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RPJM Desa', 'book', ['rpjm', {}], null, 'r:rkp'], ['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], asetGrpItem('bangun')] },
-    { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Penganggaran', 'wallet', ['keuhub', { g: 'ang' }], null, 'r:keu_anggaran'], ['Penatausahaan', 'coin', ['keuhub', { g: 'pta' }], null, 'r:keu_penatausahaan'], ['Pelaporan', 'book', ['keuhub', { g: 'lap' }], null, 'r:keu_laporan'], ['Pengajuan ADD (Siltap & Dana Dusun)', 'send', ['addaju'], null, 'r:add'], ['Impor Siskeudes (PDF / Database)', 'down', ['skimpor'], null, 'w:keu_anggaran']] },
+    { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], asetGrpItem('keufrc'), ['Penganggaran', 'wallet', ['keuhub', { g: 'ang' }], null, 'r:keu_anggaran'], ['Penatausahaan', 'coin', ['keuhub', { g: 'pta' }], null, 'r:keu_penatausahaan'], ['Pelaporan', 'book', ['keuhub', { g: 'lap' }], null, 'r:keu_laporan'], ['Pengajuan ADD (Siltap & Dana Dusun)', 'send', ['addaju'], null, 'r:add'], ['Impor Siskeudes (PDF / Database)', 'down', ['skimpor'], null, 'w:keu_anggaran']] },
     { k: 'soon', l: 'Segera Hadir', ic: 'sprout', items: Object.keys(SOON).map(k => [SOON[k].t, SOON[k].ic, ['soon', { k }], null, '*', 1]) }
   ];
 }
@@ -9123,7 +9123,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '223', tgl: '2026-11-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '224', tgl: '2026-11-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -13353,6 +13353,452 @@ async function soBA(rec) {
   return [pg, lp];
 }
 
+/* =====================================================================
+   KELENGKAPAN FRC KEUANGAN (B1–B4) — dasar hukum Perda/Perbup Lumajang,
+   catatan Kertas Kerja Inspektorat 29 Okt 2026, cek otomatis dari data
+   ===================================================================== */
+const PB59 = 'Peraturan Bupati Lumajang Nomor 59 Tahun 2018 tentang Pedoman Pengelolaan Keuangan Desa';
+const PB59S = 'Perbup Lumajang 59/2018', PB40S = 'Perbup Lumajang 40/2018', PD7S = 'Perda Kab. Lumajang 7/2016', PM73S = 'Permendagri 73/2020', PM20S = 'Permendagri 20/2018';
+const DH_KEU = ['Undang-Undang Nomor 6 Tahun 2014 tentang Desa sebagaimana telah diubah beberapa kali terakhir dengan Undang-Undang Nomor 3 Tahun 2024 tentang Perubahan Kedua atas Undang-Undang Nomor 6 Tahun 2014 tentang Desa;',
+  'Peraturan Pemerintah Nomor 43 Tahun 2014 tentang Peraturan Pelaksanaan Undang-Undang Nomor 6 Tahun 2014 tentang Desa sebagaimana telah diubah kedua kalinya dengan Peraturan Pemerintah Nomor 11 Tahun 2019;',
+  'Peraturan Menteri Dalam Negeri Nomor 111 Tahun 2014 tentang Pedoman Teknis Peraturan di Desa;',
+  'Peraturan Menteri Dalam Negeri Nomor 20 Tahun 2018 tentang Pengelolaan Keuangan Desa;',
+  'Peraturan Menteri Dalam Negeri Nomor 73 Tahun 2020 tentang Pengawasan Pengelolaan Keuangan Desa;',
+  'Peraturan Daerah Kabupaten Lumajang Nomor 7 Tahun 2016 tentang Penyelenggaraan Pemerintahan Desa;',
+  PB59 + ';'];
+const KK29 = 'Kertas Kerja FRC Inspektorat Daerah 29 Oktober 2026 (periode Jan–Sep 2026)';
+/* k: indikator · v: nilai verifikasi Inspektorat · kk: catatan · B: butir [teks, %verif, aturan[[isi, pasal]], item[[label, cek, rute FG / [view, params], dok]]] */
+const KF = [
+  { k: 'B1', j: 'Perencanaan dan Penganggaran', v: 27, kk: 'Belum diunggah: RPJMDes, RKPDes, APBDes 2026 (murni & perubahan) beserta Daftar Rencana Pembangunan dan RAB; rancangan RKPDes & APBDes 2027 beserta RAB; bukti keterlibatan masyarakat. Lakukan update data secara berkala.',
+    B: [['Keberadaan RPJMDes, RKPDes, APBDes tahun berjalan (N), dilampiri Daftar Rencana Pembangunan dan RAB', 74,
+      [['RPJM Desa ditetapkan dengan Perdes paling lama 3 bulan sejak pelantikan Kepala Desa; perubahan hanya karena peristiwa khusus/perubahan kebijakan mendasar melalui musrenbangdes.', PB40S + ' Ps. 4–5, 30'], ['RKP Desa disusun mulai Juli dan ditetapkan dengan Perdes paling lambat akhir September; dilampiri rencana kegiatan dan RAB yang diverifikasi tim verifikasi (unsur Pemdes, LKD, masyarakat).', PB40S + ' Ps. 32, 49–50'], ['Daftar Usulan RKP Desa disampaikan kepada Bupati melalui Camat paling lambat 30 September.', PB40S + ' Ps. 59'], ['Perdes APB Desa ditetapkan paling lambat 31 Desember tahun sebelumnya dan disampaikan kepada Bupati paling lama 7 hari kerja setelah ditetapkan.', PB59S + ' Ps. 46; ' + PD7S + ' Ps. 109'], ['Perubahan APB Desa hanya sekali dalam setahun (kecuali keadaan luar biasa) dan ditetapkan dengan Perdes.', PB59S + ' Ps. 48']],
+      [['Perdes RPJM Desa', 'rpjm', 'rpjmdok'], ['Perdes RKP Desa tahun N', 'rkpN', 'rkp'], ['Perdes APB Desa tahun N', 'apbN', 'lamp'], ['Perdes Perubahan APB Desa tahun N', 'apbP', 'perdes'], ['RAB kegiatan / Daftar Rencana Pembangunan', 'rab', 'rab']]],
+    ['Rancangan Perdes APB Desa (N+1) disepakati Kepala Desa dan BPD paling lambat bulan Oktober', 0,
+      [['Rancangan Perdes APB Desa disepakati bersama Kepala Desa dan BPD paling lambat bulan Oktober tahun berjalan.', PB59S + ' Ps. 40 ayat (3); ' + PD7S + ' Ps. 109 ayat (1)'], ['Rancangan yang disepakati disampaikan kepada Bupati melalui Camat paling lambat 3 hari sejak disepakati untuk dievaluasi, beserta dokumen pendukung.', PB59S + ' Ps. 42–43; ' + PD7S + ' Ps. 109 ayat (2)'], ['Bila BPD tidak menyepakati, Desa hanya dapat membiayai operasional dengan pagu tahun sebelumnya melalui Peraturan Kepala Desa.', PB59S + ' Ps. 40 ayat (4)–(5)']],
+      [['Perdes RKP Desa tahun N+1', 'rkpN1', 'rkp'], ['APBDes N+1 di aplikasi', 'apbN1', 'apb'], ['BA Kesepakatan Bersama Kades–BPD (≤ 31 Oktober)', 'kb', ['keudok', { d: 'kb' }], 1]]],
+    ['Keterlibatan masyarakat dalam perencanaan / penganggaran', 0,
+      [['BPD menyelenggarakan musyawarah desa perencanaan pembangunan paling lambat Juni.', PB40S + ' Ps. 34 ayat (3)'], ['Musrenbangdes mengundang LKD, tokoh adat/agama/masyarakat/pendidikan, kelompok tani, perempuan, anak, pemerhati anak, dan masyarakat miskin.', PB40S + ' Ps. 28 ayat (3), 54 ayat (3)'], ['Tim penyusun RKP 7–11 orang dengan keterwakilan perempuan paling sedikit 30%, ditetapkan dengan SK Kades paling lambat Juni.', PB40S + ' Ps. 10, 36'], ['Belanja desa diprioritaskan untuk kebutuhan yang disepakati dalam Musyawarah Desa.', PD7S + ' Ps. 97']],
+      [['Musyawarah RKP (undangan, daftar hadir, notulen, foto)', 'musrkp', 'musrkp'], ['SK Tim Penyusun RKP tahun N+1', 'tim_rkp', 'sk']]]] },
+  { k: 'B2', j: 'Penatausahaan Keuangan', v: 56, kk: 'Belum diunggah: SK PPKD & SK Pelaksana Kegiatan, SK Operator Siskeudes, dokumen penatausahaan bulanan s.d. September 2026 (BKU, kas tunai, pajak, bank, rekening koran), publikasi realisasi, laporan keuangan (Neraca, LRA, LKMD). Pajak belum didukung buku bantu & bukti setor 2025–2026; di FRC tercatat selisih pajak 2025 Rp5.682.036 dan 2026 Rp3.275.878 karena pajak sudah disetor tetapi belum diinput di Siskeudes.',
+    B: [['Keberadaan SK Penetapan PPKD dan SK Pelaksana Kegiatan', 89,
+      [['Kepala Desa melimpahkan sebagian kekuasaan pengelolaan keuangan kepada PPKD yang ditetapkan dengan Keputusan Kepala Desa.', PB59S + ' Ps. 5 ayat (3)–(4)'], ['Sekretaris Desa koordinator PPKD; Kaur Keuangan melaksanakan fungsi kebendaharaan dan wajib memiliki NPWP Pemerintah Desa; Kaur & Kasi pelaksana kegiatan anggaran sesuai bidang.', PB59S + ' Ps. 7, 8, 10'], ['Tim pelaksana pengadaan (TPK) diusulkan saat penyusunan RKP dan ditetapkan dengan Keputusan Kepala Desa.', PB59S + ' Ps. 9 ayat (4)–(5)']],
+      [['SK PPKD tahun N', 'ppkd', ['keudok', { d: 'ppkd' }], 1], ['SK Pelaksana Kegiatan Anggaran tahun N', 'pk', ['keudok', { d: 'pk' }], 1], ['SK Tim Pelaksana Kegiatan (TPK) tahun N', 'tpk', ['keudok', { d: 'tpk' }], 1]]],
+    ['Keberadaan penunjukan Operator Siskeudes tingkat desa', 89,
+      [['Pengelolaan keuangan desa dapat menggunakan sistem informasi yang dikelola Kementerian Dalam Negeri (Siskeudes).', PB59S + ' Ps. 38 ayat (3)']],
+      [['SK Operator Siskeudes tahun N', 'opr', ['keudok', { d: 'opr' }], 1]]],
+    ['Dokumen penatausahaan & pertanggungjawaban tribulanan (LRA semester & tahunan, BKU & buku pembantu, CaLK, rekening koran)', 49,
+      [['BKU dicatat setiap transaksi dan ditutup setiap akhir bulan; buku pembantu bank, pajak, dan panjar.', PB59S + ' Ps. 72–73'], ['Laporan BKU bulanan disampaikan Kaur Keuangan kepada Sekdes paling lambat tanggal 10 bulan berikutnya, diverifikasi dan disetujui Kepala Desa.', PB59S + ' Ps. 76'], ['Laporan realisasi semester I paling lambat akhir Juli; semester II paling lambat akhir Januari tahun berikutnya.', PD7S + ' Ps. 111; ' + PB59S + ' Ps. 77'], ['LPJ realisasi APB Desa paling lambat 3 bulan setelah akhir tahun anggaran, ditetapkan dengan Perdes, dilampiri laporan keuangan, laporan realisasi kegiatan, dan daftar program masuk desa.', PB59S + ' Ps. 79']],
+      [['Rekening koran bank per bulan', 'rekkoran', 'rekkoran'], ['Buku Kas Umum & buku pembantu', 'bku', 'bku'], ['LRA semester I', 'lra1', 'lra1'], ['CaLK akhir tahun', 'calk', 'calk']]],
+    ['Kepatuhan penyimpanan uang kas tunai tidak melebihi ketentuan', 0,
+      [['Kaur Keuangan dapat menyimpan uang tunai untuk operasional paling banyak Rp5.000.000 (setiap akhir hari kerja).', PB59S + ' Ps. 53 ayat (2)'], ['Penerimaan desa disetor ke rekening kas desa paling lambat 2 hari kerja.', PB59S + ' Ps. 53 ayat (1)'], ['Dana swakelola yang diterima pelaksana dipakai paling lama 10 hari kerja; bila belum dibayarkan wajib dikembalikan ke kas desa.', PB59S + ' Ps. 63']],
+      [['Saldo kas tunai harian ≤ Rp5.000.000', 'kastunai', 'tunai'], ['BA pemeriksaan kas', 'bakas', 'bakas']]],
+    ['Kepatuhan penyetoran pajak', 0,
+      [['Setiap pengeluaran kas desa atas beban belanja dikenakan pajak; Kaur Keuangan selaku wajib pungut memotong pajak dan wajib menyetorkan seluruh pajak yang dipungut.', PB59S + ' Ps. 67'], ['Penyetoran dicatat di buku pembantu pajak.', PB59S + ' Ps. 73'], ['Pajak yang dipotong/dipungut disetor paling lambat tanggal 15 bulan berikutnya.', 'PMK 81/2024']],
+      [['Pajak dipungut sudah disetor (Siskeudes + setoran di luar Siskeudes)', 'pajak', ['keupajakrek']], ['Bukti setor pajak (NTPN) tercatat', 'pajaksetor', ['list', { e: 'pajak_setor' }]]]],
+    ['Telah memanfaatkan Siskeudes Online', 89, [['Bukti tangkapan layar & output Siskeudes online.', 'SIMWAS']], [['Data Siskeudes sudah diimpor', 'apbN', 'skimpor']]],
+    ['Publikasi realisasi APBDes tahun sebelumnya', 89,
+      [['Kepala Desa menyampaikan informasi APB Desa dan laporan realisasi kepada masyarakat melalui media informasi, memuat realisasi, kegiatan belum selesai, sisa anggaran, dan alamat pengaduan.', PB59S + ' Ps. 47, 81; ' + PM73S + ' Ps. 23 ayat (4)']],
+      [['Baliho realisasi APBDes N-1', null, 'inforeal']]],
+    ['Persiapan penyusunan laporan keuangan / audit BPK', 34,
+      [['LPJ dilampiri laporan keuangan; Kertas Kerja Inspektorat: minimal Neraca, LRA dan Laporan Kekayaan Milik Desa (LKMD).', PB59S + ' Ps. 79; ' + KK29], ['Penutupan kas per 30 November dengan rekening koran, stock opname persediaan, buku inventaris.', 'SIMWAS B2 butir 8']],
+      [['BA pemeriksaan kas 30 November', 'bakas', 'bakas'], ['Laporan Kekayaan Milik Desa per 31 Desember', null, ['keudok', { d: 'lkmd' }], 1], ['Stock opname persediaan', null, 'asetso']]]] },
+  { k: 'B3', j: 'Pendapatan Asli Desa', v: 13, kk: 'Lengkapi dokumen 2026: persentase capaian pendapatan; Laporan Upaya Inovasi peningkatan PADes; BUMDes (Perdes pendirian, Perkades AD/ART, penyertaan modal + buku rekening + tanda terima, analisa kelayakan, administrasi keuangan); posisi keuangan BUMDes per 31 Desember 2025; daftar inventaris BUMDes per 31 Desember 2025; data intervensi kepada masyarakat miskin (Y/T).',
+    B: [['Persentase capaian pendapatan desa tahun berjalan (maks. 100%)', 0,
+      [['Perkiraan PADes dalam RKP paling sedikit sama dengan tahun sebelumnya.', PB40S + ' Ps. 40 ayat (3)'], ['Seluruh pendapatan desa diterima dan disalurkan melalui rekening kas desa.', PD7S + ' Ps. 100']], [['Capaian pendapatan tahun N', 'pend', 'lra1']]],
+    ['Laporan upaya inovasi peningkatan PADes', 0,
+      [['Hasil pemanfaatan aset (sewa TKD dsb.) menjadi PADes dan disetor ke rekening kas desa; tarif sewa tidak di bawah harga dasar.', 'Perbup Lumajang 78/2021 Ps. 13–16'], ['Kertas Kerja Inspektorat mencatat potensi inefisiensi sewa TKD (hasil Rp207 juta vs ketentuan tarif dasar).', KK29]],
+      [['Laporan Upaya Inovasi PADes', null, ['keudok', { d: 'inov' }], 1], ['Register pemanfaatan aset (sewa TKD)', 'manfaat', 'manfaat']]],
+    ['BUMDes dibentuk, beroperasi, dan mampu laba (bukti pembentukan, AD/ART, penyertaan, analisa kelayakan, administrasi keuangan)', 40,
+      [['Penyertaan modal kepada BUM Desa ditetapkan dengan Peraturan Desa dan didahului analisis kelayakan; penyertaan uang hanya bila ada surplus.', PB59S + ' Ps. 34–35'], ['BUM Desa didirikan dengan Peraturan Desa beserta AD/ART dan wajib menyusun laporan keuangan.', 'PP 11/2021 tentang BUM Desa']],
+      [['Data BUMDes & laporan tahunan', 'bumdes', ['list', { e: 'bumdes_lap' }]], ['Perdes penyertaan modal BUMDes', 'perdes_bum', 'perdes']]]] },
+  { k: 'B4', j: 'Pengendalian dan Pengawasan', v: 0, kk: 'Lengkapi 2026: laporan partisipasi masyarakat dalam pengawasan APBDes; laporan pengawasan BPD atas pengelolaan keuangan desa; laporan pembinaan & pengawasan kecamatan; laporan tindak lanjut desa atas hasil evaluasi. Setiap laporan minimal berisi undangan, daftar hadir, notulen, dan foto.',
+    B: [['Laporan partisipasi masyarakat dalam pengawasan APBDes', 0,
+      [['Masyarakat memantau pengelolaan keuangan desa; berhak meminta informasi APB Desa, pelaksana kegiatan, realisasi, kegiatan belum selesai, dan sisa anggaran; melalui musyawarah desa laporan keuangan, aspirasi, dan pengaduan.', PM73S + ' Ps. 23–24']],
+      [['Catatan pengawasan dari masyarakat tahun N', 'pw_mas', 'pengawasan'], ['Laporan kegiatan pengawasan masyarakat', null, ['keudok', { d: 'lapawas' }], 1]]],
+    ['Laporan pengawasan BPD atas pengelolaan keuangan desa', 0,
+      [['BPD mengawasi perencanaan kegiatan & anggaran, pelaksanaan kegiatan, laporan pelaksanaan APB Desa, dan capaian RPJM/RKP/APB Desa.', PM73S + ' Ps. 20'], ['Hasil pengawasan BPD disampaikan kepada Kepala Desa dalam musyawarah BPD, tembusan Camat dan APIP.', PM73S + ' Ps. 21']],
+      [['Catatan pengawasan BPD tahun N', 'pw_bpd', 'pengawasan'], ['Laporan pengawasan BPD', null, ['keudok', { d: 'lapawas', j: 'bpd' }], 1]]],
+    ['Laporan pembinaan & pengawasan keuangan oleh Kecamatan', 0,
+      [['Camat mengevaluasi rancangan Perdes APB Desa, pengelolaan keuangan & aset, serta LPJ APB Desa; hasil kepada Bupati tembusan APIP.', PM73S + ' Ps. 19'], ['Camat membina dan mengawasi pengelolaan keuangan desa di wilayahnya.', PB59S + ' Ps. 83 ayat (2)']],
+      [['Catatan pembinaan Kecamatan tahun N', 'pw_kec', 'pengawasan'], ['Laporan pembinaan & monev Kecamatan', null, ['keudok', { d: 'lapawas', j: 'kec' }], 1]]],
+    ['Laporan tindak lanjut desa atas hasil evaluasi', 0,
+      [['Rekomendasi hasil pengawasan ditindaklanjuti paling lama 60 hari kalender sejak laporan diterima; APIP menilai: sesuai, belum sesuai, belum ditindaklanjuti, tidak dapat ditindaklanjuti.', PM73S + ' Ps. 17']],
+      [['Tindak lanjut temuan (≤ 60 hari)', 'pw_tl', 'pengawasan'], ['Catat temuan Kertas Kerja 29 Okt ke Pengawasan & TL', 'kk29', ['keufrc', { imp: 1 }]]]]] }
+];
+/* ---------- cek otomatis dari data ---------- */
+async function kfCek(th) {
+  th = Number(th); const N1 = th + 1, o = {};
+  const L = (e, f, lim) => call('list', { entity: e, filters: f || {}, limit: lim || 500 }).then(r => r.rows || []).catch(() => null);
+  const [pd, sk, ba, pw, bum, ps, rk, kp, mus, ang1, ang0, man, rab] = await Promise.all([L('perdes'), L('sk_kades'), L('berita_acara'), L('pengawasan', 0, 1000), L('bumdes_lap'), L('pajak_setor', { tahun: String(th) }, 2000), L('keu_rekkoran', { tahun: String(th) }), L('keu_kasperiksa', { tahun: String(th) }), L('rkp_musyawarah'), L('keu_anggaran', { tahun: String(N1) }, 1), L('keu_anggaran', { tahun: String(th) }, 1), L('aset_manfaat'), call('list', { entity: 'rkp_rab', limit: 1 }).then(r => r.total || 0).catch(() => null)]);
+  const txt = x => JSON.stringify(x || {}).toLowerCase(), set = (k, ok, t, go) => { o[k] = { ok, t }; };
+  const pdF = (re, y, not) => (pd || []).filter(x => re.test(x.tentang || '') && (!not || !not.test(x.tentang || '')) && (y == null || String(x.tahun) === String(y) || String(x.tentang || '').indexOf(String(y)) >= 0));
+  const skF = (re, y) => (sk || []).filter(x => re.test(x.tentang || '') && (String(x.tentang || '').indexOf(String(y)) >= 0 || String(x.tanggal || '').slice(0, 4) === String(y)));
+  const lbl = R => R.map(x => 'No. ' + (x.nomor || '-') + (x.tanggal ? ' (' + fDate(x.tanggal) + ')' : '')).join('; ');
+  let r;
+  r = pdF(/rpjm/i); set('rpjm', r.length > 0, r.length ? lbl(r.slice(-1)) : 'Perdes RPJM Desa belum tercatat di Peraturan Desa');
+  r = pdF(/rkp/i, th, /perubahan/i); set('rkpN', r.length > 0, r.length ? lbl(r) : 'Perdes RKP ' + th + ' belum tercatat');
+  r = pdF(/rkp/i, N1); set('rkpN1', r.length > 0, r.length ? lbl(r) : 'Perdes RKP ' + N1 + ' belum tercatat');
+  r = pdF(/anggaran pendapatan|apb ?des/i, th, /perubahan|lpj|pertanggungjawaban/i); set('apbN', r.length > 0 || (ang0 && ang0.length > 0), r.length ? lbl(r) : ang0 && ang0.length ? 'APBDes ' + th + ' ada di aplikasi; Perdes belum dicatat' : 'APBDes ' + th + ' belum ada');
+  r = pdF(/perubahan (apb|anggaran)/i, th); set('apbP', r.length ? true : null, r.length ? lbl(r) : 'Belum ada Perdes Perubahan APBDes ' + th + ' (isi bila ada perubahan)');
+  set('rab', rab ? true : rab === 0 ? false : null, rab ? rab + ' RAB kegiatan tercatat' : 'Belum ada RAB kegiatan');
+  set('apbN1', ang1 && ang1.length > 0, ang1 && ang1.length ? 'Rancangan APBDes ' + N1 + ' ada di aplikasi' : 'Rancangan APBDes ' + N1 + ' belum diimpor dari Siskeudes');
+  r = (ba || []).filter(x => /kesepakatan/i.test(txt(x)) && txt(x).indexOf(String(N1)) >= 0);
+  set('kb', r.length ? r.every(x => String(x.tanggal || '') <= th + '-10-31') : false, r.length ? lbl(r) + (r.some(x => String(x.tanggal || '') > th + '-10-31') ? ' — melewati 31 Oktober' : '') : 'BA Kesepakatan Bersama APBDes ' + N1 + ' belum dibuat (batas 31 Oktober ' + th + ')');
+  r = (mus || []).filter(x => txt(x).indexOf(String(N1)) >= 0 || txt(x).indexOf(String(th)) >= 0); set('musrkp', mus ? r.length > 0 : null, mus ? r.length + ' musyawarah perencanaan tercatat' : '');
+  r = skF(/tim penyusun rkp/i, N1); set('tim_rkp', r.length > 0, r.length ? lbl(r) : 'SK Tim Penyusun RKP ' + N1 + ' belum tercatat');
+  r = skF(/ppkd|pelaksana pengelola(an)? keuangan/i, th); set('ppkd', r.length > 0, r.length ? lbl(r) : 'SK PPKD ' + th + ' belum tercatat di Buku Keputusan');
+  r = skF(/pelaksana kegiatan anggaran|pelaksana kegiatan (apb|tahun)/i, th); set('pk', r.length > 0, r.length ? lbl(r) : 'SK Pelaksana Kegiatan Anggaran ' + th + ' belum tercatat');
+  r = skF(/tim pelaksana (kegiatan|pembangunan)|tpk/i, th); set('tpk', r.length > 0, r.length ? lbl(r) : 'SK TPK ' + th + ' belum tercatat');
+  r = skF(/operator siskeudes/i, th); set('opr', r.length > 0, r.length ? lbl(r) : 'SK Operator Siskeudes ' + th + ' belum tercatat');
+  if (rk) { const bl = new Set(rk.map(x => String(x.bulan))); const sd = th < new Date().getFullYear() ? 12 : new Date().getMonth(); set('rekkoran', bl.size >= sd, bl.size + ' dari ' + sd + ' bulan rekening koran tercatat'); }
+  set('bakas', kp ? kp.length > 0 : null, kp && kp.length ? kp.length + ' BA pemeriksaan kas tahun ' + th : 'Belum ada BA pemeriksaan kas ' + th);
+  try { const d = await call('keuBuku', { tahun: String(th), buku: 'Tunai', bulan: '' }); const R = d.rows || [], hari = {}; R.forEach(x => { hari[String(x.tanggal).slice(0, 10)] = Number(x.saldo) || 0; }); const lebih = Object.keys(hari).filter(t => hari[t] > 5000000).sort(); o.kastunai = { ok: R.length ? !lebih.length : null, t: R.length ? (lebih.length ? lebih.length + ' hari saldo akhir > Rp5.000.000 (tertinggi ' + rp(Math.max(...lebih.map(t => hari[t]))) + ')' : 'Saldo akhir harian selalu ≤ Rp5.000.000') : 'Buku kas tunai ' + th + ' kosong', lebih: lebih.map(t => [t, hari[t]]) }; } catch (x) { }
+  try { const P = ptaPajak(await ptaData(String(th))); const sisa = P.jenis.reduce((t, x) => t + x.sisa, 0), luar = (ps || []).filter(x => x.di_siskeudes !== 'Ya').reduce((t, x) => t + mNum(x.jumlah), 0), net = sisa - luar; o.pajak = !P.jenis.length && !luar ? { ok: null, t: 'Belum ada data pajak ' + th + ' (impor Siskeudes)' } : { ok: Math.abs(net) < 1, t: 'Selisih Siskeudes ' + rp(sisa) + (luar ? ' · setoran di luar Siskeudes ' + rp(luar) : '') + ' → ' + (Math.abs(net) < 1 ? 'cocok' : (net > 0 ? 'belum disetor/belum tercatat ' : 'setoran lebih ') + rp(Math.abs(net))) }; } catch (x) { }
+  set('pajaksetor', ps ? ps.length > 0 : null, ps ? ps.length + ' bukti setor tercatat tahun ' + th : '');
+  try { const R = await call('keuRealisasi', { tahun: String(th), sampai: th + '-12-31' }); const a = R.filter(x => String(x.kode || '').charAt(0) === '4').reduce((t, x) => [t[0] + mNum(x.anggaran), t[1] + mNum(x.realisasi)], [0, 0]); const pc = a[0] ? Math.round(a[1] / a[0] * 100) : 0; o.pend = { ok: a[0] ? pc >= 80 : null, t: a[0] ? 'Capaian pendapatan ' + pc + '% (' + rp(a[1]) + ' dari ' + rp(a[0]) + ')' : 'Belum ada anggaran pendapatan ' + th }; o.lra1 = { ok: a[0] > 0, t: a[0] ? 'Data realisasi ' + th + ' tersedia' : '' }; o.bku = o.lra1; } catch (x) { }
+  set('calk', null, 'Buat dari menu CaLK');
+  const mf = (man || []).filter(x => x.status === 'Berlaku'); set('manfaat', man ? mf.length > 0 : null, man ? mf.length + ' pemanfaatan berlaku · ' + rp(mf.reduce((t, x) => t + mNum(x.nilai_sepakat), 0)) + '/tahun' : '');
+  r = (bum || []).filter(x => Number(x.tahun) >= th - 1); set('bumdes', bum ? r.length > 0 : null, r.length ? r.map(x => x.nama_bumdes + ' ' + x.tahun).join('; ') : 'Data BUMDes per 31 Desember ' + (th - 1) + ' belum diisi');
+  r = pdF(/bum ?des|badan usaha milik desa/i); set('perdes_bum', r.length > 0, r.length ? lbl(r) : 'Perdes pendirian/penyertaan modal BUMDes belum tercatat');
+  if (pw) {
+    const P = pw.filter(x => String(x.tanggal || '').slice(0, 4) === String(th)), by = re => P.filter(x => re.test(x.sumber || ''));
+    set('pw_mas', by(/masyarakat/i).length > 0, by(/masyarakat/i).length + ' catatan dari masyarakat');
+    set('pw_bpd', by(/bpd/i).length > 0, by(/bpd/i).length + ' catatan pengawasan BPD');
+    set('pw_kec', by(/kecamatan|camat/i).length > 0, by(/kecamatan|camat/i).length + ' catatan pembinaan kecamatan');
+    const buka = pw.filter(x => x.status !== 'Selesai'), telat = buka.filter(x => x.tanggal && (Date.now() - parseD(x.tanggal)) / 864e5 > 60);
+    set('pw_tl', !telat.length && pw.length > 0, buka.length + ' temuan belum selesai' + (telat.length ? ' · ' + telat.length + ' melewati 60 hari' : ''));
+    const kk = pw.filter(x => /kertas kerja frc/i.test(x.judul || '')); set('kk29', kk.length >= KK29_TEMUAN.length, kk.length + ' temuan Kertas Kerja tercatat');
+  }
+  return o;
+}
+/* ---------- halaman hub ---------- */
+const KF_CSS = `<style id="kfcss">.kf-b{border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:8px}.kf-b h4{margin:0 0 4px;font-size:14px}.kf-r{font-size:12.5px;color:var(--muted);margin:2px 0}.kf-r b{color:var(--ink)}.kf-it{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-top:1px dashed var(--line)}.kf-it .main{flex:1;min-width:0}.kf-it .main small{display:block;color:var(--muted)}.kf-dot{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:12px;background:var(--muted)}.kf-dot.ok{background:var(--ok)}.kf-dot.no{background:var(--bad)}.kf-dot.na{background:var(--warn)}.kf-v{font-weight:800;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--surface2)}.kf-v.lo{color:var(--bad)}.kf-v.mid{color:var(--warn)}.kf-v.hi{color:var(--ok)}</style>`;
+const kfGo = g => Array.isArray(g) ? g : (FG[g] || [])[1];
+const kfV = v => `<span class="kf-v ${v >= 80 ? 'hi' : v >= 50 ? 'mid' : 'lo'}">${v}%</span>`;
+VIEWS.keufrc = async (p, main, alive) => {
+  const th = keuTh(); setTop('Kelengkapan FRC Keuangan', 'B1–B4 · tahun ' + th);
+  if (!$('#kfcss')) document.head.insertAdjacentHTML('beforeend', KF_CSS);
+  main.innerHTML = '<div class="skel" style="height:300px"></div>';
+  if (p && p.imp && !p._d) { p._d = 1; await kfImporKK(); }
+  const C = await kfCek(th); if (alive && !alive()) return;
+  const sk = i => C[i] || { ok: null, t: '' };
+  let tot = 0, ok = 0;
+  const html = KF.map(d => `<div class="card"><div class="kd-h"><b>${esc(d.k)} · ${esc(d.j)}</b><span>Verifikasi Inspektorat ${kfV(d.v)}</span></div>
+    <details><summary class="meta">Catatan ${esc(KK29)}</summary><div class="s78-frc" style="margin-top:4px">${esc(d.kk)}</div></details>
+    ${d.B.map((b, i) => `<div class="kf-b"><h4>${i + 1}. ${esc(b[0])} ${kfV(b[1])}</h4>
+      ${b[2].map(a => `<div class="kf-r">• ${esc(a[0])} <b>(${esc(a[1])})</b></div>`).join('')}
+      ${b[3].map(it => { const c = it[1] ? sk(it[1]) : { ok: null, t: it[3] ? 'Buat dokumen dari aplikasi' : '' }; if (it[1]) { tot++; if (c.ok) ok++; } const g = kfGo(it[2]); return `<div class="kf-it"><span class="kf-dot ${c.ok === true ? 'ok' : c.ok === false ? 'no' : 'na'}">${c.ok === true ? '✓' : c.ok === false ? '!' : '·'}</span><span class="main"><b>${esc(it[0])}</b><small>${esc(c.t || '')}</small></span>${g ? `<button class="btn sm${it[3] ? ' pri' : ''}" data-act="go" data-go='${esc(JSON.stringify(g))}'>${ic(it[3] ? 'edit' : 'next')}${it[3] ? 'Buat' : 'Buka'}</button>` : ''}</div>`; }).join('')}
+    </div>`).join('')}</div>`).join('');
+  const pct = tot ? Math.round(ok / tot * 100) : 0;
+  main.innerHTML = `<div class="stack">
+    <div class="card"><div class="kd-h"><b>${ic('scale')} Kelengkapan sesuai Perda & Perbup Lumajang</b><span class="chips">${[th - 1, th, th + 1].map(y => `<button class="chip ${String(y) === String(th) ? 'on' : ''}" data-act="kfTh" data-v="${y}">${y}</button>`).join('')}</span></div>
+      <div class="kd-bar"><div class="t"><span><b style="font-size:20px">${pct}%</b> butir yang bisa dicek sudah terpenuhi</span><span>${ok} dari ${tot}</span></div><div class="kd-track" style="--kc:var(--${pct >= 80 ? 'ok' : pct >= 50 ? 'warn' : 'bad'})"><i style="width:${pct}%"></i></div></div>
+      <div class="meta">Dasar: ${esc(PB59S)} (Pedoman Pengelolaan Keuangan Desa), ${esc(PB40S)} (Juknis RPJM & RKP Desa), ${esc(PD7S)} (Penyelenggaraan Pemerintahan Desa), ${esc(PM20S)}, ${esc(PM73S)}, dan ${esc(KK29)}. Hijau = sudah ada di aplikasi; merah = belum; kuning = isi/cek manual.</div>
+      <div class="btns"><button class="btn sm" data-act="go" data-go='["frc"]'>${ic('check')}Buka FRC Desa (SIMWAS)</button><button class="btn sm" data-act="kfCetak">${ic('print')}Cetak daftar kelengkapan</button>${canWrite('pengawasan') ? `<button class="btn sm" data-act="kfImp">${ic('eye')}Catat semua temuan Kertas Kerja ke Pengawasan & TL</button>` : ''}</div></div>
+    ${html}</div>`;
+  S.vh.kfTh = t => { S.keuTh = t.dataset.v; refresh(); };
+  S.vh.kfImp = async () => { await kfImporKK(); refresh(); };
+  S.vh.kfCetak = () => printDocs('Kelengkapan FRC Keuangan ' + th, [kfCetakHtml(th, C)], 'keufrc');
+};
+function kfCetakHtml(th, C) {
+  const st = c => c && c.ok === true ? 'Ada' : c && c.ok === false ? 'Belum' : 'Cek';
+  return `<div class="paper land">${kop()}<h2 style="text-align:center;margin:4px 0">DAFTAR KELENGKAPAN DOKUMEN PENGELOLAAN KEUANGAN DESA (FRC B1–B4)</h2><h3 style="text-align:center;margin:0 0 8px">TAHUN ${esc(th)}</h3>
+    <table class="pt"><thead><tr><th>No</th><th>Indikator / butir</th><th>Kelengkapan</th><th>Status</th><th>Keterangan dari data</th><th>Dasar hukum</th></tr></thead><tbody>
+    ${KF.map(d => `<tr><td colspan="6"><b>${esc(d.k)}. ${esc(d.j)}</b> — verifikasi Inspektorat ${d.v}%</td></tr>` + d.B.map((b, i) => b[3].map((it, j) => `<tr>${j ? '' : `<td rowspan="${b[3].length}" style="text-align:center">${i + 1}</td><td rowspan="${b[3].length}">${esc(b[0])}</td>`}<td>${esc(it[0])}</td><td style="text-align:center">${st(it[1] && C[it[1]])}</td><td>${esc((it[1] && C[it[1]] || {}).t || '')}</td>${j ? '' : `<td rowspan="${b[3].length}" style="font-size:9pt">${b[2].map(a => esc(a[1])).join('<br>')}</td>`}</tr>`).join('')).join('')).join('')}
+    </tbody></table>${a78TtdKades(isoToday(), false)}</div>`;
+}
+
+/* ---------- dokumen keuangan (SK, BA, laporan) — mesin form + pratinjau ---------- */
+async function kfCtx() {
+  const L = (e, f, lim) => call('list', { entity: e, filters: f || {}, limit: lim || 500 }).then(r => r.rows || []).catch(() => []);
+  const th = Number(keuTh());
+  const [ap, sk, ba, keg, a0, a1, bum, man, tl] = await Promise.all([L('aparat', 0, 200).then(r => r.filter(apAktif)), L('sk_kades'), L('berita_acara'), L('kegiatan', 0, 300), L('keu_anggaran', { tahun: String(th) }, 5000), L('keu_anggaran', { tahun: String(th + 1) }, 5000), L('bumdes_lap'), L('aset_manfaat'), L('petugas', 0, 500)]);
+  ap.sort((a, b) => (Number(a.no_urut) || 99) - (Number(b.no_urut) || 99));
+  const bpd = tl.filter(x => /bpd|badan permusyawaratan/i.test((x.lembaga || '') + ' ' + (x.jabatan || '') + ' ' + (x.jabatan_l || '')));
+  return { th, ap, sk, ba, keg: keg.sort((a, b) => String(b.tanggal).localeCompare(String(a.tanggal))), ang: { [th]: a0, [th + 1]: a1 }, bum, man, bpd };
+}
+const kfAp = (c, id) => c.ap.find(x => x.id === id) || {};
+const kfApOpt = (c, f) => c.ap.filter(f || (() => true)).map(x => [x.id, x.nama + ' — ' + x.jabatan]);
+const kfKd = c => c.ap.find(x => /^kepala desa/i.test(x.jabatan || '')) || { nama: (S.set || {}).nama_kades || '', jabatan: 'Kepala Desa' };
+const kfTabelOrang = (R, kol) => `<table class="pt"><thead><tr><th style="width:30px">No</th><th>Nama</th><th>Jabatan</th><th>${esc(kol || 'Kedudukan')}</th></tr></thead><tbody>${R.map((r, i) => `<tr><td style="text-align:center">${i + 1}</td><td>${esc(fmtNama(r[0] || '', 'u'))}</td><td>${esc(r[1] || '')}</td><td>${esc(r[2] || '')}</td></tr>`).join('')}</tbody></table>`;
+const kfSkLama = (c, re) => { const x = c.sk.filter(s => re.test(s.tentang || '')).sort((a, b) => String(b.tanggal).localeCompare(String(a.tanggal)))[0]; return x ? x.nomor + '|' + (x.tentang || '') : ''; };
+const kfCabut = (st, nama) => { const c = String(st.cabut || '').split('|'); return c[0] ? `Pada saat Keputusan ini mulai berlaku, Keputusan Kepala Desa ${esc(ND())} Nomor ${esc(c[0])} tentang ${esc(c[1] || nama)} dicabut dan dinyatakan tidak berlaku.` : ''; };
+const kfAngKeg = (c, th) => { const m = {}; (c.ang[th] || []).filter(x => String(x.rek || '').charAt(0) === '5').forEach(x => { const k = x.kode_kegiatan || x.kegiatan; if (!k) return; const g = m[k] = m[k] || { kode: x.kode_kegiatan || '', nama: x.kegiatan || '', bidang: String(x.kode_bidang || String(x.kode_kegiatan || '').split('.')[0] || ''), nb: x.bidang || '', pagu: 0 }; g.pagu += mNum(x.jumlah_pak || x.jumlah); }); return Object.values(m).sort((a, b) => String(a.kode).localeCompare(String(b.kode), 'id', { numeric: true })); };
+const KF_BIDANG = [['1', 'Penyelenggaraan Pemerintahan Desa'], ['2', 'Pelaksanaan Pembangunan Desa'], ['3', 'Pembinaan Kemasyarakatan Desa'], ['4', 'Pemberdayaan Masyarakat Desa'], ['5', 'Penanggulangan Bencana, Keadaan Darurat dan Mendesak Desa']];
+const kfSk = (st, tentang, menimbang, diktum, lamp) => {
+  const o = { nomor: st.nomor, tanggal: st.tanggal, tentang, menimbang, mengingat: DH_KEU, diktum };
+  const pages = [a78SkHtml(o)]; if (lamp) pages.push(`<div class="paper sopdoc" style="font-size:11pt">${a78LampHd('KEPUTUSAN KEPALA DESA ' + String(ND()).toUpperCase(), st.nomor, st.tanggal, tentang)}${lamp}${a78TtdKades(st.tanggal, false)}</div>`);
+  return { pages, o };
+};
+const DOKKEU = {
+  ppkd: { t: 'SK Pelaksana Pengelolaan Keuangan Desa (PPKD)', ps: PB59S + ' Ps. 5–10', ic: 'users', simpan: 'sk_kades', kla: '100.3.3',
+    init: (st, c) => { const f = re => (c.ap.find(x => re.test(x.jabatan || '')) || {}).id || ''; Object.assign(st, { sekdes: f(/^sekretaris desa/i), kaurkeu: f(/urusan keuangan/i), pk: c.ap.filter(x => /^(kepala urusan|kepala seksi|kaur|kasi)/i.test(x.jabatan || '') && !/keuangan/i.test(x.jabatan || '')).map(x => x.id), cabut: kfSkLama(c, /ppkd|pelaksana pengelola(an)? keuangan/i) }); },
+    fields: c => [['tanggal', 'Tanggal ditetapkan', 'date'], ['nomor', 'Nomor Keputusan', 'text'], ['tahun', 'Tahun anggaran', 'number'], ['sekdes', 'Sekretaris Desa (koordinator PPKD)', 'select', kfApOpt(c)], ['kaurkeu', 'Kaur Keuangan (fungsi kebendaharaan)', 'select', kfApOpt(c)], ['pk', 'Kaur & Kasi pelaksana kegiatan anggaran', 'multi', kfApOpt(c, x => /urusan|seksi|^kaur|^kasi/i.test(x.jabatan || ''))], ['cabut', 'SK lama yang dicabut (nomor|tentang)', 'text']],
+    cek: (st, c) => { const W = [], s = kfAp(c, st.sekdes), k = kfAp(c, st.kaurkeu); if (s.jabatan && !/sekretaris desa/i.test(s.jabatan)) W.push(['warn', 'Koordinator PPKD adalah Sekretaris Desa (Pasal 7).']); if (k.jabatan && !/keuangan/i.test(k.jabatan)) W.push(['warn', 'Fungsi kebendaharaan dilaksanakan Kaur Keuangan (Pasal 10).']); if (!(st.pk || []).length) W.push(['bad', 'Pilih Kaur dan Kasi pelaksana kegiatan anggaran.']); return W; },
+    doc: (st, c) => {
+      const D = ND(), tentang = 'Penetapan Pelaksana Pengelolaan Keuangan Desa ' + D + ' Tahun Anggaran ' + st.tahun, s = kfAp(c, st.sekdes), k = kfAp(c, st.kaurkeu), P = (st.pk || []).map(id => kfAp(c, id)).filter(x => x.nama);
+      const dk = [['KESATU', 'Menetapkan Pelaksana Pengelolaan Keuangan Desa (PPKD) ' + esc(D) + ' Tahun Anggaran ' + esc(st.tahun) + ' dengan susunan sebagaimana tercantum dalam Lampiran yang merupakan bagian tidak terpisahkan dari Keputusan ini.'],
+        ['KEDUA', 'Sekretaris Desa selaku koordinator PPKD bertugas:' + a78List(['mengoordinasikan penyusunan dan pelaksanaan kebijakan APB Desa;', 'mengoordinasikan penyusunan rancangan APB Desa dan rancangan perubahan APB Desa;', 'mengoordinasikan penyusunan rancangan Peraturan Desa tentang APB Desa, perubahan APB Desa, dan pertanggungjawaban pelaksanaan APB Desa;', 'mengoordinasikan penyusunan rancangan Peraturan Kepala Desa tentang Penjabaran APB Desa dan perubahannya;', 'mengoordinasikan tugas perangkat desa lain yang menjalankan tugas PPKD; dan', 'mengoordinasikan penyusunan laporan keuangan desa dalam rangka pertanggungjawaban pelaksanaan APB Desa, serta melakukan verifikasi terhadap DPA, DPPA, DPAL, RAK Desa, dan bukti penerimaan dan pengeluaran APB Desa.'], a78Huruf)],
+        ['KETIGA', 'Kepala Urusan Keuangan melaksanakan fungsi kebendaharaan, bertugas menyusun RAK Desa dan melakukan penatausahaan yang meliputi menerima, menyimpan, menyetorkan/membayar, menatausahakan, dan mempertanggungjawabkan penerimaan pendapatan desa dan pengeluaran dalam rangka pelaksanaan APB Desa, termasuk memungut dan menyetorkan pajak sesuai ketentuan peraturan perundang-undangan.'],
+        ['KEEMPAT', 'Kepala Urusan dan Kepala Seksi selaku pelaksana kegiatan anggaran sesuai bidang tugasnya bertugas:' + a78List(['melakukan tindakan pengeluaran yang menyebabkan atas beban anggaran belanja kegiatan;', 'melaksanakan anggaran kegiatan sesuai bidang tugasnya;', 'mengendalikan kegiatan;', 'menyusun DPA, DPPA, dan DPAL sesuai bidang tugasnya;', 'menandatangani perjanjian kerja sama dengan penyedia atas pengadaan barang/jasa untuk kegiatan yang berada dalam bidang tugasnya; dan', 'menyusun laporan pelaksanaan kegiatan sesuai bidang tugasnya untuk pertanggungjawaban pelaksanaan APB Desa.'], a78Huruf)],
+        ['KELIMA', 'Segala biaya yang timbul akibat ditetapkannya Keputusan ini dibebankan pada APB Desa ' + esc(D) + ' Tahun Anggaran ' + esc(st.tahun) + '.'],
+        ['KEENAM', 'Keputusan ini mulai berlaku pada tanggal ditetapkan. ' + kfCabut(st, 'Pelaksana Pengelolaan Keuangan Desa')]];
+      const R = [[s.nama, s.jabatan, 'Koordinator PPKD'], [k.nama, k.jabatan, 'Pelaksana fungsi kebendaharaan']].concat(P.map(x => [x.nama, x.jabatan, 'Pelaksana kegiatan anggaran']));
+      return kfSk(st, tentang, ['bahwa berdasarkan Pasal 5 ayat (3) dan ayat (4) ' + PB59 + ', Kepala Desa selaku pemegang kekuasaan pengelolaan keuangan desa melimpahkan sebagian kekuasaannya kepada perangkat desa selaku Pelaksana Pengelolaan Keuangan Desa yang ditetapkan dengan Keputusan Kepala Desa;', 'bahwa berdasarkan pertimbangan sebagaimana dimaksud pada huruf a, perlu menetapkan Keputusan Kepala Desa tentang ' + tentang + ';'], dk, `<div style="text-align:center;font-weight:700;margin:6px 0">SUSUNAN PELAKSANA PENGELOLAAN KEUANGAN DESA ${esc(String(D).toUpperCase())}<br>TAHUN ANGGARAN ${esc(st.tahun)}</div>${kfTabelOrang(R, 'Kedudukan dalam PPKD')}`);
+    } },
+  pk: { t: 'SK Pelaksana Kegiatan Anggaran', ps: PB59S + ' Ps. 8', ic: 'list', simpan: 'sk_kades', kla: '100.3.3',
+    init: (st, c) => { const f = re => (c.ap.find(x => re.test(x.jabatan || '')) || {}).id || ''; Object.assign(st, { b1: f(/pemerintahan/i) || f(/tata usaha/i), b2: f(/perencanaan/i), b3: f(/kesejahteraan/i), b4: f(/pelayanan/i), b5: f(/kesejahteraan/i), cabut: kfSkLama(c, /pelaksana kegiatan anggaran/i) }); },
+    fields: c => [['tanggal', 'Tanggal ditetapkan', 'date'], ['nomor', 'Nomor Keputusan', 'text'], ['tahun', 'Tahun anggaran', 'number']].concat(KF_BIDANG.map(b => ['b' + b[0], 'Pelaksana Bidang ' + b[0] + ' — ' + b[1], 'select', [['', '—']].concat(kfApOpt(c, x => /urusan|seksi|^kaur|^kasi|sekretaris/i.test(x.jabatan || '')))])).concat([['cabut', 'SK lama yang dicabut (nomor|tentang)', 'text']]),
+    cek: (st, c) => { const K = kfAngKeg(c, st.tahun); const W = []; if (!K.length) W.push(['warn', 'Belanja APBDes ' + st.tahun + ' belum ada di aplikasi (impor Siskeudes) — lampiran kegiatan kosong.']); KF_BIDANG.forEach(b => { if (K.some(k => k.bidang === b[0]) && !st['b' + b[0]]) W.push(['bad', 'Pilih pelaksana Bidang ' + b[0] + '.']); }); return W; },
+    doc: (st, c) => {
+      const D = ND(), tentang = 'Penetapan Pelaksana Kegiatan Anggaran APB Desa ' + D + ' Tahun Anggaran ' + st.tahun, K = kfAngKeg(c, st.tahun);
+      const pel = b => kfAp(c, st['b' + b]);
+      const lamp = `<div style="text-align:center;font-weight:700;margin:6px 0">DAFTAR KEGIATAN DAN PELAKSANA KEGIATAN ANGGARAN<br>TAHUN ANGGARAN ${esc(st.tahun)}</div><table class="pt"><thead><tr><th>No</th><th>Kode</th><th>Kegiatan</th><th style="text-align:right">Pagu (Rp)</th><th>Pelaksana</th></tr></thead><tbody>${KF_BIDANG.map(b => { const R = K.filter(k => k.bidang === b[0]); return R.length ? `<tr><td colspan="5"><b>Bidang ${b[0]}. ${esc(b[1])}</b></td></tr>` + R.map((k, i) => `<tr><td style="text-align:center">${i + 1}</td><td>${esc(k.kode)}</td><td>${esc(k.nama)}</td><td style="text-align:right">${Number(k.pagu).toLocaleString('id-ID')}</td><td>${esc(fmtNama(pel(b[0]).nama || '', 'u'))}<br><small>${esc(pel(b[0]).jabatan || '')}</small></td></tr>`).join('') : ''; }).join('') || '<tr><td colspan="5" style="text-align:center">Belanja APBDes belum tersedia.</td></tr>'}</tbody></table>`;
+      return kfSk(st, tentang, ['bahwa berdasarkan Pasal 8 ' + PB59 + ', Kepala Urusan dan Kepala Seksi berkedudukan sebagai pelaksana kegiatan anggaran sesuai bidang tugasnya;', 'bahwa untuk tertib pelaksanaan APB Desa Tahun Anggaran ' + st.tahun + ' perlu menetapkan pelaksana setiap kegiatan anggaran;', 'bahwa berdasarkan pertimbangan sebagaimana dimaksud pada huruf a dan huruf b, perlu menetapkan Keputusan Kepala Desa tentang ' + tentang + ';'],
+        [['KESATU', 'Menetapkan Pelaksana Kegiatan Anggaran APB Desa ' + esc(D) + ' Tahun Anggaran ' + esc(st.tahun) + ' sebagaimana tercantum dalam Lampiran yang merupakan bagian tidak terpisahkan dari Keputusan ini.'], ['KEDUA', 'Pelaksana kegiatan anggaran menyusun DPA/DPPA/DPAL, melaksanakan dan mengendalikan kegiatan, mengajukan SPP disertai laporan perkembangan pelaksanaan kegiatan, serta menyampaikan laporan akhir kegiatan paling lambat 7 (tujuh) hari sejak seluruh kegiatan selesai.'], ['KETIGA', 'Dana kegiatan swakelola yang diterima pelaksana kegiatan digunakan paling lama 10 (sepuluh) hari kerja; dana yang belum dibayarkan dalam waktu tersebut wajib dikembalikan ke kas desa.'], ['KEEMPAT', 'Keputusan ini mulai berlaku pada tanggal ditetapkan. ' + kfCabut(st, 'Pelaksana Kegiatan Anggaran')]], lamp);
+    } },
+  tpk: { t: 'SK Tim Pelaksana Kegiatan (TPK) Pengadaan', ps: PB59S + ' Ps. 9; Perlem LKPP 12/2019', ic: 'hammer', simpan: 'sk_kades', kla: '100.3.3',
+    init: (st, c) => { const f = re => (c.ap.find(x => re.test(x.jabatan || '')) || {}).id || ''; Object.assign(st, { ketua: f(/perencanaan/i), sekr: f(/tata usaha/i), anggota: 'Nama anggota | Unsur LPMD\nNama anggota | Unsur masyarakat', cabut: kfSkLama(c, /tim pelaksana (kegiatan|pembangunan)|tpk/i) }); },
+    fields: c => [['tanggal', 'Tanggal ditetapkan', 'date'], ['nomor', 'Nomor Keputusan', 'text'], ['tahun', 'Tahun anggaran', 'number'], ['ketua', 'Ketua TPK (unsur perangkat desa)', 'select', kfApOpt(c)], ['sekr', 'Sekretaris TPK', 'select', kfApOpt(c)], ['anggota', 'Anggota (satu per baris: nama | unsur)', 'textarea'], ['cabut', 'SK lama yang dicabut (nomor|tentang)', 'text']],
+    cek: (st, c) => { const W = [], n = String(st.anggota || '').split('\n').filter(x => x.trim() && !/^nama anggota/i.test(x)).length; if (!n) W.push(['bad', 'Isi anggota TPK dari unsur LKD/masyarakat.']); W.push(['warn', 'Pastikan ketua/anggota TPK pernah mengikuti pelatihan PBJ Desa dan unggah sertifikatnya (catatan Inspektorat C2).']); return W; },
+    doc: (st, c) => {
+      const D = ND(), tentang = 'Pembentukan Tim Pelaksana Kegiatan Pengadaan Barang/Jasa Desa ' + D + ' Tahun Anggaran ' + st.tahun, k = kfAp(c, st.ketua), s = kfAp(c, st.sekr);
+      const A = String(st.anggota || '').split('\n').map(x => x.split('|').map(y => y.trim())).filter(x => x[0] && !/^nama anggota/i.test(x[0]));
+      return kfSk(st, tentang, ['bahwa berdasarkan Pasal 9 ayat (4) dan ayat (5) ' + PB59 + ', tim pelaksana pengadaan diusulkan pada saat penyusunan RKP Desa dan ditetapkan dengan Keputusan Kepala Desa;', 'bahwa berdasarkan Peraturan Lembaga Kebijakan Pengadaan Barang/Jasa Pemerintah Nomor 12 Tahun 2019 tentang Pedoman Penyusunan Tata Cara Pengadaan Barang/Jasa di Desa, pengadaan dilaksanakan oleh Tim Pelaksana Kegiatan yang terdiri atas unsur Perangkat Desa, Lembaga Kemasyarakatan Desa, dan/atau masyarakat;', 'bahwa berdasarkan pertimbangan sebagaimana dimaksud pada huruf a dan huruf b, perlu menetapkan Keputusan Kepala Desa tentang ' + tentang + ';'],
+        [['KESATU', 'Membentuk Tim Pelaksana Kegiatan (TPK) Pengadaan Barang/Jasa Desa ' + esc(D) + ' Tahun Anggaran ' + esc(st.tahun) + ' dengan susunan sebagaimana tercantum dalam Lampiran.'], ['KEDUA', 'TPK bertugas:' + a78List(['membantu Kaur/Kasi pelaksana kegiatan dalam persiapan pengadaan: menyusun jadwal, Harga Perkiraan Sendiri (HPS) berdasarkan survei harga, spesifikasi teknis/KAK, dan rancangan surat perjanjian;', 'melaksanakan pengadaan melalui swakelola dan/atau penyedia (pembelian langsung, permintaan penawaran, lelang) sesuai ketentuan;', 'memeriksa hasil pekerjaan dan menyerahkannya kepada Kaur/Kasi dengan Berita Acara Serah Terima; dan', 'melaporkan penyelenggaraan pengadaan barang/jasa kepada Kaur/Kasi pelaksana kegiatan.'], a78Huruf)], ['KETIGA', 'Keputusan ini mulai berlaku pada tanggal ditetapkan. ' + kfCabut(st, 'Tim Pelaksana Kegiatan')]],
+        `<div style="text-align:center;font-weight:700;margin:6px 0">SUSUNAN TIM PELAKSANA KEGIATAN (TPK)<br>TAHUN ANGGARAN ${esc(st.tahun)}</div>${kfTabelOrang([[k.nama, k.jabatan, 'Ketua'], [s.nama, s.jabatan, 'Sekretaris']].concat(A.map(x => [x[0], x[1] || '', 'Anggota'])), 'Kedudukan dalam TPK')}`);
+    } },
+  opr: { t: 'SK Operator Siskeudes Desa', ps: PB59S + ' Ps. 38', ic: 'key', simpan: 'sk_kades', kla: '100.3.3',
+    init: (st, c) => Object.assign(st, { opr: c.ap.filter(x => /urusan keuangan/i.test(x.jabatan || '')).map(x => x.id), cabut: kfSkLama(c, /operator siskeudes/i) }),
+    fields: c => [['tanggal', 'Tanggal ditetapkan', 'date'], ['nomor', 'Nomor Keputusan', 'text'], ['tahun', 'Tahun anggaran', 'number'], ['opr', 'Operator Siskeudes', 'multi', kfApOpt(c)], ['cabut', 'SK lama yang dicabut (nomor|tentang)', 'text']],
+    cek: st => (st.opr || []).length ? [] : [['bad', 'Pilih operator.']],
+    doc: (st, c) => {
+      const D = ND(), tentang = 'Penunjukan Operator Sistem Keuangan Desa (Siskeudes) Desa ' + D + ' Tahun Anggaran ' + st.tahun, O = (st.opr || []).map(id => kfAp(c, id)).filter(x => x.nama);
+      return kfSk(st, tentang, ['bahwa berdasarkan Pasal 38 ayat (3) ' + PB59 + ', pengelolaan keuangan desa dapat menggunakan sistem informasi yang dikelola oleh Kementerian Dalam Negeri;', 'bahwa untuk kelancaran penatausahaan dan pelaporan keuangan desa melalui aplikasi Siskeudes, perlu menunjuk operator tingkat desa;', 'bahwa berdasarkan pertimbangan sebagaimana dimaksud pada huruf a dan huruf b, perlu menetapkan Keputusan Kepala Desa tentang ' + tentang + ';'],
+        [['KESATU', 'Menunjuk Operator Siskeudes Desa ' + esc(D) + ' Tahun Anggaran ' + esc(st.tahun) + ' sebagaimana tercantum dalam Lampiran.'], ['KEDUA', 'Operator bertugas:' + a78List(['menginput data perencanaan, penganggaran, penatausahaan, dan pelaporan keuangan desa ke dalam Siskeudes sesuai dokumen sah;', 'mencatat pungutan dan setoran pajak beserta bukti setor (NTPN) agar buku pembantu pajak sesuai dengan setoran;', 'melakukan pencadangan (backup) database secara berkala dan sinkronisasi ke Siskeudes Online;', 'menjaga kerahasiaan akun dan kata sandi; dan', 'mencetak laporan yang diperlukan untuk pertanggungjawaban dan pemeriksaan.'], a78Huruf)], ['KETIGA', 'Keputusan ini mulai berlaku pada tanggal ditetapkan. ' + kfCabut(st, 'Operator Siskeudes')]],
+        `<div style="text-align:center;font-weight:700;margin:6px 0">OPERATOR SISKEUDES DESA ${esc(String(D).toUpperCase())}<br>TAHUN ANGGARAN ${esc(st.tahun)}</div>${kfTabelOrang(O.map(x => [x.nama, x.jabatan, 'Operator Siskeudes']), 'Tugas')}`);
+    } },
+  kb: { t: 'BA Kesepakatan Bersama Rancangan Perdes APB Desa', ps: PB59S + ' Ps. 40–43; ' + PD7S + ' Ps. 109', ic: 'stamp', simpan: 'berita_acara', kla: '000.2.4',
+    init: (st, c) => { const b = c.bpd[0] || {}; Object.assign(st, { tahun: String(c.th + 1), tanggal: c.th + '-10-' + (new Date().getMonth() >= 9 ? '31' : '15'), ketua_bpd: b.nama || '', surat_no: '', jam: '09.00', tempat: 'Balai Desa ' + ND() }); },
+    fields: c => [['tanggal', 'Tanggal kesepakatan (paling lambat 31 Oktober)', 'date'], ['nomor', 'Nomor Berita Acara', 'text'], ['tahun', 'APB Desa tahun anggaran', 'number'], ['jam', 'Jam', 'text'], ['tempat', 'Tempat', 'text'], ['ketua_bpd', 'Ketua BPD', 'text'], ['surat_no', 'Nomor surat penyampaian ke Camat', 'text']],
+    cek: (st, c) => { const W = [], th = Number(st.tahun) - 1; if (String(st.tanggal) > th + '-10-31') W.push(['bad', 'Melewati batas 31 Oktober ' + th + ' (Perbup 59/2018 Pasal 40 ayat 3).']); if (!(c.ang[st.tahun] || []).length) W.push(['warn', 'Rancangan APBDes ' + st.tahun + ' belum diimpor — angka ringkasan kosong. Impor dari Siskeudes dulu.']); if (!st.ketua_bpd) W.push(['bad', 'Isi nama Ketua BPD.']); return W; },
+    doc: (st, c) => {
+      const s = S.set || {}, D = ND(), d = parseD(st.tanggal) || new Date(), R = c.ang[st.tahun] || [], sum = re => R.filter(x => re.test(String(x.rek || ''))).reduce((t, x) => t + mNum(x.jumlah), 0);
+      const P = sum(/^4/), B = sum(/^5/), T = sum(/^6\.1/), K = sum(/^6\.2/), kd = kfKd(c);
+      const ring = `<table class="pt" style="width:80%;margin:6px auto"><tbody>${[['Pendapatan', P], ['Belanja', B], ['Surplus/(Defisit)', P - B], ['Penerimaan Pembiayaan', T], ['Pengeluaran Pembiayaan', K], ['Pembiayaan Netto', T - K], ['SiLPA tahun berjalan', P - B + T - K]].map(x => `<tr><td>${x[0]}</td><td style="text-align:right">Rp ${Number(x[1]).toLocaleString('id-ID')}</td></tr>`).join('')}</tbody></table>`;
+      const ba = `<div class="paper sopdoc" style="font-size:11.5pt">${kop()}<div style="text-align:center;font-weight:700;line-height:1.4">BERITA ACARA KESEPAKATAN BERSAMA<br>KEPALA DESA DAN BADAN PERMUSYAWARATAN DESA ${esc(String(D).toUpperCase())}<br>TENTANG<br>RANCANGAN PERATURAN DESA TENTANG ANGGARAN PENDAPATAN DAN BELANJA DESA TAHUN ANGGARAN ${esc(st.tahun)}<br><span style="font-weight:400">Nomor: ${esc(st.nomor || '……')}</span></div>
+        <p style="text-align:justify">Pada hari ini ${esc(HARI[d.getDay()])} tanggal ${esc(terbilang(d.getDate()).trim())} bulan ${esc(BULAN[d.getMonth()])} tahun ${esc(terbilang(d.getFullYear()).trim())} (${esc(fDate(st.tanggal))}), pukul ${esc(st.jam || '…')} WIB, bertempat di ${esc(st.tempat || '…')}, telah dilaksanakan musyawarah pembahasan Rancangan Peraturan Desa tentang APB Desa ${esc(D)} Tahun Anggaran ${esc(st.tahun)} antara Kepala Desa dan Badan Permusyawaratan Desa, sebagaimana diatur dalam Pasal 40 ayat (3) ${esc(PB59)} dan Pasal 109 ayat (1) Peraturan Daerah Kabupaten Lumajang Nomor 7 Tahun 2016.</p>
+        <p style="text-align:justify">Setelah dilakukan pembahasan, Kepala Desa dan BPD <b>menyepakati</b> Rancangan Peraturan Desa tentang APB Desa Tahun Anggaran ${esc(st.tahun)} dengan ringkasan sebagai berikut:</p>${ring}
+        <p style="text-align:justify">Selanjutnya rancangan tersebut disampaikan kepada Bupati Lumajang melalui Camat ${esc(s.kecamatan || '')} paling lambat 3 (tiga) hari sejak disepakati untuk dievaluasi. Daftar hadir, notulen, dan dokumentasi musyawarah terlampir.</p>
+        <table style="width:100%;margin-top:14px"><tr><td style="width:50%;text-align:center">KETUA BPD ${esc(String(D).toUpperCase())},<div style="height:64px"></div><b>${esc(fmtNama(st.ketua_bpd || '……………', 'u'))}</b></td><td style="text-align:center">KEPALA DESA ${esc(String(D).toUpperCase())},<div style="height:64px"></div><b>${esc(fmtNama(kd.nama || '……………', 'u'))}</b></td></tr></table></div>`;
+      const tgS = new Date(d); tgS.setDate(tgS.getDate() + 1);
+      const surat = `<div class="paper sopdoc" style="font-size:11.5pt">${kop()}<table class="kv" style="width:100%"><tr><td style="width:80px">Nomor</td><td>: ${esc(st.surat_no || '……')}</td><td style="text-align:right">${esc(D)}, ${esc(fDate(isoOf(tgS)))}</td></tr><tr><td>Sifat</td><td>: Penting</td><td></td></tr><tr><td>Lampiran</td><td>: 1 (satu) berkas</td><td></td></tr><tr><td>Perihal</td><td>: Penyampaian Rancangan Peraturan Desa tentang APB Desa Tahun Anggaran ${esc(st.tahun)} untuk dievaluasi</td><td></td></tr></table>
+        <p>Kepada Yth.<br>Bupati Lumajang<br>c.q. Camat ${esc(s.kecamatan || '')}<br>di ${esc(s.kecamatan || 'Tempat')}</p>
+        <p style="text-align:justify">Memenuhi ketentuan Pasal 42 dan Pasal 43 ${esc(PB59)}, bersama ini kami sampaikan Rancangan Peraturan Desa tentang APB Desa ${esc(D)} Tahun Anggaran ${esc(st.tahun)} yang telah disepakati bersama BPD pada tanggal ${esc(fDate(st.tanggal))} untuk dievaluasi, dengan dilampiri:</p>
+        ${a78List(['Rancangan Peraturan Desa tentang APB Desa dan Rancangan Peraturan Kepala Desa tentang Penjabaran APB Desa;', 'Peraturan Desa tentang RKP Desa Tahun ' + esc(st.tahun) + ';', 'Peraturan Kepala Desa tentang kewenangan berdasarkan hak asal usul dan kewenangan lokal berskala desa;', 'Berita Acara Kesepakatan Bersama Kepala Desa dan BPD Nomor ' + esc(st.nomor || '……') + '; dan', 'Rencana Anggaran Biaya (RAB) kegiatan.'], i => (i + 1) + '.')}
+        <p>Demikian untuk menjadi maklum.</p>${a78TtdKades(st.tanggal, false)}</div>`;
+      return { pages: [ba, surat], ba: { jenis: 'Berita Acara Kesepakatan Bersama', tentang: 'Kesepakatan Bersama Kepala Desa dan BPD tentang Rancangan Peraturan Desa tentang APB Desa Tahun Anggaran ' + st.tahun, nomor: st.nomor, klasifikasi: String(st.nomor || '').split('/')[0] || '000.2.4', tanggal: st.tanggal, jam: st.jam, tempat: st.tempat, pihak1: st.ketua_bpd, jabatan1: 'Ketua BPD', pihak2: kd.nama, jabatan2: 'Kepala Desa', mengetahui: 'Tidak', hasil: 'Rancangan Perdes APB Desa TA ' + st.tahun + ' disepakati: pendapatan ' + rp(P) + ', belanja ' + rp(B) + ', pembiayaan netto ' + rp(T - K) } };
+    } },
+  lapawas: { t: 'Laporan Kegiatan Pengawasan / Pembinaan', ps: PM73S + ' Ps. 19–24', ic: 'eye',
+    init: (st, c) => { const j = (S.kfP && S.kfP.j) || 'mas'; const R = c.keg.filter(x => KF_LAPJ[j][2].test((x.nama || '') + ' ' + (x.materi || '') + ' ' + (x.ringkasan || ''))); Object.assign(st, { j, keg: (R[0] || c.keg[0] || {}).id || '' }); },
+    fields: c => [['j', 'Jenis laporan', 'select', Object.keys(KF_LAPJ).map(k => [k, KF_LAPJ[k][0]])], ['keg', 'Kegiatan (dari Agenda — undangan, peserta, hasil, foto)', 'select', c.keg.map(x => [x.id, fDate(x.tanggal) + ' — ' + (x.nama || '')])], ['tanggal', 'Tanggal laporan', 'date'], ['nomor', 'Nomor laporan (opsional)', 'text']],
+    cek: (st, c) => { const k = c.keg.find(x => x.id === st.keg) || {}, W = []; if (!k.id) W.push(['bad', 'Pilih kegiatan di Agenda. Catat dulu kegiatannya (undangan, peserta, hasil, foto) di menu Kegiatan → Agenda.']); else { if (!k.peserta) W.push(['warn', 'Kegiatan belum berisi daftar peserta/yang hadir.']); if (!k.ringkasan) W.push(['warn', 'Kegiatan belum berisi hasil/kesimpulan (notulen).']); let f = []; try { f = JSON.parse(k.foto || '[]'); } catch (x) { } if (!f.length) W.push(['warn', 'Belum ada foto kegiatan.']); } return W; },
+    doc: (st, c) => {
+      const J = KF_LAPJ[st.j] || KF_LAPJ.mas, k = c.keg.find(x => x.id === st.keg) || {}, D = ND(), kd = kfKd(c);
+      let F = []; try { F = JSON.parse(k.foto || '[]'); } catch (x) { }
+      const ps = String(k.peserta || '').split(/\n|;/).map(x => x.trim()).filter(Boolean);
+      const p1 = `<div class="paper sopdoc" style="font-size:11.5pt">${kop()}<div style="text-align:center;font-weight:700;line-height:1.4">LAPORAN ${esc(J[0].toUpperCase())}<br>DESA ${esc(String(D).toUpperCase())} TAHUN ${esc(String(k.tanggal || st.tanggal).slice(0, 4))}${st.nomor ? `<br><span style="font-weight:400">Nomor: ${esc(st.nomor)}</span>` : ''}</div>
+        <p><b>A. Dasar</b></p>${a78List(J[1].map(esc), i => (i + 1) + '.')}
+        <p><b>B. Pelaksanaan</b></p><table class="kv" style="width:100%"><tr><td style="width:150px">Nama kegiatan</td><td>: ${esc(k.nama || '')}</td></tr><tr><td>Hari/tanggal</td><td>: ${esc(k.tanggal ? HARI[parseD(k.tanggal).getDay()] + ', ' + fDate(k.tanggal) : '')}${k.jam ? ' pukul ' + esc(k.jam) : ''}</td></tr><tr><td>Tempat</td><td>: ${esc(k.tempat || '')}</td></tr><tr><td>Penyelenggara</td><td>: ${esc(k.penyelenggara || '')}</td></tr><tr><td>Materi/agenda</td><td>: ${esc(k.materi || k.keterangan || '')}</td></tr></table>
+        <p><b>C. Hasil pengawasan / kesimpulan (notulen)</b></p><div style="text-align:justify;white-space:pre-wrap">${esc(k.ringkasan || '……')}</div>
+        <p><b>D. Tindak lanjut</b></p><div style="text-align:justify">Rekomendasi/temuan dicatat dalam Register Pengawasan & Tindak Lanjut Desa dan ditindaklanjuti paling lama 60 hari kalender (Pasal 17 Permendagri 73/2020).</div>
+        <p><b>E. Lampiran</b>: undangan, daftar hadir, dan dokumentasi foto.</p>
+        <table style="width:100%;margin-top:14px"><tr><td style="width:50%;text-align:center">${esc(J[3])}<div style="height:64px"></div><b>(…………………………)</b></td><td style="text-align:center">${esc(D)}, ${esc(fDate(st.tanggal))}<br>KEPALA DESA ${esc(String(D).toUpperCase())},<div style="height:64px"></div><b>${esc(fmtNama(kd.nama || '', 'u'))}</b></td></tr></table></div>`;
+      const p2 = `<div class="paper sopdoc" style="font-size:11pt"><div style="text-align:center;font-weight:700">DAFTAR HADIR<br>${esc(String(k.nama || '').toUpperCase())}<br><span style="font-weight:400">${esc(k.tanggal ? fDate(k.tanggal) : '')} · ${esc(k.tempat || '')}</span></div><table class="pt" style="margin-top:8px"><thead><tr><th style="width:30px">No</th><th>Nama</th><th>Jabatan / Unsur</th><th style="width:120px">Tanda Tangan</th></tr></thead><tbody>${(ps.length ? ps : Array(15).fill('')).map((x, i) => { const a = String(x).split(/\s[-–—]\s|\|/); return `<tr style="height:28px"><td style="text-align:center">${i + 1}</td><td>${esc(a[0] || '')}</td><td>${esc(a[1] || '')}</td><td>${i % 2 ? '' : (i + 1) + '.'}</td></tr>`; }).join('')}</tbody></table></div>`;
+      const p3 = F.length ? `<div class="paper sopdoc"><div style="text-align:center;font-weight:700;margin-bottom:8px">DOKUMENTASI KEGIATAN</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${F.slice(0, 6).map(f => `<figure style="margin:0"><img src="${esc(thumb(f.id || f, 800))}" style="width:100%;height:220px;object-fit:cover;border:1px solid #999" alt=""><figcaption style="font-size:9pt;text-align:center">${esc(f.ket || k.nama || '')}</figcaption></figure>`).join('')}</div></div>` : '';
+      return { pages: [p1, p2].concat(p3 ? [p3] : []) };
+    } },
+  lkmd: { t: 'Laporan Kekayaan Milik Desa (LKMD)', ps: PB59S + ' Ps. 79; Kertas Kerja Inspektorat', ic: 'box', prep: true,
+    init: (st, c) => Object.assign(st, { tahun: String(c.th - 1), piutang: '', persediaan: '', investasi: '', cadangan: '', lain: '', utang_lain: '' }),
+    fields: c => [['tahun', 'Posisi per 31 Desember tahun', 'number'], ['tanggal', 'Tanggal laporan', 'date'], ['piutang', 'Piutang (mis. sewa TKD belum dibayar) Rp', 'number'], ['persediaan', 'Persediaan Rp', 'number'], ['investasi', 'Investasi / penyertaan modal BUMDes Rp', 'number'], ['cadangan', 'Dana cadangan Rp', 'number'], ['lain', 'Aset lainnya Rp', 'number'], ['utang_lain', 'Kewajiban lain Rp', 'number']],
+    load: async (st, c) => { const th = String(st.tahun), [A, bank, tunai, P] = await Promise.all([asetSemua({}), call('keuBuku', { tahun: th, buku: 'Bank', bulan: '' }).then(d => d.rows || []).catch(() => []), call('keuBuku', { tahun: th, buku: 'Tunai', bulan: '' }).then(d => d.rows || []).catch(() => []), ptaData(th).then(ptaPajak).catch(() => null)]); const b = (c.bum || []).filter(x => String(x.tahun) === th)[0]; if (b && !st.investasi) st.investasi = String(mNum(b.modal_desa) || ''); return { A, bank: kkSaldo(bank, th + '-12-31').saldo, tunai: kkSaldo(tunai, th + '-12-31').saldo, pajak: P ? P.jenis.reduce((t, x) => t + Math.max(0, x.sisa), 0) : 0 }; },
+    cek: (st, c) => [['warn', 'Kas bank & tunai dari Siskeudes per 31 Desember, aset tetap dari Inventaris (KIB) yang diperoleh s.d. 31 Desember, utang pajak = pajak dipungut belum disetor. Cocokkan dengan Neraca Siskeudes.']],
+    doc: (st, c) => {
+      const X = st._data || { A: [], bank: 0, tunai: 0, pajak: 0 }, th = String(st.tahun), D = ND(), kd = kfKd(c);
+      const A = X.A.filter(a => a.status !== 'Dihapus' && (!a.tgl_perolehan || String(a.tgl_perolehan) <= th + '-12-31') && (tahunOf(a.tgl_perolehan) || Number(a.tahun) || 0) <= Number(th));
+      const kib = KIB_OPT.map(k => [k, A.filter(a => kibHuruf(a) === k.charAt(0)).reduce((t, a) => t + asetNum(a.nilai) + asetNum(a.nilai_kapitalisasi), 0)]);
+      const n = v => mNum(v), lancar = X.bank + X.tunai + n(st.piutang) + n(st.persediaan), tetap = kib.reduce((t, x) => t + x[1], 0), aset = lancar + n(st.investasi) + tetap + n(st.cadangan) + n(st.lain), wajib = X.pajak + n(st.utang_lain);
+      const R = (l, v, b, ind) => `<tr><td style="padding-left:${(ind || 0) * 14 + 4}px">${b ? '<b>' + esc(l) + '</b>' : esc(l)}</td><td style="text-align:right">${b ? '<b>' : ''}${Number(v).toLocaleString('id-ID')}${b ? '</b>' : ''}</td></tr>`;
+      return { pages: [`<div class="paper sopdoc" style="font-size:11pt">${kop()}<div style="text-align:center;font-weight:700;line-height:1.4">LAPORAN KEKAYAAN MILIK DESA<br>PEMERINTAH DESA ${esc(String(D).toUpperCase())}<br>PER 31 DESEMBER ${esc(th)}</div>
+        <table class="pt" style="margin-top:8px"><thead><tr><th>Uraian</th><th style="text-align:right;width:160px">Jumlah (Rp)</th></tr></thead><tbody>
+        ${R('1. ASET', aset, 1)}${R('1.1 Aset Lancar', lancar, 1, 1)}${R('Kas di Bank', X.bank, 0, 2)}${R('Kas Tunai', X.tunai, 0, 2)}${R('Piutang', n(st.piutang), 0, 2)}${R('Persediaan', n(st.persediaan), 0, 2)}
+        ${R('1.2 Investasi (Penyertaan Modal BUM Desa)', n(st.investasi), 1, 1)}${R('1.3 Aset Tetap', tetap, 1, 1)}${kib.map(x => R(x[0], x[1], 0, 2)).join('')}${R('1.4 Dana Cadangan', n(st.cadangan), 1, 1)}${R('1.5 Aset Lainnya', n(st.lain), 1, 1)}
+        ${R('2. KEWAJIBAN', wajib, 1)}${R('Utang Pajak (pajak dipungut belum disetor)', X.pajak, 0, 2)}${R('Kewajiban lainnya', n(st.utang_lain), 0, 2)}
+        ${R('3. KEKAYAAN BERSIH (1 − 2)', aset - wajib, 1)}</tbody></table>
+        <div class="meta" style="font-size:9pt;margin-top:4px">Sumber: Buku Bank & Kas Tunai Siskeudes, Buku Inventaris Aset Desa (${A.length} catatan), buku pembantu pajak.</div>
+        ${a78TtdKades(st.tanggal || isoToday(), false)}</div>`] };
+    } },
+  inov: { t: 'Laporan Upaya Inovasi Peningkatan PADes', ps: 'SIMWAS B3 butir 2', ic: 'sprout', prep: true,
+    init: (st, c) => Object.assign(st, { latar: 'Pendapatan Asli Desa (PADes) Desa ' + ND() + ' sebagian besar berasal dari hasil pemanfaatan Tanah Kas Desa. Untuk meningkatkan PADes dan memenuhi ketentuan harga dasar sewa Perbup Lumajang 78/2021, Pemerintah Desa melakukan upaya inovasi berikut.', inovasi: 'Penyesuaian tarif sewa TKD sesuai harga dasar Pasal 15 Perbup 78/2021 | Kontrak sewa baru tertulis & setoran ke Rekening Kas Desa | Perdes pemanfaatan TKD\nPenguatan BUMDes (unit usaha baru) | Laba dan bagi hasil ke PADes | Analisa kelayakan & penyertaan modal\nPemanfaatan aset desa lain (gedung, lapangan) melalui sewa/KSP | Kontribusi tetap per tahun | Perjanjian & Perdes' }),
+    fields: c => [['tahun', 'Tahun', 'number'], ['tanggal', 'Tanggal laporan', 'date'], ['latar', 'Latar belakang', 'textarea'], ['inovasi', 'Upaya inovasi (satu per baris: upaya | hasil/target | tindak lanjut)', 'textarea']],
+    load: async (st) => { const th = Number(st.tahun), Y = [th - 2, th - 1, th]; const R = await Promise.all(Y.map(y => call('keuRealisasi', { tahun: String(y), sampai: y + '-12-31' }).catch(() => []))); return { Y, R: R.map(r => r.filter(x => /^4\.1/.test(String(x.kode || '')))) }; },
+    doc: (st, c) => {
+      const X = st._data || { Y: [], R: [] }, D = ND(), kd = kfKd(c), mf = (c.man || []).filter(x => x.status === 'Berlaku');
+      const rek = {}; X.R.forEach((r, i) => r.forEach(x => { const k = String(x.kode).split('.').slice(0, 3).join('.'); const o = rek[k] = rek[k] || { n: x.nama || x.uraian || k, v: [] }; o.v[i] = (o.v[i] || [0, 0]); o.v[i][0] += mNum(x.anggaran); o.v[i][1] += mNum(x.realisasi); }));
+      const I = String(st.inovasi || '').split('\n').map(x => x.split('|').map(y => y.trim())).filter(x => x[0]);
+      return { pages: [`<div class="paper sopdoc" style="font-size:11pt">${kop()}<div style="text-align:center;font-weight:700;line-height:1.4">LAPORAN UPAYA INOVASI PENINGKATAN PENDAPATAN ASLI DESA<br>DESA ${esc(String(D).toUpperCase())} TAHUN ${esc(st.tahun)}</div>
+        <p><b>A. Latar belakang</b></p><p style="text-align:justify">${esc(st.latar || '')}</p>
+        <p><b>B. Perkembangan PADes</b></p><table class="pt"><thead><tr><th>Rekening</th>${X.Y.map(y => `<th style="text-align:right">Anggaran ${y}</th><th style="text-align:right">Realisasi ${y}</th>`).join('')}</tr></thead><tbody>${Object.keys(rek).sort().map(k => `<tr><td>${esc(k)} ${esc(rek[k].n)}</td>${X.Y.map((y, i) => `<td style="text-align:right">${((rek[k].v[i] || [0])[0]).toLocaleString('id-ID')}</td><td style="text-align:right">${((rek[k].v[i] || [0, 0])[1]).toLocaleString('id-ID')}</td>`).join('')}</tr>`).join('') || '<tr><td colspan="7">Data realisasi PADes belum tersedia.</td></tr>'}</tbody></table>
+        <p><b>C. Pemanfaatan aset desa yang berlaku</b></p><table class="pt"><thead><tr><th>Bentuk</th><th>Objek</th><th>Mitra</th><th>Jangka waktu</th><th style="text-align:right">Nilai/tahun</th></tr></thead><tbody>${mf.map(m => `<tr><td>${esc(m.jenis || '')}</td><td>${esc(String(m.aset || '').split(' | ')[0] + (m.objek ? ' — ' + m.objek : ''))}</td><td>${esc(m.pihak2 || '')}</td><td>${esc(fDate(m.tgl_mulai) + ' s.d. ' + fDate(m.tgl_selesai))}</td><td style="text-align:right">${mNum(m.nilai_sepakat).toLocaleString('id-ID')}</td></tr>`).join('') || '<tr><td colspan="5">Belum ada catatan pemanfaatan (menu Aset → Pemanfaatan).</td></tr>'}</tbody></table>
+        <p><b>D. Upaya inovasi</b></p><table class="pt"><thead><tr><th style="width:30px">No</th><th>Upaya</th><th>Hasil / target</th><th>Tindak lanjut</th></tr></thead><tbody>${I.map((x, i) => `<tr><td style="text-align:center">${i + 1}</td><td>${esc(x[0])}</td><td>${esc(x[1] || '')}</td><td>${esc(x[2] || '')}</td></tr>`).join('')}</tbody></table>
+        <p><b>E. Penutup</b></p><p style="text-align:justify">Demikian laporan ini disusun sebagai bukti upaya peningkatan PADes dan bahan evaluasi.</p>${a78TtdKades(st.tanggal || isoToday(), false)}</div>`] };
+    } }
+};
+const KF_LAPJ = {
+  mas: ['Partisipasi Masyarakat dalam Pengawasan APB Desa', ['Pasal 23 dan Pasal 24 Peraturan Menteri Dalam Negeri Nomor 73 Tahun 2020 tentang Pengawasan Pengelolaan Keuangan Desa;', 'Pasal 47 dan Pasal 81 ' + PB59 + ' (informasi APB Desa kepada masyarakat).'], /musyawarah|musdes|sosialisasi|apb|pengawasan|realisasi|lpj|pertanggungjawaban/i, 'Perwakilan Masyarakat'],
+  bpd: ['Pengawasan BPD atas Pengelolaan Keuangan Desa', ['Pasal 20, Pasal 21, dan Pasal 22 Peraturan Menteri Dalam Negeri Nomor 73 Tahun 2020 tentang Pengawasan Pengelolaan Keuangan Desa;', 'Pasal 66 Peraturan Daerah Kabupaten Lumajang Nomor 7 Tahun 2016 tentang Penyelenggaraan Pemerintahan Desa (fungsi pengawasan BPD).'], /bpd|badan permusyawaratan|monitoring|pengawasan/i, 'KETUA BPD'],
+  kec: ['Pembinaan dan Pengawasan Keuangan Desa oleh Kecamatan', ['Pasal 19 Peraturan Menteri Dalam Negeri Nomor 73 Tahun 2020 tentang Pengawasan Pengelolaan Keuangan Desa;', 'Pasal 83 ayat (2) ' + PB59 + '.'], /kecamatan|camat|monev|pembinaan|evaluasi/i, 'CAMAT / PETUGAS KECAMATAN']
+};
+const isoOf = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+VIEWS.keudok = async (p, main, alive) => {
+  setTop('Dokumen Keuangan Desa', PB59S);
+  const S0 = S.kfD = S.kfD || {}; const d = (p && p.d) || S0.d || 'ppkd'; S0.d = d; S.kfP = p || {};
+  if (p && p.j && S0[d] && S0[d].j !== p.j && !p._d) { p._d = 1; delete S0[d]; }
+  main.innerHTML = '<div class="skel" style="height:240px"></div>';
+  if (!S.kfCtx || S.kfCtxT < Date.now() - 120000 || S.kfCtx.th !== Number(keuTh())) { S.kfCtx = await kfCtx(); S.kfCtxT = Date.now(); }
+  const c = S.kfCtx, D = DOKKEU[d]; if (alive && !alive()) return;
+  const tabs = `<div class="chips wrap">${Object.keys(DOKKEU).map(k => `<button class="chip ${k === d ? 'on' : ''}" data-act="kfD" data-v="${k}">${ic(DOKKEU[k].ic)} ${esc(DOKKEU[k].t)}</button>`).join('')}</div>`;
+  S.vh.kfD = t => go('keudok', { d: t.dataset.v }, true);
+  let st = S0[d];
+  if (!st) {
+    st = S0[d] = { tanggal: isoToday(), tahun: String(c.th), nomor: '' };
+    if (D.init) D.init(st, c);
+    if (D.simpan) { try { st.nomor = await nomorOtomatis(D.simpan, { tanggal: st.tanggal, klasifikasi: D.kla }); } catch (x) { } }
+  }
+  if (D.load && st._dth !== st.tahun) { try { st._data = await D.load(st, c); st._dth = st.tahun; } catch (x) { st._data = null; } if (alive && !alive()) return; }
+  const fld = f => {
+    const [k, l, t, o] = f, v = st[k];
+    if (t === 'select') return `<div class="f wide"><label>${esc(l)}</label><select data-k="${k}">${(o || []).map(x => `<option value="${esc(x[0])}" ${String(v) === String(x[0]) ? 'selected' : ''}>${esc(x[1])}</option>`).join('')}</select></div>`;
+    if (t === 'multi') return `<div class="f wide"><label>${esc(l)}</label><div class="a78ck" style="max-height:260px">${(o || []).map(x => `<label><input type="checkbox" data-k="${k}" data-multi="1" value="${esc(x[0])}" ${(v || []).indexOf(x[0]) >= 0 ? 'checked' : ''}><span>${esc(x[1])}</span></label>`).join('') || '<span class="meta">—</span>'}</div></div>`;
+    if (t === 'textarea') return `<div class="f wide"><label>${esc(l)}</label><textarea data-k="${k}" rows="4">${esc(v || '')}</textarea></div>`;
+    return `<div class="f"><label>${esc(l)}</label><input data-k="${k}" type="${t === 'number' ? 'number' : t === 'date' ? 'date' : 'text'}" value="${esc(v == null ? '' : v)}"></div>`;
+  };
+  main.innerHTML = `<div class="stack">${tabs}
+    <div class="card stack"><div><b style="font-size:15px">${esc(D.t)}</b> <span class="pill">${esc(D.ps)}</span></div>
+      <div class="form two" id="kfF">${D.fields(c).map(fld).join('')}</div>
+      ${D.simpan ? `<div class="meta">Nomor dibuat otomatis dari ${D.simpan === 'sk_kades' ? 'Buku Keputusan Kepala Desa' : 'Register Berita Acara'} (kode ${esc(D.kla)}). Boleh diubah.</div>` : ''}
+      <div id="kfW"></div>
+      <div class="btns"><button class="btn pri" data-act="kfCetakD">${ic('print')}Cetak / Word / PDF</button>${D.simpan && canWrite(D.simpan) ? `<button class="btn" data-act="kfSimpan">${ic('check')}Simpan ke ${D.simpan === 'sk_kades' ? 'Buku Keputusan' : 'Register Berita Acara'}</button>` : ''}<button class="btn" data-act="go" data-go='["keufrc"]'>${ic('scale')}Kelengkapan FRC</button><button class="btn" data-act="kfReset">${ic('list')}Mulai ulang</button></div></div>
+    <div id="kfPv" class="doc-prev fitp"></div></div>`;
+  if (!$('#sop78css')) document.head.insertAdjacentHTML('beforeend', SOP78_CSS);
+  let tm = 0;
+  const draw = () => { let r; try { r = D.doc(st, c); } catch (x) { $('#kfPv').innerHTML = `<div class="err">${esc(x.message)}</div>`; return; } $('#kfPv').innerHTML = r.pages.join(''); fitPapers($('#kfPv')); const W = D.cek ? D.cek(st, c) : []; $('#kfW').innerHTML = W.map(w => `<div class="${w[0] === 'bad' ? 'err' : 's78-frc'}" style="margin:2px 0">${esc(w[1])}</div>`).join(''); };
+  draw();
+  const F0 = $('#kfF');
+  const baca = ev => { const t = ev.target, k = t.dataset && t.dataset.k; if (!k) return; if (t.dataset.multi) { const A = new Set(st[k] || []); t.checked ? A.add(t.value) : A.delete(t.value); st[k] = Array.from(A); } else st[k] = t.value; if (k === 'tahun' && D.load && ev.type === 'change') return refresh(); clearTimeout(tm); tm = setTimeout(draw, 250); };
+  F0.addEventListener('input', baca); F0.addEventListener('change', baca);
+  S.vh.kfReset = () => { delete S0[d]; refresh(); };
+  S.vh.kfCetakD = () => { const r = D.doc(st, c); printDocs(D.t, r.pages, 'keudok_' + d); };
+  S.vh.kfSimpan = async t => {
+    const W = D.cek ? D.cek(st, c).filter(w => w[0] === 'bad') : [];
+    if (W.length && t.dataset.ok !== '1') { t.dataset.ok = '1'; t.innerHTML = ic('check') + 'Masih ada catatan merah. Tekan lagi untuk tetap menyimpan'; return; }
+    try {
+      const r = D.doc(st, c), e = D.simpan, rec = e === 'sk_kades' ? a78SkRecord(r.o, D.t + ' tahun ' + st.tahun) : r.ba;
+      const ada = st.nomor ? ((await call('list', { entity: e, filters: { nomor: st.nomor }, limit: 1 })).rows || [])[0] : null;
+      if (ada) rec.id = ada.id;
+      await call('save', { entity: e, record: rec }); S.kfCtxT = 0;
+      toast((ada ? 'Diperbarui' : 'Tersimpan') + ' di ' + UI[e].t + ' nomor ' + st.nomor + '. Unggah scan bertanda tangan di sana.');
+    } catch (x) { toast(x.message, 1); }
+  };
+};
+
+/* ---------- entitas: setoran pajak (termasuk yang belum diinput di Siskeudes) & BUMDes ---------- */
+const PAJAK_J2 = ['PPh Pasal 21', 'PPh Pasal 22', 'PPh Pasal 23', 'PPh Pasal 4 ayat (2)', 'PPN', 'Pajak Daerah', 'Lainnya'];
+Object.assign(UI, {
+  pajak_setor: {
+    t: 'Bukti Setor Pajak (NTPN)', ic: 'coin', read: 'r:keu_laporan', write: 'w:keu_penatausahaan', perm: 'w:keu_penatausahaan', sort: 'tanggal', year: 'tahun', excel: 1, folder: 'Keuangan/Bukti Setor Pajak',
+    intro: 'Pasal 67 ' + PB59S + ': seluruh pajak yang dipungut wajib disetor. Catat setiap bukti setor (NTPN) — terutama setoran yang belum diinput di Siskeudes — agar selisih pajak di FRC bisa dijelaskan (Kertas Kerja Inspektorat: selisih 2025 Rp5.682.036, 2026 Rp3.275.878).',
+    fields: [F('tahun', 'Tahun anggaran', 'number', { req: 1, def: () => keuTh() }), F('tanggal', 'Tanggal setor', 'date', { req: 1, def: isoToday }), F('jenis_pajak', 'Jenis pajak', 'select', { req: 1, opt: PAJAK_J2 }), F('masa', 'Masa pajak (bulan)', 'select', { opt: [''].concat(BULAN) }),
+      F('jumlah', 'Jumlah disetor (Rp)', 'money', { req: 1 }), F('ntpn', 'NTPN', 'text', { mono: 1 }), F('billing', 'Kode billing', 'text', { mono: 1 }), F('uraian', 'Untuk belanja / kegiatan / No. SPP', 'text', { wide: 1 }),
+      F('di_siskeudes', 'Sudah diinput di Siskeudes?', 'select', { opt: ['Belum', 'Ya', 'Tidak bisa (sistem terkunci)'], def: 'Belum' }), F('bukti', 'Scan bukti setor / BPN', 'file'), F('ket', 'Keterangan', 'textarea', { wide: 1 })],
+    chips: { k: 'jenis_pajak', opt: PAJAK_J2 },
+    views: [['Semua', () => ({})], ['Belum di Siskeudes', () => ({ di_siskeudes: 'Belum' })], ['Sistem terkunci', () => ({ di_siskeudes: 'Tidak bisa (sistem terkunci)' })]],
+    row: r => ({ t: (r.jenis_pajak || '') + ' · ' + fMoney(r.jumlah), s: [r.masa && 'masa ' + r.masa, r.ntpn && 'NTPN ' + r.ntpn, r.uraian].filter(Boolean).join(' · '), date: r.tanggal, av: ic('coin'), pill: `<span class="pill ${r.di_siskeudes === 'Ya' ? 'ok' : 'warn'}">${r.di_siskeudes === 'Ya' ? 'Di Siskeudes' : 'Luar Siskeudes'}</span>` }),
+    tools: () => `<button class="btn sm" data-act="go" data-go='["keupajakrek"]'>${ic('scale')}Rekonsiliasi pajak</button>`
+  },
+  bumdes_lap: {
+    t: 'BUM Desa — Profil & Laporan Tahunan', ic: 'landmark', read: 'r:keu_laporan', write: 'w:keu_penatausahaan', perm: 'w:keu_penatausahaan', sort: 'tahun', year: 'tahun', excel: 1, folder: 'Keuangan/BUM Desa',
+    intro: 'SIMWAS B3 butir 3. Kertas Kerja Inspektorat 29 Okt 2026 meminta: bukti pembentukan (Perdes pendirian), Perkades AD/ART, bukti penyertaan modal (Perdes/Perkades, buku rekening BUMDes, tanda terima), analisa kelayakan, administrasi keuangan, posisi keuangan & daftar inventaris BUMDes per 31 Desember, data intervensi kepada masyarakat miskin.',
+    fields: [F('_h1', 'Identitas', 'head'), F('tahun', 'Posisi per 31 Desember tahun', 'number', { req: 1, def: () => String(Number(keuTh()) - 1) }), F('nama_bumdes', 'Nama BUM Desa', 'text', { req: 1, wide: 1 }), F('direktur', 'Direktur / Ketua', 'text'), F('unit_usaha', 'Unit usaha', 'text', { wide: 1 }),
+      F('_h2', 'Dasar pembentukan & penyertaan modal', 'head'), F('perdes_pendirian', 'Perdes pendirian (nomor, tanggal)', 'text', { wide: 1, listFrom: { e: 'perdes', k: x => 'Nomor ' + x.nomor + ' Tahun ' + (x.tahun || '') + ' tentang ' + (x.tentang || '') } }), F('adart', 'Perkades / dokumen AD-ART (nomor)', 'text', { wide: 1 }), F('badan_hukum', 'Sertifikat badan hukum Kemenkumham', 'text', { wide: 1 }),
+      F('penyertaan', 'Penyertaan modal desa', 'rows', { cols: [['tahun', 'Tahun', 'text'], ['dasar', 'Perdes/Perkades', 'text'], ['nilai', 'Nilai (Rp)', 'money'], ['terima', 'Tanggal tanda terima', 'text']] }), F('modal_desa', 'Total modal desa s.d. 31 Des (Rp)', 'money'), F('rekening', 'Bank & nomor rekening BUMDes', 'text'), F('analisa', 'Analisa kelayakan usaha (scan)', 'file'),
+      F('_h3', 'Posisi keuangan 31 Desember', 'head'), F('aset_total', 'Total aset (Rp)', 'money'), F('kewajiban', 'Kewajiban (Rp)', 'money'), F('ekuitas', 'Ekuitas (Rp)', 'money'), F('pendapatan', 'Pendapatan usaha setahun (Rp)', 'money'), F('biaya', 'Biaya setahun (Rp)', 'money'), F('laba', 'Laba/(rugi) bersih (Rp)', 'money'), F('pades', 'Bagi hasil disetor ke Kas Desa (Rp)', 'money'),
+      F('_h4', 'Dokumen & intervensi', 'head'), F('lap_keu', 'Laporan keuangan BUMDes (scan)', 'file'), F('inventaris', 'Daftar inventaris BUMDes per 31 Des (scan)', 'file'), F('miskin', 'Ada intervensi kepada masyarakat miskin?', 'select', { opt: ['', 'Y', 'T'] }), F('miskin_uraian', 'Uraian intervensi (jumlah KPM, bentuk)', 'textarea', { wide: 1, when: { k: 'miskin', v: ['Y'] } }), F('ket', 'Keterangan', 'textarea', { wide: 1 })],
+    calc: v => { const a = mNum(v.aset_total), k = mNum(v.kewajiban), p = mNum(v.pendapatan), b = mNum(v.biaya), o = {}; if (a && k && !v.ekuitas) o.ekuitas = String(a - k); if (p && b) o.laba = String(p - b); return Object.keys(o).length ? o : null; },
+    row: r => ({ t: (r.nama_bumdes || '') + ' · ' + (r.tahun || ''), s: [r.unit_usaha, r.laba && 'laba ' + fMoney(r.laba), r.pades && 'PADes ' + fMoney(r.pades)].filter(Boolean).join(' · '), av: ic('landmark'), pill: mNum(r.laba) > 0 ? '<span class="pill ok">Laba</span>' : '' }),
+    extra: (x, el) => {
+      const C = [['Perdes pendirian', x.perdes_pendirian], ['AD/ART', x.adart], ['Penyertaan modal', x.penyertaan && x.penyertaan !== '[]'], ['Rekening BUMDes', x.rekening], ['Analisa kelayakan', x.analisa], ['Posisi keuangan 31 Des', x.aset_total], ['Laporan keuangan', x.lap_keu], ['Daftar inventaris', x.inventaris], ['Intervensi masyarakat miskin (Y/T)', x.miskin]];
+      el.insertAdjacentHTML('beforeend', `<div class="card"><div class="sec-h"><h2>${ic('check')} Kelengkapan untuk FRC B3</h2></div>${C.map(c => `<div class="row" style="cursor:default"><span class="av" style="color:var(--${c[1] ? 'ok' : 'bad'})">${ic(c[1] ? 'check' : 'x')}</span><span class="main"><span class="t">${esc(c[0])}</span></span></div>`).join('')}</div>`);
+    }
+  }
+});
+/* ---------- rekonsiliasi pajak: Siskeudes vs bukti setor ---------- */
+VIEWS.keupajakrek = async (p, main, alive) => {
+  const th = keuTh(); setTop('Rekonsiliasi Pajak', 'Tahun ' + th);
+  main.innerHTML = '<div class="skel" style="height:240px"></div>';
+  const [D, ps] = await Promise.all([ptaData(th).then(ptaPajak).catch(() => ({ jenis: [], belum: [] })), call('list', { entity: 'pajak_setor', filters: { tahun: String(th) }, limit: 3000 }).then(r => r.rows || []).catch(() => [])]);
+  if (alive && !alive()) return;
+  const norm = j => { j = String(j || ''); return /21/.test(j) ? 'PPh Pasal 21' : /22/.test(j) ? 'PPh Pasal 22' : /23/.test(j) ? 'PPh Pasal 23' : /4/.test(j) && /pph/i.test(j) ? 'PPh Pasal 4 ayat (2)' : /ppn/i.test(j) ? 'PPN' : /daerah|pdrd|restoran/i.test(j) ? 'Pajak Daerah' : j || 'Lainnya'; };
+  const M = {}; D.jenis.forEach(x => { const k = norm(x.j), o = M[k] = M[k] || { pu: 0, se: 0, lu: 0 }; o.pu += x.pungut; o.se += x.setor; });
+  ps.filter(x => x.di_siskeudes !== 'Ya').forEach(x => { const k = norm(x.jenis_pajak), o = M[k] = M[k] || { pu: 0, se: 0, lu: 0 }; o.lu += mNum(x.jumlah); });
+  const K = Object.keys(M), T = K.reduce((t, k) => [t[0] + M[k].pu, t[1] + M[k].se, t[2] + M[k].lu], [0, 0, 0]), sel = o => o.pu - o.se - o.lu;
+  const tabel = cetak => `<table class="${cetak ? 'pt' : 'tbl'}"><thead><tr><th>Jenis pajak</th><th style="text-align:right">Dipungut (Siskeudes)</th><th style="text-align:right">Disetor (Siskeudes)</th><th style="text-align:right">Disetor di luar Siskeudes</th><th style="text-align:right">Selisih</th></tr></thead><tbody>${K.map(k => `<tr><td>${esc(k)}</td><td style="text-align:right">${rp(M[k].pu)}</td><td style="text-align:right">${rp(M[k].se)}</td><td style="text-align:right">${rp(M[k].lu)}</td><td style="text-align:right;${Math.abs(sel(M[k])) > 1 ? 'color:var(--bad);font-weight:700' : ''}">${rp(sel(M[k]))}</td></tr>`).join('') || '<tr><td colspan="5">Belum ada data pajak.</td></tr>'}<tr class="tot"><td><b>Jumlah</b></td><td style="text-align:right"><b>${rp(T[0])}</b></td><td style="text-align:right"><b>${rp(T[1])}</b></td><td style="text-align:right"><b>${rp(T[2])}</b></td><td style="text-align:right"><b>${rp(T[0] - T[1] - T[2])}</b></td></tr></tbody></table>`;
+  const net = T[0] - T[1] - T[2];
+  main.innerHTML = `<div class="stack">
+    <div class="card"><div class="kd-h"><b>${ic('scale')} Pajak dipungut vs disetor</b><span class="chips">${[Number(th) - 1, Number(th)].map(y => `<button class="chip ${String(y) === String(th) ? 'on' : ''}" data-act="prTh" data-v="${y}">${y}</button>`).join('')}</span></div>
+      <div class="meta">Selisih positif = pajak sudah dipungut tetapi belum ada bukti setor. Setoran yang sudah dibayar tetapi belum diinput di Siskeudes dicatat di <b>Bukti Setor Pajak</b> (pilih "Belum" / "sistem terkunci") sehingga ikut dihitung di kolom luar Siskeudes.</div>
+      <div style="overflow:auto;margin-top:6px">${tabel()}</div>
+      <div class="${Math.abs(net) > 1 ? 'err' : 's78-frc'}" style="margin-top:6px">${!K.length ? 'Belum ada data pajak tahun ini. Impor data Siskeudes dulu.' : Math.abs(net) > 1 ? (net > 0 ? 'Masih ada pajak dipungut ' + rp(net) + ' yang belum ada bukti setornya. Telusuri SPP/kuitansi bulan terkait, lalu catat bukti setornya.' : 'Setoran melebihi pungutan ' + rp(-net) + '. Periksa setoran ganda atau pungutan yang belum dicatat.') : 'Pungutan dan setoran sudah cocok.'}</div>
+      <div class="btns"><button class="btn pri" data-act="go" data-go='["form",{"e":"pajak_setor"}]'>${ic('plus')}Catat bukti setor</button><button class="btn" data-act="go" data-go='["list",{"e":"pajak_setor"}]'>${ic('list')}Daftar bukti setor (${ps.length})</button><button class="btn" data-act="go" data-go='["keupajak"]'>${ic('chart')}Rekap pajak per bulan</button><button class="btn" data-act="prCetak">${ic('print')}Cetak rekonsiliasi & surat penjelasan</button></div></div>
+    ${D.belum.length ? `<div class="card"><div class="kd-h"><b>Pungutan belum dipasangkan dengan setoran di Siskeudes (${D.belum.length})</b></div><div style="overflow:auto"><table class="tbl"><thead><tr><th>Tanggal</th><th>Pajak</th><th>Uraian</th><th style="text-align:right">Jumlah</th></tr></thead><tbody>${D.belum.slice(0, 200).map(x => `<tr><td>${esc(fDate(x.tanggal))}</td><td>${esc(x.pajak || '')}</td><td>${esc(x.uraian || x.no_bukti || '')}</td><td style="text-align:right">${rp(x.jumlah)}</td></tr>`).join('')}</tbody></table></div></div>` : ''}</div>`;
+  S.vh.prTh = t => { S.keuTh = t.dataset.v; refresh(); };
+  S.vh.prCetak = () => {
+    const s = S.set || {}, D2 = ND();
+    printDocs('Rekonsiliasi Pajak ' + th, [`<div class="paper">${kop()}<h2 style="text-align:center">REKONSILIASI PAJAK DIPUNGUT DAN DISETOR<br>TAHUN ANGGARAN ${esc(th)}</h2>${tabel(1)}
+      <h3>Daftar bukti setor di luar Siskeudes</h3><table class="pt"><thead><tr><th>No</th><th>Tanggal</th><th>Jenis</th><th>Masa</th><th>NTPN</th><th>Uraian</th><th style="text-align:right">Jumlah</th></tr></thead><tbody>${ps.filter(x => x.di_siskeudes !== 'Ya').map((x, i) => `<tr><td>${i + 1}</td><td>${esc(fDate(x.tanggal))}</td><td>${esc(x.jenis_pajak || '')}</td><td>${esc(x.masa || '')}</td><td>${esc(x.ntpn || '')}</td><td>${esc(x.uraian || '')}</td><td style="text-align:right">${rp(x.jumlah)}</td></tr>`).join('') || '<tr><td colspan="7">-</td></tr>'}</tbody></table>
+      <table style="width:100%;margin-top:14px"><tr><td style="width:50%;text-align:center">KEPALA URUSAN KEUANGAN,<div style="height:60px"></div><b>(…………………………)</b></td><td style="text-align:center">${esc(D2)}, ${esc(fDate(isoToday()))}<br>KEPALA DESA ${esc(String(D2).toUpperCase())},<div style="height:60px"></div><b>${esc(fmtNama(s.nama_kades || '', 'u'))}</b></td></tr></table></div>`,
+      `<div class="paper sopdoc" style="font-size:11.5pt">${kop()}<div style="text-align:center;font-weight:700">SURAT PERNYATAAN<br>PENJELASAN SELISIH PAJAK TAHUN ANGGARAN ${esc(th)}</div>
+      <p>Yang bertanda tangan di bawah ini Kepala Desa ${esc(D2)} Kecamatan ${esc(s.kecamatan || '')} Kabupaten ${esc(s.kabupaten || '')}, menyatakan bahwa:</p>
+      ${a78List(['Berdasarkan data Siskeudes, pajak yang dipungut Tahun Anggaran ' + esc(th) + ' sebesar ' + esc(rp(T[0])) + ' dan yang tercatat disetor sebesar ' + esc(rp(T[1])) + ';', 'Terdapat setoran pajak sebesar ' + esc(rp(T[2])) + ' yang telah disetor ke Kas Negara/Daerah dengan bukti setor (NTPN) terlampir, namun belum/tidak dapat diinput di Siskeudes' + (ps.some(x => /terkunci/.test(x.di_siskeudes || '')) ? ' karena sistem telah terkunci' : '') + ';', 'Setelah rekonsiliasi, selisih pajak yang belum disetor adalah ' + esc(rp(Math.max(0, net))) + (net > 1 ? ' dan akan disetor/ditelusuri paling lambat ……………' : '') + ';', 'Pemerintah Desa akan lebih tertib melakukan penyetoran dan pencatatan pajak sesuai Pasal 67 ' + esc(PB59) + '.'], i => (i + 1) + '.')}
+      <p>Demikian surat pernyataan ini dibuat dengan sebenarnya.</p>${a78TtdKades(isoToday(), false)}</div>`], 'keupajakrek');
+  };
+};
+/* ---------- temuan Kertas Kerja 29 Okt 2026 → Pengawasan & Tindak Lanjut ---------- */
+const KK29_TEMUAN = [
+  ['Mandatory 2', 'Pelayanan', 'M2: bukti kesadaran masyarakat mencegah gratifikasi, suap & konflik kepentingan 0%; keterlibatan LKD dan masyarakat dalam pembangunan 70%.', 'Unggah bukti dukung (survei perilaku, surat edaran, dokumentasi) ke FRC.'],
+  ['Mandatory 3', 'Lainnya', 'M3 Kearifan lokal 14%: budaya lokal/hukum adat pencegah korupsi 0%; tokoh masyarakat/agama/adat/pemuda/perempuan pendorong antikorupsi 28%.', 'Lengkapi dokumentasi dengan narasi nilai antikorupsi (jujur, mandiri, tanggung jawab, berani, sederhana, peduli, disiplin, adil, kerja keras) dan SK/SE penetapan tokoh.'],
+  ['Mandiri 1 (B1)', 'Keuangan Desa', 'B1 Perencanaan & Penganggaran 27%: RPJMDes, RKPDes, APBDes 2026 (murni & perubahan) + Daftar Rencana Pembangunan & RAB, rancangan RKPDes & APBDes 2027 + RAB, dan bukti keterlibatan masyarakat belum diunggah; Rancangan Perdes APBDes N+1 disepakati paling lambat Oktober 0%.', 'Unggah dokumen; buat BA Kesepakatan Bersama Kades–BPD APBDes 2027 (Perbup 59/2018 Ps. 40). Lakukan update data berkala.'],
+  ['Mandiri 2 (B2)', 'Keuangan Desa', 'B2 Penatausahaan 56%: SK PPKD & Pelaksana Kegiatan, SK Operator Siskeudes, dokumen penatausahaan bulanan s.d. Sep 2026, publikasi realisasi, laporan keuangan (Neraca, LRA, LKMD) belum diunggah. Kas tunai ≤ Rp5 juta 0%, pajak 0%: belum ada buku bantu pajak & bukti setor 2025–2026; selisih pajak 2025 Rp5.682.036 dan 2026 Rp3.275.878 karena pajak disetor belum diinput di Siskeudes (2025 terkunci).', 'Unggah dokumen; catat bukti setor pajak (NTPN) dan buat rekonsiliasi + surat penjelasan selisih pajak; batasi kas tunai Rp5 juta (Perbup 59/2018 Ps. 53).'],
+  ['Mandiri 3 (B3)', 'Keuangan Desa', 'B3 PADes 13%: capaian pendapatan 0%, laporan inovasi PADes 0%, BUMDes 40% (Perdes pendirian, AD/ART, penyertaan modal + rekening + tanda terima, analisa kelayakan, administrasi keuangan, posisi keuangan & inventaris 31 Des 2025, intervensi masyarakat miskin Y/T).', 'Lengkapi data BUMDes 2025 dan Laporan Upaya Inovasi PADes 2026.'],
+  ['Mandiri 4 (B4)', 'Keuangan Desa', 'B4 Pengawasan 0%: laporan partisipasi masyarakat dalam pengawasan APBDes, laporan pengawasan BPD, laporan pembinaan & pengawasan kecamatan, laporan tindak lanjut desa atas hasil evaluasi belum ada (minimal undangan, daftar hadir, notulen, foto).', 'Susun laporan pengawasan dari Agenda Kegiatan; tindak lanjuti rekomendasi ≤ 60 hari (Permendagri 73/2020 Ps. 17).'],
+  ['Mandiri 6 (C2)', 'Aset/Barang Desa', 'C2 Pengadaan 18%: sertifikat PBJ a.n. Soma Romadhoni tetapi SK TPK tidak disajikan; laporan TPK, kontrak, surat permintaan & penawaran belum ada; proses PBJ berpotensi tidak sesuai karena belum ada survei harga memadai. Kontrak CCTV (Rp33,5 juta, Genet Mandiri Teknologi) dan PJU (Rp60 juta, swakelola) belum diunggah.', 'Buat SK TPK 2026, unggah kontrak & dokumen pengadaan CCTV/PJU di FRC Mandiri 6.'],
+  ['Mandiri 8 (P1)', 'Pelayanan', 'Pelayanan publik 30%: SOP pelayanan terbaru, kondisi sarpras pelayanan + KIP, laporan hasil & tindak lanjut survei kepuasan belum lengkap.', 'Unggah SOP/standar pelayanan terbaru, foto sarpras & KIP, laporan SKM + RTL.'],
+  ['Mandiri 9 (K1)', 'Lainnya', 'Kelembagaan 82%: struktur organisasi diunggah ulang; Kadus Krajan I kosong (meninggal Jan 2026); penghasilan TKD tidak disetor ke kas desa dan perangkat tidak memperoleh tambahan penghasilan; PK agar dilengkapi target; bukti peningkatan kapasitas tahun berjalan.', 'Unggah struktur organisasi terbaru, proses pengisian Kadus, PK dengan target, sertifikat pelatihan 2026.'],
+  ['Mandiri 10 (S1)', 'Lainnya', 'Statistik desa 7%: capaian PBB 19,30% (Rp25.128.425, sisa Rp105.050.543) — koordinator tidak memperoleh setoran dari petugas pungut; dukungan IPM 0%; aset negara 0%; monografi 30% (perlu unduhan dari sistem informasi desa); SDGs 0%; pemantauan harga komoditas 0%; PTSL 20% (perlu surat pernyataan kades tidak ada PTSL 2026).', 'Lengkapi dokumen statistik dari aplikasi (monografi, harga komoditas, aset negara) dan surat pernyataan PTSL.'],
+  ['Mandiri 11 (G1)', 'Keuangan Desa', 'Register risiko 5%: identifikasi risiko 2025 tanpa sebab, akibat, RTP & target waktu; identifikasi & RTP 2026 belum ada; laporan manajemen risiko fraud ke Camat tembusan Inspektur belum ada.', 'Isi Register Risiko Fraud 2026 lengkap dan cetak laporan ke Camat tembusan Inspektur.'],
+  ['Mandiri 12 (G2)', 'Pelayanan', 'Anti pungli 20%: publikasi anti pungli di pelayanan 0%; SK Satgas Anti Pungli 470/05/427.85.01/2025 belum menguraikan tugas; sosialisasi 2026 belum ada; kolaborasi dengan TNI/Polri belum ada.', 'Pasang poster Zona Bebas Pungli, revisi SK Satgas dengan uraian tugas, laksanakan sosialisasi, libatkan Babinsa/Bhabinkamtibmas.']
+];
+async function kfImporKK() {
+  try {
+    const ada = ((await call('list', { entity: 'pengawasan', limit: 1000 })).rows || []).map(x => String(x.temuan || '').slice(0, 40));
+    const baru = KK29_TEMUAN.filter(f => ada.indexOf(f[2].slice(0, 40)) < 0);
+    if (!baru.length) return toast('Temuan Kertas Kerja 29 Okt sudah tercatat semua.');
+    const rows = baru.map(f => ({ tanggal: '2026-10-29', sumber: PW_SUMBER.find(x => /inspektorat/i.test(x)) || PW_SUMBER[0], objek: f[1], judul: 'Kertas Kerja FRC Inspektorat Daerah (periode Jan–Sep 2026) — ' + f[0], temuan: f[2], rekomendasi: f[3], status: 'Dalam proses' }));
+    const r = await call('bulkSave', { entity: 'pengawasan', rows }); if (r.gagal && r.gagal.length) throw new Error(r.gagal[0].pesan);
+    toast(rows.length + ' temuan dicatat di Pengawasan & Tindak Lanjut.');
+  } catch (x) { toast(x.message, 1); }
+}
+
 /* ---------- susunan menu Aset yang diringkas: grup + tab di atas halaman ---------- */
 const ASET_GRP = {
   data: { t: 'Data Aset & Transaksi', ic: 'box', it: [['Inventaris (KIB)', ['list', { e: 'aset' }], 'aset'], ['Transaksi SIPADES', ['list', { e: 'aset_trx' }], 'aset_trx']] },
@@ -13378,6 +13824,7 @@ Object.assign(ASET_GRP, {
   sosial: { t: 'Data Rentan & Bansos', ic: 'heart', own: 1, it: [['Data rentan', ['list', { e: 'rentan' }], 'rentan'], ['DTSEN keluarga', ['list', { e: 'dtsen' }], 'dtsen'], ['Usulan bansos', ['list', { e: 'usulan_bansos' }], 'usulan_bansos'], ['Musdes/Muskel', ['list', { e: 'musdes_bansos' }], 'musdes_bansos'], ['Penyaluran', ['list', { e: 'penyaluran_bansos' }], 'penyaluran_bansos']] },
   lembaga: { t: 'Lembaga & Guru Ngaji', ic: 'landmark', it: [['Lembaga / yayasan', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru ngaji', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
   ats: { t: 'Anak Tidak Sekolah (ATS)', ic: 'book', own: 1, it: [['Verifikasi ATS', ['ats'], null, 'r:ats'], ['Siap diinput ke situs ATS', ['ats', { f: 'input' }], null, 'ats_operator']] },
+  keufrc: { t: 'Kelengkapan FRC Keuangan', ic: 'scale', it: [['Kelengkapan B1–B4', ['keufrc'], null, 'r:keu_laporan'], ['SK, BA & laporan', ['keudok'], null, 'r:keu_laporan'], ['Rekonsiliasi pajak', ['keupajakrek'], null, 'r:keu_laporan'], ['Bukti setor pajak', ['list', { e: 'pajak_setor' }], 'pajak_setor'], ['BUM Desa', ['list', { e: 'bumdes_lap' }], 'bumdes_lap']] },
   bangun: { t: 'RAB & Pembangunan', ic: 'hammer', it: [['RAB & gambar', ['rab', {}], null, 'r:rab'], ['Progres pembangunan', ['list', { e: 'pembangunan' }], 'pembangunan'], ['Referensi harga & AHSP', ['refs'], null, 'r:rkp']] }
 });
 const ASET_KEY_GRP = {}; Object.keys(ASET_GRP).forEach(g => ASET_GRP[g].it.forEach(it => { ASET_KEY_GRP[asetKey(it[1][0], it[1][1])] = g; }));
@@ -15724,6 +16171,7 @@ const FG = {
   sert: ['Sertifikat Aparatur', ['list', { e: 'aparat_sert' }]], aparat: ['Aparatur', ['list', { e: 'aparat' }]], skbpd: ['SK BPD', ['list', { e: 'sk_bpd' }]],
   layanan: ['Produk Layanan', ['list', { e: 'produk_layanan' }]], kir: ['Kartu Inventaris Ruangan', ['list', { e: 'aset_ruang' }]], lembaga: ['Lembaga Desa', ['list', { e: 'lembaga' }]],
   pbb: ['Data PBB', ['list', { e: 'tanah_desa' }]], pstat: ['Statistik Penduduk', ['pstat']], rentan: ['Data Rentan', ['list', { e: 'rentan' }]], sosrekap: ['Rekap Sosial', ['sosrekap']],
+  keufrc: ['Kelengkapan FRC Keuangan', ['keufrc']], ppkd: ['Buat SK PPKD', ['keudok', { d: 'ppkd' }]], pkk: ['Buat SK Pelaksana Kegiatan', ['keudok', { d: 'pk' }]], tpk: ['Buat SK TPK', ['keudok', { d: 'tpk' }]], opr: ['Buat SK Operator Siskeudes', ['keudok', { d: 'opr' }]], kb: ['Buat BA Kesepakatan APBDes', ['keudok', { d: 'kb' }]], lkmd: ['Laporan Kekayaan Milik Desa', ['keudok', { d: 'lkmd' }]], inov: ['Laporan Inovasi PADes', ['keudok', { d: 'inov' }]], lapawas: ['Laporan pengawasan masyarakat', ['keudok', { d: 'lapawas', j: 'mas' }]], lapbpd: ['Laporan pengawasan BPD', ['keudok', { d: 'lapawas', j: 'bpd' }]], lapkec: ['Laporan pembinaan Kecamatan', ['keudok', { d: 'lapawas', j: 'kec' }]], pajakrek: ['Rekonsiliasi Pajak', ['keupajakrek']], pajaksetor: ['Bukti Setor Pajak', ['list', { e: 'pajak_setor' }]], bumdes: ['Data BUMDes', ['list', { e: 'bumdes_lap' }]],
   bansos: ['Penyaluran Bansos', ['list', { e: 'penyaluran_bansos' }]], musbansos: ['Musdes Bansos', ['list', { e: 'musdes_bansos' }]], usulbansos: ['Usulan Bantuan', ['list', { e: 'usulan_bansos' }]]
 };
 const g_ = (...k) => k.map(x => FG[x]);
@@ -15764,31 +16212,31 @@ const FRC_IND = [
     n: ['Keberadaan RPJMDes, RKPDes, APBDes Tahun berjalan (N), dan dilampiri Daftar Rencana Pembangunan dan Keberadaan RAB', 'Rancangan Peraturan Desa tentang APBDesa (N+1) disepakati antara Kepala Desa dan BPD paling lambat bulan Oktober tahun berjalan', 'Keterlibatan Masyarakat dalam Perencanan/ Pengangggaran'],
     l: [L_('RPJMDes', { nv: '1', ni: 0, go: g_('rpjm', 'rpjmdok'), cek: 'rpjm' }), L_('RKPDes', { nv: '1', ni: 0, go: g_('rkp'), cek: 'rkp' }), L_('APBDes', { nv: '1', ni: 0, go: g_('apb', 'lamp'), cek: 'apbdes' }),
       L_('Lampiran APBD (Daftar Rencana Pembangunan & RAB)', { nv: '1', ni: 0, go: g_('rab', 'rak', 'paket') }), L_('Rancangan Perdes tentang APB Desa', { ni: 1, go: g_('perdes', 'lamp') }),
-      L_('Kesepakatan Kepala Desa dan BPD', { ni: 1, go: g_('ba') }), L_('Undangan, daftar hadir, notulen, bukti keterlibatan masyarakat/ hal lainnya', { ni: 2, go: g_('musrkp'), cek: 'musrkp' })],
+      L_('Kesepakatan Kepala Desa dan BPD', { ni: 1, go: g_('kb', 'ba') }), L_('Undangan, daftar hadir, notulen, bukti keterlibatan masyarakat/ hal lainnya', { ni: 2, go: g_('musrkp'), cek: 'musrkp' })],
     dh: ['Pasal 79 Undang-Undang Republik Indonesia Nomor 6 Tahun 2014 Tentang Desa', 'Pasal 96, 120 Perda Kab. Lumajang no. 7 tahun 2016 tentang Penyelenggaraan Pemdes -- RKPDes', 'Pasal 4 Perbup No. 40 Tahun 2018 Petunjuk Teknis Penyusunan RPJM Des dan RKP Des', 'Pasal 3 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 20 Tahun 2018 Tentang Pengelolaan Keuangan Desa', 'Pasal 54 Undang-Undang Republik Indonesia Nomor 6 Tahun 2014 Tentang Desa', 'Pasal 39 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 20 Tahun 2018 Tentang Pengelolaan Keuangan Desa', 'Pasal 113 Peraturan Daerah Kabupaten Lumajang Nomor 7 2016 tentang Penyelenggaraan Pemerintahan Desa'] },
   { k: 'B2', g: 'Mandiri', no: '2', j: 'Pengelolaan Keuangan Desa — B2. Penatausahaan Keuangan',
     n: ['Keberadaan SK Penetapan Pelaksana Pengelolaan Keuangan Desa (PPKD) dan SK Pelaksana Kegiatan', 'Keberadaan Penunjukan Operator Siskeudes Tingkat Desa', 'Keberadaan Dokumen Penatausahaan keuangan dan pertanggungjawaban Tribulanan: Laporan Realisasi Pelaksanaan APBDes tahunan (tribulan IV) dan Semesteran (tribulan II), Buku Kas Umum (BKU) Tribulanan dan Buku Pembantu, Catatan Atas laporan keuangan Desa Akhir tahun (Tribulan IV), Saldo rekening koran Bank Tribulan', 'Kepatuhan penyimpanan Uang Kas Tunai Tidak melebihi ketentuan', 'Kepatuhan Penyetoran Pajak', 'Telah memanfaatkan Siskeudes Online', 'Publikasi Realisasi APBDes Tahun Sebelumnya', 'Persiapan Penyusunan Laporan Keuangan/ Audit Laporan Keuangan BPK'],
-    l: [L_('Keputusan penetapan PPKD', { nv: '1', ni: 0, go: g_('sk') }), L_('Penugasan Pelaksana Kegiatan/Nama lain', { nv: '1', ni: 0, go: g_('sk') }), L_('Penetapan/penunjukan Operator sistem untuk tingkat pemerintahan desa', { ni: 1, go: g_('sk') }),
+    l: [L_('Keputusan penetapan PPKD', { nv: '1', ni: 0, go: g_('ppkd', 'sk') }), L_('Penugasan Pelaksana Kegiatan/Nama lain', { nv: '1', ni: 0, go: g_('pkk', 'tpk', 'sk') }), L_('Penetapan/penunjukan Operator sistem untuk tingkat pemerintahan desa', { ni: 1, go: g_('opr', 'sk') }),
       L_('Laporan Realisasi Pelaksanaan APBDes', { nv: '1', ni: 2, go: g_('lra1', 'lra2'), cek: 'realisasi' }), L_('Buku Kas Umum (BKU) Tribulanan dan Buku Pembantu', { nv: '1', ni: 2, go: g_('bku', 'bank', 'tunai', 'bpajak') }),
       L_('Catatan Atas laporan keuangan Desa Akhir tahun', { nv: '1', ni: 2, go: g_('calk') }),
       L_('Saldo rekening koran Bank akhir bulan', { nv: '2', ni: 2, go: g_('rekkoran', 'bank') }),
       L_('Nilai Saldo Kas Tunai di Bendahara (buku kas tunai/ bukti lainnya)', { nv: '2', ni: 3, go: g_('tunai', 'bakas'), cek: 'kastunai' }),
-      L_('Nilai saldo buku pajak menunjukkan pajak telah dibayar tepat waktu', { nv: '2', ni: 4, go: g_('bpajak', 'rpajak', 'setor'), cek: 'pajak' }),
+      L_('Nilai saldo buku pajak menunjukkan pajak telah dibayar tepat waktu', { nv: '2', ni: 4, go: g_('pajakrek', 'pajaksetor', 'bpajak', 'rpajak'), cek: 'pajak' }),
       L_('Bukti Screenshoot dan output penyelenggaraan Siskeudes online', { ni: 5, go: g_('skimpor'), up: 1 }),
       L_('Dokumentasi / bukti Publikasi realisasi APBDes tahun sebelumnya di lokasi strategis dan dapat diakses', { ni: 6, go: g_('inforeal', 'lra2') }),
-      L_('Penutupan kas bendahara per 30 November (berita acara) dilengkapi dengan RK bank; BA Stock Opname persediaan per 30 November; Buku inventaris per 30 November; dokumen lainnya', { ni: 7, go: g_('bakas', 'sedia', 'sipades') })],
+      L_('Penutupan kas bendahara per 30 November (berita acara) dilengkapi dengan RK bank; BA Stock Opname persediaan per 30 November; Buku inventaris per 30 November; dokumen lainnya', { ni: 7, go: g_('bakas', 'lkmd', 'sedia', 'sipades') })],
     dh: ['Pasal 3 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 20 Tahun 2018 Tentang Pengelolaan Keuangan Desa', 'Pasal 30 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 20 Tahun 2018 Tentang Pengelolaan Keuangan Desa', 'Pasal 63-67 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 20 Tahun 2018 Tentang Pengelolaan Keuangan Desa', 'Pasal 72-76 Peraturan Bupati Lumajang Nomor 59 Tahun 2018 Tentang Pedoman Pengelolaan Keuangan Desa', 'Pasal 53 Peraturan Bupati Lumajang Nomor 59 Tahun 2018 Tentang Pedoman Pengelolaan Keuangan Desa', 'Pasal 67 Peraturan Bupati Lumajang Nomor 59 Tahun 2018 Tentang Pedoman Pengelolaan Keuangan Desa', 'Pasal 72 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 20 Tahun 2018 Tentang Pengelolaan Keuangan Desa', 'Permintaan BPK persiapan pemeriksaan'] },
   { k: 'B3', g: 'Mandiri', no: '3', j: 'Pengelolaan Keuangan Desa — B3. Pendapatan Asli Desa',
     n: ['Persentase Capaian Pendapatan Desa Tahun berjalan (maksimal 100%)', 'Terdapat Laporan Upaya Inovasi peningkatan PADes', 'Terdapat Pembentukan BUMDes/ BUMDesma dan telah beroperasi serta telah mampu mendapatkan Laba (Bukti Pembentukan, AD/ART, Bukti Penyertaan, Analisa Kelayakan, Administrasi Keuangan, dst)'],
     l: [L_('Capaian pendapatan antara 40-80%', { nv: '1', ni: 0, go: g_('lra1', 'lra2'), cek: 'pendapatan' }), L_('Capaian pendapatan antara 80-100%', { nv: '1', ni: 0, go: g_('lra2'), cek: 'pendapatan' }),
-      L_('Laporan/ KAK/ bukti penyelenggaraan inovasi peningkatan PADes', { ni: 1, go: g_('keg'), up: 1 }),
-      L_('Bukti pembentukan BUMDes', { nv: '1', ni: 2, go: g_('lembaga', 'perdes') }), L_('Bukti BUMDes telah beroperasi', { nv: '0,5', ni: 2, go: g_('lembaga'), up: 1 }),
-      L_('Laporan keuangan/ penyelenggaraan BUMDes menunjukkan laba (Bukti pembentukan dan pejabat BUMDes termasuk AD/ART, Bukti penyertaan modal, Analisa Kelayakan Usaha, Dokumen Penatausahaan dan Laporan keuangan BUMDes, dst)', { nv: '0,5', ni: 2, go: g_('apb'), up: 1 })],
+      L_('Laporan/ KAK/ bukti penyelenggaraan inovasi peningkatan PADes', { ni: 1, go: g_('inov', 'manfaat'), up: 1 }),
+      L_('Bukti pembentukan BUMDes', { nv: '1', ni: 2, go: g_('bumdes', 'perdes') }), L_('Bukti BUMDes telah beroperasi', { nv: '0,5', ni: 2, go: g_('bumdes'), up: 1 }),
+      L_('Laporan keuangan/ penyelenggaraan BUMDes menunjukkan laba (Bukti pembentukan dan pejabat BUMDes termasuk AD/ART, Bukti penyertaan modal, Analisa Kelayakan Usaha, Dokumen Penatausahaan dan Laporan keuangan BUMDes, dst)', { nv: '0,5', ni: 2, go: g_('bumdes'), up: 1 })],
     dh: ['Pasal 26 Undang-Undang Republik Indonesia Nomor 6 Tahun 2014 Tentang Desa', 'Pasal 87 Undang-Undang Republik Indonesia Nomor 6 Tahun 2014 Tentang Desa'] },
   { k: 'B4', g: 'Mandiri', no: '4', j: 'Pengelolaan Keuangan Desa — B4. Pengendalian dan Pengawasan',
     n: ['Laporan Partisipasi masyarakat dalam pengawasan APBDes.', 'Laporan Pengawasan BPD dalam pengawasan pengelolaan keuangan desa', 'Laporan Pembinaan dan pengawasan Keuangan Kecamatan kepada Desa', 'Laporan Tindaklanjut Desa Atas Hasil Evaluasi'],
-    l: [L_('Laporan (partisipasi masyarakat dalam pengawasan APBDes)', { ni: 0, go: g_('pengawasan', 'inforeal') }), L_('Laporan Hasil Pengawasan (BPD)', { ni: 1, go: g_('pengawasan', 'skbpd') }),
-      L_('Laporan hasil pembinaan dan pengawasan (kecamatan)', { ni: 2, go: g_('pengawasan') }), L_('Laporan Hasil Tindaklanjut', { ni: 3, go: g_('pengawasan') })],
+    l: [L_('Laporan (partisipasi masyarakat dalam pengawasan APBDes)', { ni: 0, go: g_('lapawas', 'pengawasan', 'inforeal') }), L_('Laporan Hasil Pengawasan (BPD)', { ni: 1, go: g_('lapbpd', 'pengawasan', 'skbpd') }),
+      L_('Laporan hasil pembinaan dan pengawasan (kecamatan)', { ni: 2, go: g_('lapkec', 'pengawasan') }), L_('Laporan Hasil Tindaklanjut', { ni: 3, go: g_('pengawasan', 'keufrc') })],
     dh: ['Pasal 19 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 73 Tahun 2020 Tentang Pengawasan Pengelolaan Keuangan Desa', 'Pasal 20 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 73 Tahun 2020 Tentang Pengawasan Pengelolaan Keuangan Desa', 'Pasal 23 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 73 Tahun 2020 Tentang Pengawasan Pengelolaan Keuangan Desa'] },
   { k: 'C1', g: 'Mandiri', no: '5', j: 'Pengelolaan Barang Desa — C1. Penatausahaan Barang',
     n: ['Penetapan petugas/pengurus aset desa dan SOP/ Kebijakan pengelolaan barang/aset di desa', 'Keberadaan Buku Data Inventaris Aset/barang Desa yang informatif (sekurang-kurangnya menyajikan kode/penggolongan, Jumlah, spesifikasi, nilai barang, kondisi, dst)', 'Pemanfaatan aset desa yang tidak dipergunakan langsung untuk menunjang penyelenggaraan Pemerintahan Desa dilengkapi bukti berupa sewa, pinjam pakai, dst', 'Berita Acara Stock Opname Persediaan/Pemeriksaan barang habis pakai/ nama lainnya dalam rangka pengendalian', 'Pengamanan Aset desa'],
