@@ -570,7 +570,8 @@ table.dtt{font-size:11px}
 @media(max-width:760px){.form{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 8px}.form>.f.wide,.form>.f:has(textarea),.form>.f:has(.fotos),.form>.f:has(table),.form>.f:has(.checks),.form>.f:has(input[type=file]){grid-column:1/-1}
 .f label{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.25}.f .hint{font-size:10px;line-height:1.3}
 .f input:not([type=checkbox]):not([type=radio]):not([type=file]),.f select{padding:5px 6px;font-size:12px}.sipl-sel{display:block;width:100%;font-weight:600}.sipl>.selwrap{display:block}.sipl-tree{display:none!important}.form.two{grid-template-columns:1fr 1fr}.form.two .f.wide{grid-column:1/-1}.row .t{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.sipl{grid-template-columns:1fr}.doc-prev.fitp{padding:6px;border-radius:8px}.sipl-tree{max-height:210px}.sipl-tree .row.sm .t{font-size:11.5px!important}.sipl-tree{max-height:240px}.sipr{grid-template-columns:120px 1fr 30px}}
-.sopdoc{font-family:'Times New Roman',serif;font-size:10.5pt;line-height:1.35;color:#000;background:#fff}.sopdoc table{border-collapse:collapse;width:100%;margin:6px 0}.sopdoc td,.sopdoc th{border:1px solid #000;padding:3px 5px;vertical-align:top}.sopdoc h1,.sopdoc h2,.sopdoc h3{text-align:center;margin:8px 0}
+.sopdoc{font-family:'Times New Roman',serif;font-size:10.5pt;line-height:1.35;color:#000;background:#fff}.sopdoc table{border-collapse:collapse;width:100%;margin:6px 0}.sopdoc td,.sopdoc th{border:1px solid #000;padding:3px 5px;vertical-align:top}
+.sopdoc table.nb td,.sopdoc table.kv td,.paper table.nb td{border:0}.sopdoc h1,.sopdoc h2,.sopdoc h3{text-align:center;margin:8px 0}
 .lbl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm}
 .ad-hero{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;padding:16px 18px;border-radius:var(--r);color:#fff;background:linear-gradient(135deg,#1b5e20 0%,#2e7d32 45%,#00897b 100%);box-shadow:var(--shadow)}
 .ad-hero-l{display:flex;flex-direction:column;gap:3px;min-width:0}.ad-eyebrow{font-size:12px;opacity:.9;display:flex;align-items:center;gap:6px}.ad-eyebrow svg{width:15px;height:15px}
@@ -2268,9 +2269,9 @@ function MODS() {
     { k: 'presensi', l: 'Presensi', ic: 'clock', items: [['Presensi Hari Ini', 'clock', ['presensi']], ['Riwayat Harian', 'list', ['harian']]] },
     { k: 'kegiatan', l: 'Kegiatan', ic: 'cal', items: [['Agenda', 'cal', ['list', { e: 'kegiatan', v: 0, title: 'Agenda' }], null, 'r:kegiatan'], ['Berita', 'mega', ['list', { e: 'berita' }], 'berita']] },
     { k: 'arsip', l: 'Arsip', ic: 'folder', items: [grpItem('surat'), grpItem('hukum')].concat(['berita_acara', 'aparat', 'petugas', 'tokoh_luar'].map(e => [UI[e].t, UI[e].ic, ['list', { e }], e])) },
-    { k: 'aset', l: 'Aset Desa', ic: 'box', items: [['Dashboard Aset', 'chart', ['asetdash'], null, 'r:aset'], ['Inventarisasi & Penatausahaan (KIB)', 'box', ['list', { e: 'aset' }], 'aset'],
-      ['Pengadaan', 'plus', ['list', { e: 'aset_trx', chip: 'Pengadaan' }], 'aset_trx'], ['Penggunaan, Pemanfaatan & Penghapusan', 'list', ['list', { e: 'aset_trx' }], 'aset_trx'], ['Persediaan', 'box', ['list', { e: 'persediaan' }], 'persediaan'],
-      ['Inventarisasi Fisik', 'check', ['list', { e: 'aset_cek' }], 'aset_cek'], ['Laporan Format SIPADES', 'print', ['sipadeslap'], null, 'r:aset'], ['Cetak Laporan Aset (format awal)', 'print', ['asetcetak'], null, 'r:aset'], ['Cetak Register Label', 'crop', ['asetlabel'], null, 'r:aset'],
+    { k: 'aset', l: 'Aset Desa', ic: 'box', items: [['Dashboard Aset', 'chart', ['asetdash'], null, 'r:aset'], ['SOP Aset (Perbup 78/2021)', 'book', ['asetsop78'], null, 'r:aset'], ['Dokumen Perbup 78 (SK, BA, Buku Inventaris)', 'stamp', ['aset78dok'], null, 'r:aset'], ['Inventarisasi & Penatausahaan (KIB)', 'box', ['list', { e: 'aset' }], 'aset'],
+      ['Pengadaan', 'plus', ['list', { e: 'aset_trx', chip: 'Pengadaan' }], 'aset_trx'], ['Penggunaan, Pemanfaatan & Penghapusan', 'list', ['list', { e: 'aset_trx' }], 'aset_trx'], ['Pemanfaatan Aset (Sewa, Pinjam Pakai, KSP)', 'coin', ['list', { e: 'aset_manfaat' }], 'aset_manfaat'], ['Dokumen Kepemilikan & Pengamanan', 'lock', ['list', { e: 'aset_dok' }], 'aset_dok'], ['Kartu Pemeliharaan', 'hammer', ['list', { e: 'aset_pelihara' }], 'aset_pelihara'], ['Persediaan', 'box', ['list', { e: 'persediaan' }], 'persediaan'],
+      ['Cek Fisik & Stock Opname', 'check', ['asetso'], null, 'r:aset'], ['Inventarisasi Fisik per Aset', 'check', ['list', { e: 'aset_cek' }], 'aset_cek'], ['Laporan Format SIPADES', 'print', ['sipadeslap'], null, 'r:aset'], ['Cetak Laporan Aset (format awal)', 'print', ['asetcetak'], null, 'r:aset'], ['Cetak Register Label', 'crop', ['asetlabel'], null, 'r:aset'],
       ['Data Ruangan', 'house', ['list', { e: 'aset_ruang' }], 'aset_ruang'], ['Perangkat & Tim Inventarisasi', 'users', ['list', { e: 'aset_tim' }], 'aset_tim'], ['Kode Rekening Aset', 'list', ['list', { e: 'ref_kode_barang' }], 'ref_kode_barang'], ['SOP, Template BA/SK & Pedoman', 'book', ['asetsop'], null, 'r:aset']] },
     { k: 'pemerintahan', l: 'Pemerintahan', ic: 'landmark', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, 'r:penduduk'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga'], ['Tanah di Desa', 'map', ['tanah'], 'tanah_desa'], ['Monografi Desa', 'chart', ['monografi'], null, 'r:frc']] },
     { k: 'antikorupsi', l: 'Desa Anti Korupsi', ic: 'check', items: [['FRC Desa (SIMWAS)', 'check', ['frc'], null, 'r:frc'], ['Register Risiko Fraud', 'lock', ['list', { e: 'risiko_fraud' }], 'risiko_fraud'], ['Pengawasan & Tindak Lanjut', 'eye', ['list', { e: 'pengawasan' }], 'pengawasan'], ['Integritas: Anti Gratifikasi & Pungli', 'check', ['integritas'], null, 'r:frc'], ['Kinerja Perangkat', 'target', ['list', { e: 'kinerja' }], 'kinerja'], ['Pemantauan Harga Komoditas', 'chart', ['hargakom'], null, 'r:frc'], ['Aset Negara di Desa', 'landmark', ['list', { e: 'aset_negara' }], 'aset_negara']] },
@@ -5242,7 +5243,8 @@ VIEWS.form = async (p, main, alive) => {
     el.addEventListener('change', () => {
       const x = (f._rows || []).find(r => String((typeof f.listFrom.k === 'function' ? f.listFrom.k(r) : r[f.listFrom.k]) || '').trim().toLowerCase() === el.value.trim().toLowerCase()); if (!x) return;
       const m = f.fill(x);
-      Object.keys(m).forEach(k => { const t = $('#f_' + k, frm); if (!t || !m[k] || t.readOnly) return; if (t.tagName === 'SELECT' && !Array.from(t.options).some(o => o.value === m[k])) return; t.value = m[k]; if (/^(date|time|month)$/.test(t.type)) t.dispatchEvent(new Event('change', { bubbles: true })); });
+      Object.keys(m).forEach(k => { const t = $('#f_' + k, frm); if (!t || !m[k] || t.readOnly) return; if (t.tagName === 'SELECT' && !Array.from(t.options).some(o => o.value === m[k])) return; t.value = m[k]; if (/^(date|time|month)$/.test(t.type) || t.tagName === 'SELECT') t.dispatchEvent(new Event('change', { bubbles: true })); });
+      if (u.calc) frm.dispatchEvent(new Event('input', { bubbles: true }));
       const nk = $('#f_nik', frm); if (nk && /^\d{16}$/.test(nk.value)) nk.dispatchEvent(new Event('input'));
     });
   });
@@ -5446,6 +5448,7 @@ VIEWS.form = async (p, main, alive) => {
       if (e === 'dtsen' && saved) { try { if (await dtsenKeRentan(saved)) toast('Tersimpan. Desil ' + saved.desil + ': otomatis masuk Data Rentan sebagai keluarga miskin.'); } catch (er) { toast('Tersimpan, tetapi gagal membuat data rentan: ' + er.message, 1); } }
       if (e === 'aset' && saved && saved.id) await asetSetelahSimpan(saved.id);
       if (e === 'aset_cek' && saved && saved.id) await asetCekSetelahSimpan(saved.id);
+      if (e === 'aset_pelihara' && saved && saved.id) await a78PeliharaSetelahSimpan(saved.id);
       if ((e === 'rkp_musyawarah' || e === 'rpjm_musyawarah') && saved && saved.id && val.tanggal && val.jam) { const ag = await syncAgendaMus(saved.id, e); if (ag) toast('Tersimpan. Masuk juga ke Kegiatan → Agenda.'); }
       back();
       if (e === 'penduduk' && frm._kel && frm._kel.id) { const kid = frm._kel.id; setTimeout(() => go('detail', { e: 'keluarga', id: kid }), 350); }
@@ -9117,7 +9120,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '219', tgl: '2026-10-30', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '220', tgl: '2026-11-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -12402,6 +12405,937 @@ Object.assign(UI, {
 
 });
 
+/* =====================================================================
+   ASET DESA SESUAI PERBUP LUMAJANG 78/2021 (pendamping SIPADES)
+   SOP 14 aspek interaktif, SK Pengelola, SK Status Penggunaan, Buku Data
+   Inventaris (Lamp. D), BA/SK Penghapusan (Lamp. B/C), pemanfaatan,
+   register dokumen kepemilikan, kartu pemeliharaan, cek fisik/stock opname
+   ===================================================================== */
+const PB78 = 'Peraturan Bupati Lumajang Nomor 78 Tahun 2021 tentang Pengelolaan Aset Desa';
+const PB78S = 'Perbup Lumajang 78/2021';
+const SOP_LANE = [
+  { k: 'KD', l: 'Kepala Desa', s: 'Pemegang Kekuasaan' },
+  { k: 'SD', l: 'Sekretaris Desa', s: 'Pembantu Pengelola' },
+  { k: 'PA', l: 'Pengurus Aset', s: 'Petugas (Kaur)' },
+  { k: 'PK', l: 'Pelaksana/TPK', s: 'Pemakai Barang' },
+  { k: 'LU', l: 'BPD / Bupati', s: 'Camat / Mitra' }
+];
+const SOP_TAHAP = ['I. Penetapan & Perolehan', 'II. Pemakaian & Perawatan', 'III. Perubahan Status, Administrasi & Nilai', 'IV. Kontrol'];
+/* langkah: p = pelaksana, s = simbol (M mulai, P proses, D keputusan, O penetapan/otorisasi, S selesai), t = label bagan, u = uraian, kel = kelengkapan, w = waktu, o = output */
+const SOP78 = [
+  { k: 'pengelola', no: 0, tahap: 0, j: 'Pejabat Pengelola Aset', ps: 'Pasal 4–6', ic: 'users',
+    tujuan: 'Memastikan ada pejabat yang jelas kewenangan dan tanggung jawabnya atas setiap aset desa.',
+    langkah: [
+      { p: 'KD', s: 'M', t: 'Menetapkan kebijakan & SOP aset desa', u: 'Kepala Desa selaku pemegang kekuasaan pengelolaan aset menetapkan kebijakan pengelolaan aset desa, termasuk SOP ini (Pasal 5 ayat 2 huruf a).', kel: 'Perbup 78/2021, draf SOP', w: 'Januari', o: 'SOP ditandatangani Kepala Desa' },
+      { p: 'SD', s: 'P', t: 'Menyiapkan draf SK pengelola', u: 'Sekretaris Desa menyiapkan draf Keputusan Kepala Desa tentang penetapan pembantu pengelola dan petugas/pengurus aset. Petugas diambil dari unsur Kepala Urusan (Pasal 5 ayat 6).', kel: 'Data aparatur aktif', w: '1 hari', o: 'Draf SK + lampiran tugas' },
+      { p: 'KD', s: 'O', t: 'Menetapkan SK pembantu pengelola & petugas', u: 'Kepala Desa menetapkan Sekretaris Desa sebagai pembantu pengelola dan Kaur sebagai petugas/pengurus aset (Pasal 5 ayat 2 huruf b dan ayat 5).', kel: 'Draf SK', w: '1 hari', o: 'SK Kepala Desa' },
+      { p: 'PA', s: 'S', t: 'Menjalankan tugas & mengarsipkan SK', u: 'Pengurus aset menjalankan tugas Pasal 6 ayat 2, SK dicatat di Buku Keputusan, scan diunggah ke FRC.', kel: 'SK bertanda tangan', w: 'Setelah ditetapkan', o: 'SK terarsip & diunggah' }],
+    aturan: [['Kepala Desa adalah pemegang kekuasaan pengelolaan aset desa dan dapat menguasakan sebagian kekuasaannya kepada perangkat desa.', 'Pasal 5 ayat 1 & 4'], ['Sekretaris Desa sebagai pembantu pengelola: meneliti rencana kebutuhan & pemeliharaan, mengatur penggunaan/pemanfaatan/penghapusan/pemindahtanganan yang disetujui Kades, koordinasi inventarisasi, serta pengawasan & pengendalian.', 'Pasal 6 ayat 1'], ['Petugas/pengurus aset berasal dari Kepala Urusan. Tugasnya: mengajukan rencana kebutuhan, mengajukan penetapan penggunaan, inventarisasi, mengamankan & memelihara, serta menyusun laporan aset.', 'Pasal 5 ayat 6, Pasal 6 ayat 2'], ['Staf/operator SIPADES boleh membantu, tetapi kedudukannya pembantu teknis, bukan petugas/pengurus.', 'Kebijakan desa']],
+    dok: [{ l: 'SK Pembantu Pengelola & Petugas/Pengurus Aset', go: ['aset78dok', { d: 'skp' }], cek: 'skp' }, { l: 'SOP Pengelolaan Aset Desa (dokumen ini)', go: ['asetsop78'], cek: 'sop' }],
+    frc: 'FRC Mandiri 5 butir 1: SK petugas ada, SOP belum mencakup 14 aspek Perbup 78/2021.' },
+  { k: 'perencanaan', no: 1, tahap: 0, j: 'Perencanaan', ps: 'Pasal 8–9', ic: 'target',
+    tujuan: 'Kebutuhan barang dan pemeliharaan direncanakan dari data aset yang ada, bukan sekadar dibeli.',
+    langkah: [
+      { p: 'PA', s: 'M', t: 'Mendata kebutuhan barang & pemeliharaan', u: 'Pengurus aset mengajukan rencana kebutuhan aset dan pemeliharaan berdasarkan Buku Data Inventaris, kondisi barang, dan usulan tiap bidang (Pasal 6 ayat 2 huruf a).', kel: 'Buku Data Inventaris, usulan Kasi/Kaur', w: 'Juli–Agustus', o: 'Daftar usulan kebutuhan' },
+      { p: 'SD', s: 'P', t: 'Meneliti usulan kebutuhan', u: 'Sekdes meneliti rencana kebutuhan dan pemeliharaan (Pasal 6 ayat 1 huruf a–b), memperhatikan aset yang sudah ada serta Standar Barang, Standar Kebutuhan dan Standar Harga (Pasal 9).', kel: 'Daftar usulan, data aset, SSH', w: '7 hari', o: 'Rencana kebutuhan terverifikasi' },
+      { p: 'KD', s: 'P', t: 'Memuat ke RPJM & RKP Desa', u: 'Kebutuhan 6 tahun dimuat dalam RPJM Desa, kebutuhan 1 tahun dimuat dalam RKP Desa (Pasal 8).', kel: 'Dokumen RPJM & RKP Desa', w: 'Jadwal RKP Desa', o: 'Kegiatan pengadaan/pemeliharaan di RKP Desa' },
+      { p: 'LU', s: 'O', t: 'Ditetapkan dalam APB Desa bersama BPD', u: 'Rencana kebutuhan ditetapkan dalam APB Desa setelah memperhatikan ketersediaan aset yang ada (Pasal 8 ayat 2).', kel: 'Rancangan APB Desa', w: 'Paling lambat Desember', o: 'Perdes APB Desa' }],
+    aturan: [['Kebutuhan 6 tahun dituangkan dalam RPJM Desa; kebutuhan 1 tahun dalam RKP Desa dan ditetapkan dalam APB Desa.', 'Pasal 8'], ['Perencanaan berpedoman pada Standar Barang, Standar Kebutuhan dan/atau Standar Harga yang ditetapkan Keputusan Bupati.', 'Pasal 9']],
+    dok: [{ l: 'RKP Desa', go: ['rkp'] }, { l: 'APBDes', go: ['list', { e: 'keu_anggaran' }] }, { l: 'Belanja modal ↔ aset (Dashboard Aset)', go: ['asetdash'] }] },
+  { k: 'pengadaan', no: 2, tahap: 0, j: 'Pengadaan', ps: 'Pasal 10', ic: 'plus',
+    tujuan: 'Setiap barang hasil belanja sampai ke Buku Inventaris dengan bukti yang lengkap.',
+    langkah: [
+      { p: 'PK', s: 'M', t: 'Melaksanakan pengadaan barang/jasa', u: 'TPK/pelaksana kegiatan melaksanakan pengadaan sesuai DPA/RAB dengan prinsip efisien, efektif, transparan dan terbuka, bersaing, adil dan akuntabel. Tata caranya mengikuti Perbup pengadaan barang/jasa di Desa (Pasal 10).', kel: 'DPA, RAB, spesifikasi, survei harga', w: 'Sesuai jadwal kegiatan', o: 'Barang/pekerjaan selesai, bukti belanja' },
+      { p: 'PK', s: 'P', t: 'Menyerahkan hasil ke Kepala Desa', u: 'Hasil pengadaan diserahkan kepada Kepala Desa dengan BAST, dilengkapi RAB, gambar, kontrak/SPK, foto, dan SPJ.', kel: 'BAST, kontrak, foto 0–100%', w: 'Setelah pekerjaan 100%', o: 'BAST hasil pengadaan' },
+      { p: 'KD', s: 'P', t: 'Menyerahkan aset ke pengurus aset', u: 'Kepala Desa menyerahkan aset hasil pengadaan kepada pengurus aset untuk disimpan dan dicatat.', kel: 'BAST', w: '1 hari', o: 'Tanda terima pengurus aset' },
+      { p: 'PA', s: 'S', t: 'Mencatat, memberi kode & label', u: 'Pengurus aset mencatat aset baru di Buku Inventaris dengan nilai realisasi, memberi kode & label, lalu menginput ke SIPADES.', kel: 'BAST, kuitansi/SPJ', w: 'Maks. 7 hari setelah BAST', o: 'Aset tercatat & berlabel' }],
+    aturan: [['Pengadaan dilaksanakan berdasarkan prinsip efisien, efektif, transparan dan terbuka, bersaing, adil/tidak diskriminatif dan akuntabel.', 'Pasal 10 ayat 1'], ['Tata cara pengadaan berpedoman pada Peraturan Bupati tentang pengadaan barang/jasa di Desa.', 'Pasal 10 ayat 2']],
+    dok: [{ l: 'BAST hasil pengadaan', go: ['list', { e: 'bast' }] }, { l: 'Proyek RAB & Gambar', go: ['rabproyek'] }, { l: 'SPJ', go: ['spj', {}] }, { l: 'Transaksi pengadaan (format SIPADES)', go: ['list', { e: 'aset_trx', chip: 'Pengadaan' }] }],
+    frc: 'FRC Mandiri 6: SK TPK, laporan TPK, kontrak & bukti survei harga (termasuk CCTV dan PJU) belum diunggah.' },
+  { k: 'penggunaan', no: 3, tahap: 0, j: 'Penggunaan', ps: 'Pasal 11', ic: 'badge',
+    tujuan: 'Setiap aset jelas siapa pemakainya dan untuk apa, ditetapkan setiap tahun.',
+    langkah: [
+      { p: 'PA', s: 'M', t: 'Mengajukan penetapan status penggunaan', u: 'Pengurus aset mengajukan permohonan penetapan penggunaan aset yang diperoleh dari APB Desa dan perolehan lain yang sah (Pasal 6 ayat 2 huruf b), disertai daftar aset per pemakai/ruangan.', kel: 'Buku Data Inventaris, KIR', w: 'Januari & tiap ada aset baru', o: 'Daftar usulan status penggunaan' },
+      { p: 'SD', s: 'P', t: 'Meneliti & mengatur penggunaan', u: 'Sekdes meneliti dan mengatur penggunaan aset yang telah disetujui Kepala Desa (Pasal 6 ayat 1 huruf c).', kel: 'Daftar usulan', w: '2 hari', o: 'Draf SK + lampiran' },
+      { p: 'KD', s: 'O', t: 'Menetapkan SK Status Penggunaan', u: 'Status penggunaan ditetapkan setiap tahun dengan Keputusan Kepala Desa memakai format Lampiran A Perbup (Pasal 11 ayat 2).', kel: 'Draf SK', w: '1 hari', o: 'SK Status Penggunaan tahun berjalan' },
+      { p: 'PA', s: 'S', t: 'Menyerahkan ke pemakai & mencatat', u: 'Aset diserahkan kepada pemakai dengan tanda terima/KIR. Daftar dalam SK menjadi bahan Buku Data Inventaris (diktum KEDUA).', kel: 'KIR, tanda terima', w: '2 hari', o: 'KIR ditandatangani pemakai' }],
+    aturan: [['Penggunaan aset ditetapkan dalam rangka mendukung penyelenggaraan Pemerintahan Desa.', 'Pasal 11 ayat 1'], ['Status penggunaan ditetapkan setiap tahun dengan Keputusan Kepala Desa.', 'Pasal 11 ayat 2'], ['Perangkat yang berhenti wajib menyerahkan kembali aset yang dikuasainya dengan BAST.', 'Kebijakan desa']],
+    dok: [{ l: 'SK Status Penggunaan Aset (Lampiran A)', go: ['aset78dok', { d: 'skg' }], cek: 'skg' }, { l: 'Data Ruangan / KIR', go: ['list', { e: 'aset_ruang' }] }, { l: 'Transaksi penggunaan (format SIPADES)', go: ['list', { e: 'aset_trx', chip: 'Penggunaan' }] }] },
+  { k: 'pemanfaatan', no: 4, tahap: 1, j: 'Pemanfaatan', ps: 'Pasal 12–33', ic: 'coin',
+    tujuan: 'Aset yang tidak dipakai langsung (terutama tanah kas desa) menghasilkan pendapatan secara sah, dengan tarif dan perjanjian sesuai Perbup.',
+    langkah: [
+      { p: 'PA', s: 'M', t: 'Mengidentifikasi aset yang tidak dipakai langsung', u: 'Aset yang tidak dipergunakan langsung untuk menunjang penyelenggaraan Pemerintahan Desa dapat dimanfaatkan (Pasal 12 ayat 1), misalnya tanah kas desa.', kel: 'Data aset, peta tanah', w: 'Sebelum masa sewa', o: 'Daftar calon objek pemanfaatan' },
+      { p: 'SD', s: 'D', t: 'Memilih bentuk sesuai syarat', u: 'Sewa paling lama 3 tahun. Pinjam pakai paling lama 7 hari, hanya dengan Pemdes lain/LKD, dan bukan untuk tanah, bangunan, atau kendaraan. KSP untuk tanah/bangunan paling lama 15 tahun. BGS/BSG untuk tanah paling lama 20 tahun. KSP dan BGS/BSG wajib izin Bupati dan akta notaris.', kel: 'Data aset, calon mitra', w: '2 hari', o: 'Bentuk pemanfaatan terpilih' },
+      { p: 'PA', s: 'P', t: 'Menghitung harga dasar / penilaian', u: 'Sewa tanah: St = 3,33% × luas × NJOP terendah per m². Sewa bangunan: Sb = 6,64% × luas lantai × nilai wajar per m² (Pasal 15). Tanah/bangunan dinilai penilai pemerintah/publik (Pasal 76), selain itu oleh tim desa (Pasal 77). Pinjam pakai tanpa penilaian (Pasal 75 ayat 2).', kel: 'SPPT/NJOP, hasil penilaian', w: '7–14 hari', o: 'Harga dasar sewa/kontribusi' },
+      { p: 'LU', s: 'O', t: 'Perdes pemanfaatan (+ izin Bupati)', u: 'Pemanfaatan ditetapkan dalam Peraturan Desa (Pasal 12 ayat 3) yang dibahas dan disepakati bersama BPD. KSP dan BGS/BSG baru boleh ditandatangani setelah ada izin tertulis Bupati (Pasal 22 dan 27).', kel: 'Rancangan Perdes, daftar objek & tarif', w: 'Sesuai jadwal BPD', o: 'Perdes pemanfaatan, izin Bupati' },
+      { p: 'LU', s: 'P', t: 'Mitra menyetor ke Rekening Kas Desa', u: 'Seluruh uang sewa/kontribusi disetor tunai sekaligus ke Rekening Kas Desa, paling lambat 2 hari kerja sebelum perjanjian ditandatangani (Pasal 33 ayat 2–3). Dicatat sebagai pendapatan Hasil Aset Desa.', kel: 'Bukti setor bank', w: 'H-2 hari kerja', o: 'Bukti setor' },
+      { p: 'KD', s: 'O', t: 'Menandatangani perjanjian', u: 'Perjanjian sewa/pinjam pakai ditandatangani Kepala Desa dan mitra di atas meterai (Pasal 16 dan 19). KSP dan BGS/BSG dibuat dalam Akta Notaris (Pasal 22 dan 27). Biaya pembuatan perjanjian ditanggung mitra.', kel: 'Draf perjanjian, meterai', w: '1 hari', o: 'Perjanjian bermeterai / akta' },
+      { p: 'PA', s: 'S', t: 'Mencatat & memantau masa berlaku', u: 'Pengurus aset mencatat pemanfaatan, memantau masa berlaku dan kewajiban mitra (biaya pemeliharaan & pengamanan oleh mitra, Pasal 33 ayat 1), lalu menarik aset dengan BAST saat berakhir.', kel: 'Register pemanfaatan', w: 'Selama perjanjian', o: 'Register & BAST pengembalian' }],
+    aturan: [['Pemanfaatan tidak mengubah status kepemilikan dan ditetapkan dalam Peraturan Desa.', 'Pasal 12–13'], ['Sewa paling lama 3 tahun dan dapat diperpanjang. Penyewa: BUMN, BUMD, swasta (termasuk perorangan), atau badan hukum lainnya.', 'Pasal 13–14'], ['Harga dasar sewa tanah St = 3,33% × (Lt × Nt), Nt = NJOP terendah per m². Bangunan Sb = 6,64% × (Lb × Nb).', 'Pasal 15'], ['Perjanjian sewa memuat para pihak, objek, luas/jumlah, besaran sewa, jangka waktu, tanggung jawab biaya operasional & pemeliharaan, hak & kewajiban, force majeure; bermeterai; biaya ditanggung penyewa.', 'Pasal 16'], ['Pinjam pakai hanya antara Pemdes dengan Pemdes lain atau LKD, paling lama 7 hari, dan tidak boleh untuk tanah, bangunan, atau kendaraan bermotor.', 'Pasal 17–19'], ['KSP untuk tanah/bangunan, mitra bukan perorangan, paling lama 15 tahun, izin tertulis Bupati, Akta Notaris, kontribusi tetap tiap tahun ke Rekening Kas Desa.', 'Pasal 20–24'], ['BGS/BSG untuk tanah, paling lama 20 tahun, izin tertulis Bupati, Akta Notaris.', 'Pasal 25–32'], ['Seluruh pendapatan pemanfaatan disetor ke Rekening Kas Desa tunai sekaligus, paling lambat 2 hari kerja sebelum perjanjian ditandatangani. Objek pemanfaatan dilarang dijaminkan atau digadaikan.', 'Pasal 33']],
+    dok: [{ l: 'Register Pemanfaatan Aset (sewa, pinjam pakai, KSP, BGS/BSG)', go: ['list', { e: 'aset_manfaat' }], cek: 'manfaat' }, { l: 'Kalkulator harga dasar sewa (Pasal 15)', go: ['aset78dok', { d: 'kalk' }] }, { l: 'Draf Perdes Pemanfaatan Aset Desa', go: ['aset78dok', { d: 'perdes' }] }, { l: 'Peraturan Desa', go: ['list', { e: 'perdes' }] }],
+    frc: 'FRC Mandiri 5 butir 3 (0%): Perdes pemanfaatan TKD, SK penetapan pemanfaatan, perjanjian sewa dan pinjam pakai belum ada. Sewa TKD ±5 ha di Tempeh Kidul (H. Didik, H. Sudi) dinilai tidak sesuai tarif dasar sewa Perbup; bangunan KDKMP berdiri di atas TKD (Lapangan).' },
+  { k: 'pengamanan', no: 5, tahap: 1, j: 'Pengamanan', ps: 'Pasal 7, 34–37', ic: 'lock',
+    tujuan: 'Aset aman secara administrasi, fisik, dan hukum; dokumen kepemilikan asli tidak hilang.',
+    langkah: [
+      { p: 'PA', s: 'M', t: 'Mendata bukti kepemilikan', u: 'Pengurus aset mendata sertifikat, Letter C, BPKB, STNK, PBG/IMB, dan faktur, lengkap dengan tempat simpan, pemegang, dan kondisinya.', kel: 'Dokumen asli/scan', w: 'Januari & tiap ada aset baru', o: 'Register dokumen kepemilikan' },
+      { p: 'PA', s: 'P', t: 'Pengamanan administrasi', u: 'Pembukuan, inventarisasi, pelaporan, dan penyimpanan dokumen kepemilikan (Pasal 34 ayat 2 huruf a).', kel: 'Buku Data Inventaris, scan dokumen', w: 'Berkelanjutan', o: 'Arsip fisik & digital' },
+      { p: 'PA', s: 'P', t: 'Pengamanan fisik', u: 'Tanah dan bangunan dipagar dan dipasang tanda batas/papan nama. Barang lain disimpan dan dipelihara, dan label kode barang dipasang (Pasal 34 ayat 3).', kel: 'Foto patok/pagar/papan, label', w: 'Berkelanjutan', o: 'Foto bukti pengamanan fisik' },
+      { p: 'SD', s: 'P', t: 'Pengamanan hukum', u: 'Bukti kepemilikan dilengkapi: tanah disertifikatkan atas nama Pemerintah Desa (Pasal 7 ayat 1), bangunan dilengkapi bukti status kepemilikan (Pasal 7 ayat 2), dan pajak kendaraan dibayar.', kel: 'Berkas permohonan BPN/PTSL, SKPD pajak', w: 'Sesuai proses', o: 'Sertifikat / bukti proses' },
+      { p: 'KD', s: 'S', t: 'Menyimpan dokumen asli dengan aman', u: 'Bukti kepemilikan disimpan Kepala Desa secara tertib dan aman (Pasal 35), di brankas kantor desa, dengan tanda terima bila dipinjam. Kehilangan karena kelalaian menjadi tanggung jawab penanggung jawab aset (Pasal 36).', kel: 'Brankas, buku pinjam dokumen', w: 'Berkelanjutan', o: 'Dokumen asli aman & terdaftar' }],
+    aturan: [['Tanah disertifikatkan atas nama Pemerintah Desa; bangunan dilengkapi bukti status kepemilikan.', 'Pasal 7 ayat 1–2'], ['Aset dapat diasuransikan sesuai kemampuan keuangan desa.', 'Pasal 7 ayat 3'], ['Aset dilarang diserahkan sebagai pembayaran tagihan, digadaikan, atau dijadikan jaminan pinjaman.', 'Pasal 7 ayat 4–5'], ['Pengamanan meliputi administrasi, fisik (pagar & tanda batas untuk tanah/bangunan; penyimpanan & pemeliharaan untuk barang lain), dan hukum.', 'Pasal 34'], ['Bukti kepemilikan wajib disimpan tertib dan aman oleh Kepala Desa.', 'Pasal 35'], ['Kehilangan akibat kesalahan/kelalaian menjadi tanggung jawab penanggung jawab aset; penyelesaian TGR difasilitasi majelis bentukan Camat, bila tidak selesai dilaporkan ke Inspektorat.', 'Pasal 36']],
+    dok: [{ l: 'Register Dokumen Kepemilikan & Pengamanan', go: ['list', { e: 'aset_dok' }], cek: 'dok' }, { l: 'Cetak label kode barang', go: ['asetlabel'] }, { l: 'Inventaris aset (KIB)', go: ['list', { e: 'aset' }] }],
+    frc: 'FRC Mandiri 5 butir 5 (0%): bukti pengamanan (sertifikat tanah, BPKB kendaraan, pengamanan fisik) belum diunggah. Konfirmasi Sekdes: SHM tanah desa (sekolah dan kantor desa) hilang setelah disimpan Kepala Desa.' },
+  { k: 'pemeliharaan', no: 6, tahap: 1, j: 'Pemeliharaan', ps: 'Pasal 38–39', ic: 'hammer',
+    tujuan: 'Aset selalu siap pakai dan riwayat perawatannya tercatat di kartu pemeliharaan.',
+    langkah: [
+      { p: 'PA', s: 'M', t: 'Memeriksa kondisi aset berkala', u: 'Pengurus aset memeriksa kondisi aset (Baik/Rusak Ringan/Rusak Berat) dan mengusulkan kebutuhan pemeliharaan.', kel: 'Daftar kondisi barang', w: 'Berkala/saat rusak', o: 'Usulan pemeliharaan' },
+      { p: 'SD', s: 'P', t: 'Meneliti rencana pemeliharaan', u: 'Sekdes meneliti rencana kebutuhan pemeliharaan (Pasal 6 ayat 1 huruf b) dan kesesuaiannya dengan DPA.', kel: 'DPA APB Desa', w: '2 hari', o: 'Usulan terverifikasi' },
+      { p: 'KD', s: 'O', t: 'Menyetujui pelaksanaan', u: 'Biaya pemeliharaan dibebankan pada APB Desa (Pasal 38 ayat 3). Aset yang sedang dimanfaatkan pihak lain dipelihara oleh mitra (Pasal 38 ayat 4).', kel: 'Usulan, DPA', w: '1 hari', o: 'Persetujuan' },
+      { p: 'PK', s: 'P', t: 'Melaksanakan pemeliharaan/servis', u: 'Pelaksana kegiatan/bengkel melaksanakan pemeliharaan sesuai kebutuhan.', kel: 'Nota, kuitansi, foto', w: 'Sesuai pekerjaan', o: 'Aset diperbaiki, bukti belanja' },
+      { p: 'PA', s: 'S', t: 'Mencatat Kartu Pemeliharaan', u: 'Kartu pemeliharaan memuat nama barang, spesifikasi, tanggal, jenis pekerjaan, bahan, biaya, pihak pelaksana, dan hal lain yang diperlukan (Pasal 39).', kel: 'Nota/SPJ', w: '1 hari', o: 'Kartu pemeliharaan' }],
+    aturan: [['Pemeliharaan wajib dilakukan Kepala Desa dan perangkat desa agar aset selalu baik, layak, dan siap digunakan.', 'Pasal 38 ayat 1–2'], ['Biaya pemeliharaan dibebankan pada APB Desa; bila aset dimanfaatkan pihak lain, biaya menjadi tanggung jawab mitra.', 'Pasal 38 ayat 3–4'], ['Setiap pemeliharaan dicatat pada kartu pemeliharaan oleh petugas/pengurus aset.', 'Pasal 39']],
+    dok: [{ l: 'Kartu Pemeliharaan Aset', go: ['list', { e: 'aset_pelihara' }], cek: 'pelihara' }, { l: 'SPJ', go: ['spj', {}] }] },
+  { k: 'penghapusan', no: 7, tahap: 2, j: 'Penghapusan', ps: 'Pasal 40–45', ic: 'trash',
+    tujuan: 'Aset yang rusak berat, hilang, atau beralih kepemilikan dihapus dari buku secara sah dan dengan bukti lengkap.',
+    langkah: [
+      { p: 'PA', s: 'M', t: 'Mengidentifikasi aset yang akan dihapus', u: 'Sebab penghapusan: beralih kepemilikan (pemindahtanganan/putusan pengadilan), pemusnahan (tidak dapat dimanfaatkan/tidak bernilai ekonomis), atau sebab lain (hilang dicuri, terbakar/susut/kedaluwarsa/mati, keadaan kahar, bencana) (Pasal 40–42).', kel: 'Hasil cek fisik, foto', w: 'Saat ditemukan', o: 'Daftar usulan penghapusan' },
+      { p: 'SD', s: 'P', t: 'Meneliti & melengkapi bukti', u: 'Kecurian: surat keterangan Kepolisian + surat keterangan pembantu pengelola. Terbakar/susut/mati: pernyataan Sekdes + pernyataan Kades + laporan pemeriksaan. Kahar/bencana: surat keterangan instansi berwenang + pernyataan Kades (Pasal 42).', kel: 'Surat keterangan sesuai sebab', w: '7 hari', o: 'Berkas penghapusan lengkap' },
+      { p: 'SD', s: 'P', t: 'Membuat BA Usulan Penghapusan', u: 'Sekdes selaku pembantu pengelola bersama petugas aset membuat Berita Acara Usulan Penghapusan (format Lampiran B, Pasal 44 ayat 2).', kel: 'Berkas penghapusan', w: '1 hari', o: 'BA Usulan Penghapusan' },
+      { p: 'KD', s: 'D', t: 'Aset strategis?', u: 'Aset strategis (tanah kas desa, bangunan desa, pasar, mata air, dll. — Pasal 5 ayat 3) wajib mendapat persetujuan Bupati sebelum ditetapkan (Pasal 43). Aset lain cukup ditetapkan Kepala Desa (Pasal 44).', kel: 'BA Usulan', w: '1 hari', o: 'Keputusan jalur' },
+      { p: 'LU', s: 'P', t: 'Persetujuan Bupati (khusus strategis)', u: 'Permohonan persetujuan disampaikan kepada Bupati melalui Camat, dilampiri BA dan bukti.', kel: 'Surat permohonan, BA', w: 'Sesuai proses', o: 'Persetujuan Bupati' },
+      { p: 'KD', s: 'O', t: 'Menetapkan SK Penghapusan', u: 'Kepala Desa menetapkan Keputusan tentang Penghapusan Aset Desa (format Lampiran C). Untuk pemusnahan, dibuat dulu Berita Acara Pemusnahan (Pasal 41 ayat 3).', kel: 'BA, persetujuan Bupati (bila strategis)', w: '2 hari', o: 'SK Penghapusan' },
+      { p: 'PA', s: 'S', t: 'Menghapus dari Buku Inventaris & SIPADES', u: 'Aset dihapus dari Buku Data Inventaris dan SIPADES berdasarkan SK.', kel: 'SK Penghapusan', w: '3 hari', o: 'Buku inventaris mutakhir' }],
+    aturan: [['Penghapusan disebabkan beralih kepemilikan, pemusnahan, atau sebab lain.', 'Pasal 40'], ['Pemusnahan dengan cara dibakar, dihancurkan, ditimbun, ditenggelamkan, atau cara lain; dituangkan dalam Berita Acara Pemusnahan.', 'Pasal 41'], ['Kelengkapan menurut sebab: kepolisian (kecurian), pernyataan & laporan pemeriksaan (terbakar/susut/mati), surat instansi berwenang (kahar/bencana).', 'Pasal 42'], ['Penghapusan aset strategis dibuatkan Berita Acara dan ditetapkan Kepala Desa setelah mendapat persetujuan Bupati; aset lainnya tidak perlu persetujuan Bupati.', 'Pasal 43–44']],
+    dok: [{ l: 'BA Usulan Penghapusan (Lampiran B)', go: ['aset78dok', { d: 'bah' }] }, { l: 'SK Penghapusan Aset (Lampiran C)', go: ['aset78dok', { d: 'skh' }] }, { l: 'Transaksi penghapusan (format SIPADES)', go: ['list', { e: 'aset_trx', chip: 'Penghapusan' }] }] },
+  { k: 'pemindahtanganan', no: 8, tahap: 2, j: 'Pemindahtanganan', ps: 'Pasal 46–70', ic: 'next',
+    tujuan: 'Pengalihan kepemilikan aset dilakukan dengan nilai wajar, persetujuan yang benar, dan hasilnya masuk kas desa.',
+    langkah: [
+      { p: 'PA', s: 'M', t: 'Mengusulkan pemindahtanganan', u: 'Bentuknya tukar menukar, penjualan, atau penyertaan modal (Pasal 46). Tanah/bangunan hanya boleh tukar menukar atau penyertaan modal (Pasal 46 ayat 2).', kel: 'Data aset, alasan', w: '—', o: 'Usulan' },
+      { p: 'LU', s: 'P', t: 'Musyawarah Desa (aset strategis)', u: 'Usul pemindahtanganan aset strategis diajukan melalui Musyawarah Desa (Pasal 5 ayat 2 huruf e).', kel: 'Undangan, daftar hadir, BA Musdes', w: 'Sesuai jadwal', o: 'BA Musdes' },
+      { p: 'PA', s: 'P', t: 'Penilaian nilai wajar', u: 'Setiap pemindahtanganan didahului penilaian untuk mendapatkan nilai wajar (Pasal 47, 74–77).', kel: 'Laporan penilai/tim', w: '7–30 hari', o: 'Nilai wajar' },
+      { p: 'KD', s: 'D', t: 'Bentuk pemindahtanganan', u: 'Penjualan: langsung (meja, kursi, komputer, tanaman, ternak) atau lelang lewat KPKNL (kendaraan, mesin) (Pasal 63–67). Tukar menukar tanah: surat hasil Musdes ke Bupati, izin Bupati/Gubernur, tim kajian (Pasal 49–57). Penyertaan modal tanah kas desa ke BUM Desa (Pasal 69).', kel: 'Nilai wajar, BA Musdes', w: '—', o: 'Jalur terpilih' },
+      { p: 'KD', s: 'O', t: 'Menetapkan SK/Perdes & perjanjian', u: 'Penjualan ditetapkan dengan Keputusan Kepala Desa beserta bukti penjualan. Tukar menukar dan penyertaan modal ditetapkan dengan Peraturan Desa, disertai perjanjian tukar menukar (Pasal 58).', kel: 'Izin, draf SK/Perdes', w: '—', o: 'SK/Perdes, perjanjian' },
+      { p: 'LU', s: 'P', t: 'Setor hasil & serah terima', u: 'Hasil penjualan disetor seluruhnya ke Rekening Kas Desa sebagai PAD (Pasal 63 ayat 4). Serah terima dituangkan dalam BAST (Pasal 59, 68, 70).', kel: 'Bukti setor, BAST', w: '—', o: 'BAST' },
+      { p: 'PA', s: 'S', t: 'Menghapus & mencatat pengganti', u: 'Aset yang dipindahtangankan dihapus dari Buku Data Inventaris; tanah pengganti dicatat sebagai aset baru (Pasal 60, 68, 70).', kel: 'BAST, SK', w: '3 hari', o: 'Buku inventaris mutakhir' }],
+    aturan: [['Pemindahtanganan meliputi tukar menukar, penjualan, dan penyertaan modal. Tanah/bangunan hanya dengan tukar menukar atau penyertaan modal.', 'Pasal 46'], ['Penjualan langsung untuk barang seperti meja, kursi, komputer, tanaman, dan ternak; lelang melalui KPKNL untuk kendaraan bermotor dan peralatan mesin. Hasil disetor seluruhnya ke Rekening Kas Desa.', 'Pasal 63–67'], ['Biaya administrasi tukar menukar sampai sertifikat tanah pengganti ditanggung mitra.', 'Pasal 61'], ['Catatan: Permendagri 3/2024 menghapus penyertaan modal dari bentuk pemindahtanganan. Konsultasikan ke DPMD sebelum memakai jalur ini.', 'Permendagri 3/2024 Pasal 25']],
+    dok: [{ l: 'Peraturan Desa', go: ['list', { e: 'perdes' }] }, { l: 'Berita Acara', go: ['list', { e: 'berita_acara' }] }, { l: 'Transaksi penghapusan (format SIPADES)', go: ['list', { e: 'aset_trx', chip: 'Penghapusan' }] }] },
+  { k: 'penatausahaan', no: 9, tahap: 2, j: 'Penatausahaan', ps: 'Pasal 71–72', ic: 'book',
+    tujuan: 'Semua aset tercatat lengkap, berkode, dan dicocokkan dengan fisiknya secara berkala.',
+    langkah: [
+      { p: 'PA', s: 'M', t: 'Membukukan & memberi kode', u: 'Aset yang sudah ditetapkan penggunaannya dicatat dalam Buku Data Inventaris Aset Desa dan diberi kodefikasi (Pasal 71), memakai format Lampiran D.', kel: 'SK Status Penggunaan, BAST', w: 'Tiap ada mutasi', o: 'Buku Data Inventaris' },
+      { p: 'PA', s: 'P', t: 'Input ke SIPADES', u: 'Penatausahaan resmi memakai aplikasi Kemendagri, yaitu SIPADES (Permendagri 3/2024 Pasal 28 ayat 2). Aplikasi Pemdes menjadi pendamping dan arsip.', kel: 'Data aset', w: 'Tiap ada mutasi', o: 'Data SIPADES mutakhir' },
+      { p: 'PA', s: 'P', t: 'Inventarisasi / cek fisik', u: 'Perbup mewajibkan inventarisasi paling sedikit 1 kali dalam 3 tahun, dan setiap tahun untuk persediaan serta konstruksi dalam pengerjaan (Pasal 72). Kebijakan Desa: cek fisik setiap tahun per 31 Desember, boleh juga setiap semester.', kel: 'Kertas kerja cek fisik', w: 'Desember (± Juni)', o: 'Kertas kerja terisi' },
+      { p: 'SD', s: 'P', t: 'Koordinasi & verifikasi inventarisasi', u: 'Sekdes mengoordinasikan pelaksanaan inventarisasi (Pasal 6 ayat 1 huruf d).', kel: 'Kertas kerja', w: '3 hari', o: 'Hasil terverifikasi' },
+      { p: 'PA', s: 'S', t: 'Laporan hasil inventarisasi ke Kades', u: 'Laporan hasil inventarisasi disampaikan kepada Kepala Desa paling lama 3 bulan setelah inventarisasi selesai (Pasal 72 ayat 3).', kel: 'BA Cek Fisik', w: '≤ 3 bulan', o: 'BA & laporan hasil inventarisasi' }],
+    aturan: [['Aset yang sudah ditetapkan penggunaannya diinventarisir dalam Buku Data Inventaris dan diberi kodefikasi.', 'Pasal 71'], ['Inventarisasi paling sedikit 1 kali dalam 3 tahun; persediaan dan konstruksi dalam pengerjaan setiap tahun; laporan ke Kepala Desa paling lama 3 bulan setelah selesai.', 'Pasal 72'], ['Penatausahaan aset desa menggunakan aplikasi yang dikelola Kementerian Dalam Negeri.', 'Permendagri 3/2024 Pasal 28 ayat 2']],
+    dok: [{ l: 'Buku Data Inventaris Aset Desa (Lampiran D)', go: ['aset78dok', { d: 'buku' }], cek: 'buku' }, { l: 'Inventarisasi & Penatausahaan (KIB)', go: ['list', { e: 'aset' }] }, { l: 'Laporan Format SIPADES', go: ['sipadeslap'] }, { l: 'Cek fisik / stock opname', go: ['asetso'], cek: 'so' }],
+    frc: 'FRC Mandiri 5 butir 2 (30%): Buku Data Inventaris (bersumber SIPADES) belum diunggah.' },
+  { k: 'pelaporan', no: 10, tahap: 2, j: 'Pelaporan', ps: 'Pasal 73', ic: 'chart',
+    tujuan: 'Posisi aset dilaporkan berkala dan menjadi bahan neraca Pemerintah Desa.',
+    langkah: [
+      { p: 'PA', s: 'M', t: 'Menyusun laporan semesteran & tahunan', u: 'Petugas/pengurus aset menyusun laporan aset semesteran dan tahunan untuk Kepala Desa (Pasal 73 ayat 1).', kel: 'Buku inventaris, mutasi', w: 'Juli & Januari', o: 'Draf laporan aset' },
+      { p: 'SD', s: 'P', t: 'Meneliti & mencocokkan dengan belanja modal', u: 'Sekdes mencocokkan laporan aset dengan realisasi belanja modal APB Desa (Siskeudes).', kel: 'LRA, laporan aset', w: '5 hari', o: 'Laporan terverifikasi' },
+      { p: 'KD', s: 'O', t: 'Menyusun laporan aset desa', u: 'Kepala Desa menyusun laporan aset semesteran dan tahunan sebagai bahan penyusunan neraca Pemerintah Desa (Pasal 73 ayat 2–3).', kel: 'Laporan terverifikasi', w: '2 hari', o: 'Laporan aset desa' },
+      { p: 'LU', s: 'S', t: 'Menyampaikan ke Bupati', u: 'Laporan disampaikan kepada Bupati melalui Camat paling lama 3 bulan setelah laporan selesai (Pasal 73 ayat 4).', kel: 'Surat pengantar', w: '≤ 3 bulan', o: 'Tanda terima' }],
+    aturan: [['Petugas/pengurus menyusun laporan semesteran dan tahunan untuk Kepala Desa; Kepala Desa menyusun laporan semesteran dan tahunan sebagai bahan neraca.', 'Pasal 73 ayat 1–3'], ['Laporan disampaikan kepada Bupati paling lama 3 bulan setelah laporan selesai.', 'Pasal 73 ayat 4']],
+    dok: [{ l: 'Laporan Semester / Kondisi', go: ['asetcetak'] }, { l: 'Laporan Format SIPADES (rekapitulasi)', go: ['sipadeslap'] }] },
+  { k: 'penilaian', no: 11, tahap: 2, j: 'Penilaian', ps: 'Pasal 74–77', ic: 'scale',
+    tujuan: 'Nilai aset untuk sewa, kerja sama, atau pemindahtanganan ditetapkan secara wajar dan dapat dipertanggungjawabkan.',
+    langkah: [
+      { p: 'PA', s: 'M', t: 'Mengidentifikasi kebutuhan penilaian', u: 'Penilaian dilakukan dalam rangka pemanfaatan atau pemindahtanganan, kecuali pinjam pakai (Pasal 75).', kel: 'Rencana pemanfaatan/pemindahtanganan', w: '—', o: 'Daftar objek dinilai' },
+      { p: 'KD', s: 'D', t: 'Tanah/bangunan?', u: 'Tanah/bangunan dinilai penilai pemerintah atau penilai publik (Pasal 76). Selain itu dinilai tim yang ditetapkan Kepala Desa dan dapat melibatkan penilai publik (Pasal 77).', kel: '—', w: '—', o: '—' },
+      { p: 'LU', s: 'P', t: 'Penilai pemerintah/publik', u: 'Untuk tanah/bangunan, penilai pemerintah (DJKN/KPKNL) atau penilai publik berizin menghasilkan nilai wajar dan bertanggung jawab atas hasilnya.', kel: 'Data objek, sertifikat', w: 'Sesuai penilai', o: 'Laporan penilaian' },
+      { p: 'KD', s: 'O', t: 'Tim penilai desa (selain tanah/bangunan)', u: 'Kepala Desa menetapkan tim penilai. Tanpa penilai, hasilnya hanya nilai taksiran (Pasal 77 ayat 3).', kel: 'SK tim, survei harga pasar', w: '7 hari', o: 'BA hasil penilaian' },
+      { p: 'KD', s: 'S', t: 'Menetapkan hasil penilaian', u: 'Hasil penilaian tim ditetapkan Kepala Desa (Pasal 77 ayat 4). Biaya penilaian dibebankan pada APB Desa (Pasal 75 ayat 3).', kel: 'BA/laporan penilaian', w: '1 hari', o: 'Penetapan nilai wajar' }],
+    aturan: [['Penilaian dilakukan Pemerintah Daerah bersama Pemerintah Desa dalam rangka pemanfaatan atau pemindahtanganan, kecuali pinjam pakai; biaya dari APB Desa.', 'Pasal 74–75'], ['Tanah/bangunan dinilai penilai pemerintah atau penilai publik untuk mendapatkan nilai wajar.', 'Pasal 76'], ['Selain tanah/bangunan dinilai tim yang ditetapkan Kepala Desa; tanpa penilai hasilnya nilai taksiran.', 'Pasal 77']],
+    dok: [{ l: 'Kalkulator harga dasar sewa (Pasal 15)', go: ['aset78dok', { d: 'kalk' }] }, { l: 'Register Pemanfaatan Aset', go: ['list', { e: 'aset_manfaat' }] }] },
+  { k: 'pembinaan', no: 12, tahap: 3, j: 'Pembinaan', ps: 'Pasal 78', ic: 'sprout',
+    tujuan: 'Pengelola aset terus meningkat kemampuannya dan menindaklanjuti arahan kabupaten/kecamatan.',
+    langkah: [
+      { p: 'LU', s: 'M', t: 'Bupati/Camat melakukan pembinaan', u: 'Bupati melakukan pembinaan, pengawasan, dan pengendalian aset desa, dan dapat melimpahkannya kepada Camat (Pasal 78).', kel: 'Undangan/jadwal', w: 'Sesuai jadwal', o: 'Bimtek/supervisi' },
+      { p: 'PA', s: 'P', t: 'Mengikuti bimtek & sosialisasi', u: 'Pengurus aset dan operator mengikuti bimbingan teknis aset/SIPADES, lalu menyimpan sertifikatnya.', kel: 'Surat tugas', w: 'Sesuai jadwal', o: 'Sertifikat/notulen' },
+      { p: 'SD', s: 'P', t: 'Menindaklanjuti arahan pembinaan', u: 'Sekdes memastikan arahan pembinaan diterapkan dalam administrasi aset desa.', kel: 'Catatan supervisi', w: '7 hari', o: 'Rencana perbaikan' },
+      { p: 'KD', s: 'S', t: 'Melaporkan hasil tindak lanjut', u: 'Kepala Desa melaporkan tindak lanjut pembinaan kepada Camat.', kel: 'Bukti perbaikan', w: '—', o: 'Laporan tindak lanjut' }],
+    aturan: [['Bupati melakukan pembinaan, pengawasan, dan pengendalian aset desa serta menetapkan kebijakan pengelolaan aset desa; dapat dilimpahkan kepada Camat.', 'Pasal 78']],
+    dok: [{ l: 'Sertifikat bimtek aparatur', go: ['list', { e: 'aparat_sert' }] }, { l: 'Pengawasan & Tindak Lanjut', go: ['list', { e: 'pengawasan' }] }] },
+  { k: 'pengawasan', no: 13, tahap: 3, j: 'Pengawasan', ps: 'Pasal 78–79', ic: 'eye',
+    tujuan: 'Temuan pemeriksa (Inspektorat, Camat, BPD) ditindaklanjuti tuntas dan buktinya tersimpan.',
+    langkah: [
+      { p: 'LU', s: 'M', t: 'Pengawasan / audit APIP & Camat', u: 'Aparat pengawasan intern pemerintah dapat mengaudit penggunaan, pemanfaatan, dan pemindahtanganan aset desa; hasilnya disampaikan kepada Bupati (Pasal 79).', kel: 'Surat tugas pemeriksa', w: 'Sesuai jadwal', o: 'LHP / kertas kerja' },
+      { p: 'SD', s: 'P', t: 'Menyiapkan dokumen & fisik aset', u: 'Sekdes dan pengurus aset menyiapkan Buku Data Inventaris, SK, perjanjian, bukti kepemilikan, dan fisik aset.', kel: 'Semua dokumen aset', w: 'Saat pemeriksaan', o: 'Dokumen siap' },
+      { p: 'KD', s: 'O', t: 'Menetapkan rencana tindak lanjut', u: 'Kepala Desa menetapkan penanggung jawab dan target penyelesaian setiap temuan.', kel: 'LHP', w: '7 hari', o: 'Rencana tindak lanjut' },
+      { p: 'PA', s: 'P', t: 'Melaksanakan tindak lanjut & unggah bukti', u: 'Penanggung jawab melaksanakan tindak lanjut lalu mengunggah buktinya (FRC/SIMWAS).', kel: 'Bukti tindak lanjut', w: 'Sesuai target', o: 'Bukti TL' },
+      { p: 'KD', s: 'S', t: 'Melaporkan tindak lanjut', u: 'Laporan tindak lanjut disampaikan kepada Camat/Inspektorat.', kel: 'Rekap TL', w: '—', o: 'Laporan TL' }],
+    aturan: [['APIP dapat mengaudit penggunaan, pemanfaatan, dan pemindahtanganan aset desa; hasilnya disampaikan kepada Bupati untuk ditindaklanjuti.', 'Pasal 79']],
+    dok: [{ l: 'Pengawasan & Tindak Lanjut (objek Aset/Barang Desa)', go: ['list', { e: 'pengawasan' }], cek: 'tl' }],
+    frc: 'FRC Mandiri 7: laporan hasil pengendalian & pengawasan Camat atas aset beserta tindak lanjutnya belum diunggah.' },
+  { k: 'pengendalian', no: 14, tahap: 3, j: 'Pengendalian', ps: 'Pasal 6 ayat 1 huruf e, 72, 78', ic: 'check',
+    tujuan: 'Catatan buku selalu cocok dengan fisik barang, dan selisih segera ditelusuri.',
+    langkah: [
+      { p: 'SD', s: 'M', t: 'Menjadwalkan cek fisik / stock opname', u: 'Sekdes menjadwalkan cek fisik aset dan stock opname persediaan per 31 Desember (boleh juga 30 Juni), lalu menunjuk tim.', kel: 'Jadwal, tim', w: 'Desember (± Juni)', o: 'Surat tugas/jadwal' },
+      { p: 'PA', s: 'P', t: 'Cek fisik aset & persediaan', u: 'Tim mencocokkan catatan dengan fisik: keberadaan, kondisi (B/RR/RB), label kode, dan dokumen; menghitung persediaan barang habis pakai.', kel: 'Kertas kerja, KIR', w: '3–5 hari', o: 'Kertas kerja terisi' },
+      { p: 'PA', s: 'D', t: 'Ada selisih?', u: 'Barang yang tidak ditemukan ditelusuri ke pemakai terakhir. Barang yang dikuasai pihak lain/purna tugas ditarik dengan BAST. Rusak berat diusulkan dihapus, rusak ringan diusulkan pemeliharaan.', kel: 'Hasil cek', w: '7 hari', o: 'Daftar tindak lanjut selisih' },
+      { p: 'SD', s: 'O', t: 'Menandatangani BA Cek Fisik / Stock Opname', u: 'Berita Acara Cek Fisik/Stock Opname ditandatangani tim (Sekdes dan pengurus aset) dan diketahui Kepala Desa.', kel: 'Kertas kerja', w: '1 hari', o: 'BA Cek Fisik / Stock Opname' },
+      { p: 'KD', s: 'S', t: 'Mengetahui & menindaklanjuti', u: 'Kepala Desa mengetahui BA, menindaklanjuti selisih, dan memakai hasilnya untuk laporan semesteran/tahunan.', kel: 'BA', w: '—', o: 'Tindak lanjut & laporan' }],
+    aturan: [['Sekretaris Desa melakukan pengawasan dan pengendalian atas pengelolaan aset desa.', 'Pasal 6 ayat 1 huruf e'], ['Persediaan diinventarisasi setiap tahun.', 'Pasal 72 ayat 2'], ['Kebijakan Desa Pandanwangi: cek fisik aset tetap dan stock opname persediaan setiap tahun per 31 Desember, boleh juga per semester.', 'SOP desa']],
+    dok: [{ l: 'Cek Fisik Aset & Stock Opname Persediaan', go: ['asetso'], cek: 'so' }, { l: 'Persediaan (barang habis pakai)', go: ['list', { e: 'persediaan' }] }],
+    frc: 'FRC Mandiri 5 butir 4 (0%): Berita Acara Stock Opname persediaan/pemeriksaan barang habis pakai belum dibuat.' }
+];
+
+/* ---------- bagan alur (swimlane) SOP: SVG, ikut tercetak & masuk Word ---------- */
+function sopWrap(s, n) {
+  const w = String(s || '').split(/\s+/), L = []; let cur = '';
+  w.forEach(x => { if ((cur + ' ' + x).trim().length > n && cur) { L.push(cur); cur = x; } else cur = (cur + ' ' + x).trim(); });
+  if (cur) L.push(cur);
+  return L.length > 3 ? L.slice(0, 2).concat([L.slice(2).join(' ').slice(0, n - 1) + '…']) : L;
+}
+const SOP_WARNA = { M: ['#e8f5e9', '#2e7d32'], S: ['#e8f5e9', '#2e7d32'], P: ['#e3f2fd', '#1565c0'], D: ['#fff8e1', '#b7791f'], O: ['#f3e5f5', '#6a1b9a'] };
+function sopFlow(steps) {
+  const L = SOP_LANE, cw = 128, hh = 44, rh = 74, W = L.length * cw, H = hh + steps.length * rh + 8;
+  const li = k => Math.max(0, L.findIndex(l => l.k === k)), cx = i => i * cw + cw / 2, cy = i => hh + i * rh + rh / 2;
+  const sw = 108, sh = 46;
+  let g = '';
+  L.forEach((l, i) => {
+    g += `<rect x="${i * cw}" y="0" width="${cw}" height="${H}" fill="${i % 2 ? '#f6f8fb' : '#ffffff'}" stroke="#c9d3e0" stroke-width="1"/>`;
+    g += `<rect x="${i * cw}" y="0" width="${cw}" height="${hh}" fill="#26415f"/><text x="${cx(i)}" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" font-family="Arial">${esc(l.l)}</text><text x="${cx(i)}" y="33" text-anchor="middle" font-size="9" fill="#cfe0f5" font-family="Arial">${esc(l.s)}</text>`;
+  });
+  steps.forEach((s, i) => {
+    if (i === steps.length - 1) return;
+    const a = li(s.p), b = li(steps[i + 1].p), y1 = cy(i) + sh / 2, y2 = cy(i + 1) - sh / 2, ym = Math.round((y1 + y2) / 2);
+    g += `<path d="M${cx(a)} ${y1} V${ym} H${cx(b)} V${y2 - 3}" fill="none" stroke="#51627a" stroke-width="1.5"/><path d="M${cx(b) - 4} ${y2 - 7} L${cx(b)} ${y2} L${cx(b) + 4} ${y2 - 7} Z" fill="#51627a"/>`;
+    if (s.s === 'D') g += `<text x="${cx(a) + 6}" y="${y1 + 12}" font-size="8.5" fill="#b7791f" font-family="Arial" font-weight="700">ya/tidak</text>`;
+  });
+  steps.forEach((s, i) => {
+    const x = cx(li(s.p)), y = cy(i), [bg, st] = SOP_WARNA[s.s] || SOP_WARNA.P;
+    if (s.s === 'D') g += `<path d="M${x} ${y - sh / 2 - 4} L${x + sw / 2 + 6} ${y} L${x} ${y + sh / 2 + 4} L${x - sw / 2 - 6} ${y} Z" fill="${bg}" stroke="${st}" stroke-width="1.6"/>`;
+    else if (s.s === 'M' || s.s === 'S') g += `<rect x="${x - sw / 2}" y="${y - sh / 2}" width="${sw}" height="${sh}" rx="${sh / 2}" fill="${bg}" stroke="${st}" stroke-width="1.6"/>`;
+    else if (s.s === 'O') g += `<rect x="${x - sw / 2}" y="${y - sh / 2}" width="${sw}" height="${sh}" rx="3" fill="${bg}" stroke="${st}" stroke-width="1.6"/><rect x="${x - sw / 2 + 3}" y="${y - sh / 2 + 3}" width="${sw - 6}" height="${sh - 6}" rx="2" fill="none" stroke="${st}" stroke-width=".8"/>`;
+    else g += `<rect x="${x - sw / 2}" y="${y - sh / 2}" width="${sw}" height="${sh}" rx="4" fill="${bg}" stroke="${st}" stroke-width="1.6"/>`;
+    const T = sopWrap(s.t, s.s === 'D' ? 16 : 20), y0 = y - (T.length - 1) * 5.5 + 3;
+    T.forEach((t, j) => { g += `<text x="${x}" y="${y0 + j * 11}" text-anchor="middle" font-size="9" fill="#14202e" font-family="Arial">${esc(t)}</text>`; });
+    g += `<circle cx="${x - sw / 2 - 2}" cy="${y - sh / 2 + 2}" r="8" fill="${st}"/><text x="${x - sw / 2 - 2}" y="${y - sh / 2 + 5.5}" text-anchor="middle" font-size="9" font-weight="700" fill="#fff" font-family="Arial">${i + 1}</text>`;
+  });
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="width:100%;height:auto;max-width:${W}px;display:block;margin:0 auto" role="img" aria-label="Bagan alur">${g}</svg>`;
+}
+function sopLegend() {
+  const it = [['M', 'Mulai'], ['P', 'Proses / kegiatan'], ['D', 'Keputusan / pilihan'], ['O', 'Penetapan / tanda tangan'], ['S', 'Selesai / arsip']];
+  let g = '', x = 4;
+  it.forEach(([k, l]) => {
+    const [bg, st] = SOP_WARNA[k];
+    if (k === 'D') g += `<path d="M${x + 14} 4 L${x + 28} 14 L${x + 14} 24 L${x} 14 Z" fill="${bg}" stroke="${st}" stroke-width="1.4"/>`;
+    else g += `<rect x="${x}" y="5" width="28" height="18" rx="${k === 'M' || k === 'S' ? 9 : 3}" fill="${bg}" stroke="${st}" stroke-width="1.4"/>`;
+    g += `<text x="${x + 34}" y="18" font-size="10" fill="#222" font-family="Arial">${esc(l)}</text>`; x += 40 + l.length * 5.6;
+  });
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${x} 28" width="${x}" height="28" style="width:100%;height:auto;max-width:${x}px;display:block">${g}</svg>`;
+}
+/* struktur pejabat pengelola (Pasal 5–6) */
+function sopStruktur() {
+  const s = S.set || {}, nm = (v, d) => esc(v || d);
+  const box = (x, y, w, h, t1, t2, t3, c) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="${c[0]}" stroke="${c[1]}" stroke-width="1.6"/><text x="${x + w / 2}" y="${y + 18}" text-anchor="middle" font-size="11.5" font-weight="700" fill="#14202e" font-family="Arial">${t1}</text><text x="${x + w / 2}" y="${y + 33}" text-anchor="middle" font-size="9.5" fill="#455a64" font-family="Arial">${t2}</text><text x="${x + w / 2}" y="${y + 48}" text-anchor="middle" font-size="10" fill="#0d47a1" font-family="Arial">${t3}</text>`;
+  const ln = (x1, y1, x2, y2, d) => `<path d="M${x1} ${y1} V${(y1 + y2) / 2} H${x2} V${y2}" fill="none" stroke="#51627a" stroke-width="1.5"${d ? ' stroke-dasharray="4 3"' : ''}/>`;
+  const C1 = ['#fff3e0', '#e65100'], C2 = ['#e3f2fd', '#1565c0'], C3 = ['#e8f5e9', '#2e7d32'], C4 = ['#f5f5f5', '#78909c'];
+  const g = box(200, 6, 240, 58, 'KEPALA DESA', 'Pemegang Kekuasaan Pengelolaan Aset (Ps. 5)', nm(s.nama_kades, '……'), C1)
+    + ln(320, 64, 320, 92) + box(200, 92, 240, 58, 'SEKRETARIS DESA', 'Pembantu Pengelola Aset (Ps. 5–6)', nm(s.nama_sekdes, '……'), C2)
+    + ln(320, 150, 160, 182) + ln(320, 150, 480, 182, 1)
+    + box(40, 182, 240, 58, 'PETUGAS / PENGURUS ASET', 'Kepala Urusan (Ps. 5 ayat 6)', nm(s.nama_pengurus_aset, '……'), C3)
+    + box(360, 182, 240, 58, 'PEMAKAI BARANG', 'Perangkat / lembaga pengguna', 'sesuai SK Status Penggunaan', C4);
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 248" width="640" height="248" style="width:100%;height:auto;max-width:640px;display:block;margin:0 auto" role="img" aria-label="Struktur pengelola aset">${g}</svg>`;
+}
+/* siklus 14 aspek (untuk cetak) */
+function sopSiklus() {
+  const cols = SOP_TAHAP.map((t, i) => ({ t, A: SOP78.filter(a => a.tahap === i && a.no > 0) }));
+  const cw = 156, W = cols.length * cw + 8; let g = '';
+  const warna = ['#1565c0', '#2e7d32', '#6a1b9a', '#b7791f'];
+  cols.forEach((c, i) => {
+    const x = 4 + i * cw, H = 34 + c.A.length * 30;
+    g += `<rect x="${x}" y="4" width="${cw - 8}" height="${H}" rx="8" fill="#fff" stroke="${warna[i]}" stroke-width="1.6"/><rect x="${x}" y="4" width="${cw - 8}" height="24" rx="8" fill="${warna[i]}"/><text x="${x + (cw - 8) / 2}" y="20" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff" font-family="Arial">${esc(c.t.length > 26 ? c.t.slice(0, 26) + '…' : c.t)}</text>`;
+    c.A.forEach((a, j) => { const y = 34 + j * 30; g += `<circle cx="${x + 16}" cy="${y + 10}" r="9" fill="${warna[i]}"/><text x="${x + 16}" y="${y + 13.5}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff" font-family="Arial">${a.no}</text><text x="${x + 30}" y="${y + 9}" font-size="10" font-weight="700" fill="#14202e" font-family="Arial">${esc(a.j)}</text><text x="${x + 30}" y="${y + 21}" font-size="8.5" fill="#607d8b" font-family="Arial">${esc(a.ps)}</text>`; });
+    if (i < cols.length - 1) g += `<path d="M${x + cw - 8} 60 h8" stroke="#51627a" stroke-width="1.5"/><path d="M${x + cw - 3} 56 l5 4 l-5 4 z" fill="#51627a"/>`;
+  });
+  const H = 34 + Math.max(...cols.map(c => c.A.length)) * 30 + 10;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="width:100%;height:auto;max-width:${W}px;display:block;margin:0 auto" role="img" aria-label="Siklus 14 aspek">${g}</svg>`;
+}
+/* ---------- status kelengkapan dari data aplikasi ---------- */
+async function sop78Status() {
+  const th = String(new Date().getFullYear());
+  const L = (e, f, lim) => call('list', { entity: e, filters: f || {}, limit: lim || 500 }).catch(() => ({ rows: [], total: 0 }));
+  const [sk, man, dok, pel, so, tl, A] = await Promise.all([L('sk_kades', { tanggal__pre: th }), L('aset_manfaat', {}, 2000), L('aset_dok', {}, 2000), L('aset_pelihara', { tanggal__pre: th }), L('aset_so', { tahun: th }), L('pengawasan', { objek: 'Aset/Barang Desa' }), asetSemua({}).catch(() => [])]);
+  const R = {}, s = S.set || {};
+  const skp = (sk.rows || []).find(x => /pengelola|pengurus aset|pengelola barang/i.test(x.tentang || ''));
+  R.skp = skp ? { ok: 1, t: skp.nomor } : { ok: 0, t: 'Belum ada SK tahun ' + th };
+  const skg = (sk.rows || []).find(x => /status penggunaan/i.test(x.tentang || ''));
+  R.skg = skg ? { ok: 1, t: skg.nomor } : { ok: 0, t: 'Belum ada SK tahun ' + th };
+  R.sop = s.sop_aset_sah ? { ok: 1, t: 'Disahkan ' + fDate(s.sop_aset_sah) } : { ok: 0, t: 'Belum disahkan' };
+  const aktif = A.filter(a => a.status === 'Aktif'), sud = aktif.filter(a => a.sipades === 'Sudah');
+  R.buku = aktif.length ? { ok: 1, t: aktif.length + ' aset aktif · ' + sud.length + ' di SIPADES' } : { ok: 0, t: 'Belum ada aset aktif' };
+  const MR = man.rows || [], berlaku = MR.filter(x => (x.status || 'Berlaku') === 'Berlaku'), bad = MR.filter(x => manfaatCek(x).some(c => c.lvl === 'bad'));
+  R.manfaat = !MR.length ? { ok: 0, t: 'Belum ada pemanfaatan tercatat' } : { ok: bad.length ? 0 : 1, t: berlaku.length + ' berlaku' + (bad.length ? ' · ' + bad.length + ' tidak sesuai Perbup' : '') };
+  const DR = dok.rows || [], hil = DR.filter(x => x.status === 'Hilang'), perlu = A.filter(a => a.status !== 'Dihapus' && (kibHuruf(a) === 'A' || (kibHuruf(a) === 'B' && (a.no_polisi || a.no_bpkb)))), punya = new Set(DR.map(x => x.ref));
+  const kurang = perlu.filter(a => !punya.has(a.id));
+  R.dok = !DR.length ? { ok: 0, t: 'Register kosong · ' + perlu.length + ' tanah/kendaraan perlu dicatat' } : { ok: !hil.length && !kurang.length ? 1 : 0, t: DR.length + ' dokumen' + (hil.length ? ' · ' + hil.length + ' hilang' : '') + (kurang.length ? ' · ' + kurang.length + ' aset belum ada dokumennya' : '') };
+  R.pelihara = (pel.rows || []).length ? { ok: 1, t: pel.total + ' catatan tahun ' + th } : { ok: 0, t: 'Belum ada catatan tahun ' + th };
+  const SR = so.rows || [], fin = SR.filter(x => x.status === 'Final');
+  R.so = fin.length ? { ok: 1, t: fin.map(x => x.jenis + ' ' + (x.periode || '')).join(' · ') } : SR.length ? { ok: 0, t: SR.length + ' draf, belum final' } : { ok: 0, t: 'Belum ada tahun ' + th };
+  const TR = tl.rows || [], blm = TR.filter(x => x.status !== 'Selesai');
+  R.tl = TR.length ? { ok: blm.length ? 0 : 1, t: TR.length + ' temuan · ' + blm.length + ' belum selesai' } : { ok: 0, t: 'Belum ada temuan aset tercatat' };
+  return R;
+}
+const SOP78_CSS = `<style id="sop78css">
+.s78-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.s78-col{border:1px solid var(--line);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px;border-top:4px solid var(--tc)}
+.s78-col>b{font-size:12px;color:var(--tc)}
+.s78-a{all:unset;cursor:pointer;display:flex;gap:8px;align-items:center;padding:6px 8px;border-radius:9px;border:1px solid var(--line);background:var(--surface)}
+.s78-a:hover{border-color:var(--tc)}.s78-a.on{background:color-mix(in srgb,var(--tc) 14%,var(--surface));border-color:var(--tc)}
+.s78-a .n{width:24px;height:24px;border-radius:50%;background:var(--tc);color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none}
+.s78-a .x{flex:1;min-width:0}.s78-a .x b{display:block;font-size:13px}.s78-a .x small{color:var(--muted);font-size:11px}
+.s78-dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--line)}.s78-dot.ok{background:var(--ok)}.s78-dot.no{background:var(--warn)}
+.s78-flow{overflow-x:auto;border:1px solid var(--line);border-radius:10px;padding:6px;background:#fff}
+.s78-st{display:grid;grid-template-columns:28px 1fr;gap:4px 10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px}
+.s78-st .no{width:24px;height:24px;border-radius:50%;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center}
+.s78-st .mt{grid-column:2;display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11.5px;color:var(--muted)}
+.s78-rule{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px dashed var(--line);font-size:13px}.s78-rule:last-child{border:0}
+.s78-frc{border-left:4px solid var(--warn);background:color-mix(in srgb,var(--warn) 10%,var(--surface));padding:8px 10px;border-radius:8px;font-size:13px}
+.s78-dk{display:flex;gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--line);border-radius:10px}
+.s78-dk .x{flex:1;min-width:0;font-size:13px}.s78-dk .x small{display:block;color:var(--muted);font-size:11.5px}
+@media(max-width:820px){.s78-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.s78-grid{grid-template-columns:1fr}}
+</style>`;
+const S78_TC = ['#1565c0', '#2e7d32', '#6a1b9a', '#b7791f'];
+const laneNama = k => (SOP_LANE.find(l => l.k === k) || {}).l || k;
+VIEWS.asetsop78 = async (p, main, alive) => {
+  setTop('SOP Aset Desa · Perbup 78/2021');
+  if (!$('#sop78css')) document.head.insertAdjacentHTML('beforeend', SOP78_CSS);
+  const st = S.sop78 = S.sop78 || { k: 'pemanfaatan' }; if (p && p.k) st.k = p.k;
+  main.innerHTML = '<div class="skel" style="height:240px"></div>';
+  const R = await sop78Status(); if (alive && !alive()) return;
+  const s = S.set || {}, th = new Date().getFullYear();
+  const cekA = a => { const c = (a.dok || []).filter(d => d.cek && R[d.cek]); return !c.length ? '' : c.every(d => R[d.cek].ok) ? 'ok' : 'no'; };
+  const cur = SOP78.find(a => a.k === st.k) || SOP78[0], ix = SOP78.indexOf(cur), tc = S78_TC[cur.tahap];
+  main.innerHTML = `<div class="stack">
+    <div class="card stack" style="border-left:4px solid var(--pri)"><div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap"><div style="flex:1;min-width:220px"><b style="font-size:16px">SOP Pengelolaan Aset Desa ${esc(s.nama_desa || '')}</b><div class="meta">Mengikuti ${esc(PB78)} — 14 aspek + pejabat pengelola. Ketuk tiap aspek untuk melihat alur, langkah, aturan, dan kelengkapan dokumennya.</div>
+      <div class="meta" style="margin-top:4px">Nomor <b>${esc(s.sop_aset_no || 'SOP/ASET/01/' + th)}</b> · Efektif ${esc(s.sop_aset_efektif ? fDate(s.sop_aset_efektif) : '—')} · ${R.sop.ok ? '<span class="pill ok">' + esc(R.sop.t) + '</span>' : '<span class="pill warn">Belum disahkan</span>'}</div></div>
+      <div class="btns"><button class="btn sm pri" data-act="s78Cetak">${ic('print')}Cetak SOP lengkap (Word/PDF)</button>${S.user.admin ? `<button class="btn sm" data-act="s78Ident">${ic('edit')}Identitas & pengesahan</button>` : ''}<button class="btn sm" data-act="go" data-go='["aset78dok"]'>${ic('stamp')}Dokumen Perbup 78</button></div></div></div>
+    <div class="card stack"><div class="sec-h" style="margin:0"><h2 style="font-size:14px">${ic('users')} Struktur pejabat pengelola</h2><button class="btn sm" data-act="s78K" data-k="pengelola">Lihat aspek pengelola</button></div><div class="s78-flow">${sopStruktur()}</div></div>
+    <div class="card stack"><div class="sec-h" style="margin:0"><h2 style="font-size:14px">${ic('list')} Siklus 14 aspek pengelolaan</h2><span class="meta"><span class="s78-dot ok" style="display:inline-block"></span> dokumen lengkap · <span class="s78-dot no" style="display:inline-block"></span> perlu dilengkapi</span></div>
+      <div class="s78-grid">${SOP_TAHAP.map((t, i) => `<div class="s78-col" style="--tc:${S78_TC[i]}"><b>${esc(t)}</b>${SOP78.filter(a => a.tahap === i).map(a => `<button class="s78-a ${a.k === cur.k ? 'on' : ''}" data-act="s78K" data-k="${a.k}"><span class="n">${a.no || ic('users')}</span><span class="x"><b>${esc(a.j)}</b><small>${esc(a.ps)}</small></span><span class="s78-dot ${cekA(a)}"></span></button>`).join('')}</div>`).join('')}</div></div>
+    <div class="card stack" id="s78Det" style="border-top:4px solid ${tc}">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="s78-a on" style="--tc:${tc};cursor:default;padding:0;border:0;background:none"><span class="n" style="width:34px;height:34px;font-size:15px">${cur.no || ic('users')}</span></span><div style="flex:1;min-width:200px"><b style="font-size:17px">${cur.no ? 'Aspek ' + cur.no + '. ' : ''}${esc(cur.j)}</b><div class="meta">${esc(PB78S)} ${esc(cur.ps)}</div></div>
+        <div class="btns">${ix > 0 ? `<button class="btn sm" data-act="s78K" data-k="${SOP78[ix - 1].k}">${ic('back')}${esc(SOP78[ix - 1].j)}</button>` : ''}${ix < SOP78.length - 1 ? `<button class="btn sm" data-act="s78K" data-k="${SOP78[ix + 1].k}">${esc(SOP78[ix + 1].j)} ${ic('next')}</button>` : ''}</div></div>
+      <div><b>Tujuan:</b> ${esc(cur.tujuan)}</div>
+      ${cur.frc ? `<div class="s78-frc">${ic('eye')} <b>Catatan Inspektorat (FRC 2026):</b> ${esc(cur.frc)}</div>` : ''}
+      <div class="sec-h" style="margin:4px 0 0"><h2 style="font-size:14px">${ic('chart')} Bagan alur</h2></div>
+      <div class="s78-flow">${sopFlow(cur.langkah)}</div>${sopLegend()}
+      <div class="sec-h" style="margin:4px 0 0"><h2 style="font-size:14px">${ic('list')} Langkah & mutu baku</h2></div>
+      <div class="stack" style="gap:6px">${cur.langkah.map((l, i) => `<div class="s78-st"><span class="no" style="background:${(SOP_WARNA[l.s] || SOP_WARNA.P)[1]}">${i + 1}</span><div><span class="pill">${esc(laneNama(l.p))}</span> <b>${esc(l.t)}</b><div style="font-size:13px;margin-top:2px">${esc(l.u)}</div></div><div class="mt"><span>${ic('clip')} ${esc(l.kel || '—')}</span><span>${ic('clock')} ${esc(l.w || '—')}</span><span>${ic('file')} ${esc(l.o || '—')}</span></div></div>`).join('')}</div>
+      <div class="sec-h" style="margin:4px 0 0"><h2 style="font-size:14px">${ic('scale')} Aturan kunci</h2></div>
+      <div>${cur.aturan.map(r => `<div class="s78-rule"><span class="pill" style="flex:none">${esc(r[1])}</span><span>${esc(r[0])}</span></div>`).join('')}</div>
+      <div class="sec-h" style="margin:4px 0 0"><h2 style="font-size:14px">${ic('clip')} Kelengkapan & data di aplikasi</h2>${cur.k === 'pengawasan' && canWrite('pengawasan') ? `<button class="btn sm" data-act="s78Frc">${ic('plus')}Catat temuan aset FRC 2026</button>` : ''}</div>
+      <div class="stack" style="gap:6px">${(cur.dok || []).map((d, i) => { const r = d.cek && R[d.cek]; return `<div class="s78-dk">${r ? `<span class="s78-dot ${r.ok ? 'ok' : 'no'}"></span>` : `<span class="s78-dot"></span>`}<span class="x">${esc(d.l)}${r ? `<small>${esc(r.t)}</small>` : ''}</span><button class="btn sm" data-act="s78Go" data-i="${i}">Buka ${ic('next')}</button></div>`; }).join('') || '<div class="meta">—</div>'}</div>
+    </div></div>`;
+  S.vh.s78K = t => { st.k = t.dataset.k; refresh(); setTimeout(() => { const d = $('#s78Det'); if (d) d.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); };
+  S.vh.s78Go = t => { const d = cur.dok[Number(t.dataset.i)]; if (d) go(d.go[0], d.go[1] || {}); };
+  S.vh.s78Cetak = () => printDocs('SOP Pengelolaan Aset Desa', sop78Pages(), 'sop_aset78');
+  S.vh.s78Ident = () => sop78Identitas();
+  S.vh.s78Frc = () => sop78ImporFrc();
+};
+async function sop78Identitas() {
+  const s = S.set || {}, th = new Date().getFullYear();
+  const F2 = [['sop_aset_no', 'Nomor SOP', s.sop_aset_no || 'SOP/ASET/01/' + th, 'text'], ['sop_aset_buat', 'Tanggal pembuatan', s.sop_aset_buat || isoToday(), 'date'], ['sop_aset_rev', 'Tanggal revisi (kosongkan bila belum pernah)', s.sop_aset_rev || '', 'date'], ['sop_aset_efektif', 'Tanggal efektif', s.sop_aset_efektif || isoToday(), 'date'], ['sop_aset_sah', 'Tanggal disahkan Kepala Desa', s.sop_aset_sah || '', 'date']];
+  const m = modal('Identitas & pengesahan SOP Aset', `<div class="stack"><div class="form">${F2.map(f => `<div class="f wide"><label for="si_${f[0]}">${esc(f[1])}</label><input id="si_${f[0]}" type="${f[3]}" value="${esc(f[2])}"></div>`).join('')}</div><div class="meta">Isi tanggal disahkan setelah SOP ditandatangani Kepala Desa. Scan SOP bertanda tangan bisa diunggah di menu SOP, Template BA/SK & Pedoman.</div><div class="btns"><button class="btn pri" id="siOk">${ic('check')}Simpan</button></div></div>`);
+  $('#siOk', m.el).onclick = async () => { const v = {}; F2.forEach(f => { v[f[0]] = $('#si_' + f[0], m.el).value; }); try { await call('settingsSave', { values: v }); S.set = Object.assign(S.set || {}, v); m.close(); toast('Identitas SOP disimpan.'); refresh(); } catch (x) { toast(x.message, 1); } };
+}
+/* temuan Inspektorat FRC 2026 terkait aset → Pengawasan & Tindak Lanjut (sekali catat, tidak dobel) */
+const FRC26_ASET = [
+  ['SOP Pengelolaan Barang/Aset Desa belum mencakup 14 aspek sesuai Perbup Lumajang 78/2021.', 'Menyusun dan menetapkan SOP Pengelolaan Aset Desa 14 aspek; mengunggah ke FRC.'],
+  ['Buku Data Inventaris Aset (sumber SIPADES) belum disajikan/diunggah.', 'Mencetak Buku Data Inventaris (format Lampiran D / laporan SIPADES) dan mengunggah ke FRC.'],
+  ['Perdes pengelolaan/pemanfaatan Tanah Kas Desa, SK penetapan pemanfaatan, bukti perjanjian sewa dan pinjam pakai belum disajikan. Sewa TKD ±5 ha di Tempeh Kidul (H. Didik, H. Sudi) tidak sesuai tarif dasar sewa Perbup; bangunan KDKMP berdiri di atas TKD (Lapangan).', 'Menghitung harga dasar sewa (Pasal 15), menetapkan Perdes pemanfaatan, membuat perjanjian sewa bermeterai dan bukti setor ke Rekening Kas Desa; menata dasar pemanfaatan lahan KDKMP.'],
+  ['Berita Acara Stock Opname persediaan/pemeriksaan barang habis pakai belum dibuat.', 'Melaksanakan stock opname/cek fisik dan menandatangani Berita Acara per 31 Desember.'],
+  ['Bukti pengamanan aset (sertifikat tanah, BPKB kendaraan, pengamanan fisik) belum diunggah; SHM tanah desa (sekolah dan kantor desa) dilaporkan hilang setelah disimpan Kepala Desa.', 'Menyusun register dokumen kepemilikan, menelusuri/mengurus penggantian sertifikat yang hilang (laporan kepolisian, permohonan ke BPN), foto pengamanan fisik, dan mengunggah bukti.']
+];
+async function sop78ImporFrc() {
+  try {
+    const ada = ((await call('list', { entity: 'pengawasan', filters: { objek: 'Aset/Barang Desa' }, limit: 500 })).rows || []).map(x => String(x.temuan || '').slice(0, 40));
+    const baru = FRC26_ASET.filter(f => ada.indexOf(f[0].slice(0, 40)) < 0);
+    if (!baru.length) return toast('Temuan aset FRC 2026 sudah tercatat semua.');
+    const rows = baru.map(f => ({ tanggal: '2026-10-29', sumber: PW_SUMBER.find(x => /inspektorat/i.test(x)) || PW_SUMBER[0], objek: 'Aset/Barang Desa', judul: 'Kertas Kerja FRC Inspektorat Daerah (periode Jan–Sep 2026)', temuan: f[0], rekomendasi: f[1], pj: 'Kepala Urusan Tata Usaha & Umum', status: 'Dalam proses' }));
+    const r = await call('bulkSave', { entity: 'pengawasan', rows }); if (r.gagal && r.gagal.length) throw new Error(r.gagal[0].pesan);
+    toast(rows.length + ' temuan dicatat di Pengawasan & Tindak Lanjut.'); refresh();
+  } catch (x) { toast(x.message, 1); }
+}
+/* ---------- halaman cetak SOP lengkap ---------- */
+function sop78Pages() {
+  const s = S.set || {}, th = new Date().getFullYear(), D = s.nama_desa || '', DU = D.toUpperCase();
+  const kades = fmtNama(s.nama_kades || '', 'u') || '……………', sekdes = s.nama_sekdes || '……………';
+  const ident = [['Nomor SOP', s.sop_aset_no || 'SOP/ASET/01/' + th], ['Tanggal Pembuatan', s.sop_aset_buat ? fDate(s.sop_aset_buat) : ''], ['Tanggal Revisi', s.sop_aset_rev ? fDate(s.sop_aset_rev) : '-'], ['Tanggal Efektif', s.sop_aset_efektif ? fDate(s.sop_aset_efektif) : ''], ['Disahkan oleh', 'Kepala Desa ' + D], ['Nama SOP', 'Pengelolaan Aset Desa (Pejabat Pengelola dan 14 Aspek)']];
+  const dh = ['Undang-Undang Nomor 6 Tahun 2014 tentang Desa sebagaimana telah diubah terakhir dengan Undang-Undang Nomor 3 Tahun 2024;', 'Peraturan Pemerintah Nomor 43 Tahun 2014 sebagaimana telah diubah kedua kalinya dengan Peraturan Pemerintah Nomor 11 Tahun 2019;', 'Peraturan Menteri Dalam Negeri Nomor 1 Tahun 2016 tentang Pengelolaan Aset Desa sebagaimana telah diubah dengan Peraturan Menteri Dalam Negeri Nomor 3 Tahun 2024;', 'Peraturan Daerah Kabupaten Lumajang Nomor 7 Tahun 2016 tentang Penyelenggaraan Pemerintahan Desa;', PB78 + ';', 'Peraturan Desa ' + D + ' tentang APB Desa tahun berjalan.'];
+  const kual = ['Kepala Desa selaku pemegang kekuasaan pengelolaan aset desa;', 'Sekretaris Desa selaku pembantu pengelola, memahami regulasi aset desa dan verifikasi administrasi;', 'Kepala Urusan selaku petugas/pengurus aset, mampu membukukan Buku Data Inventaris/KIB/KIR, memberi kode barang, dan mengoperasikan SIPADES;', 'Pelaksana kegiatan/TPK memahami pengadaan barang/jasa di desa.'];
+  const alat = ['Komputer/laptop, printer, dan jaringan internet;', 'Aplikasi SIPADES dan Aplikasi Pemdes ' + D + ';', 'Brankas penyimpanan dokumen kepemilikan (sertifikat, BPKB);', 'Label/stiker kode barang, papan nama, dan patok tanda batas;', 'Buku Data Inventaris, KIB A–G, KIR, kartu pemeliharaan.'];
+  const tbl = (rows, w) => `<table class="pt" style="font-size:9.5pt">${rows.map(r => `<tr><td style="width:${w || 34}%;font-weight:700">${esc(r[0])}</td><td>${r[1]}</td></tr>`).join('')}</table>`;
+  const ol = A => `<ol style="margin:0;padding-left:18px">${A.map(x => `<li>${esc(x)}</li>`).join('')}</ol>`;
+  const ttd = `<table class="nb" style="width:100%;margin-top:14px;font-size:10.5pt;text-align:center"><tr><td style="width:50%">Diverifikasi oleh,<br>SEKRETARIS DESA ${esc(DU)}<br>selaku Pembantu Pengelola Aset Desa<div style="height:60px"></div><b><u>${esc(upNama(sekdes))}</u></b></td><td>Ditetapkan di ${esc(D)}<br>pada tanggal ${esc(s.sop_aset_sah ? fDate(s.sop_aset_sah) : '……………')}<br>KEPALA DESA ${esc(DU)}<div style="height:60px"></div><b><u>${esc(kades)}</u></b></td></tr></table>`;
+  const p1 = `<div class="paper sopdoc">${kop()}<h2 style="margin:4px 0">STANDAR OPERASIONAL PROSEDUR</h2><h3 style="margin:0 0 8px">PENGELOLAAN ASET DESA ${esc(DU)}</h3>
+    ${tbl(ident.map(r => [r[0], esc(r[1])]))}
+    ${tbl([['Dasar Hukum', ol(dh)], ['Kualifikasi Pelaksana', ol(kual)], ['Keterkaitan', 'SOP Penyusunan RKP Desa & APB Desa, SOP Pengadaan Barang/Jasa di Desa, SOP Penatausahaan Keuangan Desa (Siskeudes), SOP Pelayanan Publik.'], ['Peralatan / Perlengkapan', ol(alat)], ['Peringatan', 'Bila SOP ini tidak dilaksanakan, tertib administrasi, fisik, dan hukum aset desa tidak tercapai sehingga berpotensi menjadi temuan pemeriksaan (Inspektorat/BPK) dan menimbulkan kerugian kekayaan desa. Pemanfaatan dan pemindahtanganan di luar ketentuan Perbup tidak sah.'], ['Pencatatan & Pendataan', 'Setiap kegiatan dicatat dan diarsipkan secara fisik dan digital di Aplikasi Pemdes (register pemanfaatan, dokumen kepemilikan, kartu pemeliharaan, berita acara) serta diinput ke SIPADES.']])}
+    ${ttd}</div>`;
+  const p2 = `<div class="paper sopdoc"><h3 style="text-align:left">A. Struktur Pejabat Pengelola Aset Desa</h3>${sopStruktur()}<h3 style="text-align:left;margin-top:12px">B. Siklus 14 Aspek Pengelolaan (Pasal 2 ${esc(PB78S)})</h3>${sopSiklus()}<h3 style="text-align:left;margin-top:12px">C. Simbol Bagan Alur</h3>${sopLegend()}
+    <p style="font-size:9.5pt">Kolom bagan: <b>Kepala Desa</b> (pemegang kekuasaan), <b>Sekretaris Desa</b> (pembantu pengelola), <b>Pengurus Aset</b> (petugas/pengurus dari unsur Kaur), <b>Pelaksana/TPK</b> (pelaksana kegiatan, TPK, pemakai barang), dan <b>BPD/Bupati</b> (BPD, Bupati/Camat, penilai, mitra pemanfaatan).</p>
+    <p style="font-size:9.5pt"><b>Kebijakan desa:</b> cek fisik aset tetap dan stock opname persediaan dilaksanakan setiap tahun per 31 Desember dan boleh juga per 30 Juni. Ketentuan ini lebih ketat dari Pasal 72 Perbup (aset paling sedikit 1 kali dalam 3 tahun; persediaan setiap tahun).</p></div>`;
+  const pa = SOP78.map(a => `<div class="paper sopdoc"><h3 style="text-align:left;margin:0 0 2px">${a.no ? 'ASPEK ' + a.no + '. ' : ''}${esc(a.j.toUpperCase())}</h3><div style="font-size:9.5pt;margin-bottom:4px">Dasar: ${esc(PB78S)} ${esc(a.ps)} · Tujuan: ${esc(a.tujuan)}</div>
+    ${sopFlow(a.langkah)}
+    <table class="pt" style="font-size:8.5pt;margin-top:6px"><thead><tr><th style="width:4%">No</th><th style="width:38%">Uraian Kegiatan</th><th style="width:13%">Pelaksana</th><th style="width:17%">Kelengkapan</th><th style="width:10%">Waktu</th><th style="width:18%">Output</th></tr></thead><tbody>${a.langkah.map((l, i) => `<tr><td style="text-align:center">${i + 1}</td><td><b>${esc(l.t)}</b><br>${esc(l.u)}</td><td>${esc(laneNama(l.p))}</td><td>${esc(l.kel || '')}</td><td>${esc(l.w || '')}</td><td>${esc(l.o || '')}</td></tr>`).join('')}</tbody></table>
+    <div style="font-size:8.5pt"><b>Ketentuan pokok:</b><ul style="margin:2px 0;padding-left:16px">${a.aturan.map(r => `<li>${esc(r[0])} <i>(${esc(r[1])})</i></li>`).join('')}</ul></div></div>`);
+  return [p1, p2].concat(pa);
+}
+
+/* ---------- naskah Keputusan Kepala Desa (format Lampiran A/C Perbup 78/2021) ---------- */
+const DH_ASET78 = ['Undang-Undang Nomor 6 Tahun 2014 tentang Desa sebagaimana telah diubah beberapa kali terakhir dengan Undang-Undang Nomor 3 Tahun 2024 tentang Perubahan Kedua atas Undang-Undang Nomor 6 Tahun 2014 tentang Desa;',
+  'Peraturan Pemerintah Nomor 43 Tahun 2014 tentang Peraturan Pelaksanaan Undang-Undang Nomor 6 Tahun 2014 tentang Desa sebagaimana telah diubah kedua kalinya dengan Peraturan Pemerintah Nomor 11 Tahun 2019 tentang Perubahan Kedua atas Peraturan Pemerintah Nomor 43 Tahun 2014 tentang Peraturan Pelaksanaan Undang-Undang Nomor 6 Tahun 2014 tentang Desa;',
+  'Peraturan Menteri Dalam Negeri Nomor 111 Tahun 2014 tentang Pedoman Teknis Peraturan di Desa;',
+  'Peraturan Menteri Dalam Negeri Nomor 1 Tahun 2016 tentang Pengelolaan Aset Desa sebagaimana telah diubah dengan Peraturan Menteri Dalam Negeri Nomor 3 Tahun 2024 tentang Perubahan atas Peraturan Menteri Dalam Negeri Nomor 1 Tahun 2016 tentang Pengelolaan Aset Desa;',
+  'Peraturan Daerah Kabupaten Lumajang Nomor 7 Tahun 2016 tentang Penyelenggaraan Pemerintahan Desa;',
+  PB78 + ';'];
+const URUT_DIKTUM = ['KESATU', 'KEDUA', 'KETIGA', 'KEEMPAT', 'KELIMA', 'KEENAM', 'KETUJUH', 'KEDELAPAN', 'KESEMBILAN', 'KESEPULUH'];
+const a78Huruf = i => String.fromCharCode(97 + i) + '.';
+function a78List(A, f) { return `<table class="kv" style="width:100%">${A.map((x, i) => `<tr><td style="width:22px">${f(i)}</td><td style="text-align:justify">${x}</td></tr>`).join('')}</table>`; }
+function a78Judul(jenis, nomor, tentang) {
+  const s = S.set || {}, DU = String(s.nama_desa || '').toUpperCase();
+  return `<div style="text-align:center;line-height:1.35"><img src="${esc(s.logo_url || LOGO)}" alt="" style="width:62px;height:62px;object-fit:contain;display:block;margin:0 auto 4px"><b>KABUPATEN ${esc(String(s.kabupaten || '').toUpperCase())}</b><br><b>${esc(jenis)} ${esc(DU)}</b><br><b>NOMOR ${esc(nomor || '……')}</b><br><br><b>TENTANG</b><br><b>${esc(String(tentang).toUpperCase())}</b><br><br><b>KEPALA DESA ${esc(DU)},</b></div>`;
+}
+function a78TtdKades(tgl, ditetapkan) {
+  const s = S.set || {}, DU = String(s.nama_desa || '').toUpperCase();
+  return `<table class="nb" style="width:100%;margin-top:14px"><tr><td style="width:50%"></td><td style="text-align:left">${ditetapkan === false ? '' : `Ditetapkan di ${esc(s.nama_desa || '')}<br>pada tanggal ${esc(tgl ? fDate(tgl) : '……………')}<br>`}KEPALA DESA ${esc(DU)},<div style="height:64px"></div><b>${esc(fmtNama(s.nama_kades || '', 'u') || '……………')}</b></td></tr></table>`;
+}
+/* o: {nomor, tanggal, tentang, menimbang[], mengingat[], memperhatikan[], diktum[[label, html]], tembusan[]} */
+function a78SkHtml(o) {
+  const row = (l, isi) => `<tr><td style="width:112px;vertical-align:top">${l}</td><td style="width:12px;vertical-align:top">:</td><td style="vertical-align:top">${isi}</td></tr>`;
+  return `<div class="paper sopdoc" style="font-size:11.5pt">${a78Judul('KEPUTUSAN KEPALA DESA', o.nomor, o.tentang)}
+    <table class="kv" style="width:100%;margin-top:10px">${row('Menimbang', a78List(o.menimbang.map(esc), a78Huruf))}${row('Mengingat', a78List(o.mengingat.map(esc), i => (i + 1) + '.'))}${o.memperhatikan && o.memperhatikan.length ? row('Memperhatikan', o.memperhatikan.length > 1 ? a78List(o.memperhatikan.map(esc), i => (i + 1) + '.') : esc(o.memperhatikan[0])) : ''}</table>
+    <div style="text-align:center;font-weight:700;margin:10px 0">MEMUTUSKAN:</div>
+    <table class="kv" style="width:100%">${row('Menetapkan', '')}${o.diktum.map((d, i) => row(d[0] || URUT_DIKTUM[i], `<div style="text-align:justify">${d[1]}</div>`)).join('')}</table>
+    ${a78TtdKades(o.tanggal)}
+    ${o.tembusan && o.tembusan.length ? `<div style="font-size:10pt;margin-top:10px">Tembusan disampaikan kepada Yth.:${a78List(o.tembusan.map(esc), i => (i + 1) + '.')}</div>` : ''}</div>`;
+}
+function a78LampHd(judul, nomor, tgl, tentang) {
+  return `<table class="kv" style="margin-left:auto;width:66%;font-size:10pt;margin-bottom:10px"><tr><td style="width:80px">LAMPIRAN</td><td style="width:10px">:</td><td>${esc(judul)}</td></tr><tr><td>NOMOR</td><td>:</td><td>${esc(nomor || '……')}</td></tr><tr><td>TANGGAL</td><td>:</td><td>${esc(tgl ? fDate(tgl) : '……')}</td></tr><tr><td>TENTANG</td><td>:</td><td>${esc(String(tentang).toUpperCase())}</td></tr></table>`;
+}
+/* naskah untuk disimpan ke Buku Keputusan (isi_naskah satu baris per paragraf, seperti form SK) */
+function a78SkRecord(o, uraian) {
+  const strip = h => String(h || '').replace(/<br\s*\/?>/g, ' ').replace(/<\/(li|tr|p|div)>/g, '; ').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s*;\s*;/g, ';').replace(/\s+/g, ' ').trim();
+  return { nomor: o.nomor, tanggal: o.tanggal, tentang: o.tentang, uraian: uraian || '', klasifikasi: String(o.nomor || '').split('/')[0] || '100.3.3',
+    menimbang: o.menimbang.map((x, i) => a78Huruf(i) + ' ' + x).join('\n'), mengingat: o.mengingat.map((x, i) => (i + 1) + '. ' + x).join('\n'),
+    memperhatikan: (o.memperhatikan || []).join('\n'), isi_naskah: o.diktum.map((d, i) => (d[0] || URUT_DIKTUM[i]) + ' : ' + strip(d[1])).join('\n') };
+}
+/* ---------- bantu data ---------- */
+const a78Asal = a => { const v = String(a.asal || ''); if (/asli/i.test(v)) return 0; if (/lain/i.test(v)) return 2; if (/apb/i.test(v)) return 1; const sd = String(a.sumber_dana || ''); return /kekayaan asli/i.test(sd) ? 0 : /hibah|swadaya|lain/i.test(sd) ? 2 : 1; };
+const a78Kode = a => (kodeAset(a.kode_barang) || '-') + (a.no_urut ? ' / ' + sipReg(a) : '');
+const a78Ident = a => [a.merk, a.tipe, a.ukuran, a.bahan, a.no_polisi && 'Nopol ' + a.no_polisi, a.no_sertifikat && 'Sert. ' + a.no_sertifikat, a.luas && asetNum(a.luas).toLocaleString('id-ID') + ' m²', a.panjang && a.panjang + ' m', a.letak].filter(Boolean).join(', ');
+const a78Jenis = a => [a.nama_rekening, a.nama && a.nama !== a.nama_rekening ? a.nama : ''].filter(Boolean).join(' — ') || a.nama || '';
+const a78Tahun = a => String(tahunOf(a.tgl_perolehan) || a.tahun || '');
+const a78Strategis = a => kibHuruf(a) === 'A' || kibHuruf(a) === 'C';
+async function a78Ctx() {
+  const [A, ap, sk, ba, man] = await Promise.all([asetSemua({}), call('list', { entity: 'aparat', limit: 200 }).then(r => (r.rows || []).filter(apAktif)).catch(() => []), call('list', { entity: 'sk_kades', limit: 300 }).then(r => r.rows || []).catch(() => []), call('list', { entity: 'berita_acara', limit: 300 }).then(r => r.rows || []).catch(() => []), call('list', { entity: 'aset_manfaat', limit: 2000 }).then(r => r.rows || []).catch(() => [])]);
+  ap.sort((a, b) => (Number(a.no_urut) || 99) - (Number(b.no_urut) || 99));
+  return { A, ap, sk, ba, man };
+}
+const a78Kaur = x => /kepala urusan|^kaur/i.test(x.jabatan || '');
+/* ---------- definisi dokumen ---------- */
+const DOK78 = {
+  skp: { t: 'SK Pembantu Pengelola & Petugas/Pengurus Aset', ps: 'Pasal 5–6', ic: 'users', simpan: 'sk_kades', kla: '100.3.3',
+    init: (st, c) => {
+      const sek = c.ap.find(x => /^sekretaris desa/i.test(x.jabatan || '')), pg = c.ap.find(x => (S.set || {}).nama_pengurus_aset && x.nama === S.set.nama_pengurus_aset) || c.ap.find(x => /tata usaha/i.test(x.jabatan || ''));
+      const lama = c.sk.filter(x => /pengelola barang|pengurus aset|pengelola aset|petugas pengelola/i.test(x.tentang || '')).sort((a, b) => String(b.tanggal).localeCompare(String(a.tanggal)))[0];
+      Object.assign(st, { pembantu: sek ? sek.id : '', petugas: pg ? [pg.id] : [], teknis: [], cabut: lama ? lama.nomor + '|' + (lama.tentang || '') : '' });
+    },
+    fields: c => [['tanggal', 'Tanggal ditetapkan', 'date'], ['nomor', 'Nomor Keputusan', 'text'], ['tahun', 'Tahun anggaran', 'number'],
+      ['pembantu', 'Pembantu Pengelola (Sekretaris Desa)', 'select', c.ap.map(x => [x.id, x.nama + ' — ' + x.jabatan])],
+      ['petugas', 'Petugas/Pengurus Aset (dari unsur Kaur)', 'multi', c.ap.map(x => [x.id, x.nama + ' — ' + x.jabatan])],
+      ['teknis', 'Pembantu teknis/operator SIPADES (opsional)', 'multi', c.ap.filter(x => !a78Kaur(x) && !/kepala desa|sekretaris desa/i.test(x.jabatan || '')).map(x => [x.id, x.nama + ' — ' + x.jabatan])],
+      ['cabut', 'SK lama yang dicabut (nomor|tentang, kosongkan bila tidak ada)', 'text']],
+    cek: (st, c) => { const P = st.petugas.map(id => c.ap.find(x => x.id === id)).filter(Boolean), W = []; if (!P.length) W.push(['bad', 'Pilih minimal satu petugas/pengurus aset.']); P.filter(x => !a78Kaur(x)).forEach(x => W.push(['bad', x.nama + ' bukan Kepala Urusan. Petugas/pengurus aset harus dari unsur Kaur (Pasal 5 ayat 6); jadikan pembantu teknis.'])); const sk = c.ap.find(x => x.id === st.pembantu); if (sk && !/sekretaris desa/i.test(sk.jabatan || '')) W.push(['warn', 'Pasal 5 ayat 5: pembantu pengelola adalah Sekretaris Desa.']); return W; },
+    doc: (st, c) => {
+      const D = (S.set || {}).nama_desa || '', ap = id => c.ap.find(x => x.id === id) || {}, P = st.petugas.map(ap).filter(x => x.nama), T = st.teknis.map(ap).filter(x => x.nama), sek = ap(st.pembantu), kd = c.ap.find(x => /^kepala desa/i.test(x.jabatan || '')) || { nama: (S.set || {}).nama_kades, jabatan: 'Kepala Desa' };
+      const tentang = 'Penetapan Pembantu Pengelola dan Petugas/Pengurus Aset Desa ' + D + ' Tahun ' + st.tahun;
+      const cab = String(st.cabut || '').split('|');
+      const o = { nomor: st.nomor, tanggal: st.tanggal, tentang,
+        menimbang: ['bahwa berdasarkan Pasal 5 ayat (2) huruf b ' + PB78 + ', Kepala Desa selaku pemegang kekuasaan pengelolaan aset desa berwenang menetapkan pembantu pengelola dan petugas/pengurus aset desa;', 'bahwa sesuai Pasal 5 ayat (5) dan ayat (6) Peraturan Bupati sebagaimana dimaksud pada huruf a, Sekretaris Desa selaku pembantu pengelola aset desa dan petugas/pengurus aset desa berasal dari Kepala Urusan;', 'bahwa berdasarkan pertimbangan sebagaimana dimaksud pada huruf a dan huruf b, perlu menetapkan Keputusan Kepala Desa tentang ' + tentang + ';'],
+        mengingat: DH_ASET78, diktum: [
+          ['KESATU', 'Menetapkan Pembantu Pengelola dan Petugas/Pengurus Aset Desa ' + esc(D) + ' Tahun ' + esc(st.tahun) + ' dengan susunan sebagaimana tercantum dalam Lampiran yang merupakan bagian tidak terpisahkan dari Keputusan ini.'],
+          ['KEDUA', 'Sekretaris Desa selaku Pembantu Pengelola Aset Desa berwenang dan bertanggung jawab:' + a78List(['meneliti rencana kebutuhan Aset Desa;', 'meneliti rencana kebutuhan pemeliharaan Aset Desa;', 'mengatur penggunaan, pemanfaatan, penghapusan dan pemindahtanganan Aset Desa yang telah disetujui oleh Kepala Desa;', 'melakukan koordinasi dalam pelaksanaan inventarisasi Aset Desa; dan', 'melakukan pengawasan dan pengendalian atas pengelolaan Aset Desa.'], a78Huruf)],
+          ['KETIGA', 'Petugas/Pengurus Aset Desa bertugas dan bertanggung jawab:' + a78List(['mengajukan rencana kebutuhan Aset Desa;', 'mengajukan permohonan penetapan penggunaan Aset Desa yang diperoleh dari beban APB Desa dan perolehan lainnya yang sah kepada Kepala Desa;', 'melakukan inventarisasi Aset Desa;', 'mengamankan dan memelihara Aset Desa yang dikelolanya; dan', 'menyusun dan menyampaikan laporan Aset Desa.'], a78Huruf)],
+          ...(T.length ? [['', 'Pembantu teknis/operator SIPADES membantu Petugas/Pengurus Aset Desa dalam pencatatan, penginputan data ke aplikasi SIPADES, pencetakan buku inventaris dan label kode barang, serta bertanggung jawab kepada Petugas/Pengurus Aset Desa.']] : []),
+          ['', 'Dalam melaksanakan tugasnya, Pembantu Pengelola dan Petugas/Pengurus Aset Desa berpedoman pada Standar Operasional Prosedur Pengelolaan Aset Desa dan bertanggung jawab kepada Kepala Desa.'],
+          ['', 'Segala biaya yang timbul akibat ditetapkannya Keputusan ini dibebankan pada Anggaran Pendapatan dan Belanja Desa ' + esc(D) + ' Tahun Anggaran ' + esc(st.tahun) + '.'],
+          ...(cab[0] ? [['', 'Dengan berlakunya Keputusan ini, Keputusan Kepala Desa ' + esc(D) + ' Nomor ' + esc(cab[0]) + (cab[1] ? ' tentang ' + esc(cab[1]) : '') + ' dicabut dan dinyatakan tidak berlaku.']] : []),
+          ['', 'Keputusan ini mulai berlaku pada tanggal ditetapkan.']].map((d, i) => [URUT_DIKTUM[i], d[1]]),
+        tembusan: ['Bupati Lumajang melalui Camat ' + ((S.set || {}).kecamatan || '') + ';', 'Ketua BPD ' + D + ';', 'Yang bersangkutan;', 'Arsip.'] };
+      const rows = [[kd, 'Pemegang Kekuasaan Pengelolaan Aset Desa']].concat([[sek, 'Pembantu Pengelola Aset Desa']], P.map(x => [x, 'Petugas/Pengurus Aset Desa']), T.map(x => [x, 'Pembantu Teknis / Operator SIPADES']));
+      const lamp = `<div class="paper sopdoc" style="font-size:11pt">${a78LampHd('KEPUTUSAN KEPALA DESA ' + D.toUpperCase(), st.nomor, st.tanggal, tentang)}<h3>SUSUNAN PEMBANTU PENGELOLA DAN PETUGAS/PENGURUS ASET DESA ${esc(D.toUpperCase())}<br>TAHUN ${esc(st.tahun)}</h3>
+        <table class="pt" style="font-size:10pt"><thead><tr><th style="width:6%">No</th><th>Nama</th><th>Jabatan</th><th>NRPDesa / NIP</th><th>Kedudukan dalam Pengelolaan Aset</th></tr></thead><tbody>${rows.map((r, i) => `<tr><td style="text-align:center">${i + 1}</td><td>${esc(r[0].nama || '')}</td><td>${esc(r[0].jabatan || '')}</td><td>${esc(r[0].nip || '-')}</td><td>${esc(r[1])}</td></tr>`).join('')}</tbody></table>${a78TtdKades(st.tanggal, false)}</div>`;
+      return { o, pages: [a78SkHtml(o), lamp], uraian: 'Pembantu pengelola: ' + (sek.nama || '') + '; petugas/pengurus: ' + P.map(x => x.nama).join(', ') };
+    } },
+  skg: { t: 'SK Status Penggunaan Aset Desa (Lampiran A)', ps: 'Pasal 11', ic: 'badge', simpan: 'sk_kades', kla: '100.3.3',
+    fields: () => [['tanggal', 'Tanggal ditetapkan', 'date'], ['nomor', 'Nomor Keputusan', 'text'], ['tahun', 'Tahun', 'number'], ['draf', 'Ikutkan aset berstatus Draf (data lama yang belum diverifikasi)', 'check']],
+    cek: (st, c) => { const n = c.A.filter(a => a.status === 'Draf').length; return n && !st.draf ? [['warn', n + ' aset berstatus Draf tidak ikut. Verifikasi lewat cek fisik lalu ubah ke Aktif agar masuk SK.']] : []; },
+    doc: (st, c) => {
+      const D = (S.set || {}).nama_desa || '', R = c.A.filter(a => a.status === 'Aktif' || (st.draf && a.status === 'Draf')).sort((a, b) => kibHuruf(a).localeCompare(kibHuruf(b)) || String(a.kode_barang || '').localeCompare(String(b.kode_barang || '')));
+      const tentang = 'Status Penggunaan Aset Desa ' + D + ' Tahun ' + st.tahun;
+      const o = { nomor: st.nomor, tanggal: st.tanggal, tentang,
+        menimbang: ['bahwa penggunaan aset Desa digunakan dalam rangka mendukung penyelenggaraan Pemerintahan Desa ' + D + ';', 'bahwa untuk melaksanakan ketentuan Pasal 11 ayat (2) ' + PB78 + ', status penggunaan aset desa ditetapkan setiap tahun dengan Keputusan Kepala Desa;', 'bahwa berdasarkan pertimbangan sebagaimana dimaksud pada huruf a dan huruf b, perlu menetapkan Status Penggunaan Aset Desa dengan Keputusan Kepala Desa;'],
+        mengingat: DH_ASET78, diktum: [['KESATU', 'Daftar Status Penggunaan Aset Desa ' + esc(D) + ' Tahun ' + esc(st.tahun) + ' sebagaimana tercantum dalam Lampiran Keputusan ini.'], ['KEDUA', 'Aset Desa sebagaimana dimaksud dalam diktum KESATU merupakan bahan untuk dituangkan dalam Buku Data Inventaris Aset Desa.'], ['KETIGA', 'Setiap perangkat desa/pemakai aset wajib menggunakan aset sesuai peruntukannya, merawat dan mengamankannya, serta dilarang memindahtangankan, menyewakan, menjaminkan atau menggadaikan aset tanpa ketentuan yang berlaku.'], ['KEEMPAT', 'Perangkat desa/pemakai yang berhenti atau berpindah tugas wajib menyerahkan kembali aset yang dikuasainya kepada Kepala Desa melalui Petugas/Pengurus Aset Desa dengan Berita Acara Serah Terima.'], ['KELIMA', 'Keputusan Kepala Desa ini mulai berlaku pada tanggal ditetapkan.']],
+        tembusan: ['Bupati Lumajang melalui Camat ' + ((S.set || {}).kecamatan || '') + ';', 'Ketua BPD ' + D + ';', 'Arsip.'] };
+      let no = 0; const body = KIB_OPT.map(k => { const h = k.charAt(0), X = R.filter(a => kibHuruf(a) === h); if (!X.length) return ''; return `<tr><td colspan="7" style="background:#f1f1f1"><b>${esc(k)}</b> (${X.length})</td></tr>` + X.map(a => { no++; const as = a78Asal(a); return `<tr><td style="text-align:center">${no}</td><td>${esc(a78Jenis(a))}</td><td style="font-size:8pt">${esc(a78Kode(a))}</td>${[0, 1, 2].map(i => `<td style="text-align:center">${as === i ? '√' : ''}</td>`).join('')}<td>${esc([a.ruang ? 'Ruang ' + a.ruang : '', kibHuruf(a) === 'A' || kibHuruf(a) === 'C' || kibHuruf(a) === 'D' ? a.letak : '', a.penggunaan, a.status === 'Draf' ? '(Draf)' : ''].filter(Boolean).join('; '))}</td></tr>`; }).join(''); }).join('');
+      const lamp = `<div class="paper land sopdoc" style="font-size:9.5pt">${a78LampHd('KEPUTUSAN KEPALA DESA ' + D.toUpperCase(), st.nomor, st.tanggal, tentang)}<h3>DAFTAR STATUS PENGGUNAAN ASET DESA</h3>
+        <table class="pt" style="font-size:8.5pt"><thead><tr><th rowspan="2" style="width:4%">No.</th><th rowspan="2">Jenis Barang</th><th rowspan="2" style="width:15%">Kode Barang</th><th colspan="3">Asal Usul Barang</th><th rowspan="2" style="width:22%">Ket. (pemakai / lokasi)</th></tr><tr><th style="width:8%">Kekayaan Asli Desa</th><th style="width:8%">APB Desa</th><th style="width:8%">Perolehan Lain Yang Sah</th></tr><tr>${[1, 2, 3, 4, 5, 6, 7].map(n => `<th style="font-weight:400">${n}</th>`).join('')}</tr></thead><tbody>${body || '<tr><td colspan="7" style="text-align:center">Nihil</td></tr>'}</tbody></table>${a78TtdKades(st.tanggal, false)}</div>`;
+      return { o, pages: [a78SkHtml(o), lamp], uraian: R.length + ' aset ditetapkan status penggunaannya' };
+    } },
+  buku: { t: 'Buku Data Inventaris Aset Desa (Lampiran D)', ps: 'Pasal 71', ic: 'book',
+    fields: () => [['tahun', 'Tahun', 'number'], ['tanggal', 'Tanggal tanda tangan', 'date'], ['draf', 'Ikutkan aset berstatus Draf', 'check']],
+    doc: (st, c) => {
+      const s = S.set || {}, D = s.nama_desa || '', R = c.A.filter(a => a.status === 'Aktif' || (st.draf && a.status === 'Draf')).sort((a, b) => kibHuruf(a).localeCompare(kibHuruf(b)) || String(a.kode_barang || '').localeCompare(String(b.kode_barang || '')));
+      let no = 0; const tot = [0, 0, 0];
+      const body = KIB_OPT.map(k => { const h = k.charAt(0), X = R.filter(a => kibHuruf(a) === h); if (!X.length) return ''; const sub = [0, 0, 0]; const rr = X.map(a => { no++; const as = a78Asal(a), v = asetNum(a.nilai); sub[as] += v; tot[as] += v; return `<tr><td style="text-align:center">${no}</td><td>${esc(a78Jenis(a))}</td><td style="font-size:7.5pt">${esc(asetIdBarang(a) || a78Kode(a))}</td><td>${esc(a78Ident(a))}</td>${[0, 1, 2].map(i => `<td style="text-align:right;white-space:nowrap">${as === i ? fMoney(v) : ''}</td>`).join('')}<td style="text-align:center">${esc(a78Tahun(a))}</td><td>${esc(['Kondisi ' + (a.kondisi || 'Baik'), (a.jumlah || 1) + ' ' + (a.satuan || 'Unit'), a.ruang ? 'Ruang ' + a.ruang : '', a.sipades === 'Sudah' ? 'SIPADES' : 'belum SIPADES', a.status === 'Draf' ? 'Draf' : ''].filter(Boolean).join('; '))}</td></tr>`; }).join('');
+        return `<tr><td colspan="9" style="background:#f1f1f1"><b>${esc(k)}</b></td></tr>` + rr + `<tr><td></td><td colspan="3" style="text-align:right"><i>Jumlah ${esc(k.replace(/^.\. /, ''))}</i></td>${sub.map(v => `<td style="text-align:right;white-space:nowrap"><i>${v ? fMoney(v) : ''}</i></td>`).join('')}<td colspan="2"></td></tr>`; }).join('');
+      const page = `<div class="paper land sopdoc" style="font-size:9pt"><h3 style="margin:0">BUKU DATA INVENTARIS ASET DESA<br>PEMERINTAH DESA ${esc(D.toUpperCase())}<br>TAHUN ${esc(st.tahun)}</h3><div style="margin:6px 0">Kode Lokasi Desa: <b>${esc(kodeLokasi())}</b></div>
+        <table class="pt" style="font-size:8pt"><thead><tr><th rowspan="2" style="width:3%">No.</th><th rowspan="2">Jenis Barang</th><th rowspan="2" style="width:14%">Kode Barang</th><th rowspan="2" style="width:20%">Identitas Barang</th><th colspan="3">Asal Usul Barang (nilai Rp)</th><th rowspan="2" style="width:6%">Tahun Perolehan</th><th rowspan="2" style="width:13%">Ket.</th></tr><tr><th style="width:9%">Kekayaan Asli Desa</th><th style="width:9%">APB Desa</th><th style="width:9%">Perolehan Lain Yang Sah</th></tr><tr>${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<th style="font-weight:400">${n}</th>`).join('')}</tr></thead>
+        <tbody>${body || '<tr><td colspan="9" style="text-align:center">Nihil</td></tr>'}<tr><td></td><td colspan="3" style="text-align:right"><b>JUMLAH SELURUHNYA (${R.length} aset)</b></td>${tot.map(v => `<td style="text-align:right;white-space:nowrap"><b>${fMoney(v)}</b></td>`).join('')}<td colspan="2" style="text-align:right"><b>${fMoney(tot[0] + tot[1] + tot[2])}</b></td></tr></tbody></table>
+        <table class="nb" style="width:100%;margin-top:12px;text-align:center;font-size:10pt"><tr><td style="width:50%">MENGETAHUI<br>SEKRETARIS DESA<br>Selaku Pembantu Pengelola Aset Desa<div style="height:56px"></div><b><u>${esc(upNama(s.nama_sekdes || '……………'))}</u></b></td><td>Desa ${esc(D)}, tanggal ${esc(fDate(st.tanggal))}<br>Petugas/Pengurus Aset Desa<br>&nbsp;<div style="height:56px"></div><b><u>${esc(upNama(s.nama_pengurus_aset || '……………'))}</u></b></td></tr></table></div>`;
+      return { pages: [page] };
+    } },
+  bah: { t: 'BA Usulan Penghapusan Aset (Lampiran B)', ps: 'Pasal 40–44', ic: 'trash', simpan: 'berita_acara', kla: '000.2.4',
+    fields: c => [['tanggal', 'Tanggal pemeriksaan', 'date'], ['nomor', 'Nomor Berita Acara', 'text'], ['sebab', 'Sebab penghapusan', 'select', A78_SEBAB.map(x => [x[0], x[0]])], ['pilih', 'Aset yang diusulkan dihapus', 'aset']],
+    cek: (st, c) => a78CekHapus(st, c),
+    doc: (st, c) => {
+      const s = S.set || {}, D = s.nama_desa || '', d = parseD(st.tanggal), P = a78Pilih(st, c), sb = A78_SEBAB.find(x => x[0] === st.sebab) || A78_SEBAB[0];
+      const hari = d ? `${HARI[d.getDay()]} tanggal ${terbilang(d.getDate()).trim()} bulan ${BULAN[d.getMonth()]} tahun ${terbilang(d.getFullYear()).trim()}` : '……';
+      const pg = `<div class="paper sopdoc" style="font-size:11.5pt">${kop()}<div style="text-align:center;font-weight:700">BERITA ACARA<br>USULAN PENGHAPUSAN ASET DESA PEMERINTAH DESA ${esc(D.toUpperCase())}<br>NOMOR ${esc(st.nomor || '……')}<br>TAHUN ${esc(d ? d.getFullYear() : '')}</div>
+        <p style="text-indent:40px;margin-top:12px">Pada hari ini ${esc(hari)}, kami yang bertanda tangan di bawah ini selaku Pembantu Pengelola Aset Desa telah melakukan pengecekan/penelitian atas Aset Desa berupa:</p>
+        ${a78List(P.map(a => esc(a78Jenis(a)) + ' (' + esc(a78Kode(a)) + (a78Tahun(a) ? ', tahun ' + esc(a78Tahun(a)) : '') + ');'), i => (i + 1) + '.')}
+        <p style="text-indent:40px">${esc(sb[1])}</p><p style="text-indent:40px">Rincian aset sebagaimana tercantum dalam Lampiran Berita Acara ini.</p>
+        <p style="text-indent:40px">Demikian Berita Acara ini kami buat dengan sebenarnya dan disampaikan kepada Kepala Desa ${esc(D)} untuk dipergunakan sebagaimana mestinya.</p>
+        <table class="nb" style="width:100%;margin-top:10px;text-align:center"><tr><td></td><td>Desa ${esc(D)}, tanggal ${esc(fDate(st.tanggal))}</td></tr><tr><td style="width:50%">SEKRETARIS DESA<br>Selaku Pembantu Pengelola Aset Desa<div style="height:60px"></div><b><u>${esc(upNama(s.nama_sekdes || '……………'))}</u></b></td><td>Petugas/Pengurus Aset Desa<br>&nbsp;<div style="height:60px"></div><b><u>${esc(upNama(s.nama_pengurus_aset || '……………'))}</u></b></td></tr></table></div>`;
+      const lamp = `<div class="paper land sopdoc" style="font-size:9.5pt">${a78LampHd('BERITA ACARA USULAN PENGHAPUSAN ASET DESA', st.nomor, st.tanggal, 'Usulan Penghapusan Aset Desa')}<h3>DAFTAR ASET DESA YANG DIUSULKAN DIHAPUS</h3>${a78TabelHapus(P, 1)}
+        <div style="font-size:9pt"><b>Kelengkapan (Pasal 42):</b> ${esc(sb[2])}</div></div>`;
+      return { pages: [pg, lamp], ba: { jenis: 'Berita Acara Usulan Penghapusan Aset Desa', tentang: 'Usulan Penghapusan Aset Desa (' + P.length + ' barang)', uraian: P.map(a => a78Jenis(a) + ' — ' + a78Kode(a)).join('\n'), hasil: sb[1] } };
+    } },
+  skh: { t: 'SK Penghapusan Aset Desa (Lampiran C)', ps: 'Pasal 43–44', ic: 'stamp', simpan: 'sk_kades', kla: '100.3.3',
+    init: (st, c) => { const b = c.ba.filter(x => /usulan penghapusan/i.test(x.jenis || x.tentang || '')).sort((a, b) => String(b.tanggal).localeCompare(String(a.tanggal)))[0]; if (b) { st.ba_no = b.nomor || ''; st.ba_tgl = b.tanggal || ''; } },
+    fields: c => [['tanggal', 'Tanggal ditetapkan', 'date'], ['nomor', 'Nomor Keputusan', 'text'], ['ba_no', 'Nomor BA Usulan Penghapusan', 'text'], ['ba_tgl', 'Tanggal BA Usulan', 'date'], ['setuju', 'Nomor & tanggal persetujuan Bupati (wajib bila ada aset strategis)', 'text'], ['tindak', 'Tindak lanjut barang yang dihapus', 'select', ['Dimusnahkan (dibuat Berita Acara Pemusnahan)', 'Dijual (sesuai ketentuan penjualan aset)', 'Dihapus karena hilang', 'Dihapus karena beralih kepemilikan'].map(x => [x, x])], ['pilih', 'Aset yang dihapus', 'aset']],
+    cek: (st, c) => { const W = a78CekHapus(st, c); if (!st.ba_no) W.push(['warn', 'Isi nomor BA Usulan Penghapusan (Pasal 44 ayat 2: penghapusan didahului Berita Acara).']); if (a78Pilih(st, c).some(a78Strategis) && !st.setuju) W.push(['bad', 'Ada aset strategis (tanah/bangunan): wajib persetujuan Bupati sebelum ditetapkan (Pasal 43).']); return W; },
+    doc: (st, c) => {
+      const D = (S.set || {}).nama_desa || '', P = a78Pilih(st, c), tentang = 'Penghapusan Aset Desa';
+      const o = { nomor: st.nomor, tanggal: st.tanggal, tentang,
+        menimbang: ['bahwa barang milik Pemerintah Desa yang rusak berat, hilang, atau tidak efisien lagi penggunaannya untuk kepentingan penyelenggaraan Pemerintahan Desa, perlu dihapuskan dari Buku Data Inventaris Aset Desa Pertahun dan Buku Inventaris Desa Pemerintah Desa ' + D + ';', 'bahwa untuk melaksanakan ketentuan Pasal ' + (P.some(a78Strategis) ? '43' : '44') + ' ' + PB78 + ';', 'bahwa berdasarkan pertimbangan sebagaimana dimaksud pada huruf a dan huruf b, perlu menetapkan Penghapusan Aset Desa dengan Keputusan Kepala Desa;'],
+        mengingat: DH_ASET78, memperhatikan: ['Berita Acara Usulan Penghapusan Aset Desa Pemerintah Desa ' + D + ' Nomor ' + (st.ba_no || '……') + (st.ba_tgl ? ' tanggal ' + fDate(st.ba_tgl) : '') + ';'].concat(st.setuju ? ['Persetujuan Bupati Lumajang Nomor ' + st.setuju + ';'] : []),
+        diktum: [['KESATU', 'Penghapusan Aset Desa ' + esc(D) + ' sebagaimana tercantum dalam Lampiran Keputusan ini.'], ['KEDUA', 'Menghapus aset Desa sebagaimana dimaksud dalam diktum KESATU dari Buku Data Inventaris Aset Desa Pertahun dan Buku Inventaris Desa Pemerintah Desa ' + esc(D) + '.'], ['KETIGA', 'Barang sebagaimana dimaksud dalam diktum KESATU selanjutnya ' + esc(String(st.tindak || '').toLowerCase()) + ', dan Petugas/Pengurus Aset Desa memutakhirkan Buku Data Inventaris serta aplikasi SIPADES.'], ['KEEMPAT', 'Keputusan Kepala Desa ini mulai berlaku pada tanggal ditetapkan.']],
+        tembusan: ['Bupati Lumajang melalui Camat ' + ((S.set || {}).kecamatan || '') + ';', 'Ketua BPD ' + D + ';', 'Arsip.'] };
+      const lamp = `<div class="paper land sopdoc" style="font-size:9.5pt">${a78LampHd('KEPUTUSAN KEPALA DESA ' + D.toUpperCase(), st.nomor, st.tanggal, tentang)}<h3>DAFTAR ASET DESA YANG DIHAPUS</h3>${a78TabelHapus(P)}${a78TtdKades(st.tanggal, false)}</div>`;
+      return { o, pages: [a78SkHtml(o), lamp], uraian: P.length + ' barang: ' + P.slice(0, 5).map(a => a.nama || a.nama_rekening).join(', ') + (P.length > 5 ? ', dll.' : '') };
+    } },
+  kalk: { t: 'Kalkulator Harga Dasar Sewa (Pasal 15)', ps: 'Pasal 15', ic: 'coin', view: 1 },
+  perdes: { t: 'Draf Perdes Pemanfaatan Aset Desa', ps: 'Pasal 12 ayat 3', ic: 'scale', view: 1 }
+};
+const A78_SEBAB = [
+  ['Rusak berat / tidak dapat dipergunakan', 'Adapun hasil pengecekan/penelitian atas aset tersebut semua/sebagiannya dalam keadaan rusak berat dan sudah tidak dapat dipergunakan untuk kepentingan penyelenggaraan Pemerintahan Desa, sedangkan manfaat penggunaannya untuk kepentingan menunjang pelaksanaan penyelenggaraan Pemerintah Desa tidak seimbang dengan biaya perbaikan yang akan dikeluarkan. Oleh karena itu, aset tersebut diusulkan untuk dihapus dari Buku Data Inventaris Aset Desa Pertahun dan Buku Inventaris Desa.', 'Foto kondisi barang dan hasil pemeriksaan; untuk pemusnahan dibuat Berita Acara Pemusnahan (Pasal 41 ayat 3).'],
+  ['Hilang karena kecurian', 'Adapun hasil pengecekan/penelitian atas aset tersebut, aset dinyatakan hilang karena kecurian dan tidak dapat ditemukan kembali. Oleh karena itu, aset tersebut diusulkan untuk dihapus dari Buku Data Inventaris Aset Desa Pertahun dan Buku Inventaris Desa.', 'Surat keterangan dari Kepolisian dan surat keterangan dari pembantu pengelola aset desa yang memuat identitas, pernyataan kebenaran hilang, dan pernyataan kesediaan dikenai sanksi bila di kemudian hari terbukti ada unsur kelalaian/kesengajaan (Pasal 42 ayat 2).'],
+  ['Terbakar / susut / kedaluwarsa / mati', 'Adapun hasil pengecekan/penelitian atas aset tersebut, aset telah terbakar/susut/menguap/mencair/kedaluwarsa/mati sehingga tidak dapat dipergunakan lagi. Oleh karena itu, aset tersebut diusulkan untuk dihapus dari Buku Data Inventaris Aset Desa Pertahun dan Buku Inventaris Desa.', 'Pernyataan dari pembantu pengelola mengenai kebenaran alasan, pernyataan dari Kepala Desa, dilampiri hasil laporan pemeriksaan/penelitian (Pasal 42 ayat 3).'],
+  ['Keadaan kahar / bencana alam', 'Adapun hasil pengecekan/penelitian atas aset tersebut, aset rusak/hilang akibat keadaan kahar (force majeure)/bencana alam sehingga tidak dapat dipergunakan lagi. Oleh karena itu, aset tersebut diusulkan untuk dihapus dari Buku Data Inventaris Aset Desa Pertahun dan Buku Inventaris Desa.', 'Surat keterangan instansi berwenang tentang terjadinya keadaan kahar/bencana atau kondisi barang terkini, dan pernyataan dari Kepala Desa (Pasal 42 ayat 4).'],
+  ['Beralih kepemilikan (pemindahtanganan / putusan pengadilan)', 'Adapun hasil pengecekan/penelitian atas aset tersebut, aset telah beralih kepemilikannya karena pemindahtanganan/putusan pengadilan yang telah berkekuatan hukum tetap. Oleh karena itu, aset tersebut diusulkan untuk dihapus dari Buku Data Inventaris Aset Desa Pertahun dan Buku Inventaris Desa.', 'Berita Acara Serah Terima pemindahtanganan atau salinan putusan pengadilan berkekuatan hukum tetap (Pasal 40 ayat 3, Pasal 68, Pasal 70).']
+];
+const a78Pilih = (st, c) => (st.pilih || []).map(id => c.A.find(a => a.id === id)).filter(Boolean);
+function a78CekHapus(st, c) {
+  const P = a78Pilih(st, c), W = [];
+  if (!P.length) W.push(['bad', 'Pilih aset yang akan dihapus.']);
+  if (P.some(a78Strategis)) W.push(['warn', 'Ada aset strategis (tanah/bangunan): penghapusan perlu persetujuan Bupati sebelum SK ditetapkan (Pasal 43).']);
+  const sb = A78_SEBAB.find(x => x[0] === st.sebab); if (sb && st.sebab !== A78_SEBAB[0][0]) W.push(['warn', 'Siapkan kelengkapan: ' + sb[2]]);
+  return W;
+}
+function a78TabelHapus(P, kondisi) {
+  return `<table class="pt" style="font-size:8.5pt"><thead><tr><th rowspan="2" style="width:4%">No.</th><th rowspan="2">Jenis Barang</th><th rowspan="2" style="width:9%">Banyaknya Barang</th><th colspan="3">Asal Usul Barang (nilai Rp)</th><th rowspan="2" style="width:8%">Tahun Perolehan/ Pembelian</th><th rowspan="2" style="width:20%">Ket.</th></tr><tr><th style="width:10%">Kekayaan Asli Desa</th><th style="width:10%">APB Desa</th><th style="width:10%">Perolehan Lain Yang Sah</th></tr><tr>${[1, 2, 3, 4, 5, 6, 7, 8].map(n => `<th style="font-weight:400">${n}</th>`).join('')}</tr></thead>
+    <tbody>${P.map((a, i) => { const as = a78Asal(a); return `<tr><td style="text-align:center">${i + 1}</td><td>${esc(a78Jenis(a))}<br><span style="font-size:7.5pt">${esc(a78Kode(a))}${a78Ident(a) ? ' · ' + esc(a78Ident(a)) : ''}</span></td><td style="text-align:center">${esc((a.jumlah || 1) + ' ' + (a.satuan || 'Unit'))}</td>${[0, 1, 2].map(j => `<td style="text-align:right;white-space:nowrap">${as === j ? fMoney(a.nilai) : ''}</td>`).join('')}<td style="text-align:center">${esc(a78Tahun(a))}</td><td>${esc([kondisi ? 'Kondisi: ' + (a.kondisi || '') : '', a.ket].filter(Boolean).join('; '))}</td></tr>`; }).join('') || '<tr><td colspan="8" style="text-align:center">—</td></tr>'}</tbody></table>`;
+}
+
+/* ---------- hub Dokumen Perbup 78 ---------- */
+VIEWS.aset78dok = async (p, main, alive) => {
+  setTop('Dokumen Aset · Perbup 78/2021');
+  const S0 = S.a78 = S.a78 || {}; const d = (p && p.d) || S0.d || 'skp'; S0.d = d;
+  main.innerHTML = '<div class="skel" style="height:240px"></div>';
+  if (!S.a78ctx || (p && p.fresh) || S.a78ctxT < Date.now() - 120000) { S.a78ctx = await a78Ctx(); S.a78ctxT = Date.now(); }
+  const c = S.a78ctx; if (alive && !alive()) return;
+  const tabs = `<div class="chips wrap">${Object.keys(DOK78).map(k => `<button class="chip ${k === d ? 'on' : ''}" data-act="a78D" data-v="${k}">${ic(DOK78[k].ic)} ${esc(DOK78[k].t)}</button>`).join('')}</div>`;
+  S.vh.a78D = t => go('aset78dok', { d: t.dataset.v });
+  if (d === 'kalk') return a78Kalk(main, c, tabs);
+  if (d === 'perdes') return a78Perdes(main, c, tabs);
+  const D = DOK78[d];
+  let st = S0[d];
+  if (!st) {
+    st = S0[d] = { tanggal: isoToday(), tahun: String(new Date().getFullYear()), nomor: '', pilih: [], petugas: [], teknis: [] };
+    if (D.init) D.init(st, c);
+    (D.fields(c) || []).forEach(f => { if (f[2] === 'select' && !st[f[0]] && f[3] && f[3][0]) st[f[0]] = f[3][0][0]; });
+    if ((D.fields(c) || []).some(f => f[2] === 'aset') && !st.pilih.length) st.pilih = c.A.filter(a => a.status !== 'Dihapus' && a.kondisi === 'Rusak Berat').map(a => a.id);
+    if (D.simpan) { try { st.nomor = await nomorOtomatis(D.simpan, { tanggal: st.tanggal, klasifikasi: D.kla }); } catch (x) { } }
+  }
+  const fld = f => {
+    const [k, l, t, o] = f, v = st[k];
+    if (t === 'check') return `<div class="f wide"><label style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" data-k="${k}" ${v ? 'checked' : ''} style="width:18px;height:18px;flex:none"> <span>${esc(l)}</span></label></div>`;
+    if (t === 'select') return `<div class="f wide"><label>${esc(l)}</label><select data-k="${k}">${(o || []).map(x => `<option value="${esc(x[0])}" ${String(v) === String(x[0]) ? 'selected' : ''}>${esc(x[1])}</option>`).join('')}</select></div>`;
+    if (t === 'multi') return `<div class="f wide"><label>${esc(l)}</label><div class="stack" style="gap:2px;max-height:180px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:6px">${(o || []).map(x => `<label style="display:flex;gap:6px;align-items:center;font-size:13px"><input type="checkbox" data-k="${k}" data-multi="1" value="${esc(x[0])}" ${(v || []).indexOf(x[0]) >= 0 ? 'checked' : ''}> ${esc(x[1])}</label>`).join('') || '<span class="meta">—</span>'}</div></div>`;
+    if (t === 'aset') {
+      const q = (st.q || '').toLowerCase(), fk = st.fk || 'RB';
+      const L = c.A.filter(a => a.status !== 'Dihapus').filter(a => fk === 'pilih' ? (st.pilih || []).indexOf(a.id) >= 0 : fk === 'RB' ? a.kondisi === 'Rusak Berat' || (st.pilih || []).indexOf(a.id) >= 0 : true).filter(a => !q || (a78Jenis(a) + ' ' + (a.kode_barang || '') + ' ' + (a.ruang || '')).toLowerCase().indexOf(q) >= 0).slice(0, 300);
+      return `<div class="f wide"><label>${esc(l)} — dipilih ${(st.pilih || []).length}</label><div class="chips wrap" style="margin-bottom:4px">${[['RB', 'Rusak berat + terpilih'], ['pilih', 'Terpilih saja'], ['all', 'Semua aset']].map(x => `<button type="button" class="chip ${fk === x[0] ? 'on' : ''}" data-act="a78Fk" data-v="${x[0]}">${x[1]}</button>`).join('')}</div><input class="inp" id="a78Q" placeholder="Cari nama/kode/ruang" value="${esc(st.q || '')}">
+        <div class="stack" style="gap:2px;max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:6px;margin-top:4px">${L.map(a => `<label style="display:flex;gap:6px;align-items:flex-start;font-size:13px"><input type="checkbox" data-k="pilih" data-multi="1" value="${esc(a.id)}" ${(st.pilih || []).indexOf(a.id) >= 0 ? 'checked' : ''}><span><b>${esc(a.nama || a.nama_rekening)}</b> <span class="meta">${esc(a78Kode(a))} · ${esc(a.kondisi || '')}${a.status === 'Draf' ? ' · Draf' : ''}${a78Strategis(a) ? ' · strategis' : ''}</span></span></label>`).join('') || '<span class="meta">Tidak ada aset sesuai filter.</span>'}</div></div>`;
+    }
+    return `<div class="f"><label>${esc(l)}</label><input data-k="${k}" type="${t === 'number' ? 'number' : t === 'date' ? 'date' : 'text'}" value="${esc(v == null ? '' : v)}"></div>`;
+  };
+  main.innerHTML = `<div class="stack">${tabs}
+    <div class="card stack"><div><b style="font-size:15px">${esc(D.t)}</b> <span class="pill">${esc(PB78S)} ${esc(D.ps)}</span></div>
+      <div class="form two" id="a78F">${D.fields(c).map(fld).join('')}</div>
+      ${D.simpan ? `<div class="meta">Nomor dibuat otomatis berurutan dari ${D.simpan === 'sk_kades' ? 'Buku Keputusan Kepala Desa' : 'Register Berita Acara'} (kode klasifikasi ${esc(D.kla)}). Boleh diubah.</div>` : ''}
+      <div id="a78W"></div>
+      <div class="btns"><button class="btn pri" data-act="a78Cetak">${ic('print')}Cetak / Word / PDF</button>${D.simpan ? `<button class="btn" data-act="a78Simpan">${ic('check')}Simpan ke ${D.simpan === 'sk_kades' ? 'Buku Keputusan' : 'Register Berita Acara'}</button>` : ''}${d === 'skh' && canWrite('aset') ? `<button class="btn" data-act="a78Hapus">${ic('trash')}Tandai aset terpilih “Dihapus”</button>` : ''}<button class="btn" data-act="a78Reset">${ic('list')}Mulai ulang</button></div></div>
+    <div id="a78P" class="doc-prev fitp"></div></div>`;
+  let tm = 0;
+  const draw = () => { let r; try { r = D.doc(st, c); } catch (x) { $('#a78P').innerHTML = `<div class="err">${esc(x.message)}</div>`; return; } $('#a78P').innerHTML = r.pages.join(''); fitPapers($('#a78P')); const W = D.cek ? D.cek(st, c) : []; $('#a78W').innerHTML = W.map(w => `<div class="${w[0] === 'bad' ? 'err' : 's78-frc'}" style="margin:2px 0">${esc(w[1])}</div>`).join(''); };
+  if (!$('#sop78css')) document.head.insertAdjacentHTML('beforeend', SOP78_CSS);
+  draw();
+  const F0 = $('#a78F');
+  const baca = ev => { const t = ev.target, k = t.dataset && t.dataset.k; if (!k) return; if (t.dataset.multi) { const A = new Set(st[k] || []); t.checked ? A.add(t.value) : A.delete(t.value); st[k] = Array.from(A); } else st[k] = t.type === 'checkbox' ? t.checked : t.value; clearTimeout(tm); tm = setTimeout(draw, 250); };
+  F0.addEventListener('input', baca); F0.addEventListener('change', baca);
+  const q = $('#a78Q'); if (q) q.onchange = () => { st.q = q.value; refresh(); };
+  S.vh.a78Fk = t => { st.fk = t.dataset.v; refresh(); };
+  S.vh.a78Reset = () => { delete S0[d]; refresh(); };
+  S.vh.a78Cetak = () => { const r = D.doc(st, c); printDocs(D.t, r.pages, 'aset78_' + d); };
+  S.vh.a78Simpan = async t => {
+    const W = D.cek ? D.cek(st, c).filter(w => w[0] === 'bad') : [];
+    if (W.length && t.dataset.ok !== '1') { t.dataset.ok = '1'; t.innerHTML = ic('check') + 'Masih ada catatan merah. Tekan lagi untuk tetap menyimpan'; return; }
+    try {
+      const r = D.doc(st, c); let rec, e = D.simpan;
+      if (e === 'sk_kades') rec = a78SkRecord(r.o, r.uraian);
+      else { const s = S.set || {}; rec = Object.assign({ nomor: st.nomor, klasifikasi: String(st.nomor || '').split('/')[0], tanggal: st.tanggal, tempat: 'Kantor Desa ' + ND(), pihak1: s.nama_sekdes || '', jabatan1: 'Sekretaris Desa selaku Pembantu Pengelola Aset Desa', pihak2: s.nama_pengurus_aset || '', jabatan2: 'Petugas/Pengurus Aset Desa', mengetahui: 'Ya' }, r.ba); }
+      const ada = st.nomor ? ((await call('list', { entity: e, filters: { nomor: st.nomor }, limit: 1 })).rows || [])[0] : null;
+      if (ada) rec.id = ada.id;
+      const sv = await call('save', { entity: e, record: rec });
+      st.saved = (sv && sv.id) || (ada && ada.id); S.a78ctxT = 0;
+      toast((ada ? 'Diperbarui' : 'Tersimpan') + ' di ' + UI[e].t + ' nomor ' + st.nomor + '. Unggah scan bertanda tangan di sana.');
+    } catch (x) { toast(x.message, 1); }
+  };
+  S.vh.a78Hapus = async t => {
+    const P = a78Pilih(st, c); if (!P.length) return toast('Belum ada aset dipilih.', 1);
+    if (t.dataset.ok !== '1') { t.dataset.ok = '1'; t.innerHTML = ic('trash') + `Yakin? ${P.length} aset jadi status Dihapus. Tekan lagi`; return; }
+    try { const rows = P.map(a => ({ id: a.id, status: 'Dihapus', tgl_hapus: st.tanggal, ket: [a.ket, 'Dihapus dengan SK ' + (st.nomor || '') + ' tanggal ' + fDate(st.tanggal)].filter(Boolean).join('; ') })); const r = await call('bulkSave', { entity: 'aset', rows }); if (r.gagal && r.gagal.length) throw new Error(r.gagal[0].pesan); S.a78ctxT = 0; toast(P.length + ' aset ditandai Dihapus. Jangan lupa hapus juga di SIPADES.'); refresh(); } catch (x) { toast(x.message, 1); }
+  };
+};
+/* ---------- harga dasar sewa (Pasal 15) ---------- */
+function manfaatHargaDasar(v) {
+  const t = v.objek_tipe || '', lt = asetNum(v.luas_obj), nt = asetNum(v.nilai_m2), lb = asetNum(v.luas_bang), nb = asetNum(v.nilai_bang_m2);
+  const tanah = /Tanah/.test(t) && lt && nt ? 0.0333 * lt * nt : 0, bang = /Bangunan/.test(t) && lb && nb ? 0.0664 * lb * nb : 0;
+  return tanah || bang ? { tanah, bang, per_tahun: Math.round(tanah + bang) } : null;
+}
+function hariKerjaAntara(a, b) { let n = 0; const d = new Date(a); while (d < b) { const w = d.getDay(); if (w && w !== 6) n++; d.setDate(d.getDate() + 1); } return n; }
+const a78AddYears = (d, n) => { const x = new Date(d); x.setFullYear(x.getFullYear() + n); return x; };
+function manfaatCek(r) {
+  const M = [], j = r.jenis || '', mx = MANFAAT_MAX[j], ob = r.objek_tipe || '', mt = r.pihak2_jenis || '', add = (lvl, msg) => M.push({ lvl, msg });
+  const d1 = parseD(r.tgl_mulai), d2 = parseD(r.tgl_selesai);
+  if (mx && d1 && d2) { const lebih = mx.s === 'hari' ? Math.round((d2 - d1) / 864e5) + 1 > mx.n : d2 > a78AddYears(d1, mx.n); if (lebih) add('bad', `Jangka waktu melebihi ${mx.n} ${mx.s} (${mx.ps}). Perpanjangan dibuat dengan perjanjian baru.`); }
+  else if (mx) add('warn', 'Tanggal mulai dan berakhir belum diisi.');
+  if (j === 'Pinjam Pakai') {
+    if (mt && !/Lembaga Kemasyarakatan|Pemerintah Desa lain/.test(mt)) add('bad', 'Pinjam pakai hanya dengan Pemerintah Desa lain atau Lembaga Kemasyarakatan Desa (Pasal 17 ayat 1).');
+    if (/Tanah|Bangunan|Kendaraan/.test(ob)) add('bad', 'Tanah, bangunan, dan kendaraan bermotor tidak boleh dipinjampakaikan (Pasal 17 ayat 2). Gunakan sewa atau kerja sama pemanfaatan.');
+  }
+  if (j === 'Kerjasama Pemanfaatan' && ob && !/Tanah|Bangunan/.test(ob)) add('bad', 'Kerja sama pemanfaatan hanya untuk tanah dan/atau bangunan (Pasal 20).');
+  if (/^Bangun/.test(j) && ob && !/Tanah/.test(ob)) add('bad', 'BGS/BSG hanya untuk aset berupa tanah (Pasal 25).');
+  if (/Kerjasama|^Bangun/.test(j)) {
+    if (/Perorangan/.test(mt)) add('bad', 'Mitra KSP/BGS/BSG tidak boleh perorangan (Pasal 20 ayat 3, Pasal 25 ayat 2).');
+    if (!r.izin_bupati) add('warn', 'Belum ada izin tertulis Bupati (Pasal 22 ayat 1 / Pasal 27 ayat 1).');
+    if (!r.akta_notaris) add('warn', 'Perjanjian wajib dalam bentuk Akta Notaris (Pasal 22 ayat 3 / Pasal 27 ayat 3).');
+  }
+  if (j === 'Sewa' && /Pemerintah Desa lain|Lembaga Kemasyarakatan/.test(mt)) add('warn', 'Pasal 13 ayat 3: penyewa adalah BUMN, BUMD, swasta, atau badan hukum lainnya.');
+  if (!r.no_perdes) add('warn', 'Pemanfaatan aset harus ditetapkan dalam Peraturan Desa (Pasal 12 ayat 3).');
+  if (j === 'Sewa') {
+    const hd = manfaatHargaDasar(r);
+    if (!hd && /Tanah|Bangunan/.test(ob)) add('warn', 'Harga dasar sewa belum bisa dihitung: isi luas dan nilai per m² (NJOP terendah untuk tanah) — Pasal 15.');
+    else if (hd && asetNum(r.nilai_sepakat) && asetNum(r.nilai_sepakat) < hd.per_tahun) add('bad', `Sewa disepakati ${fMoney(r.nilai_sepakat)}/tahun di bawah harga dasar ${fMoney(hd.per_tahun)}/tahun (Pasal 15).`);
+    if (r.dasar_nilai === 'Perkiraan dari nilai buku aset') add('warn', 'Nilai per m² masih perkiraan dari nilai buku. Ganti dengan NJOP terendah (SPPT PBB) atau hasil penilaian.');
+  }
+  if (j !== 'Pinjam Pakai') {
+    const tp = parseD(r.tgl_perjanjian), ts = parseD(r.tgl_setor);
+    if (!ts) add('warn', 'Setoran ke Rekening Kas Desa belum dicatat (Pasal 33 ayat 2–3).');
+    else if (tp && hariKerjaAntara(ts, tp) < 2) add('bad', 'Setoran harus tunai sekaligus paling lambat 2 hari kerja sebelum perjanjian ditandatangani (Pasal 33 ayat 3).');
+  }
+  if (!r.dok_perjanjian && (r.status || '') !== 'Draf') add('warn', 'Scan perjanjian bertanda tangan belum diunggah.');
+  if ((r.status || '') === 'Berlaku' && d2) { const sisa = Math.round((d2 - parseD(isoToday())) / 864e5); if (sisa < 0) add('bad', 'Masa pemanfaatan sudah berakhir: buat perjanjian baru atau ubah status ke Berakhir dan tarik aset dengan BAST.'); else if (sisa <= 60) add('warn', `Berakhir ${sisa} hari lagi (${fDate(r.tgl_selesai)}).`); if (j === 'Kerjasama Pemanfaatan' && sisa >= 0 && sisa <= 730) add('warn', 'Permohonan perpanjangan KSP paling lambat 2 tahun sebelum berakhir (Pasal 21 ayat 2).'); }
+  return M;
+}
+const a78LabelAset = x => x.status === 'Dihapus' ? '' : (x.nama || x.nama_rekening || '') + ' | ' + (kodeAset(x.kode_barang) || '') + (x.no_urut ? ' Reg ' + sipReg(x) : '') + (x.letak ? ' | ' + String(x.letak).slice(0, 40) : '');
+const a78TipeAset = x => kibHuruf(x) === 'A' ? 'Tanah' : kibHuruf(x) === 'C' ? 'Bangunan' : /kendaraan|motor|mobil|pick ?up|truk|triseda|roda/i.test((x.nama_rekening || '') + ' ' + (x.nama || '')) || x.no_polisi ? 'Kendaraan bermotor' : 'Selain tanah/bangunan';
+/* ---------- kalkulator harga dasar sewa ---------- */
+async function a78Kalk(main, c, tabs) {
+  const st = S.a78.kalk = S.a78.kalk || { id: '', tipe: 'Tanah', luas: '', nilai: '', sepakat: '', lama: '1' };
+  const T = c.A.filter(a => a.status !== 'Dihapus' && (kibHuruf(a) === 'A' || kibHuruf(a) === 'C'));
+  const tkd = c.A.filter(a => a.status !== 'Dihapus' && kibHuruf(a) === 'A' && /tkd|tanah kas/i.test((a.nama || '') + ' ' + (a.nama_rekening || '')));
+  let apb = 0; try { const th = String(new Date().getFullYear()); const r = await call('list', { entity: 'keu_anggaran', filters: { tahun: th }, limit: 3000 }); apb = (r.rows || []).filter(x => /^4\.1\.2/.test(String(x.rek || ''))).reduce((s, x) => s + asetNum(x.jumlah_pak || x.jumlah), 0); } catch (x) { }
+  const sewaTkd = c.man.filter(m => (m.status || '') !== 'Berakhir' && tkd.some(a => a.id === m.ref)).reduce((s, m) => s + asetNum(m.nilai_sepakat), 0);
+  const hit = () => { const l = asetNum(st.luas), n = asetNum(st.nilai), f = st.tipe === 'Bangunan' ? 0.0664 : 0.0333, hd = Math.round(f * l * n), sp = asetNum(st.sepakat), lm = Math.max(1, Number(st.lama) || 1); return { f, hd, sp, lm, tot: hd * lm, selisih: sp - hd }; };
+  const totTkd = tkd.reduce((s, a) => s + (asetNum(a.luas) && asetNum(a.nilai) ? 0.0333 * asetNum(a.nilai) : 0), 0);
+  main.innerHTML = `<div class="stack">${tabs}
+    <div class="card stack"><b style="font-size:15px">Kalkulator Harga Dasar Sewa · Pasal 15 ${esc(PB78S)}</b>
+      <div class="meta">Tanah: <b>St = 3,33% × (Lt × Nt)</b>, Nt = nilai tanah hasil penilaian dengan estimasi terendah memakai NJOP per m². Bangunan: <b>Sb = 6,64% × (Lb × Nb)</b>, Nb = nilai wajar bangunan per m². Hasilnya dipakai sebagai harga dasar sewa per tahun; sewa yang disepakati tidak boleh lebih rendah.</div>
+      <div class="form two" id="kkF"><div class="f wide"><label>Aset (opsional, untuk mengisi luas)</label><select data-k="id"><option value="">— pilih —</option>${T.map(a => `<option value="${esc(a.id)}" ${st.id === a.id ? 'selected' : ''}>${esc(a.nama || a.nama_rekening)} · ${esc(asetNum(a.luas).toLocaleString('id-ID'))} m²</option>`).join('')}</select></div>
+        <div class="f"><label>Jenis objek</label><select data-k="tipe">${['Tanah', 'Bangunan'].map(x => `<option ${st.tipe === x ? 'selected' : ''}>${x}</option>`).join('')}</select></div>
+        <div class="f"><label>Luas yang disewakan (m²)</label><input data-k="luas" type="number" value="${esc(st.luas)}"></div>
+        <div class="f"><label>${st.tipe === 'Bangunan' ? 'Nilai wajar bangunan per m² (Rp)' : 'NJOP terendah per m² (Rp)'}</label><input data-k="nilai" type="number" value="${esc(st.nilai)}"></div>
+        <div class="f"><label>Sewa disepakati per tahun (Rp)</label><input data-k="sepakat" type="number" value="${esc(st.sepakat)}"></div>
+        <div class="f"><label>Lama sewa (tahun, maks. 3)</label><input data-k="lama" type="number" min="1" max="3" value="${esc(st.lama)}"></div></div>
+      <div id="kkOut"></div>
+      <div class="btns"><button class="btn pri" data-act="kkCatat">${ic('plus')}Catat sebagai pemanfaatan</button><button class="btn" data-act="kkCetak">${ic('print')}Cetak perhitungan</button></div></div>
+    <div class="card stack"><b>Tanah Kas Desa: perkiraan harga dasar vs target APBDes</b>
+      <div class="meta">Nilai per m² di bawah ini <b>masih perkiraan dari nilai buku SIPADES</b>, belum NJOP. Gunakan hanya sebagai gambaran sebelum NJOP terendah diperoleh dari SPPT PBB.</div>
+      <div style="overflow:auto"><table class="pt" style="font-size:12px;min-width:560px"><thead><tr><th>TKD</th><th>Luas (m²)</th><th>Nilai buku / m²</th><th>Harga dasar / tahun (3,33%)</th></tr></thead><tbody>${tkd.map(a => { const l = asetNum(a.luas), n = l ? asetNum(a.nilai) / l : 0; return `<tr><td>${esc(a.nama)}<br><span class="meta">${esc(a.letak || '')}</span></td><td style="text-align:right">${l.toLocaleString('id-ID')}</td><td style="text-align:right">${fMoney(Math.round(n))}</td><td style="text-align:right">${fMoney(Math.round(0.0333 * l * n))}</td></tr>`; }).join('') || '<tr><td colspan="4">Belum ada TKD di KIB A.</td></tr>'}</tbody>
+      <tfoot><tr><td><b>Jumlah</b></td><td style="text-align:right"><b>${tkd.reduce((s, a) => s + asetNum(a.luas), 0).toLocaleString('id-ID')}</b></td><td></td><td style="text-align:right"><b>${fMoney(Math.round(totTkd))}</b></td></tr></tfoot></table></div>
+      <div class="meta">Target pendapatan Hasil Aset Desa (4.1.2) APBDes tahun ini: <b>${fMoney(apb)}</b> · Sewa TKD tercatat di register pemanfaatan: <b>${fMoney(sewaTkd)}</b>/tahun.</div></div></div>`;
+  const draw = () => { const h = hit(); $('#kkOut').innerHTML = `<div class="card" style="box-shadow:none;background:var(--surface2);padding:10px 12px"><div>Harga dasar sewa per tahun: <b style="font-size:16px">${fMoney(h.hd)}</b> <span class="meta">(${(h.f * 100).toLocaleString('id-ID')}% × ${asetNum(st.luas).toLocaleString('id-ID')} m² × ${fMoney(asetNum(st.nilai))})</span></div><div>Harga dasar selama ${h.lm} tahun: <b>${fMoney(h.tot)}</b></div>${h.sp ? `<div style="margin-top:4px">${h.selisih < 0 ? `<span class="pill bad">Di bawah harga dasar ${fMoney(-h.selisih)}/tahun</span>` : `<span class="pill ok">Sesuai, di atas harga dasar ${fMoney(h.selisih)}/tahun</span>`}</div>` : ''}${Number(st.lama) > 3 ? '<div class="err">Sewa paling lama 3 tahun (Pasal 14).</div>' : ''}</div>`; };
+  draw();
+  const F0 = $('#kkF'); F0.addEventListener('input', ev => { const k = ev.target.dataset.k; if (!k) return; st[k] = ev.target.value; if (k === 'id') { const a = T.find(x => x.id === st.id); if (a) { st.tipe = kibHuruf(a) === 'C' ? 'Bangunan' : 'Tanah'; st.luas = String(asetNum(a.luas) || ''); if (!st.nilai && asetNum(a.luas)) st.nilai = String(Math.round(asetNum(a.nilai) / asetNum(a.luas))); return refresh(); } } if (k === 'tipe') return refresh(); draw(); });
+  S.vh.kkCatat = () => { const a = T.find(x => x.id === st.id), h = hit(); go('form', { e: 'aset_manfaat', preset: Object.assign({ jenis: 'Sewa', objek_tipe: st.tipe, nilai_sepakat: st.sepakat || '', harga_dasar: String(h.hd || ''), dasar_nilai: 'NJOP (SPPT PBB)', status: 'Draf' }, st.tipe === 'Bangunan' ? { luas_bang: st.luas, nilai_bang_m2: st.nilai } : { luas_obj: st.luas, nilai_m2: st.nilai }, a ? { ref: a.id, aset: a78LabelAset(a) } : {}) }); };
+  S.vh.kkCetak = () => { const h = hit(), a = T.find(x => x.id === st.id), s = S.set || {}; printDocs('Perhitungan Harga Dasar Sewa', [`<div class="paper sopdoc">${kop()}<h3>PERHITUNGAN HARGA DASAR SEWA ASET DESA</h3><table class="kv" style="width:100%">${[['Objek', a ? (a.nama + (a.letak ? ', ' + a.letak : '')) : '……'], ['Jenis objek', st.tipe], ['Luas disewakan', asetNum(st.luas).toLocaleString('id-ID') + ' m²'], [st.tipe === 'Bangunan' ? 'Nilai wajar bangunan per m² (Nb)' : 'Nilai tanah per m², NJOP terendah (Nt)', fMoney(asetNum(st.nilai))], ['Rumus', st.tipe === 'Bangunan' ? 'Sb = 6,64% × (Lb × Nb)' : 'St = 3,33% × (Lt × Nt)'], ['Harga dasar sewa per tahun', '<b>' + fMoney(h.hd) + '</b>'], ['Lama sewa', h.lm + ' tahun'], ['Harga dasar selama masa sewa', fMoney(h.tot)], ['Sewa disepakati per tahun', h.sp ? fMoney(h.sp) : '……'], ['Keterangan', h.sp ? (h.selisih < 0 ? 'Di bawah harga dasar — tidak sesuai Pasal 15' : 'Sesuai/di atas harga dasar') : '']].map(r => `<tr><td style="width:45%">${esc(r[0])}</td><td style="width:10px">:</td><td>${r[1]}</td></tr>`).join('')}</table><p style="font-size:10pt">Dasar: Pasal 15 ${esc(PB78)}.</p><table class="nb" style="width:100%;margin-top:14px;text-align:center"><tr><td style="width:50%">Petugas/Pengurus Aset Desa<div style="height:56px"></div><b><u>${esc(upNama(s.nama_pengurus_aset || '……'))}</u></b></td><td>${esc(s.nama_desa || '')}, ${fDate(isoToday())}<br>Sekretaris Desa<div style="height:56px"></div><b><u>${esc(upNama(s.nama_sekdes || '……'))}</u></b></td></tr></table></div>`], 'aset78_kalk'); };
+}
+/* ---------- draf Perdes Pemanfaatan Aset Desa ---------- */
+function a78PerdesIsi(c, th) {
+  const D = (S.set || {}).nama_desa || '', DU = D.toUpperCase(), M = c.man.filter(m => !/Berakhir|Diputus/.test(m.status || ''));
+  const B = [['b', 'BAB I'], ['b', 'KETENTUAN UMUM'], ['p', 'Pasal 1'], ['t', 'Dalam Peraturan Desa ini yang dimaksud dengan:'],
+    ['l', '1. Desa adalah Desa ' + D + ', Kecamatan ' + ((S.set || {}).kecamatan || '') + ', Kabupaten Lumajang.'], ['l', '2. Pemerintah Desa adalah Kepala Desa dibantu perangkat Desa sebagai unsur penyelenggara Pemerintahan Desa.'], ['l', '3. Badan Permusyawaratan Desa yang selanjutnya disingkat BPD adalah lembaga yang melaksanakan fungsi pemerintahan yang anggotanya merupakan wakil dari penduduk Desa.'],
+    ['l', '4. Aset Desa adalah barang milik Desa yang berasal dari kekayaan asli Desa, dibeli atau diperoleh atas beban APB Desa atau perolehan hak lainnya yang sah.'], ['l', '5. Pemanfaatan adalah pendayagunaan Aset Desa secara tidak langsung dipergunakan dalam rangka penyelenggaraan tugas Pemerintahan Desa dan tidak mengubah status kepemilikan.'],
+    ['l', '6. Sewa adalah pemanfaatan Aset Desa oleh pihak lain dalam jangka waktu tertentu dan menerima imbalan uang tunai.'], ['l', '7. Pinjam Pakai adalah pemanfaatan Aset Desa antara Pemerintah Desa dengan Pemerintah Desa lain serta Lembaga Kemasyarakatan Desa dalam jangka waktu tertentu tanpa menerima imbalan.'],
+    ['l', '8. Kerja Sama Pemanfaatan adalah pemanfaatan Aset Desa oleh pihak lain dalam jangka waktu tertentu dalam rangka meningkatkan pendapatan Desa.'], ['l', '9. Mitra pemanfaatan adalah pihak yang memanfaatkan Aset Desa berdasarkan perjanjian dengan Pemerintah Desa.'], ['l', '10. Rekening Kas Desa adalah rekening tempat menyimpan uang Pemerintah Desa yang menampung seluruh penerimaan Desa.'],
+    ['b', 'BAB II'], ['b', 'OBJEK DAN BENTUK PEMANFAATAN'], ['p', 'Pasal 2'], ['l', '(1) Aset Desa yang dapat dimanfaatkan adalah Aset Desa yang tidak dipergunakan langsung untuk menunjang penyelenggaraan Pemerintahan Desa.'], ['l', '(2) Bentuk pemanfaatan Aset Desa berupa: a. sewa; b. pinjam pakai; c. kerja sama pemanfaatan; dan d. bangun guna serah atau bangun serah guna.'], ['l', '(3) Objek, bentuk, mitra, jangka waktu, dan besaran pemanfaatan tercantum dalam Lampiran yang merupakan bagian tidak terpisahkan dari Peraturan Desa ini.'],
+    ['p', 'Pasal 3'], ['l', '(1) Pemanfaatan Aset Desa tidak mengubah status kepemilikan Aset Desa.'], ['l', '(2) Aset Desa yang menjadi objek pemanfaatan dilarang dijaminkan, digadaikan, atau dipindahtangankan oleh mitra pemanfaatan.'],
+    ['b', 'BAB III'], ['b', 'SEWA'], ['p', 'Pasal 4'], ['l', '(1) Jangka waktu sewa paling lama 3 (tiga) tahun sejak perjanjian ditandatangani dan dapat diperpanjang.'], ['l', '(2) Pihak yang dapat menyewa Aset Desa meliputi Badan Usaha Milik Negara, Badan Usaha Milik Daerah, swasta, dan/atau badan hukum lainnya.'],
+    ['p', 'Pasal 5'], ['l', '(1) Harga dasar sewa tanah dihitung dengan rumus St = 3,33% × (Lt × Nt), dengan St sewa tanah per tahun, Lt luas tanah (m²), dan Nt nilai tanah per m² berdasarkan hasil penilaian dengan estimasi terendah menggunakan NJOP.'], ['l', '(2) Harga dasar sewa bangunan dihitung dengan rumus Sb = 6,64% × (Lb × Nb), dengan Sb sewa bangunan per tahun, Lb luas lantai bangunan (m²), dan Nb nilai wajar bangunan per m².'], ['l', '(3) Besaran sewa yang disepakati tidak boleh lebih rendah dari harga dasar sewa sebagaimana dimaksud pada ayat (1) dan ayat (2).'],
+    ['p', 'Pasal 6'], ['l', '(1) Uang sewa disetorkan seluruhnya secara tunai sekaligus ke Rekening Kas Desa paling lambat 2 (dua) hari kerja sebelum perjanjian sewa ditandatangani.'], ['l', '(2) Penyewaan dituangkan dalam perjanjian sewa yang ditandatangani penyewa dan Kepala Desa di atas kertas bermeterai, sekurang-kurangnya memuat para pihak, objek, luas atau jumlah barang, besaran sewa, jangka waktu, tanggung jawab penyewa atas biaya operasional dan pemeliharaan, hak dan kewajiban para pihak, keadaan kahar, dan persyaratan lain yang dianggap perlu.'], ['l', '(3) Seluruh biaya pembuatan perjanjian sewa ditanggung penyewa.'],
+    ['b', 'BAB IV'], ['b', 'PINJAM PAKAI'], ['p', 'Pasal 7'], ['l', '(1) Pinjam pakai dilaksanakan antara Pemerintah Desa dengan Pemerintah Desa lain dan Lembaga Kemasyarakatan Desa, paling lama 7 (tujuh) hari, dan dapat diperpanjang.'], ['l', '(2) Pinjam pakai dikecualikan untuk tanah, bangunan, dan kendaraan bermotor.'], ['l', '(3) Pinjam pakai dituangkan dalam perjanjian bermeterai yang ditandatangani peminjam pakai dan Kepala Desa.'],
+    ['b', 'BAB V'], ['b', 'KERJA SAMA PEMANFAATAN, BANGUN GUNA SERAH, DAN BANGUN SERAH GUNA'], ['p', 'Pasal 8'], ['l', '(1) Kerja sama pemanfaatan atas tanah dan/atau bangunan paling lama 15 (lima belas) tahun; bangun guna serah atau bangun serah guna atas tanah paling lama 20 (dua puluh) tahun.'], ['l', '(2) Perjanjian sebagaimana dimaksud pada ayat (1) ditandatangani setelah mendapat izin tertulis Bupati dan dituangkan dalam Akta Notaris.'], ['l', '(3) Mitra wajib membayar kontribusi ke Rekening Kas Desa setiap tahun sesuai perjanjian.'],
+    ['b', 'BAB VI'], ['b', 'HAK DAN KEWAJIBAN'], ['p', 'Pasal 9'], ['l', '(1) Mitra pemanfaatan wajib membayar sesuai perjanjian, menanggung biaya pemeliharaan dan pengamanan objek, menggunakan objek sesuai peruntukan, dan menyerahkan kembali objek dalam keadaan baik pada akhir perjanjian.'], ['l', '(2) Pemerintah Desa berhak menerima pembayaran, memeriksa objek pemanfaatan sewaktu-waktu, dan mengakhiri perjanjian apabila mitra melanggar ketentuan.'],
+    ['b', 'BAB VII'], ['b', 'PENDAPATAN DAN PENGAWASAN'], ['p', 'Pasal 10'], ['l', 'Pendapatan dari pemanfaatan Aset Desa merupakan pendapatan asli Desa dari hasil aset Desa dan dianggarkan dalam APB Desa.'], ['p', 'Pasal 11'], ['l', 'Kepala Desa, Sekretaris Desa selaku pembantu pengelola, dan BPD melakukan pengawasan atas pelaksanaan pemanfaatan Aset Desa.'],
+    ['b', 'BAB VIII'], ['b', 'KETENTUAN PERALIHAN'], ['p', 'Pasal 12'], ['l', 'Pemanfaatan Aset Desa yang sudah berjalan sebelum Peraturan Desa ini berlaku tetap dilaksanakan sampai berakhirnya perjanjian, dan perpanjangannya wajib menyesuaikan dengan Peraturan Desa ini.'],
+    ['b', 'BAB IX'], ['b', 'KETENTUAN PENUTUP'], ['p', 'Pasal 13'], ['l', 'Peraturan Desa ini mulai berlaku pada tanggal diundangkan. Agar setiap orang mengetahuinya, memerintahkan pengundangan Peraturan Desa ini dengan penempatannya dalam Lembaran Desa ' + D + '.']];
+  const menimbang = ['bahwa aset Desa yang tidak dipergunakan langsung untuk menunjang penyelenggaraan Pemerintahan Desa, khususnya tanah kas Desa, dapat dimanfaatkan untuk meningkatkan pendapatan asli Desa;', 'bahwa berdasarkan Pasal 12 ayat (3) ' + PB78 + ', pemanfaatan aset Desa ditetapkan dalam Peraturan Desa;', 'bahwa berdasarkan pertimbangan sebagaimana dimaksud pada huruf a dan huruf b, perlu menetapkan Peraturan Desa tentang Pemanfaatan Aset Desa;'];
+  const mengingat = DH_ASET78.slice(0, 4).concat(['Peraturan Menteri Dalam Negeri Nomor 20 Tahun 2018 tentang Pengelolaan Keuangan Desa;'], DH_ASET78.slice(4));
+  return { D, DU, M, B, menimbang, mengingat, th };
+}
+async function a78Perdes(main, c, tabs) {
+  const th = String(new Date().getFullYear()), P = a78PerdesIsi(c, th);
+  const lampRow = m => { const a = c.A.find(x => x.id === m.ref) || {}; const hd = manfaatHargaDasar(m); return `<tr><td>${esc(a.nama || m.aset || '')}${m.objek ? '<br><span style="font-size:8pt">' + esc(m.objek) + '</span>' : ''}</td><td style="text-align:right">${esc(asetNum(m.luas_obj || m.luas_bang).toLocaleString('id-ID'))}</td><td>${esc(m.jenis || '')}</td><td>${esc(m.pihak2 || '')}</td><td>${esc([fDate(m.tgl_mulai), fDate(m.tgl_selesai)].filter(Boolean).join(' s.d. '))}</td><td style="text-align:right">${hd ? fMoney(hd.per_tahun) : fMoney(m.harga_dasar)}</td><td style="text-align:right">${fMoney(m.nilai_sepakat)}</td></tr>`; };
+  const html = () => {
+    const B = P.B.map(x => x[0] === 'b' ? `<div style="text-align:center;font-weight:700">${esc(x[1])}</div>` : x[0] === 'p' ? `<div style="text-align:center;margin-top:6px">${esc(x[1])}</div>` : `<p style="margin:2px 0;text-align:justify${x[0] === 'l' ? ';padding-left:22px;text-indent:-22px' : ''}">${esc(x[1])}</p>`).join('');
+    const row = (l, isi) => `<tr><td style="width:112px;vertical-align:top">${l}</td><td style="width:12px;vertical-align:top">:</td><td>${isi}</td></tr>`;
+    const s = S.set || {};
+    return [`<div class="paper sopdoc" style="font-size:11.5pt"><div style="text-align:center;font-weight:700">RANCANGAN<br>PERATURAN DESA ${esc(P.DU)}<br>NOMOR …… TAHUN ${esc(th)}<br><br>TENTANG<br>PEMANFAATAN ASET DESA<br><br>DENGAN RAHMAT TUHAN YANG MAHA ESA<br><br>KEPALA DESA ${esc(P.DU)},</div>
+      <table class="kv" style="width:100%;margin-top:8px">${row('Menimbang', a78List(P.menimbang.map(esc), a78Huruf))}${row('Mengingat', a78List(P.mengingat.map(esc), i => (i + 1) + '.'))}</table>
+      <div style="text-align:center;font-weight:700;margin:8px 0">Dengan Kesepakatan Bersama<br>BADAN PERMUSYAWARATAN DESA ${esc(P.DU)}<br>dan<br>KEPALA DESA ${esc(P.DU)}<br><br>MEMUTUSKAN:</div>
+      <table class="kv" style="width:100%">${row('Menetapkan', 'PERATURAN DESA TENTANG PEMANFAATAN ASET DESA.')}</table>${B}
+      ${a78TtdKades('', true)}<div style="font-size:10.5pt">Diundangkan di ${esc(P.D)}<br>pada tanggal ……………<br>SEKRETARIS DESA ${esc(P.DU)},<div style="height:56px"></div><b>${esc(fmtNama(s.nama_sekdes || '', 'u') || '……')}</b><br><br>LEMBARAN DESA ${esc(P.DU)} TAHUN ${esc(th)} NOMOR ……</div></div>`,
+    `<div class="paper land sopdoc" style="font-size:9.5pt">${a78LampHd('PERATURAN DESA ' + P.DU, '…… TAHUN ' + th, '', 'Pemanfaatan Aset Desa')}<h3>DAFTAR OBJEK PEMANFAATAN ASET DESA</h3><table class="pt" style="font-size:8.5pt"><thead><tr><th>Objek / aset</th><th>Luas (m²)</th><th>Bentuk</th><th>Mitra</th><th>Jangka waktu</th><th>Harga dasar / tahun</th><th>Besaran disepakati / tahun</th></tr></thead><tbody>${P.M.map(lampRow).join('') || '<tr><td colspan="7" style="text-align:center">Belum ada data di Register Pemanfaatan Aset. Catat dulu objek & mitranya.</td></tr>'}</tbody></table>${a78TtdKades('', false)}</div>`];
+  };
+  main.innerHTML = `<div class="stack">${tabs}<div class="card stack"><b style="font-size:15px">Draf Perdes Pemanfaatan Aset Desa</b><div class="meta">Pasal 12 ayat 3 ${esc(PB78S)}: pemanfaatan aset desa ditetapkan dalam Peraturan Desa. Isi lampiran diambil dari Register Pemanfaatan Aset (${P.M.length} data aktif/draf). Draf ini dibahas dan disepakati bersama BPD.</div>
+    <div class="btns"><button class="btn pri" data-act="pdCetak">${ic('print')}Cetak / Word / PDF</button>${canWrite('perdes') ? `<button class="btn" data-act="pdSimpan">${ic('check')}Simpan sebagai draf Peraturan Desa</button>` : ''}<button class="btn" data-act="go" data-go='${esc(JSON.stringify(['list', { e: 'aset_manfaat' }]))}'>${ic('coin')}Register Pemanfaatan</button></div></div><div id="pdP" class="doc-prev fitp"></div></div>`;
+  $('#pdP').innerHTML = html().join(''); fitPapers($('#pdP'));
+  S.vh.pdCetak = () => printDocs('Rancangan Perdes Pemanfaatan Aset Desa', html(), 'aset78_perdes');
+  S.vh.pdSimpan = () => go('form', { e: 'perdes', buat: 1, preset: { jenis: 'Peraturan Desa', tahun: th, tentang: 'Pemanfaatan Aset Desa', uraian: 'Penetapan pemanfaatan aset desa (sewa, pinjam pakai, KSP, BGS/BSG) sesuai Pasal 12 ayat 3 ' + PB78S, menimbang: P.menimbang.map((x, i) => a78Huruf(i) + ' ' + x).join('\n'), mengingat: P.mengingat.map((x, i) => (i + 1) + '. ' + x).join('\n'), isi_naskah: P.B.map(x => x[1]).join('\n') } });
+}
+
+/* ---------- entitas: pemanfaatan, dokumen kepemilikan, kartu pemeliharaan, cek fisik/stock opname ---------- */
+const MANFAAT_JENIS = ['Sewa', 'Pinjam Pakai', 'Kerjasama Pemanfaatan', 'Bangun Guna Serah', 'Bangun Serah Guna'];
+const MANFAAT_MAX = { 'Sewa': { n: 3, s: 'tahun', ps: 'Pasal 14' }, 'Pinjam Pakai': { n: 7, s: 'hari', ps: 'Pasal 18' }, 'Kerjasama Pemanfaatan': { n: 15, s: 'tahun', ps: 'Pasal 21' }, 'Bangun Guna Serah': { n: 20, s: 'tahun', ps: 'Pasal 26' }, 'Bangun Serah Guna': { n: 20, s: 'tahun', ps: 'Pasal 26' } };
+const MITRA_JENIS = ['Perorangan', 'Badan Usaha Swasta (PT/CV/Firma)', 'Koperasi', 'Yayasan', 'BUMN', 'BUMD', 'BUM Desa', 'Lembaga Kemasyarakatan Desa', 'Pemerintah Desa lain', 'Badan hukum lainnya'];
+const OBJEK_TIPE = ['Tanah', 'Bangunan', 'Tanah dan Bangunan', 'Kendaraan bermotor', 'Selain tanah/bangunan'];
+const DOK_JENIS = ['Sertifikat Tanah', 'Letter C / Petok D', 'Akta / Surat Hibah', 'BPKB', 'STNK', 'PBG / IMB', 'Faktur / Kuitansi Pembelian', 'BAST', 'Polis Asuransi', 'Lainnya'];
+const DOK_SIMPAN = ['Brankas Kantor Desa', 'Disimpan Kepala Desa', 'Lemari Arsip Sekretariat', 'Kantor BPN (proses)', 'Dipinjam pihak lain', 'Tidak diketahui'];
+const DOK_STATUS = ['Asli tersimpan', 'Hanya fotokopi/scan', 'Hilang', 'Dalam proses (sertifikasi/balik nama)', 'Belum ada'];
+const WM = (...v) => ({ k: 'jenis', v });
+const WT = (...v) => ({ k: 'objek_tipe', v });
+const a78AsetF = (extra) => [F('aset', 'Aset', 'text', Object.assign({ wide: 1, listFrom: { e: 'aset', k: a78LabelAset, limit: 5000 }, hint: 'Ketik nama aset lalu pilih dari daftar KIB' }, extra || {})), F('ref', '', 'hidden')];
+Object.assign(UI, {
+  aset_manfaat: {
+    t: 'Pemanfaatan Aset (Sewa, Pinjam Pakai, KSP, BGS/BSG)', ic: 'coin', perm: 'aset', m: 'aset', sort: 'tgl_mulai', excel: 1, folder: 'Aset Desa/Pemanfaatan',
+    intro: 'Sesuai Pasal 12–33 ' + PB78S + '. Setiap catatan diperiksa otomatis: jangka waktu, jenis mitra, objek, harga dasar sewa (Pasal 15), Perdes, dan setoran ke Rekening Kas Desa.',
+    fields: [F('_h_o', 'Objek pemanfaatan', 'head'), F('jenis', 'Bentuk pemanfaatan', 'select', { req: 1, opt: MANFAAT_JENIS, def: 'Sewa' }),
+      ...a78AsetF({ fill: x => ({ ref: x.id, objek_tipe: a78TipeAset(x), luas_obj: kibHuruf(x) === 'A' ? (x.luas || '') : '', luas_bang: kibHuruf(x) === 'C' ? (x.luas || '') : '', nilai_m2: kibHuruf(x) === 'A' && asetNum(x.luas) && asetNum(x.nilai) ? String(Math.round(asetNum(x.nilai) / asetNum(x.luas))) : '', dasar_nilai: kibHuruf(x) === 'A' ? 'Perkiraan dari nilai buku aset' : '' }) }),
+      F('objek_tipe', 'Jenis objek', 'select', { opt: OBJEK_TIPE }), F('objek', 'Uraian bagian yang dimanfaatkan', 'textarea', { wide: 1, rows: 2, hint: 'mis. Sawah TKD Tempeh Kidul 01 bagian utara ± 2,5 ha' }),
+      F('luas_obj', 'Luas tanah dimanfaatkan (m²)', 'number', { when: WT('Tanah', 'Tanah dan Bangunan') }), F('nilai_m2', 'Nilai tanah per m² — NJOP terendah (Nt)', 'money', { when: WT('Tanah', 'Tanah dan Bangunan') }),
+      F('luas_bang', 'Luas lantai bangunan (m²)', 'number', { when: WT('Bangunan', 'Tanah dan Bangunan') }), F('nilai_bang_m2', 'Nilai wajar bangunan per m² (Nb)', 'money', { when: WT('Bangunan', 'Tanah dan Bangunan') }),
+      F('dasar_nilai', 'Dasar nilai', 'select', { opt: ['NJOP (SPPT PBB)', 'Hasil penilai pemerintah/publik', 'Taksiran tim desa', 'Perkiraan dari nilai buku aset'] }),
+      F('_h_m', 'Mitra', 'head'), F('pihak2', 'Nama mitra / penyewa', 'text', { req: 1, wide: 1 }), F('pihak2_jenis', 'Jenis mitra', 'select', { opt: MITRA_JENIS }), F('pihak2_wakil', 'Diwakili oleh / jabatan (untuk badan/lembaga)', 'text', { wide: 1 }),
+      F('pihak2_nik', 'NIK / NIB', 'text', { mono: 1, sens: 1 }), F('pihak2_hp', 'No. HP', 'tel'), F('pihak2_alamat', 'Alamat mitra', 'text', { wide: 1 }),
+      F('_h_w', 'Jangka waktu & nilai', 'head', { hint: 'Sewa ≤ 3 tahun · pinjam pakai ≤ 7 hari · KSP ≤ 15 tahun · BGS/BSG ≤ 20 tahun' }), F('tgl_perjanjian', 'Tanggal perjanjian ditandatangani', 'date'), F('tgl_mulai', 'Mulai', 'date'), F('tgl_selesai', 'Berakhir', 'date'),
+      F('harga_dasar', 'Harga dasar sewa per tahun (Pasal 15, otomatis)', 'money', { when: WM('Sewa'), hint: 'Dihitung dari luas × nilai per m²: tanah 3,33%, bangunan 6,64%' }), F('nilai_sepakat', 'Besaran sewa/kontribusi disepakati per tahun', 'money', { when: WM('Sewa', 'Kerjasama Pemanfaatan', 'Bangun Guna Serah', 'Bangun Serah Guna') }), F('total_bayar', 'Total dibayar (seluruh masa)', 'money', { when: WM('Sewa', 'Kerjasama Pemanfaatan', 'Bangun Guna Serah', 'Bangun Serah Guna') }),
+      F('_h_d', 'Dasar hukum & bukti', 'head'), F('no_perdes', 'Peraturan Desa pemanfaatan', 'text', { wide: 1, listFrom: { e: 'perdes', k: x => 'Nomor ' + x.nomor + ' Tahun ' + (x.tahun || '') + ' tentang ' + (x.tentang || '') } }), F('no_perjanjian', 'Nomor perjanjian', 'text', { wide: 1 }),
+      F('izin_bupati', 'Izin tertulis Bupati (nomor & tanggal)', 'text', { wide: 1, when: WM('Kerjasama Pemanfaatan', 'Bangun Guna Serah', 'Bangun Serah Guna') }), F('akta_notaris', 'Akta Notaris (nomor, tanggal, nama notaris)', 'text', { wide: 1, when: WM('Kerjasama Pemanfaatan', 'Bangun Guna Serah', 'Bangun Serah Guna') }),
+      F('tgl_setor', 'Tanggal setor ke Rekening Kas Desa', 'date', { when: WM('Sewa', 'Kerjasama Pemanfaatan', 'Bangun Guna Serah', 'Bangun Serah Guna') }), F('no_setor', 'Nomor bukti setor / slip bank', 'text', { when: WM('Sewa', 'Kerjasama Pemanfaatan', 'Bangun Guna Serah', 'Bangun Serah Guna') }),
+      F('dok_setor', 'Bukti setor (scan)', 'file'), F('dok_perjanjian', 'Perjanjian bertanda tangan (scan)', 'file'), F('foto', 'Foto objek', 'fotos', { max: 4 }),
+      F('status', 'Status', 'select', { opt: ['Draf', 'Berlaku', 'Berakhir', 'Diputus'], def: 'Draf' }), F('ket', 'Keterangan', 'textarea', { wide: 1 })],
+    calc: v => { const h = manfaatHargaDasar(v); return h && v.jenis === 'Sewa' ? { harga_dasar: String(h.per_tahun) } : null; },
+    chips: { k: 'jenis', opt: MANFAAT_JENIS },
+    views: [['Berlaku', () => ({ status: 'Berlaku' })], ['Draf', () => ({ status: 'Draf' })], ['Berakhir', () => ({ status: 'Berakhir' })], ['Semua', () => ({})]],
+    row: r => { const W = manfaatCek(r), b = W.filter(x => x.lvl === 'bad').length, w = W.length - b; return { t: (r.jenis || '') + ' · ' + (r.pihak2 || ''), s: [String(r.aset || '').split(' | ')[0], r.objek].filter(Boolean).join(' · '), s2: [r.tgl_mulai && fDate(r.tgl_mulai) + ' s.d. ' + fDate(r.tgl_selesai), r.nilai_sepakat && fMoney(r.nilai_sepakat) + '/thn'].filter(Boolean).join(' · '), av: ic('coin'), raw2: 1, pill: `<span class="pill ${r.status === 'Berlaku' ? 'ok' : ''}">${esc(r.status || 'Draf')}</span>${b ? ` <span class="pill bad">${b} tidak sesuai</span>` : w ? ` <span class="pill warn">${w} catatan</span>` : ''}` }; },
+    print: { title: 'REGISTER PEMANFAATAN ASET DESA', land: 1, cols: [['Bentuk', 'jenis'], ['Objek', r => esc([String(r.aset || '').split(' | ')[0], r.objek].filter(Boolean).join('; '))], ['Luas (m²)', r => esc(asetNum(r.luas_obj || r.luas_bang).toLocaleString('id-ID'))], ['Mitra', r => esc([r.pihak2, r.pihak2_jenis].filter(Boolean).join(' — '))], ['Jangka Waktu', r => fDate(r.tgl_mulai) + ' s.d. ' + fDate(r.tgl_selesai)], ['Harga Dasar/Thn', r => fMoney(r.harga_dasar)], ['Disepakati/Thn', r => fMoney(r.nilai_sepakat)], ['Perdes / Perjanjian', r => esc([r.no_perdes, r.no_perjanjian].filter(Boolean).join(' / '))], ['Setor', r => esc([fDate(r.tgl_setor), r.no_setor].filter(Boolean).join(' '))], ['Status', 'status']] },
+    extra: (x, el) => {
+      const W = manfaatCek(x), hd = manfaatHargaDasar(x);
+      el.insertAdjacentHTML('beforeend', `<div class="stack"><div class="sec-h"><h2>${ic('scale')} Pemeriksaan kesesuaian ${esc(PB78S)}</h2></div>${W.length ? W.map(w => `<div class="${w.lvl === 'bad' ? 'err' : 's78-frc'}" style="margin:0">${esc(w.msg)}</div>`).join('') : `<div class="card meta" style="border-left:4px solid var(--ok)">${ic('check')} Sudah sesuai ketentuan yang bisa diperiksa aplikasi.</div>`}
+        ${hd ? `<div class="meta">Harga dasar: ${hd.tanah ? 'tanah ' + fMoney(Math.round(hd.tanah)) : ''}${hd.tanah && hd.bang ? ' + ' : ''}${hd.bang ? 'bangunan ' + fMoney(Math.round(hd.bang)) : ''} = <b>${fMoney(hd.per_tahun)}</b> per tahun.</div>` : ''}
+        <div class="btns"><button class="btn sm pri" data-act="mfCetak">${ic('print')}${/Kerjasama|^Bangun/.test(x.jenis || '') ? 'Pokok perjanjian (bahan akta notaris)' : 'Draf perjanjian ' + esc((x.jenis || '').toLowerCase())}</button>${x.ref ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'aset', id: x.ref }]))}'>${ic('box')}Buka aset</button>` : ''}<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['aset78dok', { d: 'perdes' }]))}'>${ic('scale')}Draf Perdes pemanfaatan</button></div></div>`);
+      S.vh.mfCetak = () => printDocs('Perjanjian ' + (x.jenis || ''), [a78Perjanjian(x)], 'aset78_janji');
+    }
+  },
+  aset_dok: {
+    t: 'Dokumen Kepemilikan & Pengamanan Aset', ic: 'lock', perm: 'aset', m: 'aset', sort: 'jenis', asc: 1, excel: 1, folder: 'Aset Desa/Dokumen Kepemilikan',
+    intro: 'Pasal 7 dan 34–36 ' + PB78S + ': tanah disertifikatkan atas nama Pemerintah Desa; bukti kepemilikan disimpan tertib dan aman oleh Kepala Desa; pengamanan fisik dengan pagar, tanda batas, papan nama, dan label.',
+    fields: [...a78AsetF({ fill: x => ({ ref: x.id, jenis: kibHuruf(x) === 'A' ? (x.no_sertifikat ? 'Sertifikat Tanah' : 'Letter C / Petok D') : x.no_bpkb || x.no_polisi ? 'BPKB' : kibHuruf(x) === 'C' ? 'PBG / IMB' : 'Faktur / Kuitansi Pembelian', nomor: x.no_sertifikat || x.no_bpkb || x.no_dokumen || '' }) }),
+      F('jenis', 'Jenis dokumen', 'select', { req: 1, opt: DOK_JENIS }), F('nomor', 'Nomor dokumen'), F('atas_nama', 'Atas nama', 'text', { def: () => 'Pemerintah Desa ' + ND() }), F('tanggal', 'Tanggal terbit', 'date'),
+      F('berlaku', 'Berlaku s.d. (STNK/pajak/polis)', 'date'), F('tempat', 'Tempat simpan', 'select', { opt: DOK_SIMPAN, def: 'Brankas Kantor Desa' }), F('pemegang', 'Pemegang / penanggung jawab', 'person'),
+      F('status', 'Status dokumen', 'select', { opt: DOK_STATUS, def: 'Asli tersimpan' }), F('tgl_cek', 'Terakhir dicek', 'date', { def: isoToday }),
+      F('lapor_polisi', 'Nomor & tanggal laporan kehilangan (Kepolisian)', 'text', { wide: 1, when: { k: 'status', v: ['Hilang'] } }), F('tl_hilang', 'Tindak lanjut (permohonan sertifikat pengganti ke BPN, dsb.)', 'textarea', { wide: 1, when: { k: 'status', v: ['Hilang'] } }),
+      F('fisik', 'Pengamanan fisik terpasang', 'text', { wide: 1, list: ['Pagar', 'Patok tanda batas', 'Papan nama/plang', 'Label kode barang', 'Ruang terkunci/gudang', 'Garasi terkunci', 'Pagar, patok tanda batas, papan nama'], hint: 'Boleh lebih dari satu, pisahkan dengan koma' }),
+      F('scan', 'Scan dokumen', 'file'), F('foto', 'Foto pengamanan fisik', 'fotos', { max: 4 }), F('ket', 'Keterangan', 'textarea', { wide: 1 })],
+    chips: { k: 'jenis', opt: DOK_JENIS },
+    views: [['Semua', () => ({})], ['Hilang', () => ({ status: 'Hilang' })], ['Dalam proses', () => ({ status: 'Dalam proses (sertifikasi/balik nama)' })]],
+    row: r => ({ t: (r.jenis || '') + (r.nomor ? ' No. ' + r.nomor : ''), s: [String(r.aset || '').split(' | ')[0], r.atas_nama].filter(Boolean).join(' · '), s2: [r.tempat, r.fisik].filter(Boolean).join(' · '), av: ic('lock'), raw2: 1, pill: `<span class="pill ${r.status === 'Hilang' ? 'bad' : /Asli/.test(r.status || '') ? 'ok' : 'warn'}">${esc(r.status || '')}</span>${r.berlaku && String(r.berlaku) < isoToday() ? ' <span class="pill bad">lewat masa berlaku</span>' : ''}` }),
+    print: { title: 'REGISTER DOKUMEN KEPEMILIKAN DAN PENGAMANAN ASET DESA', land: 1, cols: [['Aset', r => esc(String(r.aset || '').split(' | ')[0])], ['Jenis Dokumen', 'jenis'], ['Nomor', 'nomor'], ['Atas Nama', 'atas_nama'], ['Tgl Terbit', r => fDate(r.tanggal)], ['Berlaku s.d.', r => fDate(r.berlaku)], ['Tempat Simpan', 'tempat'], ['Pemegang', 'pemegang'], ['Status', 'status'], ['Pengamanan Fisik', 'fisik'], ['Ket', r => esc([r.lapor_polisi && 'Lapor: ' + r.lapor_polisi, r.ket].filter(Boolean).join('; '))]] }
+  },
+  aset_pelihara: {
+    t: 'Kartu Pemeliharaan Aset', ic: 'hammer', perm: 'aset', m: 'aset', year: 'tanggal', sort: 'tanggal', excel: 1, folder: 'Aset Desa/Pemeliharaan',
+    intro: 'Pasal 39 ' + PB78S + ': kartu pemeliharaan memuat nama barang, spesifikasi, tanggal, jenis pekerjaan, bahan yang dipergunakan, biaya, pihak pelaksana, dan hal lain yang diperlukan.',
+    fields: [...a78AsetF({ fill: x => ({ ref: x.id, nama_barang: x.nama || x.nama_rekening || '', spesifikasi: a78Ident(x) }) }), F('nama_barang', 'Nama barang', 'text', { req: 1, wide: 1 }), F('spesifikasi', 'Spesifikasi', 'text', { wide: 1 }),
+      F('tanggal', 'Tanggal pemeliharaan', 'date', { req: 1, def: isoToday }), F('jenis_pekerjaan', 'Jenis pekerjaan / pemeliharaan', 'text', { req: 1, wide: 1, list: ['Servis berkala', 'Ganti oli', 'Ganti suku cadang', 'Perbaikan', 'Pengecatan', 'Pembersihan', 'Isi ulang', 'Pajak/STNK'] }),
+      F('bahan', 'Barang / bahan yang dipergunakan', 'textarea', { wide: 1, rows: 2 }), F('biaya', 'Biaya (Rp)', 'money'), F('pelaksana', 'Pihak yang melaksanakan', 'text', { wide: 1 }),
+      F('sumber_biaya', 'Sumber biaya', 'select', { opt: ['APB Desa', 'Mitra pemanfaatan', 'Swadaya', 'Lainnya'], def: 'APB Desa' }), F('no_bukti', 'Nomor bukti / kuitansi / SPJ', 'text'), F('kondisi', 'Kondisi setelah pemeliharaan', 'select', { opt: [''].concat(KONDISI_ASET), hint: 'Bila diisi, kondisi aset ikut diperbarui' }),
+      F('foto', 'Foto', 'fotos', { max: 4 }), F('dok_id', 'Nota / kuitansi', 'file'), F('ket', 'Hal lain yang diperlukan', 'textarea', { wide: 1 })],
+    row: r => ({ t: (r.nama_barang || '') + ' · ' + (r.jenis_pekerjaan || ''), s: [fDate(r.tanggal), r.pelaksana].filter(Boolean).join(' · '), r: r.biaya ? fMoney(r.biaya) : '', av: ic('hammer') }),
+    print: { title: 'KARTU PEMELIHARAAN ASET DESA', land: 1, cols: [['Nama Barang', 'nama_barang'], ['Spesifikasi', 'spesifikasi'], ['Tanggal', r => fDate(r.tanggal)], ['Jenis Pekerjaan', 'jenis_pekerjaan'], ['Bahan Dipergunakan', 'bahan'], ['Biaya (Rp)', r => fMoney(r.biaya)], ['Pelaksana', 'pelaksana'], ['Ket', r => esc([r.sumber_biaya, r.no_bukti, r.ket].filter(Boolean).join('; '))]], foot: rows => ['', '', '', '', 'Jumlah', fMoney(rows.reduce((s, r) => s + asetNum(r.biaya), 0)), '', ''] }
+  },
+  aset_so: {
+    t: 'Cek Fisik & Stock Opname', ic: 'check', perm: 'aset', m: 'aset', sort: 'tanggal', noAdd: 1,
+    fields: [F('jenis', 'Jenis', 'select', { req: 1, opt: ['Cek Fisik Aset Tetap', 'Stock Opname Persediaan'] }), F('periode', 'Periode', 'select', { opt: ['Akhir Tahun (31 Desember)', 'Semester I (30 Juni)'] }), F('tahun', 'Tahun', 'number'), F('tanggal', 'Posisi per tanggal', 'date', { req: 1 }), F('tgl_periksa', 'Tanggal pemeriksaan', 'date'),
+      F('nomor', 'Nomor Berita Acara', 'text', { wide: 1 }), F('catatan', 'Catatan / tindak lanjut', 'textarea', { wide: 1 }), F('status', 'Status', 'select', { opt: ['Draf', 'Final'], def: 'Draf' }), F('dok_id', 'Scan BA bertanda tangan', 'file')],
+    row: r => { let R = []; try { R = JSON.parse(r.rincian || '[]'); } catch (x) { } return { t: (r.jenis || '') + ' · ' + (r.periode || '') + ' ' + (r.tahun || ''), s: [r.nomor, R.length + ' baris', fDate(r.tanggal)].filter(Boolean).join(' · '), av: ic('check'), pill: `<span class="pill ${r.status === 'Final' ? 'ok' : 'warn'}">${esc(r.status || 'Draf')}</span>` }; },
+    extra: (x, el) => { el.insertAdjacentHTML('beforeend', `<div class="btns"><button class="btn sm pri" data-act="go" data-go='${esc(JSON.stringify(['asetso', { id: x.id }]))}'>${ic('edit')}Buka kertas kerja</button><button class="btn sm" data-act="soCetak1">${ic('print')}Cetak Berita Acara</button></div>`); S.vh.soCetak1 = async () => printDocs('BA ' + x.jenis, await soBA(x), 'aset78_so'); }
+  }
+});
+async function a78PeliharaSetelahSimpan(id) {
+  try { const r = await call('get', { entity: 'aset_pelihara', id }); if (r && r.ref && r.kondisi) await call('save', { entity: 'aset', record: { id: r.ref, kondisi: r.kondisi } }); } catch (x) { console.warn(x); }
+}
+/* ---------- draf perjanjian sewa / pinjam pakai (Pasal 16 & 19) ---------- */
+function a78Perjanjian(x) {
+  const s = S.set || {}, D = s.nama_desa || '', DU = D.toUpperCase(), d = parseD(x.tgl_perjanjian), j = x.jenis || 'Sewa', pinjam = j === 'Pinjam Pakai', akta = /Kerjasama|^Bangun/.test(j);
+  const hari = d ? `${HARI[d.getDay()]} tanggal ${terbilang(d.getDate()).trim()} bulan ${BULAN[d.getMonth()]} tahun ${terbilang(d.getFullYear()).trim()}` : '…… tanggal …… bulan …… tahun ……';
+  const obj = String(x.aset || '').split(' | ')[0] || '……', luas = asetNum(x.luas_obj || x.luas_bang), hd = manfaatHargaDasar(x);
+  const P = (n, judul, isi) => `<div style="text-align:center;font-weight:700;margin-top:8px">Pasal ${n}<br>${esc(judul)}</div>${isi.map(t => `<p style="margin:2px 0;text-align:justify">${t}</p>`).join('')}`;
+  let n = 0; const ps = [];
+  ps.push(P(++n, 'Objek ' + (pinjam ? 'Pinjam Pakai' : akta ? 'Perjanjian' : 'Sewa'), [`PIHAK KESATU ${pinjam ? 'meminjamkan' : 'menyewakan'} kepada PIHAK KEDUA Aset Desa berupa <b>${esc(obj)}</b>${x.objek ? ' (' + esc(x.objek) + ')' : ''}${luas ? ' seluas ± ' + esc(luas.toLocaleString('id-ID')) + ' m²' : ''}, milik Pemerintah Desa ${esc(D)}.`, 'Objek sebagaimana dimaksud tetap menjadi milik Pemerintah Desa dan tidak mengubah status kepemilikannya.']));
+  ps.push(P(++n, 'Jangka Waktu', [`Jangka waktu ${pinjam ? 'pinjam pakai' : 'perjanjian'} terhitung mulai tanggal ${esc(x.tgl_mulai ? fDate(x.tgl_mulai) : '……')} sampai dengan tanggal ${esc(x.tgl_selesai ? fDate(x.tgl_selesai) : '……')}, dan dapat diperpanjang dengan perjanjian baru sesuai ketentuan ${esc(PB78S)} ${pinjam ? '(paling lama 7 hari, Pasal 18)' : j === 'Sewa' ? '(paling lama 3 tahun, Pasal 14)' : ''}.`]));
+  if (!pinjam) ps.push(P(++n, j === 'Sewa' ? 'Besaran Sewa dan Cara Pembayaran' : 'Kontribusi dan Cara Pembayaran', [`Besaran ${j === 'Sewa' ? 'sewa' : 'kontribusi'} sebesar <b>${esc(fMoney(x.nilai_sepakat || 0))}</b> per tahun${asetNum(x.total_bayar) ? ', atau seluruhnya ' + esc(fMoney(x.total_bayar)) + ' (' + esc(terbilang(asetNum(x.total_bayar)).trim()) + ' rupiah)' : ''}${hd ? ', tidak lebih rendah dari harga dasar sewa ' + esc(fMoney(hd.per_tahun)) + ' per tahun sesuai Pasal 15 ' + esc(PB78S) : ''}.`, `Pembayaran disetorkan seluruhnya secara tunai sekaligus ke Rekening Kas Desa ${esc(D)} paling lambat 2 (dua) hari kerja sebelum perjanjian ini ditandatangani${x.no_setor ? ', dibuktikan dengan bukti setor nomor ' + esc(x.no_setor) + (x.tgl_setor ? ' tanggal ' + esc(fDate(x.tgl_setor)) : '') : ''}.`]));
+  ps.push(P(++n, 'Biaya Operasional dan Pemeliharaan', [`Selama jangka waktu perjanjian, seluruh biaya operasional, pemeliharaan, dan pengamanan objek menjadi tanggung jawab PIHAK KEDUA (Pasal 33 ayat 1 ${esc(PB78S)}).`]));
+  ps.push(P(++n, 'Hak dan Kewajiban', [`PIHAK KESATU berhak ${pinjam ? '' : 'menerima pembayaran sesuai perjanjian, '}memeriksa objek sewaktu-waktu, dan menerima kembali objek dalam keadaan baik pada akhir perjanjian.`, 'PIHAK KEDUA berhak menggunakan objek sesuai peruntukan selama jangka waktu perjanjian, dan wajib menjaga, memelihara, serta mengembalikan objek dalam keadaan baik.', 'PIHAK KEDUA dilarang mengalihkan, menyewakan kembali, menjaminkan, atau menggadaikan objek kepada pihak lain, serta dilarang mengubah bentuk objek tanpa persetujuan tertulis PIHAK KESATU.']));
+  ps.push(P(++n, 'Keadaan di Luar Kemampuan (Force Majeure)', ['Apabila terjadi keadaan di luar kemampuan para pihak seperti bencana alam, kebakaran, atau huru-hara yang mengakibatkan perjanjian tidak dapat dilaksanakan, para pihak membebaskan diri dari tuntutan dan menyelesaikannya secara musyawarah.']));
+  ps.push(P(++n, 'Berakhirnya Perjanjian', ['Perjanjian berakhir karena berakhirnya jangka waktu, atau diakhiri lebih awal oleh PIHAK KESATU apabila PIHAK KEDUA melanggar ketentuan perjanjian.', 'Pada saat perjanjian berakhir, PIHAK KEDUA menyerahkan kembali objek kepada PIHAK KESATU yang dituangkan dalam Berita Acara Serah Terima.']));
+  ps.push(P(++n, 'Penyelesaian Perselisihan', ['Perselisihan diselesaikan secara musyawarah untuk mufakat; apabila tidak tercapai, diselesaikan sesuai ketentuan peraturan perundang-undangan.']));
+  ps.push(P(++n, 'Lain-lain', [`Seluruh biaya pembuatan perjanjian ini ditanggung oleh PIHAK KEDUA (Pasal ${pinjam ? '19' : '16'} ayat 4 ${esc(PB78S)}). Perjanjian dibuat rangkap 2 (dua) bermeterai cukup dan mempunyai kekuatan hukum yang sama.`, x.no_perdes ? 'Perjanjian ini dilaksanakan berdasarkan Peraturan Desa ' + esc(D) + ' ' + esc(x.no_perdes) + '.' : 'Perjanjian ini dilaksanakan berdasarkan Peraturan Desa tentang Pemanfaatan Aset Desa.']));
+  return `<div class="paper sopdoc" style="font-size:11pt">${akta ? '<div style="text-align:center;font-weight:700;color:#b00">DRAF POKOK-POKOK PERJANJIAN — BAHAN PENYUSUNAN AKTA NOTARIS<br>(KSP/BGS/BSG wajib izin tertulis Bupati dan Akta Notaris, Pasal 22/27)</div>' : ''}<div style="text-align:center;font-weight:700">PERJANJIAN ${esc(j.toUpperCase())} ASET DESA ${esc(DU)}<br>NOMOR ${esc(x.no_perjanjian || '……')}</div>
+    <p style="margin-top:10px;text-align:justify">Pada hari ini ${esc(hari)}, bertempat di Kantor Desa ${esc(D)}, kami yang bertanda tangan di bawah ini:</p>
+    <table class="kv" style="width:100%"><tr><td style="width:20px">1.</td><td style="width:120px">Nama</td><td style="width:10px">:</td><td><b>${esc(fmtNama(s.nama_kades || '', 'u') || '……')}</b></td></tr><tr><td></td><td>Jabatan</td><td>:</td><td>Kepala Desa ${esc(D)}</td></tr><tr><td></td><td colspan="3">bertindak untuk dan atas nama Pemerintah Desa ${esc(D)}, selanjutnya disebut <b>PIHAK KESATU</b>.</td></tr>
+      <tr><td>2.</td><td>Nama</td><td>:</td><td><b>${esc(x.pihak2 || '……')}</b>${x.pihak2_wakil ? ', diwakili ' + esc(x.pihak2_wakil) : ''}</td></tr><tr><td></td><td>Jenis / NIK/NIB</td><td>:</td><td>${esc([x.pihak2_jenis, x.pihak2_nik ? String(x.pihak2_nik).replace(/^(\d{6})\d+(\d{4})$/, '$1******$2') : ''].filter(Boolean).join(' / ') || '……')}</td></tr><tr><td></td><td>Alamat</td><td>:</td><td>${esc(x.pihak2_alamat || '……')}</td></tr><tr><td></td><td colspan="3">selanjutnya disebut <b>PIHAK KEDUA</b>.</td></tr></table>
+    <p style="text-align:justify">Para pihak sepakat mengadakan perjanjian ${esc(j.toLowerCase())} Aset Desa dengan ketentuan sebagai berikut:</p>${ps.join('')}
+    <table class="nb" style="width:100%;margin-top:16px;text-align:center"><tr><td style="width:50%">PIHAK KEDUA,<div style="height:22px"></div><span style="font-size:9pt;border:1px dashed #999;padding:4px 8px">meterai</span><div style="height:30px"></div><b><u>${esc(String(x.pihak2 || '……').toUpperCase())}</u></b></td><td>PIHAK KESATU,<br>KEPALA DESA ${esc(DU)}<div style="height:64px"></div><b><u>${esc(fmtNama(s.nama_kades || '', 'u') || '……')}</u></b></td></tr>
+    <tr><td colspan="2" style="padding-top:10px">Saksi-saksi:</td></tr><tr><td>1. ${esc(s.nama_sekdes || '……')}<br>(Sekretaris Desa)<div style="height:40px"></div>……………………</td><td>2. ${esc(s.nama_pengurus_aset || '……')}<br>(Petugas/Pengurus Aset Desa)<div style="height:40px"></div>……………………</td></tr></table></div>`;
+}
+/* ---------- kertas kerja cek fisik aset & stock opname persediaan ---------- */
+function soSaldoSedia(rows, perISO) {
+  const M = new Map();
+  rows.filter(r => String(r.tanggal || '') <= perISO).sort((a, b) => String(a.tanggal).localeCompare(String(b.tanggal))).forEach(r => {
+    let R = []; try { R = JSON.parse(r.rincian || '[]'); } catch (x) { }
+    const sg = /Pemakaian|Pengeluaran/i.test(r.jenis || '') ? -1 : 1;
+    R.forEach(b => { const nm = String(b.uraian || b.kode || '').trim(); if (!nm) return; const key = nm.toLowerCase() + '|' + String(b.satuan || '').toLowerCase(); const o = M.get(key) || { key, uraian: nm, kode: b.kode || '', satuan: b.satuan || '', buku: 0, harga: 0 }; o.buku += sg * asetNum(b.qty); if (sg > 0 && asetNum(b.harga)) o.harga = asetNum(b.harga); M.set(key, o); });
+  });
+  return Array.from(M.values()).sort((a, b) => a.uraian.localeCompare(b.uraian, 'id'));
+}
+VIEWS.asetso = async (p, main, alive) => {
+  setTop('Cek Fisik & Stock Opname');
+  if (!$('#sop78css')) document.head.insertAdjacentHTML('beforeend', SOP78_CSS);
+  const st = S.asetSo = S.asetSo || { kib: '', q: '', belum: 0 };
+  if (p && p.id) st.id = p.id; if (p && p.baru) st.id = '';
+  const L = (await call('list', { entity: 'aset_so', limit: 200 })).rows || [];
+  if (!st.id) {
+    const y = new Date().getFullYear(), sem = new Date().getMonth() < 6;
+    main.innerHTML = `<div class="stack"><div class="card stack"><b style="font-size:15px">Cek fisik aset & stock opname persediaan</b><div class="meta">Kebijakan desa (SOP Aset): dilaksanakan setiap tahun per 31 Desember, boleh juga per 30 Juni. ${esc(PB78S)} Pasal 72: aset tetap paling sedikit 1 kali dalam 3 tahun, persediaan dan konstruksi dalam pengerjaan setiap tahun; laporan hasil ke Kepala Desa paling lama 3 bulan.</div>
+      ${canWrite('aset_so') ? `<div class="form two"><div class="f"><label>Jenis</label><select id="soJ"><option>Cek Fisik Aset Tetap</option><option>Stock Opname Persediaan</option></select></div><div class="f"><label>Periode</label><select id="soP"><option ${sem ? '' : 'selected'}>Akhir Tahun (31 Desember)</option><option ${sem ? 'selected' : ''}>Semester I (30 Juni)</option></select></div><div class="f"><label>Tahun</label><input id="soT" type="number" value="${y}"></div></div><div class="btns"><button class="btn pri" data-act="soBaru">${ic('plus')}Mulai kertas kerja</button></div>` : ''}</div>
+      <div class="sec-h"><h2>Riwayat (${L.length})</h2></div><div class="list">${L.map(r => rowHtml('aset_so', r)).join('') || '<div class="card empty">Belum ada cek fisik / stock opname.</div>'}</div></div>`;
+    S.vh.soBaru = async () => {
+      const j = $('#soJ').value, per = $('#soP').value, th = $('#soT').value, tgl = th + (/Juni/.test(per) ? '-06-30' : '-12-31');
+      let nomor = ''; try { nomor = await nomorOtomatis('berita_acara', { tanggal: tgl, klasifikasi: j === 'Stock Opname Persediaan' ? '000.2.1.1' : '000.2.1.1' }); } catch (x) { }
+      const s = S.set || {}, tim = [{ nama: s.nama_sekdes || '', jabatan: 'Sekretaris Desa', ked: 'Ketua (Pembantu Pengelola Aset)' }, { nama: s.nama_pengurus_aset || '', jabatan: 'Kepala Urusan Tata Usaha & Umum', ked: 'Sekretaris (Petugas/Pengurus Aset)' }];
+      try { const r = await call('save', { entity: 'aset_so', record: { jenis: j, periode: per, tahun: th, tanggal: tgl, tgl_periksa: isoToday(), nomor, status: 'Draf', tim: JSON.stringify(tim), rincian: '[]' } }); st.id = r.id; refresh(); } catch (x) { toast(x.message, 1); }
+    };
+    return;
+  }
+  const rec = await call('get', { entity: 'aset_so', id: st.id }); if (alive && !alive()) return;
+  let R = []; try { R = JSON.parse(rec.rincian || '[]'); } catch (x) { }
+  const sedia = rec.jenis === 'Stock Opname Persediaan';
+  let base = [];
+  if (sedia) { const pr = ((await call('list', { entity: 'persediaan', limit: 5000 })).rows || []); base = soSaldoSedia(pr, rec.tanggal).map(b => ({ id: b.key, nama: b.uraian, kode: b.kode, satuan: b.satuan, buku: b.buku, harga: b.harga })); }
+  else { const A = await asetSemua({}); base = A.filter(a => a.status !== 'Dihapus' && String(tahunOf(a.tgl_perolehan) || a.tahun || '0') <= String(rec.tahun)).map(a => ({ id: a.id, kib: kibHuruf(a), nama: a.nama || a.nama_rekening, kode: a78Kode(a), lokasi: a.ruang || a.letak || '', buku: asetNum(a.jumlah) || 1, satuan: a.satuan || 'Unit', nilai: asetNum(a.nilai), kondisi0: a.kondisi || 'Baik', draf: a.status === 'Draf' })); }
+  const byId = new Map(R.map(r => [r.id, r]));
+  const rows = base.map(b => Object.assign({}, b, byId.get(b.id) ? { cek: byId.get(b.id) } : {}));
+  if (alive && !alive()) return;
+  const w = canWrite('aset_so') && rec.status !== 'Final';
+  const vis = rows.filter(r => (!st.kib || r.kib === st.kib) && (!st.q || (r.nama + ' ' + r.kode + ' ' + (r.lokasi || '')).toLowerCase().indexOf(st.q.toLowerCase()) >= 0) && (!st.belum || !r.cek));
+  const done = rows.filter(r => r.cek).length;
+  const sel = (id, k, opts, v) => `<select data-id="${esc(id)}" data-k="${k}" ${w ? '' : 'disabled'} style="font-size:12px;padding:3px 4px">${opts.map(o => `<option ${String(v) === o ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
+  main.innerHTML = `<div class="stack"><div class="card stack"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><div style="flex:1;min-width:200px"><b>${esc(rec.jenis)} · ${esc(rec.periode || '')} ${esc(rec.tahun || '')}</b><div class="meta">Posisi per ${esc(fDate(rec.tanggal))} · BA ${esc(rec.nomor || '-')} · ${done}/${rows.length} sudah dicek · <span class="pill ${rec.status === 'Final' ? 'ok' : 'warn'}">${esc(rec.status || 'Draf')}</span></div></div>
+      <div class="btns"><button class="btn sm" data-act="soList">${ic('back')}Daftar</button>${w ? `<button class="btn sm" data-act="soSemua">${ic('check')}Tandai semua sesuai buku</button><button class="btn sm pri" data-act="soSimpan">${ic('check')}Simpan</button><button class="btn sm" data-act="soFinal">${ic('stamp')}Finalkan</button>` : ''}<button class="btn sm" data-act="soCetak">${ic('print')}Cetak BA</button>${!sedia && canWrite('aset') ? `<button class="btn sm" data-act="soTerap">${ic('box')}Terapkan kondisi ke data aset</button>` : ''}</div></div>
+      ${!sedia ? `<div class="chips wrap"><button class="chip ${!st.kib ? 'on' : ''}" data-act="soK" data-v="">Semua</button>${KIB_OPT.map(k => `<button class="chip ${st.kib === k[0] ? 'on' : ''}" data-act="soK" data-v="${k[0]}">KIB ${k[0]}</button>`).join('')}<button class="chip ${st.belum ? 'on' : ''}" data-act="soB">Belum dicek</button></div>` : `<div class="meta">Saldo buku dihitung dari menu Persediaan (saldo awal + penerimaan − pemakaian) sampai ${esc(fDate(rec.tanggal))}. ${base.length ? '' : '<b>Belum ada data persediaan.</b> Catat saldo awal/penerimaan/pemakaian di menu Persediaan, atau tambahkan baris manual di bawah.'}</div>`}
+      <input class="inp" id="soQ" placeholder="Cari nama / kode / lokasi" value="${esc(st.q)}"></div>
+    <div class="stack" id="soRows" style="gap:4px">${vis.slice(0, 400).map(r => { const c = r.cek || {}; return `<div class="s78-dk" style="flex-wrap:wrap;${c.ada === 'Tidak ditemukan' ? 'border-color:var(--bad)' : ''}"><span class="s78-dot ${r.cek ? 'ok' : ''}"></span><span class="x" style="min-width:180px"><b>${esc(r.nama)}</b>${r.draf ? ' <span class="pill warn">Draf</span>' : ''}<small>${esc([r.kode, r.lokasi, 'buku ' + (r.buku || 0) + ' ' + (r.satuan || '')].filter(Boolean).join(' · '))}</small></span>
+      ${sedia ? `<label class="meta">Fisik <input type="number" data-id="${esc(r.id)}" data-k="fisik" value="${esc(c.fisik != null ? c.fisik : '')}" ${w ? '' : 'disabled'} style="width:80px"></label>` : `${sel(r.id, 'ada', ['Ada', 'Tidak ditemukan', 'Dikuasai pihak lain'], c.ada || 'Ada')}<label class="meta">Jml <input type="number" data-id="${esc(r.id)}" data-k="fisik" value="${esc(c.fisik != null ? c.fisik : r.buku)}" ${w ? '' : 'disabled'} style="width:60px"></label>${sel(r.id, 'kondisi', KONDISI_ASET, c.kondisi || r.kondisi0)}${sel(r.id, 'label', ['Label ada', 'Belum berlabel'], c.label || 'Label ada')}`}
+      <input data-id="${esc(r.id)}" data-k="ket" placeholder="ket" value="${esc(c.ket || '')}" ${w ? '' : 'disabled'} style="flex:1;min-width:120px;font-size:12px"></div>`; }).join('') || '<div class="card empty">Tidak ada baris.</div>'}${vis.length > 400 ? `<div class="meta">Menampilkan 400 dari ${vis.length}; pakai filter/cari.</div>` : ''}</div></div>`;
+  const kerja = new Map(R.map(r => [r.id, Object.assign({}, r)]));
+  const ubah = ev => { const t = ev.target, id = t.dataset && t.dataset.id; if (!id) return; const b = rows.find(x => x.id === id) || {}; const o = kerja.get(id) || { id, nama: b.nama, kode: b.kode, lokasi: b.lokasi, kib: b.kib, satuan: b.satuan, buku: b.buku, harga: b.harga, nilai: b.nilai, ada: 'Ada', fisik: b.buku, kondisi: b.kondisi0, label: 'Label ada' }; o[t.dataset.k] = t.dataset.k === 'fisik' ? (t.value === '' ? '' : Number(t.value)) : t.value; kerja.set(id, o); };
+  $('#soRows').addEventListener('change', ubah); $('#soRows').addEventListener('input', ubah);
+  $('#soQ').onchange = ev => { st.q = ev.target.value; refresh(); };
+  S.vh.soK = t => { st.kib = t.dataset.v; refresh(); }; S.vh.soB = () => { st.belum = st.belum ? 0 : 1; refresh(); };
+  S.vh.soList = () => { st.id = ''; go('asetso', { baru: 1 }); };
+  const simpan = async extra => { const arr = Array.from(kerja.values()); await call('save', { entity: 'aset_so', record: Object.assign({ id: rec.id, rincian: JSON.stringify(arr) }, extra || {}) }); };
+  S.vh.soSimpan = async () => { try { await simpan(); toast('Kertas kerja tersimpan.'); refresh(); } catch (x) { toast(x.message, 1); } };
+  S.vh.soSemua = () => { rows.forEach(b => { if (!kerja.has(b.id)) kerja.set(b.id, { id: b.id, nama: b.nama, kode: b.kode, lokasi: b.lokasi, kib: b.kib, satuan: b.satuan, buku: b.buku, harga: b.harga, nilai: b.nilai, ada: 'Ada', fisik: b.buku, kondisi: b.kondisi0, label: 'Label ada' }); }); S.vh.soSimpan(); };
+  S.vh.soFinal = async t => { if (t.dataset.ok !== '1') { t.dataset.ok = '1'; t.innerHTML = ic('stamp') + 'Final tidak bisa diubah lagi. Tekan lagi'; return; } try { await simpan({ status: 'Final' }); toast('Difinalkan. Cetak BA, tanda tangani, lalu unggah scan-nya.'); refresh(); } catch (x) { toast(x.message, 1); } };
+  S.vh.soCetak = async () => { try { if (w) await simpan(); const r2 = await call('get', { entity: 'aset_so', id: rec.id }); printDocs('BA ' + rec.jenis, await soBA(r2), 'aset78_so'); } catch (x) { toast(x.message, 1); } };
+  S.vh.soTerap = async t => { const arr = Array.from(kerja.values()).filter(o => o.kondisi || o.ada); if (!arr.length) return toast('Belum ada baris yang dicek.', 1); if (t.dataset.ok !== '1') { t.dataset.ok = '1'; t.innerHTML = ic('box') + `Perbarui ${arr.length} aset? Tekan lagi`; return; } try { const up = arr.map(o => ({ id: o.id, kondisi: o.kondisi || undefined, inv_terakhir: rec.tgl_periksa || rec.tanggal })).map(o => { if (!o.kondisi) delete o.kondisi; return o; }); for (let i = 0; i < up.length; i += 200) { const r = await call('bulkSave', { entity: 'aset', rows: up.slice(i, i + 200) }); if (r.gagal && r.gagal.length) throw new Error(r.gagal[0].pesan); } toast(arr.length + ' aset diperbarui (kondisi & tanggal inventarisasi).'); } catch (x) { toast(x.message, 1); } };
+};
+async function soBA(rec) {
+  const s = S.set || {}, D = s.nama_desa || '', DU = D.toUpperCase(), d = parseD(rec.tgl_periksa || rec.tanggal), sedia = rec.jenis === 'Stock Opname Persediaan';
+  let R = [], tim = []; try { R = JSON.parse(rec.rincian || '[]'); } catch (x) { } try { tim = JSON.parse(rec.tim || '[]'); } catch (x) { }
+  const hari = d ? `${HARI[d.getDay()]} tanggal ${terbilang(d.getDate()).trim()} bulan ${BULAN[d.getMonth()]} tahun ${terbilang(d.getFullYear()).trim()}` : '……';
+  const judul = sedia ? 'BERITA ACARA STOCK OPNAME PERSEDIAAN (BARANG HABIS PAKAI)' : 'BERITA ACARA CEK FISIK (INVENTARISASI) ASET DESA';
+  let ring = '', lamp = '';
+  if (sedia) {
+    const tb = R.reduce((s2, r) => s2 + asetNum(r.buku) * asetNum(r.harga), 0), tf = R.reduce((s2, r) => s2 + asetNum(r.fisik === '' ? 0 : r.fisik) * asetNum(r.harga), 0);
+    ring = `<p>Hasil pemeriksaan: ${R.length} jenis barang persediaan dengan nilai menurut buku ${esc(fMoney(tb))} dan nilai menurut hasil hitung fisik ${esc(fMoney(tf))} (selisih ${esc(fMoney(tf - tb))}). Rincian sebagaimana tercantum dalam Lampiran.</p>`;
+    lamp = `<table class="pt" style="font-size:8.5pt"><thead><tr><th>No</th><th>Nama Barang</th><th>Satuan</th><th>Saldo Buku</th><th>Hasil Hitung Fisik</th><th>Selisih</th><th>Harga Satuan</th><th>Nilai Fisik (Rp)</th><th>Ket</th></tr></thead><tbody>${R.map((r, i) => { const f = r.fisik === '' || r.fisik == null ? 0 : asetNum(r.fisik); return `<tr><td style="text-align:center">${i + 1}</td><td>${esc(r.nama)}</td><td>${esc(r.satuan || '')}</td><td style="text-align:right">${esc(String(r.buku || 0))}</td><td style="text-align:right">${esc(String(f))}</td><td style="text-align:right">${esc(String(f - asetNum(r.buku)))}</td><td style="text-align:right">${fMoney(r.harga)}</td><td style="text-align:right">${fMoney(f * asetNum(r.harga))}</td><td>${esc(r.ket || '')}</td></tr>`; }).join('') || '<tr><td colspan="9" style="text-align:center">Nihil</td></tr>'}</tbody></table>`;
+  } else {
+    const per = KIB_OPT.map(k => { const h = k.charAt(0), X = R.filter(r => r.kib === h); return { k, n: X.length, ada: X.filter(r => (r.ada || 'Ada') === 'Ada').length, hil: X.filter(r => r.ada === 'Tidak ditemukan').length, lain: X.filter(r => r.ada === 'Dikuasai pihak lain').length, B: X.filter(r => r.kondisi === 'Baik').length, RR: X.filter(r => r.kondisi === 'Rusak Ringan').length, RB: X.filter(r => r.kondisi === 'Rusak Berat').length, lb: X.filter(r => r.label === 'Belum berlabel').length, v: X.reduce((s2, r) => s2 + asetNum(r.nilai), 0) }; }).filter(x => x.n);
+    const T = k => per.reduce((s2, x) => s2 + x[k], 0);
+    ring = `<p>Hasil pemeriksaan fisik dibandingkan dengan Buku Data Inventaris Aset Desa/SIPADES:</p><table class="pt" style="font-size:9pt"><thead><tr><th>Golongan</th><th>Diperiksa</th><th>Ada</th><th>Tidak ditemukan</th><th>Dikuasai pihak lain</th><th>Baik</th><th>Rusak Ringan</th><th>Rusak Berat</th><th>Belum berlabel</th><th>Nilai (Rp)</th></tr></thead><tbody>${per.map(x => `<tr><td>${esc(x.k)}</td>${['n', 'ada', 'hil', 'lain', 'B', 'RR', 'RB', 'lb'].map(k => `<td style="text-align:center">${x[k]}</td>`).join('')}<td style="text-align:right">${fMoney(x.v)}</td></tr>`).join('')}<tr><td><b>Jumlah</b></td>${['n', 'ada', 'hil', 'lain', 'B', 'RR', 'RB', 'lb'].map(k => `<td style="text-align:center"><b>${T(k)}</b></td>`).join('')}<td style="text-align:right"><b>${fMoney(T('v'))}</b></td></tr></tbody></table>
+      <p>Tindak lanjut: aset tidak ditemukan ditelusuri ke pemakai terakhir; aset yang dikuasai pihak lain/purna tugas ditarik dengan Berita Acara Serah Terima; aset rusak berat diusulkan penghapusan; aset rusak ringan diusulkan pemeliharaan; aset belum berlabel dipasang label kode barang.${rec.catatan ? ' ' + esc(rec.catatan) : ''}</p>`;
+    lamp = `<table class="pt" style="font-size:8pt"><thead><tr><th>No</th><th>Nama Barang</th><th>Kode / Reg</th><th>Lokasi</th><th>Jml Buku</th><th>Jml Fisik</th><th>Keberadaan</th><th>Kondisi</th><th>Label</th><th>Ket</th></tr></thead><tbody>${R.map((r, i) => `<tr><td style="text-align:center">${i + 1}</td><td>${esc(r.nama || '')}</td><td style="font-size:7pt">${esc(r.kode || '')}</td><td>${esc(r.lokasi || '')}</td><td style="text-align:center">${esc(String(r.buku || ''))}</td><td style="text-align:center">${esc(String(r.fisik == null ? '' : r.fisik))}</td><td>${esc(r.ada || 'Ada')}</td><td>${esc(r.kondisi || '')}</td><td>${esc(r.label || '')}</td><td>${esc(r.ket || '')}</td></tr>`).join('') || '<tr><td colspan="10" style="text-align:center">Belum ada baris dicek</td></tr>'}</tbody></table>`;
+  }
+  const pg = `<div class="paper sopdoc" style="font-size:11pt">${kop()}<div style="text-align:center;font-weight:700">${judul}<br>POSISI PER ${esc(fDate(rec.tanggal).toUpperCase())}<br>NOMOR ${esc(rec.nomor || '……')}</div>
+    <p style="margin-top:10px;text-align:justify">Pada hari ini ${esc(hari)}, bertempat di Kantor Desa ${esc(D)}, dalam rangka melaksanakan penatausahaan dan pengendalian aset desa sesuai ${esc(PB78)} dan SOP Pengelolaan Aset Desa, kami yang bertanda tangan di bawah ini:</p>
+    ${a78List(tim.map(t => `<b>${esc(t.nama || '……')}</b>, ${esc(t.jabatan || '')}${t.ked ? ' — ' + esc(t.ked) : ''};`), i => (i + 1) + '.')}
+    <p style="text-align:justify">telah melaksanakan ${sedia ? 'penghitungan fisik (stock opname) atas persediaan barang habis pakai' : 'pemeriksaan fisik atas Aset Desa'} dan mencocokkannya dengan catatan ${sedia ? 'buku persediaan' : 'Buku Data Inventaris Aset Desa/SIPADES'} dengan hasil sebagai berikut:</p>${ring}
+    <p style="text-align:justify">Demikian Berita Acara ini dibuat dengan sebenarnya sebagai dasar laporan hasil inventarisasi kepada Kepala Desa dan penyusunan laporan aset semesteran/tahunan.</p>
+    <table class="nb" style="width:100%;margin-top:10px;text-align:center"><tr><td style="width:50%">Petugas/Pengurus Aset Desa<div style="height:56px"></div><b><u>${esc(upNama(s.nama_pengurus_aset || '……'))}</u></b></td><td>${esc(D)}, ${esc(fDate(rec.tgl_periksa || rec.tanggal))}<br>Sekretaris Desa<br>selaku Pembantu Pengelola Aset Desa<div style="height:56px"></div><b><u>${esc(upNama(s.nama_sekdes || '……'))}</u></b></td></tr><tr><td colspan="2" style="padding-top:8px">Mengetahui,<br>KEPALA DESA ${esc(DU)}<div style="height:56px"></div><b><u>${esc(fmtNama(s.nama_kades || '', 'u') || '……')}</u></b></td></tr></table></div>`;
+  const lp = `<div class="paper land sopdoc" style="font-size:9pt">${a78LampHd(judul, rec.nomor, rec.tgl_periksa || rec.tanggal, sedia ? 'Stock Opname Persediaan' : 'Kertas Kerja Cek Fisik Aset Desa')}<h3>${sedia ? 'DAFTAR HASIL STOCK OPNAME PERSEDIAAN' : 'KERTAS KERJA CEK FISIK DAN REKONSILIASI ASET DESA'}</h3>${lamp}</div>`;
+  return [pg, lp];
+}
+
 /* ---------- ambil semua aset (untuk dashboard & laporan) ---------- */
 async function asetSemua(f) {
   let rows = [], off = 0, tot = 1;
@@ -12447,7 +13381,8 @@ function sipForm(a) {
 }
 async function extraAset(a, el) {
   const w = canWrite('aset_mutasi'), wa = canWrite('aset');
-  const [mut, cek] = await Promise.all([call('list', { entity: 'aset_mutasi', filters: { ref: a.id }, limit: 200 }).then(r => r.rows || []), call('list', { entity: 'aset_cek', filters: { ref: a.id }, limit: 200 }).then(r => r.rows || [])]);
+  const [mut, cek, dk, mf, pl] = await Promise.all([call('list', { entity: 'aset_mutasi', filters: { ref: a.id }, limit: 200 }).then(r => r.rows || []), call('list', { entity: 'aset_cek', filters: { ref: a.id }, limit: 200 }).then(r => r.rows || []), call('list', { entity: 'aset_dok', filters: { ref: a.id }, limit: 100 }).then(r => r.rows || []).catch(() => []), call('list', { entity: 'aset_manfaat', filters: { ref: a.id }, limit: 100 }).then(r => r.rows || []).catch(() => []), call('list', { entity: 'aset_pelihara', filters: { ref: a.id }, limit: 200 }).then(r => r.rows || []).catch(() => [])]);
+  const lbA = a78LabelAset(a), sub78 = (e2, rows, judul, ikon, btn, pre, kosong) => `<div class="sec-h"><h2>${ic(ikon)} ${judul} (${rows.length})</h2>${canWrite(e2) ? `<button class="btn sm" data-act="addSub" data-e="${e2}" data-p='${esc(JSON.stringify(Object.assign({ ref: a.id, aset: lbA }, pre)))}'>${ic('plus')}${btn}</button>` : ''}</div>${rows.length ? `<div class="list">${rows.map(r => rowHtml(e2, r)).join('')}</div>` : `<div class="card meta">${kosong}</div>`}`;
   const due = asetJatuhTempo(a), SF = sipForm(a);
   el.innerHTML = `<div class="stack">
     <div class="card stack" style="padding:10px 12px"><div class="sec-h" style="margin:0"><h2 style="font-size:14px">Salin ke SIPADES · ${esc(kibNama(kibHuruf(a)) || '')}</h2>${a.sipades === 'Sudah' ? '<span class="pill ok">Sudah di SIPADES</span>' : '<span class="pill warn">Belum di SIPADES</span>'}</div>
@@ -12456,8 +13391,11 @@ async function extraAset(a, el) {
       ${wa ? `<div class="btns">${a.sipades === 'Sudah' ? `<button class="btn sm" data-act="sipTandai" data-v="Belum">Tandai belum di SIPADES</button>` : `<button class="btn sm pri" data-act="sipTandai" data-v="Sudah">${ic('check')}Tandai sudah diinput di SIPADES</button>`}</div>` : ''}</div>
     ${a.proyek_id ? `<div class="btns"><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['rabproyek', { id: a.proyek_id }]))}'>${ic('hammer')}Buka RAB & gambar asal aset</button></div>` : ''}
     <div class="meta">${due ? `Inventarisasi fisik berikutnya: <b>${esc(dPanjang(due.iso))}</b>${due.hari < 0 ? ' <span class="pill bad">lewat</span>' : due.hari < 183 ? ' <span class="pill warn">segera</span>' : ''}` : ''}</div>
+    ${sub78('aset_dok', dk, 'Dokumen kepemilikan & pengamanan', 'lock', 'Dokumen', { jenis: kibHuruf(a) === 'A' ? (a.no_sertifikat ? 'Sertifikat Tanah' : 'Letter C / Petok D') : a.no_bpkb || a.no_polisi ? 'BPKB' : kibHuruf(a) === 'C' ? 'PBG / IMB' : 'Faktur / Kuitansi Pembelian', nomor: a.no_sertifikat || a.no_bpkb || a.no_dokumen || '' }, 'Belum ada bukti kepemilikan tercatat (Pasal 34–35 Perbup 78/2021).')}
+    ${kibHuruf(a) === 'A' || kibHuruf(a) === 'C' || mf.length ? sub78('aset_manfaat', mf, 'Pemanfaatan', 'coin', 'Pemanfaatan', { objek_tipe: a78TipeAset(a), luas_obj: kibHuruf(a) === 'A' ? (a.luas || '') : '', luas_bang: kibHuruf(a) === 'C' ? (a.luas || '') : '' }, 'Belum ada sewa/pinjam pakai/KSP tercatat untuk aset ini.') : ''}
+    ${sub78('aset_pelihara', pl, 'Kartu pemeliharaan', 'hammer', 'Pemeliharaan', { nama_barang: a.nama || a.nama_rekening || '', spesifikasi: a78Ident(a) }, 'Belum ada catatan pemeliharaan (Pasal 39).')}
     <div class="sec-h"><h2>Inventarisasi fisik (${cek.length})</h2>${w ? `<button class="btn sm" data-act="addSub" data-e="aset_cek" data-p='${esc(JSON.stringify({ ref: a.id, nama_aset: a.nama, kondisi: a.kondisi || 'Baik' }))}'>${ic('plus')}Catat pemeriksaan</button>` : ''}</div>
-    ${cek.length ? `<div class="list">${cek.map(r => rowHtml('aset_cek', r)).join('')}</div>` : '<div class="card meta">Belum pernah diperiksa. Permendagri 3/2024: inventarisasi paling sedikit sekali dalam 5 tahun.</div>'}
+    ${cek.length ? `<div class="list">${cek.map(r => rowHtml('aset_cek', r)).join('')}</div>` : '<div class="card meta">Belum pernah diperiksa. SOP desa: cek fisik setiap tahun (Perbup 78/2021 Pasal 72: paling sedikit 1 kali dalam 3 tahun).</div>'}
     <div class="sec-h"><h2>Mutasi (${mut.length})</h2>${w ? `<button class="btn sm" data-act="addSub" data-e="aset_mutasi" data-p='${esc(JSON.stringify({ ref: a.id }))}'>${ic('plus')}Catat mutasi</button>` : ''}</div>
     ${mut.length ? `<div class="list">${mut.map(r => rowHtml('aset_mutasi', r)).join('')}</div>` : '<div class="card meta">Belum ada mutasi.</div>'}</div>`;
   S.vh.sipCopy = async t => { const v = String(SF[Number(t.dataset.i)][1] || '').replace(/ \| /g, '.'); try { await navigator.clipboard.writeText(v); toast('Disalin: ' + v); } catch (x) { toast('Gagal menyalin; salin manual.', 1); } };
@@ -12465,7 +13403,7 @@ async function extraAset(a, el) {
 }
 function asetJatuhTempo(a) {
   const b = parseD(a.inv_terakhir || a.tgl_pembukuan || a.tgl_perolehan || (a.tahun ? a.tahun + '-12-31' : '')); if (!b) return null;
-  const d = new Date(b); d.setFullYear(d.getFullYear() + 5);
+  const d = new Date(b); d.setMonth(d.getMonth() + (Number((S.set || {}).aset_siklus_cek) || 12));
   const iso = d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
   return { iso, hari: Math.round((d - parseD(isoToday())) / 864e5) };
 }
@@ -13001,7 +13939,7 @@ VIEWS.asetdash = async (p, main, alive) => {
       <div class="kd-c"><div class="kd-h"><b>Perlu ditindaklanjuti</b></div><div class="list">
         ${draf.length ? `<button class="row" data-act="go" data-go='${goL(1)}'><span class="av">${ic('edit')}</span><span class="main"><span class="t">${N(draf.length)} data lama / draf belum resmi</span><span class="s">Cek fisik, lengkapi kode aset & tanggal, input ke SIPADES, lalu ubah status ke Aktif</span></span></button>` : ''}
         ${nonHapus.length - sudah.length ? `<button class="row" data-act="go" data-go='${goL(2)}'><span class="av">${ic('send')}</span><span class="main"><span class="t">${N(nonHapus.length - sudah.length)} catatan belum di SIPADES</span><span class="s">Buka aset → panel "Salin ke SIPADES" → tandai sudah</span></span></button>` : ''}
-        ${jt.length ? `<button class="row" data-act="go" data-go='${goL(0)}'><span class="av">${ic('check')}</span><span class="main"><span class="t">Inventarisasi fisik jatuh tempo / segera: ${N(jt.length)} aset</span><span class="s">Paling sedikit sekali dalam 5 tahun (Permendagri 3/2024) · ${N((cek || []).length)} pemeriksaan tercatat</span></span></button>` : ''}
+        ${jt.length ? `<button class="row" data-act="go" data-go='${goL(0)}'><span class="av">${ic('check')}</span><span class="main"><span class="t">Inventarisasi fisik jatuh tempo / segera: ${N(jt.length)} aset</span><span class="s">SOP desa: setiap tahun (Perbup 78/2021 Ps. 72: min. 1× per 3 tahun) · ${N((cek || []).length)} pemeriksaan tercatat</span></span></button>` : ''}
         ${tidakLengkap.length ? `<button class="row" data-act="go" data-go='${goL(4)}'><span class="av">${ic('clip')}</span><span class="main"><span class="t">${N(tidakLengkap.length)} aset datanya belum lengkap</span><span class="s">Kode aset, nilai, atau tanggal perolehan masih kosong</span></span></button>` : ''}
         ${tanpaFoto.length ? `<div class="row" style="cursor:default"><span class="av">${ic('cam')}</span><span class="main"><span class="t">${N(tanpaFoto.length)} aset belum ada fotonya</span><span class="s">Foto memudahkan inventarisasi & pemeriksaan</span></span></div>` : ''}
         ${kibF.length ? `<div class="row" style="cursor:default"><span class="av">${ic('hammer')}</span><span class="main"><span class="t">KDP (Gol F) lebih dari 1 tahun: ${N(kibF.length)}</span><span class="s">Selesaikan BAST agar pindah ke Gol C/D</span></span></div>` : ''}
@@ -13016,7 +13954,7 @@ VIEWS.asetdash = async (p, main, alive) => {
       <button class="btn" data-act="adXls">${ic('down')}Excel format SIPADES</button>
       <button class="btn" data-act="go" data-go='["asetcetak"]'>${ic('print')}Laporan format awal</button>
       <button class="btn" data-act="go" data-go='["asetlabel"]'>${ic('crop')}Register label</button>
-      <button class="btn" data-act="go" data-go='["asetsop"]'>${ic('book')}SOP, template BA/SK & pedoman</button>
+      <button class="btn" data-act="go" data-go='["asetsop78"]'>${ic('book')}SOP Aset Perbup 78</button><button class="btn" data-act="go" data-go='["aset78dok"]'>${ic('stamp')}Dokumen Perbup 78</button><button class="btn" data-act="go" data-go='["asetsop"]'>${ic('book')}Template BA/SK & pedoman</button>
     </div></div>`;
   S.vh.adCak = t => { st.cak = t.dataset.v; refresh(); };
   S.vh.adApbTh = t => { st.apbTh = t.dataset.v; refresh(); };
@@ -14668,7 +15606,7 @@ const FG = {
   bku: ['Buku Kas Umum', ['keubuku', { buku: 'BKU' }]], bank: ['Buku Bank', ['keubuku', { buku: 'Bank' }]], tunai: ['Buku Kas Tunai', ['keubuku', { buku: 'Tunai' }]], bpajak: ['Buku Pajak', ['keubuku', { buku: 'Pajak' }]],
   rpajak: ['Rekap Pajak', ['keupajak']], setor: ['Setor Pajak', ['pta', { t: 'pajak' }]], pta: ['Penatausahaan', ['pta']], skimpor: ['Impor Siskeudes', ['skimpor']],
   sipades: ['Buku Inventaris (SIPADES)', ['sipadeslap']], asetdash: ['Dashboard Aset', ['asetdash']], asettim: ['Pengurus Aset', ['list', { e: 'aset_tim' }]], asetsop: ['SOP Aset', ['asetsop']],
-  asettrx: ['Sewa / Pinjam Pakai', ['list', { e: 'aset_trx' }]], sedia: ['Persediaan', ['list', { e: 'persediaan' }]], label: ['Label Aset', ['asetlabel']], tanah: ['Tanah Desa', ['tanah']], aset: ['Inventaris Aset', ['list', { e: 'aset' }]],
+  asettrx: ['Sewa / Pinjam Pakai', ['list', { e: 'aset_trx' }]], sop78: ['SOP Aset Perbup 78', ['asetsop78']], dok78: ['Dokumen Aset Perbup 78', ['aset78dok']], skp78: ['SK Pengelola Aset', ['aset78dok', { d: 'skp' }]], buku78: ['Buku Data Inventaris', ['aset78dok', { d: 'buku' }]], manfaat: ['Pemanfaatan Aset', ['list', { e: 'aset_manfaat' }]], asetdok: ['Dokumen Kepemilikan', ['list', { e: 'aset_dok' }]], asetso: ['Cek Fisik & Stock Opname', ['asetso']], pelihara: ['Kartu Pemeliharaan', ['list', { e: 'aset_pelihara' }]], sedia: ['Persediaan', ['list', { e: 'persediaan' }]], label: ['Label Aset', ['asetlabel']], tanah: ['Tanah Desa', ['tanah']], aset: ['Inventaris Aset', ['list', { e: 'aset' }]],
   bangun: ['Pembangunan', ['list', { e: 'pembangunan' }]], rabp: ['Proyek RAB & Gambar', ['rabproyek']], bast: ['BAST', ['list', { e: 'bast' }]], spj: ['SPJ', ['spj', {}]],
   sert: ['Sertifikat Aparatur', ['list', { e: 'aparat_sert' }]], aparat: ['Aparatur', ['list', { e: 'aparat' }]], skbpd: ['SK BPD', ['list', { e: 'sk_bpd' }]],
   layanan: ['Produk Layanan', ['list', { e: 'produk_layanan' }]], kir: ['Kartu Inventaris Ruangan', ['list', { e: 'aset_ruang' }]], lembaga: ['Lembaga Desa', ['list', { e: 'lembaga' }]],
@@ -14741,12 +15679,12 @@ const FRC_IND = [
     dh: ['Pasal 19 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 73 Tahun 2020 Tentang Pengawasan Pengelolaan Keuangan Desa', 'Pasal 20 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 73 Tahun 2020 Tentang Pengawasan Pengelolaan Keuangan Desa', 'Pasal 23 Peraturan Menteri Dalam Negeri Republik Indonesia Nomor 73 Tahun 2020 Tentang Pengawasan Pengelolaan Keuangan Desa'] },
   { k: 'C1', g: 'Mandiri', no: '5', j: 'Pengelolaan Barang Desa — C1. Penatausahaan Barang',
     n: ['Penetapan petugas/pengurus aset desa dan SOP/ Kebijakan pengelolaan barang/aset di desa', 'Keberadaan Buku Data Inventaris Aset/barang Desa yang informatif (sekurang-kurangnya menyajikan kode/penggolongan, Jumlah, spesifikasi, nilai barang, kondisi, dst)', 'Pemanfaatan aset desa yang tidak dipergunakan langsung untuk menunjang penyelenggaraan Pemerintahan Desa dilengkapi bukti berupa sewa, pinjam pakai, dst', 'Berita Acara Stock Opname Persediaan/Pemeriksaan barang habis pakai/ nama lainnya dalam rangka pengendalian', 'Pengamanan Aset desa'],
-    l: [L_('Penetapan/penugasan pengurus aset desa', { nv: '1', ni: 0, go: g_('asettim', 'sk'), cek: 'asettim' }), L_('SOP/Kebijakan Pengelolaan aset', { nv: '1', ni: 0, go: g_('asetsop') }),
-      L_('Buku Inventaris Tersedia tidak Informatif', { nv: '1', ni: 1, go: g_('sipades'), cek: 'aset' }), L_('Buku Inventaris Tersedia Cukup Informatif', { ni: 1, go: g_('sipades', 'asetdash'), cek: 'aset' }),
-      L_('Bukti perjanjian sewa/ Pinjam Pakai, dst', { ni: 2, go: g_('asettrx') }),
-      L_('Laporan posisi aset desa khususnya barang pakai habis secara tidak berkala/ nama lainnya', { nv: '1', ni: 3, go: g_('sedia'), cek: 'sedia' }), L_('Laporan posisi aset desa khususnya barang pakai habis secara berkala/ nama lainnya', { nv: '2', ni: 3, go: g_('sedia'), cek: 'sedia' }),
-      L_('Bukti kodefikasi barang', { nv: '0,5', ni: 4, go: g_('label') }), L_('Bukti proses Pensertifikatan Tanah', { nv: '0,5', ni: 4, go: g_('tanah') }), L_('Seluruh tanah telah bersertifikat', { nv: '1,5', ni: 4, go: g_('tanah') }),
-      L_('Persentase pajak kendaraan yang telah dibayar dari total kendaraan dinas 100%', { nv: '0,5', ni: 4, go: g_('aset'), up: 1 })],
+    l: [L_('Penetapan/penugasan pengurus aset desa', { nv: '1', ni: 0, go: g_('skp78', 'asettim', 'sk'), cek: 'asettim' }), L_('SOP/Kebijakan Pengelolaan aset', { nv: '1', ni: 0, go: g_('sop78', 'asetsop') }),
+      L_('Buku Inventaris Tersedia tidak Informatif', { nv: '1', ni: 1, go: g_('buku78', 'sipades'), cek: 'aset' }), L_('Buku Inventaris Tersedia Cukup Informatif', { ni: 1, go: g_('buku78', 'sipades', 'asetdash'), cek: 'aset' }),
+      L_('Bukti perjanjian sewa/ Pinjam Pakai, dst', { ni: 2, go: g_('manfaat', 'asettrx', 'perdes') }),
+      L_('Laporan posisi aset desa khususnya barang pakai habis secara tidak berkala/ nama lainnya', { nv: '1', ni: 3, go: g_('asetso', 'sedia'), cek: 'sedia' }), L_('Laporan posisi aset desa khususnya barang pakai habis secara berkala/ nama lainnya', { nv: '2', ni: 3, go: g_('asetso', 'sedia'), cek: 'sedia' }),
+      L_('Bukti kodefikasi barang', { nv: '0,5', ni: 4, go: g_('label') }), L_('Bukti proses Pensertifikatan Tanah', { nv: '0,5', ni: 4, go: g_('asetdok', 'tanah') }), L_('Seluruh tanah telah bersertifikat', { nv: '1,5', ni: 4, go: g_('asetdok', 'tanah') }),
+      L_('Persentase pajak kendaraan yang telah dibayar dari total kendaraan dinas 100%', { nv: '0,5', ni: 4, go: g_('asetdok', 'pelihara', 'aset'), up: 1 })],
     dh: ['Pasal 5 Peraturan Bupati Lumajang Nomor 78 Tahun 2021 Tentang Pengelolaan Aset Desa', 'Pasal 6 Peraturan Bupati Lumajang Nomor 78 Tahun 2021 Tentang Pengelolaan Aset Desa', 'Pasal 12 Peraturan Bupati Lumajang Nomor 78 Tahun 2021 Tentang Pengelolaan Aset Desa', 'Pasal 34 Peraturan Bupati Lumajang Nomor 78 Tahun 2021 Tentang Pengelolaan Aset Desa', 'Pasal 71 Peraturan Bupati Lumajang Nomor 78 Tahun 2021 Tentang Pengelolaan Aset Desa', 'Pasal 116 Peraturan Daerah Kabupaten Lumajang Nomor 7 Tahun 2016 tentang Penyelenggaraan Pemerintahan Desa'] },
   { k: 'C2', g: 'Mandiri', no: '6', j: 'Pengelolaan Barang Desa — C2. Pengadaan Barang/ Jasa Desa',
     n: ['Telah terdapat Tim Pelaksana Kegiatan (TPK)/nama lainnya yang telah mengikuti Diklat Pengadaan barang/jasa Desa', 'Telah ada laporan penyelenggaraan pengadaan barang/jasa dari TPK/nama lainnya kepada Kaur/Kasi dan Bukti Penyerahan hasil pengadaan Kaur/Kasi Kepada Kepala Desa (pembangunan fisik dilengkapi RAB, Gambar, Kontrak Pengadaan, BAST, dst)'],
