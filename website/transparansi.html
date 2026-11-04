@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Transparansi Desa — Desa Pandanwangi</title>
+<meta name="description" content="Informasi publik Desa Pandanwangi: rencana pembangunan (RPJM & RKP Desa), paket kegiatan dan pengadaan, produk hukum desa, kinerja layanan, capaian PBB, dan komitmen desa antikorupsi.">
+<meta name="theme-color" content="#0f241a">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Caveat:wght@600&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css?v=230">
+<link rel="icon" href="img/favicon.png"><link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<style>
+.years{display:flex;gap:8px;flex-wrap:wrap;margin-top:26px}
+.years .chip{background:transparent;color:var(--cream);border-color:rgba(248,242,228,.35)}
+.years .chip.on,.years .chip:hover{background:var(--padi);color:var(--ink);border-color:var(--padi)}
+.jump{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.jump a{color:var(--cream);font-weight:700;font-size:14px;text-decoration:none;border-bottom:2px solid var(--padi);padding-bottom:2px}
+.tp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:900px){.tp-grid{grid-template-columns:1fr 1fr}}
+.tk{background:var(--paper);border:2px solid var(--ink);border-radius:var(--r-s);padding:16px;box-shadow:var(--hard)}
+.tk small{display:block;font-weight:700;color:var(--muted);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.tk b{display:block;font:800 26px/1.15 var(--f-d);margin-top:6px}
+.tk span{font-size:13px;color:var(--muted)}
+.box{background:var(--paper);border:2px solid var(--ink);border-radius:var(--r);padding:22px;box-shadow:var(--hard);margin-top:22px}
+.box h3{font:800 22px/1.2 var(--f-d);margin:0 0 6px}
+.box .ds{color:var(--muted);margin:0 0 14px;font-size:15px}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:12px}
+table.tt{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+table.tt th{background:var(--sand);text-align:left;font-weight:800;padding:9px 10px;white-space:nowrap}
+table.tt td{padding:8px 10px;border-top:1px solid var(--line);vertical-align:top}
+table.tt td.r,table.tt th.r{text-align:right;white-space:nowrap}
+.pill{display:inline-block;font-size:12px;font-weight:800;padding:2px 9px;border-radius:99px;background:var(--sand)}
+.pill.ok{background:#d7efd9;color:#14532d}.pill.wr{background:#fde7c7;color:#7a4b06}.pill.bd{background:#fbd5cc;color:#7f1d1d}
+.tbar{height:8px;border-radius:9px;background:var(--sand);overflow:hidden;min-width:70px}
+.tbar i{display:block;height:100%;background:var(--leaf)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.empty{padding:16px;color:var(--muted);font-size:14px;background:var(--cream);border-radius:12px;border:1px dashed var(--line)}
+.nilai{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0}
+.nilai span{background:var(--ink);color:var(--padi);font-weight:800;font-size:13px;padding:6px 12px;border-radius:99px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+.dasar{font-size:13px;color:var(--muted);margin-top:10px}
+.bars .br{display:grid;grid-template-columns:160px 1fr 60px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+@media(max-width:600px){.bars .br{grid-template-columns:110px 1fr 50px}}
+</style>
+</head>
+<body>
+<main>
+<section class="phero">
+  <div class="hero-grid"></div>
+  <div class="wrap">
+    <div class="crumb"><a href="index.html">Beranda</a> / Transparansi</div>
+    <span data-ed="t1" class="eyebrow">Informasi publik desa</span>
+    <h1 data-ed="t2" data-lines>Desa terbuka,<br><span style="color:var(--padi)">warga ikut mengawasi</span>.</h1>
+    <p data-ed="t3" class="reveal d2">Rencana pembangunan, paket kegiatan, produk hukum, sampai kinerja layanan desa bisa dipantau di sini. Datanya diambil langsung dari aplikasi pemerintahan desa, jadi selalu mengikuti catatan terbaru.</p>
+    <div class="years" id="years"></div>
+    <div class="jump"><a href="#rencana">Perencanaan</a><a href="#paket">Kegiatan &amp; pengadaan</a><a href="apbdes.html">APBDes</a><a href="#hukum">Produk hukum</a><a href="#layanan">Kinerja layanan</a><a href="#integritas">Desa antikorupsi</a><a href="#pbb">PBB</a></div>
+  </div>
+</section>
+
+<section class="sec tight">
+  <div class="wrap">
+    <div class="tp-grid" id="ring">
+      <div class="tk"><small>Paket kegiatan</small><b class="skel" style="height:30px"></b></div>
+      <div class="tk"><small>Nilai paket</small><b class="skel" style="height:30px"></b></div>
+      <div class="tk"><small>Realisasi paket</small><b class="skel" style="height:30px"></b></div>
+      <div class="tk"><small>Produk hukum</small><b class="skel" style="height:30px"></b></div>
+    </div>
+
+    <div class="box reveal" id="rencana"><h3 data-ed="t4">Rencana pembangunan desa</h3><p data-ed="t5" class="ds">Arah pembangunan enam tahunan (RPJM Desa) dijabarkan tiap tahun dalam RKP Desa, lalu menjadi dasar APB Desa. Semuanya disusun lewat musyawarah bersama warga.</p>
+      <div class="tabs" id="rTab"></div><div id="rIsi"></div>
+      <p class="dasar">Dasar: Perbup Lumajang 40/2018 tentang Juknis RPJM & RKP Desa; Perda Kab. Lumajang 7/2016.</p></div>
+
+    <div class="box reveal" id="paket"><h3 data-ed="t6">Paket kegiatan &amp; pengadaan</h3><p data-ed="t7" class="ds">Daftar kegiatan tahun ini beserta cara pelaksanaannya (swakelola oleh warga atau melalui penyedia), keluaran, nilai, dan realisasinya. Kegiatan yang realisasinya belum penuh ikut ditandai, sehingga sisa anggaran mudah dipantau.</p>
+      <div id="pIsi"><div class="empty">Memuat…</div></div>
+      <p class="dasar">Dasar: Perbup Lumajang 26/2021 tentang Tata Cara Pengadaan Barang/Jasa di Desa Pasal 16 dan 27; Perbup Lumajang 59/2018 Pasal 81; Permendagri 73/2020 Pasal 23. Rincian anggaran & realisasi per kegiatan ada di halaman <a href="apbdes.html">APBDes</a>.</p></div>
+
+    <div class="box reveal" id="hukum"><h3 data-ed="t8">Produk hukum desa</h3><p data-ed="t9" class="ds">Peraturan Desa, Peraturan Kepala Desa, dan Keputusan Kepala Desa yang berlaku. Butuh salinannya? Hubungi kantor desa.</p>
+      <div class="tabs" id="hTab"></div><div id="hIsi"></div>
+      <p class="dasar">Dasar: UU 6/2014 tentang Desa Pasal 69; Permendagri 111/2014 tentang Pedoman Teknis Peraturan di Desa; UU 14/2008 tentang Keterbukaan Informasi Publik.</p></div>
+
+    <div class="two" id="layanan">
+      <div class="box reveal"><h3 data-ed="t10">Kepuasan warga atas layanan</h3><p data-ed="t11" class="ds">Hasil Survei Kepuasan Masyarakat (SKM) 9 unsur. Nilainya dipakai desa untuk memperbaiki layanan.</p><div id="skm"><div class="empty">Memuat…</div></div>
+        <p style="margin-top:14px"><a class="btn" href="survei.html">Isi Survei Kepuasan →</a></p></div>
+      <div class="box reveal d1"><h3 data-ed="t12">Laporan warga &amp; tindak lanjutnya</h3><p data-ed="t13" class="ds">Rekap laporan dan aspirasi yang masuk ke desa beserta penyelesaiannya. Identitas pelapor tidak ditampilkan.</p><div id="adu"><div class="empty">Memuat…</div></div>
+        <p style="margin-top:14px"><a class="btn" href="lapor.html">Kirim Laporan →</a></p></div>
+    </div>
+
+    <div class="box reveal" id="integritas" style="background:var(--ink);color:var(--cream)"><h3 data-ed="t14" style="color:var(--padi)">Desa antikorupsi, mulai dari layanan sehari-hari</h3>
+      <p data-ed="t15" class="ds" style="color:rgba(248,242,228,.8)">Perangkat desa berkomitmen melayani dengan jujur dan tidak menerima imbalan di luar ketentuan. Bila menemukan permintaan pungutan atau pemberian yang tidak semestinya, sampaikan lewat Lapor Desa. Identitas pelapor dirahasiakan.</p>
+      <div class="nilai"><span>Jujur</span><span>Mandiri</span><span>Tanggung jawab</span><span>Berani</span><span>Sederhana</span><span>Peduli</span><span>Disiplin</span><span>Adil</span><span>Kerja keras</span></div>
+      <div id="sg" style="margin-top:14px"></div>
+      <p style="margin-top:16px"><a class="btn" href="lapor.html">Laporkan Secara Aman →</a> <a class="btn ghost" href="layanan.html" style="color:var(--cream)">Cek Biaya &amp; Syarat Resmi →</a></p>
+      <p class="dasar" style="color:rgba(248,242,228,.65)">Dasar: Perpres 87/2016 tentang Satgas Saber Pungli; Keputusan Bupati Lumajang 188.45/182/427.12/2021; program Desa Antikorupsi KPK.</p></div>
+
+    <div class="two">
+      <div class="box reveal" id="pbb"><h3 data-ed="t16">Capaian PBB per dusun</h3><p data-ed="t17" class="ds">Persentase pajak bumi dan bangunan yang sudah dibayar warga tahun ini. Ayo bayar tepat waktu, hasilnya kembali untuk pembangunan desa.</p><div id="pbbIsi"><div class="empty">Memuat…</div></div></div>
+      <div class="box reveal d1"><h3 data-ed="t18">Harga bahan pokok di desa</h3><p data-ed="t19" class="ds">Pantauan harga komoditas terbaru yang dilaporkan desa untuk mendukung pengendalian inflasi daerah.</p><div id="hrg"><div class="empty">Memuat…</div></div>
+        <div id="bum" style="margin-top:16px"></div></div>
+    </div>
+    <p data-ed="t20" class="note" style="margin-top:18px" id="upd">Memuat data…</p>
+  </div>
+</section>
+</main>
+<script src="assets/site.js?v=230"></script>
+<script src="assets/transparansi.js?v=230"></script>
+</body>
+</html>
