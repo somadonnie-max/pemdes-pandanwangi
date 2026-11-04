@@ -2260,7 +2260,7 @@ const SOON = {};
 /* Grup menu: satu daftar dengan tab di atas (Masuk/Keluar/Ekspedisi; jenis produk hukum) */
 const GRUP = {
   surat: { t: 'Surat', ic: 'inbox', es: [['surat_masuk', 'Masuk'], ['surat_keluar', 'Keluar'], ['ekspedisi', 'Ekspedisi']] },
-  hukum: { t: 'Produk Hukum', ic: 'scale', es: [['perdes', 'Perdes'], ['perkades', 'Perkades'], ['sk_kades', 'SK Kades'], ['sk_bpd', 'SK BPD'], ['perbersama', 'Per. Bersama']] }
+  hukum: { t: 'Produk Hukum & Berita Acara', ic: 'scale', es: [['perdes', 'Perdes'], ['perkades', 'Perkades'], ['sk_kades', 'SK Kades'], ['sk_bpd', 'SK BPD'], ['perbersama', 'Per. Bersama'], ['berita_acara', 'Berita Acara']] }
 };
 const GRUP_OF = {}; Object.keys(GRUP).forEach(g => GRUP[g].es.forEach(([e]) => { GRUP_OF[e] = g; }));
 const grpEs = g => GRUP[g].es.filter(x => canRead(x[0]));
@@ -2274,14 +2274,13 @@ function MODS() {
   return [
     { k: 'presensi', l: 'Presensi', ic: 'clock', items: [['Presensi Hari Ini', 'clock', ['presensi']], ['Riwayat Harian', 'list', ['harian']]] },
     { k: 'kegiatan', l: 'Kegiatan', ic: 'cal', items: [['Agenda', 'cal', ['list', { e: 'kegiatan', v: 0, title: 'Agenda' }], null, 'r:kegiatan'], ['Berita', 'mega', ['list', { e: 'berita' }], 'berita']] },
-    { k: 'arsip', l: 'Arsip', ic: 'folder', items: [grpItem('surat'), grpItem('hukum')].concat(['berita_acara', 'aparat', 'petugas', 'tokoh_luar'].map(e => [UI[e].t, UI[e].ic, ['list', { e }], e])) },
+    { k: 'arsip', l: 'Arsip', ic: 'folder', items: [grpItem('surat'), grpItem('hukum'), asetGrpItem('org')] },
     { k: 'aset', l: 'Aset Desa', ic: 'box', items: [['Dashboard Aset', 'chart', ['asetdash'], null, 'r:aset']].concat(['data', 'manfaat', 'aman', 'cek', 'lap', 'dok', 'atur'].map(asetGrpItem)) },
-    { k: 'pemerintahan', l: 'Pemerintahan', ic: 'landmark', items: [['Ringkasan Penduduk', 'chart', ['pstat'], null, 'r:penduduk'], ['Data Penduduk', 'users', ['list', { e: 'penduduk' }], 'penduduk'], ['Data Keluarga', 'house', ['list', { e: 'keluarga' }], 'keluarga'], ['Tanah di Desa', 'map', ['tanah'], 'tanah_desa'], ['Monografi Desa', 'chart', ['monografi'], null, 'r:frc']] },
-    { k: 'antikorupsi', l: 'Desa Anti Korupsi', ic: 'check', items: [['FRC Desa (SIMWAS)', 'check', ['frc'], null, 'r:frc'], ['Register Risiko Fraud', 'lock', ['list', { e: 'risiko_fraud' }], 'risiko_fraud'], ['Pengawasan & Tindak Lanjut', 'eye', ['list', { e: 'pengawasan' }], 'pengawasan'], ['Integritas: Anti Gratifikasi & Pungli', 'check', ['integritas'], null, 'r:frc'], ['Kinerja Perangkat', 'target', ['list', { e: 'kinerja' }], 'kinerja'], ['Pemantauan Harga Komoditas', 'chart', ['hargakom'], null, 'r:frc'], ['Aset Negara di Desa', 'landmark', ['list', { e: 'aset_negara' }], 'aset_negara']] },
-    { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [['Permohonan Surat Online', 'inbox', ['list', { e: 'permohonan_surat' }], 'permohonan_surat'], ['Surat Keterangan', 'file', ['list', { e: 'register_surat' }], 'register_surat'], ['Buku NTCR', 'users', ['list', { e: 'ntcr' }], 'ntcr'], ['Formulir Adminduk', 'file', ['list', { e: 'adminduk' }], 'register_surat'], ['Produk Layanan', 'book', ['list', { e: 'produk_layanan' }], 'produk_layanan'], ['Pengaduan Masyarakat', 'mega', ['list', { e: 'pengaduan' }], 'pengaduan'], ['Standar Pelayanan, Maklumat & SKM', 'check', ['layanpub'], null, 'r:frc']] },
-    { k: 'kesejahteraan', l: 'Kesejahteraan', ic: 'heart', items: [['Rekap Sosial', 'chart', ['sosrekap'], null, 'r:rentan'], ['Rentan / Sosial', 'heart', ['list', { e: 'rentan' }], 'rentan'], ['DTSEN Keluarga (SIKS-NG)', 'house', ['list', { e: 'dtsen' }], 'dtsen'], ['Usulan Bansos & DTSEN', 'send', ['list', { e: 'usulan_bansos' }], 'usulan_bansos'], ['Musdes/Muskel Bansos', 'users', ['list', { e: 'musdes_bansos' }], 'musdes_bansos'], ['Penyaluran Bansos', 'check', ['list', { e: 'penyaluran_bansos' }], 'penyaluran_bansos'], ['Lembaga / Yayasan', 'landmark', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru Ngaji', 'book', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
-    { k: 'pendidikan', l: 'Pendidikan', ic: 'book', items: [['Verifikasi ATS (Anak Tidak Sekolah)', 'book', ['ats'], null, 'r:ats'], ['Siap Diinput ke Situs ATS', 'send', ['ats', { f: 'input' }], null, 'ats_operator']] },
-    { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RPJM Desa', 'book', ['rpjm', {}], null, 'r:rkp'], ['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], ['RAB & Gambar', 'hammer', ['rab', {}], null, 'r:rab'], ['Referensi', 'book', ['refs'], null, 'r:rkp'], ['Progres Pembangunan', 'hammer', ['list', { e: 'pembangunan' }], 'pembangunan']] },
+    { k: 'pemerintahan', l: 'Pemerintahan', ic: 'landmark', items: [asetGrpItem('duduk'), ['Tanah di Desa', 'map', ['tanah'], 'tanah_desa'], ['Monografi Desa', 'chart', ['monografi'], null, 'r:frc']] },
+    { k: 'antikorupsi', l: 'Desa Anti Korupsi', ic: 'check', items: ['frc', 'integ', 'pantau'].map(asetGrpItem) },
+    { k: 'pelayanan', l: 'Pelayanan', ic: 'file', perm: 'pelayanan', items: [asetGrpItem('suratket'), ['Pengaduan Masyarakat', 'mega', ['list', { e: 'pengaduan' }], 'pengaduan'], asetGrpItem('mutu')] },
+    { k: 'kesejahteraan', l: 'Kesejahteraan & Pendidikan', ic: 'heart', items: [['Rekap Sosial', 'chart', ['sosrekap'], null, 'r:rentan'], asetGrpItem('sosial'), asetGrpItem('lembaga'), asetGrpItem('ats')] },
+    { k: 'rkp', l: 'Perencanaan', ic: 'sprout', perm: 'perencanaan', items: [['RPJM Desa', 'book', ['rpjm', {}], null, 'r:rkp'], ['RKP Desa', 'sprout', ['rkp'], null, 'r:rkp'], asetGrpItem('bangun')] },
     { k: 'keuangan', l: 'Keuangan', ic: 'wallet', items: [['Dashboard Keuangan', 'chart', ['keu'], null, 'r:keu_laporan'], ['Penganggaran', 'wallet', ['keuhub', { g: 'ang' }], null, 'r:keu_anggaran'], ['Penatausahaan', 'coin', ['keuhub', { g: 'pta' }], null, 'r:keu_penatausahaan'], ['Pelaporan', 'book', ['keuhub', { g: 'lap' }], null, 'r:keu_laporan'], ['Pengajuan ADD (Siltap & Dana Dusun)', 'send', ['addaju'], null, 'r:add'], ['Impor Siskeudes (PDF / Database)', 'down', ['skimpor'], null, 'w:keu_anggaran']] },
     { k: 'soon', l: 'Segera Hadir', ic: 'sprout', items: Object.keys(SOON).map(k => [SOON[k].t, SOON[k].ic, ['soon', { k }], null, '*', 1]) }
   ];
@@ -2690,8 +2689,7 @@ function modItems(m) {
   /* grup (Surat, Produk Hukum) & sub-menu dipecah menjadi item satu per satu */
   const out = [];
   m.items.filter(itemOk).forEach(it => {
-    if (it[7]) grpEs(it[7]).forEach(([e]) => out.push([UI[e].t, UI[e].ic, ['list', { e }], e]));
-    else if (it[6]) SUBS()[it[6]].items.filter(itemOk).forEach(x => out.push(x));
+    if (it[6]) SUBS()[it[6]].items.filter(itemOk).forEach(x => out.push(x));
     else out.push(it);
   });
   return out;
@@ -2752,7 +2750,7 @@ const MENU_KET = {"Presensi Hari Ini": "Absen masuk & pulang · swafoto wajah", 
 function modBuka(k) {
   const d = S.homeData || {}, m = modDaftar().find(x => x.k === k); if (!m) return;
   const c = d.counts || {};
-  const items = m.list.map(it => `<button class="sh-it${it[5] ? ' soon' : ''}" data-go='${esc(JSON.stringify(it[2]))}'><span class="ti">${ic(it[1])}</span><span>${esc(it[0])}${(() => { const kt = it[8] ? ASET_GRP[it[8]].it.filter(asetGrpOk).map(x => x[0]).join(' · ') : MENU_KET[it[0]] || '', nd = it[3] && c[it[3]] != null ? Number(c[it[3]]).toLocaleString('id-ID') + ' data' : ''; return kt || nd ? `<small>${esc([kt, nd].filter(Boolean).join(' · '))}</small>` : ''; })()}</span></button>`).join('');
+  const items = m.list.map(it => `<button class="sh-it${it[5] ? ' soon' : ''}" data-go='${esc(JSON.stringify(it[2]))}'><span class="ti">${ic(it[1])}</span><span>${esc(it[0])}${(() => { const kt = menuSubs(it).join(' · ') || MENU_KET[it[0]] || '', nd = it[3] && c[it[3]] != null ? Number(c[it[3]]).toLocaleString('id-ID') + ' data' : ''; return kt || nd ? `<small>${esc([kt, nd].filter(Boolean).join(' · '))}</small>` : ''; })()}</span></button>`).join('');
   sheet(m.l, modCepat(m, d) + `<div class="sh-items">${items}</div>`, { ikon: m.ic, warna: MOD_WARNA[m.k] });
 }
 ACT.modOpen = t => modBuka(t.dataset.k);
@@ -9125,7 +9123,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '222', tgl: '2026-11-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '223', tgl: '2026-11-04', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -13367,20 +13365,36 @@ const ASET_GRP = {
 };
 const asetGrpOk = it => it[2] ? canRead(it[2]) : can(it[3] || 'r:aset');
 /* kunci halaman: list → nama entitas, view → nama view (aset78dok kalk/perdes masuk grup pemanfaatan) */
-const asetKey = (v, p) => v === 'list' ? 'e:' + ((p || {}).e || '') : v === 'aset78dok' ? (/^(kalk|perdes)$/.test(String((p || {}).d || (S.a78 || {}).d || '')) ? 'v:aset78dok:' + ((p || {}).d || S.a78.d) : 'v:aset78dok') : 'v:' + v;
+const asetKey = (v, p) => v === 'list' ? 'e:' + ((p || {}).e || '') : v !== 'aset78dok' ? 'v:' + v + ((p || {}).f ? ':f=' + p.f : '') : 1 ? (/^(kalk|perdes)$/.test(String((p || {}).d || (S.a78 || {}).d || '')) ? 'v:aset78dok:' + ((p || {}).d || S.a78.d) : 'v:aset78dok') : 'v:' + v;
+/* grup menu modul lain (pola sama dengan Aset). own: tab sudah dibuat oleh halamannya sendiri */
+Object.assign(ASET_GRP, {
+  org: { t: 'Aparatur & Lembaga', ic: 'users', it: [['Aparatur desa', ['list', { e: 'aparat' }], 'aparat'], ['Petugas & lembaga desa', ['list', { e: 'petugas' }], 'petugas'], ['Tokoh & pejabat luar', ['list', { e: 'tokoh_luar' }], 'tokoh_luar']] },
+  duduk: { t: 'Penduduk & Keluarga', ic: 'users', it: [['Ringkasan', ['pstat'], null, 'r:penduduk'], ['Data penduduk', ['list', { e: 'penduduk' }], 'penduduk'], ['Data keluarga (KK)', ['list', { e: 'keluarga' }], 'keluarga']] },
+  frc: { t: 'FRC & Pengawasan', ic: 'check', it: [['FRC Desa (SIMWAS)', ['frc'], null, 'r:frc'], ['Risiko fraud', ['list', { e: 'risiko_fraud' }], 'risiko_fraud'], ['Pengawasan & tindak lanjut', ['list', { e: 'pengawasan' }], 'pengawasan']] },
+  integ: { t: 'Integritas & Kinerja', ic: 'target', it: [['Anti gratifikasi & pungli', ['integritas'], null, 'r:frc'], ['Kinerja perangkat', ['list', { e: 'kinerja' }], 'kinerja']] },
+  pantau: { t: 'Pemantauan', ic: 'eye', it: [['Harga komoditas', ['hargakom'], null, 'r:frc'], ['Aset negara di desa', ['list', { e: 'aset_negara' }], 'aset_negara']] },
+  suratket: { t: 'Surat & Adminduk', ic: 'file', it: [['Surat keterangan', ['list', { e: 'register_surat' }], 'register_surat'], ['Permohonan online', ['list', { e: 'permohonan_surat' }], 'permohonan_surat'], ['Formulir adminduk', ['list', { e: 'adminduk' }], 'register_surat'], ['Buku NTCR', ['list', { e: 'ntcr' }], 'ntcr']] },
+  mutu: { t: 'Standar & Produk Layanan', ic: 'check', it: [['Standar pelayanan, maklumat & SKM', ['layanpub'], null, 'r:frc'], ['Produk layanan', ['list', { e: 'produk_layanan' }], 'produk_layanan']] },
+  sosial: { t: 'Data Rentan & Bansos', ic: 'heart', own: 1, it: [['Data rentan', ['list', { e: 'rentan' }], 'rentan'], ['DTSEN keluarga', ['list', { e: 'dtsen' }], 'dtsen'], ['Usulan bansos', ['list', { e: 'usulan_bansos' }], 'usulan_bansos'], ['Musdes/Muskel', ['list', { e: 'musdes_bansos' }], 'musdes_bansos'], ['Penyaluran', ['list', { e: 'penyaluran_bansos' }], 'penyaluran_bansos']] },
+  lembaga: { t: 'Lembaga & Guru Ngaji', ic: 'landmark', it: [['Lembaga / yayasan', ['list', { e: 'lembaga' }], 'lembaga'], ['Guru ngaji', ['list', { e: 'guru_ngaji' }], 'guru_ngaji']] },
+  ats: { t: 'Anak Tidak Sekolah (ATS)', ic: 'book', own: 1, it: [['Verifikasi ATS', ['ats'], null, 'r:ats'], ['Siap diinput ke situs ATS', ['ats', { f: 'input' }], null, 'ats_operator']] },
+  bangun: { t: 'RAB & Pembangunan', ic: 'hammer', it: [['RAB & gambar', ['rab', {}], null, 'r:rab'], ['Progres pembangunan', ['list', { e: 'pembangunan' }], 'pembangunan'], ['Referensi harga & AHSP', ['refs'], null, 'r:rkp']] }
+});
 const ASET_KEY_GRP = {}; Object.keys(ASET_GRP).forEach(g => ASET_GRP[g].it.forEach(it => { ASET_KEY_GRP[asetKey(it[1][0], it[1][1])] = g; }));
 function asetTabs(v, p) {
-  const k = asetKey(v, p), g = ASET_KEY_GRP[k]; if (!g) return '';
+  const k = asetKey(v, p), g = ASET_KEY_GRP[k]; if (!g || ASET_GRP[g].own) return '';
+  if (v !== 'list' && Object.keys(p || {}).some(x => !/^(d|f|g)$/.test(x) && p[x] !== '' && p[x] != null)) return '';
   const I = ASET_GRP[g].it.filter(asetGrpOk); if (I.length < 2) return '';
   return `<div class="gtabs" role="tablist" style="margin-bottom:8px">${I.map(it => { const on = asetKey(it[1][0], it[1][1]) === k; return `<button role="tab" class="${on ? 'on' : ''}" data-act="asetTab" data-go='${esc(JSON.stringify(it[1]))}'>${esc(it[0])}</button>`; }).join('')}</div>`;
 }
-const asetGrpItem = g => { const G = ASET_GRP[g], I = G.it.filter(asetGrpOk), f = I[0] || G.it[0]; return [G.t, G.ic, f[1], null, 'r:aset', 0, null, null, g]; };
+const asetGrpItem = g => { const G = ASET_GRP[g], I = G.it.filter(asetGrpOk), f = I[0] || G.it[0]; return [G.t, G.ic, f[1], null, null, 0, null, null, g]; };
 const asetGrpN = it => it && it[8] ? ASET_GRP[it[8]].it.filter(asetGrpOk).length : 1;
 /* kata kunci tersembunyi agar sub-menu tetap ketemu saat dicari */
-const asetKw = it => it && it[8] ? `<i hidden>${esc(ASET_GRP[it[8]].it.map(x => x[0]).join(' · '))}</i>` : '';
+const menuSubs = it => it && it[8] ? ASET_GRP[it[8]].it.filter(asetGrpOk).map(x => x[0]) : it && it[7] ? grpEs(it[7]).map(x => (UI[x[0]] || {}).t || x[1]) : [];
+const asetKw = it => { const s = menuSubs(it); return s.length ? `<i hidden>${esc(s.join(' · '))}</i>` : ''; };
 /* bungkus view aset agar tab grup tampil di atas */
 setTimeout(() => {
-  ['asetsop78', 'aset78dok', 'asetsop', 'asetso', 'asetlabel', 'sipadeslap', 'asetcetak', 'asettpl'].forEach(v => {
+  Array.from(new Set([].concat(...Object.keys(ASET_GRP).filter(g => !ASET_GRP[g].own).map(g => ASET_GRP[g].it.map(it => it[1][0]))))).filter(v => v !== 'list').forEach(v => {
     const f = VIEWS[v]; if (!f || f._grp) return;
     const w = async (p, main, alive) => { const r = await f(p, main, alive); if (alive && !alive()) return r; const t = asetTabs(v, p); if (t && main && !main.querySelector(':scope > .gtabs')) main.insertAdjacentHTML('afterbegin', t); return r; };
     w._grp = 1; VIEWS[v] = w;
