@@ -41,6 +41,27 @@
 .ways{display:grid;grid-template-columns:1fr 1fr;gap:22px}
 @media(max-width:800px){.ways{grid-template-columns:1fr}}
 .acc .src{font-size:12px;color:var(--muted);margin-top:12px}
+
+.alur{margin:6px 0 34px;background:var(--paper);border:2px solid var(--ink);border-radius:var(--r);box-shadow:var(--hard);padding:18px 18px 8px}
+.alur svg{display:block;width:100%;height:auto;font-family:var(--f-b)}
+.alur .v{display:none}
+@media(max-width:760px){.alur .h{display:none}.alur .v{display:block;max-width:380px;margin:0 auto}}
+.alur .nd rect,.alur .nd path{fill:var(--sand);stroke:var(--ink);stroke-width:2}
+.alur .nd text{font-size:15px;font-weight:800;fill:var(--ink);text-anchor:middle}
+.alur .nd text.s{font-size:11.5px;font-weight:600;fill:var(--muted)}
+.alur .nd .no{fill:var(--ink)}.alur .nd text.n{fill:var(--padi);font-size:12px}
+.alur .nd>rect,.alur .nd>path{animation:aBg 12s infinite;animation-delay:inherit}
+@keyframes aBg{0%,4%{fill:var(--sand)}8%,16%{fill:var(--padi)}22%,100%{fill:var(--sand)}}
+.alur .ln{fill:none;stroke:var(--moss);stroke-width:3;stroke-dasharray:9 7;animation:aLn 1.2s linear infinite}
+.alur .ln.b{stroke:var(--bara)}
+@keyframes aLn{to{stroke-dashoffset:-16}}
+.alur .lb{font-size:12.5px;font-weight:800;fill:var(--moss)}.alur .lb.b{fill:var(--bara)}
+.alur .tk{fill:var(--paper);stroke:var(--ink);stroke-width:2}
+.alur .tk.b{fill:#fbd5cc;stroke:var(--bara)}
+.alur ol{margin:10px 0 8px;padding-left:20px;font-size:14px;color:var(--muted);columns:2;column-gap:34px}
+.alur ol li{margin:0 0 6px;break-inside:avoid}.alur ol b{color:var(--ink)}
+@media(max-width:760px){.alur ol{columns:1}}
+@media(prefers-reduced-motion:reduce){.alur .ln,.alur .nd rect,.alur .nd path{animation:none}.alur .tk{display:none}}
 </style>
 </head>
 <body>
@@ -91,6 +112,52 @@
 <section class="sec" id="syarat">
   <div class="wrap">
     <div class="sec-h"><span data-ed="t26" class="eyebrow reveal">Persyaratan</span><h2 data-ed="t27" class="reveal d1">Apa saja yang <span class="mark">perlu dibawa</span>?</h2><p data-ed="t28" class="reveal d2">Ketuk nama layanan untuk melihat persyaratannya. Siapkan berkasnya lebih dulu supaya urusan Anda selesai dalam sekali datang. Daftar ini diperbarui langsung dari aplikasi desa.</p></div>
+    <div class="alur reveal" id="bagan">
+      <h3 data-ed="t32" style="font:800 22px/1.2 var(--f-d);margin:0 0 4px">Alur pelayanan di kantor desa</h3>
+      <p data-ed="t33" class="note" style="margin:0 0 10px">Ikuti perjalanan berkasmu: dari meja pelayanan sampai surat jadi. Berkas yang belum lengkap dikembalikan dulu untuk dilengkapi, jadi cek syaratnya di bawah sebelum datang.</p>
+      <svg class="h" viewBox="0 0 1100 300" role="img" aria-label="Bagan alur pelayanan kantor desa">
+<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--moss)"/></marker><marker id="ab" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--bara)"/></marker></defs>
+<path class="ln" d="M170,140 H226" marker-end="url(#ah)"/><path class="ln" d="M400,140 H436" marker-end="url(#ah)"/><path class="ln" d="M564,140 H596" marker-end="url(#ah)"/><path class="ln" d="M770,140 H826" marker-end="url(#ah)"/><path class="ln" d="M945,168 V216" marker-end="url(#ah)"/>
+<path class="ln" d="M860,244 H95 V172" marker-end="url(#ah)"/>
+<path class="ln b" d="M500,94 V38 H95 V108" marker-end="url(#ab)"/>
+<text class="lb b" x="300" y="30">Belum lengkap → dikembalikan ke pemohon untuk dilengkapi</text>
+<text class="lb" x="566" y="128">Ya</text><text class="lb b" x="508" y="70">Tidak</text>
+<text class="lb" x="340" y="268">Surat selesai diserahkan kepada pemohon</text>
+<g class="nd" style="animation-delay:-0.9s"><rect x="20" y="112" width="150" height="56" rx="14"/><circle class="no" cx="24" cy="116" r="12"/><text class="n" x="24" y="120">1</text><text x="95.0" y="138.0">Pemohon</text><text class="s" x="95.0" y="155.0">bawa berkas</text></g>
+<g class="nd" style="animation-delay:0.5s"><rect x="230" y="112" width="170" height="56" rx="14"/><circle class="no" cx="234" cy="116" r="12"/><text class="n" x="234" y="120">2</text><text x="315.0" y="138.0">Petugas Pelayanan</text><text class="s" x="315.0" y="155.0">periksa berkas</text></g>
+<g class="nd" style="animation-delay:2.2s"><path d="M500,94 L564,140 L500,186 L436,140 Z"/><text x="500" y="138">Berkas</text><text x="500" y="155">lengkap?</text></g>
+<g class="nd" style="animation-delay:3.7s"><rect x="600" y="112" width="170" height="56" rx="14"/><circle class="no" cx="604" cy="116" r="12"/><text class="n" x="604" y="120">3</text><text x="685.0" y="138.0">Operator Pelayanan</text><text class="s" x="685.0" y="155.0">buat surat</text></g>
+<g class="nd" style="animation-delay:5.3s"><rect x="830" y="112" width="230" height="56" rx="14"/><circle class="no" cx="834" cy="116" r="12"/><text class="n" x="834" y="120">4</text><text x="945.0" y="138.0">Pengesahan</text><text class="s" x="945.0" y="155.0">tanda tangan Kades/Sekdes</text></g>
+<g class="nd" style="animation-delay:6.8s"><rect x="860" y="218" width="170" height="52" rx="14"/><circle class="no" cx="864" cy="222" r="12"/><text class="n" x="864" y="226">5</text><text x="945.0" y="242.0">Registrasi</text><text class="s" x="945.0" y="259.0">dicatat di buku agenda</text></g>
+<circle class="tk" r="8"><animateMotion dur="12s" repeatCount="indefinite" keyPoints="0;0;0.033;0.033;0.158;0.158;0.239;0.239;0.367;0.367;0.474;0.474;1;1" keyTimes="0;.04;.12;.18;.26;.32;.39;.45;.52;.58;.65;.71;.95;1" calcMode="linear" path="M170,140 H945 V244 H95 V172"/></circle>
+<circle class="tk b" r="8" opacity="0"><animateMotion dur="12s" begin="0s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.26;0.38;1" calcMode="linear" path="M500,94 V38 H95 V112"/><animate attributeName="opacity" dur="12s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.25;0.26;0.38;0.39;1"/></circle>
+</svg>
+      <svg class="v" viewBox="0 0 360 590" role="img" aria-label="Bagan alur pelayanan kantor desa">
+<defs><marker id="vh" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--moss)"/></marker><marker id="vb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--bara)"/></marker></defs>
+<path class="ln" d="M180,78 V114" marker-end="url(#vh)"/><path class="ln" d="M180,172 V192" marker-end="url(#vh)"/><path class="ln" d="M180,290 V326" marker-end="url(#vh)"/><path class="ln" d="M180,384 V420" marker-end="url(#vh)"/><path class="ln" d="M180,478 V514" marker-end="url(#vh)"/>
+<path class="ln" d="M80,546 H30 V50 H74" marker-end="url(#vh)"/>
+<path class="ln b" d="M244,242 H334 V50 H286" marker-end="url(#vb)"/>
+<text class="lb b" x="250" y="232">Tidak</text><text class="lb" x="190" y="312">Ya</text>
+<text class="lb b" transform="translate(350,150) rotate(90)">Dikembalikan untuk dilengkapi</text>
+<text class="lb" transform="translate(22,410) rotate(-90)">Surat diserahkan ke pemohon</text>
+<g class="nd" style="animation-delay:-0.9s"><rect x="80" y="22" width="200" height="56" rx="14"/><circle class="no" cx="84" cy="26" r="12"/><text class="n" x="84" y="30">1</text><text x="180.0" y="48.0">Pemohon</text><text class="s" x="180.0" y="65.0">bawa berkas</text></g>
+<g class="nd" style="animation-delay:0.5s"><rect x="80" y="116" width="200" height="56" rx="14"/><circle class="no" cx="84" cy="120" r="12"/><text class="n" x="84" y="124">2</text><text x="180.0" y="142.0">Petugas Pelayanan</text><text class="s" x="180.0" y="159.0">periksa berkas</text></g>
+<g class="nd" style="animation-delay:2.2s"><path d="M180,196 L244,242 L180,288 L116,242 Z"/><text x="180" y="240">Berkas</text><text x="180" y="257">lengkap?</text></g>
+<g class="nd" style="animation-delay:3.7s"><rect x="80" y="328" width="200" height="56" rx="14"/><circle class="no" cx="84" cy="332" r="12"/><text class="n" x="84" y="336">3</text><text x="180.0" y="354.0">Operator Pelayanan</text><text class="s" x="180.0" y="371.0">buat surat</text></g>
+<g class="nd" style="animation-delay:5.3s"><rect x="56" y="422" width="248" height="56" rx="14"/><circle class="no" cx="60" cy="426" r="12"/><text class="n" x="60" y="430">4</text><text x="180.0" y="448.0">Pengesahan</text><text class="s" x="180.0" y="465.0">tanda tangan Kades/Sekdes</text></g>
+<g class="nd" style="animation-delay:6.8s"><rect x="80" y="516" width="200" height="56" rx="14"/><circle class="no" cx="84" cy="520" r="12"/><text class="n" x="84" y="524">5</text><text x="180.0" y="542.0">Registrasi</text><text class="s" x="180.0" y="559.0">dicatat di buku agenda</text></g>
+<circle class="tk" r="8"><animateMotion dur="12s" repeatCount="indefinite" keyPoints="0;0;0.033;0.033;0.102;0.102;0.217;0.217;0.298;0.298;0.38;0.38;1;1" keyTimes="0;.04;.12;.18;.26;.32;.39;.45;.52;.58;.65;.71;.95;1" calcMode="linear" path="M180,78 V544 H30 V50 H74"/></circle>
+<circle class="tk b" r="8" opacity="0"><animateMotion dur="12s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.26;0.38;1" calcMode="linear" path="M224,242 H334 V50 H280"/><animate attributeName="opacity" dur="12s" repeatCount="indefinite" values="0;0;1;1;0;0" keyTimes="0;0.25;0.26;0.38;0.39;1"/></circle>
+</svg>
+      <ol>
+        <li data-ed="t34">Pemohon menyerahkan berkas yang lengkap dan benar kepada <b>Petugas Pelayanan</b>.</li>
+        <li data-ed="t35">Petugas memeriksa berkas sesuai persyaratan. Bila <b>belum lengkap</b>, berkas dikembalikan ke pemohon untuk dilengkapi; bila lengkap, langsung diproses.</li>
+        <li data-ed="t36">Berkas diteruskan ke <b>Operator Pelayanan</b> untuk dibuatkan surat.</li>
+        <li data-ed="t37">Surat dibawa ke <b>Kepala Desa atau Sekretaris Desa</b> untuk disahkan dan ditandatangani.</li>
+        <li data-ed="t38">Petugas melakukan <b>registrasi</b> surat.</li>
+        <li data-ed="t39">Surat yang sudah selesai <b>diserahkan kepada pemohon</b>.</li>
+      </ol>
+    </div>
     <label class="search reveal"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="q" type="search" placeholder="Cari layanan, misal: KK, SKCK, pindah…" aria-label="Cari layanan"></label>
     <div class="acc" id="acc"></div>
     <p class="note" id="accSrc" style="margin-top:16px"></p>
