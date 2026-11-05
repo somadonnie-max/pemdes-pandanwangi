@@ -9128,7 +9128,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '231', tgl: '2026-11-05', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '232', tgl: '2026-11-05', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -14145,6 +14145,7 @@ Object.assign(DOKKEU, {
 
 /* ---------- peta aset KIB A (tanah) & KIB D (jalan, irigasi, jaringan): GeoJSON, gambar di peta, titik → Bhumi ---------- */
 const AP_KIB = { A: 1, D: 1 };
+const apGmaps = (lat, lng) => 'https://www.google.com/maps/search/?api=1&query=' + Number(lat).toFixed(7) + ',' + Number(lng).toFixed(7);
 const apBhumi = (lat, lng) => { lat = +lat; lng = +lng; const d = .0012; return 'https://bhumi.atrbpn.go.id/peta?bbox=' + [lng - d * 2, lat - d, lng + d * 2, lat + d].map(v => v.toFixed(6)).join('%2C') + '&height=855&width=1920&x=960&y=427&latitude=' + Number(lat).toFixed(7) + '&longitude=' + Number(lng).toFixed(7); };
 /* UTM → WGS84 (Lumajang: zona 49 Selatan / EPSG:32749) */
 function apUtm(x, y, zone, selatan) {
@@ -14221,14 +14222,14 @@ function apKartuHtml(a) {
   const ukur = g ? [apLuasTxt(a), a.geom_panjang ? 'panjang peta ' + (/Polygon/.test(g.type) ? '±' : '') + '<b>' + apAngka(a.geom_panjang) + ' m</b>' + (a.panjang ? ' (tercatat ' + apAngka(asetNum(a.panjang)) + ' m)' : '') : ''].filter(Boolean).join(' · ') : '';
   return `<details class="card stack sipbox" id="apKartu" style="padding:10px 12px"${g ? ' open' : ''}><summary class="sec-h" style="margin:0"><h2>${ic('next')} Peta lokasi</h2>${g ? '<span class="pill ok">Ada peta</span>' : '<span class="pill warn">Belum ada peta</span>'}</summary>
     ${g ? `<div id="apMap" class="ap-map"></div><div class="meta">${ukur}</div>` : `<div class="meta">Peta aset diisi sekaligus untuk semua aset KIB A & D lewat satu berkas GeoJSON: buka <b>Peta aset</b> → Ekspor, gambar di QGIS, lalu Impor.</div>`}
-    <div class="btns">${a.peta_lat ? `<a class="btn sm pri" href="${esc(apBhumi(a.peta_lat, a.peta_lng))}" target="_blank" rel="noopener">${ic('map')}Buka titik di Bhumi</a>` : ''}<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['asetpeta', {}]))}'>${ic('map')}Peta aset desa</button></div></details>`;
+    <div class="btns">${a.peta_lat ? `<a class="btn sm pri" href="${esc(apGmaps(a.peta_lat, a.peta_lng))}" target="_blank" rel="noopener">${ic('map')}Buka di Google Maps</a>` : ''}<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['asetpeta', {}]))}'>${ic('map')}Peta aset desa</button></div></details>`;
 }
 async function apKartuPasang(a) {
   const h = kibHuruf(a), g = apGeom(a), box = $('#apKartu'); if (!AP_KIB[h] || !g || !box) return;
   let sudah = false;
   const pasang = async () => { if (sudah || !box.open || !$('#apMap')) return; sudah = true;
     try { const L = await muatLeaflet(); const map = apPeta(L, $('#apMap')); const ly = L.geoJSON(g, { style: () => apGaya(h), pointToLayer: (f, ll) => L.circleMarker(ll, { radius: 7, color: '#fff', weight: 2, fillColor: AP_WARNA[h], fillOpacity: 1 }) }).addTo(map); map.fitBounds(ly.getBounds(), { padding: [20, 20], maxZoom: 19 });
-      if (a.peta_lat) L.circleMarker([a.peta_lat, a.peta_lng], { radius: 6, color: '#fff', weight: 2, fillColor: '#dc2626', fillOpacity: 1 }).addTo(map).bindPopup(`<b>${esc(a.nama || '')}</b><br><a href="${esc(apBhumi(a.peta_lat, a.peta_lng))}" target="_blank" rel="noopener">Buka di Bhumi ATR/BPN →</a>`);
+      if (a.peta_lat) L.circleMarker([a.peta_lat, a.peta_lng], { radius: 6, color: '#fff', weight: 2, fillColor: '#dc2626', fillOpacity: 1 }).addTo(map).bindPopup(`<b>${esc(a.nama || '')}</b><br><a href="${esc(apGmaps(a.peta_lat, a.peta_lng))}" target="_blank" rel="noopener">Buka di Google Maps →</a>`);
     } catch (x) { $('#apMap').innerHTML = `<div class="err">${esc(x.message)}</div>`; } };
   box.addEventListener('toggle', pasang); pasang();
 }
@@ -14280,7 +14281,7 @@ VIEWS.asetpeta = async (p, main, alive) => {
   const map = apPeta(L, $('#apAll'), { roda: 1 }), grp = L.featureGroup().addTo(map);
   ada.forEach(a => { const h = kibHuruf(a), ly = L.geoJSON(apGeom(a), { style: () => apGaya(h), pointToLayer: (ft, ll) => L.circleMarker(ll, { radius: 7, color: '#fff', weight: 2, fillColor: AP_WARNA[h], fillOpacity: 1 }) }).addTo(grp);
     ly.bindTooltip(esc(a.nama || ''), { sticky: true });
-    ly.bindPopup(`<b>${esc(a.nama || '')}</b><br>${esc(a.kode_barang || '')} · Reg ${esc(a.no_urut || '')}<br>${apLuasTxt(a) ? apLuasTxt(a).replace(/^l/, 'L') + '<br>' : ''}${a.geom_panjang ? 'Panjang peta ±' + apAngka(a.geom_panjang) + ' m<br>' : ''}${a.nilai ? esc(rp(asetNum(a.nilai))) + '<br>' : ''}<a href="#" data-ap="${esc(a.id)}">Buka detail aset →</a>${a.peta_lat ? ` · <a href="${esc(apBhumi(a.peta_lat, a.peta_lng))}" target="_blank" rel="noopener">Bhumi →</a>` : ''}`); });
+    ly.bindPopup(`<b>${esc(a.nama || '')}</b><br>${esc(a.kode_barang || '')} · Reg ${esc(a.no_urut || '')}<br>${apLuasTxt(a) ? apLuasTxt(a).replace(/^l/, 'L') + '<br>' : ''}${a.geom_panjang ? 'Panjang peta ±' + apAngka(a.geom_panjang) + ' m<br>' : ''}${a.nilai ? esc(rp(asetNum(a.nilai))) + '<br>' : ''}<a href="#" data-ap="${esc(a.id)}">Buka detail aset →</a>${a.peta_lat ? ` · <a href="${esc(apGmaps(a.peta_lat, a.peta_lng))}" target="_blank" rel="noopener">Google Maps →</a>` : ''}`); });
   map.on('popupopen', e => { const el = e.popup.getElement().querySelector('[data-ap]'); if (el) el.onclick = ev => { ev.preventDefault(); go('detail', { e: 'aset', id: el.dataset.ap }); }; });
   if (ada.length) map.fitBounds(grp.getBounds(), { padding: [16, 16], maxZoom: 18 }); else map.setView([Number(S.set.kantor_lat) || -8.2383, Number(S.set.kantor_lng) || 113.1937], 14);
   const sum = (k, h) => ada.filter(a => kibHuruf(a) === h).reduce((s, a) => s + (k === 'geom_luas' && apSert(a) ? asetNum(a.luas) : +a[k] || 0), 0);
