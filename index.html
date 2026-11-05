@@ -9128,7 +9128,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '229', tgl: '2026-11-05', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '230', tgl: '2026-11-05', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -14211,11 +14211,14 @@ function apIsian(a, g, sumber) {
   return { geom: JSON.stringify(g), geom_luas: u.luas || '', geom_panjang: u.panjang || (d && u.keliling ? Math.round(u.keliling / 2) : ''), peta_lat: u.lat, peta_lng: u.lng, peta_sumber: sumber, peta_waktu: new Date().toISOString() };
 }
 const apAngka = n => Number(n).toLocaleString('id-ID');
+/* KIB A bersertifikat: tampilkan luas sertifikat saja; lainnya luas dari peta */
+const apSert = a => kibHuruf(a) === 'A' && !!(a.no_sertifikat || /sertifikat/i.test(a.status_tanah || '')) && asetNum(a.luas) > 0;
+const apLuasTxt = a => apSert(a) ? 'luas sertifikat <b>' + apAngka(asetNum(a.luas)) + ' m²</b>' : a.geom_luas ? 'luas peta <b>' + apAngka(a.geom_luas) + ' m²</b>' + (asetNum(a.luas) > 0 ? ' (tercatat ' + apAngka(asetNum(a.luas)) + ' m²)' : '') : '';
 /* kartu peta di detail aset: hanya tampilan, bisa diciutkan */
 function apKartuHtml(a) {
   const h = kibHuruf(a); if (!AP_KIB[h]) return '';
   const g = apGeom(a);
-  const ukur = g ? [a.geom_luas ? 'luas peta <b>' + apAngka(a.geom_luas) + ' m²</b>' + (a.luas ? ' (tercatat ' + apAngka(asetNum(a.luas)) + ' m²)' : '') : '', a.geom_panjang ? 'panjang peta ' + (/Polygon/.test(g.type) ? '±' : '') + '<b>' + apAngka(a.geom_panjang) + ' m</b>' + (a.panjang ? ' (tercatat ' + apAngka(asetNum(a.panjang)) + ' m)' : '') : ''].filter(Boolean).join(' · ') : '';
+  const ukur = g ? [apLuasTxt(a), a.geom_panjang ? 'panjang peta ' + (/Polygon/.test(g.type) ? '±' : '') + '<b>' + apAngka(a.geom_panjang) + ' m</b>' + (a.panjang ? ' (tercatat ' + apAngka(asetNum(a.panjang)) + ' m)' : '') : ''].filter(Boolean).join(' · ') : '';
   return `<details class="card stack sipbox" id="apKartu" style="padding:10px 12px"${g ? ' open' : ''}><summary class="sec-h" style="margin:0"><h2 style="font-size:14px">${ic('next')} Peta lokasi</h2>${g ? '<span class="pill ok">Ada peta</span>' : '<span class="pill warn">Belum ada peta</span>'}</summary>
     ${g ? `<div id="apMap" class="ap-map"></div><div class="meta">${ukur}</div>` : `<div class="meta">Peta aset diisi sekaligus untuk semua aset KIB A & D lewat satu berkas GeoJSON: buka <b>Peta aset</b> → Ekspor, gambar di QGIS, lalu Impor.</div>`}
     <div class="btns">${a.peta_lat ? `<a class="btn sm pri" href="${esc(apBhumi(a.peta_lat, a.peta_lng))}" target="_blank" rel="noopener">${ic('map')}Buka titik di Bhumi</a>` : ''}<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['asetpeta', {}]))}'>${ic('map')}Peta aset desa</button></div></details>`;
@@ -14277,10 +14280,10 @@ VIEWS.asetpeta = async (p, main, alive) => {
   const map = apPeta(L, $('#apAll'), { roda: 1 }), grp = L.featureGroup().addTo(map);
   ada.forEach(a => { const h = kibHuruf(a), ly = L.geoJSON(apGeom(a), { style: () => apGaya(h), pointToLayer: (ft, ll) => L.circleMarker(ll, { radius: 7, color: '#fff', weight: 2, fillColor: AP_WARNA[h], fillOpacity: 1 }) }).addTo(grp);
     ly.bindTooltip(esc(a.nama || ''), { sticky: true });
-    ly.bindPopup(`<b>${esc(a.nama || '')}</b><br>${esc(a.kode_barang || '')} · Reg ${esc(a.no_urut || '')}<br>${a.geom_luas ? 'Luas peta ' + apAngka(a.geom_luas) + ' m²' + (a.luas ? ' (tercatat ' + apAngka(asetNum(a.luas)) + ')' : '') + '<br>' : ''}${a.geom_panjang ? 'Panjang peta ±' + apAngka(a.geom_panjang) + ' m<br>' : ''}${a.nilai ? esc(rp(asetNum(a.nilai))) + '<br>' : ''}<a href="#" data-ap="${esc(a.id)}">Buka detail aset →</a>${a.peta_lat ? ` · <a href="${esc(apBhumi(a.peta_lat, a.peta_lng))}" target="_blank" rel="noopener">Bhumi →</a>` : ''}`); });
+    ly.bindPopup(`<b>${esc(a.nama || '')}</b><br>${esc(a.kode_barang || '')} · Reg ${esc(a.no_urut || '')}<br>${apLuasTxt(a) ? apLuasTxt(a).replace(/^l/, 'L') + '<br>' : ''}${a.geom_panjang ? 'Panjang peta ±' + apAngka(a.geom_panjang) + ' m<br>' : ''}${a.nilai ? esc(rp(asetNum(a.nilai))) + '<br>' : ''}<a href="#" data-ap="${esc(a.id)}">Buka detail aset →</a>${a.peta_lat ? ` · <a href="${esc(apBhumi(a.peta_lat, a.peta_lng))}" target="_blank" rel="noopener">Bhumi →</a>` : ''}`); });
   map.on('popupopen', e => { const el = e.popup.getElement().querySelector('[data-ap]'); if (el) el.onclick = ev => { ev.preventDefault(); go('detail', { e: 'aset', id: el.dataset.ap }); }; });
   if (ada.length) map.fitBounds(grp.getBounds(), { padding: [16, 16], maxZoom: 18 }); else map.setView([Number(S.set.kantor_lat) || -8.2383, Number(S.set.kantor_lng) || 113.1937], 14);
-  const sum = (k, h) => ada.filter(a => kibHuruf(a) === h).reduce((s, a) => s + (+a[k] || 0), 0);
+  const sum = (k, h) => ada.filter(a => kibHuruf(a) === h).reduce((s, a) => s + (k === 'geom_luas' && apSert(a) ? asetNum(a.luas) : +a[k] || 0), 0);
   $('#apStat').innerHTML = `<b>${ada.length}</b> dari ${rows.length} aset sudah punya peta${!f || f === 'A' ? ` · luas tanah di peta <b>${(sum('geom_luas', 'A') / 1e4).toLocaleString('id-ID', { maximumFractionDigits: 2 })} ha</b>` : ''}${!f || f === 'D' ? ` · panjang jalan/saluran ±<b>${(sum('geom_panjang', 'D') / 1000).toLocaleString('id-ID', { maximumFractionDigits: 2 })} km</b>` : ''}`;
   $('#apBelum').innerHTML = belum.length ? `<details class="card"><summary><b>Belum punya peta (${belum.length})</b></summary><div class="list" style="margin-top:8px">${belum.map(a => `<button class="row" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'aset', id: a.id }]))}'><span class="av">${esc(kibHuruf(a))}</span><span class="main"><span class="t">${esc(a.nama || a.nama_rekening || '')}</span><span class="s">${esc([a.kode_barang, a.no_urut ? 'Reg ' + a.no_urut : '', a.letak].filter(Boolean).join(' · '))}</span></span></button>`).join('')}</div></details>` : '';
 };
