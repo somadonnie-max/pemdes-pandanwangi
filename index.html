@@ -9128,7 +9128,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '228', tgl: '2026-11-05', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '229', tgl: '2026-11-05', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -14182,18 +14182,18 @@ function apBaca(obj, kib) {
 }
 /* ukuran: luas (m²) & panjang (m) dihitung dari bentuk di peta */
 function apUkur(g) {
-  let luas = 0, panjang = 0, sx = 0, sy = 0, n = 0;
+  let luas = 0, panjang = 0, keliling = 0, sx = 0, sy = 0, n = 0;
   const m = (a, b) => { const k = 111320, dx = (b[0] - a[0]) * k * Math.cos((a[1] + b[1]) / 2 * Math.PI / 180), dy = (b[1] - a[1]) * k; return Math.sqrt(dx * dx + dy * dy); };
   const ring = r => { let s = 0; const lat0 = r[0][1] * Math.PI / 180, k = 111320; for (let i = 0; i < r.length - 1; i++) { const x1 = r[i][0] * k * Math.cos(lat0), y1 = r[i][1] * k, x2 = r[i + 1][0] * k * Math.cos(lat0), y2 = r[i + 1][1] * k; s += x1 * y2 - x2 * y1; } return Math.abs(s / 2); };
   const pt = p => { sx += p[0]; sy += p[1]; n++; };
   const jalan = g => { if (!g) return; const c = g.coordinates;
-    if (g.type === 'Polygon') { c.forEach((r, i) => { luas += (i ? -1 : 1) * ring(r); }); c[0].slice(0, -1).forEach(pt); }
+    if (g.type === 'Polygon') { c.forEach((r, i) => { luas += (i ? -1 : 1) * ring(r); }); for (let i = 0; i < c[0].length - 1; i++) keliling += m(c[0][i], c[0][i + 1]); c[0].slice(0, -1).forEach(pt); }
     else if (g.type === 'MultiPolygon') c.forEach(pg => jalan({ type: 'Polygon', coordinates: pg }));
     else if (g.type === 'LineString') { for (let i = 0; i < c.length - 1; i++) panjang += m(c[i], c[i + 1]); c.forEach(pt); }
     else if (g.type === 'MultiLineString') c.forEach(l => jalan({ type: 'LineString', coordinates: l }));
     else if (g.type === 'GeometryCollection') g.geometries.forEach(jalan); };
   jalan(g);
-  return { luas: Math.round(luas), panjang: Math.round(panjang * 10) / 10, lat: n ? Math.round(sy / n * 1e7) / 1e7 : null, lng: n ? Math.round(sx / n * 1e7) / 1e7 : null };
+  return { luas: Math.round(luas), panjang: Math.round(panjang * 10) / 10, keliling: Math.round(keliling * 10) / 10, lat: n ? Math.round(sy / n * 1e7) / 1e7 : null, lng: n ? Math.round(sx / n * 1e7) / 1e7 : null };
 }
 const apGeom = a => { try { return a && a.geom ? JSON.parse(a.geom) : null; } catch (x) { return null; } };
 function apPeta(L, el, opt) {
@@ -14205,87 +14205,84 @@ function apPeta(L, el, opt) {
 }
 const AP_WARNA = { A: '#f59e0b', D: '#38bdf8' };
 const apGaya = h => ({ color: h === 'D' ? '#0ea5e9' : '#fbbf24', weight: h === 'D' ? 4 : 2.5, fillColor: AP_WARNA[h] || '#f59e0b', fillOpacity: .28 });
-function apSimpanGeom(a, g, sumber) {
-  const u = apUkur(g);
-  return call('save', { entity: 'aset', record: { id: a.id, geom: JSON.stringify(g), geom_luas: u.luas || '', geom_panjang: u.panjang || '', peta_lat: u.lat, peta_lng: u.lng, peta_sumber: sumber, peta_waktu: new Date().toISOString() } });
+/* isian peta yang disimpan di data aset (KIB D poligon: panjang ≈ setengah keliling) */
+function apIsian(a, g, sumber) {
+  const u = apUkur(g), d = kibHuruf(a) === 'D';
+  return { geom: JSON.stringify(g), geom_luas: u.luas || '', geom_panjang: u.panjang || (d && u.keliling ? Math.round(u.keliling / 2) : ''), peta_lat: u.lat, peta_lng: u.lng, peta_sumber: sumber, peta_waktu: new Date().toISOString() };
 }
-/* kartu peta di detail aset (dipanggil dari extraAset) */
+const apAngka = n => Number(n).toLocaleString('id-ID');
+/* kartu peta di detail aset: hanya tampilan, bisa diciutkan */
 function apKartuHtml(a) {
   const h = kibHuruf(a); if (!AP_KIB[h]) return '';
-  const wa = canWrite('aset'), g = apGeom(a);
-  const ukur = g ? [a.geom_luas ? 'luas peta <b>' + Number(a.geom_luas).toLocaleString('id-ID') + ' m²</b>' + (a.luas ? ' (tercatat ' + asetNum(a.luas).toLocaleString('id-ID') + ' m²)' : '') : '', a.geom_panjang ? 'panjang peta <b>' + Number(a.geom_panjang).toLocaleString('id-ID') + ' m</b>' + (a.panjang ? ' (tercatat ' + asetNum(a.panjang).toLocaleString('id-ID') + ' m)' : '') : ''].filter(Boolean).join(' · ') : '';
-  return `<div class="card stack" id="apKartu" style="padding:10px 12px"><div class="sec-h" style="margin:0"><h2 style="font-size:14px">${ic('map')} Peta ${h === 'A' ? 'bidang tanah' : 'jalan / irigasi / jaringan'}</h2>${g ? '<span class="pill ok">Ada peta</span>' : '<span class="pill warn">Belum ada peta</span>'}</div>
-    ${g ? `<div id="apMap" class="ap-map"></div><div class="meta">${ukur}${a.peta_lat ? ` · titik lokasi <span class="mono">${a.peta_lat}, ${a.peta_lng}</span>` : ''}</div>` : `<div class="meta">Unggah GeoJSON dari QGIS (${h === 'A' ? 'poligon bidang' : 'garis ruas jalan/saluran atau poligon'}; koordinat derajat WGS84 atau UTM 49S otomatis dikenali), atau gambar langsung di peta satelit.</div>`}
-    <div id="apGambar"></div>
-    <div class="btns">${a.peta_lat ? `<a class="btn sm pri" href="${esc(apBhumi(a.peta_lat, a.peta_lng))}" target="_blank" rel="noopener">${ic('map')}Buka titik di Bhumi</a>` : ''}
-      ${wa ? `<label class="btn sm">${ic('clip')}${g ? 'Ganti' : 'Unggah'} GeoJSON<input type="file" id="apFile" accept=".geojson,.json,application/geo+json,application/json" data-nolimit hidden></label><button class="btn sm" data-act="apGbr">${ic('edit')}${g ? 'Gambar ulang' : 'Gambar di peta'}</button>` : ''}
-      ${g ? `<button class="btn sm" data-act="apUnduh">${ic('down')}Unduh GeoJSON</button>` : ''}${g && wa ? `<button class="btn sm" data-act="apHapus">${ic('trash')}Hapus peta</button>` : ''}
-      <button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['asetpeta', {}]))}'>${ic('map')}Peta semua aset</button></div></div>`;
-}
-async function apKartuPasang(a, refresh) {
-  const h = kibHuruf(a); if (!AP_KIB[h]) return;
   const g = apGeom(a);
-  if (g && $('#apMap')) { try { const L = await muatLeaflet(); const map = apPeta(L, $('#apMap')); const ly = L.geoJSON(g, { style: () => apGaya(h) }).addTo(map); map.fitBounds(ly.getBounds(), { padding: [20, 20], maxZoom: 19 });
-    if (a.peta_lat) L.circleMarker([a.peta_lat, a.peta_lng], { radius: 6, color: '#fff', weight: 2, fillColor: '#dc2626', fillOpacity: 1 }).addTo(map).bindPopup(`<b>${esc(a.nama || '')}</b><br><a href="${esc(apBhumi(a.peta_lat, a.peta_lng))}" target="_blank" rel="noopener">Buka di Bhumi ATR/BPN →</a>`);
-  } catch (x) { $('#apMap').innerHTML = `<div class="err">${esc(x.message)}</div>`; } }
-  const f = $('#apFile');
-  if (f) f.onchange = async () => { const fl = f.files[0]; if (!fl) return; try {
-    if (fl.size > 8e6) throw new Error('Berkas lebih dari 8 MB. Sederhanakan dulu di QGIS.');
-    const r = apBaca(JSON.parse(await fl.text()), h), u = apUkur(r.geom);
-    if (!confirm(`${r.info}\n${u.luas ? 'Luas peta ' + u.luas.toLocaleString('id-ID') + ' m²' : ''}${u.panjang ? ' Panjang peta ' + u.panjang.toLocaleString('id-ID') + ' m' : ''}\nSimpan sebagai peta aset ini?`)) return;
-    await apSimpanGeom(a, r.geom, 'GeoJSON: ' + fl.name); toast('Peta aset tersimpan.'); refresh();
-  } catch (x) { toast(x.message || 'GeoJSON tidak bisa dibaca.', 1); } f.value = ''; };
-  S.vh.apUnduh = () => { const gj = { type: 'FeatureCollection', features: [{ type: 'Feature', properties: { nama: a.nama, kode_barang: a.kode_barang, no_register: a.no_urut, id_barang: asetIdBarang(a), luas_peta_m2: a.geom_luas || null, panjang_peta_m: a.geom_panjang || null }, geometry: g }] };
-    saveBlob(new Blob([JSON.stringify(gj)], { type: 'application/geo+json' }), 'aset_' + String(a.nama || a.id).toLowerCase().replace(/\W+/g, '_') + '.geojson'); };
-  S.vh.apHapus = async () => { if (!confirm('Hapus peta aset ini? Data aset lainnya tidak berubah.')) return; try { await call('save', { entity: 'aset', record: { id: a.id, geom: '', geom_luas: '', geom_panjang: '', peta_lat: '', peta_lng: '', peta_sumber: '' } }); toast('Peta dihapus.'); refresh(); } catch (x) { toast(x.message, 1); } };
-  S.vh.apGbr = async () => {
-    const box = $('#apGambar'); let L; try { L = await muatLeaflet(); } catch (x) { toast(x.message, 1); return; }
-    let tipe = h === 'A' ? 'poligon' : 'garis'; const pts = [];
-    box.innerHTML = `<div class="stack"><div class="meta"><b>Mode gambar.</b> Ketuk sudut-sudut ${h === 'A' ? 'bidang' : 'ruas'} berurutan di peta satelit. Untuk mencocokkan dengan sertifikat, buka Bhumi di lokasi yang sama lalu ikuti batas bidangnya.</div>
-      ${h === 'D' ? `<div class="chips"><button class="chip on" data-t="garis">Garis (ruas jalan/saluran)</button><button class="chip" data-t="poligon">Poligon</button></div>` : ''}
-      <div id="apDraw" class="ap-map" style="height:380px"></div><div class="meta" id="apInfo">0 titik</div>
-      <div class="btns"><button class="btn sm" id="apUndo">${ic('back')}Hapus titik terakhir</button><a class="btn sm" id="apBh" target="_blank" rel="noopener">${ic('map')}Buka Bhumi di tengah peta</a><button class="btn sm pri" id="apOk">${ic('check')}Simpan</button><button class="btn sm" id="apBatal">Batal</button></div></div>`;
-    const map = apPeta(L, $('#apDraw'), { roda: 1 });
-    const g0 = apGeom(a); if (g0) { const l0 = L.geoJSON(g0, { style: () => Object.assign(apGaya(h), { dashArray: '4 6', fillOpacity: .08 }) }).addTo(map); map.fitBounds(l0.getBounds(), { maxZoom: 19 }); }
-    else if (a.peta_lat) map.setView([a.peta_lat, a.peta_lng], 18); else map.setView([Number(S.set.kantor_lat) || -8.2383, Number(S.set.kantor_lng) || 113.1937], 16);
-    let shp = null, mk = L.layerGroup().addTo(map);
-    const gambar = () => { if (shp) map.removeLayer(shp); mk.clearLayers(); const ll = pts.map(p => [p[1], p[0]]);
-      ll.forEach(p => L.circleMarker(p, { radius: 5, color: '#fff', weight: 2, fillColor: '#dc2626', fillOpacity: 1 }).addTo(mk));
-      shp = ll.length > 1 ? (tipe === 'poligon' ? L.polygon(ll, apGaya(h)) : L.polyline(ll, apGaya(h))).addTo(map) : null;
-      const g = geomNow(); const u = g ? apUkur(g) : null; $('#apInfo').textContent = pts.length + ' titik' + (u ? (u.luas ? ' · luas ' + u.luas.toLocaleString('id-ID') + ' m²' : '') + (u.panjang ? ' · panjang ' + u.panjang.toLocaleString('id-ID') + ' m' : '') : ''); };
-    const geomNow = () => tipe === 'poligon' ? (pts.length >= 3 ? { type: 'Polygon', coordinates: [pts.concat([pts[0]])] } : null) : (pts.length >= 2 ? { type: 'LineString', coordinates: pts.slice() } : null);
-    const bh = () => { const c = map.getCenter(); $('#apBh').href = apBhumi(c.lat, c.lng); }; bh(); map.on('moveend', bh);
-    map.on('click', e => { pts.push([Math.round(e.latlng.lng * 1e7) / 1e7, Math.round(e.latlng.lat * 1e7) / 1e7]); gambar(); });
-    box.querySelectorAll('[data-t]').forEach(b => { b.onclick = () => { tipe = b.dataset.t; box.querySelectorAll('[data-t]').forEach(x => x.classList.toggle('on', x === b)); gambar(); }; });
-    $('#apUndo').onclick = () => { pts.pop(); gambar(); };
-    $('#apBatal').onclick = () => { map.remove(); box.innerHTML = ''; };
-    $('#apOk').onclick = async () => { const g = geomNow(); if (!g) { toast(tipe === 'poligon' ? 'Poligon butuh minimal 3 titik.' : 'Garis butuh minimal 2 titik.', 1); return; }
-      try { await apSimpanGeom(a, g, 'Digambar di aplikasi'); toast('Peta aset tersimpan.'); refresh(); } catch (x) { toast(x.message, 1); } };
-    box.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
+  const ukur = g ? [a.geom_luas ? 'luas peta <b>' + apAngka(a.geom_luas) + ' m²</b>' + (a.luas ? ' (tercatat ' + apAngka(asetNum(a.luas)) + ' m²)' : '') : '', a.geom_panjang ? 'panjang peta ' + (/Polygon/.test(g.type) ? '±' : '') + '<b>' + apAngka(a.geom_panjang) + ' m</b>' + (a.panjang ? ' (tercatat ' + apAngka(asetNum(a.panjang)) + ' m)' : '') : ''].filter(Boolean).join(' · ') : '';
+  return `<details class="card stack sipbox" id="apKartu" style="padding:10px 12px"${g ? ' open' : ''}><summary class="sec-h" style="margin:0"><h2 style="font-size:14px">${ic('next')} Peta lokasi</h2>${g ? '<span class="pill ok">Ada peta</span>' : '<span class="pill warn">Belum ada peta</span>'}</summary>
+    ${g ? `<div id="apMap" class="ap-map"></div><div class="meta">${ukur}</div>` : `<div class="meta">Peta aset diisi sekaligus untuk semua aset KIB A & D lewat satu berkas GeoJSON: buka <b>Peta aset</b> → Ekspor, gambar di QGIS, lalu Impor.</div>`}
+    <div class="btns">${a.peta_lat ? `<a class="btn sm pri" href="${esc(apBhumi(a.peta_lat, a.peta_lng))}" target="_blank" rel="noopener">${ic('map')}Buka titik di Bhumi</a>` : ''}<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['asetpeta', {}]))}'>${ic('map')}Peta aset desa</button></div></details>`;
+}
+async function apKartuPasang(a) {
+  const h = kibHuruf(a), g = apGeom(a), box = $('#apKartu'); if (!AP_KIB[h] || !g || !box) return;
+  let sudah = false;
+  const pasang = async () => { if (sudah || !box.open || !$('#apMap')) return; sudah = true;
+    try { const L = await muatLeaflet(); const map = apPeta(L, $('#apMap')); const ly = L.geoJSON(g, { style: () => apGaya(h), pointToLayer: (f, ll) => L.circleMarker(ll, { radius: 7, color: '#fff', weight: 2, fillColor: AP_WARNA[h], fillOpacity: 1 }) }).addTo(map); map.fitBounds(ly.getBounds(), { padding: [20, 20], maxZoom: 19 });
+      if (a.peta_lat) L.circleMarker([a.peta_lat, a.peta_lng], { radius: 6, color: '#fff', weight: 2, fillColor: '#dc2626', fillOpacity: 1 }).addTo(map).bindPopup(`<b>${esc(a.nama || '')}</b><br><a href="${esc(apBhumi(a.peta_lat, a.peta_lng))}" target="_blank" rel="noopener">Buka di Bhumi ATR/BPN →</a>`);
+    } catch (x) { $('#apMap').innerHTML = `<div class="err">${esc(x.message)}</div>`; } };
+  box.addEventListener('toggle', pasang); pasang();
+}
+/* satu berkas GeoJSON untuk semua aset KIB A & D (ekspor → edit di QGIS → impor) */
+function apEkspor(rows) {
+  const multi = g => g && g.type === 'Polygon' ? { type: 'MultiPolygon', coordinates: [g.coordinates] } : g;
+  const fs = rows.map(a => ({ type: 'Feature', properties: { id: a.id, kib: kibHuruf(a), nama: a.nama || a.nama_rekening || '', kode_barang: a.kode_barang || '', register: a.no_urut || '', letak: a.letak || '', luas_catat: a.luas || '', panjang_catat: a.panjang || '' }, geometry: multi(apGeom(a)) || null }));
+  fs.sort((x, y) => (y.geometry ? 1 : 0) - (x.geometry ? 1 : 0));
+  saveBlob(new Blob([JSON.stringify({ type: 'FeatureCollection', name: 'aset_desa', crs: { type: 'name', properties: { name: 'urn:ogc:def:crs:OGC:1.3:CRS84' } }, features: fs })], { type: 'application/geo+json' }), 'aset_desa_' + String(S.set.nama_desa || 'desa').toLowerCase().replace(/\W+/g, '_') + '.geojson');
+  toast(fs.length + ' aset diekspor (' + fs.filter(f => f.geometry).length + ' sudah berpeta).');
+}
+async function apImpor(file, rows) {
+  if (file.size > 15e6) throw new Error('Berkas lebih dari 15 MB. Sederhanakan dulu di QGIS.');
+  const gj = JSON.parse(await file.text()), byId = {}; rows.forEach(a => { byId[a.id] = a; });
+  const crs = gj.crs, ubah = [], tanpaId = [], asing = [], salah = []; let sama = 0, kosong = 0;
+  (gj.features || []).forEach((f, i) => {
+    const id = String(((f && f.properties) || {}).id || '').trim(), a = byId[id];
+    if (!id) { if (f && f.geometry) tanpaId.push(i + 1); return; }
+    if (!a) { asing.push(id); return; }
+    if (!f.geometry) { kosong++; return; }
+    try { const r = apBaca({ type: 'FeatureCollection', crs, features: [f] }, kibHuruf(a)); const gs = JSON.stringify(r.geom);
+      if (gs === a.geom) sama++; else ubah.push([a, r.geom]); } catch (x) { salah.push((a.nama || id) + ': ' + x.message); }
+  });
+  const pesan = [`${ubah.length} aset petanya baru/berubah`, `${sama} tidak berubah`, `${kosong} belum digambar`, tanpaId.length ? `${tanpaId.length} bentuk TANPA id dilewati (isi kolom id, atau gambar dengan "Tambah bagian" pada baris aset)` : '', asing.length ? `${asing.length} id tidak dikenal dilewati` : '', salah.length ? 'Gagal dibaca: ' + salah.join('; ') : ''].filter(Boolean).join('\n');
+  if (!ubah.length) { alert('Tidak ada peta yang perlu disimpan.\n\n' + pesan); return 0; }
+  if (!confirm('Impor peta aset:\n\n' + pesan + '\n\nSimpan sekarang?')) return 0;
+  let n = 0; for (const [a, g] of ubah) { await call('save', { entity: 'aset', record: Object.assign({ id: a.id }, apIsian(a, g, 'Impor ' + file.name)) }); n++; if (n % 5 === 0) toast('Menyimpan peta… ' + n + '/' + ubah.length); }
+  return n;
 }
 /* halaman Peta Aset Desa: semua KIB A & D */
 VIEWS.asetpeta = async (p, main, alive) => {
   setTop('Peta Aset Desa');
-  const f = S.apF || '';
+  const f = S.apF || '', wa = canWrite('aset');
   main.innerHTML = `${asetTabs('asetpeta', p)}<div class="stack">
     <div class="chips">${[['', 'Semua'], ['A', 'KIB A · Tanah'], ['D', 'KIB D · Jalan, irigasi & jaringan']].map(([v, t]) => `<button class="chip ${f === v ? 'on' : ''}" data-act="apF" data-v="${v}">${t}</button>`).join('')}</div>
     <div id="apStat" class="meta">Memuat…</div>
     <div class="tn-wrap"><div id="apAll" class="tn-map"></div><div class="tn-leg"><span><i style="background:${AP_WARNA.A}"></i>Tanah (KIB A)</span><span><i style="background:${AP_WARNA.D}"></i>Jalan, irigasi & jaringan (KIB D)</span></div></div>
+    <details class="card tn-imp"><summary>${ic('down')} Ekspor / impor GeoJSON (QGIS)</summary><div class="stack" style="margin-top:8px">
+      <div class="btns"><button class="btn sm pri" data-act="apEks">${ic('down')}Ekspor semua aset KIB A & D</button>${wa ? `<label class="btn sm">${ic('map')}Impor GeoJSON<input type="file" id="apImp" accept=".geojson,.json,application/geo+json,application/json" data-nolimit hidden></label>` : ''}</div>
+      <div class="meta">Satu berkas berisi semua aset KIB A & D (yang belum berpeta ikut, bentuknya kosong). Di QGIS: buka berkasnya, <b>Toggle Editing</b>, pilih baris aset di tabel atribut, lalu gambar dengan <b>Add Part (Tambah Bagian)</b>; simpan, lalu impor di sini. Kolom <b>id</b> jangan diubah. Semua aset digambar sebagai poligon (KIB D: badan jalan/saluran; panjang dihitung ± setengah keliling). Koordinat derajat atau UTM 49S otomatis dikenali. Bentuk yang kosong di berkas tidak menghapus peta yang sudah ada.</div></div></details>
     <div id="apBelum"></div></div>`;
   S.vh.apF = t => { S.apF = t.dataset.v; refresh(); };
   let L; try { L = await muatLeaflet(); } catch (x) { $('#apAll').innerHTML = `<div class="err">${esc(x.message)}</div>`; return; }
-  const rows = (await ambilSemua('aset')).filter(a => AP_KIB[kibHuruf(a)] && (!f || kibHuruf(a) === f) && !/hapus/i.test(a.status_aset || ''));
+  const semua = (await ambilSemua('aset')).filter(a => AP_KIB[kibHuruf(a)] && !/hapus/i.test(a.status_aset || ''));
   if (!alive()) return;
-  const ada = rows.filter(a => apGeom(a)), belum = rows.filter(a => !apGeom(a));
+  S.vh.apEks = () => apEkspor(semua);
+  const fi = $('#apImp'); if (fi) fi.onchange = async () => { const fl = fi.files[0]; if (!fl) return; try { const n = await apImpor(fl, semua); if (n) { toast(n + ' peta aset tersimpan.'); refresh(); } } catch (x) { toast(x.message || 'GeoJSON tidak bisa dibaca.', 1); } fi.value = ''; };
+  const rows = semua.filter(a => !f || kibHuruf(a) === f), ada = rows.filter(a => apGeom(a)), belum = rows.filter(a => !apGeom(a));
   const map = apPeta(L, $('#apAll'), { roda: 1 }), grp = L.featureGroup().addTo(map);
-  ada.forEach(a => { const h = kibHuruf(a), ly = L.geoJSON(apGeom(a), { style: () => apGaya(h) }).addTo(grp);
-    ly.bindPopup(`<b>${esc(a.nama || '')}</b><br>${esc(a.kode_barang || '')} · Reg ${esc(a.no_urut || '')}<br>${a.geom_luas ? 'Luas peta ' + Number(a.geom_luas).toLocaleString('id-ID') + ' m²<br>' : ''}${a.geom_panjang ? 'Panjang peta ' + Number(a.geom_panjang).toLocaleString('id-ID') + ' m<br>' : ''}${a.nilai ? esc(rp(asetNum(a.nilai))) + '<br>' : ''}<a href="#" data-ap="${esc(a.id)}">Buka detail aset →</a>${a.peta_lat ? ` · <a href="${esc(apBhumi(a.peta_lat, a.peta_lng))}" target="_blank" rel="noopener">Bhumi →</a>` : ''}`); });
+  ada.forEach(a => { const h = kibHuruf(a), ly = L.geoJSON(apGeom(a), { style: () => apGaya(h), pointToLayer: (ft, ll) => L.circleMarker(ll, { radius: 7, color: '#fff', weight: 2, fillColor: AP_WARNA[h], fillOpacity: 1 }) }).addTo(grp);
+    ly.bindTooltip(esc(a.nama || ''), { sticky: true });
+    ly.bindPopup(`<b>${esc(a.nama || '')}</b><br>${esc(a.kode_barang || '')} · Reg ${esc(a.no_urut || '')}<br>${a.geom_luas ? 'Luas peta ' + apAngka(a.geom_luas) + ' m²' + (a.luas ? ' (tercatat ' + apAngka(asetNum(a.luas)) + ')' : '') + '<br>' : ''}${a.geom_panjang ? 'Panjang peta ±' + apAngka(a.geom_panjang) + ' m<br>' : ''}${a.nilai ? esc(rp(asetNum(a.nilai))) + '<br>' : ''}<a href="#" data-ap="${esc(a.id)}">Buka detail aset →</a>${a.peta_lat ? ` · <a href="${esc(apBhumi(a.peta_lat, a.peta_lng))}" target="_blank" rel="noopener">Bhumi →</a>` : ''}`); });
   map.on('popupopen', e => { const el = e.popup.getElement().querySelector('[data-ap]'); if (el) el.onclick = ev => { ev.preventDefault(); go('detail', { e: 'aset', id: el.dataset.ap }); }; });
   if (ada.length) map.fitBounds(grp.getBounds(), { padding: [16, 16], maxZoom: 18 }); else map.setView([Number(S.set.kantor_lat) || -8.2383, Number(S.set.kantor_lng) || 113.1937], 14);
   const sum = (k, h) => ada.filter(a => kibHuruf(a) === h).reduce((s, a) => s + (+a[k] || 0), 0);
-  $('#apStat').innerHTML = `<b>${ada.length}</b> dari ${rows.length} aset sudah punya peta${!f || f === 'A' ? ` · luas tanah di peta <b>${(sum('geom_luas', 'A') / 1e4).toLocaleString('id-ID', { maximumFractionDigits: 2 })} ha</b>` : ''}${!f || f === 'D' ? ` · panjang jalan/saluran di peta <b>${(sum('geom_panjang', 'D') / 1000).toLocaleString('id-ID', { maximumFractionDigits: 2 })} km</b>` : ''}`;
-  $('#apBelum').innerHTML = belum.length ? `<div class="sec-h"><h2>Belum punya peta (${belum.length})</h2></div><div class="list">${belum.map(a => `<button class="row" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'aset', id: a.id }]))}'><span class="av">${esc(kibHuruf(a))}</span><span class="main"><span class="t">${esc(a.nama || a.nama_rekening || '')}</span><span class="s">${esc([a.kode_barang, 'Reg ' + (a.no_urut || ''), a.letak].filter(Boolean).join(' · '))}</span></span></button>`).join('')}</div>` : '';
+  $('#apStat').innerHTML = `<b>${ada.length}</b> dari ${rows.length} aset sudah punya peta${!f || f === 'A' ? ` · luas tanah di peta <b>${(sum('geom_luas', 'A') / 1e4).toLocaleString('id-ID', { maximumFractionDigits: 2 })} ha</b>` : ''}${!f || f === 'D' ? ` · panjang jalan/saluran ±<b>${(sum('geom_panjang', 'D') / 1000).toLocaleString('id-ID', { maximumFractionDigits: 2 })} km</b>` : ''}`;
+  $('#apBelum').innerHTML = belum.length ? `<details class="card"><summary><b>Belum punya peta (${belum.length})</b></summary><div class="list" style="margin-top:8px">${belum.map(a => `<button class="row" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'aset', id: a.id }]))}'><span class="av">${esc(kibHuruf(a))}</span><span class="main"><span class="t">${esc(a.nama || a.nama_rekening || '')}</span><span class="s">${esc([a.kode_barang, a.no_urut ? 'Reg ' + a.no_urut : '', a.letak].filter(Boolean).join(' · '))}</span></span></button>`).join('')}</div></details>` : '';
 };
 
 /* ---------- susunan menu Aset yang diringkas: grup + tab di atas halaman ---------- */
@@ -14445,7 +14442,7 @@ async function extraAset(a, el) {
     ${cek.length ? `<div class="list">${cek.map(r => rowHtml('aset_cek', r)).join('')}</div>` : '<div class="card meta">Belum pernah diperiksa. SOP desa: cek fisik setiap tahun (Perbup 78/2021 Pasal 72: paling sedikit 1 kali dalam 3 tahun).</div>'}
     <div class="sec-h"><h2>Mutasi (${mut.length})</h2>${w ? `<button class="btn sm" data-act="addSub" data-e="aset_mutasi" data-p='${esc(JSON.stringify({ ref: a.id }))}'>${ic('plus')}Catat mutasi</button>` : ''}</div>
     ${mut.length ? `<div class="list">${mut.map(r => rowHtml('aset_mutasi', r)).join('')}</div>` : '<div class="card meta">Belum ada mutasi.</div>'}</div>`;
-  apKartuPasang(a, refresh);
+  apKartuPasang(a);
   S.vh.sipCopy = async t => { const v = String(SF[Number(t.dataset.i)][1] || '').replace(/ \| /g, '.'); try { await navigator.clipboard.writeText(v); toast('Disalin: ' + v); } catch (x) { toast('Gagal menyalin; salin manual.', 1); } };
   S.vh.sipTandai = async t => { try { await call('save', { entity: 'aset', record: { id: a.id, sipades: t.dataset.v, id_barang: asetIdBarang(a) } }); toast('Status SIPADES diperbarui.'); refresh(); } catch (x) { toast(x.message, 1); } };
 }
