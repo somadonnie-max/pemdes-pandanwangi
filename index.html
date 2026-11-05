@@ -9128,7 +9128,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '230', tgl: '2026-11-05', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '231', tgl: '2026-11-05', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -14219,7 +14219,7 @@ function apKartuHtml(a) {
   const h = kibHuruf(a); if (!AP_KIB[h]) return '';
   const g = apGeom(a);
   const ukur = g ? [apLuasTxt(a), a.geom_panjang ? 'panjang peta ' + (/Polygon/.test(g.type) ? '±' : '') + '<b>' + apAngka(a.geom_panjang) + ' m</b>' + (a.panjang ? ' (tercatat ' + apAngka(asetNum(a.panjang)) + ' m)' : '') : ''].filter(Boolean).join(' · ') : '';
-  return `<details class="card stack sipbox" id="apKartu" style="padding:10px 12px"${g ? ' open' : ''}><summary class="sec-h" style="margin:0"><h2 style="font-size:14px">${ic('next')} Peta lokasi</h2>${g ? '<span class="pill ok">Ada peta</span>' : '<span class="pill warn">Belum ada peta</span>'}</summary>
+  return `<details class="card stack sipbox" id="apKartu" style="padding:10px 12px"${g ? ' open' : ''}><summary class="sec-h" style="margin:0"><h2>${ic('next')} Peta lokasi</h2>${g ? '<span class="pill ok">Ada peta</span>' : '<span class="pill warn">Belum ada peta</span>'}</summary>
     ${g ? `<div id="apMap" class="ap-map"></div><div class="meta">${ukur}</div>` : `<div class="meta">Peta aset diisi sekaligus untuk semua aset KIB A & D lewat satu berkas GeoJSON: buka <b>Peta aset</b> → Ekspor, gambar di QGIS, lalu Impor.</div>`}
     <div class="btns">${a.peta_lat ? `<a class="btn sm pri" href="${esc(apBhumi(a.peta_lat, a.peta_lng))}" target="_blank" rel="noopener">${ic('map')}Buka titik di Bhumi</a>` : ''}<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['asetpeta', {}]))}'>${ic('map')}Peta aset desa</button></div></details>`;
 }
@@ -14431,7 +14431,7 @@ async function extraAset(a, el) {
   const lbA = a78LabelAset(a), sub78 = (e2, rows, judul, ikon, btn, pre, kosong) => `<div class="sec-h"><h2>${ic(ikon)} ${judul} (${rows.length})</h2>${canWrite(e2) ? `<button class="btn sm" data-act="addSub" data-e="${e2}" data-p='${esc(JSON.stringify(Object.assign({ ref: a.id, aset: lbA }, pre)))}'>${ic('plus')}${btn}</button>` : ''}</div>${rows.length ? `<div class="list">${rows.map(r => rowHtml(e2, r)).join('')}</div>` : `<div class="card meta">${kosong}</div>`}`;
   const due = asetJatuhTempo(a), SF = sipForm(a);
   el.innerHTML = `<div class="stack">
-    <details class="card stack sipbox" style="padding:10px 12px"${a.sipades === 'Sudah' ? '' : ' open'}><summary class="sec-h" style="margin:0"><h2 style="font-size:14px">${ic('next')} Salin ke SIPADES · ${esc(kibNama(kibHuruf(a)) || '')}</h2>${a.sipades === 'Sudah' ? '<span class="pill ok">Sudah di SIPADES</span>' : '<span class="pill warn">Belum di SIPADES</span>'}</summary>
+    <details class="card stack sipbox" style="padding:10px 12px"${a.sipades === 'Sudah' ? '' : ' open'}><summary class="sec-h" style="margin:0"><h2>${ic('next')} Salin ke SIPADES · ${esc(kibNama(kibHuruf(a)) || '')}</h2>${a.sipades === 'Sudah' ? '<span class="pill ok">Sudah di SIPADES</span>' : '<span class="pill warn">Belum di SIPADES</span>'}</summary>
       <div class="meta">Urutan isian sama dengan form SIPADES (Data Transaksi → Inventarisasi dan Penatausahaan → Golongan ${esc(kibNama(kibHuruf(a)))}). Tekan ${ic('file')} untuk menyalin, lalu tempel di SIPADES.</div>
       <div class="sipf">${SF.map(([l, v], i) => `<div class="sipr"><span class="l">${esc(l)}</span><span class="v mono">${esc(v == null ? '' : String(v)) || '<i class="meta">—</i>'}</span>${v ? `<button class="iconbtn" data-act="sipCopy" data-i="${i}" title="Salin">${ic('file')}</button>` : '<span></span>'}</div>`).join('')}</div>
       ${wa ? `<div class="btns">${a.sipades === 'Sudah' ? `<button class="btn sm" data-act="sipTandai" data-v="Belum">Tandai belum di SIPADES</button>` : `<button class="btn sm pri" data-act="sipTandai" data-v="Sudah">${ic('check')}Tandai sudah diinput di SIPADES</button>`}</div>` : ''}</details>
