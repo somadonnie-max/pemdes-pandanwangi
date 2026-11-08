@@ -107,9 +107,12 @@ button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid 
   <header class="blok kop"><img src="../icon-192.png" alt="Logo Pemerintah Desa Pandanwangi"><div><div class="t">Verifikasi Surat</div><div class="n">Pemerintah Desa Pandanwangi</div><div class="a">Kecamatan Tempeh · Kabupaten Lumajang</div></div></header>
   <div class="skel"></div>
 </main>
+<script src="../config.js"></script>
 <script>
 (() => {
-const API = 'https://niaqgsqfsztcsgdyzavt.supabase.co/functions/v1/berkas';
+const CFG = window.PEMDES_CFG || {}, PW = /(^|\.)pemdespandanwangi\.pages\.dev$|^somadonnie-max\.github\.io$|^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+const SBU = String(!/^ISI/i.test(CFG.supabaseUrl || '') && CFG.supabaseUrl || (PW ? 'https://niaqgsqfsztcsgdyzavt.supabase.co' : '')).replace(/\/+$/, '');
+const API = SBU + '/functions/v1/berkas';
 const IK = {
   ok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
   warn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',

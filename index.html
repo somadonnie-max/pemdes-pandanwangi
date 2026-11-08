@@ -1168,6 +1168,7 @@ section.docx,section.docx *{-webkit-hyphens:manual!important;hyphens:manual!impo
 window.addEventListener('error', function (e) { if (/ResizeObserver loop/i.test(e.message || '')) { e.stopImmediatePropagation && e.stopImmediatePropagation(); return; } var d = document.createElement('pre'); d.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#b3261e;color:#fff;padding:10px;border-radius:8px;white-space:pre-wrap;font:12px monospace'; d.textContent = 'Galat: ' + e.message + ' (baris ' + e.lineno + ':' + e.colno + ')'; document.body.appendChild(d); });
 window.addEventListener('unhandledrejection', function (e) { var d = document.createElement('pre'); d.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#b3261e;color:#fff;padding:10px;border-radius:8px;white-space:pre-wrap;font:12px monospace'; d.textContent = 'Galat: ' + (e.reason && e.reason.message || e.reason); document.body.appendChild(d); });
 </script>
+<script src="config.js"></script>
 <script>
 (function () {
 /* =====================================================================
@@ -1176,9 +1177,13 @@ window.addEventListener('unhandledrejection', function (e) { var d = document.cr
    Apps Script (FILE_URL). Tanpa alamat server -> mode contoh (demo).
    ===================================================================== */
 const CFG = window.PEMDES_CFG || {};
-const SB_URL = String(CFG.supabaseUrl || 'https://niaqgsqfsztcsgdyzavt.supabase.co').replace(/\/+$/, '');
-const SB_KEY = CFG.supabaseKey || 'sb_publishable_FrjuzHg6pJFQhJRIqBoXIw_5sL7E5sH';
-const FILE_URL = CFG.appsScriptUrl || 'https://script.google.com/macros/s/AKfycbxShhsuYUC5jwQv0WGfxUarlhAnKvldxT8fbFmCHsSjnPg-PBDopSpX6WA1uSHAELe_/exec';
+/* Alamat bawaan hanya berlaku di alamat aplikasi Pandanwangi. Desa lain WAJIB mengisi config.js,
+   supaya aplikasinya tidak pernah tersambung ke database Pandanwangi. */
+const PW_HOST = /(^|\.)pemdespandanwangi\.pages\.dev$|^somadonnie-max\.github\.io$|^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+const cfgIsi = v => /^ISI/i.test(String(v || '').trim()) ? '' : String(v || '').trim();
+const SB_URL = String(cfgIsi(CFG.supabaseUrl) || (PW_HOST ? 'https://niaqgsqfsztcsgdyzavt.supabase.co' : '')).replace(/\/+$/, '');
+const SB_KEY = cfgIsi(CFG.supabaseKey) || (PW_HOST ? 'sb_publishable_FrjuzHg6pJFQhJRIqBoXIw_5sL7E5sH' : '');
+const FILE_URL = cfgIsi(CFG.appsScriptUrl) || (PW_HOST ? 'https://script.google.com/macros/s/AKfycbxShhsuYUC5jwQv0WGfxUarlhAnKvldxT8fbFmCHsSjnPg-PBDopSpX6WA1uSHAELe_/exec' : '');
 const MODE = 'http';
 
 /* ---------------- utilitas ---------------- */
@@ -1299,7 +1304,7 @@ const GARUDA_EMAS = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASQAAAEkCAYAA
 const garudaBytes = u => Uint8Array.from(atob(u.split(',')[1]), c => c.charCodeAt(0));
 let LOGO = document.getElementById('favi').href;
 /* Identitas desa: dari Pengaturan (S.set), cadangan dari tembolok perangkat, lalu bawaan */
-const DESA0 = 'Pandanwangi', KEC0 = 'Tempeh', KAB0 = 'Lumajang';
+const DESA0 = PW_HOST ? 'Pandanwangi' : 'Desa', KEC0 = PW_HOST ? 'Tempeh' : '', KAB0 = PW_HOST ? 'Lumajang' : '';
 const brandCache = () => { try { return JSON.parse(localStorage.getItem('pd_brand') || '{}') || {}; } catch (e) { return {}; } };
 function brand() { const s = (typeof S !== 'undefined' && S.set) || {}, b = brandCache(); return { desa: s.nama_desa || b.desa || CFG.namaDesa || DESA0, kec: s.kecamatan || b.kec || CFG.kecamatan || KEC0, kab: s.kabupaten || b.kab || CFG.kabupaten || KAB0 }; }
 const ND = () => brand().desa;
@@ -2332,7 +2337,7 @@ async function bersihkanSekarang() {
 }
 function callBerkas(action, p) {
   return fetch(BERKAS_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ action, token: S.token }, p || {})) })
-    .then(r => r.json()).catch(() => { throw new Error('Tidak ada koneksi ke server berkas. Periksa internet Anda.'); })
+    .then(r => r.status === 404 ? { ok: false, error: 'Penyimpanan berkas (Edge Function "berkas") belum dipasang.' } : r.json()).catch(() => { throw new Error('Tidak ada koneksi ke server berkas. Periksa internet Anda.'); })
     .then(r => {
       if (r && r.ok) return r.data;
       const e = new Error((r && r.error) || 'Terjadi kesalahan.');
@@ -3148,6 +3153,7 @@ async function uploadFile(file, folder, maxAdm, maxAll) {
     try { return await uploadR2(file, folder); }
     catch (e) { if (!/belum dipasang/.test(e.message)) throw e; }   /* R2 belum dipasang: pakai Drive */
   }
+  if (!FILE_URL) throw new Error('Penyimpanan berkas belum diatur. Isi appsScriptUrl di config.js (Panduan Pemasangan langkah 6).');
   if (file.size > 25 * 1024 * 1024) throw new Error('Ukuran berkas maksimal 25 MB.');
   let data, mime = file.type || 'application/octet-stream', name = file.name;
   if (mime.indexOf('image') === 0 && !/gif|svg/.test(mime)) { data = await shrink(file, 2000); mime = 'image/jpeg'; name = name.replace(/\.\w+$/, '') + '.jpg'; }
@@ -9128,7 +9134,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '232', tgl: '2026-11-05', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '233', tgl: '2026-11-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -9281,6 +9287,7 @@ VIEWS.settings = async (p, main) => {
    PENYIMPANAN & CADANGAN (admin): kuota Supabase/R2, cadangan malam ke Google Drive,
    pindah KTP/KK Supabase -> R2
    ===================================================================== */
+const gasCadangan = () => GAS_CADANGAN.split('https://niaqgsqfsztcsgdyzavt.supabase.co').join(SB_URL).split('Pemdes Pandanwangi').join('Pemdes ' + ND());
 const GAS_CADANGAN = String.raw`/**
  * ============================================================
  *  CADANGAN MALAM — Pemdes Pandanwangi
@@ -9686,7 +9693,7 @@ VIEWS.penyimpanan = async (p, main, alive) => {
   </div>`;
 
   $('#kqHitung').onclick = async ev => { ev.target.disabled = true; ev.target.textContent = 'Menghitung…'; try { S.kuota = { k: await callBerkas('kuota', { hitung: 1 }), at: Date.now() }; refresh(); } catch (x) { toast(x.message, 1); ev.target.disabled = false; } };
-  $('#bkKode').onclick = async () => { try { await navigator.clipboard.writeText(GAS_CADANGAN); toast('Kode Apps Script disalin. Tempel di script.google.com.'); } catch (x) { const b = $('#bkKunciBox'); b.innerHTML = `<textarea readonly rows="8" style="width:100%;font:12px monospace">${esc(GAS_CADANGAN)}</textarea><div class="meta">Salin manual kode di atas.</div>`; } };
+  $('#bkKode').onclick = async () => { try { await navigator.clipboard.writeText(gasCadangan()); toast('Kode Apps Script disalin. Tempel di script.google.com.'); } catch (x) { const b = $('#bkKunciBox'); b.innerHTML = `<textarea readonly rows="8" style="width:100%;font:12px monospace">${esc(gasCadangan())}</textarea><div class="meta">Salin manual kode di atas.</div>`; } };
   $('#bkKunciBtn').onclick = () => tnKonfirm(k.bkKunci ? 'Buat kunci baru? Kunci lama tidak berlaku lagi, jadi BK_KUNCI di Apps Script juga harus diganti.' : 'Buat kunci cadangan untuk Apps Script di akun Google pribadi Anda?', async () => {
     const r = await callBerkas('bkKunci');
     $('#bkKunciBox').innerHTML = `<div class="stack" style="gap:6px"><div class="meta">Kunci ini hanya ditampilkan sekali. Tempel sebagai <code>BK_KUNCI</code> di Script properties, jangan dibagikan.</div><div style="display:flex;gap:6px"><input readonly id="bkKunciIn" value="${esc(r.kunci)}" style="flex:1;font-family:monospace"><button class="btn sm" id="bkSalin">${ic('check')}Salin</button></div></div>`;
@@ -16225,29 +16232,17 @@ function skMdeSusun(G, th, rekNama) {
    ===================================================================== */
 const PK_EXT_SCHEMA = { pgcrypto: 1, 'uuid-ossp': 1, pg_trgm: 1, pg_stat_statements: 1 };
 function pkSkema(sk) {
-  const A = sk.indexOf('\n-- ===== TABLES =====\n'), B = sk.indexOf('\n-- ===== FUNCTIONS =====\n');
-  let head = sk.slice(0, A), tab = sk.slice(A, B), rest = sk.slice(B);
-  head = head.split('\n').filter(l => !/sipades_stage/.test(l)).map(l => {
+  /* server (private.paket_skema) sudah mengurutkan: tabel -> fungsi -> nilai bawaan/indeks/constraint -> trigger,
+     dan semua bagian aman dijalankan ulang. Di sini hanya ekstensi yang disesuaikan untuk proyek Supabase baru. */
+  const A = sk.indexOf('\n-- ===== TABLES');
+  const head = (A < 0 ? sk : sk.slice(0, A)).split('\n').filter(l => !/sipades_stage/.test(l)).map(l => {
     const m = l.match(/^create extension if not exists ("?[\w-]+"?);$/);
     if (!m) return l;
     const nm = m[1].replace(/"/g, '');
-    if (nm === 'supabase_vault' || nm === 'pg_cron') return '-- (dilewati) ' + l;
+    if (nm === 'supabase_vault' || nm === 'pg_cron' || nm === 'pg_stat_statements') return '-- (dilewati) ' + l;
     return `do $x$ begin create extension if not exists ${m[1]}${PK_EXT_SCHEMA[nm] ? ' with schema extensions' : ''}; exception when others then raise notice 'ekstensi ${nm}: %', sqlerrm; end $x$;`;
   }).join('\n');
-  const fk = [], defs = [];
-  let t = '';
-  tab = tab.split('\n').map(l => {
-    let m = l.match(/^create table if not exists private\.("?\w+"?) \($/);
-    if (m) { t = m[1]; return l; }
-    if (/^alter table .* FOREIGN KEY /.test(l)) { fk.push(l); return null; }
-    if (/^CREATE (UNIQUE )?INDEX /.test(l) && /private\./.test(l.replace(/ ON private\.\w+/, ''))) { defs.push(l); return null; }
-    m = l.match(/^  ("?\w+"?) (.+?) default (.*private\..*?)( not null)?(,?)$/);
-    if (m && t) { defs.push(`alter table private.${t} alter column ${m[1]} set default ${m[3]};`); return `  ${m[1]} ${m[2]}${m[4] || ''}${m[5]}`; }
-    return l;
-  }).filter(l => l != null).join('\n');
-  const T = rest.indexOf('\n-- ===== TRIGGERS =====\n') + 1;
-  return [head, tab, '-- ===== RELASI ANTAR TABEL =====', fk.join('\n'), '', rest.slice(0, T),
-    '-- ===== NILAI BAWAAN KOLOM & INDEKS BERFUNGSI =====', defs.join('\n'), '', rest.slice(T)].join('\n');
+  return A < 0 ? head : head + sk.slice(A);
 }
 const pkJson = v => '$PDJ$' + JSON.stringify(v) + '$PDJ$';
 const pkStr = v => "'" + String(v == null ? '' : v).replace(/'/g, "''") + "'";
@@ -16264,7 +16259,7 @@ function pkSql(r, o) {
   L.push('', '-- ===== DAFTAR MODUL (entity) =====',
     `insert into private.entity select * from jsonb_populate_recordset(null::private.entity, ${pkJson(r.entity || [])}::jsonb) on conflict do nothing;`);
   L.push('', '-- ===== PENGATURAN AWAL =====',
-    `insert into private.setting (key, value) select key, value from jsonb_each_text(${pkJson(st)}::jsonb) on conflict (key) do update set value = excluded.value;`,
+    `insert into private.setting (key, value) select key, value from jsonb_each_text(${pkJson(st)}::jsonb) on conflict (key) do nothing;`,
     "insert into private.setting (key, value) values ('salt', encode(extensions.gen_random_bytes(16), 'hex')) on conflict (key) do nothing;",
     "insert into private.setting (key, value) values ('import_open', 'tidak') on conflict (key) do nothing;");
   for (let i = 0; i < rec.length; i += 1500) {
