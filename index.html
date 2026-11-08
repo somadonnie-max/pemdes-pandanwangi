@@ -4241,7 +4241,7 @@ async function renderDetail(e, x, el, full) {
   const files = u.fields.filter(f => f.t === 'file' && x[f.k] && !(e === 'aparat' && /^(dok_sk_id|dok_henti_id)$/.test(f.k)));
   const diKK = e === 'penduduk' && !!el.closest('.kkang'), KK_SEMBUNYI = ['kk', 'w_prov', 'w_kab', 'w_kec', 'w_desa', 'dusun', 'rw', 'rt', 'alamat', 'alamat_kk', 'lokasi'];
   const shown = u.fields.filter(f => !(diKK && KK_SEMBUNYI.includes(f.k)) && !(e === 'aparat' && f.k === 'jabatan_tambahan') && f.t !== 'file' && f.t !== 'geo' && f.t !== 'fotos' && f.t !== 'rows' && f.t !== 'hidden' && f.t !== 'head' && x[f.k] !== '' && x[f.k] != null);
-  const rws = u.fields.filter(f => f.t === 'rows' && x[f.k]).map(f => { let a = []; try { a = JSON.parse(x[f.k]); } catch (er) { } return a.length ? `<div class="lbl">${esc(f.l)}</div><div class="tbl-wrap ttw"><table class="tbl dtt ttema"><thead><tr>${f.cols.map(c => `<th>${esc(c[1])}</th>`).join('')}</tr></thead><tbody>${a.map(r => '<tr>' + f.cols.map(([k, , t]) => `<td${t === 'money' ? ' style="text-align:right"' : ''}>${esc(t === 'money' ? (f.dec2 ? (r[k] === '' || r[k] == null ? '' : 'Rp ' + akt(r[k])) : rp(r[k])) : r[k] || '')}</td>`).join('') + '</tr>').join('')}</tbody>${f.cols.some(c => c[0] === 'jumlah') ? `<tfoot><tr><td colspan="${f.cols.length - 1}"><b>Jumlah</b></td><td style="text-align:right"><b>${f.dec2 ? 'Rp ' + akt(a.reduce((t, r) => t + mNum(r.jumlah), 0)) : rp(a.reduce((t, r) => t + Number(r.jumlah || 0), 0))}</b></td></tr></tfoot>` : ''}</table></div>` : ''; }).join('');
+  const rws = u.fields.filter(f => f.t === 'rows' && x[f.k]).map(f => { let a = []; try { a = JSON.parse(x[f.k]); } catch (er) { } return a.length ? `<div class="lbl">${esc(f.l)}</div><div class="tbl-wrap ttw"><table class="tbl dtt ttema"><thead><tr>${f.cols.map(c => `<th${c[2] === 'money' || c[2] === 'num' ? ' style="text-align:right"' : ''}>${esc(c[1])}</th>`).join('')}</tr></thead><tbody>${a.map(r => '<tr>' + f.cols.map(([k, , t]) => `<td${t === 'money' || t === 'num' ? ' style="text-align:right"' : ''}>${esc(t === 'money' ? (f.dec2 ? (r[k] === '' || r[k] == null ? '' : 'Rp ' + akt(r[k])) : rp(r[k])) : r[k] || '')}</td>`).join('') + '</tr>').join('')}</tbody>${f.cols.some(c => c[0] === 'jumlah') ? `<tfoot><tr><td colspan="${f.cols.length - 1}"><b>Jumlah</b></td><td style="text-align:right"><b>${f.dec2 ? 'Rp ' + akt(a.reduce((t, r) => t + mNum(r.jumlah), 0)) : rp(a.reduce((t, r) => t + Number(r.jumlah || 0), 0))}</b></td></tr></tfoot>` : ''}</table></div>` : ''; }).join('');
   const galeri = u.fields.filter(f => f.t === 'fotos' && x[f.k]).map(f => { let a = []; try { a = JSON.parse(x[f.k]); } catch (er) { } return a.length ? `<div class="lbl">${esc(f.l)} (${a.length})</div><div class="pgrid">${a.map(fo => `<div class="pslot has"><button type="button" class="pimg" data-act="file" data-id="${esc(fo.id)}" data-name="${esc(fo.ket || f.l)}"><img src="${esc(thumb(fo.id, 240))}" alt="" loading="lazy"></button>${fo.ket ? `<span class="plbl">${esc(fo.ket)}</span>` : ''}</div>`).join('')}</div>` : ''; }).join('');
   const geoF = e === 'penduduk' ? null : u.fields.find(f => f.t === 'geo' && x[f.k]);
   const geo = geoF ? x[geoF.k] : u.geo ? u.geo(x) : '';
@@ -4912,7 +4912,7 @@ ACT.draftKK = async t => {
 /* ---------------- Formulir ---------------- */
 /* Isian baris berulang (mis. rincian SPP), disimpan sebagai JSON */
 function rowsTr(f, r) {
-  return '<tr>' + f.cols.map(([k, , t]) => `<td>${t === 'sumber' ? `<select data-c="${k}"><option value=""></option>${OPT.sumberDana.map(o => `<option ${r[k] === o ? 'selected' : ''}>${o}</option>`).join('')}</select>` : t === 'money' ? `<input data-c="${k}" data-money inputmode="numeric" value="${r[k] ? (f.dec2 ? mFmt2 : mFmt)(r[k]) : ''}" style="min-width:110px;text-align:right">` : `<input data-c="${k}" value="${esc(r[k] || '')}" ${t === 'kel' ? 'list="dl_kelsedia" style="min-width:190px"' : t === 'list' ? `list="dl_${f.k}" style="min-width:220px"` : 'style="min-width:160px"'}>`}</td>`).join('') + `<td><button type="button" class="btn sm danger rwdel">${ic('trash')}</button></td></tr>`;
+  return '<tr>' + f.cols.map(([k, , t]) => `<td>${t === 'sumber' ? `<select data-c="${k}"><option value=""></option>${OPT.sumberDana.map(o => `<option ${r[k] === o ? 'selected' : ''}>${o}</option>`).join('')}</select>` : t === 'money' ? `<input data-c="${k}" data-money inputmode="numeric" value="${r[k] ? (f.dec2 ? mFmt2 : mFmt)(r[k]) : ''}" style="min-width:110px;text-align:right">` : `<input data-c="${k}" value="${esc(r[k] || '')}" ${t === 'num' ? 'inputmode="decimal" style="min-width:80px;text-align:right"' : t === 'kel' ? 'list="dl_kelsedia" style="min-width:190px"' : t === 'list' ? `list="dl_${f.k}" style="min-width:220px"` : 'style="min-width:160px"'}>`}</td>`).join('') + `<td><button type="button" class="btn sm danger rwdel">${ic('trash')}</button></td></tr>`;
 }
 function rowsBox(box, f) {
   const sum = () => { if (!f.cols.some(c => c[2] === 'money')) return; const t = $$(f.sumCol ? 'input[data-money][data-c="' + f.sumCol + '"]' : 'input[data-money]', box).reduce((a, i) => a + Number(mIn(i) || 0), 0); $('.rwsum', box).textContent = 'Jumlah: ' + (f.dec2 ? 'Rp ' + akt(t) : rp(t)); };
@@ -5118,7 +5118,7 @@ function fieldHtml(f, v, rec) {
       let arr = []; try { arr = JSON.parse(v || '[]'); } catch (x) { }
       if (!arr.length) arr = [{}];
       const dl = (f._list ? `<datalist id="dl_${f.k}">${f._list.map(o => `<option value="${esc(o)}">`).join('')}</datalist>` : '') + (f.cols.some(c => c[2] === 'kel') ? `<datalist id="dl_kelsedia">${SEDIA_KEL.map(o => `<option value="${esc(o)}">`).join('')}</datalist>` : '');
-      inp = `<div class="rws" id="${id}">${dl}<div class="tbl-wrap"><table class="tbl rwt"><thead><tr>${f.cols.map(c => `<th>${esc(c[1])}</th>`).join('')}<th></th></tr></thead><tbody>${arr.map(r => rowsTr(f, r)).join('')}</tbody></table></div><div class="btns" style="margin-top:6px"><button type="button" class="btn sm rwadd">${ic('plus')}Tambah baris</button><span class="meta rwsum"></span></div></div>`;
+      inp = `<div class="rws" id="${id}">${dl}<div class="tbl-wrap"><table class="tbl rwt"><thead><tr>${f.cols.map(c => `<th${c[2] === 'money' || c[2] === 'num' ? ' style="text-align:right"' : ''}>${esc(c[1])}</th>`).join('')}<th></th></tr></thead><tbody>${arr.map(r => rowsTr(f, r)).join('')}</tbody></table></div><div class="btns" style="margin-top:6px"><button type="button" class="btn sm rwadd">${ic('plus')}Tambah baris</button><span class="meta rwsum"></span></div></div>`;
       break;
     }
     case 'fotos': {
@@ -9150,7 +9150,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '236', tgl: '2026-11-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '237', tgl: '2026-11-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -12057,7 +12057,7 @@ const H2D = (() => {
     return render(pages, async (box, papers) => {
       const ctx = { img: await siapGambar(box), media: [], rid: 0 }, K = Konv(ctx);
       const body = papers.map((pg, i) => {
-        const s = sect(pg, isLand(pg)), lb = (isLand(pg) ? 16838 : 11906) - Number(/w:right="(\d+)"/.exec(s)[1]) - Number(/w:left="(\d+)"/.exec(s)[1]);
+        const s = sect(pg, isLand(pg)), lb = (isLand(pg) ? (pg.classList.contains('f4') ? 18709 : 16838) : 11906) - Number(/w:right="(\d+)"/.exec(s)[1]) - Number(/w:left="(\d+)"/.exec(s)[1]);
         ctx.maxW = lb;
         const isi = K.blocks(pg).join('') || '<w:p/>';
         return i < papers.length - 1 ? isi + `<w:p><w:pPr>${s}</w:pPr></w:p>` : isi + s;
@@ -12423,7 +12423,7 @@ Object.assign(UI, {
     fields: [F('jenis', 'Jenis', 'select', { req: 1, opt: ['Saldo Awal Persediaan', 'Pembelian / Pengadaan / Penerimaan', 'Pemakaian / Pengeluaran'] }),
       F('nomor', 'Nomor', 'text'), F('tanggal', 'Tanggal', 'date', { req: 1, def: isoToday }), F('no_bukti', 'No Bukti / Nomor BAP', 'text'), F('rekanan', 'Rekanan', 'text', { when: { k: 'jenis', v: ['Pembelian / Pengadaan / Penerimaan'] } }), F('alamat', 'Alamat Rekanan', 'text', { when: { k: 'jenis', v: ['Pembelian / Pengadaan / Penerimaan'] } }),
       F('belanja_bidang', 'Belanja Bidang', 'select', { opt: BIDANG_ASET }), F('nama', 'Nama Penerima / Penanggung Jawab', 'person'), F('nip', 'NIP', 'text'), F('jabatan', 'Jabatan', 'text'), F('uraian', 'Uraian', 'textarea', { wide: 1 }),
-      F('rincian', 'Rincian Barang', 'rows', { listFrom: { e: 'ref_kode_barang', k: x => x.kode + ' ' + x.uraian, limit: 5000 }, cols: [['kode', 'Kode Aset Persediaan', 'list'], ['uraian', 'Nama Barang', 'text'], ['kelompok', 'Kelompok Barang', 'kel'], ['kode_brg', 'Kode Barang', 'text'], ['qty', 'Kuantitas', 'text'], ['satuan', 'Satuan', 'text'], ['harga', 'Harga Satuan (Rp)', 'money'], ['jumlah', 'Jumlah (Rp)', 'money']], sumCol: 'jumlah', dec2: 1 }),
+      F('rincian', 'Rincian Barang', 'rows', { listFrom: { e: 'ref_kode_barang', k: x => x.kode + ' ' + x.uraian, limit: 5000 }, cols: [['kode', 'Kode Aset Persediaan', 'list'], ['uraian', 'Nama Barang', 'text'], ['kelompok', 'Kelompok Barang', 'kel'], ['kode_brg', 'Kode Barang', 'text'], ['qty', 'Kuantitas', 'num'], ['satuan', 'Satuan', 'text'], ['harga', 'Harga Satuan (Rp)', 'money'], ['jumlah', 'Jumlah (Rp)', 'money']], sumCol: 'jumlah', dec2: 1 }),
       F('ket', 'Keterangan', 'textarea', { wide: 1 })],
     tools: () => `<button class="btn sm pri" data-act="go" data-go='${esc(JSON.stringify(['sedialap']))}'>${ic('print')}Daftar Persediaan (F4)</button>`,
     chips: { k: 'jenis', opt: ['Saldo Awal Persediaan', 'Pembelian / Pengadaan / Penerimaan', 'Pemakaian / Pengeluaran'], lbl: s => s.split(' /')[0] },
@@ -13363,7 +13363,7 @@ function sediaDoc(G, per, tgl, so) {
 }
 VIEWS.sedialap = async (p, main, alive) => {
   setTop('Daftar Persediaan');
-  if (!$('#sedlapcss')) document.head.insertAdjacentHTML('beforeend', '<style id="sedlapcss">.sdl{font:8pt/1.3 Arial,Helvetica,sans-serif;padding:10mm 12mm 14mm;box-sizing:border-box}.sdl h2,.sdl h3{text-align:center;margin:2px 0}.sdl h2{font-size:12pt}.sdl h3{font-size:10pt}.sdl table.pt{width:100%;border-collapse:collapse;margin-top:6px}.sdl .pt th,.sdl .pt td{border:1px solid #000;padding:2px 3px;vertical-align:top}.sdl .pt th{text-align:center;background:#eee}.sdl .c{text-align:center}.sdl .r{text-align:right;white-space:nowrap}.sdl tr.gh td{background:#f3f3f3}.sdl tr.sub td{font-weight:700}.sdl tr.tot td{font-weight:700;background:#e6e6e6}.sdl table.nb td{border:0}</style>');
+  if (!$('#sedlapcss')) document.head.insertAdjacentHTML('beforeend', '<style id="sedlapcss">.sdl{font:8pt/1.3 Arial,Helvetica,sans-serif;padding:10mm 12mm 14mm;box-sizing:border-box}.sdl h2,.sdl h3{text-align:center;margin:2px 0}.sdl h2{font-size:12pt}.sdl h3{font-size:10pt}.sdl table.pt{width:100%;border-collapse:collapse;margin-top:6px}.sdl .pt th,.sdl .pt td{border:1px solid #000;padding:2px 3px;vertical-align:top}.sdl .pt th{text-align:center;background:#eee}.paper.sdl .pt td.c{text-align:center}.paper.sdl .pt td.r{text-align:right;white-space:nowrap}.paper.sdl .pt th{text-align:center}.sdl tr.gh td{background:#f3f3f3}.sdl tr.sub td{font-weight:700}.sdl tr.tot td{font-weight:700;background:#e6e6e6}.sdl table.nb td{border:0}</style>');
   main.innerHTML = '<div class="skel" style="height:200px"></div>';
   const rows = ((await call('list', { entity: 'persediaan', limit: 5000 })).rows || []);
   let SO = []; try { SO = ((await call('list', { entity: 'aset_so', limit: 200 })).rows || []).filter(r => r.jenis === 'Stock Opname Persediaan'); } catch (x) { } if (alive && !alive()) return;
