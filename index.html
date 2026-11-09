@@ -185,6 +185,8 @@ button.stat:hover{border-color:var(--pri)}
 .athumbs{display:flex;gap:5px;margin:0 0 8px;overflow-x:auto}.athumbs button{flex:none;width:40px;height:40px;padding:0;border:2px solid transparent;border-radius:7px;overflow:hidden;background:none;cursor:pointer}.athumbs button.on{border-color:var(--pri)}.athumbs img{width:100%;height:100%;object-fit:cover;display:block}
 .akpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:6px 12px;margin:6px 0;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}.akpi .l{display:block;font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}.akpi b{display:block;font-size:12.5px}
 .atabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:4px 0 8px;overflow-x:auto}.atabs button{height:30px;padding:0 11px;border:0;background:none;font-weight:600;font-size:12px;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer}.atabs button.on{color:var(--pri);border-bottom-color:var(--pri)}
+.akp{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}.akc{text-align:left;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;display:flex;flex-direction:column;gap:1px;color:var(--ink);font:inherit}.akc:hover{border-color:var(--pri)}.akc.on{border-color:var(--pri);box-shadow:inset 0 0 0 1px var(--pri)}.akc .l{font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}.akc b{font-size:20px;line-height:1.2}.akc .s{font-size:10.5px;color:var(--muted)}
+.amini{margin-top:8px;padding:8px 10px;display:flex;flex-direction:column;gap:6px}.amini .map iframe{height:120px}
 .adt{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start}.adt.solo{grid-template-columns:1fr}.adr{min-width:0}.adl{min-width:0}
 .agr{grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0 22px}.ag{min-width:0}.ag .lbl{display:block;color:var(--pri);margin:6px 0 2px;font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}.ar{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);font-size:12px}.ar span{color:var(--muted);font-size:11px;flex:none}.ar b{font-weight:600;text-align:right;word-break:break-word}
 .aket{margin-top:10px;padding:7px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface);font-size:12px;white-space:pre-line}.aket .lbl{display:block;font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
@@ -4013,13 +4015,21 @@ VIEWS.list = async (p, main, alive) => {
       plus.forEach(([k, n]) => { chipN[k] = (chipN[k] || 0) + n; });
     } catch (x) { }
   }
+  let aHead = null;
+  if (e === 'aset') {
+    try {
+      const R = await asetSemua({}); aHead = asetKpiList(R);
+      const f0 = u.views ? u.views[st.view][1]() : {};
+      R.filter(r => r.status !== 'Dihapus' || f0.status === 'Dihapus' || !f0.status && !Object.keys(f0).length).filter(r => Object.keys(f0).every(k => String(r[k] == null ? '' : r[k]) === String(f0[k]))).forEach(r => { if (r.kib) chipN[r.kib] = (chipN[r.kib] || 0) + 1; });
+    } catch (x) { }
+  }
   const yearNow = new Date().getFullYear();
   if (st.per === '' && u.year && S.grpPer && GRUP_OF[e]) { st.per = S.grpPer; S.grpPer = null; }
   if (st.per === '' && u.year) st.per = String(yearNow);
   if (st.per === '' && u.month) st.per = isoToday().slice(0, 7);
   setTop(p.title || (GRUP_OF[e] ? GRUP[GRUP_OF[e]].t : u.t), u.rkp ? 'RKP Desa ' + rkpLbl(S.rkpYear) : u.rpjm && S.rpjmDokPer && S.rpjmDokPer.id === S.rpjmPid ? S.rpjmDokPer.nama : '');
   const pers = u.year ? [String(yearNow), String(yearNow - 1), String(yearNow - 2), 'Semua'] : null;
-  main.innerHTML = `<div class="stack">${asetTabs('list', { e })}${e === 'tanah_desa' ? tanahTabs('list') : e === 'tanah_sert' ? tanahTabs('sert') : ''}${SOS_TAB_E[e] ? rentanTabs(SOS_TAB_E[e]) : ''}
+  main.innerHTML = `<div class="stack">${asetTabs('list', { e })}${aHead ? asetHeadHtml(aHead, st.view) : ''}${e === 'tanah_desa' ? tanahTabs('list') : e === 'tanah_sert' ? tanahTabs('sert') : ''}${SOS_TAB_E[e] ? rentanTabs(SOS_TAB_E[e]) : ''}
     <div class="toolbar"><label class="search">${ic('search')}<input id="q" placeholder="Cari…" value="${esc(st.q)}" autocomplete="off"></label>${fltF.length ? `<button class="btn sm${fltN ? ' pri' : ''}" data-act="flt" title="Cari berdasarkan kriteria">${ic('filter')}Filter<span class="fcnt">${fltN || ''}</span></button>` : ''}
       ${u.month ? `<input type="month" class="inp" id="per" value="${esc(st.per)}" style="max-width:180px">` : ''}
       ${e === 'rkp_rutin' && canWrite(e) ? `<button class="btn sm" data-act="rkpRutinIsi">${ic('down')}Salin dari APBDes ${esc(keuTh())}</button>` : ''}${NASKAH[e] && canWrite(e) ? `<button class="btn sm pri" data-act="go" data-go='${esc(JSON.stringify(['form', { e, buat: 1 }]))}' title="${esc(NASKAH[e].buat)}">${ic('next')}Buat</button>` : ''}${u.tools ? u.tools() : ''}${u.print ? `<button class="btn sm" data-act="cetak" title="Cetak buku register">${ic('print')}Cetak</button>` : ''}${u.excel ? `<button class="btn sm" data-act="xlsOut">${ic('down')}Ekspor Excel</button>${canWrite(e) ? `<label class="btn sm">${ic('plus')}Impor Excel<input type="file" id="xlsIn" accept=".xlsx,.csv" hidden></label>` : ''}` : ''}${u.print2 ? `<button class="btn sm" data-act="cetak2">${ic('print')}${esc(u.print2.label)}</button>` : ''}</div>
@@ -4259,13 +4269,13 @@ async function renderDetail(e, x, el, full) {
   const geo = geoF ? x[geoF.k] : u.geo ? u.geo(x) : '';
   const w = canWrite(e) && !(e === 'kegiatan' && x.sumber_mus);
   el.innerHTML = `
-    ${e === 'aset' ? (h => '<div class="adt' + (h ? '' : ' solo') + '">' + (h ? '<div class="adl">' + h + '</div>' : '') + '<div class="adr"><div class="atb"></div>')(asetHeroHtml(x)) : ''}
+    ${e === 'aset' ? (h => '<div class="adt' + (h ? '' : ' solo') + '">' + (h ? '<div class="adl">' + h + '</div>' : '') + '<div class="adr"><div class="atb"></div>')(asetHeroHtml(x) + asetMiniPeta(x, geo)) : ''}
     ${e === 'kegiatan' && x.sumber_mus ? `<div class="card meta">${ic('lock')} Agenda ini terusan otomatis dari Musyawarah RKP/RPJM (tanggal, jam, tempat, dan foto mengikuti data musyawarah). Tidak bisa diubah atau dihapus di sini; ubah lewat Perencanaan → RKP/RPJM Desa → Musyawarah &amp; Tim.</div>` : ''}
     ${e === 'aset' ? asetGrupHtml(u, x, shown) : shown.length ? `<dl class="dl">${shown.map(f => `<div class="${f.t === 'textarea' || f.wide && String(x[f.k]).length > 40 ? 'w' : ''}"><dt>${esc(f.l)}</dt><dd>${pendLinkVal(e, f, x) || valHtml(f, x[f.k], x)}</dd></div>`).join('')}</dl>` : ''}
     ${files.length && e !== 'penduduk' ? `<div class="btns"${e === 'aset' ? ' data-tab="d"' : ''}>${files.map(f => `<button class="btn sm" data-act="file" data-id="${esc(x[f.k])}" data-priv="${f.priv ? 1 : 0}" data-name="${esc(f.lihat || f.l)}">${ic(x[f.k] === '•' ? 'lock' : f.img ? 'eye' : 'file')}${esc(f.lihat || f.l)}</button>`).join('')}</div>` : ''}
     ${e === 'aset' ? '' : galeri}${rws}
     <div class="xk"></div>
-    ${geo ? (e === 'aset' ? '<div data-tab="r">' + mapHtml(geo, 'Lokasi ' + (u.row(x).t || '')) + '</div>' : mapHtml(geo, 'Lokasi ' + (u.row(x).t || ''))) : ''}
+    ${geo && e !== 'aset' ? mapHtml(geo, 'Lokasi ' + (u.row(x).t || '')) : ''}
     <div class="xx"></div>
     <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button>${/^tanah_/.test(e) && !S.user.admin ? '' : `<button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>`}` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak (tanpa QR)</button>` : ''}${e === 'keu_spp' ? `<button class="btn sm" data-act="sppWord" data-id="${esc(x.id)}">${ic('file')}SPP + SPTJM (Word)</button><button class="btn sm" data-act="kuitansi" data-id="${esc(x.id)}">${ic('print')}Cetak kuitansi</button>` : ''}${e === 'keu_spp' && w && x.status !== 'Dicairkan' ? `<button class="btn sm pri" data-act="keuCair" data-id="${esc(x.id)}">${ic('check')}Cairkan</button>` : ''}${e === 'keu_spp' && w && x.status === 'Dicairkan' ? `<button class="btn sm danger" data-act="keuBatal" data-id="${esc(x.id)}">${ic('x')}Batalkan pencairan</button>` : ''}${e === 'keu_trans' && w && x.jenis === 'Pajak Dipungut' ? `<button class="btn sm" data-act="setorPajak" data-id="${esc(x.id)}">${ic('send')}Setor pajak</button>` : ''}${NASKAH[e] && (w || e === 'surat_keluar') && !(e === 'surat_keluar' && !skAdaDraf(x)) ? `<button class="btn sm" data-act="cetakNaskah" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic(e === 'surat_keluar' ? 'eye' : 'print')}${e === 'surat_keluar' ? 'Lihat Draf' : 'Buat dokumen (Word)'}</button>` : ''}${e === 'surat_keluar' && x.jenis === 'Surat Tugas' ? `<button class="btn sm" data-act="sppdBuat" data-id="${esc(x.id)}">${ic('send')}Buat SPPD</button>` : ''}${e === 'surat_keluar' && w && skDraf(x) ? `<button class="btn sm pri" data-act="skSetuju" data-id="${esc(x.id)}">${ic('check')}Disetujui</button>` : ''}${e === 'surat_keluar' && w && x.status === 'Disetujui' && !x.dok_id ? `<button class="btn sm" data-act="skSetuju" data-id="${esc(x.id)}" data-pdf="1">${ic('plus')}Unggah PDF bertanda tangan</button>` : ''}${e === 'surat_masuk' && x.jenis === 'Surat Undangan' && x.acara_tgl && !(/Agenda/.test(x.terusan || '') && !x.agenda_id) ? (x.agenda_id ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'kegiatan', id: x.agenda_id }]))}'>${ic('cal')}Lihat di Agenda</button>` : canWrite('kegiatan') && w ? `<button class="btn sm" data-act="smAgenda" data-id="${esc(x.id)}">${ic('cal')}Masukkan ke Agenda</button>` : '') : ''}${e === 'kegiatan' && w && kgBisaSelesai(x) ? `<button class="btn sm pri" data-act="kgSelesai" data-id="${esc(x.id)}">${ic('check')}Selesai</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>${e === 'aset' ? '</div></div>' : ''}`;
   const xk = $('.xk', el), xx = $('.xx', el);
@@ -9163,7 +9173,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '240', tgl: '2026-11-09', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '241', tgl: '2026-11-09', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -12329,6 +12339,23 @@ const asetFoto1 = v => { const a = asetFotos(v); return a.length ? a[0].id : '';
 function asetHeroHtml(x) {
   const a = asetFotos(x.foto); if (!a.length) return '';
   return `<div class="ahero"><button type="button" data-act="file" data-id="${esc(a[0].id)}" data-name="${esc(a[0].ket || 'Foto aset')}" aria-label="Perbesar foto"><img class="hi" src="${esc(thumb(a[0].id, 640))}" alt="Foto aset" loading="lazy"></button><span class="cnt">${a.length} foto</span></div>${a.length > 1 ? `<div class="athumbs">${a.map((f, i) => `<button type="button" data-act="ahero" data-id="${esc(f.id)}" class="${i ? '' : 'on'}" aria-label="Foto ${i + 1}"><img src="${esc(thumb(f.id, 120))}" alt="" loading="lazy"></button>`).join('')}</div>` : ''}`;
+}
+const asetRpR = n => { n = Number(n) || 0; return n >= 1e9 ? 'Rp ' + (n / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + ' M' : n >= 1e6 ? 'Rp ' + (n / 1e6).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' jt' : fMoney(n) || 'Rp 0'; };
+function asetKpiList(R) {
+  const L = R.filter(r => r.status !== 'Dihapus'), K = L.map(r => [r, klasCek(r)]);
+  const akt = L.filter(r => r.status === 'Aktif'), drf = L.filter(r => r.status === 'Draf'), eks = K.filter(x => x[1].eks), usul = K.filter(x => !x[1].eks && x[1].usul), bwh = K.filter(x => !x[1].eks && !x[1].usul && x[1].bawah);
+  const sum = A => A.reduce((t, r) => t + asetNum(r.nilai), 0);
+  return { akt: akt.length, aktNilai: sum(akt), aktSip: akt.filter(r => r.sipades === 'Sudah').length, drf: drf.length, drfBelum: drf.filter(r => r.sipades !== 'Sudah').length, eks: eks.length, eksNilai: sum(eks.map(x => x[0])), cek: usul.length + bwh.length, usul: usul.length, bwh: bwh.length };
+}
+function asetHeadHtml(h, view) {
+  const c = (act, v, jdl, n, sub, on) => `<button type="button" class="akc${on ? ' on' : ''}" data-act="${act}" ${act === 'go' ? `data-go='["asetklas"]'` : `data-v="${v}"`}><span class="l">${jdl}</span><b>${n.toLocaleString('id-ID')}</b><span class="s">${esc(sub)}</span></button>`;
+  return `<div class="akp">${c('view', 0, 'Aset aktif', h.akt, asetRpR(h.aktNilai) + ' · ' + h.aktSip + ' di SIPADES', view === 0)}${c('view', 1, 'Draf / data lama', h.drf, h.drfBelum + ' belum diinput ke SIPADES', view === 1)}${c('view', 3, 'Ekstrakomptabel', h.eks, asetRpR(h.eksNilai) + ' · di bawah batas', view === 3)}${c('go', 0, 'Perlu dicek', h.cek, h.usul + ' usulan · ' + h.bwh + ' di bawah batas', false)}</div>`;
+}
+function asetMiniPeta(x, geo) {
+  const g = apGeom(x); if (!geo && !g) return '';
+  const pill = g ? '<span class="pill ok">Ada peta</span>' : '<span class="pill ok">Koordinat terisi</span>';
+  const body = geo ? mapHtml(geo, 'Lokasi ' + (x.nama || '')) : `<div class="meta">Bentuk lahan/jalan sudah digambar.</div><div class="btns"><button type="button" class="btn sm" data-act="atab" data-t="r">${ic('map')}Lihat di Ringkasan</button><button type="button" class="btn sm" data-act="go" data-go='["asetpeta"]'>Peta aset</button></div>`;
+  return `<div class="amini card"><div class="sec-h" style="margin:0"><h2>${ic('map')} Peta lokasi</h2>${pill}</div>${body}</div>`;
 }
 function asetGrupHtml(u, x, shown) {
   const IDEN = ['kib', 'kode_barang', 'no_urut', 'id_barang', 'nama_rekening', 'nama', 'kode_pemilik', 'belanja_bidang'], PERO = ['tgl_perolehan', 'tgl_pembukuan', 'perolehan', 'asal', 'sumber_dana', 'nilai', 'apbdes_ref'], LEWAT = ['klasifikasi', 'klasifikasi_usulan', 'ket', 'status', 'sipades', 'kondisi', 'jumlah', 'satuan'];
