@@ -9150,7 +9150,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '237', tgl: '2026-11-08', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '238', tgl: '2026-11-09', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -12305,8 +12305,13 @@ const SUMBER_ASET = ['Kekayaan Asli Desa', 'Pendapatan Asli Desa', 'Dana Desa (D
 const STATUS_HAK = ['Sertifikat - Hak Milik', 'Sertifikat - Hak Pakai', 'Bukti Lainnya - Letter C', 'Bukti Lainnya - Girik', 'Bukti Lainnya - Surat Keterangan', 'Bukti Lainnya - Surat Penguasaan Fisik', 'Bukti Lainnya - Bukti Inventarisasi Aset'];
 const KONSTRUKSI_D = ['ASPAL', 'TANAH', 'COR BETON', 'KAYU', 'BESI', 'BAMBU', 'LAINNYA'];
 const kibHuruf = a => String((a && a.kib) || '').charAt(0);
+/* klasifikasi aset: batas kapitalisasi (Perbup Lumajang 83/2022, Lampiran Bab J angka 4) */
+var KLAS_EKS = 'Barang Inventaris Kecil (Ekstrakomptabel)';
+const KLAS_DEF = { B: 500000, C: 10000000 };
+const klasBatas = h => { if (h !== 'B' && h !== 'C') return 0; const v = ((window.__klasSet || (typeof S !== 'undefined' && S.set) || {})['batas_kap_' + h.toLowerCase()]); const n = Number(String(v == null ? '' : v).replace(/\D/g, '')); return n > 0 ? n : KLAS_DEF[h]; };
 const kibNama = h => (KIB_OPT.find(k => k.charAt(0) === h) || h).replace(/^.\. /, '');
 const kibOf = h => KIB_OPT.find(k => k.charAt(0) === h) || '';
+const klasCek = a => { const h = kibHuruf(a), batas = klasBatas(h), j = Math.max(1, asetNum(a.jumlah) || 1), n = asetNum(a.nilai), per = n / j; return { h, batas, j, n, per, bawah: batas > 0 && n > 0 && per < batas, eks: a.klasifikasi === KLAS_EKS, usul: String(a.klasifikasi_usulan || '').trim() }; };
 const asetNum = v => { const s = String(v == null ? '' : v).trim(); if (/^-?\d+(\.\d+)?$/.test(s)) return Number(s); return Number(s.replace(/\./g, '').replace(',', '.')) || 0; };
 const asetDig = v => String(v || '').replace(/\D/g, '');
 /* kode aset SIPADES "3.7.1.2.2" (golongan.bidang.kelompok.sub.subsub) */
@@ -12361,13 +12366,15 @@ Object.assign(UI, {
       F('status', 'Status Aset', 'select', { opt: ['Aktif', 'Draf', 'Dihapus'], def: 'Aktif', hint: 'Draf = data lama / dari BAST yang belum lengkap' }),
       F('sipades', 'Status di SIPADES', 'select', { opt: ['Belum', 'Sudah'], def: 'Belum' }),
       F('jumlah', 'Jumlah Barang', 'number', { def: 1, hint: 'Untuk data lama yang dicatat berkelompok; di SIPADES dicatat satu per satu' }), F('satuan', 'Satuan', 'text', { def: 'Unit' }),
+      F('klasifikasi', 'Klasifikasi', 'select', { opt: ['', KLAS_EKS], hint: 'Kosong = Aset Tetap. Ekstrakomptabel = di bawah batas kapitalisasi (Perbup 83/2022 Bab J), dicatat di buku inventaris saja' }),
+      F('klasifikasi_usulan', 'Usulan klasifikasi (perlu dicek)', 'text', { wide: 1, hint: 'Isian dari pemeriksaan data; kosongkan bila sudah dicek dan tetap Aset Tetap' }),
       F('dusun', 'Dusun', 'select', { opt: OPT.dusun }), F('koordinat', 'Koordinat', 'geo'), F('inv_terakhir', 'Inventarisasi Fisik Terakhir', 'date'), F('sumber_data', 'Sumber Data', 'text'),
       F('apbdes_ref', 'Rincian APBDes asal (belanja modal)', 'text', { wide: 1, listFrom: { e: 'keu_anggaran', k: x => /^5\.3/.test(String(x.rek || '')) ? apbLabel(x) : '' }, hint: 'Pilih rincian belanja modal APBDes (tahun | rekening | uraian) yang menghasilkan aset ini, agar terlihat mana belanja modal yang sudah/belum dicatat sebagai aset' }),
       F('foto', 'Foto Aset', 'fotos', { max: 5 }), F('dok_id', 'Dokumen Pendukung', 'file')],
     calc: v => (v.kib === KIB_OPT[3] && asetNum(v.panjang) && asetNum(v.lebar)) ? { luas: String(Math.round(asetNum(v.panjang) * asetNum(v.lebar) * 100) / 100) } : null,
     chips: { k: 'kib', opt: KIB_OPT, lbl: s => s.replace(/^(.)\. .*/, 'KIB $1') },
-    views: [['Aktif', () => ({ status: 'Aktif' })], ['Draf / data lama', () => ({ status: 'Draf' })], ['Belum di SIPADES', () => ({ sipades: 'Belum' })], ['Dihapus', () => ({ status: 'Dihapus' })], ['Semua', () => ({})]],
-    row: r => ({ t: r.nama || r.nama_rekening, s: [kodeAset(r.kode_barang) || 'kode belum diisi', r.no_urut ? 'Reg ' + String(r.no_urut).padStart(5, '0') : '', r.nama_rekening, tahunOf(r.tgl_perolehan) || r.tahun].filter(Boolean).join(' · '), r: fMoney(r.nilai), av: `<b>${esc(kibHuruf(r) || '?')}</b>`, raw2: 1, s2: (r.status === 'Draf' ? '<span class="pill warn">Draf</span> ' : r.status === 'Dihapus' ? '<span class="pill">Dihapus</span> ' : '') + (r.sipades === 'Sudah' ? '<span class="pill ok">SIPADES</span> ' : '<span class="pill">Belum SIPADES</span> ') + (r.kondisi && r.kondisi !== 'Baik' ? `<span class="pill ${r.kondisi === 'Rusak Berat' ? 'bad' : 'warn'}">${esc(r.kondisi)}</span>` : '') + (r.ruang ? ' <span class="meta">' + esc(r.ruang) + '</span>' : '') })
+    views: [['Aktif', () => ({ status: 'Aktif' })], ['Draf / data lama', () => ({ status: 'Draf' })], ['Belum di SIPADES', () => ({ sipades: 'Belum' })], ['Ekstrakomptabel', () => ({ klasifikasi: KLAS_EKS })], ['Dihapus', () => ({ status: 'Dihapus' })], ['Semua', () => ({})]],
+    row: r => ({ t: r.nama || r.nama_rekening, s: [kodeAset(r.kode_barang) || 'kode belum diisi', r.no_urut ? 'Reg ' + String(r.no_urut).padStart(5, '0') : '', r.nama_rekening, tahunOf(r.tgl_perolehan) || r.tahun].filter(Boolean).join(' · '), r: fMoney(r.nilai), av: `<b>${esc(kibHuruf(r) || '?')}</b>`, raw2: 1, s2: (r.status === 'Draf' ? '<span class="pill warn">Draf</span> ' : r.status === 'Dihapus' ? '<span class="pill">Dihapus</span> ' : '') + (r.sipades === 'Sudah' ? '<span class="pill ok">SIPADES</span> ' : '<span class="pill">Belum SIPADES</span> ') + (r.kondisi && r.kondisi !== 'Baik' ? `<span class="pill ${r.kondisi === 'Rusak Berat' ? 'bad' : 'warn'}">${esc(r.kondisi)}</span>` : '') + (r.klasifikasi === KLAS_EKS ? '<span class="pill warn" title="' + esc(KLAS_EKS) + '">Ekstrakomptabel</span> ' : '') + (r.klasifikasi !== KLAS_EKS && String(r.klasifikasi_usulan || '').trim() ? '<span class="pill bad" title="' + esc(r.klasifikasi_usulan) + '">Usulan: cek harga</span> ' : '') + (r.ruang ? ' <span class="meta">' + esc(r.ruang) + '</span>' : '') })
   },
   aset_mutasi: {
     t: 'Mutasi Aset', ic: 'list', perm: 'aset', m: 'aset', sub: 1, sort: 'tanggal',
@@ -14415,7 +14422,7 @@ const ASET_GRP = {
   data: { t: 'Data Aset & Transaksi', ic: 'box', it: [['Inventaris (KIB)', ['list', { e: 'aset' }], 'aset'], ['Transaksi SIPADES', ['list', { e: 'aset_trx' }], 'aset_trx'], ['Peta aset (KIB A & D)', ['asetpeta'], null, 'r:aset']] },
   manfaat: { t: 'Pemanfaatan Aset', ic: 'coin', it: [['Register pemanfaatan', ['list', { e: 'aset_manfaat' }], 'aset_manfaat'], ['Kalkulator sewa', ['aset78dok', { d: 'kalk' }]], ['Draf Perdes', ['aset78dok', { d: 'perdes' }]]] },
   aman: { t: 'Pengamanan & Pemeliharaan', ic: 'lock', it: [['Dokumen kepemilikan', ['list', { e: 'aset_dok' }], 'aset_dok'], ['Kartu pemeliharaan', ['list', { e: 'aset_pelihara' }], 'aset_pelihara'], ['Label kode barang', ['asetlabel']]] },
-  cek: { t: 'Cek Fisik & Persediaan', ic: 'check', it: [['Cek fisik & stock opname', ['asetso']], ['Persediaan', ['list', { e: 'persediaan' }], 'persediaan'], ['Daftar Persediaan (cetak F4)', ['sedialap'], 'persediaan'], ['Pemeriksaan per aset', ['list', { e: 'aset_cek' }], 'aset_cek']] },
+  cek: { t: 'Cek Fisik & Persediaan', ic: 'check', it: [['Cek fisik & stock opname', ['asetso']], ['Persediaan', ['list', { e: 'persediaan' }], 'persediaan'], ['Daftar Persediaan (cetak F4)', ['sedialap'], 'persediaan'], ['Pemeriksaan per aset', ['list', { e: 'aset_cek' }], 'aset_cek'], ['Klasifikasi & batas kapitalisasi', ['asetklas'], 'aset']] },
   dok: { t: 'SOP & Dokumen Aset', ic: 'book', it: [['SOP Perbup 78', ['asetsop78']], ['SK, BA & Buku Inventaris', ['aset78dok']], ['Template SIPADES', ['asetsop']]] },
   lap: { t: 'Laporan Aset', ic: 'print', it: [['Format SIPADES', ['sipadeslap']], ['KIB, kondisi & semester', ['asetcetak']]] },
   atur: { t: 'Pengaturan Aset', ic: 'cog', it: [['Ruangan', ['list', { e: 'aset_ruang' }], 'aset_ruang'], ['Perangkat & tim', ['list', { e: 'aset_tim' }], 'aset_tim'], ['Kode rekening', ['list', { e: 'ref_kode_barang' }], 'ref_kode_barang'], ['Kop & penandatangan', ['asettpl'], null, 'admin']] }
@@ -14547,12 +14554,53 @@ function sipForm(a) {
   };
   return M[h] || umum1.concat(umum2);
 }
+function klasDasarHtml(open) {
+  const B = klasBatas('B'), C = klasBatas('C'), R = n => esc(fMoney(n));
+  return `<details class="card stack" style="padding:10px 12px"${open ? ' open' : ''}><summary class="sec-h" style="margin:0"><h2>${ic('book')} Dasar hukum batas kapitalisasi</h2></summary>
+    <div class="meta"><b>Perbup Lumajang No. 83 Tahun 2022</b> (perubahan Perbup 72/2014 tentang Kebijakan Akuntansi), Lampiran Bab J <i>Kebijakan Batasan Minimal Kapitalisasi Aset Tetap</i>, angka 4:</div>
+    <ul class="meta" style="margin:4px 0 4px 18px"><li>Tanah, Jalan/Irigasi/Jaringan, Aset Tetap Lainnya: tanpa batas minimal.</li><li>Peralatan &amp; Mesin: minimal <b>${R(B)}</b> per satuan.</li><li>Gedung &amp; Bangunan: minimal <b>${R(C)}</b> per unit.</li></ul>
+    <div class="meta">Angka 6: nilai di bawah batas tidak dikapitalisasi, diperlakukan sebagai beban (belanja barang dan jasa) dan cukup dicatat sebagai barang inventaris kecil (ekstrakomptabel). Bab J angka 1 huruf e: aset tetap berwujud, masa manfaat lebih dari 12 bulan, biaya terukur andal, untuk digunakan, dan objek pemeliharaan.</div>
+    <div class="meta"><i>Catatan:</i> Perbup ini mengatur pemerintah kabupaten; belum ada aturan khusus desa yang ditemukan. Barang perolehan sebelum 2022 menyesuaikan kebijakan saat pencatatan. Batas dapat diubah di halaman Klasifikasi &amp; batas kapitalisasi.</div></details>`;
+}
+function klasKartu(a, wa) {
+  const k = klasCek(a), R = n => esc(fMoney(n)), btn = (act, cls, t) => wa ? `<button class="btn sm ${cls}" data-act="${act}">${t}</button>` : '';
+  const perTxt = k.batas ? `Nilai per satuan <b>${R(k.per)}</b> (${R(k.n)} ÷ ${k.j}) · batas KIB ${k.h}: <b>${R(k.batas)}</b>` : 'Golongan ini tidak punya batas minimal kapitalisasi.';
+  let pill, isi = '', tombol = '', buka = false;
+  if (k.eks) { pill = '<span class="pill warn">Ekstrakomptabel</span>'; isi = 'Dicatat di buku inventaris saja, tidak dikapitalisasi sebagai aset tetap. ' + perTxt; tombol = btn('klasTetapAset', '', 'Kembalikan ke Aset Tetap'); buka = true; }
+  else if (k.usul) { pill = '<span class="pill bad">Usulan perlu dicek</span>'; isi = `<b>Usulan:</b> ${esc(k.usul)}<br>${perTxt}<br>Cek harga sebenarnya pada nota/BAST. Bila harga ≥ batas, tetap Aset Tetap.`; tombol = btn('klasTetapEks', 'pri', ic('check') + 'Tetapkan ekstrakomptabel') + btn('klasTetapAset', '', 'Tetap Aset Tetap'); buka = true; }
+  else if (k.bawah) { pill = '<span class="pill warn">Di bawah batas</span>'; isi = perTxt + '<br>Nilai per satuan di bawah batas kapitalisasi; patut dicek.'; tombol = btn('klasTetapEks', 'pri', ic('check') + 'Tetapkan ekstrakomptabel'); buka = true; }
+  else { pill = '<span class="pill ok">Aset Tetap</span>'; isi = perTxt; }
+  return `<details class="card stack sipbox" style="padding:10px 12px"${buka ? ' open' : ''}><summary class="sec-h" style="margin:0"><h2>${ic('scale')} Klasifikasi aset</h2>${pill}</summary><div class="meta">${isi}</div>${tombol ? `<div class="btns">${tombol}</div>` : ''}${klasDasarHtml(false)}</details>`;
+}
+VIEWS.asetklas = async (p, main, alive) => {
+  setTop('Klasifikasi & Batas Kapitalisasi Aset');
+  main.innerHTML = '<div class="meta">Memuat…</div>';
+  let rows; try { rows = await asetSemua({}); } catch (x) { main.innerHTML = '<div class="err">' + esc(x.message) + '</div>'; return; }
+  if (alive && !alive()) return;
+  rows = rows.filter(r => r.status !== 'Dihapus');
+  const L = rows.map(r => [r, klasCek(r)]), usul = L.filter(x => !x[1].eks && x[1].usul), eks = L.filter(x => x[1].eks), bawah = L.filter(x => !x[1].eks && !x[1].usul && x[1].bawah);
+  const sum = A => A.reduce((t, x) => t + x[1].n, 0), N = n => Number(n || 0).toLocaleString('id-ID');
+  const blok = (jdl, A, kosong) => `<div class="sec-h"><h2>${jdl} (${A.length})</h2></div>${A.length ? `<div class="list">${A.map(x => rowHtml('aset', x[0])).join('')}</div>` : `<div class="card meta">${kosong}</div>`}`;
+  const adm = S.user && S.user.admin;
+  main.innerHTML = `<div class="stack">
+    <div class="card stack"><div class="kpi3"><div><b>${N(usul.length)}</b><span class="meta">Usulan perlu dicek</span></div><div><b>${N(eks.length)}</b><span class="meta">Ekstrakomptabel · ${esc(fMoney(sum(eks)))}</span></div><div><b>${N(bawah.length)}</b><span class="meta">Di bawah batas, belum diklasifikasi</span></div></div></div>
+    ${klasDasarHtml(true)}
+    <div class="card stack"><div class="sec-h" style="margin:0"><h2>${ic('cog')} Batas kapitalisasi desa</h2></div>
+      <div class="form"><div class="f"><label for="kb_b">Peralatan &amp; Mesin (KIB B) per satuan, Rp</label><input id="kb_b" inputmode="numeric" value="${esc(String(klasBatas('B')))}" ${adm ? '' : 'disabled'}></div><div class="f"><label for="kb_c">Gedung &amp; Bangunan (KIB C) per unit, Rp</label><input id="kb_c" inputmode="numeric" value="${esc(String(klasBatas('C')))}" ${adm ? '' : 'disabled'}></div></div>
+      <div class="meta">Bawaan mengikuti Perbup 83/2022 (Rp500.000 dan Rp10.000.000). Hanya admin yang dapat mengubah; perubahan berlaku untuk pemeriksa di halaman ini dan kartu klasifikasi tiap aset.</div>
+      ${adm ? `<div class="btns"><button class="btn pri" data-act="klasSimpanBatas">${ic('check')}Simpan batas</button></div>` : ''}</div>
+    ${blok('Usulan klasifikasi perlu dicek harga', usul, 'Tidak ada usulan.')}
+    ${blok('Di bawah batas, belum diklasifikasi', bawah, 'Tidak ada aset lain di bawah batas.')}
+    ${blok('Ekstrakomptabel', eks, 'Belum ada aset ekstrakomptabel.')}</div>`;
+  S.vh.klasSimpanBatas = async () => { const v = { batas_kap_b: $('#kb_b').value.replace(/\D/g, ''), batas_kap_c: $('#kb_c').value.replace(/\D/g, '') }; try { S.set = Object.assign({}, S.set, await call('settingsSave', { values: v })); toast('Batas kapitalisasi disimpan.'); refresh(); } catch (x) { toast(x.message, 1); } };
+};
 async function extraAset(a, el) {
   const w = canWrite('aset_mutasi'), wa = canWrite('aset');
   const [mut, cek, dk, mf, pl] = await Promise.all([call('list', { entity: 'aset_mutasi', filters: { ref: a.id }, limit: 200 }).then(r => r.rows || []), call('list', { entity: 'aset_cek', filters: { ref: a.id }, limit: 200 }).then(r => r.rows || []), call('list', { entity: 'aset_dok', filters: { ref: a.id }, limit: 100 }).then(r => r.rows || []).catch(() => []), call('list', { entity: 'aset_manfaat', filters: { ref: a.id }, limit: 100 }).then(r => r.rows || []).catch(() => []), call('list', { entity: 'aset_pelihara', filters: { ref: a.id }, limit: 200 }).then(r => r.rows || []).catch(() => [])]);
   const lbA = a78LabelAset(a), sub78 = (e2, rows, judul, ikon, btn, pre, kosong) => `<div class="sec-h"><h2>${ic(ikon)} ${judul} (${rows.length})</h2>${canWrite(e2) ? `<button class="btn sm" data-act="addSub" data-e="${e2}" data-p='${esc(JSON.stringify(Object.assign({ ref: a.id, aset: lbA }, pre)))}'>${ic('plus')}${btn}</button>` : ''}</div>${rows.length ? `<div class="list">${rows.map(r => rowHtml(e2, r)).join('')}</div>` : `<div class="card meta">${kosong}</div>`}`;
   const due = asetJatuhTempo(a), SF = sipForm(a);
   el.innerHTML = `<div class="stack">
+    ${klasKartu(a, wa)}
     <details class="card stack sipbox" style="padding:10px 12px"${a.sipades === 'Sudah' ? '' : ' open'}><summary class="sec-h" style="margin:0"><h2>${ic('next')} Salin ke SIPADES · ${esc(kibNama(kibHuruf(a)) || '')}</h2>${a.sipades === 'Sudah' ? '<span class="pill ok">Sudah di SIPADES</span>' : '<span class="pill warn">Belum di SIPADES</span>'}</summary>
       <div class="meta">Urutan isian sama dengan form SIPADES (Data Transaksi → Inventarisasi dan Penatausahaan → Golongan ${esc(kibNama(kibHuruf(a)))}). Tekan ${ic('file')} untuk menyalin, lalu tempel di SIPADES.</div>
       <div class="sipf">${SF.map(([l, v], i) => `<div class="sipr"><span class="l">${esc(l)}</span><span class="v mono">${esc(v == null ? '' : String(v)) || '<i class="meta">—</i>'}</span>${v ? `<button class="iconbtn" data-act="sipCopy" data-i="${i}" title="Salin">${ic('file')}</button>` : '<span></span>'}</div>`).join('')}</div>
@@ -14569,6 +14617,9 @@ async function extraAset(a, el) {
     ${mut.length ? `<div class="list">${mut.map(r => rowHtml('aset_mutasi', r)).join('')}</div>` : '<div class="card meta">Belum ada mutasi.</div>'}</div>`;
   apKartuPasang(a);
   S.vh.sipCopy = async t => { const v = String(SF[Number(t.dataset.i)][1] || '').replace(/ \| /g, '.'); try { await navigator.clipboard.writeText(v); toast('Disalin: ' + v); } catch (x) { toast('Gagal menyalin; salin manual.', 1); } };
+  const klasSimpan = async (rec, msg) => { try { await call('save', { entity: 'aset', record: Object.assign({ id: a.id }, rec) }); toast(msg); refresh(); } catch (x) { toast(x.message, 1); } };
+  S.vh.klasTetapEks = () => klasSimpan({ klasifikasi: KLAS_EKS, klasifikasi_usulan: '' }, 'Ditetapkan sebagai ekstrakomptabel.');
+  S.vh.klasTetapAset = () => klasSimpan({ klasifikasi: '', klasifikasi_usulan: '' }, 'Tetap sebagai Aset Tetap.');
   S.vh.sipTandai = async t => { try { await call('save', { entity: 'aset', record: { id: a.id, sipades: t.dataset.v, id_barang: asetIdBarang(a) } }); toast('Status SIPADES diperbarui.'); refresh(); } catch (x) { toast(x.message, 1); } };
 }
 function asetJatuhTempo(a) {
