@@ -190,7 +190,7 @@ button.stat:hover{border-color:var(--pri)}
 .adt{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start}.adt.solo{grid-template-columns:1fr}.adr{min-width:0}.adl{min-width:0}
 .agr{grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0 22px}.ag{min-width:0}.ag .lbl{display:block;color:var(--pri);margin:6px 0 2px;font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}.ar{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);font-size:12px}.ar span{color:var(--muted);font-size:11px;flex:none}.ar b{font-weight:600;text-align:right;word-break:break-word}
 .aket{margin-top:10px;padding:7px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface);font-size:12px;white-space:pre-line}.aket .lbl{display:block;font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
-.dview[data-at] .xacts .danger{margin-left:auto}
+.dview[data-at] .xacts .danger{margin-left:auto}.krow .kbt{margin:2px 0 8px;padding-left:4px}@media(max-width:760px){.dview[data-at] .xacts{position:sticky;bottom:calc(50px + env(safe-area-inset-bottom,0px));z-index:6;margin:10px -4px 0;padding:7px 8px;gap:5px;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -5px 12px rgba(0,0,0,.07);border-radius:10px 10px 0 0}.dview[data-at] .xacts .btn.sm{padding:0 9px;font-size:11.5px}}
 @media(max-width:760px){.adt{grid-template-columns:1fr;gap:6px}.ahero img.hi{height:170px}.agr{grid-template-columns:1fr}.ag.wd{grid-column:auto}.ap-map{height:260px}.adt:not(.solo){grid-template-columns:132px 1fr;column-gap:10px;row-gap:4px}.adt:not(.solo)>.adr,.adt:not(.solo)>.adr>.atb{display:contents}.adt:not(.solo)>.adr>*:not(.atb),.adt:not(.solo)>.adr>.atb>*:not(.akpi){grid-column:1/-1}.adt:not(.solo)>.adl{grid-column:1;grid-row:1;margin:0}.adt:not(.solo) .akpi{grid-column:2;grid-row:1;grid-template-columns:1fr 1fr;gap:6px 8px;align-content:start;margin:0;padding:0;border:0;background:none}.adt:not(.solo) .akpi>div:first-child{grid-column:1/-1}.adt:not(.solo) .ahero{margin-bottom:5px}.adt:not(.solo) .ahero img.hi{height:96px}.adt:not(.solo) .athumbs{margin:0}.adt:not(.solo) .athumbs button{width:28px;height:28px}.adt:not(.solo) .ahero .cnt{font-size:9px;padding:0 6px;right:5px;top:5px}}
 .dview[data-at] [data-tab]{display:none}.dview[data-at="r"] .agr[data-tab="r"]{display:grid}.dview[data-at="r"] [data-tab="r"],.dview[data-at="p"] [data-tab="p"],.dview[data-at="s"] [data-tab="s"],.dview[data-at="d"] [data-tab="d"],.dview[data-at="h"] [data-tab="h"]{display:block}.dview[data-at] dl[data-tab]{display:none}.dview[data-at="r"] dl[data-tab="r"]{display:grid}.dview[data-at] details[data-tab]{display:none}.dview[data-at="r"] details[data-tab="r"],.dview[data-at="s"] details[data-tab="s"]{display:block}
 .pslot{display:flex;flex-direction:column;gap:3px;align-items:stretch;text-align:center}
@@ -9173,7 +9173,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '242', tgl: '2026-11-10', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '243', tgl: '2026-11-10', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -12345,7 +12345,7 @@ function asetKpiList(R) {
   const L = R.filter(r => r.status !== 'Dihapus'), K = L.map(r => [r, klasCek(r)]);
   const akt = L.filter(r => r.status === 'Aktif'), drf = L.filter(r => r.status === 'Draf'), eks = K.filter(x => x[1].eks), usul = K.filter(x => !x[1].eks && x[1].usul), bwh = K.filter(x => !x[1].eks && !x[1].usul && x[1].bawah);
   const sum = A => A.reduce((t, r) => t + asetNum(r.nilai), 0);
-  return { akt: akt.length, aktNilai: sum(akt), aktSip: akt.filter(r => r.sipades === 'Sudah').length, drf: drf.length, drfBelum: drf.filter(r => r.sipades !== 'Sudah').length, eks: eks.length, eksNilai: sum(eks.map(x => x[0])), cek: usul.length + bwh.length, usul: usul.length, bwh: bwh.length };
+  return { akt: akt.length, aktNilai: sum(akt.filter(bukanEks)), aktSip: akt.filter(r => r.sipades === 'Sudah').length, drf: drf.length, drfBelum: drf.filter(r => r.sipades !== 'Sudah').length, eks: eks.length, eksNilai: sum(eks.map(x => x[0])), cek: usul.length + bwh.length, usul: usul.length, bwh: bwh.length };
 }
 function asetHeadHtml(h, view) {
   const c = (act, v, jdl, n, sub, on) => `<button type="button" class="akc${on ? ' on' : ''}" data-act="${act}" ${act === 'go' ? `data-go='["asetklas"]'` : `data-v="${v}"`}><span class="l">${jdl}</span><b>${n.toLocaleString('id-ID')}</b><span class="s">${esc(sub)}</span></button>`;
@@ -12361,8 +12361,8 @@ function asetGrupHtml(u, x, shown) {
   const wa = canWrite('aset'), k = klasCek(x), R = n => esc(fMoney(n)), btn = (act, cls, t) => wa ? `<button type="button" class="btn sm ${cls}" data-act="${act}">${t}</button>` : '';
   let st, tbl = '', info = '';
   if (k.eks) { st = '<span class="pill warn">Ekstrakomptabel</span>'; info = 'Dicatat di buku inventaris saja, tidak dikapitalisasi sebagai aset tetap.'; tbl = btn('klasTetapAset', '', 'Kembalikan ke Aset Tetap'); }
-  else if (k.usul) { st = '<span class="pill bad">Usulan perlu dicek</span>'; info = `<b>Usulan:</b> ${esc(k.usul)}. Cek harga sebenarnya pada nota/BAST; bila harga ≥ batas, tetap Aset Tetap.`; tbl = btn('klasTetapEks', 'pri', ic('check') + 'Tetapkan ekstrakomptabel') + btn('klasTetapAset', '', 'Tetap Aset Tetap'); }
-  else if (k.bawah) { st = '<span class="pill warn">Di bawah batas</span>'; info = 'Nilai per satuan di bawah batas kapitalisasi; patut dicek.'; tbl = btn('klasTetapEks', 'pri', ic('check') + 'Tetapkan ekstrakomptabel'); }
+  else if (k.usul) { st = '<span class="pill bad">Usulan perlu dicek</span>'; info = `<b>Usulan:</b> ${esc(k.usul)}. Cek harga sebenarnya pada nota/BAST; bila harga ≥ batas, tetap Aset Tetap.`; tbl = btn('klasTetapEks', 'pri', ic('check') + 'Keluarkan dari aset tetap') + btn('klasTetapAset', '', 'Tetap aset tetap'); }
+  else if (k.bawah) { st = '<span class="pill warn">Di bawah batas</span>'; info = 'Nilai per satuan di bawah batas kapitalisasi; patut dicek.'; tbl = btn('klasTetapEks', 'pri', ic('check') + 'Keluarkan dari aset tetap'); }
   else st = '<span class="pill ok">Aset Tetap</span>';
   const klas = baris('Status', st) + (k.batas ? baris('Nilai per satuan', R(k.per)) + baris('Batas golongan ' + k.h, R(k.batas)) : baris('Batas kapitalisasi', 'Tanpa batas minimal')) + `<details class="akd"><summary>${wa ? 'Ubah klasifikasi &amp; dasar hukum' : 'Dasar hukum'}</summary>${info ? `<div class="meta">${info}</div>` : ''}${tbl ? `<div class="btns">${tbl}</div>` : ''}${klasDasarHtml(false)}</details>`;
   const ket = x.ket ? `<div class="ar ak"><b>${esc(x.ket)}</b></div>` : '';
@@ -12374,6 +12374,7 @@ function asetKpiTabs(a, n) {
   const stp = (k.eks ? '<span class="pill warn">Ekstrakomptabel</span> ' : '') + (a.status === 'Draf' ? '<span class="pill">Draf</span> ' : a.status === 'Dihapus' ? '<span class="pill">Dihapus</span> ' : '') + (a.sipades === 'Sudah' ? '<span class="pill ok">SIPADES</span>' : '<span class="pill">Belum SIPADES</span>');
   return `<div class="akpi">${it.map(x => `<div><span class="l">${esc(x[0])}</span><b>${esc(String(x[1]))}</b></div>`).join('')}</div><div class="ast">${stp}</div><div class="atabs" role="tablist"><button type="button" class="on" data-act="atab" data-t="r">Ringkasan</button>${n.p ? '<button type="button" data-act="atab" data-t="p">Peta</button>' : ''}<button type="button" data-act="atab" data-t="s">SIPADES</button><button type="button" data-act="atab" data-t="d">Dokumen${n.d ? ' (' + n.d + ')' : ''}</button><button type="button" data-act="atab" data-t="h">Riwayat${n.h ? ' (' + n.h + ')' : ''}</button></div>`;
 }
+const bukanEks = a => a.klasifikasi !== KLAS_EKS;
 const klasCek = a => { const h = kibHuruf(a), batas = klasBatas(h), j = Math.max(1, asetNum(a.jumlah) || 1), n = asetNum(a.nilai), per = n / j; return { h, batas, j, n, per, bawah: batas > 0 && n > 0 && per < batas, eks: a.klasifikasi === KLAS_EKS, usul: String(a.klasifikasi_usulan || '').trim() }; };
 const asetNum = v => { const s = String(v == null ? '' : v).trim(); if (/^-?\d+(\.\d+)?$/.test(s)) return Number(s); return Number(s.replace(/\./g, '').replace(',', '.')) || 0; };
 const asetDig = v => String(v || '').replace(/\D/g, '');
@@ -13819,7 +13820,7 @@ const DOKKEU = {
   lkmd: { t: 'Laporan Kekayaan Milik Desa (LKMD)', ps: PB59S + ' Ps. 79; Kertas Kerja Inspektorat', ic: 'box', prep: true,
     init: (st, c) => Object.assign(st, { tahun: String(c.th - 1), piutang: '', persediaan: '', investasi: '', cadangan: '', lain: '', utang_lain: '' }),
     fields: c => [['tahun', 'Posisi per 31 Desember tahun', 'number'], ['tanggal', 'Tanggal laporan', 'date'], ['piutang', 'Piutang (mis. sewa TKD belum dibayar) Rp', 'number'], ['persediaan', 'Persediaan Rp', 'number'], ['investasi', 'Investasi / penyertaan modal BUMDes Rp', 'number'], ['cadangan', 'Dana cadangan Rp', 'number'], ['lain', 'Aset lainnya Rp', 'number'], ['utang_lain', 'Kewajiban lain Rp', 'number']],
-    load: async (st, c) => { const th = String(st.tahun), [A, bank, tunai, P] = await Promise.all([asetSemua({}), call('keuBuku', { tahun: th, buku: 'Bank', bulan: '' }).then(d => d.rows || []).catch(() => []), call('keuBuku', { tahun: th, buku: 'Tunai', bulan: '' }).then(d => d.rows || []).catch(() => []), ptaData(th).then(ptaPajak).catch(() => null)]); const b = (c.bum || []).filter(x => String(x.tahun) === th)[0]; if (b && !st.investasi) st.investasi = String(mNum(b.modal_desa) || ''); return { A, bank: kkSaldo(bank, th + '-12-31').saldo, tunai: kkSaldo(tunai, th + '-12-31').saldo, pajak: P ? P.jenis.reduce((t, x) => t + Math.max(0, x.sisa), 0) : 0 }; },
+    load: async (st, c) => { const th = String(st.tahun), [A, bank, tunai, P] = await Promise.all([asetSemua({}).then(r => r.filter(bukanEks)), call('keuBuku', { tahun: th, buku: 'Bank', bulan: '' }).then(d => d.rows || []).catch(() => []), call('keuBuku', { tahun: th, buku: 'Tunai', bulan: '' }).then(d => d.rows || []).catch(() => []), ptaData(th).then(ptaPajak).catch(() => null)]); const b = (c.bum || []).filter(x => String(x.tahun) === th)[0]; if (b && !st.investasi) st.investasi = String(mNum(b.modal_desa) || ''); return { A, bank: kkSaldo(bank, th + '-12-31').saldo, tunai: kkSaldo(tunai, th + '-12-31').saldo, pajak: P ? P.jenis.reduce((t, x) => t + Math.max(0, x.sisa), 0) : 0 }; },
     cek: (st, c) => [['warn', 'Kas bank & tunai dari Siskeudes per 31 Desember, aset tetap dari Inventaris (KIB) yang diperoleh s.d. 31 Desember, utang pajak = pajak dipungut belum disetor. Cocokkan dengan Neraca Siskeudes.']],
     doc: (st, c) => {
       const X = st._data || { A: [], bank: 0, tunai: 0, pajak: 0 }, th = String(st.tahun), D = ND(), kd = kfKd(c);
@@ -14615,6 +14616,18 @@ function sipForm(a) {
   };
   return M[h] || umum1.concat(umum2);
 }
+/* kartu inventaris satu aset (A4 tegak): isian sama dengan form SIPADES */
+function asetKartuHtml(a) {
+  const h = kibHuruf(a), k = klasCek(a), desa = 'DESA ' + String((S.set || {}).nama_desa || '').toUpperCase();
+  const F = sipForm(a).concat([['Klasifikasi', k.eks ? 'Ekstrakomptabel (barang inventaris kecil)' : 'Aset Tetap'], ['Status SIPADES', a.sipades === 'Sudah' ? 'Sudah diinput' : 'Belum diinput']]).filter(r => r[1] != null && String(r[1]).trim() !== '');
+  const sel = F.map(r => `<td style="width:19%;color:#444">${esc(r[0])}</td><td style="width:31%"><b>${esc(String(r[1]))}</b></td>`), baris = [];
+  for (let i = 0; i < sel.length; i += 2) baris.push(`<tr>${sel[i]}${sel[i + 1] || '<td></td><td></td>'}</tr>`);
+  const fo = asetFotos(a.foto).slice(0, 2);
+  return `<div class="paper" style="font-size:9.5pt">${kopAset()}<h2>KARTU INVENTARIS BARANG (KIB) ${esc(h)}</h2><h3>${esc(kibNama(h).toUpperCase())} · ${esc(desa)}</h3>
+    <table class="pt" style="font-size:9pt;width:100%"><tbody>${baris.join('')}</tbody></table>
+    ${fo.length ? `<div style="display:flex;gap:8px;margin:10px 0 4px">${fo.map(f => `<img src="${esc(thumb(f.id, 480))}" alt="Foto aset" style="height:55mm;max-width:48%;object-fit:cover;border:1px solid #999">`).join('')}</div>` : ''}
+    ${ttdAset()}</div>`;
+}
 function klasDasarHtml(open) {
   const B = klasBatas('B'), C = klasBatas('C'), R = n => esc(fMoney(n));
   return `<details class="card stack" style="padding:10px 12px"${open ? ' open' : ''}><summary class="sec-h" style="margin:0"><h2>${ic('book')} Dasar hukum batas kapitalisasi</h2></summary>
@@ -14628,8 +14641,8 @@ function klasKartu(a, wa) {
   const perTxt = k.batas ? `Nilai per satuan <b>${R(k.per)}</b> (${R(k.n)} ÷ ${k.j}) · batas KIB ${k.h}: <b>${R(k.batas)}</b>` : 'Golongan ini tidak punya batas minimal kapitalisasi.';
   let pill, isi = '', tombol = '', buka = false;
   if (k.eks) { pill = '<span class="pill warn">Ekstrakomptabel</span>'; isi = 'Dicatat di buku inventaris saja, tidak dikapitalisasi sebagai aset tetap. ' + perTxt; tombol = btn('klasTetapAset', '', 'Kembalikan ke Aset Tetap'); buka = true; }
-  else if (k.usul) { pill = '<span class="pill bad">Usulan perlu dicek</span>'; isi = `<b>Usulan:</b> ${esc(k.usul)}<br>${perTxt}<br>Cek harga sebenarnya pada nota/BAST. Bila harga ≥ batas, tetap Aset Tetap.`; tombol = btn('klasTetapEks', 'pri', ic('check') + 'Tetapkan ekstrakomptabel') + btn('klasTetapAset', '', 'Tetap Aset Tetap'); buka = true; }
-  else if (k.bawah) { pill = '<span class="pill warn">Di bawah batas</span>'; isi = perTxt + '<br>Nilai per satuan di bawah batas kapitalisasi; patut dicek.'; tombol = btn('klasTetapEks', 'pri', ic('check') + 'Tetapkan ekstrakomptabel'); buka = true; }
+  else if (k.usul) { pill = '<span class="pill bad">Usulan perlu dicek</span>'; isi = `<b>Usulan:</b> ${esc(k.usul)}<br>${perTxt}<br>Cek harga sebenarnya pada nota/BAST. Bila harga ≥ batas, tetap Aset Tetap.`; tombol = btn('klasTetapEks', 'pri', ic('check') + 'Keluarkan dari aset tetap') + btn('klasTetapAset', '', 'Tetap aset tetap'); buka = true; }
+  else if (k.bawah) { pill = '<span class="pill warn">Di bawah batas</span>'; isi = perTxt + '<br>Nilai per satuan di bawah batas kapitalisasi; patut dicek.'; tombol = btn('klasTetapEks', 'pri', ic('check') + 'Keluarkan dari aset tetap'); buka = true; }
   else { pill = '<span class="pill ok">Aset Tetap</span>'; isi = perTxt; }
   const g = k.batas ? `${fMoney(k.per)} per satuan ${k.per < k.batas ? '<' : '≥'} batas ${fMoney(k.batas)}` : '';
   return `<details data-tab="r" class="card stack sipbox" style="padding:8px 12px"><summary class="sec-h" style="margin:0"><h2>${ic('scale')} Klasifikasi aset</h2><span class="meta" style="flex:1;min-width:0;text-align:right;margin-right:6px;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(g)}</span>${pill}</summary><div class="meta">${isi}</div>${tombol ? `<div class="btns">${tombol}</div>` : ''}${klasDasarHtml(false)}</details>`;
@@ -14642,7 +14655,8 @@ VIEWS.asetklas = async (p, main, alive) => {
   rows = rows.filter(r => r.status !== 'Dihapus');
   const L = rows.map(r => [r, klasCek(r)]), usul = L.filter(x => !x[1].eks && x[1].usul), eks = L.filter(x => x[1].eks), bawah = L.filter(x => !x[1].eks && !x[1].usul && x[1].bawah);
   const sum = A => A.reduce((t, x) => t + x[1].n, 0), N = n => Number(n || 0).toLocaleString('id-ID');
-  const blok = (jdl, A, kosong) => `<div class="sec-h"><h2>${jdl} (${A.length})</h2></div>${A.length ? `<div class="list">${A.map(x => rowHtml('aset', x[0])).join('')}</div>` : `<div class="card meta">${kosong}</div>`}`;
+  const adm0 = canWrite('aset');
+  const blok = (jdl, A, kosong, aksi) => `<div class="sec-h"><h2>${jdl} (${A.length})</h2>${adm0 && aksi && A.length > 1 ? (aksi === 'eks' ? `<button class="btn sm" data-act="klasSemua" data-g="eks">Kembalikan semua</button>` : `<span class="btns" style="margin:0"><button class="btn sm pri" data-act="klasSemua" data-g="${aksi}" data-v="eks">Keluarkan semua</button><button class="btn sm" data-act="klasSemua" data-g="${aksi}" data-v="tetap">Tetap semua</button></span>`) : ''}</div>${A.length ? `<div class="list">${A.map(x => `<div class="krow">${rowHtml('aset', x[0])}${adm0 && aksi ? `<div class="btns kbt">${aksi === 'eks' ? `<button class="btn sm" data-act="klasRow" data-id="${esc(x[0].id)}" data-v="tetap">Kembalikan ke aset tetap</button>` : `<button class="btn sm pri" data-act="klasRow" data-id="${esc(x[0].id)}" data-v="eks">Keluarkan</button><button class="btn sm" data-act="klasRow" data-id="${esc(x[0].id)}" data-v="tetap">Tetap</button>`}</div>` : ''}</div>`).join('')}</div>` : `<div class="card meta">${kosong}</div>`}`;
   const adm = S.user && S.user.admin;
   main.innerHTML = `<div class="stack">
     <div class="card stack"><div class="kpi3"><div><b>${N(usul.length)}</b><span class="meta">Usulan perlu dicek</span></div><div><b>${N(eks.length)}</b><span class="meta">Ekstrakomptabel · ${esc(fMoney(sum(eks)))}</span></div><div><b>${N(bawah.length)}</b><span class="meta">Di bawah batas, belum diklasifikasi</span></div></div></div>
@@ -14651,9 +14665,17 @@ VIEWS.asetklas = async (p, main, alive) => {
       <div class="form"><div class="f"><label for="kb_b">Peralatan &amp; Mesin (KIB B) per satuan, Rp</label><input id="kb_b" inputmode="numeric" value="${esc(String(klasBatas('B')))}" ${adm ? '' : 'disabled'}></div><div class="f"><label for="kb_c">Gedung &amp; Bangunan (KIB C) per unit, Rp</label><input id="kb_c" inputmode="numeric" value="${esc(String(klasBatas('C')))}" ${adm ? '' : 'disabled'}></div></div>
       <div class="meta">Bawaan mengikuti Perbup 83/2022 (Rp500.000 dan Rp10.000.000). Hanya admin yang dapat mengubah; perubahan berlaku untuk pemeriksa di halaman ini dan kartu klasifikasi tiap aset.</div>
       ${adm ? `<div class="btns"><button class="btn pri" data-act="klasSimpanBatas">${ic('check')}Simpan batas</button></div>` : ''}</div>
-    ${blok('Usulan klasifikasi perlu dicek harga', usul, 'Tidak ada usulan.')}
-    ${blok('Di bawah batas, belum diklasifikasi', bawah, 'Tidak ada aset lain di bawah batas.')}
-    ${blok('Ekstrakomptabel', eks, 'Belum ada aset ekstrakomptabel.')}</div>`;
+    ${blok('Usulan klasifikasi perlu dicek harga', usul, 'Tidak ada usulan.', 'usul')}
+    ${blok('Di bawah batas, belum diklasifikasi', bawah, 'Tidak ada aset lain di bawah batas.', 'bawah')}
+    ${blok('Ekstrakomptabel', eks, 'Belum ada aset ekstrakomptabel.', 'eks')}</div>`;
+  const klasRec = v => v === 'eks' ? { klasifikasi: KLAS_EKS, klasifikasi_usulan: '' } : { klasifikasi: '', klasifikasi_usulan: '' };
+  S.vh.klasRow = async t => { t.disabled = true; try { await call('save', { entity: 'aset', record: Object.assign({ id: t.dataset.id }, klasRec(t.dataset.v)) }); toast(t.dataset.v === 'eks' ? 'Dikeluarkan dari aset tetap (ekstrakomptabel).' : 'Tetap sebagai aset tetap.'); refresh(); } catch (x) { t.disabled = false; toast(x.message, 1); } };
+  S.vh.klasSemua = async t => {
+    const g = t.dataset.g, v = t.dataset.v || 'tetap', A = g === 'usul' ? usul : g === 'bawah' ? bawah : eks;
+    if (!A.length || !confirm((v === 'eks' ? 'Keluarkan ' : g === 'eks' ? 'Kembalikan ' : 'Tetapkan tetap sebagai aset tetap untuk ') + A.length + ' aset' + (v === 'eks' ? ' dari aset tetap (menjadi ekstrakomptabel)' : '') + '?\n\nBisa dibalik kapan saja lewat tombol di tiap aset.')) return;
+    t.disabled = true; let n = 0;
+    try { for (const x of A) { await call('save', { entity: 'aset', record: Object.assign({ id: x[0].id }, klasRec(v)) }); n++; } toast(n + ' aset diperbarui.'); refresh(); } catch (er) { t.disabled = false; toast(er.message + ' (' + n + ' aset sudah diperbarui)', 1); refresh(); }
+  };
   S.vh.klasSimpanBatas = async () => { const v = { batas_kap_b: $('#kb_b').value.replace(/\D/g, ''), batas_kap_c: $('#kb_c').value.replace(/\D/g, '') }; try { S.set = Object.assign({}, S.set, await call('settingsSave', { values: v })); toast('Batas kapitalisasi disimpan.'); refresh(); } catch (x) { toast(x.message, 1); } };
 };
 async function extraAset(a, el) {
@@ -14676,7 +14698,8 @@ async function extraAset(a, el) {
     <div class="sec-h"><h2>Mutasi (${mut.length})</h2>${w ? `<button class="btn sm" data-act="addSub" data-e="aset_mutasi" data-p='${esc(JSON.stringify({ ref: a.id }))}'>${ic('plus')}Catat mutasi</button>` : ''}</div>
     ${mut.length ? `<div class="list">${mut.map(r => rowHtml('aset_mutasi', r)).join('')}</div>` : '<div class="card meta">Belum ada mutasi.</div>'}</div></div>`;
   { const box = el.closest('.dview'), slot = box && box.querySelector('.atb'); if (slot) slot.innerHTML = asetKpiTabs(a, { d: dk.length + mf.length, h: pl.length + cek.length + mut.length, p: asetAdaPeta(a) }); }
-  { const box = el.closest('.dview'), xa = box && $('.xacts', box); if (xa && xa.firstElementChild) xa.firstElementChild.insertAdjacentHTML('afterend', `<button class="btn sm" data-act="atab" data-t="s">${ic('next')}Salin ke SIPADES</button>` + (wa && a.sipades !== 'Sudah' ? `<button class="btn sm" data-act="sipTandai" data-v="Sudah">${ic('check')}Tandai sudah di SIPADES</button>` : '')); }
+  { const box = el.closest('.dview'), xa = box && $('.xacts', box); if (xa && xa.firstElementChild) xa.firstElementChild.insertAdjacentHTML('afterend', `<button class="btn sm" data-act="cetakKartu">${ic('print')}Cetak kartu</button><button class="btn sm" data-act="atab" data-t="s">${ic('next')}Salin ke SIPADES</button>` + (wa && a.sipades !== 'Sudah' ? `<button class="btn sm" data-act="sipTandai" data-v="Sudah">${ic('check')}Tandai di SIPADES</button>` : '')); }
+  S.vh.cetakKartu = () => printDocs('Kartu inventaris ' + (a.nama || a.nama_rekening || ''), [asetKartuHtml(a)], 'aset_kartu');
   S.vh.atab = t => { const b = t.closest('.dview'); if (!b) return; b.dataset.at = t.dataset.t; $$('.atabs button', b).forEach(x => x.classList.toggle('on', x === t)); if (t.dataset.t === 'p') asetPetaPasang(b, a); };
   S.vh.ahero = t => { const b = t.closest('.dview'), im = b && $('.ahero img.hi', b), bt = b && $('.ahero>button', b); if (!im) return; im.src = thumb(t.dataset.id, 640); if (bt) bt.dataset.id = t.dataset.id; $$('.athumbs button', b).forEach(x => x.classList.toggle('on', x === t)); };
   S.vh.sipCopy = async t => { const v = String(SF[Number(t.dataset.i)][1] || '').replace(/ \| /g, '.'); try { await navigator.clipboard.writeText(v); toast('Disalin: ' + v); } catch (x) { toast('Gagal menyalin; salin manual.', 1); } };
@@ -14886,7 +14909,7 @@ function sipLaporan(nama, D, opt) {
 }
 async function sipData() {
   const L2 = async e => { try { return (await call('list', { entity: e, limit: 5000 })).rows || []; } catch (x) { return []; } };
-  const [aset, ruang, tim, trx] = await Promise.all([asetSemua({}), L2('aset_ruang'), L2('aset_tim'), L2('aset_trx')]);
+  const [aset, ruang, tim, trx] = await Promise.all([asetSemua({}).then(r => r.filter(bukanEks)), L2('aset_ruang'), L2('aset_tim'), L2('aset_trx')]);
   return { aset, ruang, tim: tim.filter(t => t.jabatan_tim).sort((a, b) => ['Ketua', 'Sekretaris', 'Anggota'].indexOf(a.jabatan_tim) - ['Ketua', 'Sekretaris', 'Anggota'].indexOf(b.jabatan_tim)), trx };
 }
 VIEWS.sipadeslap = async (p, main, alive) => {
@@ -15075,11 +15098,11 @@ VIEWS.asetcetak = async (p, main) => {
   setTop('Cetak Laporan Aset');
   const st = S.asetCt = S.asetCt || { j: 'Buku Inventaris', tahun: String(new Date().getFullYear()), semester: new Date().getMonth() < 6 ? '1' : '2' };
   main.innerHTML = '<div class="skel" style="height:200px"></div>';
-  const L = await asetSemua({});
+  const L0 = await asetSemua({}), L = L0.filter(bukanEks), nEks = L0.length - L.length;
   main.innerHTML = `<div class="stack"><div class="card stack"><div class="chips wrap">${ASET_LAP.map(j => `<button class="chip ${st.j === j ? 'on' : ''}" data-act="acJ" data-v="${esc(j)}">${esc(j)}</button>`).join('')}</div>
     <div class="form two"><div class="f"><label for="acT">Tahun</label><input id="acT" type="number" value="${esc(st.tahun)}"></div><div class="f"><label for="acS">Semester</label><select id="acS"><option value="1" ${st.semester === '1' ? 'selected' : ''}>I (Januari–Juni)</option><option value="2" ${st.semester === '2' ? 'selected' : ''}>II (Juli–Desember)</option></select></div></div>
     <div class="btns"><button class="btn pri" data-act="acCetak">${ic('print')}Cetak / PDF</button><button class="btn" data-act="acXls">${ic('down')}Excel</button><button class="btn" data-act="acAll">${ic('print')}Cetak semua KIB</button><button class="btn" data-act="go" data-go='["sipadeslap"]'>${ic('print')}Format SIPADES</button>${S.user.admin ? `<button class="btn" data-act="go" data-go='["asettpl"]'>${ic('edit')}Atur kop & penandatangan</button>` : ''}</div>
-    <div class="meta">${L.length} aset tercatat. Kolom tabel mengikuti format KIB dan tidak bisa diubah; kop, logo, penandatangan, dan redaksi diatur di editor template.</div></div><div id="acPrev" class="doc-prev fitp"></div></div>`;
+    <div class="meta">${L.length} aset tercatat${nEks ? ` (${nEks} ekstrakomptabel tidak dihitung)` : ''}. Kolom tabel mengikuti format KIB dan tidak bisa diubah; kop, logo, penandatangan, dan redaksi diatur di editor template.</div></div><div id="acPrev" class="doc-prev fitp"></div></div>`;
   const opt = () => ({ tahun: $('#acT').value, semester: $('#acS').value });
   const prev = () => { st.tahun = $('#acT').value; st.semester = $('#acS').value; const r = asetLaporan(st.j, L, opt()); $('#acPrev').innerHTML = r.html; fitPapers($('#acPrev')); };
   prev(); $('#acT').onchange = prev; $('#acS').onchange = prev;
@@ -15142,7 +15165,7 @@ VIEWS.asetdash = async (p, main, alive) => {
   setTop('Dashboard Aset Desa');
   main.innerHTML = '<div class="skel" style="height:300px"></div>';
   const L2 = async (e, o) => { try { return (await call('list', Object.assign({ entity: e, limit: 5000 }, o || {}))).rows || []; } catch (x) { return null; } };
-  const [L, ruang, trx, cek, apb] = await Promise.all([asetSemua({}), L2('aset_ruang'), L2('aset_trx', { sort: 'tanggal', desc: true }), L2('aset_cek'), L2('keu_anggaran', { filters: { rek__pre: '5.3' } })]);
+  const [L, ruang, trx, cek, apb] = await Promise.all([asetSemua({}).then(r => { S.nEksDash = r.filter(a => !bukanEks(a)).length; return r.filter(bukanEks); }), L2('aset_ruang'), L2('aset_trx', { sort: 'tanggal', desc: true }), L2('aset_cek'), L2('keu_anggaran', { filters: { rek__pre: '5.3' } })]);
   if (alive && !alive()) return;
   const d78 = await asetDash78(L).catch(x => `<div class="err">Panel Perbup 78 gagal dimuat: ${esc(x.message)}</div>`);
   if (alive && !alive()) return;
@@ -15182,7 +15205,7 @@ VIEWS.asetdash = async (p, main, alive) => {
   main.innerHTML = `<div class="kd ad">
     <div class="ad-hero">
       <div class="ad-hero-l"><span class="ad-eyebrow">${ic('box')} Aset Desa ${esc(s.nama_desa || '')} · kode lokasi ${esc(kodeLokasi())}</span>
-        <b class="ad-big">${esc(asetRpS(tot))}</b><span class="ad-sub">${N(P.length)} catatan (${N(jml(P))} unit) · ${st.cak === 'aktif' ? 'aset aktif / resmi' : 'aktif + data lama (draf)'}</span>
+        <b class="ad-big">${esc(asetRpS(tot))}</b><span class="ad-sub">${N(P.length)} catatan (${N(jml(P))} unit) · ${st.cak === 'aktif' ? 'aset aktif / resmi' : 'aktif + data lama (draf)'}${S.nEksDash ? ' · ' + N(S.nEksDash) + ' ekstrakomptabel tidak dihitung' : ''}</span>
         <div class="chips" style="margin-top:6px"><button class="chip ${st.cak === 'aktif' ? 'on' : ''}" data-act="adCak" data-v="aktif">Aset aktif</button><button class="chip ${st.cak === 'semua' ? 'on' : ''}" data-act="adCak" data-v="semua">Aktif + data lama</button></div></div>
       <div class="ad-hero-r"><div class="ad-ring" style="--p:${pctSip}"><b>${pctSip}%</b><span>sudah di SIPADES</span></div>
         <div class="meta" style="text-align:center">${N(sudah.length)} dari ${N(nonHapus.length)} catatan</div></div>
