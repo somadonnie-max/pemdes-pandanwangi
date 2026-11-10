@@ -182,6 +182,9 @@ button.stat:hover{border-color:var(--pri)}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px;margin-top:6px}
 .it[data-e="aset"] .row{padding:6px 10px;gap:9px;min-height:0}.it[data-e="aset"] .row .av{width:36px;height:36px;font-size:12px;border-radius:8px;flex:none}.it[data-e="aset"] .row .av.ph{width:40px;height:40px;margin:0}
 .it[data-e="aset"] .row .t{font-size:12.5px}.it[data-e="aset"] .row .s{font-size:10.5px}.it[data-e="aset"] .row .s2{font-size:10px}
+.ahero.ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:100%;height:150px;border:1.5px dashed var(--line);background:var(--surface2);cursor:pointer;color:var(--muted);padding:8px;text-align:center;font:inherit}.ahero.ph .ic{width:24px;height:24px;color:var(--pri)}.ahero.ph b{color:var(--ink);font-size:12.5px;line-height:1.25}.ahero.ph small{font-size:10.5px}
+.athumbs .ath-add{display:flex;align-items:center;justify-content:center;border:1.5px dashed var(--line);color:var(--pri);background:var(--surface2)}.athumbs .ath-add .ic{width:16px;height:16px}
+.apb{margin-top:8px}.alb{font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:5px;margin:0 0 5px}.alb .ic{width:13px;height:13px}.apb .ap-map{height:230px}.apb .map iframe{height:230px}.apb .btns{margin-top:6px}
 .ahero{position:relative;border-radius:10px;overflow:hidden;background:var(--surface2);margin-bottom:6px}.ahero>button{display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in}.ahero img.hi{width:100%;height:196px;object-fit:cover;display:block}.ahero .cnt{position:absolute;right:8px;top:8px;background:rgba(0,0,0,.55);color:#fff;font-size:10px;font-weight:600;border-radius:9px;padding:1px 8px}
 .athumbs{display:flex;gap:5px;margin:0 0 8px;overflow-x:auto}.athumbs button{flex:none;width:40px;height:40px;padding:0;border:2px solid transparent;border-radius:7px;overflow:hidden;background:none;cursor:pointer}.athumbs button.on{border-color:var(--pri)}.athumbs img{width:100%;height:100%;object-fit:cover;display:block}
 .akpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:6px 12px;margin:6px 0;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}.akpi .l{display:block;font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}.akpi b{display:block;font-size:12.5px}
@@ -192,7 +195,7 @@ button.stat:hover{border-color:var(--pri)}
 .agr{grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0 22px}.ag{min-width:0}.ag .lbl{display:block;color:var(--pri);margin:6px 0 2px;font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}.ar{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);font-size:12px}.ar span{color:var(--muted);font-size:11px;flex:none}.ar b{font-weight:600;text-align:right;word-break:break-word}
 .aket{margin-top:10px;padding:7px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface);font-size:12px;white-space:pre-line}.aket .lbl{display:block;font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
 .dview[data-at] .xacts .danger{margin-left:auto}.krow .kbt{margin:2px 0 8px;padding-left:4px}@media(max-width:760px){.dview[data-at] .xacts{position:sticky;bottom:calc(50px + env(safe-area-inset-bottom,0px));z-index:6;margin:10px -4px 0;padding:7px 8px;gap:5px;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -5px 12px rgba(0,0,0,.07);border-radius:10px 10px 0 0}.dview[data-at] .xacts .btn.sm{padding:0 9px;font-size:11.5px}}
-@media(max-width:760px){.adt{grid-template-columns:1fr;gap:6px}.ahero img.hi{height:170px}.agr{grid-template-columns:1fr}.ag.wd{grid-column:auto}.ap-map{height:260px}.adt:not(.solo){grid-template-columns:132px 1fr;column-gap:10px;row-gap:4px}.adt:not(.solo)>.adr,.adt:not(.solo)>.adr>.atb{display:contents}.adt:not(.solo)>.adr>*:not(.atb),.adt:not(.solo)>.adr>.atb>*:not(.akpi){grid-column:1/-1}.adt:not(.solo)>.adl{grid-column:1;grid-row:1;margin:0}.adt:not(.solo) .akpi{grid-column:2;grid-row:1;grid-template-columns:1fr 1fr;gap:6px 8px;align-content:start;margin:0;padding:0;border:0;background:none}.adt:not(.solo) .akpi>div:first-child{grid-column:1/-1}.adt:not(.solo) .ahero{margin-bottom:5px}.adt:not(.solo) .ahero img.hi{height:96px}.adt:not(.solo) .athumbs{margin:0}.adt:not(.solo) .athumbs button{width:28px;height:28px}.adt:not(.solo) .ahero .cnt{font-size:9px;padding:0 6px;right:5px;top:5px}}
+@media(max-width:760px){.adt{grid-template-columns:1fr;gap:6px}.ahero img.hi{height:170px}.agr{grid-template-columns:1fr}.ag.wd{grid-column:auto}.ap-map{height:260px}.adt:not(.solo){grid-template-columns:132px 1fr;column-gap:10px;row-gap:4px}.adt:not(.solo)>.adr,.adt:not(.solo)>.adr>.atb{display:contents}.adt:not(.solo)>.adr>*:not(.atb),.adt:not(.solo)>.adr>.atb>*:not(.akpi){grid-column:1/-1}.adt:not(.solo)>.adl{display:contents}.adt:not(.solo)>.adl>.ahero{grid-column:1;grid-row:1;margin:0}.adt:not(.solo)>.adl>.athumbs{grid-column:1;grid-row:2;margin:0}.adt:not(.solo)>.adl>.apb{grid-column:1/-1;grid-row:3;margin:2px 0 4px}.adt:not(.solo) .apb .ap-map,.adt:not(.solo) .apb .map iframe{height:170px}.adt:not(.solo) .ahero.ph{height:96px}.adt:not(.solo) .ahero.ph small{display:none}.adt:not(.solo) .akpi{grid-column:2;grid-row:1/span 2;grid-template-columns:1fr 1fr;gap:6px 8px;align-content:start;margin:0;padding:0;border:0;background:none}.adt:not(.solo) .akpi>div:first-child{grid-column:1/-1}.adt:not(.solo) .ahero{margin-bottom:5px}.adt:not(.solo) .ahero img.hi{height:96px}.adt:not(.solo) .athumbs{margin:0}.adt:not(.solo) .athumbs button{width:28px;height:28px}.adt:not(.solo) .ahero .cnt{font-size:9px;padding:0 6px;right:5px;top:5px}}
 .dview[data-at] [data-tab]{display:none}.dview[data-at="r"] .agr[data-tab="r"]{display:grid}.dview[data-at="r"] [data-tab="r"],.dview[data-at="p"] [data-tab="p"],.dview[data-at="s"] [data-tab="s"],.dview[data-at="d"] [data-tab="d"],.dview[data-at="h"] [data-tab="h"]{display:block}.dview[data-at] dl[data-tab]{display:none}.dview[data-at="r"] dl[data-tab="r"]{display:grid}.dview[data-at] details[data-tab]{display:none}.dview[data-at="r"] details[data-tab="r"],.dview[data-at="s"] details[data-tab="s"]{display:block}
 .pslot{display:flex;flex-direction:column;gap:3px;align-items:stretch;text-align:center}
 .pimg{display:grid;place-items:center;aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:var(--surface2);border:1px dashed var(--line);padding:0;color:var(--muted);cursor:pointer}
@@ -4291,7 +4294,7 @@ async function renderDetail(e, x, el, full) {
   const geo = geoF ? x[geoF.k] : u.geo ? u.geo(x) : '';
   const w = canWrite(e) && !(e === 'kegiatan' && x.sumber_mus);
   el.innerHTML = `
-    ${e === 'aset' ? (h => '<div class="adt' + (h ? '' : ' solo') + '">' + (h ? '<div class="adl">' + h + '</div>' : '') + '<div class="adr"><div class="atb"></div>')(asetHeroHtml(x)) : ''}
+    ${e === 'aset' ? (h => '<div class="adt' + (h ? '' : ' solo') + '">' + (h ? '<div class="adl">' + h + '</div>' : '') + '<div class="adr"><div class="atb"></div>')(asetHeroHtml(x) + asetPetaBox(x)) : ''}
     ${e === 'kegiatan' && x.sumber_mus ? `<div class="card meta">${ic('lock')} Agenda ini terusan otomatis dari Musyawarah RKP/RPJM (tanggal, jam, tempat, dan foto mengikuti data musyawarah). Tidak bisa diubah atau dihapus di sini; ubah lewat Perencanaan → RKP/RPJM Desa → Musyawarah &amp; Tim.</div>` : ''}
     ${e === 'aset' ? asetGrupHtml(u, x, shown) : shown.length ? `<dl class="dl">${shown.map(f => `<div class="${f.t === 'textarea' || f.wide && String(x[f.k]).length > 40 ? 'w' : ''}"><dt>${esc(f.l)}</dt><dd>${pendLinkVal(e, f, x) || valHtml(f, x[f.k], x)}</dd></div>`).join('')}</dl>` : ''}
     ${files.length && e !== 'penduduk' ? `<div class="btns"${e === 'aset' ? ' data-tab="d"' : ''}>${files.map(f => `<button class="btn sm" data-act="file" data-id="${esc(x[f.k])}" data-priv="${f.priv ? 1 : 0}" data-name="${esc(f.lihat || f.l)}">${ic(x[f.k] === '•' ? 'lock' : f.img ? 'eye' : 'file')}${esc(f.lihat || f.l)}</button>`).join('')}</div>` : ''}
@@ -9195,7 +9198,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '246', tgl: '2026-11-10', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '247', tgl: '2026-11-10', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -12359,8 +12362,10 @@ const kibOf = h => KIB_OPT.find(k => k.charAt(0) === h) || '';
 const asetFotos = v => { try { const a = JSON.parse(v || '[]'); return Array.isArray(a) ? a.filter(f => f && f.id) : []; } catch (e) { return []; } };
 const asetFoto1 = v => { const a = asetFotos(v); return a.length ? a[0].id : ''; };
 function asetHeroHtml(x) {
-  const a = asetFotos(x.foto); if (!a.length) return '';
-  return `<div class="ahero"><button type="button" data-act="file" data-id="${esc(a[0].id)}" data-name="${esc(a[0].ket || 'Foto aset')}" aria-label="Perbesar foto"><img class="hi" src="${esc(thumb(a[0].id, 640))}" alt="Foto aset" loading="lazy"></button><span class="cnt">${a.length} foto</span></div>${a.length > 1 ? `<div class="athumbs">${a.map((f, i) => `<button type="button" data-act="ahero" data-id="${esc(f.id)}" class="${i ? '' : 'on'}" aria-label="Foto ${i + 1}"><img src="${esc(thumb(f.id, 120))}" alt="" loading="lazy"></button>`).join('')}</div>` : ''}`;
+  const a = asetFotos(x.foto), w = canWrite('aset'), MX = 5, dt = `data-id="${esc(x.id)}" data-foto="${esc(x.foto || '')}"`;
+  if (!a.length) return w ? `<button type="button" class="ahero ph" data-act="fotoTambah" ${dt}>${ic('cam')}<b>${esc(x.nama || x.nama_rekening || 'Aset')}</b><small>Ketuk untuk menambah foto</small></button>` : '';
+  const tamb = w && a.length < MX ? `<button type="button" class="ath-add" data-act="fotoTambah" ${dt} title="Tambah foto" aria-label="Tambah foto">${ic('plus')}</button>` : '';
+  return `<div class="ahero"><button type="button" data-act="file" data-id="${esc(a[0].id)}" data-name="${esc(a[0].ket || 'Foto aset')}" aria-label="Perbesar foto"><img class="hi" src="${esc(thumb(a[0].id, 640))}" alt="Foto aset" loading="lazy"></button><span class="cnt">${a.length} foto</span></div>${a.length > 1 || tamb ? `<div class="athumbs">${a.map((f, i) => `<button type="button" data-act="ahero" data-id="${esc(f.id)}" class="${i ? '' : 'on'}" aria-label="Foto ${i + 1}"><img src="${esc(thumb(f.id, 120))}" alt="" loading="lazy"></button>`).join('')}${tamb}</div>` : ''}`;
 }
 const asetRpR = n => { n = Number(n) || 0; return n >= 1e9 ? 'Rp ' + (n / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + ' M' : n >= 1e6 ? 'Rp ' + (n / 1e6).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' jt' : fMoney(n) || 'Rp 0'; };
 function asetKpiList(R) {
@@ -12394,7 +12399,7 @@ function asetKpiTabs(a, n) {
   const k = klasCek(a), th = tahunOf(a.tgl_perolehan) || a.tahun || '', luas = asetNum(a.luas), lh = kibHuruf(a) === 'A' || kibHuruf(a) === 'C';
   const it = [['Nilai', a.nilai ? fMoney(a.nilai) : '—'], ['Tahun', th || '—'], ['Kondisi', a.kondisi || '—'], [lh ? 'Luas' : 'Jumlah', luas && lh ? luas.toLocaleString('id-ID') + ' m²' : ((asetNum(a.jumlah) || 1) + ' ' + (a.satuan || 'unit'))]];
   const stp = (k.eks ? '<span class="pill warn">Ekstrakomptabel</span> ' : '') + (a.status === 'Draf' ? '<span class="pill">Draf</span> ' : a.status === 'Dihapus' ? '<span class="pill">Dihapus</span> ' : '') + (a.sipades === 'Sudah' ? '<span class="pill ok">SIPADES</span>' : '<span class="pill">Belum SIPADES</span>');
-  return `<div class="akpi">${it.map(x => `<div><span class="l">${esc(x[0])}</span><b>${esc(String(x[1]))}</b></div>`).join('')}</div><div class="ast">${stp}</div><div class="atabs" role="tablist"><button type="button" class="on" data-act="atab" data-t="r">Ringkasan</button>${n.p ? '<button type="button" data-act="atab" data-t="p">Peta</button>' : ''}<button type="button" data-act="atab" data-t="s">SIPADES</button><button type="button" data-act="atab" data-t="d">Dokumen${n.d ? ' (' + n.d + ')' : ''}</button><button type="button" data-act="atab" data-t="h">Riwayat${n.h ? ' (' + n.h + ')' : ''}</button></div>`;
+  return `<div class="akpi">${it.map(x => `<div><span class="l">${esc(x[0])}</span><b>${esc(String(x[1]))}</b></div>`).join('')}</div><div class="ast">${stp}</div><div class="atabs" role="tablist"><button type="button" class="on" data-act="atab" data-t="r">Ringkasan</button><button type="button" data-act="atab" data-t="s">SIPADES</button><button type="button" data-act="atab" data-t="d">Dokumen${n.d ? ' (' + n.d + ')' : ''}</button><button type="button" data-act="atab" data-t="h">Riwayat${n.h ? ' (' + n.h + ')' : ''}</button></div>`;
 }
 const bukanEks = a => a.klasifikasi !== KLAS_EKS;
 const klasCek = a => { const h = kibHuruf(a), batas = klasBatas(h), j = Math.max(1, asetNum(a.jumlah) || 1), n = asetNum(a.nilai), per = n / j; return { h, batas, j, n, per, bawah: batas > 0 && n > 0 && per < batas, eks: a.klasifikasi === KLAS_EKS, usul: String(a.klasifikasi_usulan || '').trim() }; };
@@ -14430,19 +14435,19 @@ const apAngka = n => Number(n).toLocaleString('id-ID');
 const apSert = a => kibHuruf(a) === 'A' && !!(a.no_sertifikat || /sertifikat/i.test(a.status_tanah || '')) && asetNum(a.luas) > 0;
 const apLuasTxt = a => apSert(a) ? 'luas sertifikat <b>' + apAngka(asetNum(a.luas)) + ' m²</b>' : a.geom_luas ? 'luas peta <b>' + apAngka(a.geom_luas) + ' m²</b>' + (asetNum(a.luas) > 0 ? ' (tercatat ' + apAngka(asetNum(a.luas)) + ' m²)' : '') : '';
 /* tab Peta di detail aset: poligon/garis bila ada (tanpa titik), kalau tidak titik koordinat saja */
-const asetAdaPeta = a => !!(apGeom(a) || parseLL(a.koordinat) || AP_KIB[kibHuruf(a)]);
-function asetPetaTab(a) {
-  const h = kibHuruf(a), g = apGeom(a), ll = parseLL(a.koordinat);
+const asetAdaPeta = a => !!(apGeom(a) || parseLL(a.koordinat));
+function asetPetaBox(a) {
+  if (!asetAdaPeta(a)) return '';
+  const h = kibHuruf(a), g = apGeom(a);
   const ukur = g ? [apLuasTxt(a), a.geom_panjang ? 'panjang peta ' + (/Polygon/.test(g.type) ? '±' : '') + '<b>' + apAngka(a.geom_panjang) + ' m</b>' + (a.panjang ? ' (tercatat ' + apAngka(asetNum(a.panjang)) + ' m)' : '') : ''].filter(Boolean).join(' · ') : '';
-  const pill = g ? '<span class="pill ok">Ada peta</span>' : ll ? '<span class="pill ok">Koordinat terisi</span>' : '<span class="pill warn">Belum ada peta</span>';
-  const gm = g && a.peta_lat ? `<a class="btn sm pri" href="${esc(apGmaps(a.peta_lat, a.peta_lng))}" target="_blank" rel="noopener">${ic('map')}Buka di Google Maps</a>` : '';
-  const isi = g ? `<div class="ap-map"></div><div class="meta">${ukur}</div>` : ll ? mapHtml(a.koordinat, 'Lokasi ' + (a.nama || '')) : `<div class="meta">${AP_KIB[h] ? 'Bentuk lahan/jalan diisi sekaligus untuk semua aset KIB A &amp; D lewat satu berkas GeoJSON: buka <b>Peta aset</b> → Ekspor, gambar di QGIS, lalu Impor. Atau isi Koordinat di form Ubah.' : 'Isi Koordinat di form Ubah untuk menampilkan titik lokasi.'}</div>`;
-  return `<div class="sec-h" style="margin:0 0 6px"><h2>${ic('map')} Peta lokasi</h2>${pill}</div>${isi}${AP_KIB[h] || gm ? `<div class="btns">${gm}${AP_KIB[h] ? `<button type="button" class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['asetpeta', {}]))}'>${ic('map')}Peta aset desa</button>` : ''}</div>` : ''}`;
+  const gm = g && a.peta_lat ? `<a class="btn sm pri" href="${esc(apGmaps(a.peta_lat, a.peta_lng))}" target="_blank" rel="noopener">${ic('map')}Google Maps</a>` : '';
+  const isi = g ? `<div class="ap-map"></div>${ukur ? `<div class="meta">${ukur}</div>` : ''}` : mapHtml(a.koordinat, 'Lokasi ' + (a.nama || ''));
+  return `<div class="apb"><div class="alb">${ic('map')} Peta lokasi</div>${isi}${AP_KIB[h] || gm ? `<div class="btns">${gm}${AP_KIB[h] ? `<button type="button" class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['asetpeta', {}]))}'>${ic('map')}Peta aset desa</button>` : ''}</div>` : ''}</div>`;
 }
-/* Leaflet baru dibuat saat tab Peta pertama kali dibuka (kontainer tersembunyi tidak bisa diukur) */
+/* Leaflet dipasang setelah kotak peta tampil; gulir roda & geser satu jari dimatikan di HP agar halaman tetap bisa digulir */
 async function asetPetaPasang(box, a) {
   const h = kibHuruf(a), g = apGeom(a), el = box && $('.ap-map', box); if (!g || !el || el.dataset.ok) return; el.dataset.ok = '1';
-  try { const L = await muatLeaflet(); const map = apPeta(L, el); const ly = L.geoJSON(g, { style: () => apGaya(h), pointToLayer: (f, ll) => L.circleMarker(ll, { radius: 7, color: '#fff', weight: 2, fillColor: AP_WARNA[h], fillOpacity: 1 }) }).addTo(map); map.fitBounds(ly.getBounds(), { padding: [20, 20], maxZoom: 19 }); }
+  try { const L = await muatLeaflet(); const map = apPeta(L, el); try { map.scrollWheelZoom.disable(); if (window.matchMedia('(max-width:760px)').matches) map.dragging.disable(); } catch (x) { } const ly = L.geoJSON(g, { style: () => apGaya(h), pointToLayer: (f, ll) => L.circleMarker(ll, { radius: 7, color: '#fff', weight: 2, fillColor: AP_WARNA[h], fillOpacity: 1 }) }).addTo(map); map.fitBounds(ly.getBounds(), { padding: [20, 20], maxZoom: 19 }); }
   catch (x) { el.innerHTML = `<div class="err">${esc(x.message)}</div>`; }
 }
 /* satu berkas GeoJSON untuk semua aset KIB A & D (ekspor → edit di QGIS → impor) */
@@ -14710,7 +14715,6 @@ async function extraAset(a, el) {
       <div class="meta">Urutan isian sama dengan form SIPADES (Data Transaksi → Inventarisasi dan Penatausahaan → Golongan ${esc(kibNama(kibHuruf(a)))}). Tekan ${ic('file')} untuk menyalin, lalu tempel di SIPADES.</div>
       <div class="sipf">${SF.map(([l, v], i) => `<div class="sipr"><span class="l">${esc(l)}</span><span class="v mono">${esc(v == null ? '' : String(v)) || '<i class="meta">—</i>'}</span>${v ? `<button class="iconbtn" data-act="sipCopy" data-i="${i}" title="Salin">${ic('file')}</button>` : '<span></span>'}</div>`).join('')}</div>
       ${wa ? `<div class="btns">${a.sipades === 'Sudah' ? `<button class="btn sm" data-act="sipTandai" data-v="Belum">Tandai belum di SIPADES</button>` : `<button class="btn sm pri" data-act="sipTandai" data-v="Sudah">${ic('check')}Tandai sudah diinput di SIPADES</button>`}</div>` : ''}</details>
-    <div data-tab="p">${asetPetaTab(a)}</div>
     ${a.proyek_id ? `<div class="btns" data-tab="r"><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['rabproyek', { id: a.proyek_id }]))}'>${ic('hammer')}Buka RAB & gambar asal aset</button></div>` : ''}
     ${sub78('aset_dok', dk, 'Dokumen kepemilikan & pengamanan', 'lock', 'Dokumen', { jenis: kibHuruf(a) === 'A' ? (a.no_sertifikat ? 'Sertifikat Tanah' : 'Letter C / Petok D') : a.no_bpkb || a.no_polisi ? 'BPKB' : kibHuruf(a) === 'C' ? 'PBG / IMB' : 'Faktur / Kuitansi Pembelian', nomor: a.no_sertifikat || a.no_bpkb || a.no_dokumen || '' }, 'Belum ada bukti kepemilikan tercatat (Pasal 34–35 Perbup 78/2021).')}
     ${kibHuruf(a) === 'A' || kibHuruf(a) === 'C' || mf.length ? sub78('aset_manfaat', mf, 'Pemanfaatan', 'coin', 'Pemanfaatan', { objek_tipe: a78TipeAset(a), luas_obj: kibHuruf(a) === 'A' ? (a.luas || '') : '', luas_bang: kibHuruf(a) === 'C' ? (a.luas || '') : '' }, 'Belum ada sewa/pinjam pakai/KSP tercatat untuk aset ini.') : ''}
@@ -14719,10 +14723,24 @@ async function extraAset(a, el) {
     ${cek.length ? `<div class="list">${cek.map(r => rowHtml('aset_cek', r)).join('')}</div>` : '<div class="card meta">Belum pernah diperiksa. SOP desa: cek fisik setiap tahun (Perbup 78/2021 Pasal 72: paling sedikit 1 kali dalam 3 tahun).</div>'}
     <div class="sec-h"><h2>Mutasi (${mut.length})</h2>${w ? `<button class="btn sm" data-act="addSub" data-e="aset_mutasi" data-p='${esc(JSON.stringify({ ref: a.id }))}'>${ic('plus')}Catat mutasi</button>` : ''}</div>
     ${mut.length ? `<div class="list">${mut.map(r => rowHtml('aset_mutasi', r)).join('')}</div>` : '<div class="card meta">Belum ada mutasi.</div>'}</div></div>`;
-  { const box = el.closest('.dview'), slot = box && box.querySelector('.atb'); if (slot) slot.innerHTML = asetKpiTabs(a, { d: dk.length + mf.length, h: pl.length + cek.length + mut.length, p: asetAdaPeta(a) }); }
+  { const box = el.closest('.dview'), slot = box && box.querySelector('.atb'); if (slot) slot.innerHTML = asetKpiTabs(a, { d: dk.length + mf.length, h: pl.length + cek.length + mut.length}); if (box) asetPetaPasang(box, a); }
   { const box = el.closest('.dview'), xa = box && $('.xacts', box); if (xa && xa.firstElementChild) xa.firstElementChild.insertAdjacentHTML('afterend', `<button class="btn sm" data-act="cetakKartu">${ic('print')}Cetak kartu</button>`); }
+  S.vh.fotoTambah = t => {
+    const id = t.dataset.id; let arr = asetFotos(t.dataset.foto); const sisa = 5 - arr.length;
+    if (sisa <= 0) return toast('Maksimal 5 foto per aset.', 1);
+    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = IMG_ANY; inp.multiple = true;
+    inp.onchange = async () => {
+      const fs = [...inp.files].slice(0, sisa); if (!fs.length) return;
+      if (inp.files.length > sisa) toast('Maksimal 5 foto; hanya ' + sisa + ' foto pertama yang diunggah.');
+      t.disabled = true; let err = null, n = 0;
+      try { for (const f of fs) { toast('Mengunggah foto ' + (n + 1) + '/' + fs.length + '…'); const up = await uploadFile(f, UI.aset.folder || 'Lainnya'); arr.push({ id: up.id, ket: '' }); n++; } } catch (x) { err = x; }
+      try { if (n) { await call('save', { entity: 'aset', record: { id, foto: JSON.stringify(arr) } }); toast(n + ' foto ditambahkan.' + (err ? ' Sisanya gagal: ' + err.message : '')); refresh(); return; } } catch (x) { err = x; }
+      t.disabled = false; if (err) toast(err.message, 1);
+    };
+    inp.click();
+  };
   S.vh.cetakKartu = () => printDocs('Kartu inventaris ' + (a.nama || a.nama_rekening || ''), [asetKartuHtml(a)], 'aset_kartu');
-  S.vh.atab = t => { const b = t.closest('.dview'); if (!b) return; b.dataset.at = t.dataset.t; $$('.atabs button', b).forEach(x => x.classList.toggle('on', x === t)); if (t.dataset.t === 'p') asetPetaPasang(b, a); };
+  S.vh.atab = t => { const b = t.closest('.dview'); if (!b) return; b.dataset.at = t.dataset.t; $$('.atabs button', b).forEach(x => x.classList.toggle('on', x === t)); };
   S.vh.ahero = t => { const b = t.closest('.dview'), im = b && $('.ahero img.hi', b), bt = b && $('.ahero>button', b); if (!im) return; im.src = thumb(t.dataset.id, 640); if (bt) bt.dataset.id = t.dataset.id; $$('.athumbs button', b).forEach(x => x.classList.toggle('on', x === t)); };
   S.vh.sipCopy = async t => { const v = String(SF[Number(t.dataset.i)][1] || '').replace(/ \| /g, '.'); try { await navigator.clipboard.writeText(v); toast('Disalin: ' + v); } catch (x) { toast('Gagal menyalin; salin manual.', 1); } };
   const klasSimpan = async (rec, msg) => { try { await call('save', { entity: 'aset', record: Object.assign({ id: a.id }, rec) }); toast(msg); refresh(); } catch (x) { toast(x.message, 1); } };
