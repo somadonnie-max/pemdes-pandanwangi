@@ -9173,7 +9173,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '244', tgl: '2026-11-10', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '245', tgl: '2026-11-10', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -14698,7 +14698,7 @@ async function extraAset(a, el) {
     <div class="sec-h"><h2>Mutasi (${mut.length})</h2>${w ? `<button class="btn sm" data-act="addSub" data-e="aset_mutasi" data-p='${esc(JSON.stringify({ ref: a.id }))}'>${ic('plus')}Catat mutasi</button>` : ''}</div>
     ${mut.length ? `<div class="list">${mut.map(r => rowHtml('aset_mutasi', r)).join('')}</div>` : '<div class="card meta">Belum ada mutasi.</div>'}</div></div>`;
   { const box = el.closest('.dview'), slot = box && box.querySelector('.atb'); if (slot) slot.innerHTML = asetKpiTabs(a, { d: dk.length + mf.length, h: pl.length + cek.length + mut.length, p: asetAdaPeta(a) }); }
-  { const box = el.closest('.dview'), xa = box && $('.xacts', box); if (xa && xa.firstElementChild) xa.firstElementChild.insertAdjacentHTML('afterend', `<button class="btn sm" data-act="cetakKartu">${ic('print')}Cetak kartu</button><button class="btn sm" data-act="atab" data-t="s">${ic('next')}Salin ke SIPADES</button>` + (wa && a.sipades !== 'Sudah' ? `<button class="btn sm" data-act="sipTandai" data-v="Sudah">${ic('check')}Tandai di SIPADES</button>` : '')); }
+  { const box = el.closest('.dview'), xa = box && $('.xacts', box); if (xa && xa.firstElementChild) xa.firstElementChild.insertAdjacentHTML('afterend', `<button class="btn sm" data-act="cetakKartu">${ic('print')}Cetak kartu</button>`); }
   S.vh.cetakKartu = () => printDocs('Kartu inventaris ' + (a.nama || a.nama_rekening || ''), [asetKartuHtml(a)], 'aset_kartu');
   S.vh.atab = t => { const b = t.closest('.dview'); if (!b) return; b.dataset.at = t.dataset.t; $$('.atabs button', b).forEach(x => x.classList.toggle('on', x === t)); if (t.dataset.t === 'p') asetPetaPasang(b, a); };
   S.vh.ahero = t => { const b = t.closest('.dview'), im = b && $('.ahero img.hi', b), bt = b && $('.ahero>button', b); if (!im) return; im.src = thumb(t.dataset.id, 640); if (bt) bt.dataset.id = t.dataset.id; $$('.athumbs button', b).forEach(x => x.classList.toggle('on', x === t)); };
