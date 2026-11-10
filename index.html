@@ -9198,7 +9198,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '247', tgl: '2026-11-10', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '248', tgl: '2026-11-10', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -12380,7 +12380,7 @@ function asetHeadHtml(h, view) {
 }
 function asetGrupHtml(u, x, shown) {
   const IDEN = ['kib', 'kode_barang', 'no_urut', 'id_barang', 'nama_rekening', 'nama', 'kode_pemilik', 'belanja_bidang'], PERO = ['tgl_perolehan', 'tgl_pembukuan', 'perolehan', 'asal', 'sumber_dana', 'nilai', 'apbdes_ref'], LEWAT = ['klasifikasi', 'klasifikasi_usulan', 'ket', 'status', 'sipades', 'kondisi', 'jumlah', 'satuan'];
-  const bar = f => `<div class="ar"><span>${esc(f.l)}</span><b>${valHtml(f, x[f.k], x)}</b></div>`, baris = (l, v) => `<div class="ar"><span>${esc(l)}</span><b>${v}</b></div>`;
+  const UKUR = ['luas', 'panjang', 'lebar'], bar = f => UKUR.includes(f.k) && x[f.k] !== '' && x[f.k] != null && asetNum(x[f.k]) ? `<div class="ar"><span>${esc(f.l)}</span><b>${esc(asetNum(x[f.k]).toLocaleString('id-ID', { maximumFractionDigits: 2 }))}</b></div>` : `<div class="ar"><span>${esc(f.l)}</span><b>${valHtml(f, x[f.k], x)}</b></div>`, baris = (l, v) => `<div class="ar"><span>${esc(l)}</span><b>${v}</b></div>`;
   const grp = (t, L, cls) => L ? `<div class="ag${cls ? ' ' + cls : ''}"><span class="lbl">${t}</span>${L}</div>` : '';
   const due = asetJatuhTempo(x);
   const fis = (x.jumlah ? baris('Jumlah', esc((asetNum(x.jumlah) || 1) + ' ' + (x.satuan || 'unit'))) : '') + shown.filter(f => ![].concat(IDEN, PERO, LEWAT).includes(f.k)).map(bar).join('') + (due ? baris('Inventarisasi berikutnya', esc(dPanjang(due.iso)) + (due.hari < 0 ? ' <span class="pill bad">lewat</span>' : due.hari < 183 ? ' <span class="pill warn">segera</span>' : '')) : '');
@@ -12399,7 +12399,7 @@ function asetKpiTabs(a, n) {
   const k = klasCek(a), th = tahunOf(a.tgl_perolehan) || a.tahun || '', luas = asetNum(a.luas), lh = kibHuruf(a) === 'A' || kibHuruf(a) === 'C';
   const it = [['Nilai', a.nilai ? fMoney(a.nilai) : '—'], ['Tahun', th || '—'], ['Kondisi', a.kondisi || '—'], [lh ? 'Luas' : 'Jumlah', luas && lh ? luas.toLocaleString('id-ID') + ' m²' : ((asetNum(a.jumlah) || 1) + ' ' + (a.satuan || 'unit'))]];
   const stp = (k.eks ? '<span class="pill warn">Ekstrakomptabel</span> ' : '') + (a.status === 'Draf' ? '<span class="pill">Draf</span> ' : a.status === 'Dihapus' ? '<span class="pill">Dihapus</span> ' : '') + (a.sipades === 'Sudah' ? '<span class="pill ok">SIPADES</span>' : '<span class="pill">Belum SIPADES</span>');
-  return `<div class="akpi">${it.map(x => `<div><span class="l">${esc(x[0])}</span><b>${esc(String(x[1]))}</b></div>`).join('')}</div><div class="ast">${stp}</div><div class="atabs" role="tablist"><button type="button" class="on" data-act="atab" data-t="r">Ringkasan</button><button type="button" data-act="atab" data-t="s">SIPADES</button><button type="button" data-act="atab" data-t="d">Dokumen${n.d ? ' (' + n.d + ')' : ''}</button><button type="button" data-act="atab" data-t="h">Riwayat${n.h ? ' (' + n.h + ')' : ''}</button></div>`;
+  return `<div class="akpi">${it.map(x => `<div><span class="l">${esc(x[0])}</span><b>${esc(String(x[1]))}</b></div>`).join('')}</div><div class="atabs" role="tablist"><button type="button" class="on" data-act="atab" data-t="r">Ringkasan</button><button type="button" data-act="atab" data-t="s">SIPADES</button><button type="button" data-act="atab" data-t="d">Dokumen${n.d ? ' (' + n.d + ')' : ''}</button><button type="button" data-act="atab" data-t="h">Riwayat${n.h ? ' (' + n.h + ')' : ''}</button></div>`;
 }
 const bukanEks = a => a.klasifikasi !== KLAS_EKS;
 const klasCek = a => { const h = kibHuruf(a), batas = klasBatas(h), j = Math.max(1, asetNum(a.jumlah) || 1), n = asetNum(a.nilai), per = n / j; return { h, batas, j, n, per, bawah: batas > 0 && n > 0 && per < batas, eks: a.klasifikasi === KLAS_EKS, usul: String(a.klasifikasi_usulan || '').trim() }; };
