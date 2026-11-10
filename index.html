@@ -164,7 +164,8 @@ button.stat:hover{border-color:var(--pri)}
 .btn.block{width:100%}
 .btns{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .fab{position:fixed;right:14px;bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:25;border-radius:12px;min-height:40px;padding:0 14px;box-shadow:var(--shadow)}
-@media (min-width:900px){.fab{bottom:22px;right:24px}.fab.fabL{right:130px}}
+@media (min-width:900px){.fab{bottom:22px;right:24px}.fab.fabL{right:130px}#modFab{display:none}}
+#modFab[hidden]{display:none}#modFab .fabin .fl{max-width:104px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* ---------- list ---------- */
 .toolbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
@@ -2476,6 +2477,26 @@ function sideKlik(e) {
   return false;
 }
 function itemOk(it) { if (it[8]) return asetGrpN(it) > 0; if (it[7]) return grpEs(it[7]).length > 0; if (it[6]) return SUBS()[it[6]].items.some(itemOk); if (it[3]) return canRead(it[3]); if (it[4]) return can(it[4]); return true; }
+/* tombol menu modul di kiri bawah (HP): buka sub menu modul yang sedang dipakai tanpa kembali ke Beranda/Dashboard */
+const MOD_PENDEK = { kesejahteraan: 'Kesejahteraan', antikorupsi: 'Anti Korupsi' };
+function modOfCur() {
+  if (!S.cur || !S.user) return '';
+  const n = S.cur.name, p = S.cur.params || {};
+  if (/^(home|menu|presensi|akun|login|form|ats|atsd|soon)$/.test(n)) return '';
+  const nn = n === 'detail' ? 'list' : n, e = p.e, ml = modDaftar();
+  const g = nn === 'list' && e && GRUP_OF[e], ag = typeof ASET_KEY_GRP !== 'undefined' && ASET_KEY_GRP[asetKey(nn, p)];
+  for (const m of ml) for (const it of m.list) { if (g && it[7] === g) return m.k; if (ag && it[8] === ag) return m.k; }
+  for (const m of ml) for (const it of m.list) { const t = it[2]; if (t && t[0] === nn && (nn !== 'list' || (t[1] || {}).e === e)) return m.k; }
+  const adm = { users: 1, settings: 1, penyimpanan: 1, template: 1, webdesa: 1, paketdesa: 1 };
+  return S.user.admin && adm[n] ? 'admin' : '';
+}
+function modFabUpdate() {
+  let b = document.getElementById('modFab'); const k = modOfCur(), m = k && modDaftar().find(x => x.k === k);
+  if (!m) { if (b) b.hidden = true; return; }
+  if (!b) { b = document.createElement('button'); b.id = 'modFab'; b.type = 'button'; b.className = 'btn pri fab fabL'; b.dataset.act = 'modOpen'; b.setAttribute('aria-label', 'Sub menu'); document.body.appendChild(b); }
+  b.dataset.k = k; b.title = 'Sub menu ' + m.l; b.hidden = false;
+  b.innerHTML = `<span class="fabin">${ic(m.ic)}<span class="fl">${esc(MOD_PENDEK[k] || m.l)}</span></span>`;
+}
 function markNav() {
   const cur = JSON.stringify([S.cur.name].concat(Object.keys(S.cur.params || {}).length ? [S.cur.params] : []));
   const g = S.cur.name === 'list' && S.cur.params && GRUP_OF[S.cur.params.e];
@@ -2486,6 +2507,7 @@ function markNav() {
   if (akt) setTimeout(() => { const sc = $('#sbScroll'); if (!sc) return; const r = akt.getBoundingClientRect(), rs = sc.getBoundingClientRect(); if (r.top < rs.top + 8 || r.bottom > rs.bottom - 8) akt.scrollIntoView({ block: 'center', behavior: 'smooth' }); sbFade(); }, 340);
   const tab = { home: 'home', presensi: 'presensi', menu: 'menu', akun: 'akun' }[S.cur.name];
   $$('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  try { modFabUpdate(); } catch (x) { console.warn(x); }
 }
 function root(tab) { S.stack = []; S.cur = null; go(tab, {}); }
 const openIds = () => $$('#main .it.open').filter(it => !it.parentElement.closest('.it')).map(it => [it.dataset.e, it.dataset.id]);
@@ -9173,7 +9195,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '245', tgl: '2026-11-10', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '246', tgl: '2026-11-10', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
