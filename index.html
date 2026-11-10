@@ -2326,14 +2326,32 @@ function MODS() {
 const S = { token: store.get('token'), user: null, perms: [], set: {}, stack: [], cur: null, seq: 0, rkpYear: null, vh: {} };
 
 const FILE_ACTIONS = ['upload', 'fileData', 'makeDoc', 'tplList', 'makeKK', 'toPdf', 'tplSources', 'tplExport'];
+/* Aplikasi desktop (exe): data bacaan terakhir disimpan terenkripsi di laptop (DPAPI Windows) dan dipakai saat tanpa internet. Di HP/browser tidak berlaku. */
+const DESK = window.pemdesDesktop || null;
+const BACA_OFFLINE = new Set(['list', 'get', 'home', 'anggota', 'keluargaOf', 'pendudukStats', 'distinct', 'cariWarga', 'pendudukByNik', 'wargaGet', 'petugasList', 'silsilah', 'keuRealisasi', 'keuBuku', 'keuDash', 'keuPagu', 'keuPajak', 'keuKegiatan', 'rpjm', 'rekap', 'dashboard', 'paket', 'paketRelasi', 'rkpDraft', 'atsList', 'atsGet', 'atsResmi', 'aktivitas', 'docData', 'me', 'myData']);
+function offlineSembunyi() { const b = document.getElementById('offBar'); if (b) b.remove(); }
+function offlineTampil(t) {
+  let b = document.getElementById('offBar');
+  if (!b) { b = document.createElement('div'); b.id = 'offBar'; b.setAttribute('role', 'status'); b.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:99999;background:#7a4b00;color:#fff;font:600 12px/1.3 system-ui,sans-serif;padding:5px 10px;text-align:center'; document.body.appendChild(b); }
+  const d = new Date(t);
+  b.textContent = 'Mode offline: menampilkan data terakhir (' + d.toLocaleDateString('id-ID') + ' ' + d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + '). Perubahan belum bisa disimpan.';
+}
+if (DESK) window.addEventListener('online', () => { offlineSembunyi(); try { toast('Kembali online. Muat ulang (Ctrl+R) untuk data terbaru.'); } catch (x) { } });
 function call(action, p, bearer) {
+  const r = callNet(action, p, bearer);
+  if (!DESK || !BACA_OFFLINE.has(action)) return r;
+  const key = action + '|' + JSON.stringify(p || {});
+  return r.then(d => { offlineSembunyi(); try { DESK.simpan(key, { t: Date.now(), d }); } catch (x) { } return d; },
+    err => { if (!err || !err.offline) throw err; return DESK.baca(key).then(c => { if (!c) throw err; offlineTampil(c.t); return c.d; }); });
+}
+function callNet(action, p, bearer) {
   const req = Object.assign({ action, token: S.token }, p || {});
   const berkas = FILE_ACTIONS.indexOf(action) >= 0;
   const h = berkas ? { 'Content-Type': 'text/plain;charset=utf-8' } : { 'Content-Type': 'application/json', apikey: SB_KEY };
   if (!berkas) h.Authorization = 'Bearer ' + (bearer || SB_KEY);
   if (!berkas && !bearer && !/^eyJ/.test(SB_KEY)) delete h.Authorization;
   return fetch(berkas ? FILE_URL : SB_URL + '/rest/v1/rpc/api', { method: 'POST', headers: h, body: JSON.stringify(berkas ? req : { req }) })
-    .then(r => r.json()).catch(() => { throw new Error('Tidak ada koneksi ke server. Periksa internet Anda.'); })
+    .then(r => r.json()).catch(() => { const e = new Error('Tidak ada koneksi ke server. Periksa internet Anda.'); e.offline = true; throw e; })
     .then(r => {
       if (r && r.ok) { if (action === 'save' && p && (p.entity === 'penduduk' || p.entity === 'keluarga')) { try { sosSinkronAntre(p.entity, r.data); } catch (x) { } } if (/^(save|remove|saveMany|hapus|bulk)/i.test(action)) bersihkanNanti(); return r.data; }
       const e = new Error((r && (r.error || r.message || r.msg)) || 'Terjadi kesalahan.');
@@ -3316,7 +3334,7 @@ function faceScreen() {
   };
   mb.onclick = run;
 }
-function logoutLocal(msg) { S.token = null; S.user = null; store.set('token', null); loginScreen(msg); }
+function logoutLocal(msg) { try { DESK && DESK.hapus(); } catch (x) { } offlineSembunyi(); S.token = null; S.user = null; store.set('token', null); loginScreen(msg); }
 async function doLogout() { try { await call('logout'); } catch (x) { } logoutLocal(); }
 
 function enter() {
@@ -3380,7 +3398,7 @@ async function boot() {
     try { const r = await call('loginGoogle', {}, hp.get('access_token')); S.token = r.token; store.set('token', r.token); store.set('last_email', r.user.email); tandaAktif(true); }
     catch (x) { return loginScreen(x.message); }
   }
-  if (S.token && idleHabis()) { call('logout').catch(() => { }); S.token = null; store.set('token', null); return loginScreen('Anda keluar otomatis karena 15 menit tidak ada aktivitas. Silakan masuk lagi.'); }
+  if (S.token && idleHabis()) { call('logout').catch(() => { }); try { DESK && DESK.hapus(); } catch (x) { } S.token = null; store.set('token', null); return loginScreen('Anda keluar otomatis karena 15 menit tidak ada aktivitas. Silakan masuk lagi.'); }
   if (!S.token) return loginScreen();
   try {
     const me = await call('me');
@@ -9238,7 +9256,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '251', tgl: '2026-11-10', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '252', tgl: '2026-11-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');

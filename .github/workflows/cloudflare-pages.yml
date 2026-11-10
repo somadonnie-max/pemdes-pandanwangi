@@ -18,7 +18,7 @@ jobs:
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: |
           mkdir _situs
-          rsync -a --exclude '.git' --exclude '.github' --exclude '_situs' --exclude 'website' --exclude 'dev' ./ _situs/
+          rsync -a --exclude '.git' --exclude '.github' --exclude '_situs' --exclude 'website' --exclude 'dev' --exclude 'desktop' ./ _situs/
       - name: Buat proyek Pages jika belum ada
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         run: npx --yes wrangler@3 pages project create pemdespandanwangi --production-branch=main || true
