@@ -197,6 +197,9 @@ button.stat:hover{border-color:var(--pri)}
 .dview[data-at] .xacts .danger{margin-left:auto}.krow .kbt{margin:2px 0 8px;padding-left:4px}@media(max-width:760px){.dview[data-at] .xacts{position:sticky;bottom:calc(50px + env(safe-area-inset-bottom,0px));z-index:6;margin:10px -4px 0;padding:7px 8px;gap:5px;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -5px 12px rgba(0,0,0,.07);border-radius:10px 10px 0 0}.dview[data-at] .xacts .btn.sm{padding:0 9px;font-size:11.5px}}
 @media(max-width:760px){.adt{grid-template-columns:1fr;gap:6px}.ahero img.hi{height:170px}.agr{grid-template-columns:1fr}.ag.wd{grid-column:auto}.ap-map{height:260px}.adt:not(.solo){grid-template-columns:132px 1fr;column-gap:10px;row-gap:4px}.adt:not(.solo)>.adr,.adt:not(.solo)>.adr>.atb{display:contents}.adt:not(.solo)>.adr>*:not(.atb),.adt:not(.solo)>.adr>.atb>*:not(.akpi){grid-column:1/-1}.adt:not(.solo)>.adl{display:contents}.adt:not(.solo)>.adl>.ahero{grid-column:1;grid-row:1;margin:0}.adt:not(.solo)>.adl>.athumbs{grid-column:1;grid-row:2;margin:0}.adt:not(.solo)>.adl>.apb{grid-column:1/-1;grid-row:3;margin:2px 0 4px}.adt:not(.solo) .apb .ap-map,.adt:not(.solo) .apb .map iframe{height:170px}.adt:not(.solo) .ahero.ph{height:96px}.adt:not(.solo) .ahero.ph small{display:none}.adt:not(.solo) .akpi{grid-column:2;grid-row:1/span 2;grid-template-columns:1fr 1fr;gap:6px 8px;align-content:start;margin:0;padding:0;border:0;background:none}.adt:not(.solo) .akpi>div:first-child{grid-column:1/-1}.adt:not(.solo) .ahero{margin-bottom:5px}.adt:not(.solo) .ahero img.hi{height:96px}.adt:not(.solo) .athumbs{margin:0}.adt:not(.solo) .athumbs button{width:28px;height:28px}.adt:not(.solo) .ahero .cnt{font-size:9px;padding:0 6px;right:5px;top:5px}}
 .dview[data-at] [data-tab]{display:none}.dview[data-at="r"] .agr[data-tab="r"]{display:grid}.dview[data-at="r"] [data-tab="r"],.dview[data-at="p"] [data-tab="p"],.dview[data-at="s"] [data-tab="s"],.dview[data-at="d"] [data-tab="d"],.dview[data-at="h"] [data-tab="h"]{display:block}.dview[data-at] dl[data-tab]{display:none}.dview[data-at="r"] dl[data-tab="r"]{display:grid}.dview[data-at] details[data-tab]{display:none}.dview[data-at="r"] details[data-tab="r"],.dview[data-at="s"] details[data-tab="s"]{display:block}
+.dview[data-at="a"] [data-tab="a"],.dview[data-at="rn"] [data-tab="rn"],.dview[data-at="bs"] [data-tab="bs"],.dview[data-at="tn"] [data-tab="tn"]{display:block}.ptab:empty::before{content:"Belum ada data.";display:block;color:var(--muted);font-size:12px;padding:8px 0}
+.pdt{display:grid;grid-template-columns:345px 1fr;gap:18px;align-items:start}.pdt.solo{grid-template-columns:1fr}.pdt.solo>.adl{display:none}.pdt .adl{min-width:0}.pdt .apb .map iframe{height:260px}.dview[data-at] .kkang .xacts .danger{margin-left:0}
+@media(max-width:760px){.pdt{display:flex;flex-direction:column;align-items:stretch;gap:6px}.pdt>.adl{order:2;margin-top:8px}.pdt .apb .map iframe{height:170px}.dview[data-at] .kkang .xacts{position:static;margin:6px 0 0;padding:0;border:0;box-shadow:none;background:none;border-radius:0}}
 .pslot{display:flex;flex-direction:column;gap:3px;align-items:stretch;text-align:center}
 .pimg{display:grid;place-items:center;aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:var(--surface2);border:1px dashed var(--line);padding:0;color:var(--muted);cursor:pointer}
 .pimg img{width:100%;height:100%;object-fit:cover}.pimg.empty{cursor:default}.pslot.has .pimg{border-style:solid}
@@ -4281,12 +4284,37 @@ function mapHtml(v, title) {
   return `<div class="map"><iframe loading="lazy" src="${esc(src)}" title="${esc(title || 'Peta lokasi')}" allowfullscreen></iframe><div class="mbar">${ic('pin')}<span class="mono">${esc(q)}</span><span class="sp"></span><button class="chip on" data-act="maptype" data-t="k">Satelit</button><button class="chip" data-act="maptype" data-t="m">Peta</button><a class="btn sm" href="${esc(open)}" target="_blank" rel="noopener">${ic('map')}Buka</a></div></div>`;
 }
 /* Isi detail satu data. Dipakai di daftar (lipat-buka) dan di halaman detail. */
+function pdAtab(t) { const b = t.closest('.dview'); if (!b) return; b.dataset.at = t.dataset.t; $$('.atabs button', b).forEach(x => x.classList.toggle('on', x === t)); }
+function pdPetaHtml(ll, judul) { return parseLL(ll) ? `<div class="apb"><div class="alb">${ic('map')} Lokasi rumah</div>${mapHtml(ll, judul)}</div>` : ''; }
+function pdPeta(el, ll, judul) { const pd = $('.pdt', el), h = pdPetaHtml(ll, judul); if (!pd || !h) return; $('.adl', pd).innerHTML = h; pd.classList.remove('solo'); }
+function pdDesil(el, desil) { const b = el.closest('.dview'), r = b && b.querySelector('.pdesil'); if (!r) return false; r.querySelector('b').innerHTML = dtPill(desil); r.style.display = ''; return true; }
+function pdOpen(e, x) {
+  const kk = e === 'keluarga', dus = String(x.dusun || '').replace(/^DUSUN /, ''), rtrw = [x.rt && 'RT ' + x.rt, x.rw && 'RW ' + x.rw].filter(Boolean).join(' / ');
+  const it = kk ? [['Anggota', x.jml_anggota != null && x.jml_anggota !== '' ? x.jml_anggota : '…', 'kjml'], ['Kepala', x.kepala || '—'], ['Dusun', dus || '—'], ['RT/RW', rtrw || '—'], ['Desil', x.dt_desil || '—']]
+    : [['Umur', x.tgl_lahir ? umur(x.tgl_lahir) + ' th' : '—'], ['Status', x.status || 'Aktif'], ['Pekerjaan', x.pekerjaan || '—'], ['Pendidikan', x.pendidikan || '—']];
+  const tabs = kk ? [['r', 'Ringkasan'], ['a', 'Anggota'], ['bs', 'Bansos &amp; DTSEN']] : [['r', 'Ringkasan'], ['rn', 'Data rentan'], ['bs', 'Bansos'], ['h', 'Riwayat'], ['tn', 'Tanah']];
+  const peta = kk ? pdPetaHtml(x.lokasi, 'Rumah ' + (x.kepala || '')) : '';
+  return `<div class="pdt${peta ? '' : ' solo'}"><div class="adl">${peta}</div><div class="adr"><div class="atb"><div class="akpi">${it.map(c => `<div><span class="l">${esc(c[0])}</span><b${c[2] ? ' class="' + c[2] + '"' : ''}>${esc(String(c[1]))}</b></div>`).join('')}</div><div class="atabs" role="tablist">${tabs.map((t, i) => `<button type="button"${i ? '' : ' class="on"'} data-act="atab" data-t="${t[0]}">${t[1]}</button>`).join('')}</div></div>`;
+}
+function pdGrupHtml(e, u, x, shown) {
+  const bar = f => `<div class="ar"><span>${esc(f.l)}</span><b>${pendLinkVal(e, f, x) || valHtml(f, x[f.k], x)}</b></div>`;
+  const ALM = ['w_prov', 'w_kab', 'w_kec', 'w_desa', 'dusun', 'rw', 'rt'];
+  const G = e === 'keluarga' ? [['Identitas KK', ['kk', 'kepala', 'tgl_kk']], ['Alamat', ALM.concat(['alamat'])]]
+    : [['Identitas', ['nik', 'kk', 'nama', 'jk', 'gol_darah', 'agama', 'warga_negara', 'no_paspor', 'no_kitap']], ['Kelahiran &amp; keluarga', ['tempat_lahir', 'tgl_lahir', 'status_kawin', 'tgl_kawin', 'tgl_cerai', 'hubungan', 'ayah', 'ibu']], ['Pendidikan &amp; pekerjaan', ['pendidikan', 'pekerjaan']], ['Alamat', ALM.concat(['alamat_kk'])], ['Status &amp; kontak', ['status', 'tgl_datang', 'tgl_meninggal', 'tgl_pindah', 'no_hp', 'email']]];
+  const pakai = new Set(['ket']); G.forEach(g => g[1].forEach(k => pakai.add(k)));
+  const grp = (t, L, cls) => L ? `<div class="ag${cls ? ' ' + cls : ''}"><span class="lbl">${t}</span>${L}</div>` : '';
+  const out = G.map(g => grp(g[0], g[1].map(k => shown.find(f => f.k === k)).filter(Boolean).map(bar).join('') + (e === 'penduduk' && g[0].indexOf('kontak') > 0 ? '<div class="ar pdesil" style="display:none"><span>Desil (dari DTSEN KK)</span><b></b></div>' : ''))).join('');
+  const lain = grp('Lainnya', shown.filter(f => !pakai.has(f.k)).map(bar).join(''));
+  const ket = x.ket ? `<div class="ag wd"><span class="lbl">Keterangan</span><div class="ar ak"><b>${esc(x.ket)}</b></div></div>` : '';
+  return `<div class="agr" data-tab="r">${out}${lain}${ket}</div>`;
+}
 async function renderDetail(e, x, el, full) {
   el.classList.add('dview'); if (e === 'aset') el.dataset.at = 'r';
   if (e === 'keluarga') { try { await kelDtMuat(x); if (/^\d+$/.test(x.dt_desil || '')) x.dt_desil = 'Desil ' + x.dt_desil; } catch (er) { } }
   const u = UI[e];
   const files = u.fields.filter(f => f.t === 'file' && x[f.k] && !(e === 'aparat' && /^(dok_sk_id|dok_henti_id)$/.test(f.k)));
   const diKK = e === 'penduduk' && !!el.closest('.kkang'), KK_SEMBUNYI = ['kk', 'w_prov', 'w_kab', 'w_kec', 'w_desa', 'dusun', 'rw', 'rt', 'alamat', 'alamat_kk', 'lokasi'];
+  const PD = (e === 'penduduk' && !diKK) || e === 'keluarga'; if (PD) { el.dataset.at = 'r'; S.vh.atab = pdAtab; }
   const shown = u.fields.filter(f => !(diKK && KK_SEMBUNYI.includes(f.k)) && !(e === 'aparat' && f.k === 'jabatan_tambahan') && f.t !== 'file' && f.t !== 'geo' && f.t !== 'fotos' && f.t !== 'rows' && f.t !== 'hidden' && f.t !== 'head' && x[f.k] !== '' && x[f.k] != null);
   const rws = u.fields.filter(f => f.t === 'rows' && x[f.k]).map(f => { let a = []; try { a = JSON.parse(x[f.k]); } catch (er) { } return a.length ? `<div class="lbl">${esc(f.l)}</div><div class="tbl-wrap ttw"><table class="tbl dtt ttema"><thead><tr>${f.cols.map(c => `<th${c[2] === 'money' || c[2] === 'num' ? ' style="text-align:right"' : ''}>${esc(c[1])}</th>`).join('')}</tr></thead><tbody>${a.map(r => '<tr>' + f.cols.map(([k, , t]) => `<td${t === 'money' || t === 'num' ? ' style="text-align:right"' : ''}>${esc(t === 'money' ? (f.dec2 ? (r[k] === '' || r[k] == null ? '' : 'Rp ' + akt(r[k])) : rp(r[k])) : r[k] || '')}</td>`).join('') + '</tr>').join('')}</tbody>${f.cols.some(c => c[0] === 'jumlah') ? `<tfoot><tr><td colspan="${f.cols.length - 1}"><b>Jumlah</b></td><td style="text-align:right"><b>${f.dec2 ? 'Rp ' + akt(a.reduce((t, r) => t + mNum(r.jumlah), 0)) : rp(a.reduce((t, r) => t + Number(r.jumlah || 0), 0))}</b></td></tr></tfoot>` : ''}</table></div>` : ''; }).join('');
   const galeri = u.fields.filter(f => f.t === 'fotos' && x[f.k]).map(f => { let a = []; try { a = JSON.parse(x[f.k]); } catch (er) { } return a.length ? `<div class="lbl">${esc(f.l)} (${a.length})</div><div class="pgrid">${a.map(fo => `<div class="pslot has"><button type="button" class="pimg" data-act="file" data-id="${esc(fo.id)}" data-name="${esc(fo.ket || f.l)}"><img src="${esc(thumb(fo.id, 240))}" alt="" loading="lazy"></button>${fo.ket ? `<span class="plbl">${esc(fo.ket)}</span>` : ''}</div>`).join('')}</div>` : ''; }).join('');
@@ -4294,24 +4322,26 @@ async function renderDetail(e, x, el, full) {
   const geo = geoF ? x[geoF.k] : u.geo ? u.geo(x) : '';
   const w = canWrite(e) && !(e === 'kegiatan' && x.sumber_mus);
   el.innerHTML = `
+    ${PD ? pdOpen(e, x) : ''}
     ${e === 'aset' ? (h => '<div class="adt' + (h ? '' : ' solo') + '">' + (h ? '<div class="adl">' + h + '</div>' : '') + '<div class="adr"><div class="atb"></div>')(asetHeroHtml(x) + asetPetaBox(x)) : ''}
     ${e === 'kegiatan' && x.sumber_mus ? `<div class="card meta">${ic('lock')} Agenda ini terusan otomatis dari Musyawarah RKP/RPJM (tanggal, jam, tempat, dan foto mengikuti data musyawarah). Tidak bisa diubah atau dihapus di sini; ubah lewat Perencanaan → RKP/RPJM Desa → Musyawarah &amp; Tim.</div>` : ''}
-    ${e === 'aset' ? asetGrupHtml(u, x, shown) : shown.length ? `<dl class="dl">${shown.map(f => `<div class="${f.t === 'textarea' || f.wide && String(x[f.k]).length > 40 ? 'w' : ''}"><dt>${esc(f.l)}</dt><dd>${pendLinkVal(e, f, x) || valHtml(f, x[f.k], x)}</dd></div>`).join('')}</dl>` : ''}
-    ${files.length && e !== 'penduduk' ? `<div class="btns"${e === 'aset' ? ' data-tab="d"' : ''}>${files.map(f => `<button class="btn sm" data-act="file" data-id="${esc(x[f.k])}" data-priv="${f.priv ? 1 : 0}" data-name="${esc(f.lihat || f.l)}">${ic(x[f.k] === '•' ? 'lock' : f.img ? 'eye' : 'file')}${esc(f.lihat || f.l)}</button>`).join('')}</div>` : ''}
+    ${e === 'aset' ? asetGrupHtml(u, x, shown) : PD ? pdGrupHtml(e, u, x, shown) : shown.length ? `<dl class="dl">${shown.map(f => `<div class="${f.t === 'textarea' || f.wide && String(x[f.k]).length > 40 ? 'w' : ''}"><dt>${esc(f.l)}</dt><dd>${pendLinkVal(e, f, x) || valHtml(f, x[f.k], x)}</dd></div>`).join('')}</dl>` : ''}
+    ${files.length && e !== 'penduduk' ? `<div class="btns"${e === 'aset' ? ' data-tab="d"' : e === 'keluarga' ? ' data-tab="r"' : ''}>${files.map(f => `<button class="btn sm" data-act="file" data-id="${esc(x[f.k])}" data-priv="${f.priv ? 1 : 0}" data-name="${esc(f.lihat || f.l)}">${ic(x[f.k] === '•' ? 'lock' : f.img ? 'eye' : 'file')}${esc(f.lihat || f.l)}</button>`).join('')}</div>` : ''}
     ${e === 'aset' ? '' : galeri}${rws}
-    <div class="xk"></div>
-    ${geo && e !== 'aset' ? mapHtml(geo, 'Lokasi ' + (u.row(x).t || '')) : ''}
+    <div class="xk"${PD ? ' data-tab="r"' : ''}></div>
+    ${geo && e !== 'aset' && !PD ? mapHtml(geo, 'Lokasi ' + (u.row(x).t || '')) : ''}
     <div class="xx"></div>
-    <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button>${/^tanah_/.test(e) && !S.user.admin ? '' : `<button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>`}` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak (tanpa QR)</button>` : ''}${e === 'keu_spp' ? `<button class="btn sm" data-act="sppWord" data-id="${esc(x.id)}">${ic('file')}SPP + SPTJM (Word)</button><button class="btn sm" data-act="kuitansi" data-id="${esc(x.id)}">${ic('print')}Cetak kuitansi</button>` : ''}${e === 'keu_spp' && w && x.status !== 'Dicairkan' ? `<button class="btn sm pri" data-act="keuCair" data-id="${esc(x.id)}">${ic('check')}Cairkan</button>` : ''}${e === 'keu_spp' && w && x.status === 'Dicairkan' ? `<button class="btn sm danger" data-act="keuBatal" data-id="${esc(x.id)}">${ic('x')}Batalkan pencairan</button>` : ''}${e === 'keu_trans' && w && x.jenis === 'Pajak Dipungut' ? `<button class="btn sm" data-act="setorPajak" data-id="${esc(x.id)}">${ic('send')}Setor pajak</button>` : ''}${NASKAH[e] && (w || e === 'surat_keluar') && !(e === 'surat_keluar' && !skAdaDraf(x)) ? `<button class="btn sm" data-act="cetakNaskah" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic(e === 'surat_keluar' ? 'eye' : 'print')}${e === 'surat_keluar' ? 'Lihat Draf' : 'Buat dokumen (Word)'}</button>` : ''}${e === 'surat_keluar' && x.jenis === 'Surat Tugas' ? `<button class="btn sm" data-act="sppdBuat" data-id="${esc(x.id)}">${ic('send')}Buat SPPD</button>` : ''}${e === 'surat_keluar' && w && skDraf(x) ? `<button class="btn sm pri" data-act="skSetuju" data-id="${esc(x.id)}">${ic('check')}Disetujui</button>` : ''}${e === 'surat_keluar' && w && x.status === 'Disetujui' && !x.dok_id ? `<button class="btn sm" data-act="skSetuju" data-id="${esc(x.id)}" data-pdf="1">${ic('plus')}Unggah PDF bertanda tangan</button>` : ''}${e === 'surat_masuk' && x.jenis === 'Surat Undangan' && x.acara_tgl && !(/Agenda/.test(x.terusan || '') && !x.agenda_id) ? (x.agenda_id ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'kegiatan', id: x.agenda_id }]))}'>${ic('cal')}Lihat di Agenda</button>` : canWrite('kegiatan') && w ? `<button class="btn sm" data-act="smAgenda" data-id="${esc(x.id)}">${ic('cal')}Masukkan ke Agenda</button>` : '') : ''}${e === 'kegiatan' && w && kgBisaSelesai(x) ? `<button class="btn sm pri" data-act="kgSelesai" data-id="${esc(x.id)}">${ic('check')}Selesai</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>${e === 'aset' ? '</div></div>' : ''}`;
+    <div class="btns xacts">${w ? `<button class="btn sm pri" data-act="xedit" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('edit')}Ubah</button>${/^tanah_/.test(e) && !S.user.admin ? '' : `<button class="btn sm danger" data-act="xdel" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic('trash')}Hapus</button>`}` : ''}${e === 'register_surat' && w ? `<button class="btn sm" data-act="cetakSurat" data-id="${esc(x.id)}">${ic('print')}Cetak (tanpa QR)</button>` : ''}${e === 'keu_spp' ? `<button class="btn sm" data-act="sppWord" data-id="${esc(x.id)}">${ic('file')}SPP + SPTJM (Word)</button><button class="btn sm" data-act="kuitansi" data-id="${esc(x.id)}">${ic('print')}Cetak kuitansi</button>` : ''}${e === 'keu_spp' && w && x.status !== 'Dicairkan' ? `<button class="btn sm pri" data-act="keuCair" data-id="${esc(x.id)}">${ic('check')}Cairkan</button>` : ''}${e === 'keu_spp' && w && x.status === 'Dicairkan' ? `<button class="btn sm danger" data-act="keuBatal" data-id="${esc(x.id)}">${ic('x')}Batalkan pencairan</button>` : ''}${e === 'keu_trans' && w && x.jenis === 'Pajak Dipungut' ? `<button class="btn sm" data-act="setorPajak" data-id="${esc(x.id)}">${ic('send')}Setor pajak</button>` : ''}${NASKAH[e] && (w || e === 'surat_keluar') && !(e === 'surat_keluar' && !skAdaDraf(x)) ? `<button class="btn sm" data-act="cetakNaskah" data-e="${esc(e)}" data-id="${esc(x.id)}">${ic(e === 'surat_keluar' ? 'eye' : 'print')}${e === 'surat_keluar' ? 'Lihat Draf' : 'Buat dokumen (Word)'}</button>` : ''}${e === 'surat_keluar' && x.jenis === 'Surat Tugas' ? `<button class="btn sm" data-act="sppdBuat" data-id="${esc(x.id)}">${ic('send')}Buat SPPD</button>` : ''}${e === 'surat_keluar' && w && skDraf(x) ? `<button class="btn sm pri" data-act="skSetuju" data-id="${esc(x.id)}">${ic('check')}Disetujui</button>` : ''}${e === 'surat_keluar' && w && x.status === 'Disetujui' && !x.dok_id ? `<button class="btn sm" data-act="skSetuju" data-id="${esc(x.id)}" data-pdf="1">${ic('plus')}Unggah PDF bertanda tangan</button>` : ''}${e === 'surat_masuk' && x.jenis === 'Surat Undangan' && x.acara_tgl && !(/Agenda/.test(x.terusan || '') && !x.agenda_id) ? (x.agenda_id ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'kegiatan', id: x.agenda_id }]))}'>${ic('cal')}Lihat di Agenda</button>` : canWrite('kegiatan') && w ? `<button class="btn sm" data-act="smAgenda" data-id="${esc(x.id)}">${ic('cal')}Masukkan ke Agenda</button>` : '') : ''}${e === 'kegiatan' && w && kgBisaSelesai(x) ? `<button class="btn sm pri" data-act="kgSelesai" data-id="${esc(x.id)}">${ic('check')}Selesai</button>` : ''}${!full && DETAIL_PAGE[e] ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e, id: x.id }]))}'>${ic('next')}Buka halaman</button>` : ''}<span class="meta" style="margin-left:auto">${x._oleh ? 'Diubah ' + esc(x._oleh) + ' · ' + esc(String(x._waktu || '').slice(0, 16)) : ''}</span></div>${e === 'aset' || PD ? '</div></div>' : ''}`;
   const xk = $('.xk', el), xx = $('.xx', el);
   if (e === 'penduduk' && !diKK) {
     try {
       const k = await call('keluargaOf', { penduduk_id: x.id });
-      xk.innerHTML = k ? `<button type="button" class="card kkcard" data-act="kk" data-id="${esc(k.id)}">${ic('house')}<span>Kepala <b>${esc(k.kepala)}</b> · ${k.jml_anggota} anggota</span>${ic('next')}</button>${mapHtml(k.lokasi, 'Rumah ' + k.kepala)}`
+      xk.innerHTML = k ? `<button type="button" class="card kkcard" data-act="kk" data-id="${esc(k.id)}">${ic('house')}<span>Kepala <b>${esc(k.kepala)}</b> · ${k.jml_anggota} anggota</span>${ic('next')}</button>`
         : x.kk ? `<div class="meta">No. KK <span class="mono">${esc(x.kk)}</span> belum ada di Data Keluarga.</div>` : '';
+      if (k) pdPeta(el, k.lokasi, 'Rumah ' + k.kepala);
     } catch (er) { xk.innerHTML = `<div class="err">${esc(er.message)}</div>`; }
   }
-  if (e === 'keluarga') { await extraKeluarga(x, xx, full); try { await extraKelDtsen(x, xx); } catch (er) { } }
+  if (e === 'keluarga') { xx.innerHTML = '<div class="ptab" data-tab="a"></div><div class="ptab" data-tab="bs"></div>'; await extraKeluarga(x, $('[data-tab="a"]', xx), full); try { await extraKelDtsen(x, $('[data-tab="bs"]', xx)); } catch (er) { } }
   if (e === 'keu_paket') await extraPaket(x, xx);
   if (e === 'dtsen') await extraDtsen(x, xx);
   if (e === 'register_surat') { try { await extraSuratVerif(x, xx); } catch (er) { console.warn(er); } }
@@ -4330,10 +4360,15 @@ async function renderDetail(e, x, el, full) {
   if (e === 'keu_kwitansi') await extraKwtSpj(x, xx, canWrite('keu_bukti'));
   if (e === 'aparat') { extraAparat(x, xx, canWrite(e)); await extraAparatSK(x, xx, canWrite(e)); await extraAparatSert(x, xx, canWrite(e)); }
   if (e === 'tanah_desa' || e === 'tanah_sert') await extraTanah(e, x, xx);
-  if (e === 'penduduk') xx.insertAdjacentHTML('afterbegin', mutasiHtml(x) + pendTombol(x));
-  if (e === 'penduduk') await extraPendudukLink(x, xx);
-  if (e === 'penduduk') await extraPendudukSosial(x, xx);
-  if (e === 'penduduk') await extraSosialUsulan(x, xx);
+  if (e === 'penduduk' && PD) {
+    xx.innerHTML = '<div class="pxr" data-tab="r"></div><div class="ptab" data-tab="rn"></div><div class="ptab" data-tab="bs"></div><div class="ptab" data-tab="h"></div><div class="ptab" data-tab="tn"></div>';
+    const TB = {}; ['r', 'rn', 'bs', 'h', 'tn'].forEach(k => { TB[k] = $('[data-tab="' + k + '"]', xx); });
+    TB.r.innerHTML = mutasiHtml(x) + pendTombol(x);
+    await extraPendudukSosial(x, xx, TB); await extraPendudukLink(x, xx, TB); await extraSosialUsulan(x, TB.bs);
+  } else if (e === 'penduduk') {
+    xx.insertAdjacentHTML('afterbegin', mutasiHtml(x) + pendTombol(x));
+    await extraPendudukLink(x, xx); await extraPendudukSosial(x, xx); await extraSosialUsulan(x, xx);
+  }
   if (e === 'musdes_bansos') await extraMusdes(x, xx);
   if (e === 'ntcr') ntcrExtra(x, xx);
   if (e === 'adminduk') admExtra(x, xx);
@@ -4931,6 +4966,7 @@ function confirmDel(box, fn, msg, lbl) {
 async function extraKeluarga(k, el, full) {
   const rows = urutKK(await call('anggota', { keluarga_id: k.id }));
   const w = canWrite('penduduk');
+  { const dv = el.closest('.dview'), kj = dv && dv.querySelector('.kjml'); if (kj) kj.textContent = rows.length; }
   el.innerHTML = `<div class="sec-h kkh"><h2>Anggota keluarga (${rows.length})</h2><span class="btns">${canWrite('keluarga') ? `<button class="btn sm" data-act="kkLokasi" data-id="${esc(k.id)}" data-ll="${esc(k.lokasi || '')}">${ic('pin')}Pilih</button>` : ''}${can('lihat_nik') ? `<button class="btn sm" data-act="draftKK" data-id="${esc(k.id)}">${ic('print')}KK</button>` : ''}${w ? `<button class="btn sm" data-act="addAng" data-k='${esc(JSON.stringify({ kk: String(k.kk).indexOf('•') < 0 ? k.kk : '', dusun: k.dusun, rt: k.rt, rw: k.rw }))}'>${ic('plus')}Anggota</button>` : ''}</span></div>` +
     (rows.length ? `<div class="list kkang">${rows.map(r => rowHtml('penduduk', r)).join('')}</div>` : '<div class="card empty">Belum ada anggota yang tercatat dengan nomor KK ini.</div>');
 }
@@ -6099,17 +6135,18 @@ ACT.ortuBuka = async t => {
   const id = t.dataset.id;
   try { await call('get', { entity: 'penduduk', id }); go('detail', { e: 'penduduk', id }); } catch (er) { go('silsilah', { id }); }
 };
-async function extraPendudukLink(x, el) {
+async function extraPendudukLink(x, el, TB) {
   const nikOk = /^\d{16}$/.test(String(x.nik || ''));
   const [tn, sr] = await Promise.all([
     canRead('tanah_desa') ? Promise.all([call('list', { entity: 'tanah_desa', filters: { pm_penduduk_id: x.id }, limit: 100 }), nikOk ? call('list', { entity: 'tanah_desa', filters: { pm_nik: x.nik }, limit: 100 }).catch(() => null) : null]).then(a => a.filter(Boolean).flatMap(r => r.rows || [])).catch(() => null) : null,
     canRead('register_surat') ? Promise.all([call('list', { entity: 'register_surat', filters: { penduduk_id: x.id }, limit: 100 }), nikOk ? call('list', { entity: 'register_surat', filters: { nik: x.nik }, limit: 100 }).catch(() => null) : null]).then(a => a.filter(Boolean).flatMap(r => r.rows || [])).catch(() => null) : null
   ]);
   const uniq = a => { const m = {}; (a || []).forEach(r => { m[r.id] = r; }); return Object.values(m); };
-  let h = '';
-  if (tn && uniq(tn).length) { const T = uniq(tn); h += `<div class="sec-h"><h2>${ic('map')} Tanah yang dimiliki (${T.length})</h2></div>` + (T.length ? `<div class="list">${T.map(r => rowHtml('tanah_desa', r)).join('')}</div>${T.some(r => r.bidang) ? `<div class="btns"><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['tanah', { fokus: T.find(r => r.bidang).id }]))}'>${ic('map')}Lihat di peta</button></div>` : ''}` : '<div class="meta">Belum tercatat sebagai pemilik tanah.</div>'); }
+  let h = '', hT = '';
+  if (tn && uniq(tn).length) { const T = uniq(tn); hT += `<div class="sec-h"><h2>${ic('map')} Tanah yang dimiliki (${T.length})</h2></div>` + (T.length ? `<div class="list">${T.map(r => rowHtml('tanah_desa', r)).join('')}</div>${T.some(r => r.bidang) ? `<div class="btns"><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['tanah', { fokus: T.find(r => r.bidang).id }]))}'>${ic('map')}Lihat di peta</button></div>` : ''}` : '<div class="meta">Belum tercatat sebagai pemilik tanah.</div>'); }
   if (sr && uniq(sr).length) { const R2 = uniq(sr).sort((a, b) => String(b.tgl_surat || '').localeCompare(String(a.tgl_surat || ''))); h += `<div class="sec-h"><h2>${ic('file')} Riwayat surat keterangan (${R2.length})</h2></div>` + (R2.length ? `<div class="list">${R2.map(r => rowHtml('register_surat', r)).join('')}</div>` : '<div class="meta">Belum pernah mengurus surat keterangan.</div>'); }
-  if (h) el.insertAdjacentHTML('beforeend', `<div class="stack">${h}</div>`);
+  if (TB) { if (hT) TB.tn.insertAdjacentHTML('beforeend', `<div class="stack">${hT}</div>`); if (h) TB.h.insertAdjacentHTML('beforeend', `<div class="stack">${h}</div>`); }
+  else { h = hT + h; if (h) el.insertAdjacentHTML('beforeend', `<div class="stack">${h}</div>`); }
 }
 /* ---- Orang (Tanah: pemilik, NTCR: suami/istri/orang tua, Rentan: warga) dari Data Penduduk atau baru (luar desa) ---- */
 const ORANG_BUAT = { tanah_desa: [['pm_', 'Pemilik']], ntcr: [['s_', 'Suami', { ayah: 'sa_nama', ibu: 'si_nama' }], ['i_', 'Istri', { ayah: 'ia_nama', ibu: 'ii_nama' }]], rentan: [['r_', 'Warga']] };
@@ -6994,7 +7031,7 @@ async function extraSosialUsulan(x, el) {
   if (!canRead('usulan_bansos')) return;
   const [us, sl] = await Promise.all(['usulan_bansos', 'penyaluran_bansos'].map((e, i) => call('list', { entity: e, filters: { [(i ? 'p_' : 'u_') + 'penduduk_id']: x.id }, limit: 200 }).then(r => r.rows || []).catch(() => [])));
   /* desil kosong -> tampilkan desil keluarganya */
-  if (!x.desil && x.kk) { try { const d = await pendDtDesil(x.kk); const dl = el.parentElement && el.parentElement.querySelector(':scope > dl.dl'); if (d && d.desil && dl) dl.insertAdjacentHTML('beforeend', `<div><dt>Desil (dari DTSEN KK)</dt><dd>${dtPill(d.desil)}</dd></div>`); } catch (er) { } }
+  if (!x.desil && x.kk) { try { const d = await pendDtDesil(x.kk); const dl = el.parentElement && el.parentElement.querySelector(':scope > dl.dl'); if (d && d.desil && !pdDesil(el, d.desil) && dl) dl.insertAdjacentHTML('beforeend', `<div><dt>Desil (dari DTSEN KK)</dt><dd>${dtPill(d.desil)}</dd></div>`); } catch (er) { } }
   let h = '';
   if (us.length) h += `<div class="sec-h"><h2>${ic('send')} Usulan bansos / DTSEN (${us.length})</h2></div><div class="list">${us.map(r => rowHtml('usulan_bansos', r)).join('')}</div>`;
   if (sl.length) {
@@ -7194,7 +7231,7 @@ function rentanRingkas(r) {
     + (bs.length ? `<div class="tbl-wrap ttw"><table class="tbl dtt ttema"><thead><tr><th>Program / jenis</th><th>Sumber</th><th>Tahun</th><th>Keterangan</th></tr></thead><tbody>${bs.map(b => `<tr><td><b>${esc(b.program)}</b></td><td>${esc(b.sumber || '')}</td><td>${esc(b.tahun || '')}</td><td>${esc(b.ket || '')}</td></tr>`).join('')}</tbody></table></div>` : '')
     + '</div>';
 }
-async function extraPendudukSosial(x, el) {
+async function extraPendudukSosial(x, el, TB) {
   const id = x.id, uniq = a => { const m = {}; (a || []).forEach(r => { m[r.id] = r; }); return Object.values(m); };
   const [nt, rn] = await Promise.all([
     canRead('ntcr') ? Promise.all([call('list', { entity: 'ntcr', filters: { s_penduduk_id: id }, limit: 50 }), call('list', { entity: 'ntcr', filters: { i_penduduk_id: id }, limit: 50 })]).then(a => uniq(a.flatMap(r => r.rows || []))).catch(() => null) : null,
@@ -7203,7 +7240,7 @@ async function extraPendudukSosial(x, el) {
   let rw = []; try { rw = Array.isArray(x.riwayat_kawin) ? x.riwayat_kawin : JSON.parse(x.riwayat_kawin || '[]'); } catch (er) { }
   const u = umur(x.tgl_lahir), tag = [];
   if (x.tgl_lahir && u >= 60) tag.push('Lansia (' + u + ' th)'); if (x.tgl_lahir && u < 5) tag.push('Balita');
-  let h = '';
+  let h = '', hR = '';
   if ((nt && nt.length) || rw.length) {
     const N2 = (nt || []).sort((a, b) => String(b.tgl_peristiwa || b.tanggal || '').localeCompare(String(a.tgl_peristiwa || a.tanggal || '')));
     h += `<div class="sec-h"><h2>${ic('users')} Riwayat perkawinan</h2></div>` + (N2.length ? `<div class="list">${N2.map(r => rowHtml('ntcr', r)).join('')}</div>` : '')
@@ -7211,10 +7248,11 @@ async function extraPendudukSosial(x, el) {
       + (!N2.length && !rw.length ? '<div class="meta">Belum ada catatan di Buku NTCR.</div>' : '');
   }
   if (rn) {
-    h += `<div class="sec-h"><h2>${ic('heart')} Data rentan / sosial${tag.length ? ' <span class="pill info">' + esc(tag.join(', ')) + '</span>' : ''}</h2>${canWrite('rentan') ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['form', { e: 'rentan', preset: { r_nama: x.nama || '', r_penduduk_id: x.id, r_nik: x.nik || '', r_kk: x.kk || '', r_jk: x.jk || '', r_tempat_lahir: x.tempat_lahir || '', r_tgl_lahir: x.tgl_lahir || '', r_agama: x.agama || '', r_pekerjaan: x.pekerjaan || '', r_wn: x.warga_negara || 'WNI', r_alamat: x.dusun || '', r_rt: x.rt || '', r_rw: x.rw || '', r_desa: /luar/i.test(x.status || '') ? '' : (S.set.nama_desa || '').toUpperCase(), r_kec: /luar/i.test(x.status || '') ? '' : (S.set.kecamatan || '').toUpperCase(), r_kab: /luar/i.test(x.status || '') ? '' : (S.set.kabupaten || '').toUpperCase() } }]))}'>${ic('plus')}Catat data rentan</button>` : ''}</div>`
+    hR += `<div class="sec-h"><h2>${ic('heart')} Data rentan / sosial${tag.length ? ' <span class="pill info">' + esc(tag.join(', ')) + '</span>' : ''}</h2>${canWrite('rentan') ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['form', { e: 'rentan', preset: { r_nama: x.nama || '', r_penduduk_id: x.id, r_nik: x.nik || '', r_kk: x.kk || '', r_jk: x.jk || '', r_tempat_lahir: x.tempat_lahir || '', r_tgl_lahir: x.tgl_lahir || '', r_agama: x.agama || '', r_pekerjaan: x.pekerjaan || '', r_wn: x.warga_negara || 'WNI', r_alamat: x.dusun || '', r_rt: x.rt || '', r_rw: x.rw || '', r_desa: /luar/i.test(x.status || '') ? '' : (S.set.nama_desa || '').toUpperCase(), r_kec: /luar/i.test(x.status || '') ? '' : (S.set.kecamatan || '').toUpperCase(), r_kab: /luar/i.test(x.status || '') ? '' : (S.set.kabupaten || '').toUpperCase() } }]))}'>${ic('plus')}Catat data rentan</button>` : ''}</div>`
       + (rn.length ? rn.map(rentanRingkas).join('') : '<div class="meta">Belum tercatat sebagai penduduk rentan/penerima bantuan.</div>');
   }
-  if (h) el.insertAdjacentHTML('beforeend', `<div class="stack">${h}</div>`);
+  if (TB) { if (h) TB.h.insertAdjacentHTML('beforeend', `<div class="stack">${h}</div>`); if (hR) TB.rn.insertAdjacentHTML('beforeend', `<div class="stack">${hR}</div>`); }
+  else { h += hR; if (h) el.insertAdjacentHTML('beforeend', `<div class="stack">${h}</div>`); }
 }
 /* ---- Mutasi penduduk: Nyatakan Meninggal / Nyatakan Pindah (dari detail penduduk) ---- */
 const SEBAB_MATI = ['Sakit biasa / tua', 'Wabah penyakit', 'Kecelakaan', 'Kriminalitas', 'Bunuh diri', 'Lainnya'];
@@ -9198,7 +9236,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '248', tgl: '2026-11-10', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '249', tgl: '2026-11-10', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
