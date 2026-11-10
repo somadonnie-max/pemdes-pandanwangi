@@ -9173,7 +9173,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '243', tgl: '2026-11-10', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '244', tgl: '2026-11-10', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
@@ -15069,6 +15069,12 @@ function asetLaporan(jenis, L, opt) {
     const foot = cols.map((c, i) => /Nilai/.test(c[0]) ? fMoney(asetTotal(R)) : i === 0 ? 'Jumlah' : '');
     return { html: asetHalaman('KARTU INVENTARIS BARANG (KIB) ' + h, kibNama(h).toUpperCase() + ' · ' + desa + th, cols, R, foot), rows: R, cols };
   }
+  if (jenis === 'Barang Inventaris Kecil') {
+    const R = L.filter(a => a.status !== 'Dihapus' && !bukanEks(a)).sort((a, b) => kibHuruf(a).localeCompare(kibHuruf(b)) || String(a.kode_barang || '').localeCompare(String(b.kode_barang || '')));
+    const cols = [['Nama Barang', 'nama'], ['KIB', a => 'KIB ' + kibHuruf(a)], ['Kode / Reg', regTxt], ['Merk / Tipe / Ukuran', a => esc([a.merk, a.tipe, a.ukuran, a.bahan].filter(Boolean).join(' / '))], ['Jumlah', a => esc((a.jumlah || '1') + ' ' + (a.satuan || ''))], ['Tahun', a => esc(String(a.tahun || tahunOf(a.tgl_perolehan) || ''))], ['Asal Usul', a => esc([a.asal, a.sumber_dana].filter(Boolean).join(' / '))], ['Harga Satuan (Rp)', a => fMoney(asetNum(a.nilai) / Math.max(1, asetNum(a.jumlah) || 1))], ['Nilai (Rp)', a => fMoney(a.nilai)], ['Kondisi', 'kondisi'], ['Lokasi / Ruang', a => esc([a.ruang, a.letak, a.dusun].filter(Boolean).join(', '))], ['Ket', 'ket']];
+    const html = asetHalaman('DAFTAR BARANG INVENTARIS KECIL (EKSTRAKOMPTABEL)', desa + th, cols, R, cols.map((c, i) => c[0] === 'Nilai (Rp)' ? fMoney(asetTotal(R)) : i === 0 ? 'Jumlah' : '')).replace('</h3>', '</h3><p style="font-size:8pt;margin:2px 0 6px">Barang di bawah batas kapitalisasi (Perbup Lumajang No. 83 Tahun 2022, Bab J angka 4 dan 6), dicatat sebagai inventaris dan tidak dikapitalisasi sebagai aset tetap.</p>');
+    return { html, rows: R, cols };
+  }
   if (jenis === 'Buku Inventaris') {
     const cols = [['Jenis Barang / Bangunan', 'nama'], ['KIB', a => 'KIB ' + kibHuruf(a)], ['Kode / Reg', regTxt], ['Identitas', a => esc([a.merk, a.ukuran, a.bahan, a.panjang ? a.panjang + ' m' : '', a.luas ? a.luas + ' m²' : ''].filter(Boolean).join(', '))], ['Jumlah', a => esc((a.jumlah || '1') + ' ' + (a.satuan || ''))], ['Asal Usul', 'asal'], ['Sumber Dana', 'sumber_dana'], ['Tahun', a => esc(String(a.tahun || tahunOf(a.tgl_perolehan) || ''))], ['Kondisi', 'kondisi'], ['Lokasi', a => esc([a.letak, a.dusun].filter(Boolean).join(', '))], ['Nilai (Rp)', a => fMoney(a.nilai)], ['Ket', 'ket']];
     const R = aktif.slice().sort((a, b) => kibHuruf(a).localeCompare(kibHuruf(b)) || String(a.kode_barang || '').localeCompare(String(b.kode_barang || '')));
@@ -15093,7 +15099,7 @@ function asetLaporan(jenis, L, opt) {
   }
   return { html: '', rows: [], cols: [] };
 }
-const ASET_LAP = ['Buku Inventaris', 'KIB A', 'KIB B', 'KIB C', 'KIB D', 'KIB E', 'KIB F', 'KIB G', 'Laporan Kondisi', 'Laporan Semester'];
+const ASET_LAP = ['Buku Inventaris', 'KIB A', 'KIB B', 'KIB C', 'KIB D', 'KIB E', 'KIB F', 'KIB G', 'Laporan Kondisi', 'Laporan Semester', 'Barang Inventaris Kecil'];
 VIEWS.asetcetak = async (p, main) => {
   setTop('Cetak Laporan Aset');
   const st = S.asetCt = S.asetCt || { j: 'Buku Inventaris', tahun: String(new Date().getFullYear()), semester: new Date().getMonth() < 6 ? '1' : '2' };
@@ -15104,15 +15110,15 @@ VIEWS.asetcetak = async (p, main) => {
     <div class="btns"><button class="btn pri" data-act="acCetak">${ic('print')}Cetak / PDF</button><button class="btn" data-act="acXls">${ic('down')}Excel</button><button class="btn" data-act="acAll">${ic('print')}Cetak semua KIB</button><button class="btn" data-act="go" data-go='["sipadeslap"]'>${ic('print')}Format SIPADES</button>${S.user.admin ? `<button class="btn" data-act="go" data-go='["asettpl"]'>${ic('edit')}Atur kop & penandatangan</button>` : ''}</div>
     <div class="meta">${L.length} aset tercatat${nEks ? ` (${nEks} ekstrakomptabel tidak dihitung)` : ''}. Kolom tabel mengikuti format KIB dan tidak bisa diubah; kop, logo, penandatangan, dan redaksi diatur di editor template.</div></div><div id="acPrev" class="doc-prev fitp"></div></div>`;
   const opt = () => ({ tahun: $('#acT').value, semester: $('#acS').value });
-  const prev = () => { st.tahun = $('#acT').value; st.semester = $('#acS').value; const r = asetLaporan(st.j, L, opt()); $('#acPrev').innerHTML = r.html; fitPapers($('#acPrev')); };
+  const prev = () => { st.tahun = $('#acT').value; st.semester = $('#acS').value; const r = asetLaporan(st.j, st.j === 'Barang Inventaris Kecil' ? L0 : L, opt()); $('#acPrev').innerHTML = r.html; fitPapers($('#acPrev')); };
   prev(); $('#acT').onchange = prev; $('#acS').onchange = prev;
   S.vh.acJ = t => { st.j = t.dataset.v; refresh(); };
-  S.vh.acCetak = () => printDocs(st.j, [asetLaporan(st.j, L, opt()).html], 'aset_lap');
-  S.vh.acAll = () => printDocs('KIB A–G', ['KIB A', 'KIB B', 'KIB C', 'KIB D', 'KIB E', 'KIB F', 'KIB G'].map(j => asetLaporan(j, L, opt()).html), 'aset_kib');
+  S.vh.acCetak = () => printDocs(st.j, [asetLaporan(st.j, st.j === 'Barang Inventaris Kecil' ? L0 : L, opt()).html], 'aset_lap');
+  S.vh.acAll = () => printDocs('KIB A–G', ['KIB A', 'KIB B', 'KIB C', 'KIB D', 'KIB E', 'KIB F', 'KIB G'].map(j => asetLaporan(j, j === 'Barang Inventaris Kecil' ? L0 : L, opt()).html), 'aset_kib');
   S.vh.acXls = () => {
     const strip = h => String(h == null ? '' : h).replace(/<br\s*\/?>/g, ' ').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").trim();
     const jj = st.j === 'Buku Inventaris' ? ASET_LAP.slice(0, 8) : [st.j];
-    saveBlob(XL.write(jj.map(j => { const r = asetLaporan(j, L, opt()); return { name: j, rows: [['No'].concat(r.cols.map(c => c[0]))].concat(r.rows.map((x, i) => [i + 1].concat(r.cols.map(c => { const v = typeof c[1] === 'function' ? strip(c[1](x)) : (x[c[1]] == null ? '' : x[c[1]]); const n = /Rp|Nilai|unit|Luas|Panjang|Lebar/.test(c[0]) ? Number(String(v).replace(/[^\d,-]/g, '').replace(',', '.')) : NaN; return isNaN(n) || v === '' ? v : n; })))), head: true, widths: [5].concat(r.cols.map(c => /Nama|Jenis|Letak|Identitas/.test(c[0]) ? 30 : 16)) }; })), namaFile(st.j + ' ' + (S.set.nama_desa || '') + ' ' + st.tahun) + '.xlsx');
+    saveBlob(XL.write(jj.map(j => { const r = asetLaporan(j, j === 'Barang Inventaris Kecil' ? L0 : L, opt()); return { name: j, rows: [['No'].concat(r.cols.map(c => c[0]))].concat(r.rows.map((x, i) => [i + 1].concat(r.cols.map(c => { const v = typeof c[1] === 'function' ? strip(c[1](x)) : (x[c[1]] == null ? '' : x[c[1]]); const n = /Rp|Nilai|unit|Luas|Panjang|Lebar/.test(c[0]) ? Number(String(v).replace(/[^\d,-]/g, '').replace(',', '.')) : NaN; return isNaN(n) || v === '' ? v : n; })))), head: true, widths: [5].concat(r.cols.map(c => /Nama|Jenis|Letak|Identitas/.test(c[0]) ? 30 : 16)) }; })), namaFile(st.j + ' ' + (S.set.nama_desa || '') + ' ' + st.tahun) + '.xlsx');
   };
 };
 /* ---------- editor kop & penandatangan laporan aset ---------- */
