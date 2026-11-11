@@ -814,6 +814,19 @@ input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-sof
   .dview .meta{font-size:11px}
 }
 .pill .ic{width:11px;height:11px;vertical-align:-1px;margin-right:3px}
+.sr-g{display:grid;gap:10px;align-items:stretch}.sr-12{grid-template-columns:minmax(300px,1fr) 2fr}.sr-21{grid-template-columns:2fr minmax(300px,1fr)}.sr-11{grid-template-columns:1fr 1fr}.sr-3{grid-template-columns:repeat(3,minmax(0,1fr))}.sr-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.sr-duo{display:grid;grid-template-columns:1fr 1fr;gap:14px}.sr-in{display:flex;flex-direction:column;gap:8px;min-width:0}.sr-duo>.sr-in+.sr-in{border-left:1px dashed var(--line);padding-left:14px}
+.sr .kd-c{padding:11px 12px;gap:8px}.sr .ad-donut{grid-template-columns:150px 1fr}.sr .ad-leg{gap:0}.sr .ad-leg .sr-b2{padding:3px 6px}
+.sr-b .sr-tk{height:10px;background:var(--surface2);display:block;overflow:hidden}.sr-b .sr-tk>i{display:block;height:100%}
+.sr .kd-g svg{filter:drop-shadow(0 5px 6px rgba(0,0,0,.22)) drop-shadow(0 1px 1px rgba(0,0,0,.15))}.sr .kd-g svg circle{stroke-linecap:butt}
+.sr-cb i{background:linear-gradient(90deg,#15803d 0%,#4ade80 38%,#22c55e 55%,#166534 100%)!important;border-radius:6px 6px 2px 2px;box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -2px 0 rgba(0,0,0,.18),0 4px 8px -2px rgba(21,128,61,.45);position:relative;transform-origin:bottom;animation:srUp .9s cubic-bezier(.2,.8,.2,1) both}
+.sr-cb i::before{content:'';position:absolute;left:0;right:0;top:0;height:6px;border-radius:6px 6px 50% 50%;background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,0))}
+@keyframes srUp{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.sr-cell{box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 0 rgba(0,0,0,.12),0 2px 3px rgba(0,0,0,.12);background-image:linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,0) 55%,rgba(0,0,0,.06))}
+.sr .sr-mx{margin:0}.sr .sr-mx td,.sr .sr-mx th{padding:3px 6px}
+.sr .ad-ring{box-shadow:0 6px 14px -4px rgba(0,0,0,.35),inset 0 2px 3px rgba(255,255,255,.25)}
+@media(max-width:1100px){.sr-12,.sr-21{grid-template-columns:1fr 1fr}.sr-4{grid-template-columns:1fr 1fr}.sr-3{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.sr-12,.sr-21,.sr-11,.sr-3,.sr-4,.sr-duo{grid-template-columns:minmax(0,1fr)}.sr-duo>.sr-in+.sr-in{border-left:0;padding-left:0;border-top:1px dashed var(--line);padding-top:10px}}
 .sr .ad-hero{background:linear-gradient(135deg,#4a148c 0%,#7b1fa2 45%,#c2185b 100%)}.sr .ad-ring::before{background:#7b1fa2}.sr .ad-hero .ad-ring{background:conic-gradient(#ffd54f calc(var(--p)*1%),rgba(255,255,255,.22) 0)}
 .sr-fil{gap:6px;padding:10px 12px}.sr-fr{display:flex;align-items:center;gap:8px;min-width:0}.sr-fl2{flex:none;width:58px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}.sr-fr .chips{flex:1;min-width:0}.sr-fr .chip{padding:4px 11px;font-size:12px}.sr-fr .chip.on{background:var(--pri);border-color:var(--pri);color:#fff}
 .sr-fa{justify-content:space-between;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:7px;margin-top:2px}.sr-fa .meta{white-space:normal}
@@ -7121,15 +7134,16 @@ VIEWS.sosrekap = async (p, main, alive) => {
     const bars = (judul, m, urut, warna, jenis, nilai) => {
       const ks = urut ? urut.filter(k => m[k]).concat(Object.keys(m).filter(k => urut.indexOf(k) < 0)) : Object.keys(m).sort((a, b) => (nilai ? nilai(m[b]) - nilai(m[a]) : m[b].length - m[a].length));
       const v = k => nilai ? nilai(m[k]) : m[k].length, mx = Math.max(1, ...ks.map(v));
-      return `<div class="kd-c sr-c"><div class="kd-h"><b class="sr-t">${esc(judul)}</b></div><div class="sr-bars">${ks.length ? ks.map(k => `<button type="button" class="rk-r sr-b" data-act="srList" data-k="${reg(judul + ': ' + k, jenis, m[k])}"><span>${esc(k)}</span><i style="--w:${v(k) / mx * 100}%;--c:${warna}"></i><b>${nilai ? srRpS(v(k)) : nfD(v(k))}</b></button>`).join('') : '<div class="meta">Belum ada data.</div>'}</div></div>`;
+      return `<div class="kd-c sr-c"><div class="kd-h"><b class="sr-t">${esc(judul)}</b></div><div class="sr-bars">${ks.length ? ks.map(k => `<button type="button" class="rk-r sr-b" data-act="srList" data-k="${reg(judul + ': ' + k, jenis, m[k])}"><span class="t">${esc(k)}</span><span class="kd-track sr-tk"><i style="width:${Math.max(1.5, v(k) / mx * 100)}%;background-color:${warna}"></i></span><b>${nilai ? srRpS(v(k)) : nfD(v(k))}</b></button>`).join('') : '<div class="meta">Belum ada data.</div>'}</div></div>`;
     };
+    const duo = (a, b) => '<div class="kd-c sr-duo">' + [a, b].map(h => h.replace('<div class="kd-c sr-c">', '<div class="sr-c sr-in">')).join('') + '</div>';
     /* donat + legenda yang bisa diklik */
     const donat = (judul, items, tengah, sub, jenis, ket) => `<div class="kd-c sr-c"><div class="kd-h"><b class="sr-t">${esc(judul)}</b>${ket ? `<span class="meta">${esc(ket)}</span>` : ''}</div>${items.some(x => x.v) ? `<div class="ad-donut"><div class="kd-g">${asetDonut(items.filter(x => x.v).map(x => ({ v: x.v, c: x.c, l: x.l, t: x.t })), tengah, sub)}</div><div class="ad-leg">${items.filter(x => x.v).map(x => `<button type="button" class="sr-b2" data-act="srList" data-k="${reg(judul + ': ' + x.l, jenis, x.rows)}"><i style="background:${x.c}"></i><span class="t">${esc(x.l)}</span><span class="n">${esc(x.t)}</span></button>`).join('')}</div></div>` : '<div class="meta">Belum ada data.</div>'}</div>`;
     /* matriks desil × dusun */
     const DES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Belum'], DUS = SR_DUS.concat(['Lainnya']).filter(d => dtA.some(x => x.dusun === d));
     const mx = {}; dtA.forEach(x => { const k = x.desil + '|' + x.dusun; (mx[k] = mx[k] || []).push(x); });
     const top = Math.max(1, ...Object.values(mx).map(a => a.length));
-    const matriks = `<div class="kd-c sr-c sr-wide"><div class="kd-h"><b class="sr-t">KK aktif per desil × dusun</b><span class="meta">klik angka untuk daftar KK</span></div><div class="tbl-wrap"><table class="tbl sr-mx"><thead><tr><th>Desil</th>${DUS.map(d => `<th class="r">${esc(d.replace('KRAJAN ', 'Krj ').replace('TIMUR SAWAH', 'Tmr Sawah').replace('TUNJUNGAN', 'Tunjungan').replace('PEMUKIMAN', 'Pemukiman'))}</th>`).join('')}<th class="r">Jml</th></tr></thead><tbody>${DES.map(ds => {
+    const matriks = `<div class="kd-c sr-c"><div class="kd-h"><b class="sr-t">KK aktif per desil × dusun</b><span class="meta">klik angka untuk daftar KK</span></div><div class="tbl-wrap"><table class="tbl sr-mx"><thead><tr><th>Desil</th>${DUS.map(d => `<th class="r">${esc(d.replace('KRAJAN ', 'Krj ').replace('TIMUR SAWAH', 'Tmr Sawah').replace('TUNJUNGAN', 'Tunjungan').replace('PEMUKIMAN', 'Pemukiman'))}</th>`).join('')}<th class="r">Jml</th></tr></thead><tbody>${DES.map(ds => {
       const rowAll = dtA.filter(x => x.desil === ds); if (!rowAll.length) return '';
       return `<tr><th>${ds === 'Belum' ? 'Belum' : 'Desil ' + ds}</th>${DUS.map(du => { const a = mx[ds + '|' + du] || []; return `<td class="r">${a.length ? `<button type="button" class="sr-cell" style="--a:${(a.length / top).toFixed(2)}" data-act="srList" data-k="${reg('Desil ' + ds + ' · ' + du, 'kk', a)}">${a.length}</button>` : '<span class="meta">·</span>'}</td>`; }).join('')}<td class="r"><button type="button" class="sr-cell tot" data-act="srList" data-k="${reg((ds === 'Belum' ? 'Desil belum ditentukan' : 'Desil ' + ds) + ' · semua dusun', 'kk', rowAll)}">${rowAll.length}</button></td></tr>`;
     }).join('')}</tbody></table></div></div>`;
@@ -7138,7 +7152,7 @@ VIEWS.sosrekap = async (p, main, alive) => {
     let blK = Object.keys(bln).map(Number).sort((p, q) => p - q);
     if (F.tahun) { const y = Number(F.tahun); blK = Array.from({ length: 12 }, (_, i) => y * 100 + i + 1); } else blK = blK.slice(-12);
     const blMx = Math.max(1, ...blK.map(k => (bln[k] || {}).v || 0));
-    const tren = `<div class="kd-c sr-c sr-wide"><div class="kd-h"><b class="sr-t">Bansos tersalur per bulan ${F.program ? '· ' + esc(F.program) : ''}</b><span class="meta">nilai berhasil · periode 3 bulan dibagi rata ke bulannya · PBI JK tanpa nilai rupiah</span></div>${blK.some(k => bln[k]) ? `<div class="sr-col">${blK.map(k => { const o = bln[k] || { v: 0, rows: [] }, lb = SR_BL[k % 100 - 1] + (F.tahun ? '' : ' ' + String(Math.floor(k / 100)).slice(2)); return `<button type="button" class="sr-cb" ${o.rows.length ? `data-act="srList" data-k="${reg('Bansos ' + SR_BL[k % 100 - 1] + ' ' + Math.floor(k / 100), 'sl', o.rows)}"` : 'disabled'} title="${esc(lb)}: ${srRpS(Math.round(o.v))}"><i style="height:${o.v ? Math.max(2, o.v / blMx * 100) : 0}%"></i><b>${o.v ? srRpS(Math.round(o.v)) : ''}</b><small>${esc(lb)}</small></button>`; }).join('')}</div>` : '<div class="meta">Belum ada data penyaluran bernilai rupiah.</div>'}</div>`;
+    const tren = `<div class="kd-c sr-c"><div class="kd-h"><b class="sr-t">Bansos tersalur per bulan ${F.program ? '· ' + esc(F.program) : ''}</b><span class="meta">nilai berhasil · periode 3 bulan dibagi rata ke bulannya · PBI JK tanpa nilai rupiah</span></div>${blK.some(k => bln[k]) ? `<div class="sr-col">${blK.map(k => { const o = bln[k] || { v: 0, rows: [] }, lb = SR_BL[k % 100 - 1] + (F.tahun ? '' : ' ' + String(Math.floor(k / 100)).slice(2)); return `<button type="button" class="sr-cb" ${o.rows.length ? `data-act="srList" data-k="${reg('Bansos ' + SR_BL[k % 100 - 1] + ' ' + Math.floor(k / 100), 'sl', o.rows)}"` : 'disabled'} title="${esc(lb)}: ${srRpS(Math.round(o.v))}"><i style="height:${o.v ? Math.max(2, o.v / blMx * 100) : 0}%"></i><b>${o.v ? srRpS(Math.round(o.v)) : ''}</b><small>${esc(lb)}</small></button>`; }).join('')}</div>` : '<div class="meta">Belum ada data penyaluran bernilai rupiah.</div>'}</div>`;
     /* hunian */
     const dtH = dtF.filter(x => x.d.h_lantai || x.d.h_dinding || x.d.h_listrik);
     const hun = {}; SR_HUNI.forEach(([l, f]) => { const a = dtH.filter(x => f(x.d)); if (a.length) hun[l] = a; });
@@ -7176,27 +7190,29 @@ VIEWS.sosrekap = async (p, main, alive) => {
         ${kt(nfD(belum.length + ragu.length), 'DTSEN perlu dicek', belum.length + ' belum terhubung · ' + ragu.length + ' ragu', reg('DTSEN perlu dicek', 'kk', belum.concat(ragu)), '#757575', 'search')}
       </div>
       <div class="sr-sec">${ic('house')} DTSEN keluarga</div>
-      <div class="kd-2">
+      <div class="sr-g sr-12">
         ${donat('Sebaran desil', dsI, nfD(dtF.length), 'KK DTSEN', 'kk')}
-        ${bars('KK per dusun', grp(dtF, x => x.dusun), SR_DUS.concat(['Lainnya']), '#3949ab', 'kk')}
         ${matriks}
-        ${bars('Status DTSEN', grp(dtF, x => x.aktif ? 'Aktif' : 'Tidak aktif'), ['Aktif', 'Tidak aktif'], '#0891b2', 'kk')}
-        ${bars('Status perlinsos (pendaftaran)', grp(dtF, x => x.perl || 'Tidak tercatat'), ['Sudah Pendaftaran', 'Belum Pendaftaran', 'Tidak tercatat'], '#6366f1', 'kk')}
+      </div>
+      <div class="sr-g sr-11">
+        ${bars('KK per dusun', grp(dtF, x => x.dusun), SR_DUS.concat(['Lainnya']), '#3949ab', 'kk')}
+        ${duo(bars('Status DTSEN', grp(dtF, x => x.aktif ? 'Aktif' : 'Tidak aktif'), ['Aktif', 'Tidak aktif'], '#0891b2', 'kk'), bars('Status perlinsos (pendaftaran)', grp(dtF, x => x.perl || 'Tidak tercatat'), ['Sudah Pendaftaran', 'Belum Pendaftaran', 'Tidak tercatat'], '#6366f1', 'kk'))}
       </div>
       <div class="sr-sec">${ic('coin')} Bansos</div>
-      <div class="kd-2">
+      <div class="sr-g sr-21">
         ${tren}
         ${donat('Nilai tersalur per program', prI, srRpS(rp).replace('Rp ', ''), 'tanpa PBI JK', 'sl')}
+      </div>
+      <div class="sr-g sr-3">
         ${bars('KPM per program (keluarga)', Object.fromEntries(Object.entries(grp(slOk, x => x.prog)).map(([k, a]) => [k, Object.values(a.reduce((m, x) => (m[x.id || x.r.atas_nama] = m[x.id || x.r.atas_nama] || x, m), {}))])), SK_PROG, '#2e7d32', 'sl')}
         ${bars('Status transaksi', grp(slF, x => x.ok ? 'Berhasil' : x.gagal ? (/exclude/i.test(x.r.status) ? 'Exclude' : 'Gagal') : (x.r.status || 'Tanpa status')), ['Berhasil', 'Gagal', 'Exclude'], '#0f766e', 'sl')}
         ${bars('Nilai tersalur per dusun', grp(slOk.filter(x => !srPBI(x)), x => x.dusun), SR_DUS.concat(['Lainnya']), '#7c3aed', 'sl', a => a.reduce((s, x) => s + x.nom, 0))}
       </div>
       <div class="sr-sec">${ic('house')} Kondisi hunian & aset <span class="meta">${nfD(dtH.length)} KK yang datanya ada di SIKS-NG</span></div>
-      <div class="kd-2">${bars('Indikator rumah tidak layak & aset', hun, SR_HUNI.map(h => h[0]), '#b45309', 'kk')}
-        ${bars('Lantai terluas', grp(dtH, x => x.d.h_lantai), null, '#64748b', 'kk')}
-        ${bars('Sumber penerangan', grp(dtH, x => x.d.h_listrik), null, '#64748b', 'kk')}</div>
+      <div class="sr-g sr-11">${bars('Indikator rumah tidak layak & aset', hun, SR_HUNI.map(h => h[0]), '#b45309', 'kk')}
+        ${duo(bars('Lantai terluas', grp(dtH, x => x.d.h_lantai), null, '#64748b', 'kk'), bars('Sumber penerangan', grp(dtH, x => x.d.h_listrik), null, '#0369a1', 'kk'))}</div>
       <div class="sr-sec">${ic('heart')} Data rentan & usulan</div>
-      <div class="kd-2">
+      <div class="sr-g sr-4">
         ${bars('Rentan per kategori', grp(rnF, r => String(r.kategori || '').split(',').map(s => s.trim())), RENTAN_KT, '#db2777', 'rn')}
         ${bars('Rentan per dusun', grp(rnF, r => srDusun(r.r_alamat) || 'Lainnya'), SR_DUS.concat(['Lainnya']), '#059669', 'rn')}
         ${bars('Status usulan', grp(usF, r => r.status || 'Draf'), SK_ST, '#7c3aed', 'us')}
@@ -9447,7 +9463,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '255', tgl: '2026-11-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '256', tgl: '2026-11-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
