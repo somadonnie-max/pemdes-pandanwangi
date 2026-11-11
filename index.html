@@ -814,6 +814,13 @@ input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-sof
   .dview .meta{font-size:11px}
 }
 .pill .ic{width:11px;height:11px;vertical-align:-1px;margin-right:3px}
+.sr .ad-hero{background:linear-gradient(135deg,#4a148c 0%,#7b1fa2 45%,#c2185b 100%)}.sr .ad-ring::before{background:#7b1fa2}.sr .ad-hero .ad-ring{background:conic-gradient(#ffd54f calc(var(--p)*1%),rgba(255,255,255,.22) 0)}
+.sr-fil{gap:6px;padding:10px 12px}.sr-fr{display:flex;align-items:center;gap:8px;min-width:0}.sr-fl2{flex:none;width:58px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}.sr-fr .chips{flex:1;min-width:0}.sr-fr .chip{padding:4px 11px;font-size:12px}.sr-fr .chip.on{background:var(--pri);border-color:var(--pri);color:#fff}
+.sr-fa{justify-content:space-between;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:7px;margin-top:2px}.sr-fa .meta{white-space:normal}
+.sr-sec{display:flex;align-items:center;gap:7px;font-weight:700;font-size:14.5px;margin:4px 0 -2px}.sr-sec .meta{font-weight:400;font-size:11.5px}
+.sr .kd-2 .sr-wide{grid-column:1/-1}.sr-bars{display:grid;gap:3px}.sr .kd-k{min-height:84px}
+.sr .ad-leg .sr-b2{display:flex;align-items:center;gap:8px;border:0;background:none;font:inherit;color:inherit;cursor:pointer;padding:4px 6px;border-radius:6px;text-align:left;width:100%}.sr .ad-leg .sr-b2:hover{background:var(--surface2)}.sr .ad-leg .sr-b2 i{width:10px;height:10px;border-radius:3px;flex:none}.sr .ad-leg .sr-b2 .t{flex:1}.sr .ad-leg .sr-b2 .n{font-weight:700;font-variant-numeric:tabular-nums}
+@media(max-width:760px){.sr-fl2{width:44px;font-size:10px}.sr .kd-k{min-height:0}.sr-col{height:150px}.sr-cb{min-width:34px}.sr-cb b{font-size:8px}}
 .sr-fl{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:flex-end;padding:10px}.sr-f{display:flex;flex-direction:column;gap:2px;font-size:11px;color:var(--muted);font-weight:600;min-width:120px;flex:1}.sr-f select{min-height:32px}.sr-act{margin-left:auto}
 .sr-ks{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}.sr-k{border:0;text-align:left;cursor:pointer;font:inherit;color:inherit;transition:transform .12s,box-shadow .12s}.sr-k:hover{transform:translateY(-1px);box-shadow:0 0 0 1.5px var(--pri) inset}.sr-k b{font-size:16px}.sr-k i{display:block;font-style:normal;font-size:9.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sr-h{margin:6px 0 -2px;font-size:14px;display:flex;align-items:center;gap:6px}.sr-wide{grid-column:1/-1}
@@ -2251,7 +2258,7 @@ const UI_NTCR = {
     print: { title: 'REGISTER FORMULIR ADMINISTRASI KEPENDUDUKAN', land: 1, cols: [['Tanggal', r => fDate(r.tanggal)], ['Formulir', 'formulir'], ['Pemohon / Pelapor', 'p_nama'], ['Alamat', r => esc([r.p_alamat, r.p_rt ? 'RT ' + r.p_rt + '/RW ' + (r.p_rw || '') : ''].filter(Boolean).join(' '))], ['Ket', 'ket']] }
   },
   rentan: {
-    t: 'Data Penduduk Rentan / Sosial', ic: 'heart', sort: 'r_nama', asc: 1, excel: 1,
+    t: 'DTSEN & Penduduk Rentan', ic: 'heart', sort: 'r_nama', asc: 1, excel: 1,
     fields: [...orangF('r_', 'Identitas warga', { kk: 1, buat: 1, req: 1 }),
       F('_h_kt', 'Kategori', 'head', { hint: 'Boleh lebih dari satu. Dasar: Permendesa PDT No. 13 Tahun 2025 Pasal 77 (warga/keluarga miskin, kelompok rentan, kelompok marginal, penerima bantuan sosial).' }),
       F('kategori', 'Kategori', 'checks', { opt: RENTAN_KT, req: 1, wide: 1 }),
@@ -7073,8 +7080,8 @@ const SR_HUNI = [
   ['Tanpa smartphone', d => /^tidak$/i.test(d.a_hp || '')]];
 
 VIEWS.sosrekap = async (p, main, alive) => {
-  setTop('Dashboard Sosial', ND());
-  main.innerHTML = rentanTabs('rekap') + '<div class="card skel" style="height:240px"></div>';
+  setTop('Dashboard Sosial', ND(), `<button class="btn sm" data-act="go" data-go='["list",{"e":"dtsen"}]'>${ic('list')}Data DTSEN</button>`);
+  main.innerHTML = '<div class="skel" style="height:300px"></div>';
   const ls = e => canRead(e) ? call('list', { entity: e, limit: 5000 }).then(r => r.rows || []).catch(() => []) : Promise.resolve([]);
   const [rn, us, sl, dt, kl] = await Promise.all([ls('rentan'), ls('usulan_bansos'), ls('penyaluran_bansos'), ls('dtsen'), ls('keluarga')]);
   if (!alive()) return;
@@ -7110,17 +7117,19 @@ VIEWS.sosrekap = async (p, main, alive) => {
     const kpm = new Set(slOk.map(x => x.id || x.r.atas_nama)).size;
     const rp = slOk.filter(x => !srPBI(x)).reduce((a, x) => a + x.nom, 0);
     const grp = (arr, f) => { const m = {}; arr.forEach(x => [].concat(f(x) || []).forEach(k => { if (k) (m[k] = m[k] || []).push(x); })); return m; };
-    const kt = (v, l, sub, k) => `<button type="button" class="dk sr-k" ${k ? `data-act="srList" data-k="${k}"` : 'disabled'}><b>${v}</b><small>${esc(l)}</small>${sub ? `<i>${sub}</i>` : ''}</button>`;
+    const kt = (v, l, sub, k, c, i) => `<button type="button" class="kd-k sr-k" style="--kc:${c || 'var(--pri)'}" ${k ? `data-act="srList" data-k="${k}"` : 'disabled'}><span class="l">${ic(i || 'chart')}${esc(l)}</span><b class="v">${v}</b><span class="s">${sub || '&nbsp;'}</span></button>`;
     const bars = (judul, m, urut, warna, jenis, nilai) => {
       const ks = urut ? urut.filter(k => m[k]).concat(Object.keys(m).filter(k => urut.indexOf(k) < 0)) : Object.keys(m).sort((a, b) => (nilai ? nilai(m[b]) - nilai(m[a]) : m[b].length - m[a].length));
       const v = k => nilai ? nilai(m[k]) : m[k].length, mx = Math.max(1, ...ks.map(v));
-      return `<div class="card stack sr-c"><div class="lbl">${esc(judul)}</div>${ks.length ? ks.map(k => `<button type="button" class="rk-r sr-b" data-act="srList" data-k="${reg(judul + ': ' + k, jenis, m[k])}"><span>${esc(k)}</span><i style="--w:${v(k) / mx * 100}%;--c:${warna}"></i><b>${nilai ? srRpS(v(k)) : nfD(v(k))}</b></button>`).join('') : '<div class="meta">Belum ada data.</div>'}</div>`;
+      return `<div class="kd-c sr-c"><div class="kd-h"><b class="sr-t">${esc(judul)}</b></div><div class="sr-bars">${ks.length ? ks.map(k => `<button type="button" class="rk-r sr-b" data-act="srList" data-k="${reg(judul + ': ' + k, jenis, m[k])}"><span>${esc(k)}</span><i style="--w:${v(k) / mx * 100}%;--c:${warna}"></i><b>${nilai ? srRpS(v(k)) : nfD(v(k))}</b></button>`).join('') : '<div class="meta">Belum ada data.</div>'}</div></div>`;
     };
+    /* donat + legenda yang bisa diklik */
+    const donat = (judul, items, tengah, sub, jenis, ket) => `<div class="kd-c sr-c"><div class="kd-h"><b class="sr-t">${esc(judul)}</b>${ket ? `<span class="meta">${esc(ket)}</span>` : ''}</div>${items.some(x => x.v) ? `<div class="ad-donut"><div class="kd-g">${asetDonut(items.filter(x => x.v).map(x => ({ v: x.v, c: x.c, l: x.l, t: x.t })), tengah, sub)}</div><div class="ad-leg">${items.filter(x => x.v).map(x => `<button type="button" class="sr-b2" data-act="srList" data-k="${reg(judul + ': ' + x.l, jenis, x.rows)}"><i style="background:${x.c}"></i><span class="t">${esc(x.l)}</span><span class="n">${esc(x.t)}</span></button>`).join('')}</div></div>` : '<div class="meta">Belum ada data.</div>'}</div>`;
     /* matriks desil × dusun */
     const DES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Belum'], DUS = SR_DUS.concat(['Lainnya']).filter(d => dtA.some(x => x.dusun === d));
     const mx = {}; dtA.forEach(x => { const k = x.desil + '|' + x.dusun; (mx[k] = mx[k] || []).push(x); });
     const top = Math.max(1, ...Object.values(mx).map(a => a.length));
-    const matriks = `<div class="card stack sr-c sr-wide"><div class="lbl">KK aktif per desil × dusun <span class="meta">(klik angka untuk daftar KK)</span></div><div class="tbl-wrap"><table class="tbl sr-mx"><thead><tr><th>Desil</th>${DUS.map(d => `<th class="r">${esc(d.replace('KRAJAN ', 'Krj ').replace('TIMUR SAWAH', 'Tmr Sawah').replace('TUNJUNGAN', 'Tunjungan').replace('PEMUKIMAN', 'Pemukiman'))}</th>`).join('')}<th class="r">Jml</th></tr></thead><tbody>${DES.map(ds => {
+    const matriks = `<div class="kd-c sr-c sr-wide"><div class="kd-h"><b class="sr-t">KK aktif per desil × dusun</b><span class="meta">klik angka untuk daftar KK</span></div><div class="tbl-wrap"><table class="tbl sr-mx"><thead><tr><th>Desil</th>${DUS.map(d => `<th class="r">${esc(d.replace('KRAJAN ', 'Krj ').replace('TIMUR SAWAH', 'Tmr Sawah').replace('TUNJUNGAN', 'Tunjungan').replace('PEMUKIMAN', 'Pemukiman'))}</th>`).join('')}<th class="r">Jml</th></tr></thead><tbody>${DES.map(ds => {
       const rowAll = dtA.filter(x => x.desil === ds); if (!rowAll.length) return '';
       return `<tr><th>${ds === 'Belum' ? 'Belum' : 'Desil ' + ds}</th>${DUS.map(du => { const a = mx[ds + '|' + du] || []; return `<td class="r">${a.length ? `<button type="button" class="sr-cell" style="--a:${(a.length / top).toFixed(2)}" data-act="srList" data-k="${reg('Desil ' + ds + ' · ' + du, 'kk', a)}">${a.length}</button>` : '<span class="meta">·</span>'}</td>`; }).join('')}<td class="r"><button type="button" class="sr-cell tot" data-act="srList" data-k="${reg((ds === 'Belum' ? 'Desil belum ditentukan' : 'Desil ' + ds) + ' · semua dusun', 'kk', rowAll)}">${rowAll.length}</button></td></tr>`;
     }).join('')}</tbody></table></div></div>`;
@@ -7129,49 +7138,70 @@ VIEWS.sosrekap = async (p, main, alive) => {
     let blK = Object.keys(bln).map(Number).sort((p, q) => p - q);
     if (F.tahun) { const y = Number(F.tahun); blK = Array.from({ length: 12 }, (_, i) => y * 100 + i + 1); } else blK = blK.slice(-12);
     const blMx = Math.max(1, ...blK.map(k => (bln[k] || {}).v || 0));
-    const tren = `<div class="card stack sr-c sr-wide"><div class="lbl">Bansos tersalur per bulan ${F.program ? '· ' + esc(F.program) : '(semua program)'} <span class="meta">— nilai rupiah berhasil; periode 3 bulan dibagi rata ke tiap bulannya; PBI JK tidak bernilai rupiah</span></div>${blK.some(k => bln[k]) ? `<div class="sr-col">${blK.map(k => { const o = bln[k] || { v: 0, rows: [] }, lb = SR_BL[k % 100 - 1] + (F.tahun ? '' : ' ' + String(Math.floor(k / 100)).slice(2)); return `<button type="button" class="sr-cb" ${o.rows.length ? `data-act="srList" data-k="${reg('Bansos ' + SR_BL[k % 100 - 1] + ' ' + Math.floor(k / 100), 'sl', o.rows)}"` : 'disabled'} title="${esc(lb)}: ${srRpS(Math.round(o.v))}"><i style="height:${o.v ? Math.max(2, o.v / blMx * 100) : 0}%"></i><b>${o.v ? srRpS(Math.round(o.v)) : ''}</b><small>${esc(lb)}</small></button>`; }).join('')}</div>` : '<div class="meta">Belum ada data penyaluran bernilai rupiah.</div>'}</div>`;
+    const tren = `<div class="kd-c sr-c sr-wide"><div class="kd-h"><b class="sr-t">Bansos tersalur per bulan ${F.program ? '· ' + esc(F.program) : ''}</b><span class="meta">nilai berhasil · periode 3 bulan dibagi rata ke bulannya · PBI JK tanpa nilai rupiah</span></div>${blK.some(k => bln[k]) ? `<div class="sr-col">${blK.map(k => { const o = bln[k] || { v: 0, rows: [] }, lb = SR_BL[k % 100 - 1] + (F.tahun ? '' : ' ' + String(Math.floor(k / 100)).slice(2)); return `<button type="button" class="sr-cb" ${o.rows.length ? `data-act="srList" data-k="${reg('Bansos ' + SR_BL[k % 100 - 1] + ' ' + Math.floor(k / 100), 'sl', o.rows)}"` : 'disabled'} title="${esc(lb)}: ${srRpS(Math.round(o.v))}"><i style="height:${o.v ? Math.max(2, o.v / blMx * 100) : 0}%"></i><b>${o.v ? srRpS(Math.round(o.v)) : ''}</b><small>${esc(lb)}</small></button>`; }).join('')}</div>` : '<div class="meta">Belum ada data penyaluran bernilai rupiah.</div>'}</div>`;
     /* hunian */
     const dtH = dtF.filter(x => x.d.h_lantai || x.d.h_dinding || x.d.h_listrik);
     const hun = {}; SR_HUNI.forEach(([l, f]) => { const a = dtH.filter(x => f(x.d)); if (a.length) hun[l] = a; });
-    const sel = (k, l, opt) => `<label class="sr-f"><span>${l}</span><select data-f="${k}"><option value="">Semua</option>${opt.map(o => `<option value="${esc(o[0])}"${F[k] === o[0] ? ' selected' : ''}>${esc(o[1])}</option>`).join('')}</select></label>`;
+    const chips = (k, l, opt) => `<div class="sr-fr"><span class="sr-fl2">${l}</span><div class="chips">${[['', 'Semua']].concat(opt).map(o => `<button type="button" class="chip ${F[k] === o[0] ? 'on' : ''}" data-act="srF" data-f="${k}" data-v="${esc(o[0])}">${esc(o[1])}</button>`).join('')}</div></div>`;
     const belum = dtF.filter(x => x.lepas), ragu = dtF.filter(x => x.ragu);
-    main.innerHTML = `<div class="stack">` + rentanTabs('rekap') + `<div class="stack">
-      <div class="card sr-fl">${sel('dusun', 'Dusun', SR_DUS.concat(['Lainnya']).map(d => [d, d]))}${sel('desil', 'Desil', DES.map(d => [d, d === 'Belum' ? 'Belum ditentukan' : 'Desil ' + d]))}${sel('program', 'Program', progAda.map(p => [p, p]))}${sel('tahun', 'Tahun bansos', tahunAda.map(t => [t, t]))}
-        <div class="btns sr-act"><button class="btn sm" data-act="srReset">${ic('x')}Reset</button><button class="btn sm" data-act="srCetak">${ic('print')}Cetak / Excel</button></div></div>
-      <div class="dks sr-ks">
-        ${kt(nfD(dtA.length), 'KK aktif DTSEN', maxT ? 'dicek ' + fDate(maxT) : '', reg('KK aktif DTSEN', 'kk', dtA))}
-        ${kt(nfD(dtA.filter(x => x.desil === '1' || x.desil === '2').length), 'KK desil 1–2', 'sangat miskin', reg('KK desil 1–2', 'kk', dtA.filter(x => x.desil === '1' || x.desil === '2')))}
-        ${kt(nfD(kpm), 'KPM bansos', F.tahun || 'semua tahun', reg('Penyaluran berhasil', 'sl', slOk))}
-        ${kt(srRpS(rp), 'Nilai bansos tersalur', (F.tahun || '') + ' · tanpa PBI JK', reg('Penyaluran berhasil (bernilai rupiah)', 'sl', slOk.filter(x => !srPBI(x))))}
-        ${kt(nfD(slF.filter(x => x.gagal).length), 'Transaksi gagal / exclude', '', reg('Transaksi gagal / exclude', 'sl', slF.filter(x => x.gagal)))}
-        ${kt(nfD(rnF.length), 'Warga rentan aktif', '', reg('Warga rentan aktif', 'rn', rnF))}
-        ${kt(nfD(usF.filter(r => r.status === 'Draf' || r.status === 'Diusulkan di SIKS-NG').length), 'Usulan diproses', '', reg('Usulan diproses', 'us', usF.filter(r => r.status === 'Draf' || r.status === 'Diusulkan di SIKS-NG')))}
-        ${kt(nfD(belum.length + ragu.length), 'DTSEN perlu dicek', belum.length + ' belum terhubung · ' + ragu.length + ' ragu', reg('DTSEN perlu dicek', 'kk', belum.concat(ragu)))}
+    const d12 = dtA.filter(x => x.desil === '1' || x.desil === '2'), d12id = new Set(d12.filter(x => x.id).map(x => x.id));
+    const d12dapat = new Set(slOk.filter(x => d12id.has(x.id)).map(x => x.id)).size, pctCak = d12id.size ? Math.round(d12dapat / d12id.size * 100) : 0;
+    const DW = ['#b71c1c', '#e53935', '#f4511e', '#fb8c00', '#fdd835', '#c0ca33', '#7cb342', '#43a047', '#00897b', '#00695c', '#9e9e9e'];
+    const dsI = DES.map((d, i) => { const r = dtF.filter(x => x.desil === d); return { l: d === 'Belum' ? 'Belum ditentukan' : 'Desil ' + d, v: r.length, t: nfD(r.length) + ' KK', c: DW[i], rows: r }; });
+    const PW = { 'PKH': '#1e88e5', 'Sembako / BPNT': '#43a047', 'BLTS Kesra': '#fb8c00', 'YAPI': '#8e24aa', 'ATENSI': '#00897b', 'BLT Dana Desa': '#e53935' };
+    const prI = Object.entries(grp(slOk.filter(x => !srPBI(x)), x => x.prog)).map(([k, r], i) => { const v = r.reduce((t, x) => t + x.nom, 0); return { l: k, v, t: srRpS(v), c: PW[k] || ['#6d4c41', '#546e7a', '#c2185b'][i % 3], rows: r }; }).sort((p, q) => q.v - p.v);
+    const tgl = maxT ? fDate(maxT) : '-';
+    main.innerHTML = `<div class="kd ad sr">
+      <div class="ad-hero">
+        <div class="ad-hero-l"><span class="ad-eyebrow">${ic('heart')} DTSEN & Penduduk Rentan · ${esc((S.set || {}).nama_desa || 'Desa')} · dicek ${esc(tgl)}</span>
+          <b class="ad-big">${nfD(dtA.length)} KK</b><span class="ad-sub">aktif di DTSEN · ${nfD(d12.length)} KK desil 1–2 · ${nfD(kpm)} KPM bansos ${esc(F.tahun || '')} · ${esc(srRpS(rp))} tersalur</span></div>
+        <div class="ad-hero-r"><div class="ad-ring" style="--p:${pctCak}"><b>${pctCak}%</b><span>desil 1–2 dapat bansos</span></div>
+          <div class="meta" style="text-align:center">${nfD(d12dapat)} dari ${nfD(d12id.size)} KK ${esc(F.tahun || '')}</div></div>
       </div>
-      <h3 class="sr-h">${ic('house')} DTSEN keluarga</h3>
-      <div class="rk-g">${matriks}
-        ${bars('KK per desil', grp(dtF, x => x.desil === 'Belum' ? 'Belum ditentukan' : 'Desil ' + x.desil), DES.map(d => d === 'Belum' ? 'Belum ditentukan' : 'Desil ' + d), '#2563eb', 'kk')}
-        ${bars('KK per dusun', grp(dtF, x => x.dusun), SR_DUS.concat(['Lainnya']), '#059669', 'kk')}
+      <div class="kd-c sr-fil">
+        ${chips('dusun', 'Dusun', SR_DUS.concat(['Lainnya']).map(d => [d, d.replace('KRAJAN', 'Krajan').replace('TIMUR SAWAH', 'Timur Sawah').replace('TUNJUNGAN', 'Tunjungan').replace('PEMUKIMAN', 'Pemukiman')]))}
+        ${chips('desil', 'Desil', DES.map(d => [d, d === 'Belum' ? 'Belum' : d]))}
+        ${chips('program', 'Program', progAda.map(p => [p, p]))}
+        ${chips('tahun', 'Tahun', tahunAda.map(t => [t, t]))}
+        <div class="sr-fr sr-fa"><span class="meta">${esc(fTeks())}</span><span class="btns"><button class="btn sm" data-act="srReset">${ic('x')}Reset</button><button class="btn sm" data-act="srCetak">${ic('print')}Cetak / Excel</button></span></div>
+      </div>
+      <div class="kd-kpi">
+        ${kt(nfD(dtA.length), 'KK aktif DTSEN', 'dicek ' + esc(tgl), reg('KK aktif DTSEN', 'kk', dtA), '#3949ab', 'house')}
+        ${kt(nfD(d12.length), 'KK desil 1–2', 'sangat miskin', reg('KK desil 1–2', 'kk', d12), '#c62828', 'heart')}
+        ${kt(nfD(kpm), 'KPM bansos', 'keluarga penerima ' + esc(F.tahun || ''), reg('Penyaluran berhasil', 'sl', slOk), '#2e7d32', 'users')}
+        ${kt(esc(srRpS(rp)), 'Nilai tersalur', esc(F.tahun || '') + ' · tanpa PBI JK', reg('Penyaluran berhasil (bernilai rupiah)', 'sl', slOk.filter(x => !srPBI(x))), '#00897b', 'coin')}
+        ${kt(nfD(slF.filter(x => x.gagal).length), 'Gagal / exclude', 'transaksi', reg('Transaksi gagal / exclude', 'sl', slF.filter(x => x.gagal)), '#ef6c00', 'x')}
+        ${kt(nfD(rnF.length), 'Warga rentan', 'aktif', reg('Warga rentan aktif', 'rn', rnF), '#ad1457', 'heart')}
+        ${kt(nfD(usF.filter(r => r.status === 'Draf' || r.status === 'Diusulkan di SIKS-NG').length), 'Usulan diproses', 'draf & diusulkan', reg('Usulan diproses', 'us', usF.filter(r => r.status === 'Draf' || r.status === 'Diusulkan di SIKS-NG')), '#6a1b9a', 'send')}
+        ${kt(nfD(belum.length + ragu.length), 'DTSEN perlu dicek', belum.length + ' belum terhubung · ' + ragu.length + ' ragu', reg('DTSEN perlu dicek', 'kk', belum.concat(ragu)), '#757575', 'search')}
+      </div>
+      <div class="sr-sec">${ic('house')} DTSEN keluarga</div>
+      <div class="kd-2">
+        ${donat('Sebaran desil', dsI, nfD(dtF.length), 'KK DTSEN', 'kk')}
+        ${bars('KK per dusun', grp(dtF, x => x.dusun), SR_DUS.concat(['Lainnya']), '#3949ab', 'kk')}
+        ${matriks}
         ${bars('Status DTSEN', grp(dtF, x => x.aktif ? 'Aktif' : 'Tidak aktif'), ['Aktif', 'Tidak aktif'], '#0891b2', 'kk')}
-        ${bars('Status perlinsos (pendaftaran)', grp(dtF, x => x.perl || 'Tidak tercatat'), ['Sudah Pendaftaran', 'Belum Pendaftaran', 'Tidak tercatat'], '#6366f1', 'kk')}</div>
-      <h3 class="sr-h">${ic('coin')} Bansos</h3>
-      <div class="rk-g">${tren}
-        ${bars('Nilai tersalur per program', grp(slOk.filter(x => !srPBI(x)), x => x.prog), SK_PROG, '#16a34a', 'sl', a => a.reduce((s, x) => s + x.nom, 0))}
-        ${bars('KPM per program (keluarga)', Object.fromEntries(Object.entries(grp(slOk, x => x.prog)).map(([k, a]) => [k, Object.values(a.reduce((m, x) => (m[x.id || x.r.atas_nama] = m[x.id || x.r.atas_nama] || x, m), {}))])), SK_PROG, '#d97706', 'sl')}
+        ${bars('Status perlinsos (pendaftaran)', grp(dtF, x => x.perl || 'Tidak tercatat'), ['Sudah Pendaftaran', 'Belum Pendaftaran', 'Tidak tercatat'], '#6366f1', 'kk')}
+      </div>
+      <div class="sr-sec">${ic('coin')} Bansos</div>
+      <div class="kd-2">
+        ${tren}
+        ${donat('Nilai tersalur per program', prI, srRpS(rp).replace('Rp ', ''), 'tanpa PBI JK', 'sl')}
+        ${bars('KPM per program (keluarga)', Object.fromEntries(Object.entries(grp(slOk, x => x.prog)).map(([k, a]) => [k, Object.values(a.reduce((m, x) => (m[x.id || x.r.atas_nama] = m[x.id || x.r.atas_nama] || x, m), {}))])), SK_PROG, '#2e7d32', 'sl')}
         ${bars('Status transaksi', grp(slF, x => x.ok ? 'Berhasil' : x.gagal ? (/exclude/i.test(x.r.status) ? 'Exclude' : 'Gagal') : (x.r.status || 'Tanpa status')), ['Berhasil', 'Gagal', 'Exclude'], '#0f766e', 'sl')}
-        ${bars('Nilai tersalur per dusun', grp(slOk.filter(x => !srPBI(x)), x => x.dusun), SR_DUS.concat(['Lainnya']), '#7c3aed', 'sl', a => a.reduce((s, x) => s + x.nom, 0))}</div>
-      <h3 class="sr-h">${ic('house')} Kondisi hunian & aset <span class="meta">(${nfD(dtH.length)} KK yang datanya ada di SIKS-NG)</span></h3>
-      <div class="rk-g">${bars('Indikator rumah tidak layak & aset', hun, SR_HUNI.map(h => h[0]), '#b45309', 'kk')}
+        ${bars('Nilai tersalur per dusun', grp(slOk.filter(x => !srPBI(x)), x => x.dusun), SR_DUS.concat(['Lainnya']), '#7c3aed', 'sl', a => a.reduce((s, x) => s + x.nom, 0))}
+      </div>
+      <div class="sr-sec">${ic('house')} Kondisi hunian & aset <span class="meta">${nfD(dtH.length)} KK yang datanya ada di SIKS-NG</span></div>
+      <div class="kd-2">${bars('Indikator rumah tidak layak & aset', hun, SR_HUNI.map(h => h[0]), '#b45309', 'kk')}
         ${bars('Lantai terluas', grp(dtH, x => x.d.h_lantai), null, '#64748b', 'kk')}
         ${bars('Sumber penerangan', grp(dtH, x => x.d.h_listrik), null, '#64748b', 'kk')}</div>
-      <h3 class="sr-h">${ic('heart')} Data rentan & usulan</h3>
-      <div class="rk-g">
+      <div class="sr-sec">${ic('heart')} Data rentan & usulan</div>
+      <div class="kd-2">
         ${bars('Rentan per kategori', grp(rnF, r => String(r.kategori || '').split(',').map(s => s.trim())), RENTAN_KT, '#db2777', 'rn')}
         ${bars('Rentan per dusun', grp(rnF, r => srDusun(r.r_alamat) || 'Lainnya'), SR_DUS.concat(['Lainnya']), '#059669', 'rn')}
         ${bars('Status usulan', grp(usF, r => r.status || 'Draf'), SK_ST, '#7c3aed', 'us')}
         ${bars('Jenis usulan', grp(usF, r => r.jenis), SK_JENIS, '#0891b2', 'us')}</div>
-    </div></div>`;
-    $$('select[data-f]', main).forEach(s => s.onchange = () => { F[s.dataset.f] = s.value; const y = window.scrollY; render(); window.scrollTo(0, y); });
+    </div>`;
   };
   /* --- daftar hasil klik --- */
   const KOL = {
@@ -7190,17 +7220,18 @@ VIEWS.sosrekap = async (p, main, alive) => {
     $('#srLc', m.el).onclick = () => printDocs(g.judul, [`<div class="paper land">${kop()}<h2 style="margin:6px 0 2px">${esc(g.judul.toUpperCase())}</h2><div style="text-align:center;margin-bottom:6px">${esc(fTeks())}</div>${tabelCetak('Daftar', g.jenis, g.rows)}</div>`], 'sosrekap_list');
     m.body.addEventListener('click', e => { const tr = e.target.closest('.sr-tr'); if (!tr) return; const x = L[Number(tr.dataset.i)]; m.close(); const d = bukaDari(g.jenis, x); go(d[0], d[1]); });
   };
+  S.vh.srF = t => { const k = t.dataset.f, v = t.dataset.v; F[k] = F[k] === v ? '' : v; S.srF = F; const y = window.scrollY; render(); window.scrollTo(0, y); };
   S.vh.srReset = () => { S.srF = { dusun: '', desil: '', program: '', tahun: '' }; Object.assign(F, S.srF); render(); };
   S.vh.srCetak = () => {
     const sec = [];
     $$('.sr-c', main).forEach(c => {
-      const jd = ($('.lbl', c) || {}).textContent || '';
+      const jd = ($('.sr-t', c) || {}).textContent || '';
       const mxT = $('table.sr-mx', c);
       if (mxT) { sec.push(`<h3 style="margin:10px 0 4px">${esc(jd.replace(/\(klik.*\)/, ''))}</h3>` + mxT.outerHTML.replace(/<button[^>]*>([^<]*)<\/button>/g, '$1')); return; }
-      const rows = $$('.sr-b, .sr-cb', c).map(b => [($('span', b) || $('small', b) || {}).textContent || '', ($('b', b) || {}).textContent || '']);
+      const rows = $$('.sr-b, .sr-cb, .sr-b2', c).map(b => [($('.t', b) || $('span', b) || $('small', b) || {}).textContent || '', ($('.n', b) || $('b', b) || {}).textContent || '']);
       if (rows.length) sec.push(`<h3 style="margin:10px 0 4px">${esc(jd.replace(/—.*$/, ''))}</h3><table class="tbl"><thead><tr><th>Uraian</th><th>Jumlah</th></tr></thead><tbody>${rows.map(r => `<tr><td>${esc(r[0])}</td><td style="text-align:right">${esc(r[1])}</td></tr>`).join('')}</tbody></table>`);
     });
-    const kp = $$('.sr-k', main).map(b => `<tr><td>${esc(($('small', b) || {}).textContent || '')}</td><td style="text-align:right">${esc(($('b', b) || {}).textContent || '')}</td></tr>`).join('');
+    const kp = $$('.sr-k', main).map(b => `<tr><td>${esc(($('.l', b) || {}).textContent || '')}</td><td style="text-align:right">${esc(($('.v', b) || {}).textContent || '')}</td></tr>`).join('');
     printDocs('Rekap Kesejahteraan Sosial', [`<div class="paper">${kop()}<h2 style="margin:6px 0 2px">REKAP KESEJAHTERAAN SOSIAL</h2><div style="text-align:center;margin-bottom:6px">${esc(fTeks())} · dicetak ${esc(fDate(isoToday()))}</div><h3 style="margin:10px 0 4px">Ringkasan</h3><table class="tbl"><tbody>${kp}</tbody></table>${sec.join('')}</div>`], 'sosrekap');
   };
   render();
@@ -7225,7 +7256,7 @@ async function extraMusdes(x, el) {
   const us = await call('list', { entity: 'usulan_bansos', filters: { musdes_ba: x.nomor_ba }, limit: 500 }).then(r => r.rows || []).catch(() => []);
   el.insertAdjacentHTML('beforeend', `<div class="stack"><div class="sec-h"><h2>${ic('send')} Usulan dalam BA ini (${us.length})</h2>${canWrite('usulan_bansos') ? `<button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['form', { e: 'usulan_bansos', preset: { musdes_ba: x.nomor_ba, periode: x.periode || '' } }]))}'>${ic('plus')}Tambah usulan</button>` : ''}</div>${us.length ? `<div class="list">${us.map(r => rowHtml('usulan_bansos', r)).join('')}</div>` : '<div class="meta">Belum ada usulan yang mencantumkan nomor BA ini.</div>'}</div>`);
 }
-function rentanTabs(cur) { return `<div class="gtabs">${[['list', 'heart', 'Data rentan', '["list",{"e":"rentan"}]'], ['dtsen', 'house', 'DTSEN Keluarga', '["list",{"e":"dtsen"}]'], ['usulan', 'send', 'Usulan', '["list",{"e":"usulan_bansos"}]'], ['musdes', 'users', 'Musdes/Muskel', '["list",{"e":"musdes_bansos"}]'], ['salur', 'check', 'Penyaluran', '["list",{"e":"penyaluran_bansos"}]'], ['rekap', 'chart', 'Dashboard', '["sosrekap"]'], ['lansia', 'users', 'Lansia 60+', '["rentanauto",{"j":"lansia"}]'], ['balita', 'users', 'Balita', '["rentanauto",{"j":"balita"}]']].map(([k, i, t, g]) => `<button class="${cur === k ? 'on' : ''}" data-act="go" data-go='${g}'>${ic(i)} ${t}</button>`).join('')}</div>`; }
+function rentanTabs(cur) { return `<div class="gtabs">${[['dtsen', 'house', 'DTSEN Keluarga', '["list",{"e":"dtsen"}]'], ['salur', 'check', 'Penyaluran', '["list",{"e":"penyaluran_bansos"}]'], ['list', 'heart', 'Data Rentan', '["list",{"e":"rentan"}]'], ['usulan', 'send', 'Usulan', '["list",{"e":"usulan_bansos"}]'], ['musdes', 'users', 'Musdes/Muskel', '["list",{"e":"musdes_bansos"}]'], ['lansia', 'users', 'Lansia 60+', '["rentanauto",{"j":"lansia"}]'], ['balita', 'users', 'Balita', '["rentanauto",{"j":"balita"}]']].map(([k, i, t, g]) => `<button class="${cur === k ? 'on' : ''}" data-act="go" data-go='${g}'>${ic(i)} ${t}</button>`).join('')}</div>`; }
 VIEWS.rentanauto = async (p, main) => {
   const j = p.j === 'balita' ? 'balita' : 'lansia';
   setTop(j === 'lansia' ? 'Lansia (60 tahun ke atas)' : 'Balita (di bawah 5 tahun)', 'Otomatis dari Data Penduduk aktif');
@@ -9416,7 +9447,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '254', tgl: '2026-11-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '255', tgl: '2026-11-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
