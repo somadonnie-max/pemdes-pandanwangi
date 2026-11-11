@@ -817,7 +817,7 @@ input.inbad{border-color:var(--bad)!important;box-shadow:0 0 0 2px var(--bad-sof
 .sr-fl{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:flex-end;padding:10px}.sr-f{display:flex;flex-direction:column;gap:2px;font-size:11px;color:var(--muted);font-weight:600;min-width:120px;flex:1}.sr-f select{min-height:32px}.sr-act{margin-left:auto}
 .sr-ks{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}.sr-k{border:0;text-align:left;cursor:pointer;font:inherit;color:inherit;transition:transform .12s,box-shadow .12s}.sr-k:hover{transform:translateY(-1px);box-shadow:0 0 0 1.5px var(--pri) inset}.sr-k b{font-size:16px}.sr-k i{display:block;font-style:normal;font-size:9.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sr-h{margin:6px 0 -2px;font-size:14px;display:flex;align-items:center;gap:6px}.sr-wide{grid-column:1/-1}
-.sr-b{border:0;background:none;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;border-radius:6px;padding:2px 4px}.sr-b:hover{background:var(--surface2)}.sr-b span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sr-b{grid-template-columns:minmax(90px,46%) 1fr auto;border:0;background:none;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;border-radius:6px;padding:2px 4px}.sr-b:hover{background:var(--surface2)}.sr-b span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sr-mx th,.sr-mx td{padding:3px 6px;font-size:12px}.sr-mx thead th{font-size:10.5px;white-space:nowrap}.sr-cell{border:0;cursor:pointer;min-width:34px;padding:3px 6px;border-radius:6px;font:inherit;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink);background:color-mix(in srgb,#2563eb calc(var(--a)*70%),transparent)}.sr-cell:hover{outline:2px solid var(--pri)}.sr-cell.tot{background:var(--surface2)}
 .sr-col{display:flex;align-items:flex-end;justify-content:center;gap:10px;height:190px;overflow-x:auto;padding-top:14px}.sr-cb{flex:1;min-width:52px;max-width:84px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:3px;border:0;background:none;cursor:pointer;font:inherit;color:inherit;padding:0}.sr-cb i{display:block;width:70%;background:linear-gradient(180deg,#22c55e,#15803d);border-radius:5px 5px 2px 2px;min-height:2px}.sr-cb:hover i{filter:brightness(1.15)}.sr-cb b{font-size:9.5px;white-space:nowrap}.sr-cb small{font-size:9.5px;color:var(--muted);white-space:nowrap}
 @media(max-width:760px){.sr-f{min-width:calc(50% - 6px)}.sr-act{margin-left:0;width:100%}.rk-g .sr-c{min-width:0}}
@@ -6902,9 +6902,10 @@ const dtMasuk = r => !/gagal|dikembalikan|belum/i.test(r.status || '') && Number
 /** kartu total bantuan tahun berjalan per program (seperti SIKS-NG) */
 function dtTotalHtml(sl) {
   const th = new Date().getFullYear(), per = {};
-  sl.filter(r => Math.floor(dtPerKey(r) / 100) === th && dtMasuk(r)).forEach(r => { const p = r.program || 'Lainnya'; per[p] = (per[p] || 0) + Number(r.nominal); });
+  const thI = sl.filter(r => Math.floor(dtPerKey(r) / 100) === th && dtMasuk(r)), pbi = thI.some(r => /PBI/i.test(r.program || ''));
+  thI.filter(r => !/PBI/i.test(r.program || '')).forEach(r => { const p = r.program || 'Lainnya'; per[p] = (per[p] || 0) + (Number(r.nominal) || 0); });
   const P = Object.keys(per).sort(), tot = P.reduce((a, p) => a + per[p], 0);
-  return `<div class="dttot"><div class="dttot-l">${ic('check')} Total bantuan tahun ${th}</div><b>${tot ? dtRp(tot) : 'Rp 0'}</b>${P.length ? `<div class="dttot-r">${P.map(p => `<span><i>${esc(p)}</i>${dtRp(per[p])}</span>`).join('')}</div>` : '<div class="dttot-r"><span>Belum ada bantuan tercatat tahun ini.</span></div>'}</div>`;
+  return `<div class="dttot"><div class="dttot-l">${ic('check')} Total bantuan tahun ${th}</div><b>${tot ? dtRp(tot) : 'Rp 0'}</b>${P.length || pbi ? `<div class="dttot-r">${P.map(p => `<span><i>${esc(p)}</i>${dtRp(per[p])}</span>`).join('')}${pbi ? '<span><i>PBI JK</i>iuran kesehatan ditanggung</span>' : ''}</div>` : '<div class="dttot-r"><span>Belum ada bantuan tercatat tahun ini.</span></div>'}</div>`;
 }
 /** bagian "Bansos" di detail keluarga (isian DTSEN sudah tampil di data keluarga) */
 async function extraKelDtsen(k, el) {
@@ -7042,6 +7043,19 @@ const srOK = s => /sudah|sukses|aktif|berhasil|salur/i.test(s || '') && !/gagal|
 const srGagal = s => /gagal|exclude/i.test(s || '');
 const srTahun = r => { const k = dtPerKey(r); return k ? String(Math.floor(k / 100)) : ''; };
 const srTw = r => { const k = dtPerKey(r); if (!k) return ''; const b = k % 100; return Math.floor(k / 100) + (b ? ' T' + Math.ceil(b / 3) : ''); };
+const srPBI = x => /PBI/i.test(x.prog || x.program || '');
+const SR_BL = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+/* periode "PKH JUL - SEPT 2026" -> [[202607,1/3],[202608,1/3],[202609,1/3]] (nilai dibagi rata ke bulan periodenya) */
+function srBulan(r) {
+  const t = String(r.periode || '').toUpperCase(), ys = (t.match(/20\d\d/g) || []).map(Number), ms = (t.match(/\b(JAN|FEB|MAR|APR|MEI|MAY|JUN|JUL|AGU|AGS|AUG|SEP|OKT|OCT|NOV|DES|DEC)/g) || []).map(m => DT_BLN[m]);
+  if (!ys.length) { const tg = String(r.tgl_salur || ''); return /^\d{4}-\d\d/.test(tg) ? [[Number(tg.slice(0, 4)) * 100 + Number(tg.slice(5, 7)), 1]] : []; }
+  if (!ms.length) return [];
+  const ey = ys[ys.length - 1], em = ms[ms.length - 1], sm = ms[0];
+  const sy = ys.length > 1 ? ys[0] : (sm > em ? ey - 1 : ey);
+  let n = (ey * 12 + em) - (sy * 12 + sm) + 1; if (n < 1 || n > 12) n = 1;
+  const out = []; for (let i = 0; i < n; i++) { const a = sy * 12 + sm - 1 + i; out.push([Math.floor(a / 12) * 100 + (a % 12) + 1, 1 / n]); }
+  return out;
+}
 const srPerl = d => ((String(d.ket || '').match(/Perlinsos:\s*([^\n]+)/) || [])[1] || '').trim();
 const SR_HUNI = [
   ['Lantai tanah', d => /tanah/i.test(d.h_lantai || '')],
@@ -7094,7 +7108,7 @@ VIEWS.sosrekap = async (p, main, alive) => {
     const rnF = rn.filter(r => r.status !== 'Tidak lagi' && (!F.dusun || srDusun(r.r_alamat) === F.dusun) && rnDes(r.desil));
     const usF = us.filter(r => (!F.dusun || srDusun(r.u_alamat) === F.dusun) && (!F.tahun || !srTahun(r) || srTahun(r) === F.tahun));
     const kpm = new Set(slOk.map(x => x.id || x.r.atas_nama)).size;
-    const rp = slOk.reduce((a, x) => a + x.nom, 0);
+    const rp = slOk.filter(x => !srPBI(x)).reduce((a, x) => a + x.nom, 0);
     const grp = (arr, f) => { const m = {}; arr.forEach(x => [].concat(f(x) || []).forEach(k => { if (k) (m[k] = m[k] || []).push(x); })); return m; };
     const kt = (v, l, sub, k) => `<button type="button" class="dk sr-k" ${k ? `data-act="srList" data-k="${k}"` : 'disabled'}><b>${v}</b><small>${esc(l)}</small>${sub ? `<i>${sub}</i>` : ''}</button>`;
     const bars = (judul, m, urut, warna, jenis, nilai) => {
@@ -7110,10 +7124,12 @@ VIEWS.sosrekap = async (p, main, alive) => {
       const rowAll = dtA.filter(x => x.desil === ds); if (!rowAll.length) return '';
       return `<tr><th>${ds === 'Belum' ? 'Belum' : 'Desil ' + ds}</th>${DUS.map(du => { const a = mx[ds + '|' + du] || []; return `<td class="r">${a.length ? `<button type="button" class="sr-cell" style="--a:${(a.length / top).toFixed(2)}" data-act="srList" data-k="${reg('Desil ' + ds + ' · ' + du, 'kk', a)}">${a.length}</button>` : '<span class="meta">·</span>'}</td>`; }).join('')}<td class="r"><button type="button" class="sr-cell tot" data-act="srList" data-k="${reg((ds === 'Belum' ? 'Desil belum ditentukan' : 'Desil ' + ds) + ' · semua dusun', 'kk', rowAll)}">${rowAll.length}</button></td></tr>`;
     }).join('')}</tbody></table></div></div>`;
-    /* tren per triwulan */
-    const tw = grp(slOk, x => x.tw);
-    const twK = Object.keys(tw).sort().slice(-12), twMx = Math.max(1, ...twK.map(k => tw[k].reduce((a, x) => a + x.nom, 0)));
-    const tren = `<div class="card stack sr-c sr-wide"><div class="lbl">Bansos tersalur per triwulan ${F.program ? '· ' + esc(F.program) : '(semua program)'} <span class="meta">— nilai rupiah, berhasil saja</span></div>${twK.length ? `<div class="sr-col">${twK.map(k => { const v = tw[k].reduce((a, x) => a + x.nom, 0); return `<button type="button" class="sr-cb" data-act="srList" data-k="${reg('Bansos ' + k, 'sl', tw[k])}" title="${esc(k)}: ${srRpS(v)}"><i style="height:${Math.max(2, v / twMx * 100)}%"></i><b>${srRpS(v)}</b><small>${esc(k.replace(' T', ' T'))}</small></button>`; }).join('')}</div>` : '<div class="meta">Belum ada data penyaluran.</div>'}</div>`;
+    /* tren per bulan (nilai periode dibagi rata ke bulan-bulannya; PBI JK tanpa nilai rupiah) */
+    const bln = {}; slOk.filter(x => !srPBI(x)).forEach(x => srBulan(x.r).forEach(([ym, f]) => { const o = bln[ym] = bln[ym] || { v: 0, rows: [] }; o.v += x.nom * f; o.rows.push(x); }));
+    let blK = Object.keys(bln).map(Number).sort((p, q) => p - q);
+    if (F.tahun) { const y = Number(F.tahun); blK = Array.from({ length: 12 }, (_, i) => y * 100 + i + 1); } else blK = blK.slice(-12);
+    const blMx = Math.max(1, ...blK.map(k => (bln[k] || {}).v || 0));
+    const tren = `<div class="card stack sr-c sr-wide"><div class="lbl">Bansos tersalur per bulan ${F.program ? '· ' + esc(F.program) : '(semua program)'} <span class="meta">— nilai rupiah berhasil; periode 3 bulan dibagi rata ke tiap bulannya; PBI JK tidak bernilai rupiah</span></div>${blK.some(k => bln[k]) ? `<div class="sr-col">${blK.map(k => { const o = bln[k] || { v: 0, rows: [] }, lb = SR_BL[k % 100 - 1] + (F.tahun ? '' : ' ' + String(Math.floor(k / 100)).slice(2)); return `<button type="button" class="sr-cb" ${o.rows.length ? `data-act="srList" data-k="${reg('Bansos ' + SR_BL[k % 100 - 1] + ' ' + Math.floor(k / 100), 'sl', o.rows)}"` : 'disabled'} title="${esc(lb)}: ${srRpS(Math.round(o.v))}"><i style="height:${o.v ? Math.max(2, o.v / blMx * 100) : 0}%"></i><b>${o.v ? srRpS(Math.round(o.v)) : ''}</b><small>${esc(lb)}</small></button>`; }).join('')}</div>` : '<div class="meta">Belum ada data penyaluran bernilai rupiah.</div>'}</div>`;
     /* hunian */
     const dtH = dtF.filter(x => x.d.h_lantai || x.d.h_dinding || x.d.h_listrik);
     const hun = {}; SR_HUNI.forEach(([l, f]) => { const a = dtH.filter(x => f(x.d)); if (a.length) hun[l] = a; });
@@ -7126,7 +7142,7 @@ VIEWS.sosrekap = async (p, main, alive) => {
         ${kt(nfD(dtA.length), 'KK aktif DTSEN', maxT ? 'dicek ' + fDate(maxT) : '', reg('KK aktif DTSEN', 'kk', dtA))}
         ${kt(nfD(dtA.filter(x => x.desil === '1' || x.desil === '2').length), 'KK desil 1–2', 'sangat miskin', reg('KK desil 1–2', 'kk', dtA.filter(x => x.desil === '1' || x.desil === '2')))}
         ${kt(nfD(kpm), 'KPM bansos', F.tahun || 'semua tahun', reg('Penyaluran berhasil', 'sl', slOk))}
-        ${kt(srRpS(rp), 'Nilai bansos tersalur', F.tahun || '', reg('Penyaluran berhasil', 'sl', slOk))}
+        ${kt(srRpS(rp), 'Nilai bansos tersalur', (F.tahun || '') + ' · tanpa PBI JK', reg('Penyaluran berhasil (bernilai rupiah)', 'sl', slOk.filter(x => !srPBI(x))))}
         ${kt(nfD(slF.filter(x => x.gagal).length), 'Transaksi gagal / exclude', '', reg('Transaksi gagal / exclude', 'sl', slF.filter(x => x.gagal)))}
         ${kt(nfD(rnF.length), 'Warga rentan aktif', '', reg('Warga rentan aktif', 'rn', rnF))}
         ${kt(nfD(usF.filter(r => r.status === 'Draf' || r.status === 'Diusulkan di SIKS-NG').length), 'Usulan diproses', '', reg('Usulan diproses', 'us', usF.filter(r => r.status === 'Draf' || r.status === 'Diusulkan di SIKS-NG')))}
@@ -7136,13 +7152,14 @@ VIEWS.sosrekap = async (p, main, alive) => {
       <div class="rk-g">${matriks}
         ${bars('KK per desil', grp(dtF, x => x.desil === 'Belum' ? 'Belum ditentukan' : 'Desil ' + x.desil), DES.map(d => d === 'Belum' ? 'Belum ditentukan' : 'Desil ' + d), '#2563eb', 'kk')}
         ${bars('KK per dusun', grp(dtF, x => x.dusun), SR_DUS.concat(['Lainnya']), '#059669', 'kk')}
-        ${bars('Status DTSEN & perlinsos', grp(dtF, x => [x.aktif ? 'Aktif' : 'Tidak aktif'].concat(x.perl ? [x.perl] : [])), null, '#0891b2', 'kk')}</div>
+        ${bars('Status DTSEN', grp(dtF, x => x.aktif ? 'Aktif' : 'Tidak aktif'), ['Aktif', 'Tidak aktif'], '#0891b2', 'kk')}
+        ${bars('Status perlinsos (pendaftaran)', grp(dtF, x => x.perl || 'Tidak tercatat'), ['Sudah Pendaftaran', 'Belum Pendaftaran', 'Tidak tercatat'], '#6366f1', 'kk')}</div>
       <h3 class="sr-h">${ic('coin')} Bansos</h3>
       <div class="rk-g">${tren}
-        ${bars('Nilai tersalur per program', grp(slOk, x => x.prog), SK_PROG, '#16a34a', 'sl', a => a.reduce((s, x) => s + x.nom, 0))}
+        ${bars('Nilai tersalur per program', grp(slOk.filter(x => !srPBI(x)), x => x.prog), SK_PROG, '#16a34a', 'sl', a => a.reduce((s, x) => s + x.nom, 0))}
         ${bars('KPM per program (keluarga)', Object.fromEntries(Object.entries(grp(slOk, x => x.prog)).map(([k, a]) => [k, Object.values(a.reduce((m, x) => (m[x.id || x.r.atas_nama] = m[x.id || x.r.atas_nama] || x, m), {}))])), SK_PROG, '#d97706', 'sl')}
         ${bars('Status transaksi', grp(slF, x => x.ok ? 'Berhasil' : x.gagal ? (/exclude/i.test(x.r.status) ? 'Exclude' : 'Gagal') : (x.r.status || 'Tanpa status')), ['Berhasil', 'Gagal', 'Exclude'], '#0f766e', 'sl')}
-        ${bars('Nilai tersalur per dusun', grp(slOk, x => x.dusun), SR_DUS.concat(['Lainnya']), '#7c3aed', 'sl', a => a.reduce((s, x) => s + x.nom, 0))}</div>
+        ${bars('Nilai tersalur per dusun', grp(slOk.filter(x => !srPBI(x)), x => x.dusun), SR_DUS.concat(['Lainnya']), '#7c3aed', 'sl', a => a.reduce((s, x) => s + x.nom, 0))}</div>
       <h3 class="sr-h">${ic('house')} Kondisi hunian & aset <span class="meta">(${nfD(dtH.length)} KK yang datanya ada di SIKS-NG)</span></h3>
       <div class="rk-g">${bars('Indikator rumah tidak layak & aset', hun, SR_HUNI.map(h => h[0]), '#b45309', 'kk')}
         ${bars('Lantai terluas', grp(dtH, x => x.d.h_lantai), null, '#64748b', 'kk')}
@@ -7159,7 +7176,7 @@ VIEWS.sosrekap = async (p, main, alive) => {
   /* --- daftar hasil klik --- */
   const KOL = {
     kk: [['Kepala keluarga', x => x.kepala], ['Dusun', x => x.dusun], ['RT/RW', x => x.rt ? x.rt + '/' + x.rw : ''], ['Desil', x => x.desil], ['Status', x => (x.aktif ? 'Aktif' : 'Tidak aktif') + (x.lepas ? ' · belum terhubung' : x.ragu ? ' · ragu' : '')], ['Perlinsos', x => x.perl]],
-    sl: [['Penerima', x => x.r.p_nama || x.r.atas_nama], ['Dusun', x => x.dusun], ['Program', x => x.prog], ['Periode', x => x.r.periode], ['Nominal', x => x.nom ? nfD(x.nom) : ''], ['Status', x => x.r.status]],
+    sl: [['Penerima', x => x.r.p_nama || x.r.atas_nama], ['Dusun', x => x.dusun], ['Program', x => x.prog], ['Periode', x => x.r.periode], ['Nominal', x => srPBI(x) ? 'tanpa nilai (iuran kesehatan)' : x.nom ? nfD(x.nom) : ''], ['Status', x => x.r.status]],
     rn: [['Nama', r => r.r_nama], ['Dusun', r => srDusun(r.r_alamat) || r.r_alamat], ['RT/RW', r => r.r_rt ? Number(r.r_rt) + '/' + Number(r.r_rw) : ''], ['Kategori', r => r.kategori], ['Desil', r => r.desil]],
     us: [['Nama', r => r.u_nama], ['Dusun', r => srDusun(r.u_alamat) || r.u_alamat], ['Jenis', r => r.jenis], ['Status', r => r.status]]
   };
@@ -9399,7 +9416,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '253', tgl: '2026-11-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '254', tgl: '2026-11-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
