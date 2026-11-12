@@ -7376,7 +7376,7 @@ const SR_HUNI = [
 VIEWS.sosrekap = async (p, main, alive) => {
   setTop('Dashboard Sosial', ND(), `<button class="btn sm" data-act="go" data-go='["list",{"e":"dtsen"}]'>${ic('list')}Data DTSEN</button>`);
   main.innerHTML = '<div class="skel" style="height:300px"></div>';
-  const ls = e => canRead(e) ? call('list', { entity: e, limit: 5000 }).then(r => r.rows || []).catch(() => []) : Promise.resolve([]);
+  const ls = e => canRead(e) ? siksSemua(e).catch(() => []) : Promise.resolve([]); /* v260: per 1.500 baris, penyaluran sudah >10.000 */
   const [rn, us, sl, dt, kl] = await Promise.all([ls('rentan'), ls('usulan_bansos'), ls('penyaluran_bansos'), ls('dtsen'), ls('keluarga')]);
   if (!alive()) return;
   /* --- siapkan data --- */
@@ -9744,7 +9744,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '259', tgl: '2026-11-13', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '260', tgl: '2026-11-13', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
