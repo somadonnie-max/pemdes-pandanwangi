@@ -4105,7 +4105,7 @@ VIEWS.list = async (p, main, alive) => {
   main.innerHTML = `<div class="stack">${asetTabs('list', { e })}${aHead ? asetHeadHtml(aHead, st.view) : ''}${e === 'tanah_desa' ? tanahTabs('list') : e === 'tanah_sert' ? tanahTabs('sert') : ''}${SOS_TAB_E[e] ? rentanTabs(SOS_TAB_E[e]) : ''}
     <div class="toolbar"><label class="search">${ic('search')}<input id="q" placeholder="Cari…" value="${esc(st.q)}" autocomplete="off"></label>${fltF.length ? `<button class="btn sm${fltN ? ' pri' : ''}" data-act="flt" title="Cari berdasarkan kriteria">${ic('filter')}Filter<span class="fcnt">${fltN || ''}</span></button>` : ''}
       ${u.month ? `<input type="month" class="inp" id="per" value="${esc(st.per)}" style="max-width:180px">` : ''}
-      ${e === 'rkp_rutin' && canWrite(e) ? `<button class="btn sm" data-act="rkpRutinIsi">${ic('down')}Salin dari APBDes ${esc(keuTh())}</button>` : ''}${NASKAH[e] && canWrite(e) ? `<button class="btn sm pri" data-act="go" data-go='${esc(JSON.stringify(['form', { e, buat: 1 }]))}' title="${esc(NASKAH[e].buat)}">${ic('next')}Buat</button>` : ''}${u.tools ? u.tools() : ''}${u.print ? `<button class="btn sm" data-act="cetak" title="Cetak buku register">${ic('print')}Cetak</button>` : ''}${u.excel ? `<button class="btn sm" data-act="xlsOut">${ic('down')}Ekspor Excel</button>${canWrite(e) ? `<label class="btn sm">${ic('plus')}Impor Excel<input type="file" id="xlsIn" accept=".xlsx,.csv" hidden></label>` : ''}` : ''}${u.print2 ? `<button class="btn sm" data-act="cetak2">${ic('print')}${esc(u.print2.label)}</button>` : ''}</div>
+      ${e === 'dtsen' && canWrite(e) ? `<button class="btn sm pri" data-act="siksImpor">${ic('file')}Impor SIKS-NG</button>` : ''}${e === 'rkp_rutin' && canWrite(e) ? `<button class="btn sm" data-act="rkpRutinIsi">${ic('down')}Salin dari APBDes ${esc(keuTh())}</button>` : ''}${NASKAH[e] && canWrite(e) ? `<button class="btn sm pri" data-act="go" data-go='${esc(JSON.stringify(['form', { e, buat: 1 }]))}' title="${esc(NASKAH[e].buat)}">${ic('next')}Buat</button>` : ''}${u.tools ? u.tools() : ''}${u.print ? `<button class="btn sm" data-act="cetak" title="Cetak buku register">${ic('print')}Cetak</button>` : ''}${u.excel ? `<button class="btn sm" data-act="xlsOut">${ic('down')}Ekspor Excel</button>${canWrite(e) ? `<label class="btn sm">${ic('plus')}Impor Excel<input type="file" id="xlsIn" accept=".xlsx,.csv" hidden></label>` : ''}` : ''}${u.print2 ? `<button class="btn sm" data-act="cetak2">${ic('print')}${esc(u.print2.label)}</button>` : ''}</div>
     ${GRUP_OF[e] ? `<div class="gtabs" role="tablist">${grpEs(GRUP_OF[e]).map(([k, l]) => `<button role="tab" class="${k === e ? 'on' : ''}" data-act="grpTab" data-v="${k}">${esc(l)}</button>`).join('')}</div>` : ''}
     ${pers ? `<div class="chips">${pers.map(y => `<button class="chip ${st.per === y || (y === 'Semua' && st.per === 'all') ? 'on' : ''}" data-act="per" data-v="${y === 'Semua' ? 'all' : y}">${y}</button>`).join('')}</div>` : ''}
     ${u.views ? `<div class="chips">${u.views.map((v, i) => `<button class="chip ${st.view === i ? 'on' : ''}" data-act="view" data-v="${i}">${esc(v[0])}</button>`).join('')}</div>` : ''}
@@ -6922,8 +6922,8 @@ const dtMasuk = r => !/gagal|dikembalikan|belum/i.test(r.status || '') && Number
 /** kartu total bantuan tahun berjalan per program (seperti SIKS-NG) */
 function dtTotalHtml(sl) {
   const th = new Date().getFullYear(), per = {};
-  const thI = sl.filter(r => Math.floor(dtPerKey(r) / 100) === th && dtMasuk(r)), pbi = thI.some(r => /PBI/i.test(r.program || ''));
-  thI.filter(r => !/PBI/i.test(r.program || '')).forEach(r => { const p = r.program || 'Lainnya'; per[p] = (per[p] || 0) + (Number(r.nominal) || 0); });
+  const thI = sl.filter(r => Math.floor(dtPerKey(r) / 100) === th && dtMasuk(r)), pbi = thI.some(r => /PBI/i.test(r.program || '')) && !thI.some(r => /PBI/i.test(r.program || '') && Number(r.nominal));
+  thI.filter(r => Number(r.nominal) || !/PBI/i.test(r.program || '')).forEach(r => { const p = r.program || 'Lainnya'; per[p] = (per[p] || 0) + (Number(r.nominal) || 0); });
   const P = Object.keys(per).sort(), tot = P.reduce((a, p) => a + per[p], 0);
   return `<div class="dttot"><div class="dttot-l">${ic('check')} Total bantuan tahun ${th}</div><b>${tot ? dtRp(tot) : 'Rp 0'}</b>${P.length || pbi ? `<div class="dttot-r">${P.map(p => `<span><i>${esc(p)}</i>${dtRp(per[p])}</span>`).join('')}${pbi ? '<span><i>PBI JK</i>iuran kesehatan ditanggung</span>' : ''}</div>` : '<div class="dttot-r"><span>Belum ada bantuan tercatat tahun ini.</span></div>'}</div>`;
 }
@@ -7053,6 +7053,198 @@ async function sosSinkron(e, id) {
 
 const SOS_TAB_E = { rentan: 'list', dtsen: 'dtsen', usulan_bansos: 'usulan', musdes_bansos: 'musdes', penyaluran_bansos: 'salur' };
 /* Rekap sosial: seperti Rekap DTSEN, dihitung dari data desa */
+/* ---------- Impor SIKS-NG (v257): JSON hasil siks_scraper (siks_detail_*_bersih.json) dan/atau CSV DTSEN semua desil ---------- */
+const SIKS_BLN = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGU', 'SEP', 'OKT', 'NOV', 'DES'];
+const SIKS_HM = { 'Jumlah Keluarga yang Tinggal Dalam Satu Rumah': 'h_jml_kel', 'Status Kepemilikan Bangunan Tempat Tinggal': 'h_milik', 'Bahan Bakar/Energi Utama Untuk Memasak': 'h_bbm', 'Jenis Lantai Terluas': 'h_lantai', 'Kepemilikan dan Penggunaan Fasilitas BAB': 'h_bab', 'Jenis Dinding Terluas': 'h_dinding', 'Jenis Kloset': 'h_kloset', 'Jenis Atap Terluas': 'h_atap', 'Pembuangan Akhir Tinja': 'h_tinja', 'Sumber Air Minum Utama': 'h_air', 'Jarak Sumber Air Minum Ke Limbah/Kotoran Terdekat': 'h_jarak_air', 'Sumber Penerangan Utama': 'h_listrik', 'ID Pelanggan/No Meteran': 'h_pln', 'Luas Lahan Sawah/Kebun (Milik Sendiri)': 'a_lahan', 'Memiliki Lahan Lain': 'a_lahan_lain', 'Rumah/Bangunan di Tempat Lain': 'a_rumah_lain', 'Sapi': 'a_sapi', 'Kerbau': 'a_kerbau', 'Babi': 'a_babi', 'Kuda': 'a_kuda', 'Kambing/Domba': 'a_kambing', 'Tabung gas 5,5 kg atau lebih': 'a_gas55', 'Lemari es/kulkas': 'a_kulkas', 'Air Conditioner (AC)': 'a_ac', 'Pemanas Air (water heater)': 'a_pemanas', 'Telepon rumah (PSTN)': 'a_telepon', 'Televisi layar datar (min. 30 inci)': 'a_tv', 'Emas/perhiasan (min 10 gram)': 'a_emas', 'Komputer/Laptop/Tablet': 'a_komputer', 'Sepeda Motor': 'a_motor', 'Sepeda': 'a_sepeda', 'Mobil': 'a_mobil', 'Perahu': 'a_perahu', 'Kapal/Perahu Motor': 'a_kapal', 'Smartphone': 'a_hp' };
+const SIKS_PROG = { SEMBAKO: 'Sembako / BPNT', PBI: 'PBI JK', PKH: 'PKH', 'BLTS KESRA': 'BLTS Kesra', YAPI: 'YAPI', ATENSI: 'ATENSI', 'BANTUAN PERUMAHAN': 'Bantuan Perumahan' };
+const siksNm = s => String(s || '').toUpperCase().normalize('NFD').replace(/[^A-Z]/g, '');
+const siksNum = s => String(parseInt(s, 10) || '');
+const siksBd = v => { v = String(v == null ? '' : v).trim(); if (/^(blm|belum)\s*di\s*tentukan$|^belum ditentukan$|^blm ditentukan$/i.test(v)) return 'Belum ditentukan'; return v === '-' ? '' : v; };
+function siksCsv(t) { const rows = []; let row = [], c = '', q = false; t = t.replace(/^﻿/, ''); for (let i = 0; i < t.length; i++) { const ch = t[i]; if (q) { if (ch === '"') { if (t[i + 1] === '"') { c += '"'; i++; } else q = false; } else c += ch; } else if (ch === '"') q = true; else if (ch === ',') { row.push(c); c = ''; } else if (ch === '\n') { row.push(c.replace(/\r$/, '')); rows.push(row); row = []; c = ''; } else c += ch; } if (c || row.length) { row.push(c); rows.push(row); } const H = rows[0] || []; return rows.slice(1).filter(r => r.length > 3).map(r => Object.fromEntries(H.map((h, i) => [h, r[i]]))); }
+function siksLev(a, b) { const m = a.length, n = b.length; if (!m || !n) return Math.max(m, n); let p = [...Array(n + 1).keys()]; for (let i = 1; i <= m; i++) { const c = [i]; for (let j = 1; j <= n; j++) c[j] = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); p = c; } return p[n]; }
+async function siksSemua(e, info) { let o = []; for (let off = 0; ; off += 5000) { if (info) info(e, o.length); const r = await call('list', { entity: e, limit: 5000, offset: off }); o = o.concat(r.rows || []); if (!r.rows || r.rows.length < 5000) break; } return o; }
+
+/* gabungkan sumber: baris CSV (semua desil) + keluarga JSON (detail) → daftar KK SIKS */
+function siksGabung(csvRows, jsonKel) {
+  const L = [], idx = {};
+  const tambah = (o, j) => { const k = o.pre.slice(0, 10) + '|' + o.name; if (idx[k]) { const x = idx[k]; if (j) { x.j = j; x.pre = o.pre.length > x.pre.length ? o.pre : x.pre; ['rt', 'rw', 'alamat'].forEach(f => { if (!x[f] && o[f]) x[f] = o[f]; }); } return; } idx[k] = o; o.j = j || null; L.push(o); };
+  csvRows.forEach(r => tambah({ pre: String(r.kk_prefix || '').replace(/\D/g, ''), name: siksNm(r.kepala_keluarga), kepala: String(r.kepala_keluarga || '').toUpperCase(), desil: String(r.desil || ''), alamat: String(r.alamat_asli || '').toUpperCase(), dusun: r.dusun || '', rt: r.rt || '', rw: r.rw || '', perl: r.status_perlinsos || '', aktif: /^AKTIF/i.test(r.status || '') }));
+  jsonKel.forEach(j => tambah({ pre: String(j.no_kk_tersamar || '').replace(/\D/g, ''), name: siksNm(j.kepala_keluarga), kepala: String(j.kepala_keluarga || '').toUpperCase(), desil: String(j.desil || ''), alamat: String(j.alamat || '').toUpperCase(), dusun: '', rt: j.rt || '', rw: j.rw || '', perl: j.status_perlinsos || '', aktif: /^AKTIF/i.test(j.status_kk || '') }, j));
+  return L;
+}
+
+/* cocokkan tiap KK SIKS ke Data Keluarga desa */
+function siksCocok(L, K, P, D) {
+  const KK = {}; K.forEach(k => { const p = String(k.kk || '').slice(0, 10); (KK[p] = KK[p] || []).push(k); });
+  const KID = Object.fromEntries(K.map(k => [k.id, k])), KbyKK = Object.fromEntries(K.map(k => [k.kk, k]));
+  const MEM = {}; P.forEach(p => { (MEM[p.kk] = MEM[p.kk] || []).push(p); });
+  const OLD = {}; D.forEach(d => { if (d.keluarga_id) OLD[String(d.kk || '').slice(0, 10) + '|' + siksNm(d.kepala)] = d.keluarga_id; });
+  const dus = s => srDusun(s);
+  const lokOK = (k, r) => (!r.rt || siksNum(k.rt) === siksNum(r.rt)) && (!r.rw || siksNum(k.rw) === siksNum(r.rw));
+  const lokG = (k, r) => { const d = dus(r.dusun || r.alamat); if (!d && !r.rt) return false; if (d && dus(k.dusun) !== d) return false; return lokOK(k, r); };
+  for (const m of L) {
+    m.kid = ''; m.how = ''; m.ket = '';
+    if (!m.name) { m.how = 'KOSONG'; continue; }
+    const p10 = m.pre.slice(0, 10), c = (KK[p10] || []).filter(k => String(k.kk).startsWith(m.pre));
+    let ex = c.filter(k => siksNm(k.kepala) === m.name);
+    if (ex.length > 1) { const e2 = ex.filter(k => lokOK(k, m) && (!dus(m.dusun || m.alamat) || dus(k.dusun) === dus(m.dusun || m.alamat))); if (e2.length) ex = e2; }
+    if (ex.length === 1) { m.kid = ex[0].id; m.how = 'PASTI'; continue; }
+    if (ex.length > 1) { m.how = 'GANDA'; m.ket = ex.length + ' KK desa dengan awal No. KK & nama kepala sama'; m.cand = ex.map(k => k.id); continue; }
+    const o = OLD[p10 + '|' + m.name]; if (o && KID[o]) { m.kid = o; m.how = 'LAMA'; m.ket = 'sama dengan hubungan DTSEN sebelumnya'; continue; }
+    const mem = c.flatMap(k => (MEM[k.kk] || []).filter(p => siksNm(p.nama) === m.name).map(p => [k, p]));
+    if (mem.length === 1) { m.kid = mem[0][0].id; m.how = 'RAGU'; m.ket = 'kepala SIKS tercatat sbg ' + (mem[0][1].hubungan || 'anggota') + ' di KK ' + mem[0][0].kepala; continue; }
+    const fz = c.map(k => [k, 1 - siksLev(siksNm(k.kepala), m.name) / Math.max(m.name.length, siksNm(k.kepala).length, 1)]).filter(x => x[1] >= 0.8).sort((a, b) => b[1] - a[1]);
+    if (fz.length === 1 || (fz.length > 1 && fz[0][1] > fz[1][1])) { m.kid = fz[0][0].id; m.how = 'RAGU'; m.ket = 'nama mirip: ' + fz[0][0].kepala; continue; }
+    const g = K.filter(k => siksNm(k.kepala) === m.name && lokG(k, m));
+    if (g.length === 1) { m.kid = g[0].id; m.how = 'RAGU'; m.ket = 'No. KK beda di desa'; continue; }
+    const gp = P.filter(p => siksNm(p.nama) === m.name && KbyKK[p.kk] && lokG(KbyKK[p.kk], m));
+    if (gp.length === 1) { m.kid = KbyKK[gp[0].kk].id; m.how = 'RAGU'; m.ket = 'No. KK beda; tercatat sbg ' + (gp[0].hubungan || 'anggota') + ' di KK ' + KbyKK[gp[0].kk].kepala; continue; }
+    m.how = g.length + gp.length > 1 ? 'GANDA' : 'TIDAK ADA'; m.ket = g.length + gp.length > 1 ? (g.length + gp.length) + ' kemungkinan KK di desa' : 'tidak ditemukan di Data Keluarga';
+  }
+  /* satu KK desa hanya untuk satu KK SIKS: yang kuat (PASTI/LAMA) menang, sisanya dilepas */
+  const grp = {}; L.forEach(m => { if (m.kid) (grp[m.kid] = grp[m.kid] || []).push(m); });
+  Object.values(grp).filter(a => a.length > 1).forEach(a => {
+    const kuat = a.filter(m => m.how === 'PASTI' || m.how === 'LAMA');
+    let keep = kuat.length === 1 ? kuat : (kuat.length > 1 ? kuat : a).filter(m => lokG(KID[m.kid], m));
+    if (keep.length !== 1) keep = [kuat[0] || a[0]];
+    a.forEach(m => { if (m !== keep[0]) { m.ket = 'kemungkinan KK ' + KID[m.kid].kepala + ' (sudah dipakai SIKS ' + keep[0].kepala + ')'; m.kid = ''; m.how = 'TIDAK ADA'; } else if (kuat.length > 1 && m.how !== 'LAMA') { m.how = 'RAGU'; m.ket = 'No. KK & nama kembar di SIKS (' + a.length + ' KK), dipilih yang ini'; } });
+  });
+  return { KID, MEM };
+}
+
+/* susun baris yang akan disimpan */
+function siksSusun(L, X, tgl, opt) {
+  const { KID, MEM } = X.idx, th = tgl.slice(0, 4);
+  const DT = [], PU = [], SL = [], LAP = [];
+  const dtAda = {}; X.D.forEach(d => { if (d.tgl_cek === tgl) { const kk = ((String(d.ket || '').match(/No\. KK SIKS ([0-9*]+)/) || [])[1] || ''); dtAda[(d.keluarga_id || '') + '|' + siksNm(d.kepala) + '|' + kk.replace(/\*/g, '')] = d.id; if (d.keluarga_id) dtAda['K|' + d.keluarga_id] = d.id; } });
+  const skey = r => [r.keluarga_id, r.program, siksNm(r.periode), siksNm(r.atas_nama), String(r.nominal || ''), String(r.no_rekening || '')].join('|');
+  const slAda = new Map(); X.S.forEach(r => { const k = skey(r); slAda.set(k, (slAda.get(k) || 0) + 1); }); /* hitung jumlah: baris kembar sah (mis. dua kali salur) tetap masuk, impor ulang tidak menggandakan */
+  const pbiAda = {}; X.S.forEach(r => { if (/Ringkasan PBI/.test(r.ket || '')) pbiAda[(r.keluarga_id || siksNm(r.atas_nama)) + '|' + ((String(r.periode).match(/20\d\d/) || [])[0] || '')] = r.id; });
+  const usedP = new Set();
+  for (const m of L) {
+    if (m.how === 'KOSONG') continue;
+    const k = m.kid ? KID[m.kid] : null, j = m.j;
+    const tag = m.how === 'RAGU' ? 'RAGU: ' + m.ket : (m.how === 'TIDAK ADA' || m.how === 'GANDA') ? 'BELUM TERHUBUNG: ' + m.ket : m.how === 'LAMA' ? m.ket : '';
+    const kkS = j ? j.no_kk_tersamar : m.pre + '******';
+    const rec = { keluarga_id: k ? k.id : '', kk: k ? k.kk : '', kepala: m.kepala, alamat_dtsen: m.alamat, desil: /^\d+$/.test(m.desil) ? m.desil : 'Belum ditentukan', status: m.aktif ? 'Aktif' : 'Tidak aktif', tgl_cek: tgl,
+      ket: ['Impor SIKS-NG ' + fDate(tgl), 'No. KK SIKS ' + kkS, m.perl ? 'Perlinsos: ' + m.perl : '', tag].filter(Boolean).join('\n') };
+    const ada = (k && dtAda['K|' + k.id]) || dtAda[(k ? k.id : '') + '|' + m.name + '|' + kkS.replace(/\*/g, '')];
+    if (ada) rec.id = ada;
+    if (j) {
+      [j.hunian, j.aset, j.ternak_aset].forEach(g => Object.entries(g || {}).forEach(([a, v]) => { if (SIKS_HM[a]) rec[SIKS_HM[a]] = siksBd(v); }));
+      rec.anggota = JSON.stringify((j.anggota || []).map(a => ({ nama: a.nama, hubungan: a.hubungan, nik: a.nik_tersamar, pekerjaan: a.pekerjaan_utama, status: a.status })));
+      const mem = k ? (MEM[k.kk] || []) : [];
+      for (const a of j.anggota || []) {
+        const pre = String(a.nik_tersamar || '').replace(/\D/g, '');
+        let c = mem.filter(p => siksNm(p.nama) === siksNm(a.nama) && !usedP.has(p.id)); if (c.length > 1) c = c.filter(p => String(p.nik).startsWith(pre));
+        if (!c.length && pre.length >= 10) { const g = X.P.filter(p => siksNm(p.nama) === siksNm(a.nama) && String(p.nik).startsWith(pre)); if (g.length === 1) c = g; }
+        if (c.length === 1) { usedP.add(c[0].id); a._pid = c[0].id; if (opt.pend) { const st = /^AKTIF$/i.test(a.status || '') ? 'Aktif' : 'Tidak aktif', u = { id: c[0].id }; if (a.pekerjaan_utama && c[0].pekerjaan_utama !== a.pekerjaan_utama) u.pekerjaan_utama = a.pekerjaan_utama; if (c[0].status_dtsen !== st) u.status_dtsen = st; if (Object.keys(u).length > 1) PU.push(u); } }
+        else LAP.push({ jenis: 'Anggota', desil: m.desil, kepala: m.kepala, nama: a.nama, ket: c.length ? 'lebih dari 1 penduduk cocok' : (k ? 'tidak ada di KK desa' : 'KK belum terhubung') });
+      }
+      if (opt.bansos) {
+        const orang = (an, nik) => { const ag = (j.anggota || []).find(a => siksNm(a.nama) === siksNm(an)); let p = ag && ag._pid ? X.P.find(x => x.id === ag._pid) : null; if (!p && /^\d{16}$/.test(nik || '')) p = X.P.find(x => x.nik === nik) || null; if (!p && k) p = (MEM[k.kk] || []).find(x => siksNm(x.nama) === siksNm(an)) || null; return p; };
+        const baris = (h, prog, per, st, nom, ketL) => { const an = String(h.atas_nama || '').toUpperCase(), p = orang(an, h.nik);
+          return { keluarga_id: k ? k.id : '', p_nama: p ? p.nama : an, p_penduduk_id: p ? p.id : '', p_nik: p ? p.nik : (/^\d{16}$/.test(h.nik || '') ? h.nik : ''), p_kk: p ? p.kk : (k ? k.kk : ''), p_alamat: p ? (p.dusun || '') : (k ? k.dusun : ''), p_rt: p ? p.rt : (k ? k.rt : ''), p_rw: p ? p.rw : (k ? k.rw : ''),
+            program: prog, periode: per, penyalur: String(h.penyalur || '').toUpperCase().replace(/^BELUM DITENTUKAN$/, ''), no_kartu: h.no_kartu || '', no_rekening: h.no_rekening || '', atas_nama: an, nominal: nom ? String(nom) : '', status: st || 'Tercatat di SIKS-NG',
+            ket: ['Impor Riwayat Bansos SIKS-NG, ' + fDate(tgl)].concat(ketL || [], p ? [] : ['Penerima belum terhubung ke Data Penduduk']).join('\n') }; };
+        for (const h of j.riwayat_bansos || []) {
+          let per = h.periode || '', st = h.status_transaksi || '', kt = [];
+          if (!per && h.program === 'PBI') { const f = [h.periode_awal || '', h.periode_akhir || '']; per = (f.find(x => /^PBI JKN/i.test(x)) || '').split(' / ')[0]; st = f.find(x => /^PBI (akt|non)/i.test(x)) || ((f[0] || '').split(' / ')[1] || ''); }
+          else if (!per && h.periode_awal) { per = h.periode_awal.split(' / ')[0]; st = h.periode_awal.split(' / ')[1] || ''; if (h.periode_akhir && h.periode_akhir !== h.periode_awal) kt.push('Periode akhir: ' + h.periode_akhir); }
+          const prog = SIKS_PROG[h.program] || h.program;
+          const r = baris(h, prog, per || h.program, st, h.nominal, kt);
+          const kk_ = skey(r), n_ = slAda.get(kk_) || 0; if (n_ > 0) slAda.set(kk_, n_ - 1); else SL.push(r);
+        }
+        /* PBI JK bernilai: ringkasan "bantuan tahun ini" (iuran Rp42.000/jiwa/bulan) → satu baris per KK per tahun */
+        const pbiTot = Number((j.rincian_bantuan_tahun_ini || {}).PBI) || 0;
+        if (pbiTot > 0) {
+          const bln = Number(((j.bansos_aktif || []).find(b => b.program === 'PBI') || {}).nilai_bantuan) || 0, n = bln ? Math.round(pbiTot / bln) : 0;
+          const per = n >= 1 && n <= 12 && Math.abs(n * bln - pbiTot) < 1 ? 'PBI JK JAN' + (n > 1 ? ' - ' + SIKS_BLN[n - 1] : '') + ' ' + th : 'PBI JK ' + th;
+          const r = baris({ atas_nama: m.kepala }, 'PBI JK', per, 'PBI aktif (iuran BPJS ditanggung)', pbiTot, ['Ringkasan PBI dari "bantuan tahun ini" SIKS-NG' + (bln ? ': Rp' + nfD(bln) + '/bulan (' + Math.round(bln / 42000) + ' jiwa × Rp42.000)' : '')]);
+          const id = pbiAda[(k ? k.id : siksNm(m.kepala)) + '|' + th]; if (id) r.id = id;
+          SL.push(r);
+        }
+      }
+    }
+    DT.push(rec);
+    if (m.how !== 'PASTI') LAP.push({ jenis: m.how === 'RAGU' || m.how === 'LAMA' ? 'RAGU (terhubung)' : 'BELUM TERHUBUNG', desil: m.desil, kepala: m.kepala, nama: m.alamat, ket: m.ket });
+  }
+  return { DT, PU, SL, LAP };
+}
+
+ACT.siksImpor = async () => {
+  if (!canWrite('dtsen')) return toast('Butuh hak ubah DTSEN.', 1);
+  const today = isoToday();
+  const m = modal('Impor data SIKS-NG', `<div class="stack">
+    <div class="meta">Pilih berkas hasil unduhan SIKS-NG (boleh beberapa sekaligus):<br>• <b>siks_detail_…_bersih.json</b> — detail per desil (anggota, hunian & aset, riwayat bansos)<br>• <b>DTSEN_…_Semua.csv</b> — daftar semua desil (No. KK 10 digit, kepala, dusun, RT/RW)</div>
+    <input type="file" id="skF" accept=".json,.csv" multiple>
+    <label class="fld"><span>Tanggal dicek di SIKS-NG</span><input type="date" id="skT" value="${today}"></label>
+    <label class="chk"><input type="checkbox" id="skP" checked> Perbarui Pekerjaan utama & Status DTSEN penduduk</label>
+    <label class="chk"><input type="checkbox" id="skB" checked> Impor riwayat bansos (penyaluran) dari berkas detail</label>
+    <label class="chk"><input type="checkbox" id="skR" checked> Buat Data Rentan "Keluarga miskin" untuk desil 1–2</label>
+    <div class="meta">Data desa (nama, alamat, NIK, No. KK) tidak diubah; hanya dicocokkan lewat awal No. KK, nama kepala keluarga, dusun & RT/RW. Impor ulang tidak menggandakan data.</div>
+    <div id="skInfo" class="meta"></div>
+    <div class="btns"><button class="btn pri" id="skGo">${ic('search')}Periksa</button></div></div>`, { big: 1 });
+  const info = t => { $('#skInfo', m.el).innerHTML = t; };
+  $('#skF', m.el).onchange = async e => { for (const f of e.target.files) if (/\.json$/i.test(f.name)) { try { const d = JSON.parse(await f.text()); if (d.diambil) $('#skT', m.el).value = String(d.diambil).slice(0, 10); } catch (x) { } } };
+  $('#skGo', m.el).onclick = async () => {
+    const files = [...$('#skF', m.el).files]; if (!files.length) return toast('Pilih berkas dulu.', 1);
+    const tgl = $('#skT', m.el).value || today, opt = { pend: $('#skP', m.el).checked, bansos: $('#skB', m.el).checked, rentan: $('#skR', m.el).checked };
+    $('#skGo', m.el).disabled = true;
+    try {
+      let csvR = [], jsonK = [];
+      for (const f of files) { const t = await f.text(); if (/\.json$/i.test(f.name)) { const d = JSON.parse(t); if (!Array.isArray(d.keluarga)) throw new Error(f.name + ': bukan format siks_detail (tidak ada daftar "keluarga").'); jsonK = jsonK.concat(d.keluarga); } else { const r = siksCsv(t); if (!r.length || !('kk_prefix' in r[0])) throw new Error(f.name + ': kolom kk_prefix tidak ditemukan.'); csvR = csvR.concat(r); } }
+      const X = {}; const inf = (e, n) => info('Memuat ' + e + '… ' + (n ? nfD(n) : ''));
+      X.K = await siksSemua('keluarga', inf); X.P = await siksSemua('penduduk', inf); X.D = await siksSemua('dtsen', inf); X.S = await siksSemua('penyaluran_bansos', inf); X.RN = await siksSemua('rentan', inf);
+      info('Mencocokkan…');
+      const L = siksGabung(csvR, jsonK); X.idx = siksCocok(L, X.K, X.P, X.D);
+      const R = siksSusun(L, X, tgl, opt);
+      const by = {}; L.forEach(x => by[x.how] = (by[x.how] || 0) + 1);
+      const baru = R.DT.filter(r => !r.id).length, slBaru = R.SL.filter(r => !r.id).length;
+      const lapT = R.LAP.filter(l => l.jenis !== 'Anggota');
+      $('#skInfo', m.el).innerHTML = '';
+      m.body.insertAdjacentHTML('beforeend', `<div class="stack" id="skHasil">
+        <div class="dks">${[[nfD(L.length), 'KK di berkas'], [nfD(by.PASTI || 0), 'cocok pasti'], [nfD((by.RAGU || 0) + (by.LAMA || 0)), 'terhubung, ragu'], [nfD((by['TIDAK ADA'] || 0) + (by.GANDA || 0)), 'belum terhubung'], [nfD(by.KOSONG || 0), 'tanpa nama (dilewati)']].map(x => `<div class="dk"><b>${x[0]}</b><small>${x[1]}</small></div>`).join('')}</div>
+        <div class="meta">Akan disimpan: <b>${nfD(baru)}</b> DTSEN baru, ${nfD(R.DT.length - baru)} DTSEN tanggal ${esc(fDate(tgl))} diperbarui; ${nfD(R.PU.length)} penduduk diperbarui; ${nfD(slBaru)} penyaluran baru, ${nfD(R.SL.length - slBaru)} ringkasan PBI diperbarui${opt.rentan ? '; Data Rentan desil 1–2 dibuat bila belum ada' : ''}.</div>
+        ${lapT.length || R.LAP.length ? `<details><summary><b>${nfD(lapT.length)} KK perlu dicek</b>${R.LAP.length > lapT.length ? ' · ' + nfD(R.LAP.length - lapT.length) + ' anggota tidak ditemukan' : ''}</summary>${dtTabel(['Jenis', 'Desil', 'Kepala (SIKS)', 'Alamat / anggota', 'Catatan'], R.LAP.slice(0, 400).map(l => `<tr><td>${esc(l.jenis)}</td><td>${esc(l.desil)}</td><td>${esc(l.kepala)}</td><td>${esc(l.nama || '')}</td><td>${esc(l.ket || '')}</td></tr>`))}</details>` : ''}
+        <div class="btns"><button class="btn" id="skCek">${ic('print')}Daftar cek (Cetak / Excel)</button><button class="btn pri" id="skSave">${ic('check')}Simpan semua</button></div><div id="skProg" class="meta"></div></div>`);
+      $('#skCek', m.el).onclick = () => printDocs('Daftar cek impor SIKS-NG', [`<div class="paper land">${kop()}<h2 style="margin:6px 0">DAFTAR CEK IMPOR SIKS-NG ${esc(fDate(tgl).toUpperCase())}</h2><table class="tbl"><thead><tr><th>No</th><th>Jenis</th><th>Desil</th><th>Kepala keluarga (SIKS)</th><th>Alamat / anggota</th><th>Catatan</th></tr></thead><tbody>${R.LAP.map((l, i) => `<tr><td>${i + 1}</td><td>${esc(l.jenis)}</td><td>${esc(l.desil)}</td><td>${esc(l.kepala)}</td><td>${esc(l.nama || '')}</td><td>${esc(l.ket || '')}</td></tr>`).join('')}</tbody></table></div>`], 'siks_cek');
+      $('#skSave', m.el).onclick = async () => {
+        $('#skSave', m.el).disabled = true; const pg = t => { $('#skProg', m.el).textContent = t; };
+        const bulk = async (e, rows, lbl) => { let t = 0, u = 0, g = []; for (let i = 0; i < rows.length; i += 400) { pg(lbl + ' ' + nfD(Math.min(i + 400, rows.length)) + '/' + nfD(rows.length) + '…'); const r = await call('bulkSave', { entity: e, rows: rows.slice(i, i + 400) }); t += r.tambah; u += r.ubah; g = g.concat(r.gagal || []); } return { t, u, g }; };
+        try {
+          const a = await bulk('dtsen', R.DT, 'DTSEN');
+          const b = opt.pend ? await bulk('penduduk', R.PU, 'Penduduk') : { t: 0, u: 0, g: [] };
+          const c = opt.bansos ? await bulk('penyaluran_bansos', R.SL, 'Penyaluran') : { t: 0, u: 0, g: [] };
+          let rnB = 0, rnU = 0;
+          if (opt.rentan) {
+            const dtR = v => { const n = parseInt(v, 10); return n ? (n <= 5 ? 'Desil ' + n : 'Desil 6–10') : ''; };
+            const RNK = {}; X.RN.forEach(r => { if (r.dtsen_kel) (RNK[r.dtsen_kel] = RNK[r.dtsen_kel] || []).push(r); });
+            const SLK = {}; X.S.concat(R.SL).forEach(r => { if (r.keluarga_id) (SLK[r.keluarga_id] = SLK[r.keluarga_id] || []).push(r); });
+            const MAPP = { 'PKH': 'PKH', 'Sembako / BPNT': 'BPNT / Sembako', 'PBI JK': 'PBI JK (BPJS Kesehatan)', 'ATENSI': 'ATENSI (Kemensos)' };
+            const upd = [], neu = [], seen = new Set();
+            for (const d of R.DT) {
+              if (!d.keluarga_id || seen.has(d.keluarga_id)) continue; seen.add(d.keluarga_id);
+              const ds = dtR(d.desil), ada = RNK[d.keluarga_id] || [];
+              if (ada.length) { ada.forEach(r => { if (ds && r.desil !== ds) upd.push({ id: r.id, desil: ds, ket: (r.ket ? r.ket + '\n' : '') + 'Desil diperbarui dari impor SIKS-NG ' + fDate(tgl) + ' (' + (r.desil || '-') + ' → ' + ds + ')' }); }); continue; }
+              if (!['1', '2'].includes(String(d.desil)) || d.status === 'Tidak aktif') continue;
+              const k = X.idx.KID[d.keluarga_id], ang = X.idx.MEM[k.kk] || [], kp = ang.find(a => /kepala/i.test(a.hubungan || '')) || ang[0] || {};
+              const progs = [...new Set((SLK[d.keluarga_id] || []).filter(r => srOK(r.status)).map(r => r.program))];
+              neu.push({ r_nama: kp.nama || d.kepala, r_penduduk_id: kp.id || '', r_nik: kp.nik || '', r_kk: k.kk, r_jk: kp.jk || '', r_tempat_lahir: kp.tempat_lahir || '', r_tgl_lahir: kp.tgl_lahir || '', r_agama: kp.agama || '', r_pekerjaan: kp.pekerjaan || '', r_wn: kp.warga_negara || 'WNI', r_alamat: kp.dusun || k.dusun || '', r_rt: kp.rt || k.rt || '', r_rw: kp.rw || k.rw || '', r_desa: kp.w_desa || '', r_kec: kp.w_kec || '', r_kab: kp.w_kab || '',
+                kategori: 'Keluarga miskin', desil: ds, status: 'Aktif', tgl_data: tgl, sumber_data: 'DTSEN', dtsen_kel: d.keluarga_id, kg_miskin: 'Ya', kg_bantuan: progs.length ? 'Ya' : '', bantuan: JSON.stringify(progs.map(p => ({ program: MAPP[p] || p, sumber: 'Kemensos', tahun: tgl.slice(0, 4), ket: 'dari Penyaluran Bansos' }))),
+                ket: 'Otomatis dari DTSEN desil ' + d.desil + ' (impor SIKS-NG ' + fDate(tgl) + ')' + (kp.id ? '' : '\nRAGU: KK belum punya anggota di Data Penduduk') });
+            }
+            const r1 = await bulk('rentan', upd, 'Data Rentan'), r2 = await bulk('rentan', neu, 'Data Rentan baru'); rnU = r1.u; rnB = r2.t;
+          }
+          const gagal = a.g.length + b.g.length + c.g.length;
+          pg(`Selesai: DTSEN ${nfD(a.t)} baru / ${nfD(a.u)} diperbarui · penduduk ${nfD(b.u)} · penyaluran ${nfD(c.t)} baru / ${nfD(c.u)} diperbarui · Data Rentan ${nfD(rnB)} baru / ${nfD(rnU)} desil diperbarui${gagal ? ' · ' + gagal + ' gagal' : ''}.`);
+          toast('Impor SIKS-NG selesai.'); try { refresh(); } catch (x) { }
+        } catch (er) { pg('Gagal: ' + er.message); $('#skSave', m.el).disabled = false; }
+      };
+    } catch (er) { info('<span style="color:var(--danger)">' + esc(er.message) + '</span>'); $('#skGo', m.el).disabled = false; }
+  };
+};
+
 /* ---------- Dashboard Kesejahteraan Sosial (v253): DTSEN, bansos, hunian, rentan & usulan; filter + klik → daftar ---------- */
 const SR_DUS = ['KRAJAN 1', 'KRAJAN 2', 'KRAJAN 3', 'TIMUR SAWAH', 'TUNJUNGAN', 'PEMUKIMAN'];
 function srDusun(s) {
@@ -7063,7 +7255,7 @@ const srOK = s => /sudah|sukses|aktif|berhasil|salur/i.test(s || '') && !/gagal|
 const srGagal = s => /gagal|exclude/i.test(s || '');
 const srTahun = r => { const k = dtPerKey(r); return k ? String(Math.floor(k / 100)) : ''; };
 const srTw = r => { const k = dtPerKey(r); if (!k) return ''; const b = k % 100; return Math.floor(k / 100) + (b ? ' T' + Math.ceil(b / 3) : ''); };
-const srPBI = x => /PBI/i.test(x.prog || x.program || '');
+const srPBI = x => false; /* v257: PBI JK kini bernilai (iuran Rp42.000/jiwa/bulan) bila tercatat */
 const SR_BL = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 /* periode "PKH JUL - SEPT 2026" -> [[202607,1/3],[202608,1/3],[202609,1/3]] (nilai dibagi rata ke bulan periodenya) */
 function srBulan(r) {
@@ -7102,7 +7294,7 @@ VIEWS.sosrekap = async (p, main, alive) => {
   const KL = {}; kl.forEach(k => { KL[k.id] = k; });
   const maxT = dt.reduce((m, d) => d.tgl_cek > m ? d.tgl_cek : m, '');
   const byKel = {}, lepas = [];
-  dt.forEach(d => { if (d.keluarga_id) { const o = byKel[d.keluarga_id]; if (!o || String(d.tgl_cek || '') > String(o.tgl_cek || '')) byKel[d.keluarga_id] = d; } else if (d.tgl_cek === maxT) lepas.push(d); });
+  const lepasK = {}; dt.forEach(d => { if (d.keluarga_id) { const o = byKel[d.keluarga_id]; if (!o || String(d.tgl_cek || '') > String(o.tgl_cek || '')) byKel[d.keluarga_id] = d; } else { const k = siksNm(d.kepala) + '|' + ((String(d.ket || '').match(/No\. KK SIKS ([0-9]+)/) || [])[1] || d.id); const o = lepasK[k]; if (!o || String(d.tgl_cek || '') > String(o.tgl_cek || '')) lepasK[k] = d; } }); lepas.push(...Object.values(lepasK));
   const DT = Object.values(byKel).concat(lepas).map(d => {
     const k = KL[d.keluarga_id];
     return { d, k, id: d.keluarga_id || '', kepala: (k && k.kepala) || d.kepala || '', dusun: srDusun(k ? k.dusun : d.alamat_dtsen) || 'Lainnya', rt: k ? Number(k.rt) || '' : '', rw: k ? Number(k.rw) || '' : '',
@@ -7152,7 +7344,7 @@ VIEWS.sosrekap = async (p, main, alive) => {
     let blK = Object.keys(bln).map(Number).sort((p, q) => p - q);
     if (F.tahun) { const y = Number(F.tahun); blK = Array.from({ length: 12 }, (_, i) => y * 100 + i + 1); } else blK = blK.slice(-12);
     const blMx = Math.max(1, ...blK.map(k => (bln[k] || {}).v || 0));
-    const tren = `<div class="kd-c sr-c"><div class="kd-h"><b class="sr-t">Bansos tersalur per bulan ${F.program ? '· ' + esc(F.program) : ''}</b><span class="meta">nilai berhasil · periode 3 bulan dibagi rata ke bulannya · PBI JK tanpa nilai rupiah</span></div>${blK.some(k => bln[k]) ? `<div class="sr-col">${blK.map(k => { const o = bln[k] || { v: 0, rows: [] }, lb = SR_BL[k % 100 - 1] + (F.tahun ? '' : ' ' + String(Math.floor(k / 100)).slice(2)); return `<button type="button" class="sr-cb" ${o.rows.length ? `data-act="srList" data-k="${reg('Bansos ' + SR_BL[k % 100 - 1] + ' ' + Math.floor(k / 100), 'sl', o.rows)}"` : 'disabled'} title="${esc(lb)}: ${srRpS(Math.round(o.v))}"><i style="height:${o.v ? Math.max(2, o.v / blMx * 100) : 0}%"></i><b>${o.v ? srRpS(Math.round(o.v)) : ''}</b><small>${esc(lb)}</small></button>`; }).join('')}</div>` : '<div class="meta">Belum ada data penyaluran bernilai rupiah.</div>'}</div>`;
+    const tren = `<div class="kd-c sr-c"><div class="kd-h"><b class="sr-t">Bansos tersalur per bulan ${F.program ? '· ' + esc(F.program) : ''}</b><span class="meta">nilai berhasil · periode beberapa bulan dibagi rata ke bulannya</span></div>${blK.some(k => bln[k]) ? `<div class="sr-col">${blK.map(k => { const o = bln[k] || { v: 0, rows: [] }, lb = SR_BL[k % 100 - 1] + (F.tahun ? '' : ' ' + String(Math.floor(k / 100)).slice(2)); return `<button type="button" class="sr-cb" ${o.rows.length ? `data-act="srList" data-k="${reg('Bansos ' + SR_BL[k % 100 - 1] + ' ' + Math.floor(k / 100), 'sl', o.rows)}"` : 'disabled'} title="${esc(lb)}: ${srRpS(Math.round(o.v))}"><i style="height:${o.v ? Math.max(2, o.v / blMx * 100) : 0}%"></i><b>${o.v ? srRpS(Math.round(o.v)) : ''}</b><small>${esc(lb)}</small></button>`; }).join('')}</div>` : '<div class="meta">Belum ada data penyaluran bernilai rupiah.</div>'}</div>`;
     /* hunian */
     const dtH = dtF.filter(x => x.d.h_lantai || x.d.h_dinding || x.d.h_listrik);
     const hun = {}; SR_HUNI.forEach(([l, f]) => { const a = dtH.filter(x => f(x.d)); if (a.length) hun[l] = a; });
@@ -7183,7 +7375,7 @@ VIEWS.sosrekap = async (p, main, alive) => {
         ${kt(nfD(dtA.length), 'KK aktif DTSEN', 'dicek ' + esc(tgl), reg('KK aktif DTSEN', 'kk', dtA), '#3949ab', 'house')}
         ${kt(nfD(d12.length), 'KK desil 1–2', 'sangat miskin', reg('KK desil 1–2', 'kk', d12), '#c62828', 'heart')}
         ${kt(nfD(kpm), 'KPM bansos', 'keluarga penerima ' + esc(F.tahun || ''), reg('Penyaluran berhasil', 'sl', slOk), '#2e7d32', 'users')}
-        ${kt(esc(srRpS(rp)), 'Nilai tersalur', esc(F.tahun || '') + ' · tanpa PBI JK', reg('Penyaluran berhasil (bernilai rupiah)', 'sl', slOk.filter(x => !srPBI(x))), '#00897b', 'coin')}
+        ${kt(esc(srRpS(rp)), 'Nilai tersalur', esc(F.tahun || '') + ' · termasuk iuran PBI JK', reg('Penyaluran berhasil (bernilai rupiah)', 'sl', slOk.filter(x => !srPBI(x))), '#00897b', 'coin')}
         ${kt(nfD(slF.filter(x => x.gagal).length), 'Gagal / exclude', 'transaksi', reg('Transaksi gagal / exclude', 'sl', slF.filter(x => x.gagal)), '#ef6c00', 'x')}
         ${kt(nfD(rnF.length), 'Warga rentan', 'aktif', reg('Warga rentan aktif', 'rn', rnF), '#ad1457', 'heart')}
         ${kt(nfD(usF.filter(r => r.status === 'Draf' || r.status === 'Diusulkan di SIKS-NG').length), 'Usulan diproses', 'draf & diusulkan', reg('Usulan diproses', 'us', usF.filter(r => r.status === 'Draf' || r.status === 'Diusulkan di SIKS-NG')), '#6a1b9a', 'send')}
@@ -7201,7 +7393,7 @@ VIEWS.sosrekap = async (p, main, alive) => {
       <div class="sr-sec">${ic('coin')} Bansos</div>
       <div class="sr-g sr-21">
         ${tren}
-        ${donat('Nilai tersalur per program', prI, srRpS(rp).replace('Rp ', ''), 'tanpa PBI JK', 'sl')}
+        ${donat('Nilai tersalur per program', prI, srRpS(rp).replace('Rp ', ''), 'total tersalur', 'sl')}
       </div>
       <div class="sr-g sr-3">
         ${bars('KPM per program (keluarga)', Object.fromEntries(Object.entries(grp(slOk, x => x.prog)).map(([k, a]) => [k, Object.values(a.reduce((m, x) => (m[x.id || x.r.atas_nama] = m[x.id || x.r.atas_nama] || x, m), {}))])), SK_PROG, '#2e7d32', 'sl')}
@@ -7222,7 +7414,7 @@ VIEWS.sosrekap = async (p, main, alive) => {
   /* --- daftar hasil klik --- */
   const KOL = {
     kk: [['Kepala keluarga', x => x.kepala], ['Dusun', x => x.dusun], ['RT/RW', x => x.rt ? x.rt + '/' + x.rw : ''], ['Desil', x => x.desil], ['Status', x => (x.aktif ? 'Aktif' : 'Tidak aktif') + (x.lepas ? ' · belum terhubung' : x.ragu ? ' · ragu' : '')], ['Perlinsos', x => x.perl]],
-    sl: [['Penerima', x => x.r.p_nama || x.r.atas_nama], ['Dusun', x => x.dusun], ['Program', x => x.prog], ['Periode', x => x.r.periode], ['Nominal', x => srPBI(x) ? 'tanpa nilai (iuran kesehatan)' : x.nom ? nfD(x.nom) : ''], ['Status', x => x.r.status]],
+    sl: [['Penerima', x => x.r.p_nama || x.r.atas_nama], ['Dusun', x => x.dusun], ['Program', x => x.prog], ['Periode', x => x.r.periode], ['Nominal', x => x.nom ? nfD(x.nom) : ''], ['Status', x => x.r.status]],
     rn: [['Nama', r => r.r_nama], ['Dusun', r => srDusun(r.r_alamat) || r.r_alamat], ['RT/RW', r => r.r_rt ? Number(r.r_rt) + '/' + Number(r.r_rw) : ''], ['Kategori', r => r.kategori], ['Desil', r => r.desil]],
     us: [['Nama', r => r.u_nama], ['Dusun', r => srDusun(r.u_alamat) || r.u_alamat], ['Jenis', r => r.jenis], ['Status', r => r.status]]
   };
@@ -9463,7 +9655,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '256', tgl: '2026-11-11', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '257', tgl: '2026-11-12', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
