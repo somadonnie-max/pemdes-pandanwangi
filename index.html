@@ -7067,7 +7067,7 @@ const siksNum = s => String(parseInt(s, 10) || '');
 const siksBd = v => { v = String(v == null ? '' : v).trim(); if (/^(blm|belum)\s*di\s*tentukan$|^belum ditentukan$|^blm ditentukan$/i.test(v)) return 'Belum ditentukan'; return v === '-' ? '' : v; };
 function siksCsv(t) { const rows = []; let row = [], c = '', q = false; t = t.replace(/^﻿/, ''); for (let i = 0; i < t.length; i++) { const ch = t[i]; if (q) { if (ch === '"') { if (t[i + 1] === '"') { c += '"'; i++; } else q = false; } else c += ch; } else if (ch === '"') q = true; else if (ch === ',') { row.push(c); c = ''; } else if (ch === '\n') { row.push(c.replace(/\r$/, '')); rows.push(row); row = []; c = ''; } else c += ch; } if (c || row.length) { row.push(c); rows.push(row); } const H = rows[0] || []; return rows.slice(1).filter(r => r.length > 3).map(r => Object.fromEntries(H.map((h, i) => [h, r[i]]))); }
 function siksLev(a, b) { const m = a.length, n = b.length; if (!m || !n) return Math.max(m, n); let p = [...Array(n + 1).keys()]; for (let i = 1; i <= m; i++) { const c = [i]; for (let j = 1; j <= n; j++) c[j] = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); p = c; } return p[n]; }
-async function siksSemua(e, info) { let o = []; for (let off = 0; ; off += 5000) { if (info) info(e, o.length); const r = await call('list', { entity: e, limit: 5000, offset: off }); o = o.concat(r.rows || []); if (!r.rows || r.rows.length < 5000) break; } return o; }
+async function siksSemua(e, info) { let o = []; const N = 1500; for (let off = 0; ; off += N) { if (info) info(e, o.length); let r; for (let c = 0; ; c++) { try { r = await call('list', { entity: e, limit: N, offset: off }); break; } catch (er) { if (c >= 2) throw er; await new Promise(z => setTimeout(z, 1500)); } } o = o.concat(r.rows || []); if (!r.rows || r.rows.length < N) break; } return o; }
 
 /* v258: format v2 siks_scraper_v2 (data[]: No. KK & NIK lengkap, padan Dukcapil, riwayat PBI per bulan, komponen PKH, perubahan anggota) → bentuk v1 + tambahan */
 const siksRp = s => { const n = String(s == null ? '' : s).replace(/[^\d]/g, ''); return n ? Number(n) : 0; };
@@ -9744,7 +9744,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '258', tgl: '2026-11-13', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '259', tgl: '2026-11-13', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
