@@ -6979,18 +6979,31 @@ function dtKeluargaBaru(x, AG) {
   const rtrw = String(x.alamat_dtsen || '').match(/RT\.?\s*0*(\d+)\D+RW\.?\s*0*(\d+)/i) || [], dus = srDusun(x.alamat_dtsen);
   const p3 = v => v ? String(v).padStart(3, '0') : '';
   const luar = !/^350805/.test(x.kk || '');
-  const m = modal('Tambahkan keluarga baru dari DTSEN', `<div class="stack">
+  const m = modal(/pecah KK/i.test(x.ket || '') ? 'Pecah KK dari DTSEN' : 'Tambahkan keluarga baru dari DTSEN', `<div class="stack">
     <div class="meta">Data diambil dari SIKS-NG (Dukcapil). Periksa dulu, lengkapi yang kosong. Agama & pendidikan belum ada di SIKS-NG — lengkapi nanti di Data Penduduk.${luar ? '<br><b>No. KK ini terbitan luar Desa Pandanwangi</b> (kode wilayah ' + esc(String(x.kk).slice(0, 6)) + '). Tetap ditambahkan bila keluarga ini memang tinggal di desa; status penduduk Aktif.' : ''}</div>
     <div class="form"><div class="f"><label>No. KK</label><input value="${esc(x.kk)}" disabled class="mono"></div><div class="f"><label>Kepala keluarga</label><input id="kbKep" value="${esc(x.kepala || '')}"></div>
     <div class="f"><label>Dusun</label><select id="kbDus">${SR_DUS.map(d => `<option${d === dus ? ' selected' : ''}>DUSUN ${d}</option>`).join('')}</select></div>
     <div class="f"><label>RT</label><input id="kbRt" value="${esc(p3(rtrw[1]))}" inputmode="numeric"></div><div class="f"><label>RW</label><input id="kbRw" value="${esc(p3(rtrw[2]))}" inputmode="numeric"></div></div>
     <div class="lbl">Anggota (${AG.length})</div>
-    ${AG.map((a, i) => `<div class="card stack" style="padding:8px"><label class="chk"><input type="checkbox" data-i="${i}" class="kbAng" checked> <b>${esc(a.nama)}</b> <span class="mono">${esc(a.nik)}</span></label>
+    ${AG.map((a, i) => `<div class="card stack" style="padding:8px"><label class="chk"><input type="checkbox" data-i="${i}" class="kbAng" checked> <b>${esc(a.nama)}</b> <span class="mono">${esc(a.nik)}</span> <span class="pill" id="kbSt${i}">memeriksa…</span></label>
       <div class="form"><div class="f"><label>Hubungan</label><select data-f="hub" data-i="${i}">${OPT.hubungan.map(o => `<option${o === a.hub ? ' selected' : ''}>${o}</option>`).join('')}</select></div>
       <div class="f"><label>Jenis kelamin${a.jk ? '' : ' (wajib)'}</label><select data-f="jk" data-i="${i}"><option value="">–</option>${['LAKI-LAKI', 'PEREMPUAN'].map(o => `<option${o === a.jk ? ' selected' : ''}>${o}</option>`).join('')}</select></div></div>
       <div class="meta">${esc([a.tl, a.tgl ? fDate(a.tgl) : '', a.sk, a.kerja, a.ibu ? 'Ibu: ' + a.ibu : '', a.padan].filter(Boolean).join(' · '))}</div></div>`).join('')}
     <div class="btns"><button class="btn pri" id="kbGo">${ic('check')}Simpan keluarga & anggota</button></div><div id="kbInfo" class="meta"></div></div>`, { big: 1 });
+  /* anggota yang NIK-nya sudah ada di Data Penduduk → dipindah ke KK baru (pecah KK), bukan dibuat baru */
+  const ADA = {}; let siap = false;
+  (async () => {
+    try {
+      for (let i = 0; i < AG.length; i++) {
+        const r = ((await call('list', { entity: 'penduduk', filters: { nik: AG[i].nik }, limit: 2 })).rows || [])[0], el = $('#kbSt' + i, m.el);
+        if (r) { ADA[i] = r; const k = ((await call('list', { entity: 'keluarga', filters: { kk: r.kk }, limit: 1 })).rows || [])[0]; r._kel = k || null; el.className = 'pill warn'; el.textContent = 'dipindah dari KK ' + (k ? k.kepala : r.kk) + (/KEPALA/i.test(r.hubungan || '') ? ' (kepala KK lama!)' : ''); }
+        else { el.className = 'pill info'; el.textContent = 'anggota baru'; }
+      }
+      siap = true;
+    } catch (er) { toast(er.message, 1); }
+  })();
   $('#kbGo', m.el).onclick = async () => {
+    if (!siap) return toast('Tunggu, sedang memeriksa NIK anggota…', 1);
     const info = t => { $('#kbInfo', m.el).textContent = t; }, val = (f, i) => ($(`[data-f="${f}"][data-i="${i}"]`, m.el) || {}).value || '';
     const pilih = [...m.el.querySelectorAll('.kbAng')].filter(c => c.checked).map(c => +c.dataset.i);
     if (!pilih.length) return toast('Pilih minimal satu anggota.', 1);
@@ -7002,15 +7015,16 @@ function dtKeluargaBaru(x, AG) {
       info('Memeriksa NIK & No. KK…');
       const adaK = (await call('list', { entity: 'keluarga', filters: { kk: x.kk }, limit: 2 })).rows || [];
       if (adaK.length) throw new Error('No. KK ini sudah ada di Data Keluarga (' + (adaK[0].kepala || '') + '). Pakai "Hubungkan".');
-      for (const i of pilih) { const r = (await call('list', { entity: 'penduduk', filters: { nik: AG[i].nik }, limit: 2 })).rows || []; if (r.length) throw new Error('NIK ' + AG[i].nama + ' sudah tercatat di Data Penduduk (KK ' + (r[0].kk || '') + '). Periksa dulu, lalu pakai "Hubungkan".'); }
       const W = { w_prov: 'JAWA TIMUR', w_kab: 'KAB. LUMAJANG', w_kec: 'TEMPEH', w_desa: 'PANDANWANGI' }, tgl = x.tgl_cek || isoToday();
       info('Menyimpan Data Keluarga…');
       const kel = await call('save', { entity: 'keluarga', record: Object.assign({ kk: x.kk, kepala: $('#kbKep', m.el).value.trim().toUpperCase() || x.kepala, dusun, rt, rw, alamat: dusun }, W) });
       info('Menyimpan anggota…');
-      const rows = pilih.map(i => { const a = AG[i], pd = /^PADAN/i.test(a.padan || '') ? 'PADAN' : /TIDAK PADAN/i.test(a.padan || '') ? 'TIDAK PADAN' : /BELUM/i.test(a.padan || '') ? 'BELUM DIPADANKAN' : (a.padan ? 'TIDAK DIKETAHUI' : '');
+      const pindah = pilih.filter(i => ADA[i]), baru = pilih.filter(i => !ADA[i]);
+      const rows = baru.map(i => { const a = AG[i], pd = /^PADAN/i.test(a.padan || '') ? 'PADAN' : /TIDAK PADAN/i.test(a.padan || '') ? 'TIDAK PADAN' : /BELUM/i.test(a.padan || '') ? 'BELUM DIPADANKAN' : (a.padan ? 'TIDAK DIKETAHUI' : '');
         return Object.assign({ nik: a.nik, kk: x.kk, nama: a.nama, jk: val('jk', i), hubungan: val('hub', i), tempat_lahir: a.tl || '', tgl_lahir: a.tgl || '', status_kawin: a.sk || '', pekerjaan: a.kerja || '', ibu: a.ibu || '', dusun, rt, rw, alamat_kk: dusun, status: 'Aktif', warga_negara: 'WNI',
           desil: /^\d+$/.test(x.desil || '') ? x.desil : '', status_dtsen: /^AKTIF$/i.test(a.status || '') ? 'Aktif' : (a.status ? 'Tidak aktif' : ''), padan_dk: pd, tgl_padan: pd ? tgl : '', ket: 'Ditambahkan dari DTSEN SIKS-NG (dicek ' + fDate(tgl) + ')' + (luar ? '; No. KK terbitan luar desa' : '') }, W); });
-      const b = await call('bulkSave', { entity: 'penduduk', rows });
+      const mv = pindah.map(i => { const r = ADA[i]; return { id: r.id, kk: x.kk, hubungan: val('hub', i), dusun, rt, rw, alamat_kk: dusun, ket: (r.ket ? r.ket + '\n' : '') + 'Pindah KK (pecah KK) dari ' + (r._kel ? r._kel.kepala + ' ' : '') + 'No. KK ' + r.kk + ' ke ' + x.kk + ' menurut SIKS-NG/Dukcapil (' + fDate(isoToday()) + ')' }; });
+      const b = await call('bulkSave', { entity: 'penduduk', rows: rows.concat(mv) });
       if ((b.gagal || []).length) throw new Error('Sebagian anggota gagal disimpan: ' + b.gagal.map(g => g.pesan || g.error || JSON.stringify(g)).join('; '));
       info('Menautkan DTSEN & penyaluran…');
       await call('save', { entity: 'dtsen', record: { id: x.id, keluarga_id: kel.id, kk: x.kk, ket: String(x.ket || '').replace(/\n?BELUM TERHUBUNG:[^\n]*/, '') + '\nDitambahkan sebagai keluarga baru (' + fDate(isoToday()) + ').' } });
@@ -7019,7 +7033,8 @@ function dtKeluargaBaru(x, AG) {
       const up = SL.map(r => { const p = byNm[siksNm(r.atas_nama)]; return Object.assign({ id: r.id, keluarga_id: kel.id, p_kk: x.kk, p_alamat: dusun, p_rt: rt, p_rw: rw, ket: String(r.ket || '').replace(/\nPenerima belum terhubung ke Data Penduduk/, '') }, p ? { p_penduduk_id: p.id, p_nik: p.nik, p_nama: p.nama } : {}); });
       for (let i = 0; i < up.length; i += 400) await call('bulkSave', { entity: 'penyaluran_bansos', rows: up.slice(i, i + 400) });
       let rn = false; try { rn = await dtsenKeRentan(Object.assign({}, x, { keluarga_id: kel.id, kk: x.kk })); } catch (er) { }
-      m.close(); toast('Keluarga ' + (x.kepala || '') + ' ditambahkan: ' + b.tambah + ' anggota, ' + up.length + ' penyaluran ditautkan' + (rn ? ', masuk Data Rentan' : '') + '.');
+      const lama = [...new Set(pindah.map(i => ADA[i]._kel && ADA[i]._kel.kepala).filter(Boolean))], kepPindah = pindah.some(i => /KEPALA/i.test(ADA[i].hubungan || ''));
+      m.close(); toast('KK ' + (x.kepala && x.kepala !== '-' ? x.kepala : '') + ' dibuat: ' + baru.length + ' anggota baru' + (pindah.length ? ', ' + pindah.length + ' dipindah dari KK ' + lama.join(', ') : '') + (kepPindah ? '. Kepala KK lama ikut pindah — perbarui kepala keluarga KK lama.' : '') + ', ' + up.length + ' penyaluran ditautkan' + (rn ? ', masuk Data Rentan' : '') + '.');
       go('detail', { e: 'keluarga', id: kel.id });
     } catch (er) { info(''); toast(er.message, 1); $('#kbGo', m.el).disabled = false; }
   };
@@ -7027,10 +7042,10 @@ function dtKeluargaBaru(x, AG) {
 async function extraDtsen(x, el) {
   const w = canWrite('dtsen');
   if (x.keluarga_id) { el.insertAdjacentHTML('afterbegin', `<div class="btns"><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'keluarga', id: x.keluarga_id }]))}'>${ic('house')}Buka Data Keluarga</button></div>`); return; }
-  const AG = dtAngSiks(x), bisaBaru = w && canWrite('keluarga') && canWrite('penduduk') && /^\d{16}$/.test(x.kk || '') && AG.length && AG.every(a => /^\d{16}$/.test(a.nik || ''));
-  el.insertAdjacentHTML('afterbegin', `<div class="card stack" style="border:1px solid #e8a400"><div>${ic('mega')} <b>Belum terhubung ke Data Keluarga desa.</b> No. KK dan NIK anggotanya tidak ditemukan di Data Keluarga / Data Penduduk. Bila keluarga ini memang tinggal di desa, pilih <b>Tambahkan sebagai keluarga baru</b>; bila sudah tercatat dengan No. KK lain, pilih <b>Hubungkan</b>.</div>
+  const AG = dtAngSiks(x), bisaBaru = w && canWrite('keluarga') && canWrite('penduduk') && /^\d{16}$/.test(x.kk || '') && AG.length && AG.every(a => /^\d{16}$/.test(a.nik || '')), pecah = /pecah KK/i.test(x.ket || '');
+  el.insertAdjacentHTML('afterbegin', `<div class="card stack" style="border:1px solid #e8a400"><div>${ic('mega')} <b>Belum terhubung ke Data Keluarga desa.</b> ${pecah ? 'No. KK SIKS-NG ini belum ada di Data Keluarga, tetapi sebagian anggotanya masih tercatat di KK lain di desa — <b>kemungkinan pecah KK</b>. Pilih <b>Pecah KK</b> untuk membuat KK baru dan memindahkan anggota itu.' : 'No. KK dan NIK anggotanya tidak ditemukan di Data Keluarga / Data Penduduk. Bila keluarga ini memang tinggal di desa, pilih <b>Tambahkan sebagai keluarga baru</b>; bila sudah tercatat dengan No. KK lain, pilih <b>Hubungkan</b>.'}</div>
     ${AG.length ? `<div class="lbl">Anggota menurut SIKS-NG${x.kk ? ' · No. KK ' + esc(x.kk) : ''}</div>${dtTabel(['Nama', 'Hubungan', 'NIK', 'JK', 'Lahir', 'Padan'], AG.map(a => `<tr><td>${esc(a.nama)}</td><td>${esc(a.hub || '')}</td><td class="mono">${esc(a.nik || a.nik_s || '')}</td><td>${esc(a.jk ? a.jk[0] : '')}</td><td>${esc([a.tl, a.tgl ? fDate(a.tgl) : ''].filter(Boolean).join(', '))}</td><td>${esc(String(a.padan || '').replace(/\s*\(.*$/, ''))}</td></tr>`))}` : ''}
-    ${w ? `<div class="btns">${bisaBaru ? `<button class="btn sm pri" data-act="dtBaru">${ic('plus')}Tambahkan sebagai keluarga baru</button>` : ''}<button class="btn sm${bisaBaru ? '' : ' pri'}" data-act="dtHub">${ic('link')}Hubungkan ke Data Keluarga</button></div>` : ''}</div>`);
+    ${w ? `<div class="btns">${bisaBaru ? `<button class="btn sm pri" data-act="dtBaru">${ic('plus')}${pecah ? 'Pecah KK / pindahkan ke KK baru' : 'Tambahkan sebagai keluarga baru'}</button>` : ''}<button class="btn sm${bisaBaru ? '' : ' pri'}" data-act="dtHub">${ic('link')}Hubungkan ke Data Keluarga</button></div>` : ''}</div>`);
   S.vh.dtBaru = () => dtKeluargaBaru(x, AG);
   S.vh.dtHub = () => {
     const m = sheet('Hubungkan ' + (x.kepala || ''), `<div class="stack"><input id="dhQ" placeholder="Cari nama kepala keluarga…" autocomplete="off" value="${esc(String(x.kepala || '').replace(/^\(.*\)$/, ''))}"><div id="dhL" class="list oplist"></div></div>`, { ikon: 'house' });
@@ -7197,18 +7212,19 @@ function siksCocok(L, K, P, D) {
   for (const m of L) {
     m.kid = ''; m.how = ''; m.ket = '';
     if (!m.name && !(m.j && m.j.no_kk_lengkap)) { m.how = 'KOSONG'; continue; }
-    if (m.j && m.j.no_kk_lengkap && KbyKK[m.j.no_kk_lengkap]) { m.kid = KbyKK[m.j.no_kk_lengkap].id; m.how = 'PASTI'; m.ket = siksNm(KbyKK[m.j.no_kk_lengkap].kepala) === m.name ? '' : 'No. KK sama, kepala di desa ' + KbyKK[m.j.no_kk_lengkap].kepala; continue; }
-    if (m.j && m.j.anggota) { const ks = new Set(m.j.anggota.map(a => a.nik_lengkap && NIKP[a.nik_lengkap]).filter(p => p && KbyKK[p.kk]).map(p => p.kk)); if (ks.size === 1) { const k = KbyKK[[...ks][0]]; m.kid = k.id; m.how = 'PASTI'; m.ket = 'NIK anggota cocok; No. KK di desa beda'; continue; } }
+    if (m.j && m.j.no_kk_lengkap && KbyKK[m.j.no_kk_lengkap]) { m.kid = KbyKK[m.j.no_kk_lengkap].id; m.how = 'PASTI'; m.via = 'KK'; m.ket = siksNm(KbyKK[m.j.no_kk_lengkap].kepala) === m.name ? '' : 'No. KK sama, kepala di desa ' + KbyKK[m.j.no_kk_lengkap].kepala; continue; }
+    if (m.j && m.j.anggota) { const ks = new Set(m.j.anggota.map(a => a.nik_lengkap && NIKP[a.nik_lengkap]).filter(p => p && KbyKK[p.kk]).map(p => p.kk)); if (ks.size === 1) { const k = KbyKK[[...ks][0]]; m.kid = k.id; m.how = 'PASTI'; m.via = 'NIK'; m.nikNm = m.j.anggota.filter(a => a.nik_lengkap && NIKP[a.nik_lengkap] && NIKP[a.nik_lengkap].kk === k.kk).map(a => a.nama); m.ket = 'NIK anggota cocok; No. KK di desa beda'; continue; } }
     /* v262: hanya berkas v2 (No. KK & NIK lengkap) — tanpa tebakan awal No. KK / nama */
     m.how = 'TIDAK ADA'; m.ket = m.j && m.j.no_kk_lengkap ? 'No. KK & NIK anggota tidak ada di Data Keluarga desa' : 'No. KK lengkap tidak ada di berkas';
   }
   /* satu KK desa hanya untuk satu KK SIKS: yang kuat (PASTI/LAMA) menang, sisanya dilepas */
   const grp = {}; L.forEach(m => { if (m.kid) (grp[m.kid] = grp[m.kid] || []).push(m); });
   Object.values(grp).filter(a => a.length > 1).forEach(a => {
-    const kuat = a.filter(m => m.how === 'PASTI' || m.how === 'LAMA');
+    const viaKK = a.filter(m => m.via === 'KK');
+    const kuat = viaKK.length === 1 ? viaKK : a.filter(m => m.how === 'PASTI' || m.how === 'LAMA');
     let keep = kuat.length === 1 ? kuat : (kuat.length > 1 ? kuat : a).filter(m => lokG(KID[m.kid], m));
     if (keep.length !== 1) keep = [kuat[0] || a[0]];
-    a.forEach(m => { if (m !== keep[0]) { m.ket = 'kemungkinan KK ' + KID[m.kid].kepala + ' (sudah dipakai SIKS ' + keep[0].kepala + ')'; m.kid = ''; m.how = 'TIDAK ADA'; } else if (kuat.length > 1 && m.how !== 'LAMA') { m.how = 'RAGU'; m.ket = 'No. KK & nama kembar di SIKS (' + a.length + ' KK), dipilih yang ini'; } });
+    a.forEach(m => { if (m !== keep[0]) { const kd = KID[m.kid]; m.ket = m.via === 'NIK' && keep[0].via === 'KK' ? 'Kemungkinan pecah KK: ' + (m.nikNm || []).join(', ') + ' di desa masih tercatat di KK ' + kd.kepala + ', di SIKS-NG sudah ber-KK sendiri (No. KK baru). Pakai tombol Pecah KK.' : 'kemungkinan KK ' + kd.kepala + ' (sudah dipakai SIKS ' + (keep[0].kepala && keep[0].kepala !== '-' ? keep[0].kepala : 'dengan kepala kosong') + ')'; m.kid = ''; m.how = 'TIDAK ADA'; } else if (kuat.length > 1 && m.how !== 'LAMA') { m.how = 'RAGU'; m.ket = 'No. KK & nama kembar di SIKS (' + a.length + ' KK), dipilih yang ini'; } });
   });
   return { KID, MEM, KbyKK, NIKP };
 }
@@ -9823,7 +9839,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '263', tgl: '2026-11-13', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '264', tgl: '2026-11-13', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
