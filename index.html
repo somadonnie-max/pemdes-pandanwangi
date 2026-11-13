@@ -6974,6 +6974,23 @@ function dtAngSiks(x) {
   if (!L.length) { try { L = JSON.parse(x.anggota || '[]').map(a => ({ nama: String(a.nama || '').toUpperCase(), hub: siksHub(a.hubungan, ''), nik: '', nik_s: a.nik || '', status: a.status || '' })); } catch (e) { L = []; } }
   return L;
 }
+/* v265: KK lama kehilangan kepala (pecah KK) → pilih kepala keluarga baru dari anggota yang tersisa */
+async function kkKepalaBaru(kl, idBaru) {
+  const sisa = urutKK((await call('anggota', { keluarga_id: kl.id }).catch(() => [])) || []).filter(p => !/meninggal|pindah/i.test(p.status || ''));
+  if (!sisa.length) { toast('KK lama ' + (kl.kepala || '') + ' tidak punya anggota lagi. Periksa KK lama (mis. tandai tidak aktif).', 1); go('detail', { e: 'keluarga', id: kl.id }); return; }
+  const m = modal('Kepala keluarga baru — KK lama', `<div class="stack"><div class="meta"><b>${esc(kl.kepala || '')}</b> sudah pindah ke KK baru. Pilih anggota yang menjadi <b>kepala keluarga</b> KK lama (No. KK ${esc(kl.kk || '')}). Nama kepala di Data Keluarga dan hubungan anggota itu otomatis diperbarui.</div>
+    <div class="list oplist">${sisa.map(p => `<button type="button" class="row" data-id="${esc(p.id)}"><span class="main"><span class="t">${esc(p.nama || '')}</span><span class="s">${esc([p.hubungan, p.jk, p.tgl_lahir ? umur(p.tgl_lahir) + ' th' : ''].filter(Boolean).join(' · '))}</span></span></button>`).join('')}</div>
+    <div class="btns"><button class="btn" id="kbLewat">Nanti saja</button></div></div>`, { onClose: () => { if (!m._ok) go('detail', { e: 'keluarga', id: kl.id }); } });
+  $('#kbLewat', m.el).onclick = () => m.close();
+  $('.oplist', m.el).onclick = ev => { const b = ev.target.closest('[data-id]'); if (!b) return; const p = sisa.find(x => x.id === b.dataset.id);
+    tnKonfirm('Jadikan ' + p.nama + ' kepala keluarga KK lama?', async () => {
+      try {
+        await call('save', { entity: 'keluarga', record: { id: kl.id, kepala: p.nama } });
+        await call('save', { entity: 'penduduk', record: { id: p.id, hubungan: 'KEPALA KELUARGA', ket: (p.ket ? p.ket + '\n' : '') + 'Menjadi kepala keluarga menggantikan ' + (kl.kepala || '') + ' (pecah KK, ' + fDate(isoToday()) + ')' } });
+        m._ok = 1; m.close(); toast(p.nama + ' kini kepala keluarga KK lama. Periksa hubungan anggota lainnya bila perlu.'); go('detail', { e: 'keluarga', id: kl.id });
+      } catch (er) { toast(er.message, 1); }
+    }, 'Ya, jadikan kepala'); };
+}
 /* v263: buat Data Keluarga + Data Penduduk dari DTSEN yang belum terhubung, lalu tautkan DTSEN, penyaluran & Data Rentan */
 function dtKeluargaBaru(x, AG) {
   const rtrw = String(x.alamat_dtsen || '').match(/RT\.?\s*0*(\d+)\D+RW\.?\s*0*(\d+)/i) || [], dus = srDusun(x.alamat_dtsen);
@@ -6996,7 +7013,7 @@ function dtKeluargaBaru(x, AG) {
     try {
       for (let i = 0; i < AG.length; i++) {
         const r = ((await call('list', { entity: 'penduduk', filters: { nik: AG[i].nik }, limit: 2 })).rows || [])[0], el = $('#kbSt' + i, m.el);
-        if (r) { ADA[i] = r; const k = ((await call('list', { entity: 'keluarga', filters: { kk: r.kk }, limit: 1 })).rows || [])[0]; r._kel = k || null; el.className = 'pill warn'; el.textContent = 'dipindah dari KK ' + (k ? k.kepala : r.kk) + (/KEPALA/i.test(r.hubungan || '') ? ' (kepala KK lama!)' : ''); }
+        if (r) { ADA[i] = r; const k = ((await call('list', { entity: 'keluarga', filters: { kk: r.kk }, limit: 1 })).rows || [])[0]; r._kel = k || null; el.className = 'pill warn'; el.textContent = 'dipindah dari KK ' + (k ? k.kepala : r.kk) + (/KEPALA/i.test(r.hubungan || '') || (k && siksNm(k.kepala) === siksNm(r.nama)) ? ' (kepala KK lama — nanti pilih kepala baru)' : ''); }
         else { el.className = 'pill info'; el.textContent = 'anggota baru'; }
       }
       siap = true;
@@ -7033,9 +7050,11 @@ function dtKeluargaBaru(x, AG) {
       const up = SL.map(r => { const p = byNm[siksNm(r.atas_nama)]; return Object.assign({ id: r.id, keluarga_id: kel.id, p_kk: x.kk, p_alamat: dusun, p_rt: rt, p_rw: rw, ket: String(r.ket || '').replace(/\nPenerima belum terhubung ke Data Penduduk/, '') }, p ? { p_penduduk_id: p.id, p_nik: p.nik, p_nama: p.nama } : {}); });
       for (let i = 0; i < up.length; i += 400) await call('bulkSave', { entity: 'penyaluran_bansos', rows: up.slice(i, i + 400) });
       let rn = false; try { rn = await dtsenKeRentan(Object.assign({}, x, { keluarga_id: kel.id, kk: x.kk })); } catch (er) { }
-      const lama = [...new Set(pindah.map(i => ADA[i]._kel && ADA[i]._kel.kepala).filter(Boolean))], kepPindah = pindah.some(i => /KEPALA/i.test(ADA[i].hubungan || ''));
-      m.close(); toast('KK ' + (x.kepala && x.kepala !== '-' ? x.kepala : '') + ' dibuat: ' + baru.length + ' anggota baru' + (pindah.length ? ', ' + pindah.length + ' dipindah dari KK ' + lama.join(', ') : '') + (kepPindah ? '. Kepala KK lama ikut pindah — perbarui kepala keluarga KK lama.' : '') + ', ' + up.length + ' penyaluran ditautkan' + (rn ? ', masuk Data Rentan' : '') + '.');
-      go('detail', { e: 'keluarga', id: kel.id });
+      const lama = [...new Set(pindah.map(i => ADA[i]._kel && ADA[i]._kel.kepala).filter(Boolean))], kepPindah = pindah.some(i => ADA[i]._kel && (/KEPALA/i.test(ADA[i].hubungan || '') || siksNm(ADA[i]._kel.kepala) === siksNm(ADA[i].nama)));
+      m.close(); toast('KK ' + (x.kepala && x.kepala !== '-' ? x.kepala : '') + ' dibuat: ' + baru.length + ' anggota baru' + (pindah.length ? ', ' + pindah.length + ' dipindah dari KK ' + lama.join(', ') : '') + (kepPindah ? '. Kepala KK lama ikut pindah — pilih kepala barunya.' : '') + ', ' + up.length + ' penyaluran ditautkan' + (rn ? ', masuk Data Rentan' : '') + '.');
+      /* v265: kepala KK lama ikut pindah → langsung pilih kepala baru KK lama */
+      const kLama = pindah.filter(i => ADA[i]._kel && (/KEPALA/i.test(ADA[i].hubungan || '') || siksNm(ADA[i]._kel.kepala) === siksNm(ADA[i].nama))).map(i => ADA[i]._kel)[0];
+      if (kLama) kkKepalaBaru(kLama, kel.id); else go('detail', { e: 'keluarga', id: kel.id });
     } catch (er) { info(''); toast(er.message, 1); $('#kbGo', m.el).disabled = false; }
   };
 }
@@ -9839,7 +9858,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '264', tgl: '2026-11-13', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '265', tgl: '2026-11-13', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
