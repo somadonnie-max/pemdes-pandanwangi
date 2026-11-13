@@ -6968,10 +6968,70 @@ async function extraKelDtsen(k, el) {
   }
 }
 /** detail DTSEN: hubungkan ke Data Keluarga (untuk baris yang belum cocok) */
+/* v263: anggota SIKS-NG di catatan DTSEN (anggota_dk lengkap bila boleh lihat NIK; selain itu anggota tersamar) */
+function dtAngSiks(x) {
+  let L = []; try { L = JSON.parse(x.anggota_dk || '[]'); } catch (e) { L = []; }
+  if (!L.length) { try { L = JSON.parse(x.anggota || '[]').map(a => ({ nama: String(a.nama || '').toUpperCase(), hub: siksHub(a.hubungan, ''), nik: '', nik_s: a.nik || '', status: a.status || '' })); } catch (e) { L = []; } }
+  return L;
+}
+/* v263: buat Data Keluarga + Data Penduduk dari DTSEN yang belum terhubung, lalu tautkan DTSEN, penyaluran & Data Rentan */
+function dtKeluargaBaru(x, AG) {
+  const rtrw = String(x.alamat_dtsen || '').match(/RT\.?\s*0*(\d+)\D+RW\.?\s*0*(\d+)/i) || [], dus = srDusun(x.alamat_dtsen);
+  const p3 = v => v ? String(v).padStart(3, '0') : '';
+  const luar = !/^350805/.test(x.kk || '');
+  const m = modal('Tambahkan keluarga baru dari DTSEN', `<div class="stack">
+    <div class="meta">Data diambil dari SIKS-NG (Dukcapil). Periksa dulu, lengkapi yang kosong. Agama & pendidikan belum ada di SIKS-NG — lengkapi nanti di Data Penduduk.${luar ? '<br><b>No. KK ini terbitan luar Desa Pandanwangi</b> (kode wilayah ' + esc(String(x.kk).slice(0, 6)) + '). Tetap ditambahkan bila keluarga ini memang tinggal di desa; status penduduk Aktif.' : ''}</div>
+    <div class="form"><div class="f"><label>No. KK</label><input value="${esc(x.kk)}" disabled class="mono"></div><div class="f"><label>Kepala keluarga</label><input id="kbKep" value="${esc(x.kepala || '')}"></div>
+    <div class="f"><label>Dusun</label><select id="kbDus">${SR_DUS.map(d => `<option${d === dus ? ' selected' : ''}>DUSUN ${d}</option>`).join('')}</select></div>
+    <div class="f"><label>RT</label><input id="kbRt" value="${esc(p3(rtrw[1]))}" inputmode="numeric"></div><div class="f"><label>RW</label><input id="kbRw" value="${esc(p3(rtrw[2]))}" inputmode="numeric"></div></div>
+    <div class="lbl">Anggota (${AG.length})</div>
+    ${AG.map((a, i) => `<div class="card stack" style="padding:8px"><label class="chk"><input type="checkbox" data-i="${i}" class="kbAng" checked> <b>${esc(a.nama)}</b> <span class="mono">${esc(a.nik)}</span></label>
+      <div class="form"><div class="f"><label>Hubungan</label><select data-f="hub" data-i="${i}">${OPT.hubungan.map(o => `<option${o === a.hub ? ' selected' : ''}>${o}</option>`).join('')}</select></div>
+      <div class="f"><label>Jenis kelamin${a.jk ? '' : ' (wajib)'}</label><select data-f="jk" data-i="${i}"><option value="">–</option>${['LAKI-LAKI', 'PEREMPUAN'].map(o => `<option${o === a.jk ? ' selected' : ''}>${o}</option>`).join('')}</select></div></div>
+      <div class="meta">${esc([a.tl, a.tgl ? fDate(a.tgl) : '', a.sk, a.kerja, a.ibu ? 'Ibu: ' + a.ibu : '', a.padan].filter(Boolean).join(' · '))}</div></div>`).join('')}
+    <div class="btns"><button class="btn pri" id="kbGo">${ic('check')}Simpan keluarga & anggota</button></div><div id="kbInfo" class="meta"></div></div>`, { big: 1 });
+  $('#kbGo', m.el).onclick = async () => {
+    const info = t => { $('#kbInfo', m.el).textContent = t; }, val = (f, i) => ($(`[data-f="${f}"][data-i="${i}"]`, m.el) || {}).value || '';
+    const pilih = [...m.el.querySelectorAll('.kbAng')].filter(c => c.checked).map(c => +c.dataset.i);
+    if (!pilih.length) return toast('Pilih minimal satu anggota.', 1);
+    if (pilih.some(i => !val('jk', i))) return toast('Jenis kelamin anggota wajib diisi.', 1);
+    const dusun = $('#kbDus', m.el).value, rt = p3($('#kbRt', m.el).value.replace(/\D/g, '')), rw = p3($('#kbRw', m.el).value.replace(/\D/g, ''));
+    if (!rt || !rw) return toast('Isi RT dan RW.', 1);
+    $('#kbGo', m.el).disabled = true;
+    try {
+      info('Memeriksa NIK & No. KK…');
+      const adaK = (await call('list', { entity: 'keluarga', filters: { kk: x.kk }, limit: 2 })).rows || [];
+      if (adaK.length) throw new Error('No. KK ini sudah ada di Data Keluarga (' + (adaK[0].kepala || '') + '). Pakai "Hubungkan".');
+      for (const i of pilih) { const r = (await call('list', { entity: 'penduduk', filters: { nik: AG[i].nik }, limit: 2 })).rows || []; if (r.length) throw new Error('NIK ' + AG[i].nama + ' sudah tercatat di Data Penduduk (KK ' + (r[0].kk || '') + '). Periksa dulu, lalu pakai "Hubungkan".'); }
+      const W = { w_prov: 'JAWA TIMUR', w_kab: 'KAB. LUMAJANG', w_kec: 'TEMPEH', w_desa: 'PANDANWANGI' }, tgl = x.tgl_cek || isoToday();
+      info('Menyimpan Data Keluarga…');
+      const kel = await call('save', { entity: 'keluarga', record: Object.assign({ kk: x.kk, kepala: $('#kbKep', m.el).value.trim().toUpperCase() || x.kepala, dusun, rt, rw, alamat: dusun }, W) });
+      info('Menyimpan anggota…');
+      const rows = pilih.map(i => { const a = AG[i], pd = /^PADAN/i.test(a.padan || '') ? 'PADAN' : /TIDAK PADAN/i.test(a.padan || '') ? 'TIDAK PADAN' : /BELUM/i.test(a.padan || '') ? 'BELUM DIPADANKAN' : (a.padan ? 'TIDAK DIKETAHUI' : '');
+        return Object.assign({ nik: a.nik, kk: x.kk, nama: a.nama, jk: val('jk', i), hubungan: val('hub', i), tempat_lahir: a.tl || '', tgl_lahir: a.tgl || '', status_kawin: a.sk || '', pekerjaan: a.kerja || '', ibu: a.ibu || '', dusun, rt, rw, alamat_kk: dusun, status: 'Aktif', warga_negara: 'WNI',
+          desil: /^\d+$/.test(x.desil || '') ? x.desil : '', status_dtsen: /^AKTIF$/i.test(a.status || '') ? 'Aktif' : (a.status ? 'Tidak aktif' : ''), padan_dk: pd, tgl_padan: pd ? tgl : '', ket: 'Ditambahkan dari DTSEN SIKS-NG (dicek ' + fDate(tgl) + ')' + (luar ? '; No. KK terbitan luar desa' : '') }, W); });
+      const b = await call('bulkSave', { entity: 'penduduk', rows });
+      if ((b.gagal || []).length) throw new Error('Sebagian anggota gagal disimpan: ' + b.gagal.map(g => g.pesan || g.error || JSON.stringify(g)).join('; '));
+      info('Menautkan DTSEN & penyaluran…');
+      await call('save', { entity: 'dtsen', record: { id: x.id, keluarga_id: kel.id, kk: x.kk, ket: String(x.ket || '').replace(/\n?BELUM TERHUBUNG:[^\n]*/, '') + '\nDitambahkan sebagai keluarga baru (' + fDate(isoToday()) + ').' } });
+      const ang = await call('anggota', { keluarga_id: kel.id }).catch(() => []), byNm = {}; (ang || []).forEach(p => { byNm[siksNm(p.nama)] = p; });
+      const SL = (await siksSemua('penyaluran_bansos')).filter(r => !r.keluarga_id && (r.p_kk === x.kk || byNm[siksNm(r.atas_nama)]));
+      const up = SL.map(r => { const p = byNm[siksNm(r.atas_nama)]; return Object.assign({ id: r.id, keluarga_id: kel.id, p_kk: x.kk, p_alamat: dusun, p_rt: rt, p_rw: rw, ket: String(r.ket || '').replace(/\nPenerima belum terhubung ke Data Penduduk/, '') }, p ? { p_penduduk_id: p.id, p_nik: p.nik, p_nama: p.nama } : {}); });
+      for (let i = 0; i < up.length; i += 400) await call('bulkSave', { entity: 'penyaluran_bansos', rows: up.slice(i, i + 400) });
+      let rn = false; try { rn = await dtsenKeRentan(Object.assign({}, x, { keluarga_id: kel.id, kk: x.kk })); } catch (er) { }
+      m.close(); toast('Keluarga ' + (x.kepala || '') + ' ditambahkan: ' + b.tambah + ' anggota, ' + up.length + ' penyaluran ditautkan' + (rn ? ', masuk Data Rentan' : '') + '.');
+      go('detail', { e: 'keluarga', id: kel.id });
+    } catch (er) { info(''); toast(er.message, 1); $('#kbGo', m.el).disabled = false; }
+  };
+}
 async function extraDtsen(x, el) {
   const w = canWrite('dtsen');
   if (x.keluarga_id) { el.insertAdjacentHTML('afterbegin', `<div class="btns"><button class="btn sm" data-act="go" data-go='${esc(JSON.stringify(['detail', { e: 'keluarga', id: x.keluarga_id }]))}'>${ic('house')}Buka Data Keluarga</button></div>`); return; }
-  el.insertAdjacentHTML('afterbegin', `<div class="card stack" style="border:1px solid #e8a400"><div>${ic('mega')} Belum terhubung ke Data Keluarga desa. ${esc(x.ket || '')}</div>${w ? `<button class="btn sm pri" data-act="dtHub" style="align-self:flex-start">${ic('link')}Hubungkan ke Data Keluarga</button>` : ''}</div>`);
+  const AG = dtAngSiks(x), bisaBaru = w && canWrite('keluarga') && canWrite('penduduk') && /^\d{16}$/.test(x.kk || '') && AG.length && AG.every(a => /^\d{16}$/.test(a.nik || ''));
+  el.insertAdjacentHTML('afterbegin', `<div class="card stack" style="border:1px solid #e8a400"><div>${ic('mega')} <b>Belum terhubung ke Data Keluarga desa.</b> No. KK dan NIK anggotanya tidak ditemukan di Data Keluarga / Data Penduduk. Bila keluarga ini memang tinggal di desa, pilih <b>Tambahkan sebagai keluarga baru</b>; bila sudah tercatat dengan No. KK lain, pilih <b>Hubungkan</b>.</div>
+    ${AG.length ? `<div class="lbl">Anggota menurut SIKS-NG${x.kk ? ' · No. KK ' + esc(x.kk) : ''}</div>${dtTabel(['Nama', 'Hubungan', 'NIK', 'JK', 'Lahir', 'Padan'], AG.map(a => `<tr><td>${esc(a.nama)}</td><td>${esc(a.hub || '')}</td><td class="mono">${esc(a.nik || a.nik_s || '')}</td><td>${esc(a.jk ? a.jk[0] : '')}</td><td>${esc([a.tl, a.tgl ? fDate(a.tgl) : ''].filter(Boolean).join(', '))}</td><td>${esc(String(a.padan || '').replace(/\s*\(.*$/, ''))}</td></tr>`))}` : ''}
+    ${w ? `<div class="btns">${bisaBaru ? `<button class="btn sm pri" data-act="dtBaru">${ic('plus')}Tambahkan sebagai keluarga baru</button>` : ''}<button class="btn sm${bisaBaru ? '' : ' pri'}" data-act="dtHub">${ic('link')}Hubungkan ke Data Keluarga</button></div>` : ''}</div>`);
+  S.vh.dtBaru = () => dtKeluargaBaru(x, AG);
   S.vh.dtHub = () => {
     const m = sheet('Hubungkan ' + (x.kepala || ''), `<div class="stack"><input id="dhQ" placeholder="Cari nama kepala keluarga…" autocomplete="off" value="${esc(String(x.kepala || '').replace(/^\(.*\)$/, ''))}"><div id="dhL" class="list oplist"></div></div>`, { ikon: 'house' });
     let tm = null;
@@ -7102,6 +7162,19 @@ function siksDkNilai(f, v, p) {
 }
 const siksSama = (f, a, b) => f === 'status_kawin' ? String(b || '').toUpperCase().startsWith(String(a || '').toUpperCase()) : f === 'nama' || f === 'ibu' || f === 'tempat_lahir' ? siksNm(a) === siksNm(b) : String(a || '').trim().toUpperCase() === String(b || '').trim().toUpperCase();
 
+/* v263: anggota SIKS-NG lengkap (NIK & isian Dukcapil) — disimpan di DTSEN (isian sensitif anggota_dk) untuk "Tambahkan sebagai keluarga baru" */
+const siksHub = (h, jk) => { const t = String(h || '').replace(/[​\s]+/g, ' ').trim().toUpperCase(); if (!t) return ''; if (/ISTRI\/SUAMI|SUAMI\/ISTRI/.test(t)) return /LAKI/.test(jk || '') ? 'SUAMI' : 'ISTRI'; if (/^KEPALA/.test(t)) return 'KEPALA KELUARGA'; if (/ORANG ?TUA/.test(t)) return 'ORANG TUA'; return OPT.hubungan.includes(t) ? t : (/FAMILI/.test(t) ? 'FAMILI LAIN' : 'LAINNYA'); };
+function siksAngDk(j) {
+  return (j.anggota || []).map(a => {
+    const nik = a.nik_lengkap || '', dk = (j.dukcapil || []).find(d => nik && String((d.f || {}).NIK || '') === nik) || (j.dukcapil || []).find(d => siksNm((d.f || {}).Nama) === siksNm(a.nama)) || { f: {} }, f = dk.f || {};
+    const v = (c, fl) => siksDkNilai(fl, f[c], {});
+    const jk = /^(LAKI-LAKI|PEREMPUAN)$/.test(String(f['Jenis Kelamin'] || '').toUpperCase()) ? String(f['Jenis Kelamin']).toUpperCase() : '';
+    const sk = String(f['Status Kawin'] || '').toUpperCase(), skOk = OPT.kawin.includes(sk) ? sk : '';
+    return { nik: /^\d{16}$/.test(nik) ? nik : (/^\d{16}$/.test(f.NIK || '') ? f.NIK : ''), nama: String(a.nama || f.Nama || '').toUpperCase(), hub: siksHub(f['Hubungan Keluarga'], jk) || siksHub(a.hubungan, jk), jk,
+      tl: v('Tempat Lahir', 'tempat_lahir'), tgl: v('Tanggal Lahir', 'tgl_lahir'), sk: skOk, kerja: v('Jenis Pekerjaan', 'pekerjaan'), ibu: v('Nama Ibu Kandung', 'ibu'), padan: dk.padan || '', status: a.status || '' };
+  });
+}
+
 /* gabungkan sumber: baris CSV (semua desil) + keluarga JSON (detail) → daftar KK SIKS */
 function siksGabung(csvRows, jsonKel) {
   const L = [], idx = {};
@@ -7127,7 +7200,7 @@ function siksCocok(L, K, P, D) {
     if (m.j && m.j.no_kk_lengkap && KbyKK[m.j.no_kk_lengkap]) { m.kid = KbyKK[m.j.no_kk_lengkap].id; m.how = 'PASTI'; m.ket = siksNm(KbyKK[m.j.no_kk_lengkap].kepala) === m.name ? '' : 'No. KK sama, kepala di desa ' + KbyKK[m.j.no_kk_lengkap].kepala; continue; }
     if (m.j && m.j.anggota) { const ks = new Set(m.j.anggota.map(a => a.nik_lengkap && NIKP[a.nik_lengkap]).filter(p => p && KbyKK[p.kk]).map(p => p.kk)); if (ks.size === 1) { const k = KbyKK[[...ks][0]]; m.kid = k.id; m.how = 'PASTI'; m.ket = 'NIK anggota cocok; No. KK di desa beda'; continue; } }
     /* v262: hanya berkas v2 (No. KK & NIK lengkap) — tanpa tebakan awal No. KK / nama */
-    m.how = 'TIDAK ADA'; m.ket = m.j && m.j.no_kk_lengkap ? 'No. KK ' + m.j.no_kk_lengkap + ' & NIK anggota tidak ada di Data Keluarga' : 'No. KK lengkap tidak ada di berkas';
+    m.how = 'TIDAK ADA'; m.ket = m.j && m.j.no_kk_lengkap ? 'No. KK & NIK anggota tidak ada di Data Keluarga desa' : 'No. KK lengkap tidak ada di berkas';
   }
   /* satu KK desa hanya untuk satu KK SIKS: yang kuat (PASTI/LAMA) menang, sisanya dilepas */
   const grp = {}; L.forEach(m => { if (m.kid) (grp[m.kid] = grp[m.kid] || []).push(m); });
@@ -7144,7 +7217,7 @@ function siksCocok(L, K, P, D) {
 function siksSusun(L, X, tgl, opt) {
   const { KID, MEM, KbyKK, NIKP } = X.idx, th = tgl.slice(0, 4);
   const DT = [], PU = [], SL = [], LAP = [], KU = [], DK = [], PN = [], KPAD = {}; const PUi = {}; const pu = (id, o) => { if (!PUi[id]) { PUi[id] = { id }; PU.push(PUi[id]); } Object.assign(PUi[id], o); };
-  const dtAda = {}; X.D.forEach(d => { if (d.tgl_cek === tgl) { const kk = ((String(d.ket || '').match(/No\. KK SIKS ([0-9*]+)/) || [])[1] || ''); dtAda[(d.keluarga_id || '') + '|' + siksNm(d.kepala) + '|' + kk.replace(/\*/g, '')] = d.id; if (d.keluarga_id) dtAda['K|' + d.keluarga_id] = d.id; } });
+  const dtAda = {}; X.D.forEach(d => { if (d.tgl_cek === tgl) { const kk = ((String(d.ket || '').match(/No\. KK SIKS ([0-9*]+)/) || [])[1] || ''); dtAda[(d.keluarga_id || '') + '|' + siksNm(d.kepala) + '|' + kk.replace(/\*/g, '')] = d.id; if (d.keluarga_id) dtAda['K|' + d.keluarga_id] = d.id; else if (/^\d{16}$/.test(d.kk || '')) dtAda['KK|' + d.kk] = d.id; } });
   const skey = r => [r.keluarga_id, r.program, siksNm(r.periode), siksNm(r.atas_nama), String(r.nominal || ''), String(r.no_rekening || '')].join('|');
   const slAda = new Map(); X.S.forEach(r => { const k = skey(r); slAda.set(k, (slAda.get(k) || 0) + 1); }); /* hitung jumlah: baris kembar sah (mis. dua kali salur) tetap masuk, impor ulang tidak menggandakan */
   const pbiOrg = {}; X.S.forEach(r => { const mm = String(r.ket || '').match(/PBI bulanan (20\d\d)/); if (mm && r.p_nik) pbiOrg[r.p_nik + '|' + mm[1]] = r.id; });
@@ -7154,14 +7227,15 @@ function siksSusun(L, X, tgl, opt) {
     if (m.how === 'KOSONG') continue;
     const k = m.kid ? KID[m.kid] : null, j = m.j;
     const tag = m.how === 'RAGU' ? 'RAGU: ' + m.ket : (m.how === 'TIDAK ADA' || m.how === 'GANDA') ? 'BELUM TERHUBUNG: ' + m.ket : m.how === 'LAMA' ? m.ket : '';
-    const kkS = j ? (j.no_kk_lengkap || j.no_kk_tersamar) : m.pre + '******';
-    const rec = { keluarga_id: k ? k.id : '', kk: k ? k.kk : '', kepala: m.kepala, alamat_dtsen: m.alamat, desil: /^\d+$/.test(m.desil) ? m.desil : 'Belum ditentukan', status: m.aktif ? 'Aktif' : 'Tidak aktif', tgl_cek: tgl,
+    const kkS = j ? (j.no_kk_tersamar || String(j.no_kk_lengkap || '').slice(0, 10) + '******') : m.pre + '******';
+    const rec = { keluarga_id: k ? k.id : '', kk: k ? k.kk : ((j && j.no_kk_lengkap) || ''), kepala: m.kepala, alamat_dtsen: m.alamat, desil: /^\d+$/.test(m.desil) ? m.desil : 'Belum ditentukan', status: m.aktif ? 'Aktif' : 'Tidak aktif', tgl_cek: tgl,
       ket: ['Impor SIKS-NG ' + fDate(tgl), 'No. KK SIKS ' + kkS, m.perl ? 'Perlinsos: ' + m.perl : '', tag].filter(Boolean).join('\n') };
-    const ada = (k && dtAda['K|' + k.id]) || dtAda[(k ? k.id : '') + '|' + m.name + '|' + kkS.replace(/\*/g, '')];
+    const ada = (k && dtAda['K|' + k.id]) || (!k && rec.kk && dtAda['KK|' + rec.kk]) || dtAda[(k ? k.id : '') + '|' + m.name + '|' + kkS.replace(/\*/g, '')];
     if (ada) rec.id = ada;
     if (j) {
       [j.hunian, j.aset, j.ternak_aset].forEach(g => Object.entries(g || {}).forEach(([a, v]) => { if (SIKS_HM[a]) rec[SIKS_HM[a]] = siksBd(v); }));
       rec.anggota = JSON.stringify((j.anggota || []).map(a => ({ nama: a.nama, hubungan: a.hubungan, nik: a.nik_tersamar, pekerjaan: a.pekerjaan_utama, status: a.status })));
+      rec.anggota_dk = JSON.stringify(siksAngDk(j));
       const mem = k ? (MEM[k.kk] || []) : [];
       for (const a of j.anggota || []) {
         const pre = String(a.nik_tersamar || '').replace(/\D/g, '');
@@ -7218,7 +7292,7 @@ function siksSusun(L, X, tgl, opt) {
       if (opt.bansos) {
         const orang = (an, nik) => { const ag = (j.anggota || []).find(a => siksNm(a.nama) === siksNm(an)); let p = ag && ag._pid ? X.P.find(x => x.id === ag._pid) : null; if (!p && /^\d{16}$/.test(nik || '')) p = X.P.find(x => x.nik === nik) || null; if (!p && k) p = (MEM[k.kk] || []).find(x => siksNm(x.nama) === siksNm(an)) || null; return p; };
         const baris = (h, prog, per, st, nom, ketL) => { const an = String(h.atas_nama || '').toUpperCase(), p = orang(an, h.nik);
-          return { keluarga_id: k ? k.id : '', p_nama: p ? p.nama : an, p_penduduk_id: p ? p.id : '', p_nik: p ? p.nik : (/^\d{16}$/.test(h.nik || '') ? h.nik : ''), p_kk: p ? p.kk : (k ? k.kk : ''), p_alamat: p ? (p.dusun || '') : (k ? k.dusun : ''), p_rt: p ? p.rt : (k ? k.rt : ''), p_rw: p ? p.rw : (k ? k.rw : ''),
+          return { keluarga_id: k ? k.id : '', p_nama: p ? p.nama : an, p_penduduk_id: p ? p.id : '', p_nik: p ? p.nik : (/^\d{16}$/.test(h.nik || '') ? h.nik : ''), p_kk: p ? p.kk : (k ? k.kk : (j.no_kk_lengkap || '')), p_alamat: p ? (p.dusun || '') : (k ? k.dusun : ''), p_rt: p ? p.rt : (k ? k.rt : ''), p_rw: p ? p.rw : (k ? k.rw : ''),
             program: prog, periode: per, penyalur: String(h.penyalur || '').toUpperCase().replace(/^BELUM DITENTUKAN$/, ''), no_kartu: h.no_kartu || '', no_rekening: h.no_rekening || '', atas_nama: an, nominal: nom ? String(nom) : '', status: st || 'Tercatat di SIKS-NG',
             ket: ['Impor Riwayat Bansos SIKS-NG, ' + fDate(tgl)].concat(ketL || [], p ? [] : ['Penerima belum terhubung ke Data Penduduk']).join('\n') }; };
         const pbiDet = (j.pbi_detail || []).length > 0; let pkhI = 0;
@@ -9749,7 +9823,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '262', tgl: '2026-11-13', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '263', tgl: '2026-11-13', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
