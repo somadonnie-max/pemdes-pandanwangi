@@ -6863,7 +6863,7 @@ Object.assign(UI, {
 /* ---------- isian DTSEN menyatu dengan form Keluarga & Penduduk ---------- */
 /* Keluarga: disimpan ke data DTSEN keluarga itu (satu sumber), ditampilkan seperti isian keluarga biasa */
 const DT_KEL = [['dt_desil', 'desil'], ['dt_status', 'status'], ['dt_tgl', 'tgl_cek'], ['dt_alamat', 'alamat_dtsen']];
-const PADAN_OPT = ['PADAN', 'TIDAK PADAN', 'BELUM DIPADANKAN', 'TIDAK DIKETAHUI'];
+const PADAN_OPT = ['PADAN', 'TIDAK PADAN', 'BELUM DIPADANKAN', 'TIDAK DIKETAHUI', 'MENINGGAL (DUKCAPIL)'];
 UI.keluarga.fields.push(
   F('_h_dt', 'DTSEN (SIKS-NG)', 'head', { dtv: 1, hint: 'Isi seperti di SIKS-NG; yang belum ada dikosongkan saja. Desil 1 dan 2 otomatis masuk Data Rentan sebagai keluarga miskin.' }),
   F('dt_desil', 'Desil', 'select', { opt: DT_DESIL, dtv: 1 }), F('dt_status', 'Status DTSEN', 'select', { opt: ['Aktif', 'Tidak aktif'], dtv: 1 }),
@@ -7002,7 +7002,7 @@ function dtKeluargaBaru(x, AG) {
     <div class="f"><label>Dusun</label><select id="kbDus">${SR_DUS.map(d => `<option${d === dus ? ' selected' : ''}>DUSUN ${d}</option>`).join('')}</select></div>
     <div class="f"><label>RT</label><input id="kbRt" value="${esc(p3(rtrw[1]))}" inputmode="numeric"></div><div class="f"><label>RW</label><input id="kbRw" value="${esc(p3(rtrw[2]))}" inputmode="numeric"></div></div>
     <div class="lbl">Anggota (${AG.length})</div>
-    ${AG.map((a, i) => `<div class="card stack" style="padding:8px"><label class="chk"><input type="checkbox" data-i="${i}" class="kbAng" checked> <b>${esc(a.nama)}</b> <span class="mono">${esc(a.nik)}</span> <span class="pill" id="kbSt${i}">memeriksa…</span></label>
+    ${AG.map((a, i) => `<div class="card stack" style="padding:8px"><label class="chk"><input type="checkbox" data-i="${i}" class="kbAng"${/MENINGGAL/i.test(a.padan || '') ? '' : ' checked'}> <b>${esc(a.nama)}</b> <span class="mono">${esc(a.nik)}</span> <span class="pill" id="kbSt${i}">memeriksa…</span></label>
       <div class="form"><div class="f"><label>Hubungan</label><select data-f="hub" data-i="${i}">${OPT.hubungan.map(o => `<option${o === a.hub ? ' selected' : ''}>${o}</option>`).join('')}</select></div>
       <div class="f"><label>Jenis kelamin${a.jk ? '' : ' (wajib)'}</label><select data-f="jk" data-i="${i}"><option value="">–</option>${['LAKI-LAKI', 'PEREMPUAN'].map(o => `<option${o === a.jk ? ' selected' : ''}>${o}</option>`).join('')}</select></div></div>
       <div class="meta">${esc([a.tl, a.tgl ? fDate(a.tgl) : '', a.sk, a.kerja, a.ibu ? 'Ibu: ' + a.ibu : '', a.padan].filter(Boolean).join(' · '))}</div></div>`).join('')}
@@ -7182,7 +7182,7 @@ function siksV2(r) {
     bansos_aktif: (r.bansos_aktif || []).map(b => ({ program: b.PROGRAM || b.program, periode: b.PERIODE || b.periode, nilai_bantuan: siksRp(b['NILAI BANTUAN'] || b.nilai_bantuan), status: b.STATUS || b.status })),
     anggota: (r.anggota || []).map(a => ({ nama: a.nama, hubungan: a.hubungan, nik_tersamar: a.nik, nik_lengkap: /^\d{16}$/.test(a.nik_lengkap || '') ? a.nik_lengkap : '', pekerjaan_utama: a.pekerjaan_utama, status: a.status })),
     hunian: ha.kondisi_perumahan || {}, aset: ha.aset || {}, ternak_aset: ha.ternak_aset || {}, riwayat_bansos: rb, pbi_detail: pbi, pkh_detail: pkh, perubahan: ubah,
-    dukcapil: ((r.dukcapil || {}).anggota || []).map(x => ({ f: x.fields_setelah_padan || x.fields || {}, st: x.status_kolom || {}, padan: x.hasil_padan || '' })) };
+    dukcapil: ((r.dukcapil || {}).anggota || []).map(x => { const mati = !!x.meninggal || /meninggal/i.test((x.pesan || '') + ' ' + (x.catatan || '') + ' ' + (x.hasil_padan || '')); return { f: x.fields_setelah_padan || x.fields || {}, st: x.status_kolom || {}, padan: mati ? 'MENINGGAL DUNIA' : (x.hasil_padan || ''), mati }; }) };
 }
 /* Dukcapil → isian Data Penduduk (hanya kolom berstatus "padan" dan hasil padan PADAN) */
 const SIKS_DK = [['NIK', 'nik'], ['NO KK', 'kk'], ['Nama', 'nama'], ['Nama Ibu Kandung', 'ibu'], ['Tempat Lahir', 'tempat_lahir'], ['Tanggal Lahir', 'tgl_lahir'], ['RT', 'rt'], ['RW', 'rw'], ['Hubungan Keluarga', 'hubungan'], ['Jenis Kelamin', 'jk'], ['Status Kawin', 'status_kawin'], ['Jenis Pekerjaan', 'pekerjaan'], ['Alamat', 'dusun']];
@@ -7285,9 +7285,16 @@ function siksSusun(L, X, tgl, opt) {
       if (opt.dukcapil) for (const dk of j.dukcapil || []) {
         const f = dk.f || {}, nik = String(f.NIK || ''), nama = f.Nama || '';
         const tdk = Object.entries(dk.st || {}).filter(([, v]) => v !== 'padan' && v !== '-').map(([kk]) => kk);
-        const pst = /^PADAN/i.test(dk.padan || '') ? 'PADAN' : /TIDAK PADAN/i.test(dk.padan || '') ? 'TIDAK PADAN' : /BELUM/i.test(dk.padan || '') ? 'BELUM DIPADANKAN' : 'TIDAK DIKETAHUI';
+        const pst = dk.mati ? 'MENINGGAL (DUKCAPIL)' : /^PADAN/i.test(dk.padan || '') ? 'PADAN' : /TIDAK PADAN/i.test(dk.padan || '') ? 'TIDAK PADAN' : /BELUM/i.test(dk.padan || '') ? 'BELUM DIPADANKAN' : 'TIDAK DIKETAHUI';
         padanL.push({ nama, hubungan: f['Hubungan Keluarga'] || '', padan: dk.padan || '', beda: tdk.join(', ') });
         let p = NIKP[nik] || null; if (!p) { const a = (j.anggota || []).find(x => siksNm(x.nama) === siksNm(nama)); if (a && a._pid) p = X.P.find(x => x.id === a._pid) || null; }
+        /* v267: meninggal menurut Dukcapil → status penduduk langsung Meninggal Dunia (tanggal & surat dilengkapi nanti; keputusan pemilik 14 Nov 2026) */
+        if (dk.mati) {
+          if (!p || !p.id) { LAP.push({ jenis: 'Dukcapil: meninggal, tidak ada di Data Penduduk', desil: m.desil, kepala: m.kepala, nama, ket: (f['Hubungan Keluarga'] || '') + ' · tidak ditambahkan' }); continue; }
+          const u0 = { padan_dk: pst, tgl_padan: tgl, padan_ket: '' };
+          if (!/meninggal|pindah/i.test(p.status || '')) { Object.assign(u0, { status: 'Meninggal Dunia', ket: (p.ket ? p.ket + '\n' : '') + 'Meninggal menurut Dukcapil (impor SIKS-NG, dicek ' + fDate(tgl) + '). Tanggal & surat kematian dilengkapi nanti.' }); const kep = /KEPALA/i.test(p.hubungan || '') || (k && siksNm(k.kepala) === siksNm(p.nama)); DK.push({ nama: p.nama, kepala: m.kepala, ubah: 'status → Meninggal Dunia (menurut Dukcapil)' + (kep ? ' · kepala keluarga, perbarui kepala KK' : '') }); LAP.push({ jenis: 'Dukcapil: meninggal → ditandai Meninggal Dunia', desil: m.desil, kepala: m.kepala, nama: p.nama, ket: 'Lengkapi tanggal & surat kematian' + (kep ? '; kepala keluarga — perbarui kepala KK' : '') }); }
+          pu(p.id, u0); continue;
+        }
         if (!p) {
           /* anggota sudah padan Dukcapil tapi belum ada di Data Penduduk → ditambahkan */
           const kt = KbyKK[f['NO KK']] || k;
@@ -9860,7 +9867,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '266', tgl: '2026-11-14', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '267', tgl: '2026-11-14', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
