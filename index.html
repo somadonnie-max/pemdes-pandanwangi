@@ -7291,6 +7291,7 @@ function siksSusun(L, X, tgl, opt) {
         /* v267: meninggal menurut Dukcapil → status penduduk langsung Meninggal Dunia (tanggal & surat dilengkapi nanti; keputusan pemilik 14 Nov 2026) */
         if (dk.mati) {
           if (!p || !p.id) { LAP.push({ jenis: 'Dukcapil: meninggal, tidak ada di Data Penduduk', desil: m.desil, kepala: m.kepala, nama, ket: (f['Hubungan Keluarga'] || '') + ' · tidak ditambahkan' }); continue; }
+          { const a1 = siksNm(p.nama), b1 = siksNm(nama || p.nama); if (b1 && a1 !== b1 && siksLev(a1, b1) > Math.max(2, Math.floor(Math.max(a1.length, b1.length) * 0.25))) { LAP.push({ jenis: 'Dukcapil: meninggal, NIK di desa atas nama lain', desil: m.desil, kepala: m.kepala, nama, ket: 'NIK ini di Data Penduduk atas nama ' + p.nama + ' — tidak diubah, cek NIK' }); continue; } }
           const u0 = { padan_dk: pst, tgl_padan: tgl, padan_ket: '' };
           if (!/meninggal|pindah/i.test(p.status || '')) { Object.assign(u0, { status: 'Meninggal Dunia', ket: (p.ket ? p.ket + '\n' : '') + 'Meninggal menurut Dukcapil (impor SIKS-NG, dicek ' + fDate(tgl) + '). Tanggal & surat kematian dilengkapi nanti.' }); const kep = /KEPALA/i.test(p.hubungan || '') || (k && siksNm(k.kepala) === siksNm(p.nama)); DK.push({ nama: p.nama, kepala: m.kepala, ubah: 'status → Meninggal Dunia (menurut Dukcapil)' + (kep ? ' · kepala keluarga, perbarui kepala KK' : '') }); LAP.push({ jenis: 'Dukcapil: meninggal → ditandai Meninggal Dunia', desil: m.desil, kepala: m.kepala, nama: p.nama, ket: 'Lengkapi tanggal & surat kematian' + (kep ? '; kepala keluarga — perbarui kepala KK' : '') }); }
           pu(p.id, u0); continue;
@@ -9867,7 +9868,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '267', tgl: '2026-11-14', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '268', tgl: '2026-11-14', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
