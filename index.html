@@ -7255,7 +7255,8 @@ function siksSusun(L, X, tgl, opt) {
   const dtAda = {}; X.D.forEach(d => { if (d.tgl_cek === tgl) { const kk = ((String(d.ket || '').match(/No\. KK SIKS ([0-9*]+)/) || [])[1] || ''); dtAda[(d.keluarga_id || '') + '|' + siksNm(d.kepala) + '|' + kk.replace(/\*/g, '')] = d.id; if (d.keluarga_id) dtAda['K|' + d.keluarga_id] = d.id; else if (/^\d{16}$/.test(d.kk || '')) dtAda['KK|' + d.kk] = d.id; } });
   const skey = r => [r.keluarga_id, r.program, siksNm(r.periode), siksNm(r.atas_nama), String(r.nominal || ''), String(r.no_rekening || '')].join('|');
   const slAda = new Map(); X.S.forEach(r => { const k = skey(r); slAda.set(k, (slAda.get(k) || 0) + 1); }); /* hitung jumlah: baris kembar sah (mis. dua kali salur) tetap masuk, impor ulang tidak menggandakan */
-  const pbiOrg = {}; X.S.forEach(r => { const mm = String(r.ket || '').match(/PBI bulanan (20\d\d)/); if (mm && r.p_nik) pbiOrg[r.p_nik + '|' + mm[1]] = r.id; });
+  const pbiOrg = {}; X.S.forEach(r => { const mm = String(r.ket || '').match(/PBI bulanan (20\d\d)/); if (!mm) return; if (r.p_nik) pbiOrg['N|' + r.p_nik + '|' + mm[1]] = r.id; if (r.p_penduduk_id) pbiOrg['P|' + r.p_penduduk_id + '|' + mm[1]] = r.id; pbiOrg['K|' + (r.keluarga_id || '') + '|' + siksNm(r.atas_nama) + '|' + mm[1]] = r.id; }); /* v266: kunci NIK SIKS, penduduk & keluarga+nama — NIK desa bisa beda dengan NIK SIKS */
+  const pbiRun = new Set();
   const pbiAda = {}; X.S.forEach(r => { if (/Ringkasan PBI/.test(r.ket || '')) pbiAda[(r.keluarga_id || siksNm(r.atas_nama)) + '|' + ((String(r.periode).match(/20\d\d/) || [])[0] || '')] = r.id; });
   const usedP = new Set();
   for (const m of L) {
@@ -7351,7 +7352,8 @@ function siksSusun(L, X, tgl, opt) {
             const per = 'PBI JK ' + SIKS_BLN[(akt[0] || ms[0]) - 1] + ((akt.length ? akt[akt.length - 1] : ms[ms.length - 1]) !== (akt[0] || ms[0]) ? ' - ' + SIKS_BLN[(akt.length ? akt[akt.length - 1] : ms[ms.length - 1]) - 1] : '') + ' ' + g.y;
             const r = baris({ atas_nama: g.nama, nik: g.nik }, 'PBI JK', per, akt.length ? 'PBI aktif' : (g.b[ms[ms.length - 1]] || 'PBI tidak aktif'), akt.length * 42000, ['PBI bulanan ' + g.y + ': ' + akt.length + ' bulan aktif × Rp42.000 (' + akt.map(b => SR_BL[b - 1]).join(', ') + ')' + (ms.length > akt.length ? '; tidak aktif: ' + ms.filter(b => akt.indexOf(b) < 0).map(b => SR_BL[b - 1]).join(', ') : '')]);
             r.p_nik = r.p_nik || g.nik;
-            const id = pbiOrg[g.nik + '|' + g.y]; if (id) r.id = id;
+            const id = pbiOrg['N|' + g.nik + '|' + g.y] || pbiOrg['N|' + r.p_nik + '|' + g.y] || (r.p_penduduk_id && pbiOrg['P|' + r.p_penduduk_id + '|' + g.y]) || pbiOrg['K|' + (r.keluarga_id || '') + '|' + siksNm(r.atas_nama) + '|' + g.y]; if (id) r.id = id;
+            const rk = (r.p_penduduk_id || g.nik) + '|' + g.y; if (pbiRun.has(rk)) return; pbiRun.add(rk);
             SL.push(r);
           });
           const sid = pbiAda[(k ? k.id : siksNm(m.kepala)) + '|' + th]; if (sid) SL.push({ id: sid, nominal: '', ket: 'Digantikan rincian PBI per jiwa (impor SIKS-NG ' + fDate(tgl) + ')', status: 'Digantikan rincian per jiwa' });
@@ -9858,7 +9860,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '265', tgl: '2026-11-13', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '266', tgl: '2026-11-14', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
