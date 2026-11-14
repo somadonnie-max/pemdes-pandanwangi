@@ -7290,7 +7290,19 @@ function siksSusun(L, X, tgl, opt) {
         let p = NIKP[nik] || null; if (!p) { const a = (j.anggota || []).find(x => siksNm(x.nama) === siksNm(nama)); if (a && a._pid) p = X.P.find(x => x.id === a._pid) || null; }
         /* v267: meninggal menurut Dukcapil → status penduduk langsung Meninggal Dunia (tanggal & surat dilengkapi nanti; keputusan pemilik 14 Nov 2026) */
         if (dk.mati) {
-          if (!p || !p.id) { LAP.push({ jenis: 'Dukcapil: meninggal, tidak ada di Data Penduduk', desil: m.desil, kepala: m.kepala, nama, ket: (f['Hubungan Keluarga'] || '') + ' · tidak ditambahkan' }); continue; }
+          if (!p || !p.id) {
+            /* v269: tetap dimasukkan ke Data Penduduk sebagai Meninggal Dunia agar riwayat bansosnya tercatat (permintaan pemilik) */
+            const ag = (j.anggota || []).find(x => siksNm(x.nama) === siksNm(nama)) || {}, nk = /^\d{16}$/.test(nik) ? nik : (/^\d{16}$/.test(ag.nik_lengkap || '') ? ag.nik_lengkap : ''), kt = KbyKK[f['NO KK']] || k;
+            const jk = /^(LAKI-LAKI|PEREMPUAN)$/i.test(f['Jenis Kelamin'] || '') ? String(f['Jenis Kelamin']).toUpperCase() : '';
+            if (!p && nk && kt && jk && (nama || ag.nama)) {
+              const rec2 = { nik: nk, kk: kt.kk, nama: String(nama || ag.nama).toUpperCase(), jk, status: 'Meninggal Dunia', tgl_meninggal: '', warga_negara: 'WNI', w_prov: kt.w_prov || '', w_kab: kt.w_kab || '', w_kec: kt.w_kec || '', w_desa: kt.w_desa || '', dusun: kt.dusun || '', alamat_kk: kt.alamat || kt.dusun || '', rt: kt.rt || '', rw: kt.rw || '', desil: /^\d+$/.test(m.desil || '') ? m.desil : '', padan_dk: pst, tgl_padan: tgl,
+                ket: 'Ditambahkan dari DTSEN SIKS-NG sebagai warga meninggal menurut Dukcapil (dicek ' + fDate(tgl) + ') agar riwayat bansos tercatat. Tanggal & surat kematian dilengkapi nanti.' };
+              for (const [col, fld] of SIKS_DK) { if (['nik', 'kk', 'dusun', 'rt', 'rw', 'jk'].includes(fld)) continue; const v = siksDkNilai(fld, f[col], {}); if (v && !/^BELUM DITENTUKAN$/i.test(v)) rec2[fld] = v; }
+              PN.push(rec2); NIKP[nk] = rec2; DK.push({ nama: rec2.nama, kepala: m.kepala, ubah: 'ditambahkan sebagai Meninggal Dunia ke KK ' + kt.kepala + ' (menurut Dukcapil)' });
+              LAP.push({ jenis: 'Dukcapil: meninggal → ditambahkan sebagai Meninggal Dunia', desil: m.desil, kepala: m.kepala, nama: rec2.nama, ket: 'Lengkapi tanggal & surat kematian' }); continue;
+            }
+            LAP.push({ jenis: 'Dukcapil: meninggal, tidak ada di Data Penduduk', desil: m.desil, kepala: m.kepala, nama, ket: (f['Hubungan Keluarga'] || '') + ' · ' + (!kt ? 'KK belum ada di Data Keluarga' : !jk ? 'jenis kelamin kosong' : 'NIK tidak lengkap') + ' — tidak ditambahkan' }); continue;
+          }
           { const a1 = siksNm(p.nama), b1 = siksNm(nama || p.nama); if (b1 && a1 !== b1 && siksLev(a1, b1) > Math.max(2, Math.floor(Math.max(a1.length, b1.length) * 0.25))) { LAP.push({ jenis: 'Dukcapil: meninggal, NIK di desa atas nama lain', desil: m.desil, kepala: m.kepala, nama, ket: 'NIK ini di Data Penduduk atas nama ' + p.nama + ' — tidak diubah, cek NIK' }); continue; } }
           const u0 = { padan_dk: pst, tgl_padan: tgl, padan_ket: '' };
           if (!/meninggal|pindah/i.test(p.status || '')) { Object.assign(u0, { status: 'Meninggal Dunia', ket: (p.ket ? p.ket + '\n' : '') + 'Meninggal menurut Dukcapil (impor SIKS-NG, dicek ' + fDate(tgl) + '). Tanggal & surat kematian dilengkapi nanti.' }); const kep = /KEPALA/i.test(p.hubungan || '') || (k && siksNm(k.kepala) === siksNm(p.nama)); DK.push({ nama: p.nama, kepala: m.kepala, ubah: 'status → Meninggal Dunia (menurut Dukcapil)' + (kep ? ' · kepala keluarga, perbarui kepala KK' : '') }); LAP.push({ jenis: 'Dukcapil: meninggal → ditandai Meninggal Dunia', desil: m.desil, kepala: m.kepala, nama: p.nama, ket: 'Lengkapi tanggal & surat kematian' + (kep ? '; kepala keluarga — perbarui kepala KK' : '') }); }
@@ -9868,7 +9880,7 @@ function dataSayaHtml(x) {
     <div class="meta" style="font-size:11px">Ada yang keliru? Minta Admin untuk mengubahnya.</div></div>`;
 }
 /* ---- Akun: tentang aplikasi, pembuat, privasi ---- */
-const APP_INFO = { ver: '268', tgl: '2026-11-14', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
+const APP_INFO = { ver: '269', tgl: '2026-11-14', nama: 'Soma Romadhoni', jab: 'Kaur Tata Usaha & Umum Desa Pandanwangi', };
 function tentangHtml() {
   const st = S.set || {}, kab = judulKata(st.kabupaten || ''), kec = judulKata(st.kecamatan || '');
   const kantor = ['Kantor Desa ' + ND(), st.alamat, kec ? 'Kec. ' + kec : '', kab ? 'Kab. ' + kab : '', st.kode_pos].filter(Boolean).join(', ');
